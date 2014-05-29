@@ -18,5 +18,7 @@ trackerdash.views.InfoPane = Backbone.View.extend({
             ranTracks: this.ranTracks,
             totalTracks: this.totalTracks
         }));
+
+        new trackerdash.views.StatusBarWidget({});
     }
 });

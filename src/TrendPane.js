@@ -17,6 +17,7 @@ trackerdash.views.TrendPane = Backbone.View.extend({
             this.fail[i] = {x: i, y: this.fail[i]};
         }
 
+        // Return the chart data
         return [{
             values: this.success,
             key: 'Success',
