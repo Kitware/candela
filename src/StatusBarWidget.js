@@ -36,7 +36,7 @@ trackerdash.views.StatusBarWidget = Backbone.View.extend({
             .text(successPercent + '%')
             .attr('x', (unitWidth * this.success)/2)
             .attr('y', textHeight)
-            .attr("fill", "white")
+            .attr('fill', 'white')
             .attr('class', 'status-bar-label');
 
         var badGroup = svg.append('g');
@@ -49,7 +49,7 @@ trackerdash.views.StatusBarWidget = Backbone.View.extend({
             .text(badPercent + '%')
             .attr('x', badStart + (unitWidth * this.bad)/2)
             .attr('y', textHeight)
-            .attr("fill", "white")
+            .attr('fill', 'white')
             .attr('class', 'status-bar-label');
 
         var failGroup = svg.append('g');
@@ -62,7 +62,7 @@ trackerdash.views.StatusBarWidget = Backbone.View.extend({
             .text(failPercent + '%')
             .attr('x', failStart + (unitWidth * this.fail)/2)
             .attr('y', textHeight)
-            .attr("fill", "white")
+            .attr('fill', 'white')
             .attr('class', 'status-bar-label');
     },
 

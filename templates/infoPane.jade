@@ -1,5 +1,9 @@
-.info-title Trackerdash Testing Peformance
-.info-branch Current Branch: #{branch}
-.info-datasets Ran on #{ranDatasets} of #{totalDatasets} datasets
-.info-tracks With total distance #{ranTracks} of #{totalTracks}
+.info-title Trackerdash Testing Peformance for #{day}
+.info-branch.info-section Current Branch: #{branch}
+.info-datasets.info-section Ran on #{ranDatasets} of #{totalDatasets} datasets
+.info-tracks.info-section With total distance #{ranTracks} of #{totalTracks}
+.info-section
+  span.info-success.info-subsection Success: #{success}
+  span.info-bad.info-subsection Bad: #{bad}
+  span.info-fail.info-subsection Fail: #{fail}
 .status-bar-widget

@@ -1,0 +1,18 @@
+table.table.table-striped.table-hover.table-bordered
+  thead.result-labels
+    td Dataset
+    td ALGA
+    td Sparse
+    td BA
+    td Track Length
+  tbody
+    each dataset in datasets
+      tr
+        td(id="#{dataset.name}-name") #{dataset.name}
+        td.bullet-container(id="#{dataset.name}-alga")
+          svg
+        td.bullet-container(id="#{dataset.name}-sparse")
+          svg
+        td.bullet-container(id="#{dataset.name}-ba")
+          svg
+        td(id="#{dataset.name}-length") #{dataset.length}
