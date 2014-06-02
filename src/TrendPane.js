@@ -2,9 +2,16 @@ trackerdash.views.TrendPane = Backbone.View.extend({
     el: '.trend-pane',
 
     initialize: function (settings) {
-        this.success = settings.success || [5, 2, 2, 5, 9];
-        this.bad = settings.bad || [2, 1, 2, 3, 0];
-        this.fail = settings.fail || [2, 6, 2, 2, 0];
+        this.success = [];
+        this.bad = [];
+        this.fail = [];
+        this.xLabels = [];
+        _.each(settings.trend, _.bind(function (curTrend) {
+            this.success.push(curTrend.success);
+            this.bad.push(curTrend.bad);
+            this.fail.push(curTrend.fail);
+            this.xLabels.push(curTrend.date);
+        }, this));
         this.render();
     },
 
@@ -42,8 +49,8 @@ trackerdash.views.TrendPane = Backbone.View.extend({
               ;
 
             chart.xAxis
-              .axisLabel('Time (Days)')
-              .tickFormat(d3.format(',r'))
+              .axisLabel('Date')
+              .tickFormat(_.bind(function (d) {return this.xLabels[d].slice(5);}, this))
               ;
 
             chart.yAxis

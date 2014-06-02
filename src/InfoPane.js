@@ -5,12 +5,12 @@ trackerdash.views.InfoPane = Backbone.View.extend({
         this.branch = settings.branch || 'master';
         this.day = settings.day || this.getToday();
         this.totalDatasets = settings.totalDatasets || 0;
-        this.ranTracks = settings.ranTracks || 0;
-        this.totalTracks = settings.totalTracks || 0;
-        this.success = settings.success || 0;
-        this.bad = settings.bad || 0;
-        this.fail = settings.fail || 0;
-        this.ranDatasets = this.success + this.bad + this.fail;
+        this.ranDistance = settings.ranDistance || 0;
+        this.totalDistance = settings.totalDistance || 0;
+        this.numSuccess = settings.numSuccess || 0;
+        this.numBad = settings.numBad || 0;
+        this.numFail = settings.numFail || 0;
+        this.ranDatasets = this.numSuccess + this.numBad + this.numFail;
         this.render();
     },
 
@@ -37,13 +37,17 @@ trackerdash.views.InfoPane = Backbone.View.extend({
             day: this.day,
             ranDatasets: this.ranDatasets,
             totalDatasets: this.totalDatasets,
-            ranTracks: this.ranTracks,
-            totalTracks: this.totalTracks,
-            success: this.success,
-            bad: this.bad,
-            fail: this.fail
+            ranDistance: this.ranDistance,
+            totalDistance: this.totalDistance,
+            numSuccess: this.numSuccess,
+            numBad: this.numBad,
+            numFail: this.numFail
         }));
 
-        new trackerdash.views.StatusBarWidget({});
+        new trackerdash.views.StatusBarWidget({
+            numSuccess: this.numSuccess,
+            numBad: this.numBad,
+            numFail: this.numFail
+        });
     }
 });
