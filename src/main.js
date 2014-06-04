@@ -1,6 +1,6 @@
 // When all scripts are loaded, we invoke the application
 $(function () {
-    $('body').trackerdash({
+    $('.dash-container').trackerdash({
         day: '2014-06-03',
         branch: 'master',
         trend: [{

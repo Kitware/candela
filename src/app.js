@@ -3,6 +3,7 @@ trackerdash.App = Backbone.View.extend({
 
     initialize: function (settings) {
         this.trackData = settings;
+        delete this.trackData.el;
         this.render();
     },
 

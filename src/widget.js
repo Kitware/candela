@@ -1,7 +1,10 @@
 (function ($) {
 
     $.fn.trackerdash = function( options ) {
-        var app = new trackerdash.App(options);
+        var settings = $.extend({
+            el: this.selector
+        }, options );
+        var app = new trackerdash.App(settings);
         return this;
     };
 
