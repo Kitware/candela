@@ -4,10 +4,6 @@ trackerdash.App = Backbone.View.extend({
     initialize: function (settings) {
         this.trackData = settings;
         this.render();
-
-        Backbone.history.start({
-            pushState: false
-        });
     },
 
     render: function () {

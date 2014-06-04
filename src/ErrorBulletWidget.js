@@ -11,19 +11,27 @@ trackerdash.views.ErrorBulletWidget = Backbone.View.extend({
 
     getChartData: function () {
         return {
-            "ranges": [this.result.fail, this.result.mean, this.result.warning],
+            "ranges":
+                [50, this.result.fail, this.result.warning, this.result.target],
             "measures": [this.result.current],
-            "markers": [this.result.target],
-            "rangeLabels": ['Failing Range', 'Mean', 'Warning Range'],
+            "markers": [this.result.target, this.result.mean],
+            "rangeLabels": ['', 'Failing', 'Warning', 'Target'],
             "measureLabels": ['Current Error %'],
-            "markerLabels": ['Target Error %']
+            "markerLabels": ['Target Error %', 'Mean Error %']
         };
     },
 
     createChart: function () {
         nv.addGraph(_.bind(function() {
-            var chart = nv.models.bulletChart();
-            chart.margin({top: 5, right: 20, bottom: 20, left: 20});
+            var chart = nv.models.bulletChart()
+              .orient('right')
+              .margin({top: 5, right: 20, bottom: 20, left: 20});
+
+            if (this.result.current > this.result.fail) {
+                chart.color('rgb(204, 0, 0)');
+            } else if (this.result.current > this.result.warning) {
+                chart.color('rgb(241, 194, 50)');
+            }
 
             d3.select(this.el)
               .datum(this.getChartData())

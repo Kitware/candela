@@ -1,6 +1,6 @@
 // When all scripts are loaded, we invoke the application
 $(function () {
-    var app = new trackerdash.App({
+    $('body').trackerdash({
         day: '2014-06-03',
         branch: 'master',
         trend: [{
@@ -53,6 +53,7 @@ $(function () {
         percentErrorByDataset: [{
             dataset: 'dataset0',
             metric: 'alga',
+            length: 300,
             mean: 11,
             current: 5,
             target: 7,
@@ -61,6 +62,7 @@ $(function () {
         }, {
             dataset: 'dataset0',
             metric: 'sparse',
+            length: 300,
             mean: 11,
             current: 5,
             target: 7,
@@ -69,6 +71,7 @@ $(function () {
         }, {
             dataset: 'dataset0',
             metric: 'ba',
+            length: 300,
             mean: 11,
             current: 5,
             target: 7,
@@ -77,6 +80,7 @@ $(function () {
         }, {
             dataset: 'dataset1',
             metric: 'alga',
+            length: 300,
             mean: 11,
             current: 5,
             target: 7,
@@ -85,14 +89,16 @@ $(function () {
         }, {
             dataset: 'dataset1',
             metric: 'sparse',
-            mean: 11,
-            current: 5,
+            length: 300,
+            mean: 15,
+            current: 14,
             target: 7,
             warning: 10,
             fail: 25
         }, {
             dataset: 'dataset1',
             metric: 'ba',
+            length: 300,
             mean: 11,
             current: 5,
             target: 7,
@@ -101,6 +107,7 @@ $(function () {
         }, {
             dataset: 'dataset2',
             metric: 'alga',
+            length: 300,
             mean: 11,
             current: 5,
             target: 7,
@@ -109,6 +116,7 @@ $(function () {
         }, {
             dataset: 'dataset2',
             metric: 'sparse',
+            length: 300,
             mean: 11,
             current: 5,
             target: 7,
@@ -117,6 +125,7 @@ $(function () {
         }, {
             dataset: 'dataset2',
             metric: 'ba',
+            length: 300,
             mean: 11,
             current: 5,
             target: 7,
@@ -125,6 +134,7 @@ $(function () {
         }, {
             dataset: 'dataset3',
             metric: 'alga',
+            length: 300,
             mean: 11,
             current: 28,
             target: 7,
@@ -133,6 +143,7 @@ $(function () {
         }, {
             dataset: 'dataset3',
             metric: 'sparse',
+            length: 300,
             mean: 11,
             current: 5,
             target: 7,
@@ -141,6 +152,7 @@ $(function () {
         }, {
             dataset: 'dataset3',
             metric: 'ba',
+            length: 300,
             mean: 11,
             current: 5,
             target: 7,

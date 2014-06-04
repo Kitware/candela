@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git@github.com/Trackerdash.git"
+    "url": "https://github.com/Trackerdash/trackerdash"
   },
   "dependencies": {
     "backbone": "~1.1.2",

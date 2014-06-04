@@ -62,7 +62,7 @@ module.exports = function (grunt) {
         stylus: {
             core: {
                 files: {
-                    'dist/app.min.css': [
+                    'dist/trackerdash.min.css': [
                         'styles/*.styl',
                     ],
                 }
@@ -83,16 +83,20 @@ module.exports = function (grunt) {
             },
             app: {
                 files: {
-                    'dist/app.min.js': [
+                    'dist/trackerdash.min.js': [
                         'build/templates.js',
                         'src/init.js',
-                        'src/**/*.js'
+                        'src/**/*.js',
+                        '!src/main.js'
+                    ],
+                    'dist/main.min.js': [
+                        'src/main.js'
                     ]
                 }
             },
             libs: {
                 files: {
-                    'dist/libs.min.js': [
+                    'dist/trackerdash.libs.min.js': [
                         'node_modules/jquery-browser/lib/jquery.js',
                         'node_modules/jade/runtime.js',
                         'node_modules/underscore/underscore.js',
