@@ -33,6 +33,10 @@ The library file, `trackerdash.libs.min.js` packages D3, NVD3, Backbone,
 Underscore, and JQuery. It is probably best to include this libraries separately
 if they are used in other areas of your application.
 
+### Usage
+
+For usage instructions see `src/main.js`.
+
 ### Important Changes
 
 The version of `nv.d3.js` included in this repository has been modified from
