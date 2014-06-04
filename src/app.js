@@ -14,6 +14,6 @@ trackerdash.App = Backbone.View.extend({
         this.$el.html(jade.templates.layout());
         new trackerdash.views.InfoPane(this.trackData);
         new trackerdash.views.TrendPane(this.trackData);
-        new trackerdash.views.ResultTablePane({});
+        new trackerdash.views.ResultTablePane(this.trackData);
     }
 });

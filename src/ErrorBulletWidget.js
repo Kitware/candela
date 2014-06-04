@@ -1,18 +1,22 @@
 trackerdash.views.ErrorBulletWidget = Backbone.View.extend({
 
     initialize: function (settings) {
-        this.ranges = settings.ranges || [5, 10, 25];
-        this.measures = settings.measures || [7];
-        this.markers = settings.markers || [11];
+        this.result = settings.result;
+        if (this.result === undefined) {
+            console.error('No result passed to error bullet.');
+        }
         this.render();
         $(window).on("resize", _.bind(this.createChart, this));
     },
 
     getChartData: function () {
         return {
-            "ranges": this.ranges,
-            "measures": this.measures,
-            "markers": this.markers,
+            "ranges": [this.result.fail, this.result.mean, this.result.warning],
+            "measures": [this.result.current],
+            "markers": [this.result.target],
+            "rangeLabels": ['Failing Range', 'Mean', 'Warning Range'],
+            "measureLabels": ['Current Error %'],
+            "markerLabels": ['Target Error %']
         };
     },
 
@@ -23,7 +27,7 @@ trackerdash.views.ErrorBulletWidget = Backbone.View.extend({
 
             d3.select(this.el)
               .datum(this.getChartData())
-              .transition().duration(200)
+              .transition().duration(100)
               .call(chart)
             ;
 

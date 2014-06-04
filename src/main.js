@@ -53,6 +53,7 @@ $(function () {
         percentErrorByDataset: [{
             dataset: 'dataset0',
             metric: 'alga',
+            mean: 11,
             current: 5,
             target: 7,
             warning: 10,
@@ -60,6 +61,7 @@ $(function () {
         }, {
             dataset: 'dataset0',
             metric: 'sparse',
+            mean: 11,
             current: 5,
             target: 7,
             warning: 10,
@@ -67,6 +69,7 @@ $(function () {
         }, {
             dataset: 'dataset0',
             metric: 'ba',
+            mean: 11,
             current: 5,
             target: 7,
             warning: 10,
@@ -74,6 +77,7 @@ $(function () {
         }, {
             dataset: 'dataset1',
             metric: 'alga',
+            mean: 11,
             current: 5,
             target: 7,
             warning: 10,
@@ -81,6 +85,7 @@ $(function () {
         }, {
             dataset: 'dataset1',
             metric: 'sparse',
+            mean: 11,
             current: 5,
             target: 7,
             warning: 10,
@@ -88,6 +93,7 @@ $(function () {
         }, {
             dataset: 'dataset1',
             metric: 'ba',
+            mean: 11,
             current: 5,
             target: 7,
             warning: 10,
@@ -95,6 +101,7 @@ $(function () {
         }, {
             dataset: 'dataset2',
             metric: 'alga',
+            mean: 11,
             current: 5,
             target: 7,
             warning: 10,
@@ -102,6 +109,7 @@ $(function () {
         }, {
             dataset: 'dataset2',
             metric: 'sparse',
+            mean: 11,
             current: 5,
             target: 7,
             warning: 10,
@@ -109,6 +117,7 @@ $(function () {
         }, {
             dataset: 'dataset2',
             metric: 'ba',
+            mean: 11,
             current: 5,
             target: 7,
             warning: 10,
@@ -116,13 +125,15 @@ $(function () {
         }, {
             dataset: 'dataset3',
             metric: 'alga',
-            current: 5,
+            mean: 11,
+            current: 28,
             target: 7,
             warning: 10,
             fail: 25
         }, {
             dataset: 'dataset3',
             metric: 'sparse',
+            mean: 11,
             current: 5,
             target: 7,
             warning: 10,
@@ -130,6 +141,7 @@ $(function () {
         }, {
             dataset: 'dataset3',
             metric: 'ba',
+            mean: 11,
             current: 5,
             target: 7,
             warning: 10,
