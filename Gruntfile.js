@@ -97,9 +97,9 @@ module.exports = function (grunt) {
                         'node_modules/jade/runtime.js',
                         'node_modules/underscore/underscore.js',
                         'node_modules/backbone/backbone.js',
-                        'libs/bootstrap.min.js',
-                        'libs/d3.min.js',
-                        'libs/nv.d3.min.js'
+                        'libs/bootstrap.js',
+                        'libs/d3.js',
+                        'libs/nv.d3.js'
                     ]
                 }
             }
