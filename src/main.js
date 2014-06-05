@@ -47,9 +47,6 @@ $(function () {
         totalDatasets: 15,
         totalDistance: 1243,
         distanceRun: 988,
-        numSuccess: 8,
-        numBad: 1,
-        numFail: 1,
         percentErrorByDataset: [{
             dataset: 'dataset0',
             metric: 'alga',

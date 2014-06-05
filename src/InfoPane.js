@@ -7,9 +7,20 @@ trackerdash.views.InfoPane = Backbone.View.extend({
         this.totalDatasets = settings.totalDatasets || 0;
         this.ranDistance = settings.ranDistance || 0;
         this.totalDistance = settings.totalDistance || 0;
-        this.numSuccess = settings.numSuccess || 0;
-        this.numBad = settings.numBad || 0;
-        this.numFail = settings.numFail || 0;
+
+        this.numSuccess = 0;
+        this.numBad = 0;
+        this.numFail = 0;
+        _.each(settings.percentErrorByDataset, _.bind(function (dataset) {
+            if (dataset.current >= dataset.fail) {
+                this.numFail++;
+            } else if (dataset.current >= dataset.warning) {
+                this.numBad++;
+            } else {
+                this.numSuccess++;
+            }
+        }, this));
+
         this.ranDatasets = this.numSuccess + this.numBad + this.numFail;
         this.render();
     },
