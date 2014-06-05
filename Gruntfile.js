@@ -97,7 +97,7 @@ module.exports = function (grunt) {
             libs: {
                 files: {
                     'dist/trackerdash.libs.min.js': [
-                        'node_modules/jquery-browser/lib/jquery.js',
+                        //'node_modules/jquery-browser/lib/jquery.js',
                         'node_modules/jade/runtime.js',
                         'node_modules/underscore/underscore.js',
                         'node_modules/backbone/backbone.js',
