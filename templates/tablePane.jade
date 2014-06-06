@@ -12,10 +12,10 @@ table.table.table-striped.table-hover.table-bordered
     each resultSet in resultsByDataset
       tr
         td(id="#{resultSet[0].dataset}-name") #{resultSet[0].dataset}
-        td.bullet-container(id="#{resultSet[0].dataset}-alga")
+        td.bullet-container(id="#{resultSet[0].id}-alga")
           svg
-        td.bullet-container(id="#{resultSet[0].dataset}-sparse")
+        td.bullet-container(id="#{resultSet[0].id}-sparse")
           svg
-        td.bullet-container(id="#{resultSet[0].dataset}-ba")
+        td.bullet-container(id="#{resultSet[0].id}-ba")
           svg
         td(id="#{resultSet[0].dataset}-length") #{resultSet[0].length}

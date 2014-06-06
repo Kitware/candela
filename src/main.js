@@ -48,7 +48,7 @@ $(function () {
         totalDistance: 1243,
         distanceRun: 988,
         percentErrorByDataset: [{
-            dataset: 'dataset0',
+            dataset: 'dataset0.jpg',
             metric: 'alga',
             length: 300,
             mean: 11,
@@ -57,7 +57,7 @@ $(function () {
             warning: 10,
             fail: 25
         }, {
-            dataset: 'dataset0',
+            dataset: 'dataset0.jpg',
             metric: 'sparse',
             length: 300,
             mean: 11,
@@ -66,7 +66,7 @@ $(function () {
             warning: 10,
             fail: 25
         }, {
-            dataset: 'dataset0',
+            dataset: 'dataset0.jpg',
             metric: 'ba',
             length: 300,
             mean: 11,
