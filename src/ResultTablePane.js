@@ -11,6 +11,11 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
 
     render: function () {
 
+        _.each(this.results, function (result) {
+            result.id = result.dataset.replace(".","_");
+        });
+        console.log(this.results);
+
         var resultsByDataset = _.groupBy(this.results, function (result) {
             return result.dataset;
         });
@@ -22,7 +27,7 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
         this.$el.promise().done(_.bind(function () {
             _.each(this.results, function (result) {
                 new trackerdash.views.ErrorBulletWidget({
-                    el: '#' + result.dataset + '-' + result.metric + ' svg',
+                    el: '#' + result.id + '-' + result.metric + ' svg',
                     result: result
                 });
             });
