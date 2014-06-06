@@ -12,7 +12,7 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
     render: function () {
 
         _.each(this.results, function (result) {
-            result.id = result.dataset.replace(".","_");
+            result.id = result.dataset.replace(/\./g, "_");
         });
 
         var resultsByDataset = _.groupBy(this.results, function (result) {
