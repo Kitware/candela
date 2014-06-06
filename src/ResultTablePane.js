@@ -14,7 +14,6 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
         _.each(this.results, function (result) {
             result.id = result.dataset.replace(".","_");
         });
-        console.log(this.results);
 
         var resultsByDataset = _.groupBy(this.results, function (result) {
             return result.dataset;
