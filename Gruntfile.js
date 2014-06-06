@@ -72,6 +72,13 @@ module.exports = function (grunt) {
         copy: {
             main: {
                 files: [{expand: true, flatten: true, src: ['libs/*.css'], dest: 'dist/', filter: 'isFile'}]
+            },
+            jquery: {
+                files: [{expand: true,
+                    flatten: true,
+                    src: ['node_modules/jquery-browser/lib/jquery.js'],
+                    dest: 'dist/',
+                    filter: 'isFile'}]
             }
         },
 
@@ -97,7 +104,6 @@ module.exports = function (grunt) {
             libs: {
                 files: {
                     'dist/trackerdash.libs.min.js': [
-                        //'node_modules/jquery-browser/lib/jquery.js',
                         'node_modules/jade/runtime.js',
                         'node_modules/underscore/underscore.js',
                         'node_modules/backbone/backbone.js',
