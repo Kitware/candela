@@ -155,6 +155,10 @@ $(function () {
             target: 7,
             warning: 10,
             fail: 25
-        }]
+        }],
+        datasetMap: {
+            'dataset3': 'http://www.trackerdash.com',
+            'dataset2': function () { alert('dataset 2'); }
+        }
     });
 });

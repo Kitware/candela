@@ -9,13 +9,19 @@ table.table.table-striped.table-hover.table-bordered
       abbr(title="Bundle Adjustment") BA
     td Trajectory Length
   tbody
-    each resultSet in resultsByDataset
+    each resultSet in resultsByDatasetId
       tr
-        td(id="#{resultSet[0].dataset}-name") #{resultSet[0].dataset}
+        td(id="#{resultSet[0].id}-name")
+          if typeof(datasetMap[resultSet[0].dataset]) === 'string'
+            a(href="#{datasetMap[resultSet[0].dataset]}") #{resultSet[0].dataset}
+          else if typeof(datasetMap[resultSet[0].dataset]) === 'function'
+            a(href="javascript:;", id="#{resultSet[0].id}-link") #{resultSet[0].dataset}
+          else
+            | #{resultSet[0].dataset}
         td.bullet-container(id="#{resultSet[0].id}-alga")
           svg
         td.bullet-container(id="#{resultSet[0].id}-sparse")
           svg
         td.bullet-container(id="#{resultSet[0].id}-ba")
           svg
-        td(id="#{resultSet[0].dataset}-length") #{resultSet[0].length}
+        td(id="#{resultSet[0].id}-length") #{resultSet[0].length}
