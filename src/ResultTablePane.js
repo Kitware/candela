@@ -30,10 +30,19 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
         this.$el.promise().done(_.bind(function () {
 
             _.each(this.results, function (result) {
+
+                // render bullets
                 new trackerdash.views.ErrorBulletWidget({
                     el: '#' + result.id + '-' + result.metric + ' svg',
                     result: result
                 });
+
+                // activate callback for bullet if specified
+                if (typeof(result.callback) === 'function') {
+                  $('#' + result.id + '-' + result.metric)
+                    .css('cursor', 'pointer')
+                    .click(result.callback);
+                }
             });
 
             _.each(this.datasetMap, function (value, key) {

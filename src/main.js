@@ -154,7 +154,8 @@ $(function () {
             current: 5,
             target: 7,
             warning: 10,
-            fail: 25
+            fail: 25,
+            callback: function () { alert('dataset3-ba'); }
         }],
         datasetMap: {
             'dataset3': 'http://www.trackerdash.com',
