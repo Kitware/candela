@@ -46,7 +46,6 @@ $(function () {
         }],
         totalDatasets: 15,
         totalDistance: 1243,
-        distanceRun: 988,
         percentErrorByDataset: [{
             dataset: 'dataset0.jpg',
             metric: 'alga',
