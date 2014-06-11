@@ -11,8 +11,6 @@ trackerdash.views.StatusBarWidget = Backbone.View.extend({
 
     createChart: function () {
 
-
-
         var total = this.numSuccess + this.numBad + this.numFail;
 
         if (total <= 0) {
@@ -20,12 +18,29 @@ trackerdash.views.StatusBarWidget = Backbone.View.extend({
             return;
         }
 
-        var
-            successPercent = (this.numSuccess*100 / total).toFixed(2),
-            badPercent = (this.numBad*100 / total).toFixed(2),
-            failPercent = (this.numFail*100 / total).toFixed(2);
+        var successPercent, badPercent, failPercent;
+
+        if (this.numSuccess > 0) {
+            successPercent = (this.numSuccess*100 / total).toFixed(2) + "%";
+        } else {
+            successPercent = "";
+        }
+
+        if (this.numBad > 0) {
+            badPercent = (this.numBad*100 / total).toFixed(2) + "%";
+        } else {
+            badPercent = "";
+        }
+
+        if (this.numFail > 0) {
+            failPercent = (this.numFail*100 / total).toFixed(2) + "%";
+        } else {
+            failPercent = "";
+        }
+
 
         var svg = d3.select('.status-bar-chart svg');
+        svg.html('');
         var curWidth = svg.style('width').slice(0, -2);
         var curHeight = svg.style('height').slice(0, -2);
 
@@ -42,7 +57,7 @@ trackerdash.views.StatusBarWidget = Backbone.View.extend({
             .attr('height', '100%')
             .attr('class', 'success');
         successGroup.append('text')
-            .text(successPercent + '%')
+            .text(successPercent)
             .attr('x', (unitWidth * this.numSuccess)/2)
             .attr('y', textHeight)
             .attr('fill', 'white')
@@ -55,7 +70,7 @@ trackerdash.views.StatusBarWidget = Backbone.View.extend({
             .attr('height', '100%')
             .attr('class', 'bad');
         badGroup.append('text')
-            .text(badPercent + '%')
+            .text(badPercent)
             .attr('x', badStart + (unitWidth * this.numBad)/2)
             .attr('y', textHeight)
             .attr('fill', 'white')
@@ -68,7 +83,7 @@ trackerdash.views.StatusBarWidget = Backbone.View.extend({
             .attr('height', '100%')
             .attr('class', 'fail');
         failGroup.append('text')
-            .text(failPercent + '%')
+            .text(failPercent)
             .attr('x', failStart + (unitWidth * this.numFail)/2)
             .attr('y', textHeight)
             .attr('fill', 'white')
