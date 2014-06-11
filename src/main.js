@@ -159,6 +159,10 @@ $(function () {
         datasetMap: {
             'dataset3': 'http://www.trackerdash.com',
             'dataset2': function () { alert('dataset 2'); }
+        },
+        trajectoryMap: {
+            'dataset0.jpg': function () { alert('dataset 0 -- trajectory'); },
+            'dataset1': 'https://github.com'
         }
     });
 });

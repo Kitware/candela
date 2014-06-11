@@ -4,6 +4,7 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
     initialize: function (settings) {
         this.results = settings.percentErrorByDataset;
         this.datasetMap = settings.datasetMap;
+        this.trajectoryMap = settings.trajectoryMap;
         if (this.results === undefined) {
             console.error('No error percentages defined.');
         }
@@ -16,6 +17,7 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
         _.each(this.results, _.bind(function (result) {
             result.id = result.dataset.replace(/\./g, "_");
             this.datasetMap[result.id] = this.datasetMap[result.dataset];
+            this.trajectoryMap[result.id] = this.trajectoryMap[result.dataset];
         }, this));
 
         var resultsByDatasetId = _.groupBy(this.results, function (result) {
@@ -24,7 +26,8 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
 
         this.$el.html(jade.templates.tablePane({
             resultsByDatasetId: resultsByDatasetId,
-            datasetMap: this.datasetMap
+            datasetMap: this.datasetMap,
+            trajectoryMap: this.trajectoryMap
         }));
 
         this.$el.promise().done(_.bind(function () {
@@ -48,6 +51,12 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
             _.each(this.datasetMap, function (value, key) {
                 if (typeof(value) === 'function') {
                     $('#' + key + '-link').click(value);
+                }
+            });
+
+            _.each(this.trajectoryMap, function (value, key) {
+                if (typeof(value) === 'function') {
+                    $('#' + key + '-trajectory-link').click(value);
                 }
             });
 
