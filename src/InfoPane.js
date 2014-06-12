@@ -26,7 +26,7 @@ trackerdash.views.InfoPane = Backbone.View.extend({
             return result.dataset;
         });
         _.each(resultsByDataset, _.bind( function (result) {
-            this.ranDistance += result[0].length;
+            this.ranDistance += result[0].length || 0;
         }, this));
 
 
