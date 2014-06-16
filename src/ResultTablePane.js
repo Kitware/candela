@@ -3,8 +3,8 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
 
     initialize: function (settings) {
         this.results = settings.percentErrorByDataset;
-        this.datasetMap = settings.datasetMap;
-        this.trajectoryMap = settings.trajectoryMap;
+        this.datasetMap = settings.datasetMap || {};
+        this.trajectoryMap = settings.trajectoryMap || {};
         if (this.results === undefined) {
             console.error('No error percentages defined.');
         }
