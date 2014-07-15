@@ -54,7 +54,8 @@ $(function () {
             current: 5,
             target: 7,
             warning: 10,
-            fail: 25
+            fail: 25,
+            max: 50
         }, {
             dataset: 'dataset0.jpg',
             metric: 'sparse',
@@ -63,7 +64,8 @@ $(function () {
             current: 5,
             target: 7,
             warning: 10,
-            fail: 25
+            fail: 25,
+            max: 50
         }, {
             dataset: 'dataset0.jpg',
             metric: 'ba',
@@ -72,7 +74,8 @@ $(function () {
             current: 5,
             target: 7,
             warning: 10,
-            fail: 25
+            fail: 25,
+            max: 50
         }, {
             dataset: 'dataset1',
             metric: 'alga',
@@ -81,7 +84,8 @@ $(function () {
             current: 5,
             target: 7,
             warning: 10,
-            fail: 25
+            fail: 25,
+            max: 50
         }, {
             dataset: 'dataset1',
             metric: 'sparse',
@@ -90,7 +94,8 @@ $(function () {
             current: 14,
             target: 7,
             warning: 10,
-            fail: 25
+            fail: 25,
+            max: 50
         }, {
             dataset: 'dataset1',
             metric: 'ba',
@@ -99,7 +104,8 @@ $(function () {
             current: 5,
             target: 7,
             warning: 10,
-            fail: 25
+            fail: 25,
+            max: 50
         }, {
             dataset: 'dataset2',
             metric: 'alga',
@@ -108,7 +114,8 @@ $(function () {
             current: 5,
             target: 7,
             warning: 10,
-            fail: 25
+            fail: 25,
+            max: 50
         }, {
             dataset: 'dataset2',
             metric: 'sparse',
@@ -117,7 +124,8 @@ $(function () {
             current: 5,
             target: 7,
             warning: 10,
-            fail: 25
+            fail: 25,
+            max: 50
         }, {
             dataset: 'dataset2',
             metric: 'ba',
@@ -126,7 +134,8 @@ $(function () {
             current: 5,
             target: 7,
             warning: 10,
-            fail: 25
+            fail: 25,
+            max: 50
         }, {
             dataset: 'dataset3',
             metric: 'alga',
@@ -135,7 +144,8 @@ $(function () {
             current: 28,
             target: 7,
             warning: 10,
-            fail: 25
+            fail: 25,
+            max: 50
         }, {
             dataset: 'dataset3',
             metric: 'sparse',
@@ -144,7 +154,8 @@ $(function () {
             current: 5,
             target: 7,
             warning: 10,
-            fail: 25
+            fail: 25,
+            max: 50
         }, {
             dataset: 'dataset3',
             metric: 'ba',
@@ -154,6 +165,7 @@ $(function () {
             target: 7,
             warning: 10,
             fail: 25,
+            max: 27,
             callback: function () { alert('dataset3-ba'); }
         }],
         datasetMap: {

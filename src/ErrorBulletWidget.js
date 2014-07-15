@@ -12,7 +12,7 @@ trackerdash.views.ErrorBulletWidget = Backbone.View.extend({
     getChartData: function () {
         return {
             "ranges":
-                [50, this.result.fail, this.result.warning, this.result.target],
+                [this.result.max, this.result.fail, this.result.warning, this.result.target],
             "measures": [this.result.current],
             "markers": [this.result.target, this.result.mean],
             "rangeLabels": ['', 'Failing', 'Warning', 'Target'],
