@@ -24,12 +24,18 @@
   width 100%
 
 .bullet-container
-  svg
+  svg.bullet
     height 55px
 
 .result-labels
   font-size 16pt
   font-weight bold
+
+svg.statusDot
+  margin-top 13px
+  width 15px
+  height 15px
+  position absolute
 
 svg
   .success
@@ -40,6 +46,9 @@ svg
 
   .fail
     fill rgb(204, 0, 0)
+
+  .none
+    fill rgba(0, 0, 0, 0)
 
   .status-bar-label
     text-anchor middle

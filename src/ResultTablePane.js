@@ -34,15 +34,25 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
 
             _.each(this.results, function (result) {
 
+                var resultDivSelector = '#' + result.id + '-' + result.metric;
+                // change color of circle
+                if (result.current > result.fail) {
+                  $(resultDivSelector + ' svg.statusDot circle')
+                    .attr('class', 'fail');
+                } else if (result.current > result.warning) {
+                  $(resultDivSelector + ' svg.statusDot circle')
+                    .attr('class', 'bad');
+                }
+
                 // render bullets
                 new trackerdash.views.ErrorBulletWidget({
-                    el: '#' + result.id + '-' + result.metric + ' svg',
+                    el: resultDivSelector + ' svg.bullet',
                     result: result
                 });
 
                 // activate callback for bullet if specified
                 if (typeof(result.callback) === 'function') {
-                  $('#' + result.id + '-' + result.metric)
+                  $(resultDivSelector)
                     .css('cursor', 'pointer')
                     .click(result.callback);
                 }
