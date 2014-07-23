@@ -37,10 +37,10 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
                 var resultDivSelector = '#' + result.id + '-' + result.metric;
                 // change color of circle
                 if (result.current > result.fail) {
-                  $(resultDivSelector + ' svg.statusDot circle')
+                  $(resultDivSelector + ' svg.statusDot').find('circle')
                     .attr('class', 'fail');
                 } else if (result.current > result.warning) {
-                  $(resultDivSelector + ' svg.statusDot circle')
+                  $(resultDivSelector + ' svg.statusDot').find('circle')
                     .attr('class', 'bad');
                 }
 
