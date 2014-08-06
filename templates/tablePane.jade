@@ -32,8 +32,8 @@ table.table.table-striped.table-hover.table-bordered
           svg.bullet
         td(id="#{resultSet[0].id}-length")
             if typeof(trajectoryMap[resultSet[0].dataset]) === 'string'
-              a(href="#{trajectoryMap[resultSet[0].dataset]}") #{resultSet[0].length}
+              a(href="#{trajectoryMap[resultSet[0].dataset]}") #{resultSet[0].length.toFixed(2)}
             else if typeof(trajectoryMap[resultSet[0].dataset]) === 'function'
-              a(href="javascript:;", id="#{resultSet[0].id}-trajectory-link") #{resultSet[0].length}
+              a(href="javascript:;", id="#{resultSet[0].id}-trajectory-link") #{resultSet[0].length.toFixed(2)}
             else
               | #{resultSet[0].length}
