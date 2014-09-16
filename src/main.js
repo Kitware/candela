@@ -168,6 +168,10 @@ $(function () {
             max: 27,
             callback: function () { alert('dataset3-ba'); }
         }],
+        datasetLabelMap: {
+            'dataset1': 'label',
+            'dataset2': 'rotation'
+        },
         datasetMap: {
             'dataset3': 'http://www.trackerdash.com',
             'dataset2': function () { alert('dataset 2'); }
