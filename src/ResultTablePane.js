@@ -3,6 +3,7 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
 
     initialize: function (settings) {
         this.results = settings.percentErrorByDataset;
+        this.algorithms = settings.algorithms || {};
         this.datasetMap = settings.datasetMap || {};
         this.trajectoryMap = settings.trajectoryMap || {};
         this.datasetLabelMap = settings.datasetLabelMap || {};
@@ -28,6 +29,7 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
 
         this.$el.html(jade.templates.tablePane({
             resultsByDatasetId: resultsByDatasetId,
+            algorithms: this.algorithms,
             datasetMap: this.datasetMap,
             trajectoryMap: this.trajectoryMap,
             datasetLabelMap: this.datasetLabelMap
@@ -37,7 +39,7 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
 
             _.each(this.results, function (result) {
 
-                var resultDivSelector = '#' + result.id + '-' + result.metric;
+                var resultDivSelector = '#' + result.id + '-' + result.algorithm;
                 // change color of circle
                 if (result.current > result.fail) {
                   $(resultDivSelector + ' svg.statusDot').find('circle')

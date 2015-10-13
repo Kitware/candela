@@ -48,7 +48,7 @@ $(function () {
         totalDistance: 1243,
         percentErrorByDataset: [{
             dataset: 'dataset0.jpg',
-            metric: 'alga',
+            algorithm: 'alga',
             length: 300,
             mean: 11,
             current: 5,
@@ -58,7 +58,7 @@ $(function () {
             max: 50
         }, {
             dataset: 'dataset0.jpg',
-            metric: 'sparse',
+            algorithm: 'sm',
             length: 300,
             mean: 11,
             current: 5,
@@ -68,7 +68,7 @@ $(function () {
             max: 50
         }, {
             dataset: 'dataset0.jpg',
-            metric: 'ba',
+            algorithm: 'ba',
             length: 300,
             mean: 11,
             current: 5,
@@ -78,7 +78,7 @@ $(function () {
             max: 50
         }, {
             dataset: 'dataset1',
-            metric: 'alga',
+            algorithm: 'alga',
             length: 300,
             mean: 11,
             current: 5,
@@ -88,7 +88,7 @@ $(function () {
             max: 50
         }, {
             dataset: 'dataset1',
-            metric: 'sparse',
+            algorithm: 'sm',
             length: 300,
             mean: 15,
             current: 14,
@@ -98,7 +98,7 @@ $(function () {
             max: 50
         }, {
             dataset: 'dataset1',
-            metric: 'ba',
+            algorithm: 'ba',
             length: 300,
             mean: 11,
             current: 5,
@@ -108,7 +108,7 @@ $(function () {
             max: 50
         }, {
             dataset: 'dataset2',
-            metric: 'alga',
+            algorithm: 'alga',
             length: 300,
             mean: 11,
             current: 5,
@@ -118,7 +118,7 @@ $(function () {
             max: 50
         }, {
             dataset: 'dataset2',
-            metric: 'sparse',
+            algorithm: 'sm',
             length: 300,
             mean: 11,
             current: 5,
@@ -128,7 +128,7 @@ $(function () {
             max: 50
         }, {
             dataset: 'dataset2',
-            metric: 'ba',
+            algorithm: 'ba',
             length: 300,
             mean: 11,
             current: 5,
@@ -138,7 +138,7 @@ $(function () {
             max: 50
         }, {
             dataset: 'dataset3',
-            metric: 'alga',
+            algorithm: 'alga',
             length: 300,
             mean: 11,
             current: 28,
@@ -148,7 +148,7 @@ $(function () {
             max: 50
         }, {
             dataset: 'dataset3',
-            metric: 'sparse',
+            algorithm: 'sm',
             length: 300,
             mean: 11,
             current: 5,
@@ -158,7 +158,7 @@ $(function () {
             max: 50
         }, {
             dataset: 'dataset3',
-            metric: 'ba',
+            algorithm: 'ba',
             length: 300,
             mean: 11,
             current: 5,
@@ -167,6 +167,17 @@ $(function () {
             fail: 25,
             max: 27,
             callback: function () { alert('dataset3-ba'); }
+        }, {
+            dataset: 'dataset2',
+            algorithm: 'com',
+            length: 300,
+            mean: 11,
+            current: 3,
+            target: 7,
+            warning: 10,
+            fail: 25,
+            max: 27,
+            callback: function () { alert('dataset2-com'); }
         }],
         datasetLabelMap: {
             'dataset1': 'label',
@@ -179,6 +190,19 @@ $(function () {
         trajectoryMap: {
             'dataset0.jpg': function () { alert('dataset 0 -- trajectory'); },
             'dataset1': 'https://github.com'
-        }
+        },
+        algorithms: [{
+            name: 'Visual-Inertial Odometry',
+            abbreviation: 'ALGA'
+        }, {
+            name: 'ALGB (Pose Graph)',
+            abbreviation: 'SM'
+        }, {
+            name: 'Bundle Adjustment',
+            abbreviation: 'BA'
+        }, {
+            name: 'Concurrent Odometry and Mapping',
+            abbreviation: 'ALGC'
+        }]
     });
 });
