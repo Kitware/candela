@@ -6,7 +6,6 @@ trackerdash.views.InfoPane = Backbone.View.extend({
         this.branch = settings.branch || 'master';
         this.day = settings.day || this.getToday();
         this.totalDatasets = settings.totalDatasets || 0;
-        this.totalDistance = settings.totalDistance || 0;
 
         this.numSuccess = 0;
         this.numBad = 0;
@@ -21,16 +20,6 @@ trackerdash.views.InfoPane = Backbone.View.extend({
                 this.numSuccess++;
             }
         }, this));
-
-        // calculate total trajectory on-the-fly
-        var resultsByDataset = _.groupBy(settings.percentErrorByDataset, function (result) {
-            return result.dataset;
-        });
-        _.each(resultsByDataset, _.bind( function (result) {
-            this.ranDistance += result[0].length || 0;
-        }, this));
-
-        this.ranDistance = this.ranDistance.toFixed(2);
 
         this.ranDatasets = this.numSuccess + this.numBad + this.numFail;
         this.render();
@@ -60,8 +49,6 @@ trackerdash.views.InfoPane = Backbone.View.extend({
             day: this.day,
             ranDatasets: this.ranDatasets,
             totalDatasets: this.totalDatasets,
-            ranDistance: this.ranDistance,
-            totalDistance: this.totalDistance,
             numSuccess: this.numSuccess,
             numBad: this.numBad,
             numFail: this.numFail

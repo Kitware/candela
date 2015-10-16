@@ -4,7 +4,6 @@ table.table.table-striped.table-hover.table-bordered
     each algorithm in algorithms
       td
         abbr(title="#{algorithm.name}") #{algorithm.abbreviation}
-    td Trajectory Length
   tbody
     each resultSet in resultsByDatasetId
       tr
@@ -23,10 +22,3 @@ table.table.table-striped.table-hover.table-bordered
             svg.statusDot
               circle.none(r="7", cx="7", cy="7")
             svg.bullet
-        td.trajectory(id="#{resultSet[0].id}-length")
-            if typeof(trajectoryMap[resultSet[0].dataset]) === 'string'
-              a(href="#{trajectoryMap[resultSet[0].dataset]}") #{resultSet[0].length.toFixed(2)}
-            else if typeof(trajectoryMap[resultSet[0].dataset]) === 'function'
-              a(href="javascript:;", id="#{resultSet[0].id}-trajectory-link") #{resultSet[0].length.toFixed(2)}
-            else
-              | #{resultSet[0].length}
