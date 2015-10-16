@@ -1,6 +1,7 @@
 // When all scripts are loaded, we invoke the application
 $(function () {
     $('.dash-container').trackerdash({
+        name: 'Beta Ground Truth',
         day: '2014-06-03',
         branch: 'master',
         trend: [{

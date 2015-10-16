@@ -2,6 +2,7 @@ trackerdash.views.InfoPane = Backbone.View.extend({
     el: '.info-pane',
 
     initialize: function (settings) {
+        this.name = settings.name || 'Ground Truth';
         this.branch = settings.branch || 'master';
         this.day = settings.day || this.getToday();
         this.totalDatasets = settings.totalDatasets || 0;
@@ -54,6 +55,7 @@ trackerdash.views.InfoPane = Backbone.View.extend({
 
     render: function () {
         this.$el.html(jade.templates.infoPane({
+            name: this.name,
             branch: this.branch,
             day: this.day,
             ranDatasets: this.ranDatasets,
