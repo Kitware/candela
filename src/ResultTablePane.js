@@ -16,6 +16,9 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
     render: function () {
 
         // dots in names confound css selectors
+        this.results.sort(function (a, b) {
+            return a.dataset.localeCompare(b.dataset);
+        });
         _.each(this.results, _.bind(function (result) {
             result.id = result.dataset.replace(/\./g, "_");
             this.datasetMap[result.id] = this.datasetMap[result.dataset];

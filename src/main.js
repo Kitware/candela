@@ -181,8 +181,8 @@ $(function () {
             callback: function () { alert('dataset2-com'); }
         }],
         datasetLabelMap: {
-            'dataset1': 'label',
-            'dataset2': 'rotation'
+            'dataset2': 'rotation',
+            'dataset1': 'label'
         },
         datasetMap: {
             'dataset3': 'http://www.trackerdash.com',

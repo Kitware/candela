@@ -10,7 +10,6 @@ trackerdash.views.InfoPane = Backbone.View.extend({
         this.numSuccess = 0;
         this.numBad = 0;
         this.numFail = 0;
-        this.ranDistance = 0;
         _.each(settings.percentErrorByDataset, _.bind(function (dataset) {
             if (dataset.current >= dataset.fail) {
                 this.numFail++;
