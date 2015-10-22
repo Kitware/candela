@@ -14,7 +14,6 @@ trackerdash.views.StatusBarWidget = Backbone.View.extend({
         var total = this.numSuccess + this.numBad + this.numFail;
 
         if (total <= 0) {
-            console.error('StatusBarWidget: Total tracks cannot be <= 0.');
             return;
         }
 

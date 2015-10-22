@@ -8,7 +8,7 @@ trackerdash.views.ResultTablePane = Backbone.View.extend({
         this.trajectoryMap = settings.trajectoryMap || {};
         this.datasetLabelMap = settings.datasetLabelMap || {};
         if (this.results === undefined) {
-            console.error('No error percentages defined.');
+            return;//console.error('No error percentages defined.');
         }
         this.render();
     },
