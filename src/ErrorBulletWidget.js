@@ -16,8 +16,8 @@ trackerdash.views.ErrorBulletWidget = Backbone.View.extend({
             "measures": [this.result.current],
             "markers": [this.result.target, this.result.mean],
             "rangeLabels": ['', 'Failing', 'Warning', 'Target'],
-            "measureLabels": ['Current Error %'],
-            "markerLabels": ['Target Error %', 'Mean Error %']
+            "measureLabels": ['Current RMSE (m)'],
+            "markerLabels": ['Target RMSE (m)', 'Mean RMSE (m)']
         };
     },
 
@@ -31,6 +31,8 @@ trackerdash.views.ErrorBulletWidget = Backbone.View.extend({
                 chart.color('rgb(204, 0, 0)');
             } else if (this.result.current > this.result.warning) {
                 chart.color('rgb(241, 194, 50)');
+            } else {
+                chart.color('rgb(147, 196, 125)');
             }
 
             d3.select(this.el)
