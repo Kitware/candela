@@ -10,7 +10,11 @@ trackerdash.views.InfoPane = Backbone.View.extend({
         this.numSuccess = 0;
         this.numBad = 0;
         this.numFail = 0;
+        this.allValues = [];
         _.each(settings.percentErrorByDataset, _.bind(function (dataset) {
+            console.log(dataset);
+
+            this.allValues.push(dataset.current);
             if (dataset.current >= dataset.fail) {
                 this.numFail++;
             } else if (dataset.current >= dataset.warning) {
@@ -19,6 +23,9 @@ trackerdash.views.InfoPane = Backbone.View.extend({
                 this.numSuccess++;
             }
         }, this));
+        this.allValues = _.sortBy(this.allValues, function (el) {return el; });
+        this.totalMedian = this.allValues[Math.floor(this.allValues.length/2)];
+        this.totalMedian = Math.round(this.totalMedian * 10000) / 10000;
 
         this.ranDatasets = this.numSuccess + this.numBad + this.numFail;
         this.render();
@@ -50,7 +57,8 @@ trackerdash.views.InfoPane = Backbone.View.extend({
             totalDatasets: this.totalDatasets,
             numSuccess: this.numSuccess,
             numBad: this.numBad,
-            numFail: this.numFail
+            numFail: this.numFail,
+            totalMedian: this.totalMedian
         }));
 
         new trackerdash.views.StatusBarWidget({
