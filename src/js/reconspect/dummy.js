@@ -11,9 +11,9 @@
         .text(function (d) {
           return d.text;
         })
-      .style(function (d) {
-        return d.color;
-      });
+        .style('color', function (d) {
+          return d.color;
+        });
     }
   };
 }(window.reconspect, window.d3));
