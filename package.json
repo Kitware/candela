@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "jade": "jade src/jade/index.jade -o site/",
-    "index": "tee <src/js/index.js site/js/index.js | uglifyjs -m >site/index.min.js",
+    "index": "tee <src/js/index.js site/index.js | uglifyjs -m >site/index.min.js",
     "lint": "semistandard src/js/**/*.js",
     "uglify": "cat src/js/reconspect/preamble.js src/js/reconspect/dummy.js | tee site/reconspect.js | uglifyjs -m >site/reconspect.min.js",
     "stylesheets": "stylus <src/styl/index.styl >site/index.css && stylus -c <src/styl/index.styl >site/index.min.css",
