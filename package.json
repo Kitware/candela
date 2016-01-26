@@ -4,11 +4,12 @@
   "description": "Laboratory for exploring visualization component architecture and specification within Resonant",
   "main": "index.js",
   "scripts": {
-    "jade": "jade src/index.jade -o site/",
-    "index": "tee <src/index.js site/index.js | uglifyjs -m >site/index.min.js",
-    "lint": "semistandard src/**/*.js",
-    "uglify": "cat src/reconspect/preamble.js src/reconspect/dummy.js | tee site/reconspect.js | uglifyjs -m >site/reconspect.min.js",
-    "build": "npm run jade && npm run -s lint && npm run index && npm run uglify",
+    "jade": "jade src/jade/index.jade -o site/",
+    "index": "tee <src/js/index.js site/js/index.js | uglifyjs -m >site/index.min.js",
+    "lint": "semistandard src/js/**/*.js",
+    "uglify": "cat src/js/reconspect/preamble.js src/js/reconspect/dummy.js | tee site/reconspect.js | uglifyjs -m >site/reconspect.min.js",
+    "stylesheets": "stylus <src/styl/index.styl >site/index.css && stylus -c <src/styl/index.styl >site/index.min.css",
+    "build": "npm run jade && npm run -s lint && npm run index && npm run uglify && npm run stylesheets",
     "clean": "rm -rf site/",
     "clean:all": "npm run clean && rm -rf node_modules"
   },
@@ -21,6 +22,7 @@
   "devDependencies": {
     "jade": "^1.11.0",
     "semistandard": "^7.0.5",
+    "stylus": "^0.53.0",
     "uglifyjs": "^2.4.10"
   }
 }
