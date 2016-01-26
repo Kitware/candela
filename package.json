@@ -6,7 +6,10 @@
   "scripts": {
     "jade": "jade src/index.jade -o site/",
 
-    "build": "npm run jade"
+    "build": "npm run jade",
+
+    "clean": "rm -rf site/",
+    "clean:all": "npm run clean && rm -rf node_modules"
   },
   "repository": {
     "type": "git",
