@@ -6,7 +6,8 @@
   "scripts": {
     "jade": "jade src/index.jade -o site/",
     "index": "tee <src/index.js site/index.js | uglifyjs -m >site/index.min.js",
-    "build": "npm run jade && npm run index",
+    "uglify": "cat src/reconspect/preamble.js src/reconspect/dummy.js | tee site/reconspect.js | uglifyjs -m >site/reconspect.min.js",
+    "build": "npm run jade && npm run index && npm run uglify",
     "clean": "rm -rf site/",
     "clean:all": "npm run clean && rm -rf node_modules"
   },
