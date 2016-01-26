@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "jade": "jade src/index.jade -o site/",
-
-    "build": "npm run jade",
-
+    "index": "tee <src/index.js site/index.js | uglifyjs -m >site/index.min.js",
+    "build": "npm run jade && npm run index",
     "clean": "rm -rf site/",
     "clean:all": "npm run clean && rm -rf node_modules"
   },
@@ -18,6 +17,7 @@
   "author": "Roni Choudhury",
   "license": "Apache-2.0",
   "devDependencies": {
-    "jade": "^1.11.0"
+    "jade": "^1.11.0",
+    "uglifyjs": "^2.4.10"
   }
 }
