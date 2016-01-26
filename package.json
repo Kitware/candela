@@ -1,0 +1,23 @@
+{
+  "name": "reconspect",
+  "version": "0.1.0",
+  "description": "Laboratory for exploring visualization component architecture and specification within Resonant",
+  "main": "index.js",
+  "scripts": {
+    "jade": "jade src/index.jade -o site/",
+    "index": "tee <src/index.js site/index.js | uglifyjs -m >site/index.min.js",
+    "build": "npm run jade && npm run index",
+    "clean": "rm -rf site/",
+    "clean:all": "npm run clean && rm -rf node_modules"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.kitware.com:ronichoudhury/reconspect.git"
+  },
+  "author": "Roni Choudhury",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "jade": "^1.11.0",
+    "uglifyjs": "^2.4.10"
+  }
+}
