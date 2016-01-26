@@ -4,12 +4,17 @@
   "description": "Laboratory for exploring visualization component architecture and specification within Resonant",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "jade": "jade src/index.jade -o site/",
+
+    "build": "npm run jade"
   },
   "repository": {
     "type": "git",
     "url": "git@gitlab.kitware.com:ronichoudhury/reconspect.git"
   },
   "author": "Roni Choudhury",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "jade": "^1.11.0"
+  }
 }
