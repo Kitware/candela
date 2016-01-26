@@ -1,0 +1,15 @@
+{
+  "name": "reconspect",
+  "version": "0.1.0",
+  "description": "Laboratory for exploring visualization component architecture and specification within Resonant",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.kitware.com:ronichoudhury/reconspect.git"
+  },
+  "author": "Roni Choudhury",
+  "license": "Apache-2.0"
+}
