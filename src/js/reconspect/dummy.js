@@ -16,8 +16,9 @@
         d = d3.select(this.div)
           .select('ul')
           .selectAll('li')
-          .data(data)
-          .enter()
+          .data(data);
+
+        d.enter()
           .append('li');
 
         d.text(function (d) {
