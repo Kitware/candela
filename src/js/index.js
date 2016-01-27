@@ -1,8 +1,10 @@
 window.onload = function () {
   (function (reconspect) {
-    var el = document.getElementById("raw");
+    var el = document.getElementById("raw"),
+      vis;
 
-    reconspect.dummy.construct(el, [
+    vis = new reconspect.Dummy();
+    vis.construct(el, [
       {
         text: "one, two",
         color: "blue"
