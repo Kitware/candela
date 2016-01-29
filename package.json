@@ -7,9 +7,9 @@
     "jade": "jade src/jade/index.jade -o site/",
     "index": "tee <src/js/index.js site/index.js | uglifyjs -m >site/index.min.js",
     "lint": "semistandard src/js/**/*.js",
-    "uglify": "cat src/js/reconspect/preamble.js src/js/reconspect/dummy.js | tee site/reconspect.js | uglifyjs -m >site/reconspect.min.js",
+    "uglify": "cat src/js/reconspect/preamble.js src/js/reconspect/dummy.js src/js/reconspect/vcharts.js | tee site/reconspect.js | uglifyjs -m >site/reconspect.min.js",
     "stylesheets": "stylus <src/styl/index.styl >site/index.css && stylus -c <src/styl/index.styl >site/index.min.css",
-    "copy": "mkdir -p site/js && cp node_modules/d3/d3.* site/js/",
+    "copy": "mkdir -p site/js && cp node_modules/d3/d3.* node_modules/vcharts/vcharts.* node_modules/vega/vega.* site/js/",
     "build": "npm run lint && npm run jade && npm run index && npm run uglify && npm run stylesheets && npm run copy",
     "clean": "rm -rf site/",
     "clean:all": "npm run clean && rm -rf node_modules"
@@ -25,6 +25,7 @@
     "jade": "^1.11.0",
     "semistandard": "^7.0.5",
     "stylus": "^0.53.0",
-    "uglifyjs": "^2.4.10"
+    "uglifyjs": "^2.4.10",
+    "vcharts": "^0.2.1"
   }
 }
