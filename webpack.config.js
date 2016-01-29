@@ -40,7 +40,7 @@ if (production) {
 module.exports = {
   debug: !production,
   devtool: production ? false : 'eval',
-  entry: './src',
+  entry: './resplendent',
   output: {
     path: 'dist',
     filename: 'resplendent.js',
