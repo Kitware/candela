@@ -10,7 +10,7 @@ var plugins = [
     minChunks: 2
   }),
 
-  new CleanPlugin('dist')
+  new CleanPlugin('dist/resplendent.js')
 ];
 
 if (production) {
@@ -42,10 +42,10 @@ module.exports = {
   devtool: production ? false : 'eval',
   entry: './src/resplendent.js',
   output: {
+    library: 'resplendent',
+    libraryTarget: 'umd',
     path: 'dist',
     filename: 'resplendent.js',
-    libraryTarget: 'umd',
-    publicPath: 'dist/'
   },
   plugins: plugins,
   module: {

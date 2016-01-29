@@ -1,1 +1,5 @@
-module.exports = 'resplendent';
+function hello () {
+  return 'hello from resplendent!';
+}
+
+export { hello };
