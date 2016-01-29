@@ -1,4 +1,6 @@
 var webpack = require('webpack');
+var CleanPlugin = require('clean-webpack-plugin');
+
 var production = process.env.NODE_ENV === 'production';
 
 var plugins = [
@@ -6,7 +8,9 @@ var plugins = [
     name: 'main',
     children: true,
     minChunks: 2
-  })
+  }),
+
+  new CleanPlugin('dist')
 ];
 
 if (production) {

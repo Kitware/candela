@@ -21,6 +21,7 @@
   "author": "Roni Choudhury",
   "license": "Apache-2.0",
   "devDependencies": {
+    "clean-webpack-plugin": "^0.1.7",
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
     "semistandard-loader": "0.0.3",
