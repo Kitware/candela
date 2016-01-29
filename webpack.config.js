@@ -59,8 +59,8 @@ module.exports = {
         loaders: ['style', 'css', 'stylus']
       },
       {
-        test: /\.html/,
-        loader: 'html'
+        test: /\.jade/,
+        loaders: ['html', 'jade']
       }
     ]
   }
