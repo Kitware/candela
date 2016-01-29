@@ -23,7 +23,7 @@
   "devDependencies": {
     "jade": "^1.11.0",
     "semistandard": "^7.0.5",
-    "stylus": "^0.53.0",
+    "stylus-loader": "^1.5.1",
     "uglifyjs": "^2.4.10"
   },
   "dependencies": {

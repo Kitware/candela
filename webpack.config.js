@@ -55,8 +55,8 @@ module.exports = {
         include: __dirname + '/src'
       },
       {
-        test: /\.scss/,
-        loaders: ['style', 'css', 'sass']
+        test: /\.styl/,
+        loaders: ['style', 'css', 'stylus']
       },
       {
         test: /\.html/,
