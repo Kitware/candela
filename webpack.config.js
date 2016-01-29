@@ -45,6 +45,11 @@ module.exports = {
   },
   plugins: plugins,
   module: {
+    preLoaders: [
+      test: /\.js$/,
+      loader: 'semistandard',
+      exclude: 'node_modules'
+    ],
     loaders: [
       {
         test: /\.js/,
