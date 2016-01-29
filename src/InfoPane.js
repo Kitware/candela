@@ -54,7 +54,6 @@ trackerdash.views.InfoPane = Backbone.View.extend({
             branch: this.branch,
             day: this.day,
             ranDatasets: this.ranDatasets,
-            totalDatasets: this.totalDatasets,
             numSuccess: this.numSuccess,
             numBad: this.numBad,
             numFail: this.numFail,
