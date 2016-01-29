@@ -21,11 +21,13 @@
   "author": "Roni Choudhury",
   "license": "Apache-2.0",
   "devDependencies": {
-    "d3": "^3.5.13",
     "jade": "^1.11.0",
     "semistandard": "^7.0.5",
     "stylus": "^0.53.0",
-    "uglifyjs": "^2.4.10",
+    "uglifyjs": "^2.4.10"
+  },
+  "dependencies": {
+    "d3": "^3.5.14",
     "vcharts": "^0.2.1"
   }
 }
