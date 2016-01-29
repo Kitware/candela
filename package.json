@@ -25,8 +25,7 @@
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
     "semistandard-loader": "0.0.3",
-    "stylus-loader": "^1.5.1",
-    "uglifyjs": "^2.4.10"
+    "stylus-loader": "^1.5.1"
   },
   "dependencies": {
     "d3": "^3.5.14",
