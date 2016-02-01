@@ -1,14 +1,9 @@
 import VisualizationComponent from './../resplendent';
-import * as vcharts from 'vcharts';
-
-console.log(vcharts);
+import vcharts from 'vcharts';
 
 class LineChart extends VisualizationComponent {
   constructor (div, data) {
     super(div, data);
-
-    // let vcharts = require('vcharts');
-    // console.log(vcharts);
 
     let values = data.values.map((x) => x[1]);
 
