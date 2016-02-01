@@ -79,7 +79,7 @@ module.exports = {
       },
       {
         test: /\.jade/,
-        loaders: ['html', 'jade']
+        loaders: ['jade']
       }
     ]
   }
