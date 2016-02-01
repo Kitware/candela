@@ -1,4 +1,4 @@
-import VisualizationComponent from './../resplendent';
+import { VisualizationComponent } from './../resplendent';
 
 var d3 = require('d3');
 

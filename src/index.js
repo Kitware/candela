@@ -1,4 +1,4 @@
-import Dummy from './components/Dummy';
+import { Dummy } from './components/Dummy';
 
 function dummy () {
   let el = document.getElementById('raw');
