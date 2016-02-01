@@ -7,12 +7,12 @@ var production = process.env.NODE_ENV === 'production';
 
 var plugins = [
   new webpack.optimize.CommonsChunkPlugin({
-    name: 'main',
+    name: 'common',
     children: true,
     minChunks: 2
   }),
 
-  new CleanPlugin(['./dist/resplendent.js', './dist/main.js', './dist/index.js'])
+  new CleanPlugin(['./dist/resplendent.js', './dist/common.js', './dist/index.js'])
 ];
 
 if (production) {

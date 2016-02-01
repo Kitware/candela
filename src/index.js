@@ -34,8 +34,6 @@ function dummy () {
   }, 1000);
 }
 
-function main () {
+window.onload = () => {
   dummy();
-}
-
-export { main };
+};
