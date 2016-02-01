@@ -56,12 +56,10 @@ module.exports = {
     path: 'dist',
     filename: '[name].js',
   },
-  externals: {
-    d3: 'd3'
-  },
   resolve: {
     alias: {
-      vega: path.resolve(__dirname, 'node_modules/vega/index.js')
+      vega: path.resolve(__dirname, 'node_modules/vega/index.js'),
+      d3: path.resolve(__dirname, 'node_modules/d3/d3.min.js')
     }
   },
   plugins: plugins,
