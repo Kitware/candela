@@ -12,6 +12,10 @@ var plugins = [
     minChunks: 2
   }),
 
+  new webpack.ProvidePlugin({
+    vg: 'vega'
+  }),
+
   new CleanPlugin(['./dist/resplendent.js', './dist/common.js', './dist/index.js'])
 ];
 
@@ -52,8 +56,11 @@ module.exports = {
     path: 'dist',
     filename: '[name].js',
   },
-  externals: {
-    d3: 'd3'
+  resolve: {
+    alias: {
+      vega: path.resolve(__dirname, 'node_modules/vega/index.js'),
+      d3: path.resolve(__dirname, 'node_modules/d3/d3.min.js')
+    }
   },
   plugins: plugins,
   module: {
@@ -66,7 +73,7 @@ module.exports = {
     ],
     loaders: [
       {
-        test: /\.js/,
+        test: /\.js$/,
         loader: 'babel-loader',
         query: {
           presets: ['es2015']
@@ -74,12 +81,16 @@ module.exports = {
         include: __dirname + '/src'
       },
       {
-        test: /\.styl/,
+        test: /\.styl$/,
         loaders: ['style', 'css', 'stylus']
       },
       {
-        test: /\.jade/,
-        loaders: ['html', 'jade']
+        test: /\.jade$/,
+        loaders: ['jade']
+      },
+      {
+        test: /\.json$/,
+        loader: 'json'
       }
     ]
   }
