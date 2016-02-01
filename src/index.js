@@ -1,4 +1,5 @@
 import { Dummy } from './components/Dummy';
+import { LineChart } from './components/VCharts';
 import $ from 'jquery';
 
 function dummy () {
@@ -35,6 +36,21 @@ function dummy () {
   }, 1000);
 }
 
+function linechart () {
+  let el = document.getElementById('vcharts-line');
+
+  let data = {
+    values: []
+  };
+
+  for (let i = 0; i < 1000; i++) {
+    data.values.push([i, Math.random() * 10]);
+  }
+
+  let vis = new LineChart(el, data);
+  vis.refresh();
+}
+
 import indexContent from './jade/index.jade';
 import './styl/index.styl';
 
@@ -42,4 +58,5 @@ window.onload = () => {
   $('body').html(indexContent());
 
   dummy();
+  linechart();
 };

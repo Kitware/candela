@@ -20,6 +20,7 @@
     "css-loader": "^0.23.1",
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
+    "json-loader": "^0.5.4",
     "semistandard-loader": "0.0.3",
     "style-loader": "^0.13.0",
     "stylus-loader": "^1.5.1",
@@ -28,6 +29,7 @@
   "dependencies": {
     "d3": "^3.5.14",
     "jquery": "^2.2.0",
-    "vcharts": "^0.2.1"
+    "vcharts": "^0.2.1",
+    "vega": "^2.4.2"
   }
 }

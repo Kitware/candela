@@ -12,6 +12,10 @@ var plugins = [
     minChunks: 2
   }),
 
+  new webpack.ProvidePlugin({
+    vg: 'vega'
+  }),
+
   new CleanPlugin(['./dist/resplendent.js', './dist/common.js', './dist/index.js'])
 ];
 
@@ -55,6 +59,11 @@ module.exports = {
   externals: {
     d3: 'd3'
   },
+  resolve: {
+    alias: {
+      vega: path.resolve(__dirname, 'node_modules/vega/index.js')
+    }
+  },
   plugins: plugins,
   module: {
     preLoaders: [
@@ -80,6 +89,10 @@ module.exports = {
       {
         test: /\.jade$/,
         loaders: ['jade']
+      },
+      {
+        test: /\.json$/,
+        loader: 'json'
       }
     ]
   }
