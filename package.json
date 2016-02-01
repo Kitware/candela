@@ -4,15 +4,7 @@
   "description": "Laboratory for exploring visualization component architecture and specification within Resonant",
   "main": "index.js",
   "scripts": {
-    "jade": "jade src/jade/index.jade -o site/",
-    "index": "tee <src/js/index.js site/index.js | uglifyjs -m >site/index.min.js",
-    "lint": "semistandard src/js/**/*.js",
-    "uglify": "cat src/js/reconspect/preamble.js src/js/reconspect/dummy.js src/js/reconspect/vcharts.js | tee site/reconspect.js | uglifyjs -m >site/reconspect.min.js",
-    "stylesheets": "stylus <src/styl/index.styl >site/index.css && stylus -c <src/styl/index.styl >site/index.min.css",
-    "copy": "mkdir -p site/js && cp node_modules/d3/d3.* node_modules/vcharts/vcharts.* node_modules/vega/vega.* site/js/",
-    "build": "npm run lint && npm run jade && npm run index && npm run uglify && npm run stylesheets && npm run copy",
-    "clean": "rm -rf site/",
-    "clean:all": "npm run clean && rm -rf node_modules"
+    "build:lib": "webpack"
   },
   "repository": {
     "type": "git",
@@ -21,11 +13,18 @@
   "author": "Roni Choudhury",
   "license": "Apache-2.0",
   "devDependencies": {
-    "d3": "^3.5.13",
+    "babel-core": "^6.4.5",
+    "babel-loader": "^6.2.1",
+    "babel-preset-es2015": "^6.3.13",
+    "clean-webpack-plugin": "^0.1.7",
     "jade": "^1.11.0",
-    "semistandard": "^7.0.5",
-    "stylus": "^0.53.0",
-    "uglifyjs": "^2.4.10",
+    "jade-loader": "^0.8.0",
+    "semistandard-loader": "0.0.3",
+    "stylus-loader": "^1.5.1",
+    "webpack": "^1.12.12"
+  },
+  "dependencies": {
+    "d3": "^3.5.14",
     "vcharts": "^0.2.1"
   }
 }
