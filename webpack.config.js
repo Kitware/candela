@@ -1,4 +1,6 @@
 var webpack = require('webpack');
+var path = require('path');
+
 var CleanPlugin = require('clean-webpack-plugin');
 
 var production = process.env.NODE_ENV === 'production';
@@ -10,7 +12,7 @@ var plugins = [
     minChunks: 2
   }),
 
-  new CleanPlugin('dist/resplendent.js')
+  new CleanPlugin(['./dist/resplendent.js', './dist/main.js', './dist/index.js'])
 ];
 
 if (production) {
@@ -40,12 +42,15 @@ if (production) {
 module.exports = {
   debug: !production,
   devtool: production ? false : 'eval',
-  entry: './src/resplendent.js',
+  entry: {
+    resplendent: ['./src/resplendent.js'],
+    index: './src/index.js'
+  },
   output: {
-    library: 'resplendent',
+    library: '[name]',
     libraryTarget: 'umd',
     path: 'dist',
-    filename: 'resplendent.js',
+    filename: '[name].js',
   },
   plugins: plugins,
   module: {
@@ -53,7 +58,7 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'semistandard',
-        exclude: 'node_modules'
+        include: path.resolve(__dirname, 'src')
       }
     ],
     loaders: [
