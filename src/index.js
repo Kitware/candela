@@ -1,5 +1,5 @@
-import { Dummy } from './components/Dummy';
-import { LineChart } from './components/VCharts';
+import Dummy from './components/Dummy';
+import LineChart from './components/VCharts';
 import $ from 'jquery';
 
 function dummy () {

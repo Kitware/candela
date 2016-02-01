@@ -8,4 +8,4 @@ class VisualizationComponent {
   }
 }
 
-export { VisualizationComponent };
+export default VisualizationComponent;

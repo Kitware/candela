@@ -1,4 +1,4 @@
-import { VisualizationComponent } from './../resplendent';
+import VisualizationComponent from './../resplendent';
 import * as vcharts from 'vcharts';
 
 console.log(vcharts);
@@ -61,4 +61,4 @@ class LineChart extends VisualizationComponent {
   }
 }
 
-export { LineChart };
+export default LineChart;
