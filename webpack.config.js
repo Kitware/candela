@@ -52,6 +52,9 @@ module.exports = {
     path: 'dist',
     filename: '[name].js',
   },
+  externals: {
+    d3: 'd3'
+  },
   plugins: plugins,
   module: {
     preLoaders: [

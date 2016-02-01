@@ -1,6 +1,6 @@
 import VisualizationComponent from './../resplendent';
 
-import d3 from 'd3';
+var d3 = require('d3');
 
 class Dummy extends VisualizationComponent {
   construct (div, data) {
