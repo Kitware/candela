@@ -1,5 +1,5 @@
 {
-  "name": "reconspect",
+  "name": "resplendent",
   "version": "0.1.0",
   "description": "Laboratory for exploring visualization component architecture and specification within Resonant",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@gitlab.kitware.com:ronichoudhury/reconspect.git"
+    "url": "git@gitlab.kitware.com:ronichoudhury/resplendent.git"
   },
   "author": "Roni Choudhury",
   "license": "Apache-2.0",
