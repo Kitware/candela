@@ -3,8 +3,8 @@ import { VisualizationComponent } from './../resplendent';
 var d3 = require('d3');
 
 class Dummy extends VisualizationComponent {
-  construct (div, data) {
-    super.construct(div, data);
+  constructor (div, data) {
+    super(div, data);
 
     d3.select(this.div)
       .append('ul');
