@@ -66,7 +66,7 @@ module.exports = {
     ],
     loaders: [
       {
-        test: /\.js/,
+        test: /\.js$/,
         loader: 'babel-loader',
         query: {
           presets: ['es2015']
@@ -74,11 +74,11 @@ module.exports = {
         include: __dirname + '/src'
       },
       {
-        test: /\.styl/,
+        test: /\.styl$/,
         loaders: ['style', 'css', 'stylus']
       },
       {
-        test: /\.jade/,
+        test: /\.jade$/,
         loaders: ['jade']
       }
     ]
