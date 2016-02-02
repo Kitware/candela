@@ -68,7 +68,8 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'semistandard',
-        include: path.resolve(__dirname, 'src')
+        include: path.resolve(__dirname, 'src'),
+        exclude: path.resolve(__dirname, 'src', 'external')
       }
     ],
     loaders: [
@@ -79,6 +80,12 @@ module.exports = {
           presets: ['es2015']
         },
         include: __dirname + '/src'
+      },
+      {
+        test: function (path) {
+          return path.endsWith('/src/external/pc.js');
+        },
+        loader: 'legacy'
       },
       {
         test: /\.styl$/,

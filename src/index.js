@@ -1,5 +1,6 @@
 import Dummy from './components/Dummy';
 import LineChart from './components/VCharts';
+import './components/ParallelCoordinates';
 import $ from 'jquery';
 
 function dummy () {
