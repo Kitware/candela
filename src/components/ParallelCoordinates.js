@@ -2,9 +2,14 @@ import VisualizationComponent from './../resplendent';
 import $ from 'jquery';
 
 export default class ParallelCoordinates extends VisualizationComponent {
-  constructor (div, dataRoot) {
+  constructor (div, dataRoot, width, height) {
     super(div);
     this.dataRoot = dataRoot;
+
+    if (width && height) {
+      $(div).attr('width', width);
+      $(div).attr('height', height);
+    }
 
     let PC = require('./../external/pc');
 

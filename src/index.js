@@ -63,7 +63,7 @@ function parallelCoordinates () {
     'versatility index'
   ];
 
-  let vis = new ParallelCoordinates(el, 'nba-heatmaps');
+  let vis = new ParallelCoordinates(el, 'nba-heatmaps', 540, 360);
   vis.refresh(data);
 }
 
