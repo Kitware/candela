@@ -1,6 +1,6 @@
 import Dummy from './components/Dummy';
 import LineChart from './components/VCharts';
-import './components/ParallelCoordinates';
+import ParallelCoordinates from './components/ParallelCoordinates';
 import $ from 'jquery';
 
 function dummy () {
@@ -52,6 +52,21 @@ function linechart () {
   vis.refresh();
 }
 
+function parallelCoordinates () {
+  let el = document.getElementById('parallel-coords');
+
+  let data = [
+    'games',
+    'age',
+    'free throw percent',
+    'minutes',
+    'versatility index'
+  ];
+
+  let vis = new ParallelCoordinates(el, 'nba-heatmaps');
+  vis.refresh(data);
+}
+
 import indexContent from './jade/index.jade';
 import './styl/index.styl';
 
@@ -60,4 +75,5 @@ window.onload = () => {
 
   dummy();
   linechart();
+  parallelCoordinates();
 };

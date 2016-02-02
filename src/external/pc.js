@@ -17,7 +17,7 @@ window.ParallelCoordinates = function (canvasElement, fetchHistogramFunction, se
         querySelection = selectionQueryFunction,
         clearCallback = selectionClearedCallback;
 
-        axisList = [],
+        var axisList = [],
         orientationList = [],
 
         axesCenters = [],
@@ -305,7 +305,7 @@ window.ParallelCoordinates = function (canvasElement, fetchHistogramFunction, se
         drawableArea.width = canvasArea.width - (borderOffset.left + borderOffset.right);
         drawableArea.height = canvasArea.height - (borderOffset.top + borderOffset.bottom);
 
-        axisSpacing = (drawableArea.width - axisWidth) / (axisList.length - 1);
+        var axisSpacing = (drawableArea.width - axisWidth) / (axisList.length - 1);
 
         axesCenters = [];
         axesCenters.push(borderOffset.left + (axisWidth / 2));

@@ -1,3 +1,24 @@
-var ParallelCoordinates = require('./../external/pc');
+import VisualizationComponent from './../resplendent';
+import $ from 'jquery';
 
-console.log(ParallelCoordinates);
+export default class ParallelCoordinates extends VisualizationComponent {
+  constructor (div, dataRoot) {
+    super(div);
+    this.dataRoot = dataRoot;
+
+    let PC = require('./../external/pc');
+
+    this.pc = new PC(this.div, (var1, var2, callback) => {
+      this.fetchHistogram(var1, var2).then(callback);
+    });
+  }
+
+  refresh (data) {
+    this.pc.updateAxisList(data);
+    this.pc.render();
+  }
+
+  fetchHistogram (var1, var2) {
+    return $.getJSON([this.dataRoot, var1, var2].join('/') + '.json');
+  }
+}

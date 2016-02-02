@@ -1,5 +1,5 @@
 class VisualizationComponent {
-  constructor (div, data) {
+  constructor (div) {
     this.div = div;
   }
 
