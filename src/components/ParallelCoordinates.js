@@ -16,6 +16,18 @@ export default class ParallelCoordinates extends VisualizationComponent {
     this.pc = new PC(this.el, (var1, var2, callback) => {
       this.fetchHistogram(var1, var2).then(callback);
     });
+
+    let mouseHandler = (action) => (e) => {
+      let rect = this.el.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      let y = e.clientY - rect.top;
+
+      this.pc.mouseHandler({x, y, action});
+    };
+
+    $(el).on('mousedown', mouseHandler('mousedown'));
+    $(el).on('mousemove', mouseHandler('mousemove'));
+    $(el).on('mouseup', mouseHandler('mouseup'));
   }
 
   refresh (data) {
