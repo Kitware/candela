@@ -2,18 +2,18 @@ import VisualizationComponent from './../resplendent';
 import $ from 'jquery';
 
 export default class ParallelCoordinates extends VisualizationComponent {
-  constructor (div, dataRoot, width, height) {
-    super(div);
+  constructor (el, dataRoot, width, height) {
+    super(el);
     this.dataRoot = dataRoot;
 
     if (width && height) {
-      $(div).attr('width', width);
-      $(div).attr('height', height);
+      $(el).attr('width', width);
+      $(el).attr('height', height);
     }
 
     let PC = require('./../external/pc');
 
-    this.pc = new PC(this.div, (var1, var2, callback) => {
+    this.pc = new PC(this.el, (var1, var2, callback) => {
       this.fetchHistogram(var1, var2).then(callback);
     });
   }
