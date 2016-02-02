@@ -4,7 +4,7 @@ var d3 = require('d3');
 
 class Dummy extends VisualizationComponent {
   constructor (div, data) {
-    super(div, data);
+    super(div);
 
     d3.select(this.div)
       .append('ul');

@@ -3,7 +3,7 @@ import vcharts from 'vcharts';
 
 class LineChart extends VisualizationComponent {
   constructor (div, data) {
-    super(div, data);
+    super(div);
 
     let values = data.values.map((x) => x[1]);
 
