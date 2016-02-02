@@ -3,10 +3,10 @@ import VisualizationComponent from './../resplendent';
 var d3 = require('d3');
 
 class Dummy extends VisualizationComponent {
-  constructor (div, data) {
-    super(div, data);
+  constructor (el, data) {
+    super(el);
 
-    d3.select(this.div)
+    d3.select(this.el)
       .append('ul');
 
     if (data) {
@@ -15,7 +15,7 @@ class Dummy extends VisualizationComponent {
   }
 
   refresh (data) {
-    let d = d3.select(this.div)
+    let d = d3.select(this.el)
       .select('ul')
       .selectAll('li')
       .data(data);

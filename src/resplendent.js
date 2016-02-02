@@ -1,6 +1,6 @@
 class VisualizationComponent {
-  constructor (div, data) {
-    this.div = div;
+  constructor (el) {
+    this.el = el;
   }
 
   refresh (data) {

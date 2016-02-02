@@ -2,8 +2,8 @@ import VisualizationComponent from './../resplendent';
 import vcharts from 'vcharts';
 
 class LineChart extends VisualizationComponent {
-  constructor (div, data) {
-    super(div, data);
+  constructor (el, data) {
+    super(el);
 
     let values = data.values.map((x) => x[1]);
 
@@ -20,7 +20,7 @@ class LineChart extends VisualizationComponent {
     maxY += (maxY - minY) * 0.20;
 
     this.chart = vcharts.chart('xy', {
-      el: div,
+      el: el,
       series: [
         {
           name: 'series1',
