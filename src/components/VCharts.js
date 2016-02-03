@@ -1,7 +1,7 @@
 import VisualizationComponent from './../resplendent';
 import vcharts from 'vcharts';
 
-class LineChart extends VisualizationComponent {
+export default class LineChart extends VisualizationComponent {
   constructor (el, data) {
     super(el);
 
@@ -27,7 +27,7 @@ class LineChart extends VisualizationComponent {
           values: data.values,
           x: '0',
           y: '1',
-          color: 'blue',
+          color: 'darkslategray',
           line: true,
           point: true
         }
@@ -51,7 +51,7 @@ class LineChart extends VisualizationComponent {
     });
   }
 
-  refresh (data) {
+  render () {
     this.chart.update();
   }
 }

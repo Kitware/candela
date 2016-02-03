@@ -19,6 +19,7 @@ function dummy () {
   ];
 
   let vis = new Dummy(el, data);
+  vis.render();
 
   window.setTimeout(() => {
     data = [
@@ -33,7 +34,8 @@ function dummy () {
       }
     ];
 
-    vis.refresh(data);
+    vis.data(data);
+    vis.render();
   }, 1000);
 }
 
@@ -49,7 +51,7 @@ function linechart () {
   }
 
   let vis = new LineChart(el, data);
-  vis.refresh();
+  vis.render();
 }
 
 function parallelCoordinates () {
@@ -64,7 +66,8 @@ function parallelCoordinates () {
   ];
 
   let vis = new ParallelCoordinates(el, 'nba-heatmaps', 540, 360);
-  vis.refresh(data);
+  vis.data(data);
+  vis.render(data);
 }
 
 import indexContent from './jade/index.jade';

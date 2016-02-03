@@ -2,30 +2,33 @@ import VisualizationComponent from './../resplendent';
 
 var d3 = require('d3');
 
-class Dummy extends VisualizationComponent {
+export default class Dummy extends VisualizationComponent {
   constructor (el, data) {
     super(el);
 
     d3.select(this.el)
       .append('ul');
 
-    if (data) {
-      this.refresh(data);
-    }
+    this._data = data || [];
   }
 
-  refresh (data) {
+  render () {
     let d = d3.select(this.el)
       .select('ul')
       .selectAll('li')
-      .data(data);
+      .data(this._data);
 
     d.enter()
       .append('li');
 
+    d.exit()
+      .remove();
+
     d.text((d) => d.text)
       .style('color', (d) => d.color);
   }
-}
 
-export default Dummy;
+  data (newData) {
+    this._data = newData;
+  }
+}
