@@ -2,7 +2,7 @@ import VisualizationComponent from './../resplendent';
 
 var d3 = require('d3');
 
-class Dummy extends VisualizationComponent {
+export default class Dummy extends VisualizationComponent {
   constructor (el, data) {
     super(el);
 
@@ -32,5 +32,3 @@ class Dummy extends VisualizationComponent {
     this._data = newData;
   }
 }
-
-export default Dummy;

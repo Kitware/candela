@@ -1,4 +1,4 @@
-class VisualizationComponent {
+export default class VisualizationComponent {
   constructor (el) {
     if (!el) {
       throw new Error('"el" is a required argument');
@@ -11,5 +11,3 @@ class VisualizationComponent {
     throw new Error('"refresh() is pure abstract"');
   }
 }
-
-export default VisualizationComponent;

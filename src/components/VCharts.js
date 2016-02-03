@@ -1,7 +1,7 @@
 import VisualizationComponent from './../resplendent';
 import vcharts from 'vcharts';
 
-class LineChart extends VisualizationComponent {
+export default class LineChart extends VisualizationComponent {
   constructor (el, data) {
     super(el);
 
