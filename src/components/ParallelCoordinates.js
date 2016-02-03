@@ -30,9 +30,12 @@ export default class ParallelCoordinates extends VisualizationComponent {
     $(el).on('mouseup', mouseHandler('mouseup'));
   }
 
-  refresh (data) {
-    this.pc.updateAxisList(data);
+  render (data) {
     this.pc.render();
+  }
+
+  data (data) {
+    this.pc.updateAxisList(data);
   }
 
   fetchHistogram (var1, var2) {

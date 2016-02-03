@@ -66,7 +66,8 @@ function parallelCoordinates () {
   ];
 
   let vis = new ParallelCoordinates(el, 'nba-heatmaps', 540, 360);
-  vis.refresh(data);
+  vis.data(data);
+  vis.render(data);
 }
 
 import indexContent from './jade/index.jade';
