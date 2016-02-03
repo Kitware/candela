@@ -27,7 +27,7 @@ export default class LineChart extends VisualizationComponent {
           values: data.values,
           x: '0',
           y: '1',
-          color: 'blue',
+          color: 'darkslategray',
           line: true,
           point: true
         }
