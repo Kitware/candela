@@ -51,7 +51,7 @@ function linechart () {
   }
 
   let vis = new LineChart(el, data);
-  vis.refresh();
+  vis.render();
 }
 
 function parallelCoordinates () {

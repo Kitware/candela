@@ -51,7 +51,7 @@ class LineChart extends VisualizationComponent {
     });
   }
 
-  refresh (data) {
+  render () {
     this.chart.update();
   }
 }
