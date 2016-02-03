@@ -47,7 +47,6 @@ module.exports = {
   debug: !production,
   devtool: production ? false : 'eval',
   entry: {
-    resplendent: ['./src/resplendent.js'],
     index: './src/index.js'
   },
   output: {

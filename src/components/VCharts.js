@@ -1,4 +1,4 @@
-import VisualizationComponent from './../resplendent';
+import VisualizationComponent from './../components';
 import vcharts from 'vcharts';
 
 export default class LineChart extends VisualizationComponent {
