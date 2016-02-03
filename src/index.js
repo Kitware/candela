@@ -19,6 +19,7 @@ function dummy () {
   ];
 
   let vis = new Dummy(el, data);
+  vis.render();
 
   window.setTimeout(() => {
     data = [
@@ -33,7 +34,8 @@ function dummy () {
       }
     ];
 
-    vis.refresh(data);
+    vis.data(data);
+    vis.render();
   }, 1000);
 }
 
