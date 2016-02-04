@@ -42,6 +42,10 @@ module.exports = {
     ],
     loaders: [
       {
+        test: require.resolve('./src/resplendent.js'),
+        loader: 'expose?resplendent'
+      },
+      {
         test: /\.js$/,
         loader: 'babel-loader',
         query: {
