@@ -3,14 +3,6 @@ var path = require('path');
 
 var CleanPlugin = require('clean-webpack-plugin');
 
-var plugins = [
-  new webpack.ProvidePlugin({
-    vg: 'vega'
-  }),
-
-  new CleanPlugin(['./dist/resplendent.js', './dist/common.js', './dist/index.js'])
-];
-
 module.exports = {
   entry: {
     resplendent: './src/resplendent.js',
@@ -28,7 +20,17 @@ module.exports = {
       d3: path.resolve(__dirname, 'node_modules/d3/d3.min.js')
     }
   },
-  plugins: plugins,
+  plugins: [
+    new webpack.ProvidePlugin({
+      vg: 'vega'
+    }),
+
+    new CleanPlugin([
+      './dist/resplendent.js',
+      './dist/common.js',
+      './dist/index.js'
+    ])
+  ],
   module: {
     preLoaders: [
       {
