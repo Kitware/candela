@@ -4,7 +4,7 @@
   "description": "Laboratory for exploring visualization component architecture and specification within Resonant",
   "main": "index.js",
   "scripts": {
-    "build:lib": "webpack"
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
