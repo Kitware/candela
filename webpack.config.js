@@ -3,15 +3,7 @@ var path = require('path');
 
 var CleanPlugin = require('clean-webpack-plugin');
 
-var production = process.env.NODE_ENV === 'production';
-
 var plugins = [
-  new webpack.optimize.CommonsChunkPlugin({
-    name: 'common',
-    children: true,
-    minChunks: 2
-  }),
-
   new webpack.ProvidePlugin({
     vg: 'vega'
   }),
@@ -19,33 +11,7 @@ var plugins = [
   new CleanPlugin(['./dist/resplendent.js', './dist/common.js', './dist/index.js'])
 ];
 
-if (production) {
-  plugins = plugins.concat([
-      new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.OccurrenceOrderPlugin(),
-      new webpack.optimize.MinChunkSizePlugin({
-        minChunkSize: 51200,
-      }),
-      new webpack.optimize.UglifyJsPlugin({
-        mangle: true,
-        compress: {
-          warnings: false
-        }
-      }),
-      new webpack.DefinePlugin({
-        __SERVER__: !production,
-        __DEVELOPMENT__: !production,
-        __DEVTOOLS__: !production,
-        'process.env': {
-          BABEL_ENV: JSON.stringify(process.env.NODE_ENV)
-        }
-      })
-  ]);
-}
-
 module.exports = {
-  debug: !production,
-  devtool: production ? false : 'eval',
   entry: {
     resplendent: './src/resplendent.js',
     index: './src/index.js'
@@ -59,11 +25,11 @@ module.exports = {
   resolve: {
     alias: {
       vega: path.resolve(__dirname, 'node_modules/vega/index.js'),
-      // d3: path.resolve(__dirname, 'node_modules/d3/d3.min.js')
     }
   },
   externals: {
-    d3: 'd3'
+    d3: 'd3',
+    pc: 'pc'
   },
   plugins: plugins,
   module: {
