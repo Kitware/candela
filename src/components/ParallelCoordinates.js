@@ -1,4 +1,4 @@
-import VisualizationComponent from './../resplendent';
+import VisualizationComponent from './../components';
 import $ from 'jquery';
 
 export default class ParallelCoordinates extends VisualizationComponent {

@@ -1,13 +1,14 @@
-export default class VisualizationComponent {
-  constructor (el) {
-    if (!el) {
-      throw new Error('"el" is a required argument');
-    }
+import VisualizationComponent from './components';
+import Dummy from './components/Dummy';
+import LineChart from './components/VCharts';
+import ParallelCoordinates from './components/ParallelCoordinates';
 
-    this.el = el;
-  }
+module.exports = {
+  VisualizationComponent,
 
-  render () {
-    throw new Error('"refresh() is pure abstract"');
+  components: {
+    Dummy,
+    LineChart,
+    ParallelCoordinates
   }
-}
+};
