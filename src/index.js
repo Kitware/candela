@@ -44,7 +44,7 @@ function linechart () {
 
   let data = [];
 
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 20; i++) {
     data.push([i, Math.random() * 10]);
   }
 
