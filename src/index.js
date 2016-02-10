@@ -42,12 +42,10 @@ function dummy () {
 function linechart () {
   let el = document.getElementById('vcharts-line');
 
-  let data = {
-    values: []
-  };
+  let data = [];
 
   for (let i = 0; i < 1000; i++) {
-    data.values.push([i, Math.random() * 10]);
+    data.push([i, Math.random() * 10]);
   }
 
   let vis = new LineChart(el, data);

@@ -5,7 +5,7 @@ export default class LineChart extends VisualizationComponent {
   constructor (el, data) {
     super(el);
 
-    let values = data.values.map((x) => x[1]);
+    let values = data.map((x) => x[1]);
 
     let minY = Math.min(...values);
     if (minY === -Infinity) {
@@ -24,7 +24,7 @@ export default class LineChart extends VisualizationComponent {
       series: [
         {
           name: 'series1',
-          values: data.values,
+          values: data,
           x: '0',
           y: '1',
           color: 'darkslategray',
