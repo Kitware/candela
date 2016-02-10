@@ -1,3 +1,5 @@
+import telegraph from 'telegraph-events';
+
 export default class VisualizationComponent {
   constructor (el) {
     if (!el) {
@@ -5,6 +7,8 @@ export default class VisualizationComponent {
     }
 
     this.el = el;
+
+    telegraph(this);
   }
 
   render () {

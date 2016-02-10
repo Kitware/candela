@@ -26,6 +26,7 @@
     "semistandard-loader": "0.0.3",
     "style-loader": "^0.13.0",
     "stylus-loader": "^1.5.1",
+    "telegraph-events": "^1.0.3",
     "webpack": "^1.12.12"
   },
   "dependencies": {
