@@ -1,5 +1,6 @@
 *.swp
 node_modules
 dist/index.js
+dist/index.js.map
 dist/resplendent.js
-dist/common.js
+dist/resplendent.js.map
