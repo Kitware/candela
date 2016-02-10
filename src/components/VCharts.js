@@ -59,6 +59,7 @@ export default class LineChart extends VisualizationComponent {
 
   render () {
     this.chart.update();
+    this.emit('render');
   }
 }
 

@@ -50,6 +50,21 @@ function linechart () {
 
   let vis = new LineChart(el, data);
   vis.render();
+
+  let counter = data.length;
+  window.setInterval(function () {
+    data.push([counter, Math.random() * 10]);
+    data = data.slice(1);
+
+    counter++;
+
+    vis.data(data);
+    vis.render();
+  }, 1000);
+
+  vis.on('render', function () {
+    $('#counter').text(counter - data.length);
+  });
 }
 
 function parallelCoordinates () {
