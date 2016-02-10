@@ -11,6 +11,7 @@ export default class LineChart extends VisualizationComponent {
     if (minY === -Infinity) {
       minY = 0;
     }
+    this.minY = minY;
 
     let maxY = Math.max(...values);
     if (maxY === Infinity) {
@@ -18,9 +19,14 @@ export default class LineChart extends VisualizationComponent {
     }
 
     maxY += (maxY - minY) * 0.20;
+    this.maxY = maxY;
 
+    this.data(data);
+  }
+
+  data (data) {
     this.chart = vcharts.chart('xy', {
-      el: el,
+      el: this.el,
       series: [
         {
           name: 'series1',
@@ -40,7 +46,7 @@ export default class LineChart extends VisualizationComponent {
         title: 'Y',
         zoom: false,
         pan: false,
-        domain: [minY, maxY]
+        domain: [this.minY, this.maxY]
       },
       padding: {
         top: 100,
