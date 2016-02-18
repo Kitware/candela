@@ -1,36 +1,30 @@
 var webpack = require('webpack');
 var path = require('path');
-
-var CleanPlugin = require('clean-webpack-plugin');
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   devtool: 'source-map',
-  entry: {
-    resplendent: './src/resplendent.js',
-    index: './src/index.js'
-  },
+  entry: './src',
   output: {
-    library: '[name]',
+    library: 'harmony',
     libraryTarget: 'umd',
     path: 'dist',
-    filename: '[name].js'
+    filename: 'harmony.js'
   },
   resolve: {
     alias: {
-      vega: path.resolve(__dirname, 'node_modules/vega/index.js'),
-      d3: path.resolve(__dirname, 'node_modules/d3/d3.min.js')
+      vega: path.resolve(__dirname, '../../node_modules/vega/index.js'),
+      d3: path.resolve(__dirname, '../../node_modules/d3/d3.min.js')
     }
   },
   plugins: [
     new webpack.ProvidePlugin({
       vg: 'vega'
     }),
-
-    new CleanPlugin([
-      './dist/resplendent.js',
-      './dist/common.js',
-      './dist/index.js'
-    ])
+    new CopyWebpackPlugin([{
+      from: './index.html',
+      to: './index.html'
+    }])
   ],
   module: {
     preLoaders: [
@@ -43,10 +37,6 @@ module.exports = {
     ],
     loaders: [
       {
-        test: require.resolve('./src/resplendent.js'),
-        loader: 'expose?resplendent'
-      },
-      {
         test: /\.js$/,
         loader: 'babel-loader',
         query: {
@@ -55,18 +45,12 @@ module.exports = {
         include: __dirname + '/src'
       },
       {
-        test: function (path) {
-          return path.endsWith('/src/external/pc.js');
-        },
-        loader: 'legacy'
-      },
-      {
         test: /\.styl$/,
         loaders: ['style', 'css', 'stylus']
       },
       {
         test: /\.jade$/,
-        loaders: ['jade']
+        loader: 'jade'
       },
       {
         test: /\.json$/,
