@@ -1,1 +1,2 @@
-dist
+web_client/extra
+*.pyc

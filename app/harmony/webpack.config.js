@@ -1,6 +1,5 @@
 var webpack = require('webpack');
 var path = require('path');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   devtool: 'source-map',
@@ -8,23 +7,13 @@ module.exports = {
   output: {
     library: 'harmony',
     libraryTarget: 'umd',
-    path: 'dist',
+    path: 'web_client/extra',
     filename: 'harmony.js'
-  },
-  resolve: {
-    alias: {
-      vega: path.resolve(__dirname, '../../node_modules/vega/index.js'),
-      d3: path.resolve(__dirname, '../../node_modules/d3/d3.min.js')
-    }
   },
   plugins: [
     new webpack.ProvidePlugin({
       vg: 'vega'
-    }),
-    new CopyWebpackPlugin([{
-      from: './index.html',
-      to: './index.html'
-    }])
+    })
   ],
   module: {
     preLoaders: [
