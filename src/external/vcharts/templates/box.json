@@ -1,0 +1,249 @@
+[
+  "@defaults",
+  [
+    ["group", "key"],
+    ["boxSize", 0.75],
+    ["capSize", 0.5],
+    ["orient", "horizontal"],
+    ["horiz", ["@eq", ["@get", "orient"], "horizontal"]],
+    ["valueAxis", ["@if", ["@get", "horiz"], "x", "y"]],
+    ["categoryAxis", ["@if", ["@get", "horiz"], "y", "x"]]
+  ],
+  [
+    "@merge",
+    [
+      "@apply",
+      "axis",
+      [
+        "@merge",
+        ["@if", ["@get", "horiz"], ["@get", "xAxis"], ["@get", "yAxis"]],
+        {
+          "axis": ["@get", "valueAxis"],
+          "size": ["@if", ["@get", "horiz"], ["@get", "width"], ["@get", "height"]],
+          "domain": {"data": "table", "field": "value"}
+        }
+      ]
+    ],
+    [
+      "@apply",
+      "axis",
+      [
+        "@merge",
+        ["@if", ["@get", "horiz"], ["@get", "yAxis"], ["@get", "xAxis"]],
+        {
+          "axis": ["@get", "categoryAxis"],
+          "size": ["@if", ["@get", "horiz"], ["@get", "height"], ["@get", "width"]],
+          "type": "ordinal",
+          "points": true,
+          "padding": 1,
+          "domain": {"data": "table", "field": "name", "sort": true}
+        }
+      ]
+    ],
+    {
+      "name": "boxplot",
+      "height": ["@get", "height", 400],
+      "padding": ["@get", "padding", {"left": 100, "right": 10, "top": 10, "bottom": 50}],
+      "width": ["@get", "width", 600],
+      "data": [
+        {
+          "name": "table",
+          "values": ["@get", "values"],
+          "transform": [
+            {
+              "type": "fold",
+              "fields": ["@get", "fields"]
+            },
+            {
+              "type": "formula",
+              "field": "name",
+              "expr": [
+                "@if",
+                ["@eq", "key", ["@get", "group"]],
+                "datum.key",
+                [
+                  "@join",
+                  "",
+                  ["datum.key + ' ' + datum.", ["@get", "group"]]
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "name": "stats",
+          "source": "table",
+          "transform": [
+            {
+              "type": "aggregate",
+              "groupby": ["name"],
+              "summarize": [
+                {
+                  "field": "value",
+                  "ops": ["min","max", "median", "q1", "q3", "valid"]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "calcs",
+          "source": "stats",
+          "transform": [
+            {"type": "formula", "field": "lower", "expr": "max(datum.min_value,datum.q1_value-1.5*(datum.q3_value-datum.q1_value))"},
+            {"type": "formula", "field": "upper", "expr": "min(datum.max_value,datum.q3_value+1.5*(datum.q3_value-datum.q1_value))"},
+            {"type": "formula", "field": "min_value_opacity", "expr": "if(datum.min_value==datum.lower,0,1)"},
+            {"type": "formula", "field": "max_value_opacity", "expr": "if(datum.max_value==datum.upper,0,1)"}
+          ]
+        }
+      ],
+      "scales": [
+        {
+          "name": "ybar",
+          "range": ["@if", ["@get", "horiz"], "height", "width"],
+          "domain": {"data": "table", "field": "name", "sort": true},
+          "type": "ordinal",
+          "round": true
+        }
+      ],
+      "marks": [
+        {
+          "type": "group",
+          "properties": {
+            "enter": {
+              "x": {"value": 0},
+              "width": {"field": {"group": "width"}},
+              "y": {"value": 0},
+              "height": {"field": {"group": "height"}},
+              "clip": {"value": true}
+            }
+          },
+          "marks": [
+            {
+              "type": "rect",
+              "from": {"data": "calcs"},
+              "properties": {
+                "update": [
+                  "@orient",
+                  ["@get", "orient"],
+                  {
+                    "x": {"field": "lower", "scale": ["@get", "valueAxis"]},
+                    "x2": {"field": "upper", "scale": ["@get", "valueAxis"]},
+                    "yc": {"field": "name", "scale": ["@get", "categoryAxis"]},
+                    "height": {"value": 1},
+                    "fill": {"value": "#888"}
+                  }
+                ]
+              }
+            },
+            {
+              "type": "rect",
+              "from": {"data": "calcs"},
+              "properties": {
+                "update": [
+                  "@orient",
+                  ["@get", "orient"],
+                  {
+                    "x": {"scale": ["@get", "valueAxis"], "field": "q1_value"},
+                    "x2": {"scale": ["@get", "valueAxis"], "field": "q3_value"},
+                    "yc": {"scale": ["@get", "categoryAxis"], "field": "name"},
+                    "height": {"scale": "ybar", "band": true, "mult": ["@get", "boxSize"]},
+                    "fill": {"value": ["@get", "fill", "white"]},
+                    "stroke": {"value": "#888"}
+                  }
+                ]
+              }
+            },
+            {
+              "type": "rect",
+              "from": {"data": "calcs"},
+              "properties": {
+                "update": [
+                  "@orient",
+                  ["@get", "orient"],
+                  {
+                    "x": {"scale": ["@get", "valueAxis"], "field": "median_value"},
+                    "width": {"value": 2},
+                    "yc": {"scale": ["@get", "categoryAxis"], "field": "name"},
+                    "height": {"scale": "ybar", "band": true, "mult": ["@get", "boxSize"]},
+                    "fill": {"value": "#000"}
+                  }
+                ]
+              }
+            },
+            {
+              "type": "rect",
+              "from": {"data": "calcs"},
+              "properties": {
+                "update": [
+                  "@orient",
+                  ["@get", "orient"],
+                  {
+                    "x": {"scale": ["@get", "valueAxis"], "field": "lower"},
+                    "width": {"value": 1},
+                    "yc": {"scale": ["@get", "categoryAxis"], "field": "name"},
+                    "height": {"scale": "ybar", "band": true, "mult": ["@get", "capSize"]},
+                    "fill": {"value": "#000"}
+                  }
+                ]
+              }
+            },
+            {
+              "type": "rect",
+              "from": {"data": "calcs"},
+              "properties": {
+                "update": [
+                  "@orient",
+                  ["@get", "orient"],
+                  {
+                    "x": {"scale": ["@get", "valueAxis"], "field": "upper"},
+                    "width": {"value": 1},
+                    "yc": {"scale": ["@get", "categoryAxis"], "field": "name"},
+                    "height": {"scale": "ybar", "band": true, "mult": ["@get", "capSize"]},
+                    "fill": {"value": "#000"}
+                  }
+                ]
+              }
+            },
+            {
+              "type": "symbol",
+              "from": {"data": "calcs"},
+              "properties": {
+                "update": [
+                  "@orient",
+                  ["@get", "orient"],
+                  {
+                    "x": {"scale": ["@get", "valueAxis"], "field": "min_value"},
+                    "yc": {"scale": ["@get", "categoryAxis"], "field": "name"},
+                    "size": {"value": 20},
+                    "stroke": {"value": "#000"},
+                    "fill": {"value": "#fff"},
+                    "opacity": {"field": "min_value_opacity"}
+                  }
+                ]
+              }
+            },
+            {
+              "type": "symbol",
+              "from": {"data": "calcs"},
+              "properties": {
+                "update": [
+                  "@orient",
+                  ["@get", "orient"],
+                  {
+                    "x": {"scale": ["@get", "valueAxis"], "field": "max_value"},
+                    "yc": {"scale": ["@get", "categoryAxis"], "field": "name"},
+                    "size": {"value": 20},
+                    "stroke": {"value": "#000"},
+                    "fill": {"value": "#fff"},
+                    "opacity": {"field": "max_value_opacity"}
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+]

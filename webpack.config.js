@@ -6,8 +6,7 @@ var CleanPlugin = require('clean-webpack-plugin');
 module.exports = {
   devtool: 'source-map',
   entry: {
-    resplendent: './src/resplendent.js',
-    index: './src/index.js'
+    resplendent: './src/index.js'
   },
   output: {
     library: '[name]',
