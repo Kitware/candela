@@ -162,6 +162,7 @@ additional options are supported:
 | xAxis     | [Axis](#axis) | An object describing the *x* axis. |
 | yAxis     | [Axis](#axis) | An object describing the *y* axis. |
 | tooltip   | String | Mustache-style string template where `d` is the hovered data element, e.g. `'{{d.x}} -- {{d.y}}'`. |
+| legend    | Boolean | Whether to draw a legend (default *true*). |
 
 ### Series
 

@@ -18,7 +18,14 @@ export default class Scatter {
         values: options.data,
         x: options.x,
         y: options.y
-      }]
+      }],
+      xAxis: {
+        title: options.x
+      },
+      yAxis: {
+        title: options.y
+      },
+      legend: false
     });
     window.onresize = () => chart.update();
   }
