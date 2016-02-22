@@ -1,10 +1,30 @@
 
 
-class CustomAppRoot(object):
+class CustomAppRoot:
     exposed = True
 
     def GET(self):
-        return '<script src="static/built/plugins/harmony/extra/harmony.js"></script>'
+        return """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet"
+          href="//fonts.googleapis.com/css?family=Droid+Sans:400,700">
+    <link rel="stylesheet" href="static/lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/lib/fontello/css/fontello.css">
+    <link rel="stylesheet" href="static/lib/fontello/css/animation.css">
+    <link rel="stylesheet" href="static/built/app.min.css">
+    <link rel="icon" type="image/png" href="static/img/Girder_Favicon.png">
+</head>
+<body>
+    <div id="g-global-info-apiroot" class="hide">api/v1</div>
+    <div id="g-global-info-staticroot" class="hide">static</div>
+    <div class="hmy-content"></div>
+    <script src="static/built/libs.min.js"></script>
+    <script src="static/built/app.min.js"></script>
+    <script src="static/built/plugins/harmony/extra/harmony.js"></script>
+</body>
+"""
 
 
 def load(info):

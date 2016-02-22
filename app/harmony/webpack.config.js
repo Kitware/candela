@@ -30,8 +30,7 @@ module.exports = {
         loader: 'babel-loader',
         query: {
           presets: ['es2015']
-        },
-        include: __dirname + '/src'
+        }
       },
       {
         test: /\.styl$/,
