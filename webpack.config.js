@@ -6,7 +6,7 @@ var CleanPlugin = require('clean-webpack-plugin');
 module.exports = {
   devtool: 'source-map',
   entry: {
-    resplendent: './src/resplendent.js',
+    candela: './src/candela.js',
     index: './src/index.js'
   },
   output: {
@@ -27,7 +27,7 @@ module.exports = {
     }),
 
     new CleanPlugin([
-      './dist/resplendent.js',
+      './dist/candela.js',
       './dist/common.js',
       './dist/index.js'
     ])
@@ -43,8 +43,8 @@ module.exports = {
     ],
     loaders: [
       {
-        test: require.resolve('./src/resplendent.js'),
-        loader: 'expose?resplendent'
+        test: require.resolve('./src/candela.js'),
+        loader: 'expose?candela'
       },
       {
         test: /\.js$/,
