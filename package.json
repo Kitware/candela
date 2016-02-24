@@ -1,7 +1,7 @@
 {
-  "name": "resplendent",
+  "name": "candela",
   "version": "0.1.0",
-  "description": "Laboratory for exploring visualization component architecture and specification within Resonant",
+  "description": "Visualization components for the web",
   "main": "index.js",
   "scripts": {
     "build": "webpack",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@gitlab.kitware.com:ronichoudhury/resplendent.git"
+    "url": "git@github.com:kitware/candela.git"
   },
   "author": "Roni Choudhury",
   "license": "Apache-2.0",
