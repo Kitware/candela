@@ -1,6 +1,6 @@
 import layout from './jade/layout.jade';
 import './styl/layout.styl';
-import resplendent from './../../../src';
+import candela from './../../../src';
 
 let girder = window.girder;
 
@@ -74,7 +74,7 @@ window.onload = () => {
 
   visualizations.on('add', item => {
     let visMeta = item.get('meta').visualization;
-    let VisComponent = resplendent.components[visMeta.type];
+    let VisComponent = candela.components[visMeta.type];
     resolveOptions(VisComponent, visMeta.options, (opts) => {
       new VisComponent('.hmy-vis', opts);
     });

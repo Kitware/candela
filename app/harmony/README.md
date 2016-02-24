@@ -11,7 +11,7 @@ Choose your own visualization adventure.
 3. Run the following after cloning this repository:
 
   ```bash
-  cd resplendent_repo_dir
+  cd candela_repo_dir
   npm install
   npm run build-harmony
   ```
@@ -34,7 +34,7 @@ Choose your own visualization adventure.
 ## Incremental build
 
 ```bash
-cd resplendent_repo_dir
+cd candela_repo_dir
 npm run build-harmony
 cd girder_repo_dir
 grunt
