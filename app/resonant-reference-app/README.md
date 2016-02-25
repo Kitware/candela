@@ -1,39 +1,45 @@
-resonant-reference-app
-======================
-A UX prototype for the whole resonant-supported workflow
+# Reference Application
 
-# Building / Running
+Choose your own visualization adventure.
 
-## Prerequisites
-Technically, you only need (node.js)[https://nodejs.org/en/download/].
+## Installation
 
-Then type this in the terminal:
+1. [Install Girder prerequisites](http://girder.readthedocs.org/en/latest/prerequisites.html).
 
-    cd resonant-reference-app
-    npm install
+2. [Install Girder from a Git checkout](http://girder.readthedocs.org/en/latest/installation.html#install-from-git-checkout).
 
-However, for easy running/development, you'll probably want
-to do this as well (may need sudo, depending on your setup):
+3. Run the following after cloning this repository:
 
-    npm install -g webpack-dev-server
+  ```bash
+  cd candela_repo_dir
+  npm install
+  npm run build:reference
+  ```
 
-## To run locally / develop
+4. Install the Harmony plugin using `girder-install`:
 
-    webpack-dev-server --progress --colors --hot --content-base _build
+  ```bash
+  girder-install plugin -s app/resonant-reference-app
+  ```
 
-You will see the results at [localhost:8080](http://localhost:8080).
+5. Rebuild Girder:
 
-You *won't* see the built site (`webpack-dev-server` will
-create `_build` in memory, not disk!). Because of this,
-changes that you save should be visible right away.
+  ```bash
+  cd girder_repo_dir
+  grunt
+  ```
 
-## To build
-If you've installed webpack globally:
+6. Visit the Girder admin interface to enable the Resonant Reference App plugin and restart Girder.
 
-    webpack -p --progress --colors
+## Incremental build
 
-If not, `npm install` will have given you a local copy:
+1. Rebuild:
 
-    node_modules/webpack/bin/webpack.js -p --progress --colors
-    
-The resulting minified site will be in _build
+  ```bash
+  cd candela_repo_dir
+  npm run build:reference
+  cd girder_repo_dir
+  grunt
+  ```
+
+2. Restart Girder.
