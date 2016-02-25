@@ -9,7 +9,7 @@ var Backbone = require('backbone'),
     libImage = require('../../../../assets/images/library.svg'),
     candela = require('../../../../../../dist/candela/candela.js');
 
-var DatasetLibrary = Backbone.View.extend({
+var VisualizationLibrary = Backbone.View.extend({
     render : function () {
         var self = this;
         self.$el.html(myTemplate);
@@ -29,4 +29,4 @@ var DatasetLibrary = Backbone.View.extend({
     }
 });
 
-module.exports = DatasetLibrary;
+module.exports = VisualizationLibrary;

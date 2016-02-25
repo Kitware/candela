@@ -30,7 +30,6 @@ var ToolsView = Backbone.View.extend({
         var hashes = location.hash.split('#');
         tools.forEach(function (d) {
             d.targeted = hashes.indexOf(d.key) !== -1;
-            // TODO: why isn't the icon changing?
         });
         
         // Create sections for each tool
@@ -64,6 +63,7 @@ var ToolsView = Backbone.View.extend({
         handlesEnter.append('img');
         sections.selectAll('h2').selectAll('a').selectAll('img')
             .attr('src', function (d) {
+                // TODO: why isn't the icon changing?
                 if (d.targeted) {
                     return collapseIcon;
                 } else {
@@ -85,9 +85,12 @@ var ToolsView = Backbone.View.extend({
         });
         
         // Distribute the space for each section
-        var style = 'calc((100% - (0.5em ' +
-            '+ 2.5*' + tools.length +
-            'em)) / ' + (hashes.length - 1) + ')';
+        var expandedSections = hashes.length - 1;
+        var collapsedSections = tools.length - expandedSections;
+        var style = 'calc((100% - (0.5em + ' +
+            '2.5*' + collapsedSections + 'em + ' +
+            '0.5*' + expandedSections + 'em)) / ' +
+            expandedSections + ')';
         
         self.$el.find('section')
             .css('width', '');
