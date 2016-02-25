@@ -1,0 +1,24 @@
+{
+  "name": "resonant-reference-app",
+  "author": "Alex Bigelow",
+  "version": "0.0.1",
+  "description": "A UX prototype for the whole resonant-supported workflow",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "backbone": "^1.2.3",
+    "d3": "^3.5.16",
+    "jquery": "^2.2.1"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^0.1.8",
+    "copy-webpack-plugin": "^1.1.1",
+    "css-loader": "^0.23.1",
+    "file-loader": "^0.8.5",
+    "html-loader": "^0.4.3",
+    "json-loader": "^0.5.4",
+    "style-loader": "^0.13.0",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.12.14"
+  }
+}
