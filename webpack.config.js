@@ -6,7 +6,8 @@ var CleanPlugin = require('clean-webpack-plugin');
 module.exports = {
   devtool: 'source-map',
   entry: {
-    candela: './src/index.js'
+    candela: './src/index.js',
+    demo: './app/demo/index.js'
   },
   output: {
     library: '[name]',
@@ -37,6 +38,7 @@ module.exports = {
         test: /\.js$/,
         loader: 'semistandard',
         include: path.resolve(__dirname, 'src'),
+        include: path.resolve(__dirname, 'app'),
         exclude: path.resolve(__dirname, 'src', 'external')
       }
     ],
@@ -51,7 +53,10 @@ module.exports = {
         query: {
           presets: ['es2015']
         },
-        include: __dirname + '/src'
+        include: [
+          __dirname + '/src',
+          __dirname + '/app'
+        ]
       },
       {
         test: function (path) {
