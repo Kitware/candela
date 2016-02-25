@@ -1,19 +1,11 @@
 /*globals require, module*/
-var CleanWebpackPlugin = require('clean-webpack-plugin'),
-    CopyWebpackPlugin = require('copy-webpack-plugin');
-
 module.exports = {
     entry: './app.js',
     output: {
-        path: '_build',
+        path: 'web_client/extra',
         filename: 'webpack_bundle.js'
     },
-    plugins: [
-        new CleanWebpackPlugin(['_build'], {
-            verbose: true
-        }),
-        new CopyWebpackPlugin([{ from: 'data', to: 'data' }])
-    ],
+    plugins: [],
     debug : true,
     devtool : 'cheap-source-map',
     module : {
@@ -23,11 +15,7 @@ module.exports = {
                 loader: 'style-loader!css-loader'
             },
             {
-                test: /index\.html/,
-                loader: 'file?name=index.html'
-            },
-            {
-                test: /^((?!index).)*\.html$/,
+                test: /\.html$/,
                 loader: 'html?attrs=img:src'
             },
             {
