@@ -49,7 +49,7 @@ module.exports = {
     ],
     loaders: [
       {
-        test: require.resolve('./src/candela.js'),
+        test: require.resolve('./src/index.js'),
         loader: 'expose?candela'
       },
       {
