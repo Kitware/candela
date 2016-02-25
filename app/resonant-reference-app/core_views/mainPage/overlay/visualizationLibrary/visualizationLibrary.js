@@ -6,34 +6,26 @@ var Backbone = require('backbone'),
     d3 = require('d3'),
     myTemplate = require('./template.html'),
     library = require('./visualizationLibrary.json'),
-    libImage = require('../../../../assets/images/library.svg');
+    libImage = require('../../../../assets/images/library.svg'),
+    candela = require('../../../../../../dist/candela/candela.js');
 
 var DatasetLibrary = Backbone.View.extend({
     render : function () {
         var self = this;
         self.$el.html(myTemplate);
-        
-        var libraryButtons = d3.select('div.visualizationLibrary')
-            .selectAll('.circleButton')
-            .data(library);
-        
-        var libraryButtonsEnter = libraryButtons.enter().append('div')
-            .attr('class', 'circleButton');
-        libraryButtons.exit().remove();
 
-        libraryButtonsEnter.append('img');
-        libraryButtons.selectAll('img')
-            .attr('src', libImage);
-        
-        libraryButtonsEnter.append('span');
-        libraryButtons.selectAll('span')
-            .text(function (d) { return d; });
-
-        d3.select('div.libraryInterface').selectAll('.circleButton')
-            .on('click', function (d) {
-                // TODO
-                window.overlay.render(null);
-            });
+        var vis = new candela.default.components.Scatter('.visualization', {
+          data: [
+            {
+              x: 1,
+              y: 1
+            },
+            {
+              x: 3,
+              y: 8
+            }
+          ]
+        });
     }
 });
 
