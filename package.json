@@ -4,7 +4,8 @@
   "description": "Visualization components for the web",
   "main": "index.js",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "build:harmony": "cd app/harmony && webpack"
   },
   "repository": {
     "type": "git",
@@ -32,7 +33,6 @@
   "dependencies": {
     "d3": "^3.5.14",
     "jquery": "^2.2.0",
-    "vcharts": "^0.2.1",
     "vega": "^2.4.2"
   }
 }

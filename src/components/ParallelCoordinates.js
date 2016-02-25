@@ -1,4 +1,4 @@
-import VisualizationComponent from './../components';
+import VisualizationComponent from '../core/VisualizationComponent';
 import $ from 'jquery';
 
 export default class ParallelCoordinates extends VisualizationComponent {

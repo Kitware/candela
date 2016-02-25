@@ -1,0 +1,178 @@
+[
+  "@defaults",
+  [
+    ["bin", "value"],
+    ["discrete", false],
+    ["width", 800],
+    ["height", 500]
+  ],
+  [
+    "@merge",
+    [
+      "@apply",
+      "axis",
+      [
+        "@merge",
+        ["@get", "xAxis"],
+        {
+          "axis": "x",
+          "size": ["@get", "width"],
+          "type": "ordinal",
+          "sort": false,
+          "domain": {
+            "data": "series",
+            "field": "bin",
+            "sort": true
+          }
+        }
+      ]
+    ],
+    [
+      "@apply",
+      "axis",
+      [
+        "@merge",
+        ["@get", "yAxis"],
+        {
+          "axis": "y",
+          "size": ["@get", "height"],
+          "type": "linear",
+          "domain": {
+            "data": "series",
+            "field": "count"
+          }
+        }
+      ]
+    ],
+    {
+      "width": ["@get", "width"],
+      "height": ["@get", "height"],
+      "padding": ["@get", "padding", {"top": 20, "bottom": 50, "left": 50, "right": 10}],
+      "predicates": [
+        {
+          "name": "tooltip",
+          "type": "==",
+          "operands": [{"signal": "d._id"}, {"arg": "id"}]
+        }
+      ],
+      "data": [
+        {
+          "name": "series",
+          "values": ["@get", "values"],
+          "transform": [
+            "@if",
+            ["@get", "discrete"],
+            [
+              {
+                "type": "formula",
+                "field": "bin",
+                "expr": [
+                  "@join",
+                  "",
+                  ["datum['", ["@get", "bin"], "']"]
+                ]
+              },
+              {
+                "type": "aggregate",
+                "groupby": ["bin"],
+                "summarize": [
+                  {
+                    "field": "*",
+                    "ops": ["count"]
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "type": "bin",
+                "field": ["@get", "bin"],
+                "output": {"start": "bin"},
+                "maxbins": ["@get", "maxBins", 10]
+              },
+              {
+                "type": "aggregate",
+                "groupby": ["bin"],
+                "summarize": [
+                  {
+                    "field": "*",
+                    "ops": ["count"]
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ],
+      "signals": [
+        {
+          "name": "d",
+          "init": {},
+          "streams": [
+            {"type": "rect:mouseover", "expr": "datum"},
+            {"type": "rect:mouseout", "expr": "{}"}
+          ]
+        }
+      ],
+      "marks": [
+        {
+          "type": "group",
+          "properties": {
+            "enter": {
+              "x": {"value": 0},
+              "width": {"field": {"group": "width"}},
+              "y": {"value": 0},
+              "height": {"field": {"group": "height"}},
+              "clip": {"value": true}
+            }
+          },
+          "marks": [
+            {
+              "type": "rect",
+              "from": {"data": "series"},
+              "properties": {
+                "update": {
+                  "x": {"scale": "x", "field": "bin", "offset": 1},
+                  "width": {"scale": "x", "band": true, "offset": -1},
+                  "y": {"scale": "y", "field": "count"},
+                  "y2": {"scale": "y", "value": 0},
+                  "fill": {"value": ["@get", "fill", "steelblue"]}
+                },
+                "hover": {
+                  "fill": {"value": ["@get", "hover", "red"]}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "properties": {
+                "enter": {
+                  "align": {"value": "center"},
+                  "fill": {"value": "#333"}
+                },
+                "update": {
+                  "x": {"scale": "x", "signal": "d.bin"},
+                  "dx": {"scale": "x", "band": true, "mult": 0.5},
+                  "y": {"scale": "y", "signal": "d.count", "offset": -5},
+                  "text": {"template": ["@get", "tooltip", "{{d.count}}"]},
+                  "fillOpacity": {
+                    "rule": [
+                      {
+                        "predicate": {
+                          "name": "tooltip",
+                          "id": {"value": null}
+                        },
+                        "value": 0
+                      },
+                      {"value": 1}
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+]

@@ -1,35 +1,19 @@
 var webpack = require('webpack');
 var path = require('path');
 
-var CleanPlugin = require('clean-webpack-plugin');
-
 module.exports = {
   devtool: 'source-map',
-  entry: {
-    candela: './src/index.js'
-  },
+  entry: './src',
   output: {
-    library: '[name]',
+    library: 'harmony',
     libraryTarget: 'umd',
-    path: 'dist',
-    filename: '[name].js'
-  },
-  resolve: {
-    alias: {
-      vega: path.resolve(__dirname, 'node_modules/vega/index.js'),
-      d3: path.resolve(__dirname, 'node_modules/d3/d3.min.js')
-    }
+    path: 'web_client/extra',
+    filename: 'harmony.js'
   },
   plugins: [
     new webpack.ProvidePlugin({
       vg: 'vega'
-    }),
-
-    new CleanPlugin([
-      './dist/candela.js',
-      './dist/common.js',
-      './dist/index.js'
-    ])
+    })
   ],
   module: {
     preLoaders: [
@@ -42,22 +26,11 @@ module.exports = {
     ],
     loaders: [
       {
-        test: require.resolve('./src/candela.js'),
-        loader: 'expose?candela'
-      },
-      {
         test: /\.js$/,
         loader: 'babel-loader',
         query: {
           presets: ['es2015']
-        },
-        include: __dirname + '/src'
-      },
-      {
-        test: function (path) {
-          return path.endsWith('/src/external/pc.js');
-        },
-        loader: 'legacy'
+        }
       },
       {
         test: /\.styl$/,
@@ -65,7 +38,7 @@ module.exports = {
       },
       {
         test: /\.jade$/,
-        loaders: ['jade']
+        loader: 'jade'
       },
       {
         test: /\.json$/,
