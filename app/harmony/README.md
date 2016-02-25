@@ -13,7 +13,7 @@ Choose your own visualization adventure.
   ```bash
   cd candela_repo_dir
   npm install
-  npm run build-harmony
+  npm run build:harmony
   ```
 
 4. Install the Harmony plugin using `girder-install`:
