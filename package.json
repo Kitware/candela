@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "build-harmony": "cd app/harmony && webpack"
+    "build:harmony": "cd app/harmony && webpack"
   },
   "repository": {
     "type": "git",
