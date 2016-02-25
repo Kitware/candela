@@ -2,6 +2,7 @@ var webpack = require('webpack');
 var path = require('path');
 
 var CleanPlugin = require('clean-webpack-plugin');
+var HtmlPlugin = require('html-webpack-plugin');
 
 module.exports = {
   devtool: 'source-map',
@@ -13,7 +14,7 @@ module.exports = {
     library: '[name]',
     libraryTarget: 'umd',
     path: 'dist',
-    filename: '[name].js'
+    filename: '[name]/[name].js'
   },
   resolve: {
     alias: {
@@ -27,10 +28,14 @@ module.exports = {
     }),
 
     new CleanPlugin([
-      './dist/candela.js',
-      './dist/common.js',
-      './dist/index.js'
-    ])
+      './dist'
+    ]),
+
+    new HtmlPlugin({
+      title: 'Candela Demo',
+      filename: 'demo/index.html',
+      chunks: ['demo']
+    })
   ],
   module: {
     preLoaders: [
