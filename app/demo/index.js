@@ -1,6 +1,6 @@
-import Dummy from './components/Dummy';
-import LineChart from './components/VCharts';
-import ParallelCoordinates from './components/ParallelCoordinates';
+import Dummy from './../../src/components/Dummy';
+import LineChart from './../../src/components/VCharts';
+import ParallelCoordinates from './../../src/components/ParallelCoordinates';
 import $ from 'jquery';
 
 function dummy () {
@@ -86,8 +86,8 @@ function parallelCoordinates () {
   vis.render(data);
 }
 
-import indexContent from './jade/index.jade';
-import './styl/index.styl';
+import indexContent from './index.jade';
+import './index.styl';
 
 window.onload = () => {
   $('body').html(indexContent());
