@@ -2,13 +2,13 @@
 /*jshint devel:true, browser:true*/
 
 var jQuery = require('jquery'),
-    myTemplate = require('./mainPage.html'),
-    myStyles = require('./mainPage.css'),
-    formStyles = require('../../css_extras/pure-css-custom-form-elements/style.css'),
-    tooltipStyles = require('../../css_extras/tooltip/tooltip.css'),
-    Overlay = require('./overlay/overlay.js'),
-    UserView = require('./user/user.js'),
-    ToolsView = require('./tools/tools.js');
+    myTemplate = require('./core_views/mainPage/mainPage.html'),
+    myStyles = require('./core_views/mainPage/mainPage.css'),
+    formStyles = require('./css_extras/pure-css-custom-form-elements/style.css'),
+    tooltipStyles = require('./css_extras/tooltip/tooltip.css'),
+    Overlay = require('./core_views/overlay/overlay.js'),
+    UserView = require('./core_views/user/user.js'),
+    ToolsView = require('./core_views/tools/tools.js');
 
 function renderEverything() {
     window.overlay.render();
@@ -17,6 +17,9 @@ function renderEverything() {
 }
 
 jQuery('body').append(myTemplate);
+
+var User = require('./core_models/user');
+window.user = new User();
 
 window.overlay = new Overlay({
     el : '#Overlay'

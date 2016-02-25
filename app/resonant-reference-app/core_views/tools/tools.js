@@ -6,8 +6,8 @@ var Backbone = require('backbone'),
     myTemplate = require('./template.html'),
     myStyles = require('./style.css'),
     d3 = require('d3'),
-    collapseIcon = require('../../../assets/images/collapse.svg'),
-    expandIcon = require('../../../assets/images/expand.svg');
+    collapseIcon = require('../../assets/images/collapse.svg'),
+    expandIcon = require('../../assets/images/expand.svg');
 
 var ToolsView = Backbone.View.extend({
     initialize : function () {

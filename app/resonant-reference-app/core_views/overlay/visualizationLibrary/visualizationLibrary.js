@@ -6,8 +6,8 @@ var Backbone = require('backbone'),
     d3 = require('d3'),
     myTemplate = require('./template.html'),
     library = require('./visualizationLibrary.json'),
-    libImage = require('../../../../assets/images/library.svg'),
-    candela = require('../../../../../../dist/candela/candela.js');
+    libImage = require('../../../assets/images/library.svg'),
+    candela = require('../../../../../dist/candela/candela.js');
 
 var VisualizationLibrary = Backbone.View.extend({
     render : function () {

@@ -1,6 +1,6 @@
 /*globals require, module*/
 module.exports = {
-    entry: './app.js',
+    entry: './mainPage.js',
     output: {
         path: 'web_client/extra',
         filename: 'webpack_bundle.js'

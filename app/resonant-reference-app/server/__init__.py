@@ -9,11 +9,10 @@ class CustomAppRoot:
 <html lang="en">
 <head>
     <title>Resonant Reference App</title>
-    <link rel="stylesheet"
-          href="//fonts.googleapis.com/css?family=Droid+Sans:400,700">
-    <link rel="stylesheet" href="static/lib/bootstrap/css/bootstrap.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Gentium+Basic:400,700' rel='stylesheet' type='text/css'>
+    <!--link rel="stylesheet" href="static/lib/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="static/lib/fontello/css/fontello.css">
-    <link rel="stylesheet" href="static/lib/fontello/css/animation.css">
+    <link rel="stylesheet" href="static/lib/fontello/css/animation.css"-->
     <link rel="stylesheet" href="static/built/app.min.css">
     <link rel="icon" type="image/png" href="static/img/Girder_Favicon.png">
 </head>
