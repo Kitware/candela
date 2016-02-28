@@ -1,4 +1,4 @@
-table.table.table-striped.table-hover.table-bordered
+table.table.table-striped.table-hover.table-responsive.table-compact
   thead.result-labels
     td Data Set
     each algorithm in algorithms
@@ -20,5 +20,6 @@ table.table.table-striped.table-hover.table-bordered
         each algorithm in algorithms
           td.bullet-container(id="#{resultSet[0].id}-#{algorithm.abbreviation.toLowerCase()}")
             svg.statusDot
-              circle.none(r="7", cx="7", cy="7")
-            svg.bullet
+              circle.none(r="10", cx="10", cy="10")
+            .bullet(id="#{resultSet[0].id}-#{algorithm.abbreviation.toLowerCase()}-bullet")
+              svg

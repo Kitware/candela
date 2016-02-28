@@ -1,10 +1,15 @@
-module.exports = {
-  entry: './src/index.js',
+var webpack = require('webpack');
 
+module.exports = {
+  entry: {
+    index: './src/index.js',
+    widget: './src/widget.js',
+    app: ['./src/app.js']
+  },
   output: {
     path: __dirname + '/dist',
     publicPath: '/dist/',
-    filename: 'trackerdash.js'
+    filename: 'trackerdash.[name].js'
   },
   module: {
     preLoaders: [
@@ -45,11 +50,19 @@ module.exports = {
       { test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/font-woff' },
       { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/octet-stream' },
       { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'file' },
-      { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=image/svg+xml' }
+      { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=image/svg+xml' },
+
+      // Needed by Vega
+      { test: /\.json$/, loader: 'json-loader' }
     ]
   },
   resolve: {
     extensions: ['.js', '.styl', '.css', '.jade', ''],
     modulesDirectories: ['./node_modules']
-  }
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      vg: 'vega'
+    })
+  ]
 };

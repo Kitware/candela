@@ -1,59 +1,25 @@
-import { App } from './app';
-
-require('bootstrap-webpack');
-require('nvd3/build/nv.d3.min.css');
-require('../styles/main.styl');
+import { dash as Dash } from './app';
 
 window.onload = () => {
   let newDiv = document.createElement('div');
   newDiv.setAttribute('class', 'dash-container');
   document.body.appendChild(newDiv);
-  let app = new App({
+  const app = new Dash({
     el: '.dash-container',
     name: 'Beta Ground Truth',
     day: '2014-06-03',
     branch: 'master',
-    trend: [{
-      success: 3,
-      bad: 1,
-      fail: 6,
-      date: '2014-05-27'
-    }, {
-      success: 2,
-      bad: 3,
-      fail: 5,
-      date: '2014-05-28'
-    }, {
-      success: 4,
-      bad: 5,
-      fail: 1,
-      date: '2014-05-29'
-    }, {
-      success: 3,
-      bad: 3,
-      fail: 4,
-      date: '2014-05-30'
-    }, {
-      success: 7,
-      bad: 2,
-      fail: 1,
-      date: '2014-05-31'
-    }, {
-      success: 6,
-      bad: 4,
-      fail: 0,
-      date: '2014-06-01'
-    }, {
-      success: 10,
-      bad: 0,
-      fail: 0,
-      date: '2014-06-02'
-    }, {
-      success: 8,
-      bad: 1,
-      fail: 1,
-      date: '2014-06-03'
-    }],
+    warning: 0.4,
+    fail: 0.7,
+    max: 1.0,
+    metric_name: 'RMSE euclids distance',
+    aggregate_metric_name: '94th percentile RMSE',
+    agg_trends: {
+      'ALGA': [0.4, 0.5, 0.6, 0.8, 1.2, 0.55, 0.2],
+      'ALGASBR': [0.4, 0.6, 0.6, 0.8, 1.2, 4, 5],
+      'ALGC': [0.1, 0.1, 0.2, 0.3, 1.5, 1.55, 0.2],
+      'ALGD-ONLINE': [0.4, 0.5, 0.6, 0.8, 2.2, 3.1415, 0.2]
+    },
     totalDatasets: 15,
     totalDistance: 1243,
     percentErrorByDataset: [{
@@ -177,6 +143,17 @@ window.onload = () => {
       fail: 25,
       max: 27,
       callback: function () { console.log('dataset3-ba'); }
+    }, {
+      dataset: 'dataset3',
+      algorithm: 'com',
+      length: 300,
+      mean: 11,
+      current: 38,
+      target: 7,
+      warning: 10,
+      fail: 25,
+      max: 25,
+      callback: function () { console.log('dataset3-com'); }
     }, {
       dataset: 'dataset2',
       algorithm: 'com',

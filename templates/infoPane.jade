@@ -1,12 +1,29 @@
-.info-title #{name}
-.info-date.info-section Date:
-  span.info-value #{day}
-.info-branch.info-section Branch:
-  span.info-value #{branch}
-.info-datasets.info-section Number of Runs:
-  span.info-value #{ranDatasets}
-.info-datasets.info-section Median RMSE Euclidean Distance
-  span.info-value #{totalMedian} m
-.info-section Results (Success / Bad / Fail):
-  span.info-value #{numSuccess} / #{numBad} / #{numFail}
-.status-bar-widget
+table.table.table-responsive.table-compact
+  thead.result-labels
+    th(colspan="2")
+      .agg-label-header
+        | Algorithm
+    th
+      .agg-sparkline-header
+        | Last 7 Days
+    th(colspan="2")
+      .agg-bullet-header
+        | #{aggregate_metric_name}
+  tbody
+  each algorithm in algorithms
+    tr.info-section-chart(id="#{algorithm}-aggregate-container")
+      td
+        svg.statusDot
+          circle.none(r="10", cx="10", cy="10")
+      td
+        .agg-label
+          | #{algorithm}
+      td
+        .agg-sparkline(id="#{algorithm}-aggregate-sparkline")
+          svg
+      td
+        .agg-value
+          | #{aggTrends[algorithm][aggTrends[algorithm].length-1]}
+      td
+        .agg-bullet(id="#{algorithm}-aggregate-bullet")
+          svg

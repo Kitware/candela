@@ -42,9 +42,7 @@ export let ResultTablePane = Backbone.View.extend({
       datasetMap: this.datasetMap,
       trajectoryMap: this.trajectoryMap,
       datasetLabelMap: this.datasetLabelMap
-    }));
-
-    this.$el.promise().done(_.bind(function () {
+    })).promise().done(_.bind(function () {
       _.each(this.results, function (result) {
         var resultDivSelector = '#' + result.id + '-' + result.algorithm;
         // change color of circle
@@ -57,7 +55,7 @@ export let ResultTablePane = Backbone.View.extend({
         }
         // render bullets
         let errorBullet = new ErrorBulletWidget({
-          el: resultDivSelector + ' svg.bullet',
+          el: resultDivSelector + '-bullet',
           result: result
         });
         errorBullet.render();

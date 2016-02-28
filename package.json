@@ -23,11 +23,14 @@
     "less-loader": "^2.2.2",
     "nvd3": "^1.8.2",
     "underscore": "~1.5",
-    "url-loader": "^0.5.7"
+    "url-loader": "^0.5.7",
+    "vcharts": "^0.2.1",
+    "vega": "^2.4.2"
   },
   "scripts": {
     "build": "webpack",
-    "start": "webpack-dev-server"
+    "build:release": "webpack --progress -p",
+    "start": "webpack-dev-server --progress --colors"
   },
   "devDependencies": {
     "babel-core": "^6.5.1",
@@ -38,9 +41,11 @@
     "d3": "^3.5.14",
     "eslint": "^1.10.3",
     "eslint-loader": "^1.2.1",
+    "expose-loader": "^0.7.1",
     "jade-loader": "^0.8.0",
     "jshint": "^2.0.0",
     "jshint-loader": "^0.8.3",
+    "json-loader": "^0.5.4",
     "node-libs-browser": "^1.0.0",
     "nvd3": "^1.8.2",
     "semistandard": "^7.0.5",
