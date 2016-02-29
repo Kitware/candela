@@ -1,6 +1,6 @@
 *.swp
 node_modules
-dist/index.js
-dist/index.js.map
-dist/candela.js
-dist/candela.js.map
+build/index.js
+build/index.js.map
+build/candela.js
+build/candela.js.map

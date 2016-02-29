@@ -11,7 +11,7 @@ module.exports = {
   output: {
     library: '[name]',
     libraryTarget: 'umd',
-    path: 'dist',
+    path: 'build',
     filename: '[name].js'
   },
   resolve: {
@@ -26,9 +26,9 @@ module.exports = {
     }),
 
     new CleanPlugin([
-      './dist/candela.js',
-      './dist/common.js',
-      './dist/index.js'
+      './build/candela.js',
+      './build/common.js',
+      './build/index.js'
     ])
   ],
   module: {
