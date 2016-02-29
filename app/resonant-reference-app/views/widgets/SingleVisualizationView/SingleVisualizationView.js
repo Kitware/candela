@@ -1,6 +1,6 @@
 import Backbone from 'backbone';
 import myTemplate from './template.html';
-//let candela = require('../../../../../dist/candela/candela.js');
+let candela = require('../../../../../dist/candela/candela.js');
 
 let SingleVisualizationView = Backbone.View.extend({
   render: function () {

@@ -1,4 +1,4 @@
-import telegraph from 'telegraph-events';
+// import telegraph from 'telegraph-events';
 
 export default class VisualizationComponent {
   constructor (el) {
@@ -8,7 +8,7 @@ export default class VisualizationComponent {
 
     this.el = el;
 
-    telegraph(this);
+    // telegraph(this);
   }
 
   render () {
