@@ -1,5 +1,3 @@
-
-
 class CustomAppRoot:
     exposed = True
 
