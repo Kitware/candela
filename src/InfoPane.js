@@ -152,8 +152,6 @@ export let InfoPane = Backbone.View.extend({
           }
         }).render();
         let dotSelector = '#' + key + '-aggregate-dot';
-        console.log(dotSelector);
-        console.log($(dotSelector));
         let current = value[value.length - 1];
         if (current > this.fail) {
           $(dotSelector).attr('class', 'fail');
