@@ -1,3 +1,5 @@
+var webpack = require('webpack');
+
 /*globals module*/
 module.exports = {
   entry: './mainPage.js',
@@ -5,7 +7,11 @@ module.exports = {
     path: 'web_client/extra',
     filename: 'webpack_bundle.js'
   },
-  plugins: [],
+  plugins: [
+    new webpack.ProvidePlugin({
+      vg: 'vega'
+    })
+  ],
   debug: true,
   devtool: 'cheap-source-map',
   module: {

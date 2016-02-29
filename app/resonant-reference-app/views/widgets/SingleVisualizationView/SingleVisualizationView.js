@@ -1,6 +1,6 @@
 import Backbone from 'backbone';
 import myTemplate from './template.html';
-let candela = require('../../../../../dist/candela/candela.js');
+import candela from './../../../../../src';
 
 let SingleVisualizationView = Backbone.View.extend({
   render: function () {
@@ -8,7 +8,7 @@ let SingleVisualizationView = Backbone.View.extend({
 
     self.$el.html(myTemplate);
 
-    /*self.vis = new candela.default.components.Scatter('.visualization', {
+    self.vis = new candela.components.Scatter('.visualization', {
       data: [{
         x: 1,
         y: 1
@@ -16,7 +16,7 @@ let SingleVisualizationView = Backbone.View.extend({
         x: 3,
         y: 8
       }]
-    });*/
+    });
   }
 });
 
