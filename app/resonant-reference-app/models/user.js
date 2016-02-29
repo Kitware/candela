@@ -1,5 +1,5 @@
 import Backbone from 'backbone';
-import Toolchain from './toolchain.js';
+import Toolchain from './Toolchain.js';
 
 let Toolchains = Backbone.Collection.extend({
   initialize: function () {

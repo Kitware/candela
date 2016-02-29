@@ -1,7 +1,7 @@
 import Backbone from 'backbone';
-import Dataset from './dataset.js';
-import Visualization from './visualization.js';
-import Matching from './matching.js';
+import Dataset from './Dataset.js';
+import Visualization from './Visualization.js';
+import Matching from './Matching.js';
 
 let Datasets = Backbone.Collection.extend({
   model: Dataset

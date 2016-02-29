@@ -4,14 +4,14 @@ import jQuery from 'jquery';
 
 import './overlay.css';
 
-import startup from './startingGuide/startingGuide.js';
-import datasetLibrary from './datasetLibrary/datasetLibrary.js';
-import visualizationLibrary from './visualizationLibrary/visualizationLibrary.js';
+import StartupGuide from '../StartingGuide/StartingGuide.js';
+import DatasetLibrary from '../DatasetLibrary/DatasetLibrary.js';
+import VisualizationLibrary from '../VisualizationLibrary/VisualizationLibrary.js';
 
 let templates = {
-  startup: startup,
-  datasetLibrary: datasetLibrary,
-  visualizationLibrary: visualizationLibrary
+  startup: StartupGuide,
+  datasetLibrary: DatasetLibrary,
+  visualizationLibrary: VisualizationLibrary
 };
 
 let Overlay = Backbone.View.extend({
