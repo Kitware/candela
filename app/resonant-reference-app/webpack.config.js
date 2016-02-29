@@ -1,4 +1,5 @@
 var webpack = require('webpack');
+var GruntWatchPlugin = require('./grunt-watch-plugin.js');
 
 /*globals module*/
 module.exports = {
@@ -8,6 +9,7 @@ module.exports = {
     filename: 'webpack_bundle.js'
   },
   plugins: [
+    GruntWatchPlugin,
     new webpack.ProvidePlugin({
       vg: 'vega'
     })

@@ -57,15 +57,12 @@ to recognize internal changes without necessitating a restart:
   girder-server --testing
   ```
 
-However, for changes to get inside girder, a webpack step
-is needed:
+We've also added to webpack's watch mode, so that it triggers
+a grunt step when you change code in resonant-reference-app. To
+use it:
+
   ```bash
-  cd candela_repo_dir
-  npm run build:reference
-  ```
-  
-followed by a grunt step:
-  ```bash
-  cd girder_repo_dir
-  grunt
+  export GIRDER_PATH=girder_repo_dir
+  cd candela_repo_dir/app/resonant-reference-app
+  webpack --watch
   ```
