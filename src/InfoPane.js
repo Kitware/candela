@@ -13,6 +13,7 @@ export let InfoPane = Backbone.View.extend({
   el: '.info-pane',
 
   initialize: function (settings) {
+    this.percentile = settings.percentile || 95;
     this.name = settings.name || 'Ground Truth';
     this.branch = settings.branch || 'master';
     this.day = settings.day || this.getToday();
@@ -40,7 +41,39 @@ export let InfoPane = Backbone.View.extend({
     this.totalMedian = this.allValues[Math.floor(this.allValues.length / 2)];
     this.totalMedian = Math.round(this.totalMedian * 10000) / 10000;
     this.ranDatasets = this.numSuccess + this.numBad + this.numFail;
-    this.agg_trends = settings.agg_trends;
+    this.agg_trends = settings.agg_trends || this._getAggTrends(settings);
+  },
+
+  _percentile: function (arr, p) {
+    if (arr.length === 0) return 0;
+    if (typeof p !== 'number') throw new TypeError('p must be a number');
+    if (p <= 0) return arr[0];
+    if (p >= 1) return arr[arr.length - 1];
+
+    let index = arr.length * p;
+    let lower = Math.floor(index);
+    let upper = lower + 1;
+    let weight = index % 1;
+
+    if (upper >= arr.length) return arr[lower];
+    return arr[lower] * (1 - weight) + arr[upper] * weight;
+  },
+
+  _getAggTrends: function (settings) {
+    const byAlgorithm = _.groupBy(settings.percentErrorByDataset, 'algorithm');
+    const algorithms = _.keys(byAlgorithm);
+    let aggTrends = {};
+    for (let i = 0; i < algorithms.length; ++i) {
+      let algorithm = algorithms[i];
+      aggTrends[algorithm] = _.map(byAlgorithm[algorithm], (value) => {
+        return value.current;
+      });
+      aggTrends[algorithm] = _.sortBy(aggTrends[algorithm], (num) => {
+        return num;
+      });
+      aggTrends[algorithm] = [this._percentile(aggTrends[algorithm], this.percentile / 100)];
+    }
+    return aggTrends;
   },
 
   getToday: function () {
@@ -118,6 +151,15 @@ export let InfoPane = Backbone.View.extend({
             current: value[value.length - 1]
           }
         }).render();
+        let dotSelector = '#' + key + '-aggregate-dot';
+        console.log(dotSelector);
+        console.log($(dotSelector));
+        let current = value[value.length - 1];
+        if (current > this.fail) {
+          $(dotSelector).attr('class', 'fail');
+        } else if (current > this.warning) {
+          $(dotSelector).attr('class', 'bad');
+        }
       });
     }, this));
 

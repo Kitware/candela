@@ -3,24 +3,26 @@ table.table.table-responsive.table-compact
     th(colspan="2")
       .agg-label-header
         | Algorithm
-    th
-      .agg-sparkline-header
-        | Last 7 Days
+    if aggTrends[algorithms[0]].length > 1
+      th
+        .agg-sparkline-header
+          | Last 7 Days
     th(colspan="2")
       .agg-bullet-header
         | #{aggregate_metric_name}
   tbody
   each algorithm in algorithms
     tr.info-section-chart(id="#{algorithm}-aggregate-container")
-      td
+      td.agg-status-dot
         svg.statusDot
-          circle.none(r="10", cx="10", cy="10")
+            circle.none(id="#{algorithm}-aggregate-dot" r="10", cx="10", cy="10")
       td
         .agg-label
-          | #{algorithm}
-      td
-        .agg-sparkline(id="#{algorithm}-aggregate-sparkline")
-          svg
+          | #{algorithm.toUpperCase()}
+      if aggTrends[algorithms[0]].length > 1
+        td
+          .agg-sparkline(id="#{algorithm}-aggregate-sparkline")
+            svg
       td
         .agg-value
           | #{aggTrends[algorithm][aggTrends[algorithm].length-1]}
