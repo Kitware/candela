@@ -2,17 +2,19 @@ var webpack = require('webpack');
 var path = require('path');
 
 var CleanPlugin = require('clean-webpack-plugin');
+var HtmlPlugin = require('html-webpack-plugin');
 
 module.exports = {
   devtool: 'source-map',
   entry: {
-    candela: './src/index.js'
+    candela: './src/index.js',
+    demo: './app/demo/index.js'
   },
   output: {
     library: '[name]',
     libraryTarget: 'umd',
-    path: 'build',
-    filename: '[name].js'
+    path: 'dist',
+    filename: '[name]/[name].js'
   },
   resolve: {
     alias: {
@@ -26,10 +28,14 @@ module.exports = {
     }),
 
     new CleanPlugin([
-      './build/candela.js',
-      './build/common.js',
-      './build/index.js'
-    ])
+      './dist'
+    ]),
+
+    new HtmlPlugin({
+      title: 'Candela Demo',
+      filename: 'demo/index.html',
+      chunks: ['demo']
+    })
   ],
   module: {
     preLoaders: [
@@ -37,12 +43,13 @@ module.exports = {
         test: /\.js$/,
         loader: 'semistandard',
         include: path.resolve(__dirname, 'src'),
+        include: path.resolve(__dirname, 'app'),
         exclude: path.resolve(__dirname, 'src', 'external')
       }
     ],
     loaders: [
       {
-        test: require.resolve('./src/candela.js'),
+        test: require.resolve('./src/index.js'),
         loader: 'expose?candela'
       },
       {
@@ -51,7 +58,10 @@ module.exports = {
         query: {
           presets: ['es2015']
         },
-        include: __dirname + '/src'
+        include: [
+          __dirname + '/src',
+          __dirname + '/app'
+        ]
       },
       {
         test: function (path) {
