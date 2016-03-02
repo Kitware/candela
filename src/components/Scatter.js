@@ -21,7 +21,7 @@ export default class Scatter extends VisualizationComponent {
     this.options.x = this.options.x || 'x';
     this.options.y = this.options.y || 'y';
 
-    this.options.color = this.options.color || 'steelblue';
+    this.options.defaultColor = this.options.defaultColor || 'steelblue';
 
     this.chart = vcharts.chart('xy', {
       el,
