@@ -1,8 +1,8 @@
 {
   "name": "candela",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Visualization components for the web",
-  "main": "index.js",
+  "main": "dist/candela.js",
   "scripts": {
     "build": "webpack",
     "build:reference": "cd app/resonant-reference-app && webpack"
