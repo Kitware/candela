@@ -22,10 +22,10 @@ export let dash = Backbone.View.extend({
 
   render: function () {
     this.$el.html(layout());
+    let topInfoBar = new TopInfoBar(this.trackData);
     let infoPane = new InfoPane(this.trackData);
     let trendPane = new TrendPane(this.trackData);
     let resultPane = new ResultTablePane(this.trackData);
-    let topInfoBar = new TopInfoBar(this.trackData);
     topInfoBar.render();
     infoPane.render();
     trendPane.render();

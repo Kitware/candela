@@ -37,9 +37,6 @@ export let InfoPane = Backbone.View.extend({
         this.numSuccess++;
       }
     }, this));
-    this.allValues = _.sortBy(this.allValues, function (el) { return el; });
-    this.totalMedian = this.allValues[Math.floor(this.allValues.length / 2)];
-    this.totalMedian = Math.round(this.totalMedian * 10000) / 10000;
     this.ranDatasets = this.numSuccess + this.numBad + this.numFail;
     this.agg_trends = settings.agg_trends || this._getAggTrends(settings);
   },
@@ -114,7 +111,7 @@ export let InfoPane = Backbone.View.extend({
             let parent = $('#' + key + '-aggregate-sparkline');
             let width = parent.width();
             let height = parent.height();
-            var chart = nv.models.sparklinePlus()
+            let chart = nv.models.sparklinePlus()
               .margin({right: 40})
               .height(height)
               .width(width)

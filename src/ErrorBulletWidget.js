@@ -4,6 +4,8 @@ import d3 from 'd3';
 import nv from 'nvd3';
 import $ from 'jquery';
 
+import colors from './colors.js';
+
 export let ErrorBulletWidget = Backbone.View.extend({
 
   initialize: function (settings) {
@@ -20,17 +22,17 @@ export let ErrorBulletWidget = Backbone.View.extend({
     };
   },
 
-  createChart: function () {
+  render: function () {
     nv.addGraph({
       generate: _.bind(function () {
         let chart = nv.models.bulletChart()
           .margin({top: 5, right: 20, bottom: 20, left: 25});
         if (this.result.current > this.result.fail) {
-          chart.color('rgb(204, 0, 0)');
+          chart.color(colors.fail);
         } else if (this.result.current > this.result.warning) {
-          chart.color('rgb(241, 194, 50)');
+          chart.color(colors.bad);
         } else {
-          chart.color('rgb(147, 196, 125)');
+          chart.color(colors.good);
         }
         d3.select('#' + this.el.id + ' svg')
           .datum(this.chartData())
@@ -61,10 +63,6 @@ export let ErrorBulletWidget = Backbone.View.extend({
         }, this));
       }, this)
     });
-  },
-
-  render: function () {
-    this.createChart();
   }
 
 });

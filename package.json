@@ -23,9 +23,7 @@
     "less-loader": "^2.2.2",
     "nvd3": "^1.8.2",
     "underscore": "~1.5",
-    "url-loader": "^0.5.7",
-    "vcharts": "^0.2.1",
-    "vega": "^2.4.2"
+    "url-loader": "^0.5.7"
   },
   "scripts": {
     "build": "webpack",
