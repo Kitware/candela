@@ -24,21 +24,12 @@ export default class Scatter extends VisualizationComponent {
     this.options.color = this.options.color || 'steelblue';
 
     this.chart = vcharts.chart('xy', {
-      el: el,
-      series: [{
-        name: 'values',
-        values: this.data,
-        x: this.options.x,
-        y: this.options.y,
-        color: this.options.color
-      }],
-      xAxis: {
-        title: this.options.x
-      },
-      yAxis: {
-        title: this.options.y
-      },
-      legend: false
+      el,
+      series: [
+        {
+          name: 'values'
+        }
+      ]
     });
 
     window.onresize = () => this.render();
@@ -59,7 +50,6 @@ export default class Scatter extends VisualizationComponent {
       yAxis: {
         title: this.options.y
       },
-      color: this.options.color,
       legend: false
     });
   }
