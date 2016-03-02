@@ -4,10 +4,29 @@ import vcharts from '../external/vcharts/src';
 export default class Scatter extends VisualizationComponent {
   static get options () {
     return [
-      {name: 'data', type: 'table'},
-      {name: 'x', type: 'string'},
-      {name: 'y', type: 'string'},
-      {name: 'color', type: 'string'}
+      {
+        name: 'x',
+        type: 'number',
+        selector: ['field']
+      },
+
+      {
+        name: 'y',
+        type: 'number',
+        selector: ['field']
+      },
+
+      {
+        name: 'color',
+        type: 'string',
+        selector: ['field', 'text']
+      },
+
+      {
+        name: 'default color',
+        type: 'string',
+        selector: ['color', 'text']
+      }
     ];
   }
 
@@ -52,5 +71,24 @@ export default class Scatter extends VisualizationComponent {
       },
       legend: false
     });
+  }
+
+  // TODO: the following "set*()" methods should be automatically generated from
+  // the options getter at construction time (probably in
+  // VisualizationComponent).
+  setX (x) {
+    this.options.x = x;
+  }
+
+  setY (y) {
+    this.options.y = y;
+  }
+
+  setColor (color) {
+    this.options.color = color;
+  }
+
+  setDefaultColor (color) {
+    this.options.defaultColor = color;
   }
 }
