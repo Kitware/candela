@@ -1,6 +1,7 @@
 import Dummy from './../../src/components/Dummy';
 import LineChart from './../../src/components/VCharts';
 import ParallelCoordinates from './../../src/components/ParallelCoordinates';
+import Scatter from '../../src/components/Scatter';
 import $ from 'jquery';
 
 function dummy () {
@@ -86,6 +87,17 @@ function parallelCoordinates () {
   vis.render(data);
 }
 
+function scatterplot () {
+  let el = document.getElementById('scatter');
+
+  let data = [0, 1, 2, 3, 4, 5].map((v) => ({
+    x: v,
+    y: v * v
+  }));
+
+  let vis = new Scatter(el, {data});
+}
+
 import indexContent from './index.jade';
 import './index.styl';
 
@@ -95,4 +107,5 @@ window.onload = () => {
   dummy();
   linechart();
   parallelCoordinates();
+  scatterplot();
 };
