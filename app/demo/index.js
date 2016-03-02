@@ -95,7 +95,9 @@ function scatterplot () {
     y: v * v
   }));
 
-  let vis = new Scatter(el, data, {});
+  let vis = new Scatter(el, data, {
+    color: 'firebrick'
+  });
   vis.render();
 }
 

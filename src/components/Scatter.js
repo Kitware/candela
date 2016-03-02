@@ -21,13 +21,16 @@ export default class Scatter extends VisualizationComponent {
     this.options.x = this.options.x || 'x';
     this.options.y = this.options.y || 'y';
 
+    this.options.color = this.options.color || 'steelblue';
+
     this.chart = vcharts.chart('xy', {
       el: el,
       series: [{
         name: 'values',
         values: this.data,
         x: this.options.x,
-        y: this.options.y
+        y: this.options.y,
+        color: this.options.color
       }],
       xAxis: {
         title: this.options.x
@@ -47,7 +50,8 @@ export default class Scatter extends VisualizationComponent {
         name: 'values',
         values: this.data,
         x: this.options.x,
-        y: this.options.y
+        y: this.options.y,
+        color: this.options.color
       }],
       xAxis: {
         title: this.options.x
@@ -55,6 +59,7 @@ export default class Scatter extends VisualizationComponent {
       yAxis: {
         title: this.options.y
       },
+      color: this.options.color,
       legend: false
     });
   }
