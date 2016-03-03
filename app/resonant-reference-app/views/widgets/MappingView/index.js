@@ -9,9 +9,9 @@ let MappingView = Backbone.View.extend({
     const spec = candela.components.Scatter.options;
     const fields = spec.filter((opt) => opt.selector && opt.selector[0] === 'field');
 
-    console.log(fields);
-
-    this.$el.html(myTemplate());
+    this.$el.html(myTemplate({
+      fieldOpts: fields
+    }));
   }
 });
 
