@@ -2,4 +2,8 @@
   h1 Specify fields for the following mappings
 
   each opt in fieldOpts
-    p #{opt.name} (type: #{opt.type})
+    b #{opt.name}
+    input(type="text" name="#{opt.name}").field
+    br
+
+  button.mapping-update Update
