@@ -1,5 +1,6 @@
 import Backbone from 'backbone';
 import Toolchain from './Toolchain.js';
+import MappingView from '../views/widgets/MappingView';
 
 let Toolchains = Backbone.Collection.extend({
   initialize: function () {
@@ -38,6 +39,12 @@ let User = Backbone.Model.extend({
         friendlyName: 'Dataset',
         model: 'datasets',
         view: require('../views/widgets/SingleDatasetView/SingleDatasetView.js'),
+        hidden: false,
+        new: false
+      },
+      'mappingView': {
+        friendlyName: 'Mapping',
+        view: MappingView,
         hidden: false,
         new: false
       },
