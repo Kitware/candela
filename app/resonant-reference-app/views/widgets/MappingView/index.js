@@ -1,12 +1,11 @@
 import Backbone from 'backbone';
-import myTemplate from './template.html';
+import myTemplate from './index.jade';
 
 let MappingView = Backbone.View.extend({
   initialize: function () {
-    this.$el.html(myTemplate);
   },
   render: function () {
-    this.$el.html("<b>Hello</b>");
+    this.$el.html(myTemplate());
   }
 });
 
