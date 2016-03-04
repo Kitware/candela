@@ -34,7 +34,7 @@ export let ErrorBulletWidget = Backbone.View.extend({
         } else {
           chart.color(colors.good);
         }
-        d3.select('#' + this.el.id + ' svg')
+        d3.select('#' + this.el.id + '-svg')
           .datum(this.chartData())
           .call(chart);
         chart.bullet.dispatch.on('elementMouseover.tooltip', null);
