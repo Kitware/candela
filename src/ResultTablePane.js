@@ -21,7 +21,7 @@ export let ResultTablePane = Backbone.View.extend({
   },
 
   render: function () {
-    if (this.result === undefined) {
+    if (this.results === undefined) {
       return;
     }
     // dots in names confound css selectors
