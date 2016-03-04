@@ -3,7 +3,7 @@ table.table.table-responsive.table-compact
     th(colspan="2")
       .agg-label-header
         | Algorithm
-    if aggTrends[algorithms[0]].length > 1
+    if algorithms.length >= 1 && aggTrends[algorithms[0]].length > 1
       th
         .agg-sparkline-header
           | Last 7 Days
@@ -19,7 +19,7 @@ table.table.table-responsive.table-compact
       td
         .agg-label
           | #{algorithm.toUpperCase()}
-      if aggTrends[algorithms[0]].length > 1
+      if algorithms.length >= 1 && aggTrends[algorithms[0]].length > 1
         td
           .agg-sparkline(id="#{algorithm}-aggregate-sparkline")
             svg

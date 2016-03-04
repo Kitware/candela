@@ -21,6 +21,9 @@ export let ResultTablePane = Backbone.View.extend({
   },
 
   render: function () {
+    if (this.result === undefined) {
+      return;
+    }
     // dots in names confound css selectors
     this.results.sort(function (a, b) {
       return a.dataset.localeCompare(b.dataset);
