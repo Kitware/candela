@@ -145,7 +145,7 @@ export let InfoPane = Backbone.View.extend({
             warning: this.warning,
             fail: this.fail,
             max: this.max,
-            current: value[value.length - 1]
+            current: Math.round(value[value.length - 1] * 10000) / 10000
           }
         }).render();
         let dotSelector = '#' + key + '-aggregate-dot';

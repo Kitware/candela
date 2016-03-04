@@ -18,7 +18,7 @@ export let ErrorBulletWidget = Backbone.View.extend({
   chartData: function () {
     return {
       ranges: [this.result.warning, this.result.fail, this.result.max],
-      measures: [Math.min(this.result.current, this.result.max)]
+      measures: [Math.round(Math.min(this.result.current, this.result.max) * 10000) / 10000]
     };
   },
 
@@ -34,14 +34,14 @@ export let ErrorBulletWidget = Backbone.View.extend({
         } else {
           chart.color(colors.good);
         }
-        d3.select('#' + this.el.id + '-svg')
+        d3.select('[id=\'' + this.el.id + '-svg\']')
           .datum(this.chartData())
           .call(chart);
         chart.bullet.dispatch.on('elementMouseover.tooltip', null);
         chart.bullet.dispatch.on('elementMouseover.tooltip', _.bind(function (evt) {
           evt['series'] = {
             key: 'Current value',
-            value: this.result.current,
+            value: Math.round(this.result.current * 10000) / 10000,
             color: chart.color()
           };
           chart.tooltip.data(evt).hidden(false);
@@ -55,7 +55,7 @@ export let ErrorBulletWidget = Backbone.View.extend({
           let height = parent.height();
           graph.width(width).height(height);
 
-          d3.select('#' + this.el.id + ' svg')
+          d3.select('[id=\'' + this.el.id + '-svg\']')
             .attr('width', width)
             .attr('height', height)
             .transition().duration(0)

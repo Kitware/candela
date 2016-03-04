@@ -25,7 +25,7 @@ table.table.table-responsive.table-compact
             svg
       td
         .agg-value
-          | #{aggTrends[algorithm][aggTrends[algorithm].length-1]}
+          | #{Math.round(aggTrends[algorithm][aggTrends[algorithm].length-1] * 10000) / 10000}
       td
         .agg-bullet(id="#{algorithm}-aggregate-bullet")
           svg(id="#{algorithm}-aggregate-bullet-svg")
