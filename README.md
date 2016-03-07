@@ -14,11 +14,11 @@ TBD
 
 ## Build
 
-'''bash
+```bash
 git clone https://github.com/Kitware/candela.git
 cd candela
 npm install
 npm run build
-'''
+```
 
 # [Reference application](https://github.com/Kitware/candela/blob/master/app/resonant-reference-app/README.md)
