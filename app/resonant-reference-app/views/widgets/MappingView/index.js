@@ -5,6 +5,7 @@ import candela from '../../../../../src';
 let MappingView = Widget.extend({
   initialize: function () {
     this.friendlyName = 'Mapping';
+    this.hashName = 'mappingView';
   },
   render: function () {
     const spec = candela.components.Scatter.options;

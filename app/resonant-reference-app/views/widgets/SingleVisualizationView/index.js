@@ -3,9 +3,13 @@ import myTemplate from './template.html';
 import candela from './../../../../../src';
 
 let SingleVisualizationView = Widget.extend({
-  render: function () {
+  initialize: function () {
     let self = this;
     self.friendlyName = 'Visualization';
+    self.hashName = 'singleVisualizationView';
+  },
+  render: function () {
+    let self = this;
     
     self.$el.html(myTemplate);
     

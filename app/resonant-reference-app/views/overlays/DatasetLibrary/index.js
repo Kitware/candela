@@ -10,16 +10,17 @@ let DatasetLibrary = Backbone.View.extend({
     self.$el.html(myTemplate);
 
     girder.restRequest({
-      path: 'resource/lookup?path=/collection/ReferenceApp/Data',
+      path: 'api/v1/resource/lookup?path=/collection/ReferenceApp/Data',
       type: 'GET',
       error: null
     }).done(function (folder) {
       let datasets = new girder.collections.ItemCollection();
+      datasets.altUrl = 'api/v1/item';
       datasets.pageLimit = 100;
       datasets.fetch({
         folderId: folder._id
       });
-
+      
       datasets.on('reset', function (items) {
         let libraryButtons = d3.select('div.datasetLibrary')
           .selectAll('.circleButton')
@@ -42,7 +43,7 @@ let DatasetLibrary = Backbone.View.extend({
         d3.select('div.libraryInterface').selectAll('.circleButton')
           .on('click', function (d) {
             window.toolchain.setDataset(d);
-            self.render(null);
+            window.layout.overlay.render(null);
           });
       });
     });

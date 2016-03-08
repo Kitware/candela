@@ -5,15 +5,19 @@ let SingleDatasetView = Widget.extend({
   initialize: function () {
     let self = this;
     self.friendlyName = 'Dataset';
+    self.hashName = 'singleDatasetView';
+    
+    self.listenTo(window.toolchain, 'rra:changeDatasets', self.render);
+  },
+  render: function () {
+    let self = this;
+    
     self.$el.html(myTemplate);
     self.$el.find('button.switchDataset')
       .on('click', function () {
         window.layout.overlay.render('datasetLibrary');
       });
-    window.toolchain.listen('rra:changeDatasets', self.render);
-  },
-  render: function () {
-    let self = this;
+    
     let dataset = window.toolchain.get('meta');
     if (dataset) {
       dataset = dataset.datasets;

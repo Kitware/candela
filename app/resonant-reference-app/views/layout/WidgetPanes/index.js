@@ -1,6 +1,7 @@
 import Backbone from 'backbone';
 import myTemplate from './template.html';
 import d3 from 'd3';
+import jQuery from 'jquery';
 
 import './accordionhorz.css';
 import './style.css';
@@ -20,14 +21,14 @@ let WidgetPanes = Backbone.View.extend({
 
     // Only show widgets that aren't hidden
     let widgets = window.widgets.filter(function (d) {
-      return !d.value.hidden;
+      return !d.hidden;
     });
     
     // Patch on a temporary flag as to
     // which sections are expanded
     let hashes = window.location.hash.split('#');
     widgets.forEach(function (d) {
-      d.targeted = hashes.indexOf(d.key) !== -1;
+      d.targeted = hashes.indexOf(d.hashName) !== -1;
     });
 
     // Create sections for each widget
@@ -35,18 +36,18 @@ let WidgetPanes = Backbone.View.extend({
       .select('article')
       .selectAll('section')
       .data(widgets, function (d) {
-        return d.key;
+        return d.hashName;
       });
 
     let sectionsEnter = sections.enter().append('section');
 
     // Remove each view object when views are removed
     sections.exit().each(function (d) {
-      delete self.views[d.key];
+      delete self.views[d.hashName];
     }).remove();
 
     sections.attr('id', function (d) {
-      return d.key;
+      return d.hashName;
     }).attr('class', function (d) {
       return d.targeted ? 'targeted' : null;
     });
@@ -55,7 +56,7 @@ let WidgetPanes = Backbone.View.extend({
     let handlesEnter = sectionsEnter.append('h2').append('a');
     sections.selectAll('h2').selectAll('a')
       .on('click', function (d) {
-        self.toggle(d.key);
+        self.toggle(d.hashName);
       });
 
     handlesEnter.append('img');
@@ -72,14 +73,14 @@ let WidgetPanes = Backbone.View.extend({
     handlesEnter.append('span');
     sections.selectAll('h2').selectAll('a').selectAll('span')
       .text(function (d) {
-        return d.value.friendlyName;
+        return d.friendlyName;
       });
 
     // Finally, a div (that will scroll)
     // to contain the view
     sectionsEnter.append('div').attr({
       id: function (d) {
-        return d.key + 'Container';
+        return d.hashName + 'Container';
       },
       class: 'content'
     });
@@ -100,17 +101,8 @@ let WidgetPanes = Backbone.View.extend({
 
     // Now let's embed the actual view
     sectionsEnter.each(function (d) {
-      let model = d.value.model;
-      model = self.model.getCurrentwidgetchain().get(model);
-
-      let ViewClass = d.value.view;
-
-      let newView = new ViewClass({
-        el: '#' + d.key + 'Container',
-        model: model
-      });
-
-      self.views[d.key] = newView;
+      d.setElement(jQuery('#' + d.hashName + 'Container')[0]);
+      self.views[d.hashName] = d;
     });
 
     // Finally, get all our views to render

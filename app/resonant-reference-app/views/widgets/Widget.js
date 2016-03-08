@@ -6,6 +6,7 @@ let Widget = Backbone.View.extend({
     self.hidden = false;
     self.new = false;
     self.friendlyName = 'ERROR! Abstract Widget!';
+    self.hashName = '';
   }
 });
 

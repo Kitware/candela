@@ -18,9 +18,9 @@ import SingleDatasetView from './views/widgets/SingleDatasetView';
 import MappingView from './views/widgets/MappingView';
 import SingleVisualizationView from './views/widgets/SingleVisualizationView';
 window.widgets = [
-  SingleDatasetView,
-  MappingView,
-  SingleVisualizationView
+  new SingleDatasetView(),
+  new MappingView(),
+  new SingleVisualizationView()
 ];
 
 // The overlay views
@@ -51,9 +51,9 @@ window.layout = {
 
 // Draw everything
 function renderEverything () {
-  for (let [, chunk] of window.layout) {
-    chunk.render();
-  }
+  window.layout.header.render();
+  window.layout.widgetPanes.render();
+  window.layout.overlay.render();
 }
 
 jQuery(window).on('hashchange', renderEverything);

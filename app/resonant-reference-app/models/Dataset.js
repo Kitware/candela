@@ -17,7 +17,7 @@ let Dataset = girder.models.ItemModel.extend({
   initialize: function () {
     let self = this;
     let meta = this.get('meta');
-    if (!meta.spec) {
+    if (!meta || !meta.spec) {
       self.autoDetermineSpec();
     }
   },

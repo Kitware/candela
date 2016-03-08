@@ -38,14 +38,14 @@ let Toolchain = girder.models.ItemModel.extend({
     let triggers = [];
     // Sneaky hack to cast the raw Girder ItemModel
     // into our Dataset subclass
-    newDataset = new Dataset(newDataset.toJson());
+    newDataset = new Dataset(newDataset.toJSON());
     
     let meta = this.get('meta');
     if (newDataset.has('exampleToolchain') &&
         meta.visualizations.length === 0) {
       // The user is starting off with this dataset;
       // we want to load up the example visualization and
-      // matching that go with it
+      // the matching that goes with it
       meta = newDataset.get('exampleToolchain');
     } else {
       if (index > meta.datasets.length) {
@@ -69,12 +69,12 @@ let Toolchain = girder.models.ItemModel.extend({
   setVisualization: function (newVisualization, index = 0) {
     let triggers = [];
     let meta = this.get('meta');
-    if (newVisualization.has('exampleToolchain') &&
+    if (newVisualization.exampleToolchain &&
         meta.datasets.length === 0) {
       // The user is starting off with this visualization;
       // we want to load up the example dataset and
-      // matching that go with it
-      meta = newVisualization.get('exampleToolchain');
+      // the matching that goes with it
+      meta = newVisualization.exampleToolchain;
     } else {
       if (index > meta.visualizations.length) {
         meta.visualizations.push(newVisualization);
