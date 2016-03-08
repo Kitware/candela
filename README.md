@@ -1,10 +1,6 @@
 # Candela
 Visualization components for the web
 
-# Installation from npm
-
-TBD
-
 # Installation from source
 
 ## Prerequisites
