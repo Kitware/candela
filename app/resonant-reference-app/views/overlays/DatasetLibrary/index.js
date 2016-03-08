@@ -1,7 +1,7 @@
 import Backbone from 'backbone';
-import d3 from'd3';
-import myTemplate from'./template.html';
-import libImage from'../../../images/library.svg';
+import d3 from 'd3';
+import myTemplate from './template.html';
+import libImage from '../../../images/library.svg';
 let girder = window.girder;
 
 let DatasetLibrary = Backbone.View.extend({
@@ -41,20 +41,12 @@ let DatasetLibrary = Backbone.View.extend({
 
         d3.select('div.libraryInterface').selectAll('.circleButton')
           .on('click', function (d) {
-            girder.restRequest({
-              path: 'item/' + d.id + '/download',
-              type: 'GET',
-              error: null,
-              dataType: 'text'
-            }).done(function (data) {
-              d.set('content', data);
-              window.user.addDataset(d);
-              window.layout.overlay.render(null);
-            });
+            window.toolchain.setDataset(d);
+            self.render(null);
           });
       });
     });
   }
 });
 
-module.exports = DatasetLibrary;
+export default DatasetLibrary;

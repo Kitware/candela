@@ -1,13 +1,14 @@
-import Backbone from 'backbone';
+import Widget from '../Widget';
 import myTemplate from './template.html';
 import candela from './../../../../../src';
 
-let SingleVisualizationView = Backbone.View.extend({
+let SingleVisualizationView = Widget.extend({
   render: function () {
     let self = this;
-
+    self.friendlyName = 'Visualization';
+    
     self.$el.html(myTemplate);
-
+    
     self.vis = new candela.components.Scatter('.visualization', {
       data: [{
         x: 1,
@@ -20,4 +21,4 @@ let SingleVisualizationView = Backbone.View.extend({
   }
 });
 
-module.exports = SingleVisualizationView;
+export default SingleVisualizationView;

@@ -1,9 +1,10 @@
-import Backbone from 'backbone';
+import Widget from '../Widget';
 import myTemplate from './index.jade';
 import candela from '../../../../../src';
 
-let MappingView = Backbone.View.extend({
+let MappingView = Widget.extend({
   initialize: function () {
+    this.friendlyName = 'Mapping';
   },
   render: function () {
     const spec = candela.components.Scatter.options;

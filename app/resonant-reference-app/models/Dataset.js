@@ -1,14 +1,6 @@
-import Backbone from 'backbone';
 import d3 from 'd3';
 
-let LOCATION_TYPES = {
-  PASTED_BROWSER: 0,
-  LOCAL_FILE: 1,
-  PUBLIC_GIRDER: 2,
-  PRIVATE_GIRDER: 3,
-  LIBRARY: 4,
-  EXTERNALLY_LINKED: 5
-};
+let girder = window.girder;
 
 let DATA_TYPES = {
   BOOLEAN: 'Boolean',
@@ -21,30 +13,31 @@ let DATA_TYPES = {
   LAT_LON: 'Lat/Lon'
 };
 
-let Dataset = Backbone.Model.extend({
-  defaults: {
-    name: 'Empty dataset',
-    attrs: {},
-    contents: '',
-    locationType: LOCATION_TYPES.PASTED_BROWSER
-  },
-  getData: function () {
+let Dataset = girder.models.ItemModel.extend({
+  initialize: function () {
     let self = this;
-    // TODO
-    return d3.csv.parse(self.get('contents'));
+    let meta = this.get('meta');
+    if (!meta.spec) {
+      self.autoDetermineSpec();
+    }
   },
-  getFormat: function () {
-    // TODO
-    return 'csv';
+  getParsed: function (callback) {
+    let self = this;
+    // TODO: support more file formats / non-Girder
+    // files (e.g. pasted browser data)
+    girder.restRequest({
+      path: 'item/' + self.id + '/download',
+      type: 'GET',
+      error: null,
+      dataType: 'text'
+    }).done(function (data) {
+      callback(d3.csv.parse(data));
+    });
   },
-  getDescription: function () {
-    // TODO
-  },
-  getMetadata: function () {
+  autoDetermineSpec: function () {
     // TODO
   }
 });
 
 Dataset.DATA_TYPES = DATA_TYPES;
-Dataset.LOCATION_TYPES = LOCATION_TYPES;
-module.exports = Dataset;
+export default Dataset;

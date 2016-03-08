@@ -1,4 +1,4 @@
-#UserView {
+#Header {
   position: absolute;
   left: 0px;
   top: 0px;
@@ -9,23 +9,23 @@
   align-items: center;
 }
 
-#UserView img.configButton {
+#Header img.configButton {
   width: 3em;
   height: 3em;
   border-radius: 1.5em;
   cursor: pointer;
 }
 
-#UserView img.configButton:hover {
+#Header img.configButton:hover {
   background-color: #ccc;
 }
 
-#UserView div.pageTitle {
+#Header div.pageTitle {
   margin-left: 1em;
   margin-right: auto;
   color: white;
 }
 
-#UserView div.loginButtons {
+#Header div.loginButtons {
   padding: 0.5em;
 }

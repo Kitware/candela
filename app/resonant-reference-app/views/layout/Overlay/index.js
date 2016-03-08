@@ -4,22 +4,12 @@ import jQuery from 'jquery';
 
 import './overlay.css';
 
-import StartupGuide from '../StartingGuide/StartingGuide.js';
-import DatasetLibrary from '../DatasetLibrary/DatasetLibrary.js';
-import VisualizationLibrary from '../VisualizationLibrary/VisualizationLibrary.js';
-
-let templates = {
-  startup: StartupGuide,
-  datasetLibrary: DatasetLibrary,
-  visualizationLibrary: VisualizationLibrary
-};
-
 let Overlay = Backbone.View.extend({
   initialize: function () {
     let self = this;
-
+    
     if (window.location.hash === '') {
-      self.render('startup');
+      self.render('startingGuide');
     } else {
       self.render(null);
     }
@@ -35,11 +25,11 @@ let Overlay = Backbone.View.extend({
       // for next time we just re-render
       self.template = template;
     }
-
+    
     if (template !== null) {
       self.$el.html('');
-
-      let temp = new templates[template]();
+      
+      let temp = new window.overlays[template]();
       self.el.appendChild(temp.el);
       temp.render();
 
@@ -70,4 +60,4 @@ let Overlay = Backbone.View.extend({
   }
 });
 
-module.exports = Overlay;
+export default Overlay;

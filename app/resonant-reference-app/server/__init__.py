@@ -12,9 +12,9 @@ class CustomAppRoot:
     <link rel="icon" type="image/png" href="static/img/Girder_Favicon.png">
 </head>
 <body>
-    <div id="g-global-info-apiroot" class="hide">api/v1</div>
-    <div id="g-global-info-staticroot" class="hide">static</div>
-    <div class="hmy-content"></div>
+    <header id="Header"></header>
+    <div id="WidgetPanes"></div>
+    <div id="Overlay"></div>
     <script src="static/built/libs.min.js"></script>
     <script src="static/built/app.min.js"></script>
     <script src="static/built/plugins/resonant-reference-app/extra/webpack_bundle.js"></script>

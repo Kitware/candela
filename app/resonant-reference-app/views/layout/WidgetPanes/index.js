@@ -8,7 +8,7 @@ import './style.css';
 import collapseIcon from '../../../images/collapse.svg';
 import expandIcon from '../../../images/expand.svg';
 
-let ToolsView = Backbone.View.extend({
+let WidgetPanes = Backbone.View.extend({
   initialize: function () {
     let self = this;
     self.listenTo(self.model, 'change', self.render);
@@ -17,25 +17,24 @@ let ToolsView = Backbone.View.extend({
   },
   render: function () {
     let self = this;
-    let tools = d3.entries(self.model.get('tools'));
 
-    // Only show tools that aren't hidden
-    tools = tools.filter(function (d) {
+    // Only show widgets that aren't hidden
+    let widgets = window.widgets.filter(function (d) {
       return !d.value.hidden;
     });
-
+    
     // Patch on a temporary flag as to
     // which sections are expanded
     let hashes = window.location.hash.split('#');
-    tools.forEach(function (d) {
+    widgets.forEach(function (d) {
       d.targeted = hashes.indexOf(d.key) !== -1;
     });
 
-    // Create sections for each tool
+    // Create sections for each widget
     let sections = d3.select(self.el)
       .select('article')
       .selectAll('section')
-      .data(tools, function (d) {
+      .data(widgets, function (d) {
         return d.key;
       });
 
@@ -87,7 +86,7 @@ let ToolsView = Backbone.View.extend({
 
     // Distribute the space for each section
     let expandedSections = hashes.length - 1;
-    let collapsedSections = tools.length - expandedSections;
+    let collapsedSections = widgets.length - expandedSections;
     let style = 'calc((100% - (0.5em + ' + // a little grey space at the beginning
       '2.5*' + collapsedSections + 'em + ' + // collapsed sections are 2em wide + a grey space
       '2.5*' + expandedSections + 'em)) / ' + // expanded sections have a total of 2em of padding, + their grey space
@@ -102,7 +101,7 @@ let ToolsView = Backbone.View.extend({
     // Now let's embed the actual view
     sectionsEnter.each(function (d) {
       let model = d.value.model;
-      model = self.model.getCurrentToolchain().get(model);
+      model = self.model.getCurrentwidgetchain().get(model);
 
       let ViewClass = d.value.view;
 
@@ -139,4 +138,4 @@ let ToolsView = Backbone.View.extend({
   }
 });
 
-module.exports = ToolsView;
+export default WidgetPanes;
