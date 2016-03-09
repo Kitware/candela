@@ -1,3 +1,4 @@
+import d3 from 'd3';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 
@@ -12,12 +13,7 @@ let SingleDatasetView = Widget.extend({
   render: function () {
     let self = this;
     
-    self.$el.html(myTemplate);
-    self.$el.find('button.switchDataset')
-      .on('click', function () {
-        window.layout.overlay.render('datasetLibrary');
-      });
-    
+    // Get the dataset in the toolchain (if there is one)
     let dataset = window.toolchain.get('meta');
     if (dataset) {
       dataset = dataset.datasets;
@@ -25,17 +21,39 @@ let SingleDatasetView = Widget.extend({
         dataset = dataset.at(0);
       }
     }
+    
+    let name = dataset ? dataset.get('name') : 'No file loaded';
+    
+    let handle = d3.select(self.getIndicatorSpan());
+    
+    handle.on('click', function () {
+      window.layout.overlay.render('datasetLibrary');
+    });
+    handle.text(name);
+    
+    let handleIcon = handle.selectAll('img').data([0]);
+    handleIcon.enter().append('img');
+    
+    self.$el.html(myTemplate);
+    self.$el.find('button.switchDataset')
+      .on('click', function () {
+        window.layout.overlay.render('datasetLibrary');
+      });
 
     if (!dataset) {
+      self.$el.find('textarea.dataContents')
+        .val('').prop('disabled', true);
       self.$el.find('button.switchDataset')
         .text('Choose a dataset');
-      self.$el.find('div.fileName')
-        .text('No file loaded.');
+      handleIcon.attr('src', Widget.warningIcon);
     } else {
+      dataset.loadData(function (rawData) {
+        self.$el.find('textarea.dataContents')
+          .prop('disabled', '').val(rawData);
+      });
       self.$el.find('button.switchDataset')
         .text('Switch datasets');
-      self.$el.find('div.fileName')
-        .text(dataset.get('name'));
+      handleIcon.attr('src', Widget.okayIcon);
     }
   }
 });

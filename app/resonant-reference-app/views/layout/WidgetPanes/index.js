@@ -52,8 +52,16 @@ let WidgetPanes = Backbone.View.extend({
       return d.targeted ? 'targeted' : null;
     });
 
-    // We need a header/handle for each section
-    let handlesEnter = sectionsEnter.append('h2').append('a');
+    // We need a header for each section
+    let headerEnter = sectionsEnter.append('h2');
+    
+    // Add a little space for the widget to
+    // store indicators when it is collapsed
+    headerEnter.append('span')
+      .attr('class', 'indicators');
+    
+    // We need a handle for each section to expand / collapse everything
+    let handlesEnter = headerEnter.append('a');
     sections.selectAll('h2').selectAll('a')
       .on('click', function (d) {
         self.toggle(d.hashName);
@@ -62,7 +70,6 @@ let WidgetPanes = Backbone.View.extend({
     handlesEnter.append('img');
     sections.selectAll('h2').selectAll('a').selectAll('img')
       .attr('src', function (d) {
-        // TODO: why isn't the icon changing?
         if (d.targeted) {
           return collapseIcon;
         } else {

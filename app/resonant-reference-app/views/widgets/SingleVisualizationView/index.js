@@ -1,3 +1,4 @@
+import d3 from 'd3';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 import candela from './../../../../../src';
@@ -12,14 +13,32 @@ let SingleVisualizationView = Widget.extend({
   },
   render: function () {
     let self = this;
+    
+    // Get the visualization in the toolchain (if there is one)
+    let visSpec = window.toolchain.get('meta');
+    if (visSpec) {
+      visSpec = visSpec.visualizations;
+      if (visSpec) {
+        visSpec = visSpec[0];
+      }
+    }
+    
+    let name = visSpec ? visSpec['name'] : 'None selected';
+    
+    let handle = d3.select(self.getIndicatorSpan());
+    
+    handle.on('click', function () {
+      window.layout.overlay.render('visualizationLibrary');
+    });
+    handle.text(name);
+    
+    let handleIcon = handle.selectAll('img').data([0]);
+    handleIcon.enter().append('img');
+    
     self.$el.html(myTemplate);
     
-    let meta = window.toolchain.get('meta');
-    let visSpec = meta.visualizations;
     if (visSpec) {
-      visSpec = visSpec[0];
-    }
-    if (visSpec) {
+      handleIcon.attr('src', Widget.okayIcon);
       self.vis = new candela.components[visSpec.name]('.visualization', {
         data: [{
           x: 1,
@@ -29,6 +48,8 @@ let SingleVisualizationView = Widget.extend({
           y: 8
         }]
       });
+    } else {
+      handleIcon.attr('src', Widget.warningIcon);
     }
   }
 });

@@ -74,7 +74,7 @@ let Toolchain = girder.models.ItemModel.extend({
         meta.datasets.push(newDataset);
         triggers = ['rra:changeDatasets'];
       } else {
-        meta.datasets.add(newDataset, { at: index });
+        meta.datasets.add(newDataset, { at: index, merge: true });
         // Swapping in a new dataset invalidates the matching
         meta.matching = {};
         triggers = ['rra:changeDatasets',

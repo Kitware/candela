@@ -8,7 +8,7 @@ class CustomAppRoot:
 <head>
     <title>Resonant Reference App</title>
     <link href='https://fonts.googleapis.com/css?family=Gentium+Basic:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="static/built/app.min.css">
+    <!--link rel="stylesheet" href="static/built/app.min.css"-->
     <link rel="icon" type="image/png" href="static/img/Girder_Favicon.png">
 </head>
 <body>
