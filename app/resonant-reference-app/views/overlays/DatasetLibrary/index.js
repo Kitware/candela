@@ -37,7 +37,7 @@ let DatasetLibrary = Backbone.View.extend({
         libraryButtonsEnter.append('span');
         libraryButtons.selectAll('span')
           .text(function (d) {
-            return d.get('name');
+            return d.name();
           });
 
         d3.select('div.libraryInterface').selectAll('.circleButton')

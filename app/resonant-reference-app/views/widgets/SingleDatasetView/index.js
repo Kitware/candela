@@ -22,7 +22,7 @@ let SingleDatasetView = Widget.extend({
     if (dataset) {
       dataset = dataset.datasets;
       if (dataset) {
-        dataset = dataset[0];
+        dataset = dataset.at(0);
       }
     }
 

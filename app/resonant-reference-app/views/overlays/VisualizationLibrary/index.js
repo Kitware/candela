@@ -8,25 +8,24 @@ let VisualizationLibrary = Backbone.View.extend({
   render: function () {
     let self = this;
     self.$el.html(myTemplate);
-    
-    // TODO: populate with available visualizations
-    // (see issue #12)
-    
+
     let libraryVisSpecs = [];
-    let visName;
-    for (visName in candela.components) {
-      if (candela.components.hasOwnProperty(visName)) {
-        libraryVisSpecs.push({
-          name: visName,
-          options: candela.components[visName].options
-        });
-      }
+    for (let visName of Object.keys(candela.components)) {
+      let spec = {
+        name: visName,
+        options: candela.components[visName]
+          .options.filter(function (option) {
+            return (option.selector &&
+                    option.selector.indexOf('field') !== -1);
+          })
+      };
+      libraryVisSpecs.push(spec);
     }
-    
+
     let libraryButtons = d3.select('div.visualizationLibrary')
       .selectAll('.circleButton')
       .data(libraryVisSpecs);
-    
+
     let libraryButtonsEnter = libraryButtons.enter().append('div')
       .attr('class', 'circleButton');
     libraryButtons.exit().remove();

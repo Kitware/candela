@@ -21,92 +21,101 @@ let girder = window.girder;
 
 let Toolchain = girder.models.ItemModel.extend({
   initialize: function () {
-    let meta = this.get('meta');
+    let self = this;
+    let meta = self.get('meta');
     if (!meta) {
       meta = {};
     }
     
-    meta.datasets = Backbone.Collection.extend({
+    let DatasetCollection = Backbone.Collection.extend({
       model: Dataset
     });
+    
     meta.visualizations = [];
     meta.matching = {};
+    meta.datasets = new DatasetCollection();
+    // Forward events from dataset changes
+    self.listenTo(meta.datasets, 'rra:changeSpec', function () {
+      self.trigger('rra:changeMappings');
+    });
     
-    this.set('meta', meta);
+    self.set('meta', meta);
+  },
+  setToolchain: function (newMeta) {
+    let self = this;
+    // Swap in an entirely new set of datasets, visualizations,
+    // and pre-baked mappings
+    let meta = self.get('meta');
+    meta.datasets.set(newMeta.datasets);
+    meta.matching = newMeta.matching;
+    meta.visualizations = newMeta.visualizations;
+    self.set('meta', meta);
+    self.trigger('rra:changeDatasets');
+    self.trigger('rra:changeMappings');
+    self.trigger('rra:changeVisualizations');
   },
   setDataset: function (newDataset, index = 0) {
-    let triggers = [];
-    // Sneaky hack to cast the raw Girder ItemModel
-    // into our Dataset subclass
-    newDataset = new Dataset(newDataset.toJSON());
+    let self = this;
+    let triggers;
+    // Need to convert the raw Girder ItemModel
+    // (when we add it to meta.datasets, it gets
+    // auto-converted to our Dataset model)
+    newDataset = newDataset.toJSON();
     
-    let meta = this.get('meta');
-    if (newDataset.has('exampleToolchain') &&
+    let meta = self.get('meta');
+    if (newDataset.exampleToolchain &&
         meta.visualizations.length === 0) {
       // The user is starting off with this dataset;
       // we want to load up the example visualization and
       // the matching that goes with it
-      meta = newDataset.get('exampleToolchain');
+      self.setToolchain(newDataset.exampleToolchain);
     } else {
       if (index > meta.datasets.length) {
         meta.datasets.push(newDataset);
-        triggers.push('rra:changeDatasets');
+        triggers = ['rra:changeDatasets'];
       } else {
-        meta.datasets[index] = newDataset;
-        triggers.push('rra:changeDatasets');
+        meta.datasets.add(newDataset, { at: index });
         // Swapping in a new dataset invalidates the matching
         meta.matching = {};
-        triggers.push('rra:changeMatchings');
+        triggers = ['rra:changeDatasets',
+                    'rra:changeMappings'];
       }
     }
     
-    this.set('meta', meta);
+    self.set('meta', meta);
     
     for (let trigger of triggers) {
-      this.trigger(trigger);
+      self.trigger(trigger);
     }
   },
   setVisualization: function (newVisualization, index = 0) {
+    let self = this;
     let triggers = [];
-    let meta = this.get('meta');
+    let meta = self.get('meta');
     if (newVisualization.exampleToolchain &&
         meta.datasets.length === 0) {
       // The user is starting off with this visualization;
       // we want to load up the example dataset and
       // the matching that goes with it
-      meta = newVisualization.exampleToolchain;
+      self.setToolchain(newVisualization.exampleToolchain);
     } else {
       if (index > meta.visualizations.length) {
         meta.visualizations.push(newVisualization);
-        triggers.push('rra:changeVisualizations');
+        triggers = ['rra:changeVisualizations'];
       } else {
         meta.visualizations[index] = newVisualization;
-        triggers.push('rra:changeVisualizations');
         // Swapping in a new dataset invalidates the matching
         meta.matching = {};
-        triggers.push('rra:changeMatchings');
+        triggers = ['rra:changeVisualizations',
+                    'rra:changeMappings'];
       }
     }
     
-    this.set('meta', meta);
+    self.set('meta', meta);
     
     for (let trigger of triggers) {
-      this.trigger(trigger);
+      self.trigger(trigger);
     }
-  },
-  pipeDataForVis: function (callback, visIndex) {
-    let meta = this.get('meta');
-    if (!visIndex) {
-      visIndex = 0;
-    }
-    
-    // TODO: use the matching to transform
-    // the parsed data into the shape that
-    // the visualization expects
-    
-    meta.datasets[0].getParsed(function (data) {
-      callback(data);
-    });
   }
 });
 

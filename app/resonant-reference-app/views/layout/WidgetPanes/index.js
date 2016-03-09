@@ -106,11 +106,8 @@ let WidgetPanes = Backbone.View.extend({
     });
 
     // Finally, get all our views to render
-    let view;
-    for (view in self.views) {
-      if (self.views.hasOwnProperty(view)) {
-        self.views[view].render();
-      }
+    for (let viewName of Object.keys(self.views)) {
+      self.views[viewName].render();
     }
   },
   toggle: function (key) {
