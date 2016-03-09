@@ -28,6 +28,7 @@ let SingleVisualizationView = Widget.extend({
     let handle = d3.select(self.getIndicatorSpan());
     
     handle.on('click', function () {
+      d3.event.stopPropagation();
       window.layout.overlay.render('visualizationLibrary');
     });
     handle.text(name);

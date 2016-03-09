@@ -45,7 +45,7 @@ let WidgetPanes = Backbone.View.extend({
     sections.exit().each(function (d) {
       delete self.views[d.hashName];
     }).remove();
-
+    
     sections.attr('id', function (d) {
       return d.hashName;
     }).attr('class', function (d) {
@@ -53,19 +53,21 @@ let WidgetPanes = Backbone.View.extend({
     });
 
     // We need a header for each section
-    let headerEnter = sectionsEnter.append('h2');
+    // (this will accept expand / collapse clicks)
+    let headerEnter = sectionsEnter.append('h2')
+      .on('click', function (d) {
+        self.toggle(d.hashName);
+      });
     
     // Add a little space for the widget to
-    // store indicators when it is collapsed
+    // store indicators, especially for when
+    // it's collapsed
     headerEnter.append('span')
       .attr('class', 'indicators');
     
     // We need a handle for each section to expand / collapse everything
     let handlesEnter = headerEnter.append('a');
-    sections.selectAll('h2').selectAll('a')
-      .on('click', function (d) {
-        self.toggle(d.hashName);
-      });
+    sections.selectAll('h2').selectAll('a');
 
     handlesEnter.append('img');
     sections.selectAll('h2').selectAll('a').selectAll('img')
