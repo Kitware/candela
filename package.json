@@ -4,7 +4,7 @@
   "description": "Visualization components for the web",
   "main": "dist/candela.js",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack --config config/webpack.config.js",
     "build:reference": "cd app/resonant-reference-app && webpack"
   },
   "repository": {

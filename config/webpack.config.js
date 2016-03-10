@@ -4,6 +4,8 @@ var path = require('path');
 var CleanPlugin = require('clean-webpack-plugin');
 var HtmlPlugin = require('html-webpack-plugin');
 
+__dirname = path.resolve(__dirname, '..');
+
 module.exports = {
   devtool: 'source-map',
   entry: {
@@ -49,7 +51,7 @@ module.exports = {
     ],
     loaders: [
       {
-        test: require.resolve('./src/index.js'),
+        test: require.resolve(__dirname + '/src/index.js'),
         loader: 'expose?candela'
       },
       {
