@@ -306,15 +306,20 @@ var chart = function (type, initialOptions, done) {
     // size explicitly specified or element size is zero.
     el = d3.select(that.options.el)[0][0];
     sizeOptions = {};
-    if (el.offsetWidth !== 0 && el.offsetHeight !== 0) {
+
+    let style = window.getComputedStyle(el, null);
+    let elWidth = window.parseInt(style.getPropertyValue('width'));
+    let elHeight = window.parseInt(style.getPropertyValue('height'));
+
+    if (elWidth !== 0 && elHeight !== 0) {
       if (that.options.width === undefined) {
-        sizeOptions.width = el.offsetWidth;
+        sizeOptions.width = elWidth;
         if (spec.padding) {
           sizeOptions.width -= spec.padding.left + spec.padding.right;
         }
       }
       if (that.options.height === undefined) {
-        sizeOptions.height = el.offsetHeight;
+        sizeOptions.height = elHeight;
         if (spec.padding) {
           sizeOptions.height -= spec.padding.top + spec.padding.bottom;
         }
