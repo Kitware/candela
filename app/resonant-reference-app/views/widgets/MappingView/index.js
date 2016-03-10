@@ -282,7 +282,15 @@ let MappingView = Widget.extend({
     
     // Figure out how we're going to lay things
     // out based on how much space we have
-    let bounds = self.el.getBoundingClientRect();
+    
+    // Temporarily force the scroll bars so we
+    // account for their size
+    self.$el.css('overflow', 'scroll');
+    let bounds = {
+      width: self.el.clientWidth,
+      height: self.el.clientHeight
+    };
+    self.$el.css('overflow', '');
     self.$el.find('svg')
       .attr({
         width: bounds.width,
