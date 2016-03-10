@@ -1,0 +1,77 @@
+/* CB dark:
+#1b9e77
+#d95f02
+#7570b3
+#e7298a
+#66a61e
+#e6ab02
+#a6761d
+#666666
+*/
+/* CB light:
+#b3e2cd
+#fdcdac
+#cbd5e8
+#f4cae4
+#e6f5c9
+#fff2ae
+#f1e2cc
+#cccccc
+*/
+
+#mappingView .node {
+    cursor: pointer;
+}
+#mappingView .node rect {
+    fill: white;
+    stroke: black;
+    stroke-width: 1px;
+}
+#mappingView .node text {
+    text-anchor: middle;
+}
+#mappingView .node text.label {
+    font-size: 12pt;
+}
+#mappingView .node text.types {
+    font-size: 9pt;
+}
+
+#mappingView .node.ineligible {
+    cursor: not-allowed;
+}
+#mappingView .node.ineligible rect {
+    fill: #cccccc;
+    stroke: none;
+}
+#mappingView .node.ineligible text {
+    fill: #666666;
+}
+#mappingView .node.selected rect {
+    fill: black;
+    stroke: none;
+}
+#mappingView .node.selected text {
+    fill: white;
+}
+#mappingView .node.connectable rect {
+    stroke-dasharray: 5,5;
+}
+#mappingView .node.linked rect {
+    stroke-width: 3px;
+}
+
+#mappingView path.edge {
+    fill: none;
+    stroke-width: 1px;
+    stroke: black;
+}
+#mappingView path.potential.edge {
+    stroke-dasharray: 5,10;
+}
+#mappingView path.probable.edge {
+    stroke-dasharray: 10,5;
+}
+#mappingView path.established.selected.edge {
+    stroke-width: 3px;
+}

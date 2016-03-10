@@ -5,7 +5,7 @@ let girder = window.girder;
 /*
     A Toolchain represents a user's saved session;
     it includes specific datasets, with specific
-    matchings to specific visualizations (in the future,
+    mappingss to specific visualizations (in the future,
     this may also include faceting settings, etc).
     
     Though behind the scenes we're making room for multiple
@@ -32,7 +32,7 @@ let Toolchain = girder.models.ItemModel.extend({
     });
     
     meta.visualizations = [];
-    meta.matching = {};
+    meta.mappings = [];
     meta.datasets = new DatasetCollection();
     // Forward events from dataset changes
     self.listenTo(meta.datasets, 'rra:changeSpec', function () {
@@ -47,7 +47,7 @@ let Toolchain = girder.models.ItemModel.extend({
     // and pre-baked mappings
     let meta = self.get('meta');
     meta.datasets.set(newMeta.datasets);
-    meta.matching = newMeta.matching;
+    meta.mappings = newMeta.mappings;
     meta.visualizations = newMeta.visualizations;
     self.set('meta', meta);
     self.trigger('rra:changeDatasets');
@@ -56,7 +56,6 @@ let Toolchain = girder.models.ItemModel.extend({
   },
   setDataset: function (newDataset, index = 0) {
     let self = this;
-    let triggers;
     // Need to convert the raw Girder ItemModel
     // (when we add it to meta.datasets, it gets
     // auto-converted to our Dataset model)
@@ -67,55 +66,51 @@ let Toolchain = girder.models.ItemModel.extend({
         meta.visualizations.length === 0) {
       // The user is starting off with this dataset;
       // we want to load up the example visualization and
-      // the matching that goes with it
+      // the mappings that goes with it
       self.setToolchain(newDataset.exampleToolchain);
     } else {
       if (index > meta.datasets.length) {
         meta.datasets.push(newDataset);
-        triggers = ['rra:changeDatasets'];
+        self.set('meta', meta);
+        self.trigger('rra:changeDatasets');
       } else {
         meta.datasets.add(newDataset, { at: index, merge: true });
-        // Swapping in a new dataset invalidates the matching
-        meta.matching = {};
-        triggers = ['rra:changeDatasets',
-                    'rra:changeMappings'];
+        // Swapping in a new dataset invalidates the mappings
+        self.set('meta', meta);
+        self.setupEmptyMapping();
+        self.trigger('rra:changeDatasets');
       }
-    }
-    
-    self.set('meta', meta);
-    
-    for (let trigger of triggers) {
-      self.trigger(trigger);
     }
   },
   setVisualization: function (newVisualization, index = 0) {
     let self = this;
-    let triggers = [];
     let meta = self.get('meta');
     if (newVisualization.exampleToolchain &&
         meta.datasets.length === 0) {
       // The user is starting off with this visualization;
       // we want to load up the example dataset and
-      // the matching that goes with it
+      // the mappings that goes with it
       self.setToolchain(newVisualization.exampleToolchain);
     } else {
       if (index > meta.visualizations.length) {
         meta.visualizations.push(newVisualization);
-        triggers = ['rra:changeVisualizations'];
+        self.set('meta', meta);
+        self.trigger('rra:changeVisualizations');
       } else {
         meta.visualizations[index] = newVisualization;
-        // Swapping in a new dataset invalidates the matching
-        meta.matching = {};
-        triggers = ['rra:changeVisualizations',
-                    'rra:changeMappings'];
+        // Swapping in a new dataset invalidates the mappings
+        self.set('meta', meta);
+        self.setupEmptyMapping();
+        self.trigger('rra:changeVisualizations');
       }
     }
+  },
+  setupEmptyMapping: function () {
+    let self = this;
+    let meta = self.get('meta');
     
-    self.set('meta', meta);
-    
-    for (let trigger of triggers) {
-      self.trigger(trigger);
-    }
+    meta.mappings = [];
+    self.trigger('rra:changeMappings');
   }
 });
 

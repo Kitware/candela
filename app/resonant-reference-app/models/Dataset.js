@@ -87,7 +87,6 @@ let Dataset = girder.models.ItemModel.extend({
   inferFileType: function () {
     let self = this;
     let fileType = self.name();
-    console.log(fileType);
     fileType = fileType.split('.');
     fileType = fileType[fileType.length - 1];
     let meta = self.get('meta');
@@ -103,10 +102,10 @@ let Dataset = girder.models.ItemModel.extend({
       self.trigger('rra:changeSpec');
     });
   },
-  reshapeForVis: function (callback, matching) {
+  reshapeForVis: function (callback, mapping) {
     // let meta = this.get('meta');
     
-    // TODO: use the matching to transform
+    // TODO: use the mapping to transform
     // the parsed data into the shape that
     // the visualization expects
   }
