@@ -2,6 +2,7 @@ import d3 from 'd3';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 import candela from './../../../../../src';
+import './style.css';
 
 let SingleVisualizationView = Widget.extend({
   initialize: function () {
@@ -13,7 +14,7 @@ let SingleVisualizationView = Widget.extend({
   },
   render: function () {
     let self = this;
-
+    
     // Get the visualization in the toolchain (if there is one)
     let visSpec = window.toolchain.get('meta');
     if (visSpec) {
@@ -24,7 +25,6 @@ let SingleVisualizationView = Widget.extend({
     }
 
     let name = visSpec ? visSpec['name'] : 'None selected';
-
     let handle = d3.select(self.getIndicatorSpan());
 
     handle.on('click', function () {
@@ -38,20 +38,24 @@ let SingleVisualizationView = Widget.extend({
 
     self.$el.html(myTemplate);
 
-    let data = [{
-      x: 1,
-      y: 1
-    }, {
-      x: 3,
-      y: 8
-    }];
-
+    let data = [];
+    for (let i = 0; i < 100; i += 1) {
+      data.push({x: Math.random(), y: Math.random()});
+    }
+    
     if (visSpec) {
       handleIcon.attr('src', Widget.okayIcon);
+      
+      // Temporarily force the scrollbars, so
+      // the view can account for the needed space
+      self.$el.css('overflow', 'scroll');
+      
       self.vis = new candela.components[visSpec.name]('.visualization', data, {
         x: 'x',
         y: 'y'
       });
+      
+      self.$el.css('overflow', '');
     } else {
       handleIcon.attr('src', Widget.warningIcon);
     }
