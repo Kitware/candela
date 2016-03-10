@@ -115,9 +115,13 @@ let WidgetPanes = Backbone.View.extend({
     });
 
     // Finally, get all our views to render
-    for (let viewName of Object.keys(self.views)) {
-      self.views[viewName].render();
-    }
+    // (don't tell them to render themselves
+    // until after the animation has finished)
+    window.setTimeout(function () {
+      for (let viewName of Object.keys(self.views)) {
+        self.views[viewName].render();
+      }
+    }, 1000);
   },
   toggle: function (key) {
     let self = this;

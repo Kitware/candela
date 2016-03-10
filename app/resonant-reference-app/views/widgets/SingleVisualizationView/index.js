@@ -40,7 +40,7 @@ let SingleVisualizationView = Widget.extend({
     
     if (visSpec) {
       handleIcon.attr('src', Widget.okayIcon);
-      self.vis = new candela.components[visSpec.name]('.visualization', {
+      /* self.vis = new candela.components[visSpec.name]('.visualization', {
         data: [{
           x: 1,
           y: 1
@@ -48,7 +48,7 @@ let SingleVisualizationView = Widget.extend({
           x: 3,
           y: 8
         }]
-      });
+      });*/
     } else {
       handleIcon.attr('src', Widget.warningIcon);
     }

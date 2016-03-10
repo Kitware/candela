@@ -240,11 +240,15 @@ let MappingView = Widget.extend({
   },
   render: function () {
     let self = this;
-
+    
+    // TODO: I need a rra:mappingsInvalidated signal
+    // in addition to rra:changeMappings (so we
+    // can set self.selection to null)
+    
     // Construct a graph from each of the specs
     // (and the currently selected node)
     let graph = self.constructLookups();
-
+    
     // The vis and data nodes will be in contiguous
     // blocks in graph.nodes... rather than split them
     // into their own lists and render them seperately,
@@ -269,16 +273,15 @@ let MappingView = Widget.extend({
       self.$el.html(myTemplate);
       // Add the function to deselect everything when
       // the canvas is clicked
-      d3.select(self.el).select('svg').on('click', function () {
-        self.selection = null;
-        self.render();
-      });
+      d3.select(self.el).select('svg')
+        .on('click', function () {
+          self.selection = null;
+          self.render();
+        });
     }
     
     // Figure out how we're going to lay things
     // out based on how much space we have
-    // TODO: do some fancy split scrolling
-    // if there's not enough space
     let bounds = self.el.getBoundingClientRect();
     self.$el.find('svg')
       .attr({
@@ -393,13 +396,13 @@ let MappingView = Widget.extend({
       }
     });
 
-    enteringNodes.append('rect')
-      .attr({
-        width: nodeWidth,
-        height: nodeHeight,
-        x: -nodeWidth / 2,
-        y: -nodeHeight / 2
-      });
+    enteringNodes.append('rect');
+    nodes.selectAll('rect').attr({
+      width: nodeWidth,
+      height: nodeHeight,
+      x: -nodeWidth / 2,
+      y: -nodeHeight / 2
+    });
 
     enteringNodes.append('text')
       .attr('class', 'label')
@@ -409,16 +412,17 @@ let MappingView = Widget.extend({
     });
 
     enteringNodes.append('text')
-      .attr('class', 'types')
-      .attr('y', nodeHeight / 3);
-    nodes.selectAll('text.types').text(function (d) {
-      if (d.side === 'data') {
-        return d.type;
-      } else {
-        // TODO: highlight the connected type
-        return Dataset.COMPATIBLE_TYPES[d.type].join(',');
-      }
-    });
+      .attr('class', 'types');
+    nodes.selectAll('text.types')
+      .attr('y', nodeHeight / 3)
+      .text(function (d) {
+        if (d.side === 'data') {
+          return d.type;
+        } else {
+          // TODO: highlight the connected type
+          return Dataset.COMPATIBLE_TYPES[d.type].join(',');
+        }
+      });
     
     // Draw the connections
     let edges = d3.select(self.el).select('svg')
