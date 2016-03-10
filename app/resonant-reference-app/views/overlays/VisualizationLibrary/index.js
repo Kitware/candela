@@ -1,5 +1,6 @@
 import Backbone from 'backbone';
 import d3 from 'd3';
+import Dataset from '../../../models/Dataset';
 import myTemplate from './template.html';
 import libImage from '../../../images/library.svg';
 import candela from './../../../../../src';
@@ -15,10 +16,11 @@ let VisualizationLibrary = Backbone.View.extend({
         name: visName,
         options: candela.components[visName]
           .options.filter(function (option) {
-            return (option.selector &&
-                    option.selector.indexOf('field') !== -1);
+            // TODO: this spec will change again soon
+            return Dataset.COMPATIBLE_TYPES.hasOwnProperty(option.type);
           })
       };
+      console.log(candela.components[visName].options);
       libraryVisSpecs.push(spec);
     }
 

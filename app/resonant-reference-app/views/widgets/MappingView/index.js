@@ -248,7 +248,7 @@ let MappingView = Widget.extend({
     // Construct a graph from each of the specs
     // (and the currently selected node)
     let graph = self.constructLookups();
-    
+    console.log(graph);
     // The vis and data nodes will be in contiguous
     // blocks in graph.nodes... rather than split them
     // into their own lists and render them seperately,

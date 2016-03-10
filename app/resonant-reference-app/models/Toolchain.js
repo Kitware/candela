@@ -72,14 +72,16 @@ let Toolchain = girder.models.ItemModel.extend({
       if (index > meta.datasets.length) {
         meta.datasets.push(newDataset);
         self.set('meta', meta);
-        self.trigger('rra:changeDatasets');
       } else {
-        meta.datasets.add(newDataset, { at: index, merge: true });
+        let oldDataset = meta.datasets.at(index);
+        meta.datasets.remove(oldDataset);
+        meta.datasets.add(newDataset, { at: index });
         // Swapping in a new dataset invalidates the mappings
+        meta.mappings = [];
         self.set('meta', meta);
-        self.setupEmptyMapping();
-        self.trigger('rra:changeDatasets');
       }
+      self.trigger('rra:changeDatasets');
+      self.trigger('rra:changeMappings');
     }
   },
   setVisualization: function (newVisualization, index = 0) {
@@ -95,22 +97,15 @@ let Toolchain = girder.models.ItemModel.extend({
       if (index > meta.visualizations.length) {
         meta.visualizations.push(newVisualization);
         self.set('meta', meta);
-        self.trigger('rra:changeVisualizations');
       } else {
         meta.visualizations[index] = newVisualization;
         // Swapping in a new dataset invalidates the mappings
+        meta.mappings = [];
         self.set('meta', meta);
-        self.setupEmptyMapping();
-        self.trigger('rra:changeVisualizations');
       }
+      self.trigger('rra:changeVisualizations');
+      self.trigger('rra:changeMappings');
     }
-  },
-  setupEmptyMapping: function () {
-    let self = this;
-    let meta = self.get('meta');
-    
-    meta.mappings = [];
-    self.trigger('rra:changeMappings');
   }
 });
 
