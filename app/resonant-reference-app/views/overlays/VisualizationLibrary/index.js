@@ -20,7 +20,6 @@ let VisualizationLibrary = Backbone.View.extend({
             return Dataset.COMPATIBLE_TYPES.hasOwnProperty(option.type);
           })
       };
-      console.log(candela.components[visName].options);
       libraryVisSpecs.push(spec);
     }
 

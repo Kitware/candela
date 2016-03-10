@@ -11,6 +11,7 @@ let SingleVisualizationView = Widget.extend({
     self.hashName = 'singleVisualizationView';
 
     self.listenTo(window.toolchain, 'rra:changeVisualizations', self.render);
+    self.listenTo(window.toolchain, 'rra:changeMappings', self.render);
   },
   render: function () {
     let self = this;
@@ -37,25 +38,21 @@ let SingleVisualizationView = Widget.extend({
     handleIcon.enter().append('img');
 
     self.$el.html(myTemplate);
-
-    let data = [];
-    for (let i = 0; i < 100; i += 1) {
-      data.push({x: Math.random(), y: Math.random()});
-    }
     
     if (visSpec) {
-      handleIcon.attr('src', Widget.okayIcon);
-      
-      // Temporarily force the scrollbars, so
-      // the view can account for the needed space
-      self.$el.css('overflow', 'scroll');
-      
-      self.vis = new candela.components[visSpec.name]('.visualization', data, {
-        x: 'x',
-        y: 'y'
+      handleIcon.attr('src', Widget.workingIcon);
+      let options = window.toolchain.getVisOptions();
+      window.toolchain.shapeDataForVis(function (data) {
+        handleIcon.attr('src', Widget.okayIcon);
+
+        // Temporarily force the scrollbars, so
+        // the view can account for the needed space
+        self.$el.css('overflow', 'scroll');
+        self.vis = new candela.components[visSpec.name]('.visualization',
+                                                        data, options);
+        self.vis.render();
+        self.$el.css('overflow', '');
       });
-      
-      self.$el.css('overflow', '');
     } else {
       handleIcon.attr('src', Widget.warningIcon);
     }

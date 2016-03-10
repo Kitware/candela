@@ -33,6 +33,7 @@ let Toolchain = girder.models.ItemModel.extend({
     
     meta.visualizations = [];
     meta.mappings = [];
+    self.mappingLookup = {};
     meta.datasets = new DatasetCollection();
     // Forward events from dataset changes
     self.listenTo(meta.datasets, 'rra:changeSpec', function () {
@@ -47,8 +48,14 @@ let Toolchain = girder.models.ItemModel.extend({
     // and pre-baked mappings
     let meta = self.get('meta');
     meta.datasets.set(newMeta.datasets);
-    meta.mappings = newMeta.mappings;
     meta.visualizations = newMeta.visualizations;
+    meta.mappings = newMeta.mappings;
+    self.mappingLookup = {};
+    meta.mappings.forEach(function (mapping, index) {
+      let key = mapping.visIndex + mapping.visAttribute +
+                mapping.dataIndex + mapping.dataAttribute;
+      self.mappingLookup[key] = index;
+    });
     self.set('meta', meta);
     self.trigger('rra:changeDatasets');
     self.trigger('rra:changeMappings');
@@ -78,6 +85,7 @@ let Toolchain = girder.models.ItemModel.extend({
         meta.datasets.add(newDataset, { at: index });
         // Swapping in a new dataset invalidates the mappings
         meta.mappings = [];
+        self.mappingLookup = {};
         self.set('meta', meta);
       }
       self.trigger('rra:changeDatasets');
@@ -101,11 +109,68 @@ let Toolchain = girder.models.ItemModel.extend({
         meta.visualizations[index] = newVisualization;
         // Swapping in a new dataset invalidates the mappings
         meta.mappings = [];
+        self.mappingLookup = {};
         self.set('meta', meta);
       }
       self.trigger('rra:changeVisualizations');
       self.trigger('rra:changeMappings');
     }
+  },
+  shapeDataForVis: function (callback, index = 0) {
+    let self = this;
+    let meta = self.get('meta');
+    
+    // TODO: use the mapping to transform
+    // the parsed data into the shape that
+    // the visualization expects
+    
+    meta.datasets.at(0).getParsed(callback);
+  },
+  getVisOptions: function (index = 0) {
+    let self = this;
+    let meta = self.get('meta');
+    let options = {};
+    
+    meta.mappings.forEach((mapping) => {
+      options[mapping.visAttribute] = mapping.dataAttribute;
+    });
+    return options;
+  },
+  addMapping: function (mapping) {
+    let self = this;
+    let meta = self.get('meta');
+    let key = mapping.visIndex + mapping.visAttribute +
+              mapping.dataIndex + mapping.dataAttribute;
+    
+    // TODO: For now, I assume that vis nodes
+    // can only accept one edge at a time...
+    for (let [index, m] of meta.mappings.entries()) {
+      if (mapping.visIndex === m.visIndex &&
+          mapping.visAttribute === m.visAttribute) {
+        let mKey = m.visIndex + m.visAttribute +
+                   m.dataIndex + m.dataAttribute;
+        
+        meta.mappings.splice(index, 1);
+        delete self.mappingLookup[mKey];
+        break;
+      }
+    }
+    
+    self.mappingLookup[key] = meta.mappings.length;
+    meta.mappings.push(mapping);
+    
+    self.set('meta', meta);
+    self.trigger('rra:changeMappings');
+  },
+  removeMapping: function (mapping) {
+    let self = this;
+    let meta = self.get('meta');
+    let key = mapping.visIndex + mapping.visAttribute +
+              mapping.dataIndex + mapping.dataAttribute;
+    meta.mappings.splice(self.mappingLookup[key], 1);
+    delete self.mappingLookup[key];
+    self.set('meta', meta);
+    self.trigger('rra:changeMappings');
   }
 });
 

@@ -101,13 +101,6 @@ let Dataset = girder.models.ItemModel.extend({
       self.set('meta', meta);
       self.trigger('rra:changeSpec');
     });
-  },
-  reshapeForVis: function (callback, mapping) {
-    // let meta = this.get('meta');
-    
-    // TODO: use the mapping to transform
-    // the parsed data into the shape that
-    // the visualization expects
   }
 });
 

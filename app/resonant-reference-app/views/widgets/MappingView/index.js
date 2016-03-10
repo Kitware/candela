@@ -18,40 +18,6 @@ let EDGE_MODES = {
   PROBABLE: 3
 };
 
-/*
-let testData = {
-  'data': [{
-    'name': 'cars.csv',
-    'attributes': {
-      'name': 'string',
-      'economy (mpg)': 'number',
-      'cylinders': 'integer',
-      'displacement (cc)': 'number',
-      'power (hp)': 'integer',
-      'weight (lb)': 'integer',
-      '0-60 mph (s)': 'number',
-      'year': 'integer'
-    }
-  }],
-  'vis': [{
-    'name': 'Scatter',
-    'options': [{
-      'name': 'x',
-      'type': 'number',
-      'selector': ['field']
-    }, {
-      'name': 'y',
-      'type': 'number',
-      'selector': ['field']
-    }, {
-      'name': 'color',
-      'type': 'string',
-      'selector': ['field', 'text']
-    }]
-  }]
-};
-*/
-
 let MappingView = Widget.extend({
   initialize: function (args) {
     let self = this;
@@ -78,9 +44,6 @@ let MappingView = Widget.extend({
     meta.visualizations.forEach(function (d) {
       specs.vis.push(d);
     });
-    
-    // Temporary test data
-    // specs = testData;
 
     let selectedKey;
     if (self.selection !== null) {
@@ -248,7 +211,7 @@ let MappingView = Widget.extend({
     // Construct a graph from each of the specs
     // (and the currently selected node)
     let graph = self.constructLookups();
-    console.log(graph);
+    
     // The vis and data nodes will be in contiguous
     // blocks in graph.nodes... rather than split them
     // into their own lists and render them seperately,
@@ -367,15 +330,12 @@ let MappingView = Widget.extend({
           visNode = self.selection;
           dataNode = d;
         }
-        let meta = window.toolchain.get('meta');
-        meta.mappings.push({
+        window.toolchain.addMapping({
           visIndex: visNode.index,
           visAttribute: visNode.attrName,
           dataIndex: dataNode.index,
           dataAttribute: dataNode.attrName
         });
-        window.toolchain.set('meta', meta);
-        window.toolchain.trigger('rra:changeMappings');
       } else if (d.mode === NODE_MODES.WILL_DISCONNECT) {
         // Remove the connection between the
         // selected node and the clicked node
@@ -386,18 +346,12 @@ let MappingView = Widget.extend({
           visNode = self.selection;
           dataNode = d;
         }
-        let meta = window.toolchain.get('meta');
-        
-        meta.mappings.forEach(function (mapping, index) {
-          if (mapping.visIndex === visNode.index &&
-              mapping.visAttribute === visNode.attrName &&
-              mapping.dataIndex === dataNode.index &&
-              mapping.dataAttribute === dataNode.attrName) {
-            meta.mappings.splice(index, 1);
-          }
+        window.toolchain.removeMapping({
+          visIndex: visNode.index,
+          visAttribute: visNode.attrName,
+          dataIndex: dataNode.index,
+          dataAttribute: dataNode.attrName
         });
-        window.toolchain.set('meta', meta);
-        window.toolchain.trigger('rra:changeMappings');
       } else if (d.mode === NODE_MODES.SELECTED) {
         self.selection = null;
         self.render();
