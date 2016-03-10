@@ -27,7 +27,10 @@ let MappingView = Widget.extend({
 
     self.selection = null;
     
-    self.listenTo(window.toolchain, 'rra:changeMappings', self.render);
+    self.listenTo(window.toolchain, 'rra:changeMappings', function () {
+      self.selection = null;
+      self.render();
+    });
   },
   constructLookups: function () {
     let self = this;
@@ -204,10 +207,6 @@ let MappingView = Widget.extend({
   render: function () {
     let self = this;
     
-    // TODO: I need a rra:mappingsInvalidated signal
-    // in addition to rra:changeMappings (so we
-    // can set self.selection to null)
-    
     // Construct a graph from each of the specs
     // (and the currently selected node)
     let graph = self.constructLookups();
@@ -274,7 +273,9 @@ let MappingView = Widget.extend({
     // Draw the nodes
     let nodes = d3.select(self.el).select('svg')
       .select('.nodeLayer')
-      .selectAll('.node').data(graph.nodes);
+      .selectAll('.node').data(graph.nodes, function (d) {
+        return d.index + d.attrName + d.mode;
+      });
     let enteringNodes = nodes.enter().append('g');
     nodes.exit().remove();
 
@@ -389,7 +390,9 @@ let MappingView = Widget.extend({
     // Draw the connections
     let edges = d3.select(self.el).select('svg')
       .select('.linkLayer')
-      .selectAll('.edge').data(graph.edges);
+      .selectAll('.edge').data(graph.edges, function (d) {
+        return d.source + '_' + d.target + '_' + d.mode;
+      });
     edges.enter().append('path');
     edges.exit().remove();
 
