@@ -5,7 +5,8 @@
   "main": "dist/candela.js",
   "scripts": {
     "build": "webpack --config config/webpack.config.js",
-    "build:reference": "cd app/resonant-reference-app && webpack"
+    "build:reference": "cd app/resonant-reference-app && webpack",
+    "test": "karma start config/karma-testing.conf.js | faucet"
   },
   "repository": {
     "type": "git",
@@ -25,12 +26,20 @@
     "eslint-plugin-promise": "^1.0.8",
     "eslint-plugin-standard": "^1.3.2",
     "expose-loader": "^0.7.1",
+    "faucet": "0.0.1",
     "file-loader": "^0.8.5",
     "html-loader": "^0.4.3",
     "html-webpack-plugin": "^2.9.0",
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
     "json-loader": "^0.5.4",
+    "karma": "^0.13.22",
+    "karma-coverage": "^0.5.5",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-tap": "^1.0.4",
+    "karma-tap-reporter": "0.0.6",
+    "karma-webpack": "^1.7.0",
     "legacy-loader": "0.0.2",
     "semistandard-loader": "0.0.3",
     "style-loader": "^0.13.0",

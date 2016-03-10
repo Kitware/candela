@@ -8,6 +8,7 @@ __dirname = path.resolve(__dirname, '..');
 
 module.exports = {
   devtool: 'source-map',
+  __dirname: __dirname,
   entry: {
     candela: './src/index.js',
     demo: './app/demo/index.js'
