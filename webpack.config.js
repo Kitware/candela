@@ -49,7 +49,10 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'semistandard',
-        include: path.resolve(__dirname, 'app'),
+        include: [
+          path.resolve(__dirname, 'src'),
+          path.resolve(__dirname, 'app')
+        ],
         exclude: path.resolve(__dirname, 'src', 'external')
       }
     ],
