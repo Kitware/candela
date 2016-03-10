@@ -8,12 +8,12 @@ let SingleVisualizationView = Widget.extend({
     let self = this;
     self.friendlyName = 'Visualization';
     self.hashName = 'singleVisualizationView';
-    
+
     self.listenTo(window.toolchain, 'rra:changeVisualizations', self.render);
   },
   render: function () {
     let self = this;
-    
+
     // Get the visualization in the toolchain (if there is one)
     let visSpec = window.toolchain.get('meta');
     if (visSpec) {
@@ -22,33 +22,36 @@ let SingleVisualizationView = Widget.extend({
         visSpec = visSpec[0];
       }
     }
-    
+
     let name = visSpec ? visSpec['name'] : 'None selected';
-    
+
     let handle = d3.select(self.getIndicatorSpan());
-    
+
     handle.on('click', function () {
       d3.event.stopPropagation();
       window.layout.overlay.render('visualizationLibrary');
     });
     handle.text(name);
-    
+
     let handleIcon = handle.selectAll('img').data([0]);
     handleIcon.enter().append('img');
-    
+
     self.$el.html(myTemplate);
-    
+
+    let data = [{
+      x: 1,
+      y: 1
+    }, {
+      x: 3,
+      y: 8
+    }];
+
     if (visSpec) {
       handleIcon.attr('src', Widget.okayIcon);
-      /* self.vis = new candela.components[visSpec.name]('.visualization', {
-        data: [{
-          x: 1,
-          y: 1
-        }, {
-          x: 3,
-          y: 8
-        }]
-      });*/
+      self.vis = new candela.components[visSpec.name]('.visualization', data, {
+        x: 'x',
+        y: 'y'
+      });
     } else {
       handleIcon.attr('src', Widget.warningIcon);
     }

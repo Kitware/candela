@@ -7,8 +7,9 @@ var HtmlPlugin = require('html-webpack-plugin');
 module.exports = {
   devtool: 'source-map',
   entry: {
-    candela: './src/index.js',
-    demo: './app/demo/index.js'
+    candela: ['./src/index.js'],
+    demo: './app/demo/index.js',
+    resize: './app/resize/index.js'
   },
   output: {
     library: '[name]',
@@ -35,6 +36,12 @@ module.exports = {
       title: 'Candela Demo',
       filename: 'demo/index.html',
       chunks: ['demo']
+    }),
+
+    new HtmlPlugin({
+      title: 'Resize Test',
+      filename: 'resize/index.html',
+      chunks: ['resize']
     })
   ],
   module: {
@@ -42,7 +49,6 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'semistandard',
-        include: path.resolve(__dirname, 'src'),
         include: path.resolve(__dirname, 'app'),
         exclude: path.resolve(__dirname, 'src', 'external')
       }

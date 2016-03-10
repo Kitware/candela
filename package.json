@@ -30,6 +30,7 @@
     "html-webpack-plugin": "^2.9.0",
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
+    "javascript-detect-element-resize": "^0.5.3",
     "json-loader": "^0.5.4",
     "legacy-loader": "0.0.2",
     "semistandard-loader": "0.0.3",
