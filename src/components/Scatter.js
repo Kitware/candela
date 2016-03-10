@@ -10,12 +10,12 @@ export default class Scatter {
     ];
   }
 
-  constructor (el, options) {
-    let chart = vcharts.chart('xy', {
+  constructor (el, data, options) {
+    this.chart = vcharts.chart('xy', {
       el: el,
       series: [{
         name: 'values',
-        values: options.data,
+        values: data,
         x: options.x,
         y: options.y
       }],
@@ -27,6 +27,9 @@ export default class Scatter {
       },
       legend: false
     });
-    window.onresize = () => chart.update();
+  }
+
+  render () {
+    this.chart.update();
   }
 }

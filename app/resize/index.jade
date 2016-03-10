@@ -1,0 +1,43 @@
+.page#main
+  .test-list
+    p
+      a(href='#full') Full
+    p
+      a(href='#table') Table
+    p
+      a(href='#matrix') Matrix
+.page#full.hidden
+  .vis-element.vis-full
+  p.overlay This vis should have 100% width and height and should
+    | resize with the window.
+.page#table.hidden
+  table#containing-table
+    tr
+      td.vis-element.vis-table
+      td Hello
+      td There
+      td This
+      td Is
+    tr
+      td Table
+      td That
+      td I
+      td Made
+      td !!!
+  p.overlay This vis should fit in the table and the width should resize with it
+    | as the table width is updated each second.
+    | Note that the table cell max-width is set to zero for the columns to
+    | maintain even distribution.
+
+.page#matrix.hidden
+  table.containing-matrix
+    tr
+      td.vis-element.vis-table
+      td.vis-element.vis-table
+    tr
+      td.vis-element.vis-table
+      td.vis-element.vis-table
+  p.overlay These vis should fit in the table and the width should resize with it
+    | as you change the window size.
+    | Note that the table cell max-width is set to zero for the columns to
+    | maintain even distribution.
