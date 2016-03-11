@@ -32,11 +32,12 @@ let SingleVisualizationView = Widget.extend({
       d3.event.stopPropagation();
       window.layout.overlay.render('visualizationLibrary');
     });
-    handle.text(name);
+    handle.select('span.indicatorText').text(name);
 
-    let handleIcon = handle.selectAll('img').data([0]);
+    let handleIcon = handle.select('span.indicatorIcons')
+      .selectAll('img').data([0]);
     handleIcon.enter().append('img');
-
+    
     self.$el.html(myTemplate);
     
     if (visSpec) {

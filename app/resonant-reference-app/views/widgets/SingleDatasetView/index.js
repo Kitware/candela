@@ -23,16 +23,16 @@ let SingleDatasetView = Widget.extend({
     }
     
     let name = dataset ? dataset.get('name') : 'No file loaded';
-    
     let handle = d3.select(self.getIndicatorSpan());
-    
+
     handle.on('click', function () {
       d3.event.stopPropagation();
       window.layout.overlay.render('datasetLibrary');
     });
-    handle.text(name);
-    
-    let handleIcon = handle.selectAll('img').data([0]);
+    handle.select('span.indicatorText').text(name);
+
+    let handleIcon = handle.select('span.indicatorIcons')
+      .selectAll('img').data([0]);
     handleIcon.enter().append('img');
     
     self.$el.html(myTemplate);

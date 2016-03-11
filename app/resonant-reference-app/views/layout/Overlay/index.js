@@ -32,12 +32,17 @@ let Overlay = Backbone.View.extend({
       let temp = new window.overlays[template]();
       self.el.appendChild(temp.el);
       temp.render();
-
-      d3.select(self.el)
-        .style('display', 'block')
-        .style('opacity', 0.0)
-        .transition().duration(400)
-        .style('opacity', 1.0);
+      
+      if (template === 'startingGuide') {
+        // Don't bother fading in the startingGuide
+        d3.select(self.el).style('opacity', 1.0);
+      } else {
+        d3.select(self.el)
+          .style('display', null)
+          .style('opacity', 0.0)
+          .transition().duration(400)
+          .style('opacity', 1.0);
+      }
 
       jQuery(window).on('keyup', function (e) {
         if (e.keyCode === 27) {

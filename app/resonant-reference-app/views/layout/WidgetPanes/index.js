@@ -62,8 +62,12 @@ let WidgetPanes = Backbone.View.extend({
     // Add a little space for the widget to
     // store indicators, especially for when
     // it's collapsed
-    headerEnter.append('span')
+    let indicatorsEnter = headerEnter.append('span')
       .attr('class', 'indicators');
+    indicatorsEnter.append('span')
+      .attr('class', 'indicatorText');
+    indicatorsEnter.append('span')
+      .attr('class', 'indicatorIcons');
     
     // We need a handle for each section to expand / collapse everything
     let handlesEnter = headerEnter.append('a');

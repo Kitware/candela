@@ -76,11 +76,14 @@ let Toolchain = girder.models.ItemModel.extend({
       // the mappings that goes with it
       self.setToolchain(newDataset.exampleToolchain);
     } else {
-      if (index > meta.datasets.length) {
+      if (index >= meta.datasets.length) {
         meta.datasets.push(newDataset);
         self.set('meta', meta);
       } else {
         let oldDataset = meta.datasets.at(index);
+        if (oldDataset.get('_id') === newDataset['_id']) {
+          return;
+        }
         meta.datasets.remove(oldDataset);
         meta.datasets.add(newDataset, { at: index });
         // Swapping in a new dataset invalidates the mappings
@@ -102,10 +105,13 @@ let Toolchain = girder.models.ItemModel.extend({
       // the mappings that goes with it
       self.setToolchain(newVisualization.exampleToolchain);
     } else {
-      if (index > meta.visualizations.length) {
+      if (index >= meta.visualizations.length) {
         meta.visualizations.push(newVisualization);
         self.set('meta', meta);
       } else {
+        if (meta.visualizations[index].name === newVisualization.name) {
+          return;
+        }
         meta.visualizations[index] = newVisualization;
         // Swapping in a new dataset invalidates the mappings
         meta.mappings = [];

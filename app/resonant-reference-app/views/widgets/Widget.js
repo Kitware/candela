@@ -15,6 +15,14 @@ let Widget = Backbone.View.extend({
   getIndicatorSpan: function () {
     let self = this;
     return self.$el.parent().find('span.indicators')[0];
+  },
+  getIndicatorIconSpan: function () {
+    let self = this;
+    return self.$el.parent().find('span.indicatorIcons')[0];
+  },
+  getIndicatorTextSpan: function () {
+    let self = this;
+    return self.$el.parent().find('span.indictatorText')[0];
   }
 });
 
