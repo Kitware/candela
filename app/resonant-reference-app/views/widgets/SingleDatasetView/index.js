@@ -1,4 +1,3 @@
-import d3 from 'd3';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 
@@ -9,6 +8,9 @@ let SingleDatasetView = Widget.extend({
     self.hashName = 'singleDatasetView';
     
     self.listenTo(window.toolchain, 'rra:changeDatasets', self.render);
+  },
+  handleStatusClick: function () {
+    window.layout.overlay.render('datasetLibrary');
   },
   render: function () {
     let self = this;
@@ -22,19 +24,6 @@ let SingleDatasetView = Widget.extend({
       }
     }
     
-    let name = dataset ? dataset.get('name') : 'No file loaded';
-    let handle = d3.select(self.getIndicatorSpan());
-
-    handle.on('click', function () {
-      d3.event.stopPropagation();
-      window.layout.overlay.render('datasetLibrary');
-    });
-    handle.select('span.indicatorText').text(name);
-
-    let handleIcon = handle.select('span.indicatorIcons')
-      .selectAll('img').data([0]);
-    handleIcon.enter().append('img');
-    
     self.$el.html(myTemplate);
     self.$el.find('button.switchDataset')
       .on('click', function () {
@@ -46,7 +35,8 @@ let SingleDatasetView = Widget.extend({
         .val(''); // .prop('disabled', true);
       self.$el.find('button.switchDataset')
         .text('Choose a dataset');
-      handleIcon.attr('src', Widget.warningIcon);
+      self.statusIcon = Widget.warningIcon;
+      self.statusText = 'No file loaded';
     } else {
       dataset.loadData(function (rawData) {
         self.$el.find('textarea.dataContents').val(rawData);
@@ -54,12 +44,15 @@ let SingleDatasetView = Widget.extend({
       });
       self.$el.find('button.switchDataset')
         .text('Switch datasets');
-      handleIcon.attr('src', Widget.okayIcon);
+      self.statusIcon = Widget.okayIcon;
+      self.statusText = dataset.get('name');
     }
     // TODO: allow the user to edit the data (convert
     // to in-browser dataset)... for now, always disable
     // the textarea
     self.$el.find('textarea.dataContents').prop('disabled', true);
+    
+    self.renderStatus();
   }
 });
 

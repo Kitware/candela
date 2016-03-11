@@ -15,24 +15,3 @@ button {
 hr {
   width: 100%;
 }
-
-div.hide {
-  display: none;
-}
-
-#Tooltip {
-  display: none;
-  margin: 0px;
-}
-
-#Tooltip.showing {
-  display: inline;
-  z-index: 10;
-  position: absolute;
-  color: #111;
-  border: 1px solid #DCA;
-  padding: 1em;
-  background: #fffAF0;
-  border-radius: 5px;
-  box-shadow: 5px 5px 8px #CCC;
-}

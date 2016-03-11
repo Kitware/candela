@@ -212,7 +212,8 @@ let MappingView = Widget.extend({
     return {
       nodes: nodes,
       edges: edges,
-      nodeEdgeLookup: nodeEdgeLookup
+      nodeEdgeLookup: nodeEdgeLookup,
+      realEdgeCount: meta.mappings.length
     };
   },
   handleClick: function (d) {
@@ -295,6 +296,21 @@ let MappingView = Widget.extend({
         lastData = i;
       }
     });
+    
+    // Update our little indicator
+    // to describe the mapping
+    let numData = lastData ? 1 + lastData - firstData : 0;
+    let numVis = lastVis ? 1 + lastVis - firstVis : 0;
+    self.statusText = numData + ' \u226B ' +
+      graph.realEdgeCount + ' \u226A ' + numVis;
+    if (numData === 0 ||
+        graph.realEdgeCount === 0 ||
+        numVis === 0) {
+      self.statusIcon = Widget.warningIcon;
+    } else {
+      self.statusIcon = Widget.okayIcon;
+    }
+    self.renderStatus();
 
     // Add our template if it's not already there
     if (self.$el.find('svg').length === 0) {

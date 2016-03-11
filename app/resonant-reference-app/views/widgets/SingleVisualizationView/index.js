@@ -1,4 +1,3 @@
-import d3 from 'd3';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 import candela from './../../../../../src';
@@ -13,6 +12,9 @@ let SingleVisualizationView = Widget.extend({
     self.listenTo(window.toolchain, 'rra:changeVisualizations', self.render);
     self.listenTo(window.toolchain, 'rra:changeMappings', self.render);
   },
+  handleStatusClick: function () {
+    window.layout.overlay.render('visualizationLibrary');
+  },
   render: function () {
     let self = this;
     
@@ -24,29 +26,17 @@ let SingleVisualizationView = Widget.extend({
         visSpec = visSpec[0];
       }
     }
-
-    let name = visSpec ? visSpec['name'] : 'None selected';
-    let handle = d3.select(self.getIndicatorSpan());
-
-    handle.on('click', function () {
-      d3.event.stopPropagation();
-      window.layout.overlay.render('visualizationLibrary');
-    });
-    handle.select('span.indicatorText').text(name);
-
-    let handleIcon = handle.select('span.indicatorIcons')
-      .selectAll('img').data([0]);
-    handleIcon.enter().append('img');
     
     self.$el.html(myTemplate);
     
     if (visSpec) {
-      handleIcon.attr('src', Widget.spinnerIcon);
-      
       let options = window.toolchain.getVisOptions();
+      
+      self.statusIcon = Widget.spinnerIcon;
+      self.statusText = 'Loading...';
+      self.renderStatus();
+      
       window.toolchain.shapeDataForVis(function (data) {
-        handleIcon.attr('src', Widget.okayIcon);
-
         // Temporarily force the scrollbars, so
         // the view can account for the needed space
         self.$el.css('overflow', 'scroll');
@@ -54,9 +44,15 @@ let SingleVisualizationView = Widget.extend({
                                                         data, options);
         self.vis.render();
         self.$el.css('overflow', '');
+        
+        self.statusIcon = Widget.okayIcon;
+        self.statusText = visSpec['name'];
+        self.renderStatus();
       });
     } else {
-      handleIcon.attr('src', Widget.warningIcon);
+      self.statusIcon = Widget.warningIcon;
+      self.statusText = 'None selected';
+      self.renderStatus();
     }
   }
 });
