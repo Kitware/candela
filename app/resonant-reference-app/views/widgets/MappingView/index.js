@@ -1,4 +1,5 @@
 import d3 from 'd3';
+import jQuery from 'jquery';
 import myTemplate from './template.html';
 import Widget from '../Widget';
 import Dataset from '../../../models/Dataset';
@@ -26,11 +27,21 @@ let MappingView = Widget.extend({
     self.hashName = 'mappingView';
 
     self.selection = null;
-    
+
     self.listenTo(window.toolchain, 'rra:changeMappings', function () {
       self.selection = null;
       self.render();
     });
+  },
+  createNodeId: function (d) {
+    // Generate a valid ID for the node
+    return ('node_' + d.index + d.attrName)
+      .replace(/([^A-Za-z0-9[\]{}_.:-])\s?/g, '');
+  },
+  createEdgeId: function (d) {
+    // Generate a valid ID for the edges
+    return ('edge_' + d.source + '_' + d.target)
+      .replace(/([^A-Za-z0-9[\]{}_.:-])\s?/g, '');
   },
   constructLookups: function () {
     let self = this;
@@ -48,35 +59,27 @@ let MappingView = Widget.extend({
       specs.vis.push(d);
     });
 
-    let selectedKey;
-    if (self.selection !== null) {
-      selectedKey = 'specs.' + self.selection.side + '[' +
-        self.selection.index + ']["' +
-        self.selection.attrName + '"]';
-    }
-
     // Reshape the tree into a node/edge tables
     // for easy drawing and interaction
     let nodeLookup = {};
     let nodes = [];
     let edges = [];
-    
+    let nodeEdgeLookup = {};
+
     // Helper functions
     function _createNode (side, groupIndex, attrName, attrType) {
-      let key = 'specs.' + side + '[' + groupIndex +
-          ']["' + attrName + '"]';
-      nodeLookup[key] = nodes.length;
       let newNode = {
-        key: key,
         side: side,
         index: groupIndex,
         attrName: attrName,
         type: attrType
       };
-      
+      newNode.id = self.createNodeId(newNode);
+      nodeLookup[newNode.id] = nodes.length;
+
       if (self.selection === null) {
         newNode.mode = NODE_MODES.WILL_SELECT;
-      } else if (selectedKey === key) {
+      } else if (self.selection.id === newNode.id) {
         newNode.mode = NODE_MODES.SELECTED;
       } else if (self.selection.side === newNode.side) {
         // You can always switch to selecting
@@ -86,7 +89,7 @@ let MappingView = Widget.extend({
         // Does the selected data node's type match
         // an of our compatible types?
         if (Dataset.COMPATIBLE_TYPES[newNode.type]
-            .indexOf(self.selection.baseType) === -1) {
+          .indexOf(self.selection.baseType) === -1) {
           newNode.mode = NODE_MODES.INELIGIBLE;
         } else {
           newNode.mode = NODE_MODES.WILL_CONNECT;
@@ -95,26 +98,31 @@ let MappingView = Widget.extend({
         // Is our type compatible with any of the
         // vis node's types?
         if (Dataset.COMPATIBLE_TYPES[self.selection.baseType]
-            .indexOf(newNode.type) === -1) {
+          .indexOf(newNode.type) === -1) {
           newNode.mode = NODE_MODES.INELIGIBLE;
         } else {
           newNode.mode = NODE_MODES.WILL_CONNECT;
         }
       }
       nodes.push(newNode);
+      nodeEdgeLookup[newNode.id] = [];
     }
-    
+
     function _createEdge (established, visIndex, visAttrName, dataIndex, dataAttrName) {
       // Edges always go from data to vis
-      let sourceKey = 'specs.data[' + dataIndex +
-          ']["' + dataAttrName + '"]';
-      let targetKey = 'specs.vis[' + visIndex +
-          ']["' + visAttrName + '"]';
+      let sourceId = self.createNodeId({
+        index: dataIndex,
+        attrName: dataAttrName
+      });
+      let targetId = self.createNodeId({
+        index: visIndex,
+        attrName: visAttrName
+      });
       let newEdge = {
-        source: nodeLookup[sourceKey],
-        target: nodeLookup[targetKey]
+        source: nodeLookup[sourceId],
+        target: nodeLookup[targetId]
       };
-      
+      newEdge.id = self.createEdgeId(newEdge);
       if (established) {
         // These edges already exist
         newEdge.mode = EDGE_MODES.ESTABLISHED;
@@ -122,11 +130,11 @@ let MappingView = Widget.extend({
           // Special settings for edges attached
           // to the selected node, as well as
           // the nodes on the other end
-          if (sourceKey === selectedKey) {
-            nodes[nodeLookup[targetKey]].mode = NODE_MODES.WILL_DISCONNECT;
+          if (sourceId === self.selection.id) {
+            nodes[nodeLookup[targetId]].mode = NODE_MODES.WILL_DISCONNECT;
             newEdge.mode = EDGE_MODES.ESTABLISHED_SELECTED;
-          } else if (targetKey === selectedKey) {
-            nodes[nodeLookup[sourceKey]].mode = NODE_MODES.WILL_DISCONNECT;
+          } else if (targetId === self.selection.id) {
+            nodes[nodeLookup[sourceId]].mode = NODE_MODES.WILL_DISCONNECT;
             newEdge.mode = EDGE_MODES.ESTABLISHED_SELECTED;
           }
         }
@@ -136,7 +144,7 @@ let MappingView = Widget.extend({
         // some kind of encoding for how interesting the
         // connection is likely to be)
         newEdge.mode = EDGE_MODES.POTENTIAL;
-        
+
         // Only create a potential edge if there really is
         // potential for a connection (ideally, we would have
         // filtered the list before calling _createEdge, but
@@ -159,6 +167,8 @@ let MappingView = Widget.extend({
         // in the same group as the
         // selected node...
       }
+      nodeEdgeLookup[sourceId].push(edges.length);
+      nodeEdgeLookup[targetId].push(edges.length);
       edges.push(newEdge);
     }
 
@@ -173,11 +183,11 @@ let MappingView = Widget.extend({
         _createNode('vis', visIndex, option.name, option.type);
       });
     });
-    
+
     // Get the established edges
     meta.mappings.forEach(function (mapping) {
       _createEdge(true, mapping.visIndex, mapping.visAttribute,
-                  mapping.dataIndex, mapping.dataAttribute);
+        mapping.dataIndex, mapping.dataAttribute);
     });
 
     // Add the potential and probable edges
@@ -186,31 +196,87 @@ let MappingView = Widget.extend({
         specs.vis.forEach(function (visSpec, visIndex) {
           visSpec.options.forEach(function (option) {
             _createEdge(false, visIndex, option.name,
-                        self.selection.index, self.selection.attrName);
+              self.selection.index, self.selection.attrName);
           });
         });
       } else {
         specs.data.forEach(function (dataSpec, dataIndex) {
           for (let attrName of Object.keys(dataSpec.attributes)) {
             _createEdge(false, self.selection.index, self.selection.attrName,
-                        dataIndex, attrName);
+              dataIndex, attrName);
           }
         });
       }
     }
-    
+
     return {
       nodes: nodes,
-      edges: edges
+      edges: edges,
+      nodeEdgeLookup: nodeEdgeLookup
     };
+  },
+  handleClick: function (d) {
+    let self = this;
+
+    d3.event.stopPropagation();
+    let visNode;
+    let dataNode;
+
+    // Interactions are different, depending on our state
+    if (d.mode === NODE_MODES.WILL_SELECT) {
+      // Change the selection
+      self.selection = {
+        side: d.side,
+        index: d.index,
+        attrName: d.attrName,
+        baseType: d.type
+      };
+      self.selection.id = self.createNodeId(self.selection);
+      self.render();
+    } else if (d.mode === NODE_MODES.WILL_CONNECT) {
+      // Establish a connection from the
+      // selected node to the clicked node
+      if (d.side === 'vis') {
+        visNode = d;
+        dataNode = self.selection;
+      } else {
+        visNode = self.selection;
+        dataNode = d;
+      }
+      window.toolchain.addMapping({
+        visIndex: visNode.index,
+        visAttribute: visNode.attrName,
+        dataIndex: dataNode.index,
+        dataAttribute: dataNode.attrName
+      });
+    } else if (d.mode === NODE_MODES.WILL_DISCONNECT) {
+      // Remove the connection between the
+      // selected node and the clicked node
+      if (d.side === 'vis') {
+        visNode = d;
+        dataNode = self.selection;
+      } else {
+        visNode = self.selection;
+        dataNode = d;
+      }
+      window.toolchain.removeMapping({
+        visIndex: visNode.index,
+        visAttribute: visNode.attrName,
+        dataIndex: dataNode.index,
+        dataAttribute: dataNode.attrName
+      });
+    } else if (d.mode === NODE_MODES.SELECTED) {
+      self.selection = null;
+      self.render();
+    }
   },
   render: function () {
     let self = this;
-    
+
     // Construct a graph from each of the specs
     // (and the currently selected node)
     let graph = self.constructLookups();
-    
+
     // The vis and data nodes will be in contiguous
     // blocks in graph.nodes... rather than split them
     // into their own lists and render them seperately,
@@ -229,7 +295,7 @@ let MappingView = Widget.extend({
         lastData = i;
       }
     });
-    
+
     // Add our template if it's not already there
     if (self.$el.find('svg').length === 0) {
       self.$el.html(myTemplate);
@@ -241,10 +307,10 @@ let MappingView = Widget.extend({
           self.render();
         });
     }
-    
+
     // Figure out how we're going to lay things
     // out based on how much space we have
-    
+
     // Temporarily force the scroll bars so we
     // account for their size
     self.$el.css('overflow', 'scroll');
@@ -270,16 +336,13 @@ let MappingView = Widget.extend({
       .range([0, bounds.height]);
     let nodeHeight = 40;
 
-    // Draw the nodes
     let nodes = d3.select(self.el).select('svg')
       .select('.nodeLayer')
-      .selectAll('.node').data(graph.nodes, function (d) {
-        return d.index + d.attrName + d.mode;
-      });
+      .selectAll('.node').data(graph.nodes, (d) => d.id);
     let enteringNodes = nodes.enter().append('g');
     nodes.exit().remove();
 
-    nodes.attr('class', function (d) {
+    nodes.attr('id', (d) => d.id).attr('class', (d) => {
       let classString = '';
       // Node mode
       if (d.mode === NODE_MODES.WILL_SELECT) {
@@ -306,57 +369,24 @@ let MappingView = Widget.extend({
       } else {
         return 'translate(' + dataX + ',' + dataY(i) + ')';
       }
-    }).on('click', function (d) {
-      d3.event.stopPropagation();
-      var visNode;
-      var dataNode;
-      
-      // Interactions are different, depending on our state
-      if (d.mode === NODE_MODES.WILL_SELECT) {
-        // Change the selection
-        self.selection = {
-          side: d.side,
-          index: d.index,
-          attrName: d.attrName,
-          baseType: d.type
-        };
-        self.render();
-      } else if (d.mode === NODE_MODES.WILL_CONNECT) {
-        // Establish a connection from the
-        // selected node to the clicked node
-        if (d.side === 'vis') {
-          visNode = d;
-          dataNode = self.selection;
-        } else {
-          visNode = self.selection;
-          dataNode = d;
-        }
-        window.toolchain.addMapping({
-          visIndex: visNode.index,
-          visAttribute: visNode.attrName,
-          dataIndex: dataNode.index,
-          dataAttribute: dataNode.attrName
+    }).on('mouseover', function (d) {
+      // Highlight this node
+      jQuery(this).addClass('hovered');
+      // Highlight the edge between this node and the selection
+      if (self.selection !== null && self.selection.id !== d.id) {
+        graph.nodeEdgeLookup[d.id].forEach(function (edgeIndex) {
+          let edge = graph.edges[edgeIndex];
+          if (graph.nodes[edge.source].id === self.selection.id ||
+              graph.nodes[edge.target].id === self.selection.id) {
+            jQuery('#' + graph.edges[edgeIndex].id).addClass('hovered');
+          }
         });
-      } else if (d.mode === NODE_MODES.WILL_DISCONNECT) {
-        // Remove the connection between the
-        // selected node and the clicked node
-        if (d.side === 'vis') {
-          visNode = d;
-          dataNode = self.selection;
-        } else {
-          visNode = self.selection;
-          dataNode = d;
-        }
-        window.toolchain.removeMapping({
-          visIndex: visNode.index,
-          visAttribute: visNode.attrName,
-          dataIndex: dataNode.index,
-          dataAttribute: dataNode.attrName
-        });
-      } else if (d.mode === NODE_MODES.SELECTED) {
-        self.selection = null;
-        self.render();
       }
+    }).on('mouseout', function (d) {
+      // Clear any highlights
+      self.$el.find('.hovered').removeClass('hovered');
+    }).on('click', function (d) {
+      self.handleClick(d);
     });
 
     enteringNodes.append('rect');
@@ -382,21 +412,19 @@ let MappingView = Widget.extend({
         if (d.side === 'data') {
           return d.type;
         } else {
-          // TODO: highlight the connected type
+          // TODO: boldface the connected type
           return Dataset.COMPATIBLE_TYPES[d.type].join(',');
         }
       });
-    
+
     // Draw the connections
     let edges = d3.select(self.el).select('svg')
       .select('.linkLayer')
-      .selectAll('.edge').data(graph.edges, function (d) {
-        return d.source + '_' + d.target + '_' + d.mode;
-      });
+      .selectAll('.edge').data(graph.edges, (d) => d.id);
     edges.enter().append('path');
     edges.exit().remove();
 
-    edges.attr('class', function (d) {
+    edges.attr('id', (d) => d.id).attr('class', (d) => {
       let classString = '';
       // Edge type
       if (d.mode === EDGE_MODES.POTENTIAL) {
@@ -415,6 +443,29 @@ let MappingView = Widget.extend({
         'L' + (visX - nodeWidth / 2) + ',' +
         visY(d.target);
       return pathString;
+    }).on('mouseover', function (d) {
+      jQuery(this).addClass('hovered');
+      // If one end is selected, highlight the other end
+      let nodeToHighlight;
+      if (self.selection === null) {
+        return;
+      } else if (self.selection.side === 'vis') {
+        nodeToHighlight = graph.nodes[d.source];
+      } else {
+        nodeToHighlight = graph.nodes[d.target];
+      }
+      self.$el.find('#' + nodeToHighlight.id).addClass('hovered');
+    }).on('mouseout', function (d) {
+      // Clear any highlights
+      self.$el.find('.hovered').removeClass('hovered');
+    }).on('click', function (d) {
+      if (self.selection === null) {
+        return;
+      } else if (self.selection.side === 'vis') {
+        self.handleClick(graph.nodes[d.source]);
+      } else {
+        self.handleClick(graph.nodes[d.target]);
+      }
     });
   }
 });

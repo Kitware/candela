@@ -5,7 +5,7 @@ let girder = window.girder;
 /*
     A Toolchain represents a user's saved session;
     it includes specific datasets, with specific
-    mappingss to specific visualizations (in the future,
+    mappings to specific visualizations (in the future,
     this may also include faceting settings, etc).
     
     Though behind the scenes we're making room for multiple
