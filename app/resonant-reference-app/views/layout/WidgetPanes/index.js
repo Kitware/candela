@@ -1,6 +1,7 @@
 import Backbone from 'backbone';
 import myTemplate from './template.html';
 import d3 from 'd3';
+import jQuery from 'jquery';
 
 import './accordionhorz.css';
 import './style.css';
@@ -8,7 +9,7 @@ import './style.css';
 import collapseIcon from '../../../images/collapse.svg';
 import expandIcon from '../../../images/expand.svg';
 
-let ToolsView = Backbone.View.extend({
+let WidgetPanes = Backbone.View.extend({
   initialize: function () {
     let self = this;
     self.listenTo(self.model, 'change', self.render);
@@ -17,52 +18,64 @@ let ToolsView = Backbone.View.extend({
   },
   render: function () {
     let self = this;
-    let tools = d3.entries(self.model.get('tools'));
 
-    // Only show tools that aren't hidden
-    tools = tools.filter(function (d) {
-      return !d.value.hidden;
+    // Only show widgets that aren't hidden
+    let widgets = window.widgets.filter(function (d) {
+      return !d.hidden;
     });
-
+    
     // Patch on a temporary flag as to
     // which sections are expanded
     let hashes = window.location.hash.split('#');
-    tools.forEach(function (d) {
-      d.targeted = hashes.indexOf(d.key) !== -1;
+    widgets.forEach(function (d) {
+      d.targeted = hashes.indexOf(d.hashName) !== -1;
     });
 
-    // Create sections for each tool
+    // Create sections for each widget
     let sections = d3.select(self.el)
       .select('article')
       .selectAll('section')
-      .data(tools, function (d) {
-        return d.key;
+      .data(widgets, function (d) {
+        return d.hashName;
       });
 
     let sectionsEnter = sections.enter().append('section');
 
     // Remove each view object when views are removed
     sections.exit().each(function (d) {
-      delete self.views[d.key];
+      delete self.views[d.hashName];
     }).remove();
-
+    
     sections.attr('id', function (d) {
-      return d.key;
+      return d.hashName;
     }).attr('class', function (d) {
       return d.targeted ? 'targeted' : null;
     });
 
-    // We need a header/handle for each section
-    let handlesEnter = sectionsEnter.append('h2').append('a');
-    sections.selectAll('h2').selectAll('a')
+    // We need a header for each section
+    // (this will accept expand / collapse clicks)
+    let headerEnter = sectionsEnter.append('h2')
       .on('click', function (d) {
-        self.toggle(d.key);
+        self.toggle(d.hashName);
       });
+    
+    // Add a little space for the widget to
+    // store indicators, especially for when
+    // it's collapsed
+    let indicatorsEnter = headerEnter.append('span')
+      .attr('class', 'indicators');
+    indicatorsEnter.append('span')
+      .attr('class', 'indicatorText');
+    indicatorsEnter.append('span')
+      .attr('class', 'indicatorIcons');
+    
+    // We need a handle for each section to expand / collapse everything
+    let handlesEnter = headerEnter.append('a');
+    sections.selectAll('h2').selectAll('a');
 
     handlesEnter.append('img');
     sections.selectAll('h2').selectAll('a').selectAll('img')
       .attr('src', function (d) {
-        // TODO: why isn't the icon changing?
         if (d.targeted) {
           return collapseIcon;
         } else {
@@ -73,21 +86,21 @@ let ToolsView = Backbone.View.extend({
     handlesEnter.append('span');
     sections.selectAll('h2').selectAll('a').selectAll('span')
       .text(function (d) {
-        return d.value.friendlyName;
+        return d.friendlyName;
       });
 
     // Finally, a div (that will scroll)
     // to contain the view
     sectionsEnter.append('div').attr({
       id: function (d) {
-        return d.key + 'Container';
+        return d.hashName + 'Container';
       },
       class: 'content'
     });
 
     // Distribute the space for each section
     let expandedSections = hashes.length - 1;
-    let collapsedSections = tools.length - expandedSections;
+    let collapsedSections = widgets.length - expandedSections;
     let style = 'calc((100% - (0.5em + ' + // a little grey space at the beginning
       '2.5*' + collapsedSections + 'em + ' + // collapsed sections are 2em wide + a grey space
       '2.5*' + expandedSections + 'em)) / ' + // expanded sections have a total of 2em of padding, + their grey space
@@ -101,26 +114,18 @@ let ToolsView = Backbone.View.extend({
 
     // Now let's embed the actual view
     sectionsEnter.each(function (d) {
-      let model = d.value.model;
-      model = self.model.getCurrentToolchain().get(model);
-
-      let ViewClass = d.value.view;
-
-      let newView = new ViewClass({
-        el: '#' + d.key + 'Container',
-        model: model
-      });
-
-      self.views[d.key] = newView;
+      d.setElement(jQuery('#' + d.hashName + 'Container')[0]);
+      self.views[d.hashName] = d;
     });
 
     // Finally, get all our views to render
-    let view;
-    for (view in self.views) {
-      if (self.views.hasOwnProperty(view)) {
-        self.views[view].render();
+    // (don't tell them to render themselves
+    // until after the animation has finished)
+    window.setTimeout(function () {
+      for (let viewName of Object.keys(self.views)) {
+        self.views[viewName].render();
       }
-    }
+    }, 1000);
   },
   toggle: function (key) {
     let self = this;
@@ -139,4 +144,4 @@ let ToolsView = Backbone.View.extend({
   }
 });
 
-module.exports = ToolsView;
+export default WidgetPanes;

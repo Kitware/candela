@@ -14,7 +14,7 @@ module.exports = {
   output: {
     library: '[name]',
     libraryTarget: 'umd',
-    path: 'dist',
+    path: 'build',
     filename: '[name]/[name].js'
   },
   resolve: {
@@ -29,7 +29,7 @@ module.exports = {
     }),
 
     new CleanPlugin([
-      './dist'
+      './build'
     ]),
 
     new HtmlPlugin({

@@ -20,4 +20,4 @@ let StartingGuide = Backbone.View.extend({
   }
 });
 
-module.exports = StartingGuide;
+export default StartingGuide;

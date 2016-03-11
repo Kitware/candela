@@ -4,22 +4,12 @@ import jQuery from 'jquery';
 
 import './overlay.css';
 
-import StartupGuide from '../StartingGuide/StartingGuide.js';
-import DatasetLibrary from '../DatasetLibrary/DatasetLibrary.js';
-import VisualizationLibrary from '../VisualizationLibrary/VisualizationLibrary.js';
-
-let templates = {
-  startup: StartupGuide,
-  datasetLibrary: DatasetLibrary,
-  visualizationLibrary: VisualizationLibrary
-};
-
 let Overlay = Backbone.View.extend({
   initialize: function () {
     let self = this;
-
+    
     if (window.location.hash === '') {
-      self.render('startup');
+      self.render('startingGuide');
     } else {
       self.render(null);
     }
@@ -35,19 +25,24 @@ let Overlay = Backbone.View.extend({
       // for next time we just re-render
       self.template = template;
     }
-
+    
     if (template !== null) {
       self.$el.html('');
-
-      let temp = new templates[template]();
+      
+      let temp = new window.overlays[template]();
       self.el.appendChild(temp.el);
       temp.render();
-
-      d3.select(self.el)
-        .style('display', 'block')
-        .style('opacity', 0.0)
-        .transition().duration(400)
-        .style('opacity', 1.0);
+      
+      if (template === 'startingGuide') {
+        // Don't bother fading in the startingGuide
+        d3.select(self.el).style('opacity', 1.0);
+      } else {
+        d3.select(self.el)
+          .style('display', null)
+          .style('opacity', 0.0)
+          .transition().duration(400)
+          .style('opacity', 1.0);
+      }
 
       jQuery(window).on('keyup', function (e) {
         if (e.keyCode === 27) {
@@ -70,4 +65,4 @@ let Overlay = Backbone.View.extend({
   }
 });
 
-module.exports = Overlay;
+export default Overlay;

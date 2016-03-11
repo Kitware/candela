@@ -86,6 +86,23 @@ article.accordion section h2 a {
   text-decoration: none;
   color: inherit;
   outline: 0 none;
+  cursor: pointer;
+}
+
+article.accordion section h2 a img {
+  margin-right: 0.5em;
+  margin-left: -1.25em;
+}
+article.accordion section h2 img {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 article.accordion section div.content {
@@ -103,16 +120,6 @@ article.accordion section h2 {
   -ms-transition: all 1s ease;
   -o-transition: all 1s ease;
   transition: all 1s ease;
-}
-
-article.accordion section img {
-  vertical-align: middle;
-  margin-right: 0.5em;
-  margin-left: -1.25em;
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  content: "";
 }
 
 article.accordion section div.content {
@@ -136,6 +143,7 @@ article.accordion section.targeted {
 
 article.accordion section.targeted h2 {
   position: static;
+  width: 100%;
   font-size: 1.3em;
   text-indent: 0;
   color: #333;
@@ -146,8 +154,18 @@ article.accordion section.targeted h2 {
   transform: rotate(0deg);
 }
 
-article.accordion section.targeted img {
-  margin-left: -0.25em;
+article.accordion section.targeted h2 a img {
+  position: absolute;
+  margin: 0px;
+  top: 0.5em;
+  right: 0px;
+}
+article.accordion section.targeted h2 img {
+  -webkit-transform: rotate(0deg);
+  -moz-transform: rotate(0deg);
+  -ms-transform: rotate(0deg);
+  -o-transform: rotate(0deg);
+  transform: rotate(0deg);
 }
 
 article.accordion section.targeted div.content {
@@ -162,4 +180,17 @@ article.accordion section.targeted div.content {
   -ms-transition-delay: 1s;
   -o-transition-delay: 1s;
   transition-delay: 1s;
+}
+
+article.accordion section span.indicators {
+  position: absolute;
+  right: 1em;
+  height: 2em;
+  line-height: 2em;
+  bottom: 0em;
+  cursor: pointer;
+  text-indent: 0px;
+}
+article.accordion section.targeted span.indicators {
+  right: 2em;
 }
