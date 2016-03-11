@@ -42,6 +42,7 @@ let SingleVisualizationView = Widget.extend({
     
     if (visSpec) {
       handleIcon.attr('src', Widget.spinnerIcon);
+      
       let options = window.toolchain.getVisOptions();
       window.toolchain.shapeDataForVis(function (data) {
         handleIcon.attr('src', Widget.okayIcon);

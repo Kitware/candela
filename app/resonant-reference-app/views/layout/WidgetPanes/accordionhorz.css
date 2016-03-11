@@ -38,8 +38,6 @@ article.accordion {
   margin: 0 auto;
   background-color: #666;
   overflow: auto;
-  border-radius: 5px;
-  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3);
 }
 
 article.accordion section {
@@ -59,7 +57,7 @@ article.accordion section h2 {
   position: absolute;
   font-size: 1em;
   font-weight: bold;
-  width: calc(100vh - 1em);
+  width: calc(100vh - 4em);
   height: 2em;
   top: 100%;
   left: 0;
@@ -184,7 +182,7 @@ article.accordion section.targeted div.content {
 
 article.accordion section span.indicators {
   position: absolute;
-  right: 1em;
+  right: 0.75em;
   height: 2em;
   line-height: 2em;
   bottom: 0em;

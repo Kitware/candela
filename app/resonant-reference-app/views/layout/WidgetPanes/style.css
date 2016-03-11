@@ -1,3 +1,10 @@
+#WidgetPanes {
+  position: absolute;
+  width: 100%;
+  top: 3em;
+  bottom: 0px;
+}
+
 span.indicatorIcons img {
   margin-left: 0.5em;
   margin-right: -0.25em;
