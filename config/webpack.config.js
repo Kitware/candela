@@ -45,16 +45,14 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'semistandard',
-        include: path.resolve(__dirname, 'src'),
-        include: path.resolve(__dirname, 'app'),
+        include: [
+          path.resolve(__dirname, 'src/candela'),
+          path.resolve(__dirname, 'app')
+        ],
         exclude: path.resolve(__dirname, 'src', 'external')
       }
     ],
     loaders: [
-      {
-        test: require.resolve(__dirname + '/src/index.js'),
-        loader: 'expose?candela'
-      },
       {
         test: /\.js$/,
         loader: 'babel-loader',

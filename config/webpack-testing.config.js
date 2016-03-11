@@ -6,7 +6,7 @@ var config = require('./webpack.config');
 __dirname = config.__dirname;
 
 config.entry = {
-  'tests.bundle': path.resolve(__dirname, 'testing/tests.bundle.js')
+  'tests.bundle': './tests.bundle.js'
 };
 
 config.devtool = 'inline-source-map';

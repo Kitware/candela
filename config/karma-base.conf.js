@@ -11,10 +11,10 @@ module.exports = {
     'tap'
   ],
   files: [
-    'testing/tests.bundle.js'
+    'tests.bundle.js'
   ],
   preprocessors: {
-    'testing/tests.bundle.js': [
+    'tests.bundle.js': [
       'webpack',
       'sourcemap'
     ]
