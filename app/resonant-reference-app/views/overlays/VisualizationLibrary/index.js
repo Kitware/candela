@@ -1,9 +1,9 @@
 import Backbone from 'backbone';
 import d3 from 'd3';
-import Dataset from '../../../models/Dataset';
+// import Dataset from '../../../models/Dataset';
 import myTemplate from './template.html';
 import libImage from '../../../images/library.svg';
-import candela from './../../../../../src';
+// import candela from './../../../../../src';
 
 let VisualizationLibrary = Backbone.View.extend({
   render: function () {
@@ -11,6 +11,25 @@ let VisualizationLibrary = Backbone.View.extend({
     self.$el.html(myTemplate);
 
     let libraryVisSpecs = [];
+    
+    libraryVisSpecs.push({
+      name: 'Scatter',
+      options: [
+        {
+          name: 'x',
+          type: 'number'
+        },
+        {
+          name: 'y',
+          type: 'number'
+        }
+      ]
+    });
+    /*
+      TODO: build the library from the available
+      candela visualizations
+    */
+    /*
     for (let visName of Object.keys(candela.components)) {
       let spec = {
         name: visName,
@@ -21,8 +40,10 @@ let VisualizationLibrary = Backbone.View.extend({
           })
       };
       libraryVisSpecs.push(spec);
+      console.log(spec);
     }
-
+    */
+    
     let libraryButtons = d3.select('div.visualizationLibrary')
       .selectAll('.circleButton')
       .data(libraryVisSpecs);

@@ -40,7 +40,7 @@ let SingleVisualizationView = Widget.extend({
     self.$el.html(myTemplate);
     
     if (visSpec) {
-      handleIcon.attr('src', Widget.workingIcon);
+      handleIcon.attr('src', Widget.spinnerIcon);
       let options = window.toolchain.getVisOptions();
       window.toolchain.shapeDataForVis(function (data) {
         handleIcon.attr('src', Widget.okayIcon);

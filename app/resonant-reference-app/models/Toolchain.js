@@ -123,8 +123,12 @@ let Toolchain = girder.models.ItemModel.extend({
     // TODO: use the mapping to transform
     // the parsed data into the shape that
     // the visualization expects
-    
-    meta.datasets.at(0).getParsed(callback);
+    let dataset = meta.datasets.at(0);
+    if (!dataset) {
+      callback([]);
+    } else {
+      dataset.getParsed(callback);
+    }
   },
   getVisOptions: function (index = 0) {
     let self = this;

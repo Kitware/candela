@@ -43,19 +43,23 @@ let SingleDatasetView = Widget.extend({
 
     if (!dataset) {
       self.$el.find('textarea.dataContents')
-        .val('').prop('disabled', true);
+        .val(''); // .prop('disabled', true);
       self.$el.find('button.switchDataset')
         .text('Choose a dataset');
       handleIcon.attr('src', Widget.warningIcon);
     } else {
       dataset.loadData(function (rawData) {
-        self.$el.find('textarea.dataContents')
-          .prop('disabled', '').val(rawData);
+        self.$el.find('textarea.dataContents').val(rawData);
+        //  .prop('disabled', '');
       });
       self.$el.find('button.switchDataset')
         .text('Switch datasets');
       handleIcon.attr('src', Widget.okayIcon);
     }
+    // TODO: allow the user to edit the data (convert
+    // to in-browser dataset)... for now, always disable
+    // the textarea
+    self.$el.find('textarea.dataContents').prop('disabled', true);
   }
 });
 
