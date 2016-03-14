@@ -20,8 +20,9 @@ let EDGE_MODES = {
 };
 
 let MappingView = Widget.extend({
-  initialize: function (args) {
+  initialize: function (options) {
     let self = this;
+    Widget.prototype.initialize.apply(self, options);
 
     self.friendlyName = 'Mapping';
     self.hashName = 'mappingView';
@@ -301,16 +302,16 @@ let MappingView = Widget.extend({
     // to describe the mapping
     let numData = lastData ? 1 + lastData - firstData : 0;
     let numVis = lastVis ? 1 + lastVis - firstVis : 0;
-    self.statusText = numData + ' \u226B ' +
+    self.statusText.text = numData + ' \u226B ' +
       graph.realEdgeCount + ' \u226A ' + numVis;
     if (numData === 0 ||
         graph.realEdgeCount === 0 ||
         numVis === 0) {
-      self.statusIcon = Widget.warningIcon;
+      // self.statusIcon = Widget.warningIcon;
     } else {
-      self.statusIcon = Widget.okayIcon;
+      // self.statusIcon = Widget.okayIcon;
     }
-    self.renderStatus();
+    self.renderIndicators();
 
     // Add our template if it's not already there
     if (self.$el.find('svg').length === 0) {

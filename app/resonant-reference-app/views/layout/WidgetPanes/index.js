@@ -1,102 +1,48 @@
 import Backbone from 'backbone';
-import myTemplate from './template.html';
 import d3 from 'd3';
-import jQuery from 'jquery';
+import WidgetPane from './WidgetPane.js';
 
 import './accordionhorz.css';
 import './style.css';
-
-import collapseIcon from '../../../images/collapse.svg';
-import expandIcon from '../../../images/expand.svg';
 
 let WidgetPanes = Backbone.View.extend({
   initialize: function () {
     let self = this;
     self.listenTo(self.model, 'change', self.render);
-    self.$el.html(myTemplate);
-    self.views = {};
   },
   render: function () {
     let self = this;
-
+    
     // Only show widgets that aren't hidden
     let widgets = window.widgets.filter(function (d) {
       return !d.hidden;
     });
     
-    // Patch on a temporary flag as to
-    // which sections are expanded
     let hashes = window.location.hash.split('#');
-    widgets.forEach(function (d) {
-      d.targeted = hashes.indexOf(d.hashName) !== -1;
-    });
-
-    // Create sections for each widget
+    
+    // Create sections for each pane
     let sections = d3.select(self.el)
-      .select('article')
       .selectAll('section')
       .data(widgets, function (d) {
         return d.hashName;
       });
-
     let sectionsEnter = sections.enter().append('section');
-
-    // Remove each view object when views are removed
-    sections.exit().each(function (d) {
-      delete self.views[d.hashName];
-    }).remove();
+    sections.exit().remove();
     
     sections.attr('id', function (d) {
       return d.hashName;
     }).attr('class', function (d) {
-      return d.targeted ? 'targeted' : null;
+      return hashes.indexOf(d.hashName) !== -1 ? 'targeted' : null;
     });
-
-    // We need a header for each section
-    // (this will accept expand / collapse clicks)
-    let headerEnter = sectionsEnter.append('h2')
-      .on('click', function (d) {
-        self.toggle(d.hashName);
-      });
     
-    // Add a little space for the widget to
-    // store status indicators, especially for when
-    // it's collapsed
-    let indicatorsEnter = headerEnter.append('span')
-      .attr('class', 'indicators');
-    indicatorsEnter.append('span')
-      .attr('class', 'indicatorText');
-    indicatorsEnter.append('span')
-      .attr('class', 'indicatorIcons')
-      .append('img');
-    
-    // We need a handle for each section to expand / collapse everything
-    let handlesEnter = headerEnter.append('a');
-    sections.selectAll('h2').selectAll('a');
-
-    handlesEnter.append('img');
-    sections.selectAll('h2').selectAll('a').selectAll('img')
-      .attr('src', function (d) {
-        if (d.targeted) {
-          return collapseIcon;
-        } else {
-          return expandIcon;
-        }
+    // Any new widgets need to have a WidgetPane instantiated
+    // and bound to the new section
+    sectionsEnter.each(function (d) {
+      let pane = new WidgetPane({
+        widget: d,
+        el: this
       });
-
-    handlesEnter.append('span');
-    sections.selectAll('h2').selectAll('a').selectAll('span')
-      .text(function (d) {
-        return d.friendlyName;
-      });
-
-    // Finally, a div (that will scroll)
-    // to contain the view
-    sectionsEnter.append('div').attr({
-      id: function (d) {
-        return d.hashName + 'Container';
-      },
-      class: 'content'
+      pane.render();
     });
 
     // Distribute the space for each section
@@ -113,35 +59,14 @@ let WidgetPanes = Backbone.View.extend({
     self.$el.find('section.targeted')
       .css('width', style);
 
-    // Now let's embed the actual view
-    sectionsEnter.each(function (d) {
-      d.setElement(jQuery('#' + d.hashName + 'Container')[0]);
-      self.views[d.hashName] = d;
-    });
-
-    // Finally, get all our views to render
+    // Finally, get all the widgets to render
     // (don't tell them to render themselves
     // until after the animation has finished)
     window.setTimeout(function () {
-      for (let viewName of Object.keys(self.views)) {
-        self.views[viewName].render();
-      }
+      window.widgets.forEach(function (widget) {
+        widget.render();
+      });
     }, 1000);
-  },
-  toggle: function (key) {
-    let self = this;
-    let hashes = window.location.hash.split('#');
-    let index = hashes.indexOf(key);
-
-    if (index === -1) {
-      // Toggle on; add this view
-      hashes.push(key);
-    } else {
-      // Toggle off; collapse this view
-      hashes.splice(index, 1);
-    }
-    window.location.hash = hashes.join('#');
-    self.render();
   }
 });
 

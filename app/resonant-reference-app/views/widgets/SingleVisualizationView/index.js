@@ -4,16 +4,18 @@ import candela from './../../../../../src';
 import './style.css';
 
 let SingleVisualizationView = Widget.extend({
-  initialize: function () {
+  initialize: function (options) {
     let self = this;
+    Widget.prototype.initialize.apply(self, options);
+    
     self.friendlyName = 'Visualization';
     self.hashName = 'singleVisualizationView';
+    self.statusText.onclick = function () {
+      window.layout.overlay.render('visualizationLibrary');
+    };
 
     self.listenTo(window.toolchain, 'rra:changeVisualizations', self.render);
     self.listenTo(window.toolchain, 'rra:changeMappings', self.render);
-  },
-  handleStatusClick: function () {
-    window.layout.overlay.render('visualizationLibrary');
   },
   render: function () {
     let self = this;
@@ -32,9 +34,9 @@ let SingleVisualizationView = Widget.extend({
     if (visSpec) {
       let options = window.toolchain.getVisOptions();
       
-      self.statusIcon = Widget.spinnerIcon;
-      self.statusText = 'Loading...';
-      self.renderStatus();
+      // self.statusIcon = Widget.spinnerIcon;
+      self.statusText.text = 'Loading...';
+      self.renderIndicators();
       
       window.toolchain.shapeDataForVis(function (data) {
         // Temporarily force the scrollbars, so
@@ -45,14 +47,14 @@ let SingleVisualizationView = Widget.extend({
         self.vis.render();
         self.$el.css('overflow', '');
         
-        self.statusIcon = Widget.okayIcon;
-        self.statusText = visSpec['name'];
-        self.renderStatus();
+        // self.statusIcon = Widget.okayIcon;
+        self.statusText.text = visSpec['name'];
+        self.renderIndicators();
       });
     } else {
-      self.statusIcon = Widget.warningIcon;
-      self.statusText = 'None selected';
-      self.renderStatus();
+      // self.statusIcon = Widget.warningIcon;
+      self.statusText.text = 'None selected';
+      self.renderIndicators();
     }
   }
 });

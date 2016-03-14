@@ -2,7 +2,6 @@ import jQuery from 'jquery';
 
 // Page-wide Styles
 import './stylesheets/pure-css-custom-form-elements/style.css';
-import './stylesheets/tooltip/tooltip.css';
 import './stylesheets/mainPage.css';
 
 // Current toolchain

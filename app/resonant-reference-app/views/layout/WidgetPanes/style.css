@@ -5,11 +5,40 @@
   bottom: 0px;
 }
 
+span.indicators {
+  position: absolute;
+  right: 0.5em;
+  height: 2em;
+  line-height: 2em;
+  bottom: 0em;
+  cursor: pointer;
+}
+
+.targeted span.indicators {
+  top: 0em;
+}
+
 span.indicatorIcons img {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
   margin-left: 0.5em;
-  margin-right: -0.25em;
 }
 span.indicatorText {
   color: #999;
   font-size: 0.75em;
+}
+
+.targeted span.indicatorIcons img {
+  -webkit-transform: rotate(0deg);
+  -moz-transform: rotate(0deg);
+  -ms-transform: rotate(0deg);
+  -o-transform: rotate(0deg);
+  transform: rotate(0deg);
 }
