@@ -1,12 +1,32 @@
 import Widget from '../Widget';
 import myTemplate from './template.html';
 
+import loadingHelpTemplate from './loadingHelpTemplate.html';
+import successHelpTemplate from './successHelpTemplate.html';
+import noDataLoadedTemplate from './noDataLoadedTemplate.html';
+import infoTemplate from './infoTemplate.html';
+
 let SingleDatasetView = Widget.extend({
   initialize: function (options) {
     let self = this;
     Widget.prototype.initialize.apply(self, options);
     self.friendlyName = 'Dataset';
     self.hashName = 'singleDatasetView';
+    
+    self.statusText.onclick = function () {
+      window.layout.overlay.render('datasetLibrary');
+    };
+    self.statusText.title = 'Click to select a different dataset.';
+    
+    self.infoHint = true;
+    self.icons.splice(0, 0, {
+      src: function () {
+        return self.infoHint ? Widget.newInfoIcon : Widget.infoIcon;
+      },
+      onclick: function () {
+        self.renderInfoScreen();
+      }
+    });
     
     self.ok = null;
     self.icons.splice(0, 0, {
@@ -18,14 +38,48 @@ let SingleDatasetView = Widget.extend({
         } else {
           return Widget.warningIcon;
         }
+      },
+      title: function () {
+        if (self.ok === null) {
+          return 'The dataset hasn\'t finished loading yet';
+        } else if (self.ok === true) {
+          return 'The dataset appears to have loaded correctly';
+        } else {
+          return 'Something isn\'t quite right; click for details';
+        }
+      },
+      onclick: function () {
+        self.renderHelpScreen();
       }
     });
     
-    self.statusText.onclick = function () {
-      window.layout.overlay.render('datasetLibrary');
-    };
-    
     self.listenTo(window.toolchain, 'rra:changeDatasets', self.render);
+  },
+  renderInfoScreen: function () {
+    let self = this;
+    self.infoHint = false;
+    self.renderIndicators();
+    
+    window.layout.overlay.render(infoTemplate);
+  },
+  renderHelpScreen: function () {
+    let self = this;
+    self.infoHint = false;
+    
+    let message;
+    if (self.ok === null) {
+      message = loadingHelpTemplate;
+    } else if (self.ok === true) {
+      message = successHelpTemplate;
+    } else {
+      let meta = window.toolchain.get('meta');
+      
+      if (!meta || !meta.visualizations || !meta.visualizations[0]) {
+        message = noDataLoadedTemplate;
+      }
+    }
+    
+    window.layout.overlay.render(message);
   },
   render: function () {
     let self = this;

@@ -5,6 +5,8 @@ import Widget from '../Widget';
 import Dataset from '../../../models/Dataset';
 import './style.css';
 
+import infoTemplate from './infoTemplate.html';
+
 let NODE_MODES = {
   INELIGIBLE: 0,
   WILL_SELECT: 1,
@@ -27,12 +29,29 @@ let MappingView = Widget.extend({
     self.friendlyName = 'Mapping';
     self.hashName = 'mappingView';
     
+    self.infoHint = true;
+    self.icons.splice(0, 0, {
+      src: function () {
+        return self.infoHint ? Widget.newInfoIcon : Widget.infoIcon;
+      },
+      onclick: function () {
+        self.renderInfoScreen();
+      }
+    });
+    
     self.selection = null;
 
     self.listenTo(window.toolchain, 'rra:changeMappings', function () {
       self.selection = null;
       self.render();
     });
+  },
+  renderInfoScreen: function () {
+    let self = this;
+    self.infoHint = false;
+    self.renderIndicators();
+    
+    window.layout.overlay.render(infoTemplate);
   },
   createNodeId: function (d) {
     // Generate a valid ID for the node
@@ -304,6 +323,9 @@ let MappingView = Widget.extend({
     let numVis = lastVis ? 1 + lastVis - firstVis : 0;
     self.statusText.text = numData + ' \u226B ' +
       graph.realEdgeCount + ' \u226A ' + numVis;
+    self.statusText.title = numData + ' data attributes have ' +
+      graph.realEdgeCount + ' mappings to ' + numVis +
+      ' visual encoding channels.';
     if (numData === 0 ||
         graph.realEdgeCount === 0 ||
         numVis === 0) {
