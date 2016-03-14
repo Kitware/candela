@@ -15,12 +15,14 @@ let Widget = Backbone.View.extend({
     self.friendlyName = 'ERROR! Abstract Widget!';
     self.hashName = '';
     self.statusText = {
-      text: '',
-      onclick: function () {}
+      text: ''
     };
     self.icons = [{
       src: function () {
         return self.isTargeted() ? collapseIcon : expandIcon;
+      },
+      title: function () {
+        return self.isTargeted() ? 'Collapse Pane' : 'Expand Pane';
       },
       onclick: function () {
         self.pane.toggle();
@@ -48,7 +50,7 @@ Widget.expandIcon = okayIcon;
 Widget.okayIcon = okayIcon;
 Widget.spinnerIcon = spinnerIcon;
 Widget.warningIcon = warningIcon;
-Widget.infoIcon = warningIcon;
-Widget.newInfoIcon = warningIcon;
+Widget.infoIcon = infoIcon;
+Widget.newInfoIcon = newInfoIcon;
 
 module.exports = Widget;

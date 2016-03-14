@@ -59,9 +59,13 @@ let WidgetPane = Backbone.View.extend({
     
     indicators.select('span.indicatorText')
       .text(self.widget.statusText.text)
+      .attr('title', self.widget.statusText.title
+            ? self.widget.statusText.title : null)
       .on('click', () => {
         d3.event.stopPropagation();
-        self.widget.statusText.onclick(d3.event);
+        if (self.widget.statusText.onclick) {
+          self.widget.statusText.onclick(d3.event);
+        }
       });
     
     // Update our set of indicator icons
@@ -72,9 +76,12 @@ let WidgetPane = Backbone.View.extend({
     indicatorIcons.enter().append('img');
     indicatorIcons.exit().remove();
     indicatorIcons.attr('src', (d) => d.src())
+      .attr('title', (d) => d.title ? d.title() : null)
       .on('click', (d) => {
         d3.event.stopPropagation();
-        d.onclick(d3.event);
+        if (d.onclick) {
+          d.onclick(d3.event);
+        }
       });
   },
   toggle: function () {

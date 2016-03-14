@@ -26,7 +26,7 @@ let MappingView = Widget.extend({
 
     self.friendlyName = 'Mapping';
     self.hashName = 'mappingView';
-
+    
     self.selection = null;
 
     self.listenTo(window.toolchain, 'rra:changeMappings', function () {

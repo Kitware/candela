@@ -2,12 +2,17 @@
   position: absolute;
   min-width: 100%;
   min-height: 100%;
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(255, 255, 255, 0.85);
   z-index: 2;
 }
 
 div.libraryInterface {
-  padding: 4em;
+  position: relative;
+  margin: 5em;
+  padding: 1em 2em 2em 3em;
+  border-radius: 1em;
+  border: 2px solid #ccc;
+  background-color: white;
 }
 
 div.circleset {
@@ -34,9 +39,27 @@ div.circleButton img {
   text-align: center;
   vertical-align: middle;
   border-radius: 50px;
-  background-color: white;
+  border: 2px solid rgba(0,0,0,0);
 }
 
-div.circleButton:hover {
-  background-color: #ccc;
+div.circleButton:hover img {
+  border: 2px solid #ccc;
+}
+
+#closeOverlay {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  width: 2em;
+  height: 2em;
+  cursor: pointer;
+}
+
+div.hint {
+  position: relative;
+  margin: 5em;
+  padding: 3em;
+  border-radius: 1em;
+  border: 2px solid #ccc;
+  background-color: white;
 }

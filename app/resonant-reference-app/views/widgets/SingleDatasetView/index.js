@@ -7,6 +7,20 @@ let SingleDatasetView = Widget.extend({
     Widget.prototype.initialize.apply(self, options);
     self.friendlyName = 'Dataset';
     self.hashName = 'singleDatasetView';
+    
+    self.ok = null;
+    self.icons.splice(0, 0, {
+      src: function () {
+        if (self.ok === null) {
+          return Widget.spinnerIcon;
+        } else if (self.ok === true) {
+          return Widget.okayIcon;
+        } else {
+          return Widget.warningIcon;
+        }
+      }
+    });
+    
     self.statusText.onclick = function () {
       window.layout.overlay.render('datasetLibrary');
     };
@@ -36,24 +50,29 @@ let SingleDatasetView = Widget.extend({
         .val(''); // .prop('disabled', true);
       self.$el.find('button.switchDataset')
         .text('Choose a dataset');
-      // self.statusIcon = Widget.warningIcon;
+      
+      self.ok = false;
       self.statusText.text = 'No file loaded';
+      self.renderIndicators();
     } else {
+      self.ok = null;
+      self.statusText.text = 'Loading...';
+      self.renderIndicators();
+      
       dataset.loadData(function (rawData) {
         self.$el.find('textarea.dataContents').val(rawData);
         //  .prop('disabled', '');
+        self.ok = true;
+        self.statusText.text = dataset.get('name');
+        self.renderIndicators();
       });
       self.$el.find('button.switchDataset')
         .text('Switch datasets');
-      // self.statusIcon = Widget.okayIcon;
-      self.statusText.text = dataset.get('name');
     }
     // TODO: allow the user to edit the data (convert
     // to in-browser dataset)... for now, always disable
     // the textarea
     self.$el.find('textarea.dataContents').prop('disabled', true);
-    
-    self.renderIndicators();
   }
 });
 
