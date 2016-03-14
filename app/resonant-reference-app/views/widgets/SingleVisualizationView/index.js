@@ -1,4 +1,3 @@
-import d3 from 'd3';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 import candela from './../../../../../src';
@@ -7,6 +6,7 @@ import './style.css';
 import loadingHelpTemplate from './loadingHelpTemplate.html';
 import successHelpTemplate from './successHelpTemplate.html';
 import noVisLoadedTemplate from './noVisLoadedTemplate.html';
+import infoTemplate from './infoTemplate.html';
 
 let SingleVisualizationView = Widget.extend({
   initialize: function (options) {
@@ -64,15 +64,11 @@ let SingleVisualizationView = Widget.extend({
     self.infoHint = false;
     self.renderIndicators();
     
-    window.layout.overlay.render('<div id="singleVisualizationHelp"></div>');
-    d3.select('#singleVisualizationHelp')
-      .append('div').attr('class', 'hint')
-      .text('TODO: give the user hints and/or info about how to use this view');
+    window.layout.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
     let self = this;
     self.infoHint = false;
-    window.layout.overlay.render('<div id="singleVisualizationHelp"></div>');
     
     let message;
     if (self.ok === null) {
@@ -89,9 +85,7 @@ let SingleVisualizationView = Widget.extend({
       // base number of mappings are missing
     }
     
-    d3.select('#singleVisualizationHelp')
-      .append('div').attr('class', 'hint')
-      .html(message);
+    window.layout.overlay.render(message);
   },
   render: function () {
     let self = this;

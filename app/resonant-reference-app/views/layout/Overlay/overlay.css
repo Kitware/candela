@@ -63,3 +63,14 @@ div.hint {
   border: 2px solid #ccc;
   background-color: white;
 }
+div.hint img.headerIcon {
+  position: relative;
+  left: calc(50% - 2em);
+  width: 4em;
+  height: 4em;
+  margin-bottom: 2em;
+}
+div.hint a {
+  cursor: pointer;
+  text-decoration: underline;
+}

@@ -13,7 +13,7 @@ class CustomAppRoot:
 </head>
 <body>
     <header id="Header"></header>
-    <div id="WidgetPanes" class="accordion"></div>
+    <div id="WidgetPanels" class="accordion"></div>
     <div id="Overlay"></div>
     <div id="Tooltip"></div>
     <script src="static/built/libs.min.js"></script>

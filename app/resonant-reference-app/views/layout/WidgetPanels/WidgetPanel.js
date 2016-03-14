@@ -1,7 +1,7 @@
 import Backbone from 'backbone';
 import d3 from 'd3';
 
-let WidgetPane = Backbone.View.extend({
+let WidgetPanel = Backbone.View.extend({
   initialize: function (options) {
     let self = this;
     self.widget = options.widget;
@@ -49,7 +49,7 @@ let WidgetPane = Backbone.View.extend({
     
     // Now let's let the widget know
     // that we have its element
-    self.widget.setPane(self);
+    self.widget.setPanel(self);
   },
   renderIndicators () {
     let self = this;
@@ -97,8 +97,8 @@ let WidgetPane = Backbone.View.extend({
       hashes.splice(index, 1);
     }
     window.location.hash = hashes.join('#');
-    window.layout.widgetPanes.render();
+    window.layout.widgetPanels.render();
   }
 });
 
-module.exports = WidgetPane;
+module.exports = WidgetPanel;

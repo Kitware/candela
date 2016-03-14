@@ -52,7 +52,7 @@ let Overlay = Backbone.View.extend({
       
       // If the template doesn't specify a close
       // button, let's make sure one is there
-      if (jQuery('#closeOverlay').length === 0) {
+      if (self.$el.find('#closeOverlay').length === 0) {
         let closeOverlay = jQuery('<img/>')
           .attr('id', 'closeOverlay')
           .attr('src', closeIcon);

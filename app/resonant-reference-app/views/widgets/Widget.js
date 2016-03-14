@@ -22,26 +22,26 @@ let Widget = Backbone.View.extend({
         return self.isTargeted() ? collapseIcon : expandIcon;
       },
       title: function () {
-        return self.isTargeted() ? 'Collapse Pane' : 'Expand Pane';
+        return self.isTargeted() ? 'Collapse Panel' : 'Expand Panel';
       },
       onclick: function () {
-        self.pane.toggle();
+        self.panel.toggle();
       }
     }];
-    self.pane = null;
+    self.panel = null;
   },
   isTargeted: function () {
     let self = this;
     return window.location.hash.split('#').indexOf(self.hashName) !== -1;
   },
-  setPane: function (pane) {
+  setPanel: function (panel) {
     let self = this;
-    self.pane = pane;
+    self.panel = panel;
     self.setElement(jQuery('#' + self.hashName + 'Container')[0]);
   },
   renderIndicators: function () {
     let self = this;
-    self.pane.renderIndicators();
+    self.panel.renderIndicators();
   }
 });
 

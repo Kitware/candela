@@ -1,11 +1,11 @@
 import Backbone from 'backbone';
 import d3 from 'd3';
-import WidgetPane from './WidgetPane.js';
+import WidgetPanel from './WidgetPanel.js';
 
 import './accordionhorz.css';
 import './style.css';
 
-let WidgetPanes = Backbone.View.extend({
+let WidgetPanels = Backbone.View.extend({
   initialize: function () {
     let self = this;
     self.listenTo(self.model, 'change', self.render);
@@ -20,7 +20,7 @@ let WidgetPanes = Backbone.View.extend({
     
     let hashes = window.location.hash.split('#');
     
-    // Create sections for each pane
+    // Create sections for each panel
     let sections = d3.select(self.el)
       .selectAll('section')
       .data(widgets, function (d) {
@@ -35,14 +35,14 @@ let WidgetPanes = Backbone.View.extend({
       return hashes.indexOf(d.hashName) !== -1 ? 'targeted' : null;
     });
     
-    // Any new widgets need to have a WidgetPane instantiated
+    // Any new widgets need to have a WidgetPanel instantiated
     // and bound to the new section
     sectionsEnter.each(function (d) {
-      let pane = new WidgetPane({
+      let panel = new WidgetPanel({
         widget: d,
         el: this
       });
-      pane.render();
+      panel.render();
     });
 
     // Distribute the space for each section
@@ -70,4 +70,4 @@ let WidgetPanes = Backbone.View.extend({
   }
 });
 
-export default WidgetPanes;
+export default WidgetPanels;
