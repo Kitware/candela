@@ -3,9 +3,6 @@ import myTemplate from './template.html';
 import candela from './../../../../../src';
 import './style.css';
 
-import loadingHelpTemplate from './loadingHelpTemplate.html';
-import successHelpTemplate from './successHelpTemplate.html';
-import noVisLoadedTemplate from './noVisLoadedTemplate.html';
 import infoTemplate from './infoTemplate.html';
 
 let SingleVisualizationView = Widget.extend({
@@ -68,24 +65,32 @@ let SingleVisualizationView = Widget.extend({
   },
   renderHelpScreen: function () {
     let self = this;
-    self.infoHint = false;
-    
-    let message;
+    let screen;
     if (self.ok === null) {
-      message = loadingHelpTemplate;
+      screen = self.getErrorScreen(`
+You have not chosen a visualization yet. Click 
+<a onclick="window.layout.overlay.render('visualizationLibrary')">
+here</a> to choose one.`);
     } else if (self.ok === true) {
-      message = successHelpTemplate;
+      screen = self.getSuccessScreen(`
+The visualization appears to be functioning correctly.`);
     } else {
       let meta = window.toolchain.get('meta');
       
       if (!meta || !meta.visualizations || !meta.visualizations[0]) {
-        message = noVisLoadedTemplate;
+        screen = self.getErrorScreen(`
+You have not chosen a visualization yet. Click 
+<a onclick="window.layout.overlay.render('visualizationLibrary')">
+here</a> to choose one.`);
+      } else {
+        // TODO: Auto-log unexpected errors
+        screen = self.getErrorScreen(`
+You encountered an error we didn't anticipate! Please report it
+<a>here</a>.`);
       }
-      // TODO: add a warning + explanation when the
-      // base number of mappings are missing
     }
     
-    window.layout.overlay.render(message);
+    window.layout.overlay.render(screen);
   },
   render: function () {
     let self = this;

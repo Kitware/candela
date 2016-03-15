@@ -1,16 +1,22 @@
 import d3 from 'd3';
 import jQuery from 'jquery';
 import ace from 'brace';
-import 'brace/theme/monokai';
+import 'brace/theme/clouds';
 import Widget from '../Widget';
 import Dataset from '../../../models/Dataset';
 import myTemplate from './template.html';
 import './style.css';
 
-import loadingHelpTemplate from './loadingHelpTemplate.html';
-import successHelpTemplate from './successHelpTemplate.html';
-import noDataLoadedTemplate from './noDataLoadedTemplate.html';
 import infoTemplate from './infoTemplate.html';
+
+let STATUS = {
+  NO_DATA: 0,
+  SUCCESS: 1,
+  CANT_LOAD: 2,
+  CANT_PARSE: 3,
+  LOADING: 4,
+  NO_ATTRIBUTES: 5
+};
 
 let SingleDatasetView = Widget.extend({
   initialize: function (options) {
@@ -34,21 +40,21 @@ let SingleDatasetView = Widget.extend({
       }
     });
 
-    self.ok = null;
+    self.status = STATUS.NO_DATA;
     self.icons.splice(0, 0, {
       src: function () {
-        if (self.ok === null) {
+        if (self.status === STATUS.LOADING) {
           return Widget.spinnerIcon;
-        } else if (self.ok === true) {
+        } else if (self.status === STATUS.SUCCESS) {
           return Widget.okayIcon;
         } else {
           return Widget.warningIcon;
         }
       },
       title: function () {
-        if (self.ok === null) {
+        if (self.status === STATUS.LOADING) {
           return 'The dataset hasn\'t finished loading yet';
-        } else if (self.ok === true) {
+        } else if (self.status === STATUS.SUCCESS) {
           return 'The dataset appears to have loaded correctly';
         } else {
           return 'Something isn\'t quite right; click for details';
@@ -71,22 +77,32 @@ let SingleDatasetView = Widget.extend({
   },
   renderHelpScreen: function () {
     let self = this;
-    self.infoHint = false;
-
-    let message;
-    if (self.ok === null) {
-      message = loadingHelpTemplate;
-    } else if (self.ok === true) {
-      message = successHelpTemplate;
-    } else {
-      let meta = window.toolchain.get('meta');
-
-      if (!meta || !meta.visualizations || !meta.visualizations[0]) {
-        message = noDataLoadedTemplate;
-      }
+    let screen;
+    if (self.status === STATUS.NO_DATA) {
+      screen = self.getErrorScreen(`
+You have not chosen a dataset yet. Click 
+<a onclick="window.layout.overlay.render('datasetLibrary')">
+here</a> to choose one.`);
+    } else if (self.status === STATUS.SUCCESS) {
+      screen = self.getSuccessScreen(`
+The dataset appears to have loaded correctly.`);
+    } else if (self.status === STATUS.CANT_LOAD) {
+      screen = self.getErrorScreen(`
+The dataset could not be loaded; there is a good chance 
+that there is a permissions problem.`);
+    } else if (self.status === STATUS.CANT_PARSE) {
+      screen = self.getErrorScreen(`
+There was a problem parsing the data; you'll probably need to 
+<a>edit</a> or <a>reshape</a> the data in order to use it.`);
+    } else if (self.status === STATUS.NO_ATTRIBUTES) {
+      screen = self.getErrorScreen(`
+There was a problem parsing the data. Specifically, we're having 
+trouble understanding the dataset attributes (usually column headers); 
+you'll probably need to 
+<a>edit</a> or <a>reshape</a> the data in order to use it.`);
     }
 
-    window.layout.overlay.render(message);
+    window.layout.overlay.render(screen);
   },
   renderAttributeSettings: function () {
     let self = this;
@@ -102,24 +118,24 @@ let SingleDatasetView = Widget.extend({
     let attrOrder = Object.keys(attrs);
     // TODO: this is technically cheating; relying on the order
     // of the dict entries to preserve the order on screen
-    
+
     let cells = d3.select(self.el).select('#attributeSettings')
       .selectAll('div.cell')
       .data(attrOrder, (d) => d + attrs[d]);
     let cellsEnter = cells.enter().append('div')
       .attr('class', 'cell');
     cells.exit().remove();
-    
+
     cellsEnter.append('span');
     cells.selectAll('span').text((d) => d);
-    
+
     cellsEnter.append('select');
     let typeMenuOptions = cells.selectAll('select').selectAll('option')
       .data(d3.keys(Dataset.COMPATIBLE_TYPES));
     typeMenuOptions.enter().append('option');
     typeMenuOptions.attr('value', (d) => d)
       .text((d) => d);
-    
+
     cells.selectAll('select')
       .property('value', (d) => attrs[d])
       .on('change', (d) => {
@@ -155,28 +171,47 @@ let SingleDatasetView = Widget.extend({
       .css('width', bounds.width + 'px')
       .css('height', (bounds.height - 75) + 'px');
     self.$el.css('overflow', '');
-    
+
     self.renderAttributeSettings();
-    
+
     let editor = ace.edit('editor');
-    editor.setTheme('ace/theme/monokai');
+    editor.setTheme('ace/theme/clouds');
     editor.$blockScrolling = Infinity;
-    
+
     if (!dataset) {
       editor.setValue('');
-      self.ok = false;
+      self.status = STATUS.NO_DATA;
       self.statusText.text = 'No file loaded';
       self.renderIndicators();
     } else {
-      self.ok = null;
+      self.status = STATUS.LOADING;
       self.statusText.text = 'Loading...';
       self.renderIndicators();
 
-      dataset.loadData(function (rawData) {
-        editor.setValue(rawData);
-        self.ok = true;
-        self.statusText.text = dataset.get('name');
-        self.renderIndicators();
+      dataset.getParsed(function (parsedData) {
+        let rawData = dataset.rawCache;
+        let spec = dataset.getSpec();
+        if (rawData === null) {
+          editor.setValue('');
+          self.status = STATUS.CANT_LOAD;
+          self.statusText.text = 'ERROR';
+          self.renderIndicators();
+        } else if (parsedData === null) {
+          editor.setValue(rawData);
+          self.status = STATUS.CANT_PARSE;
+          self.statusText.text = 'ERROR';
+          self.renderIndicators();
+        } else if (Object.keys(spec.attributes).length === 0) {
+          editor.setValue(rawData);
+          self.status = STATUS.NO_ATTRIBUTES;
+          self.statusText.text = 'ERROR';
+          self.renderIndicators();
+        } else {
+          editor.setValue(rawData);
+          self.status = STATUS.SUCCESS;
+          self.statusText.text = dataset.get('name');
+          self.renderIndicators();
+        }
       });
     }
     // TODO: allow the user to edit the data (convert

@@ -39,6 +39,27 @@ let MappingView = Widget.extend({
       }
     });
     
+    self.ok = false;
+    self.icons.splice(0, 0, {
+      src: function () {
+        if (self.ok === true) {
+          return Widget.okayIcon;
+        } else {
+          return Widget.warningIcon;
+        }
+      },
+      title: function () {
+        if (self.ok === true) {
+          return 'All the needed mappings have been specified';
+        } else {
+          return 'Something isn\'t quite right; click for details';
+        }
+      },
+      onclick: function () {
+        self.renderHelpScreen();
+      }
+    });
+    
     self.selection = null;
 
     self.listenTo(window.toolchain, 'rra:changeMappings', function () {
@@ -53,9 +74,32 @@ let MappingView = Widget.extend({
     
     window.layout.overlay.render(infoTemplate);
   },
+  renderHelpScreen: function () {
+    let self = this;
+    let screen;
+    if (self.ok === true) {
+      screen = self.getSuccessScreen(`
+You've wired up all the connections that the visualization needs.
+Well done!`);
+    } else {
+      let meta = window.toolchain.get('meta');
+      if (!meta || !meta.visualizations || !meta.visualizations[0] ||
+          !meta.datasets || !meta.datasets[0]) {
+        screen = self.getErrorScreen(`
+You need to choose both a Dataset and a Visualization 
+in order to connect them together.`);
+      } else {
+        screen = self.getErrorScreen(`
+The visualization needs more connections to data in 
+order to display anything.`);
+      }
+    }
+    
+    window.layout.overlay.render(screen);
+  },
   createNodeId: function (d) {
     // Generate a valid ID for the node
-    return ('node_' + d.index + d.attrName + d.type)
+    return ('node_' + d.index + d.attrName)
       .replace(/([^A-Za-z0-9[\]{}_.:-])\s?/g, '');
   },
   createEdgeId: function (d) {
@@ -319,19 +363,14 @@ let MappingView = Widget.extend({
     
     // Update our little indicator
     // to describe the mapping
-    let numData = lastData ? 1 + lastData - firstData : 0;
     let numVis = lastVis ? 1 + lastVis - firstVis : 0;
-    self.statusText.text = numData + ' \u226B ' +
-      graph.realEdgeCount + ' \u226A ' + numVis;
-    self.statusText.title = numData + ' data attributes have ' +
-      graph.realEdgeCount + ' mappings to ' + numVis +
-      ' visual encoding channels.';
-    if (numData === 0 ||
-        graph.realEdgeCount === 0 ||
-        numVis === 0) {
-      // self.statusIcon = Widget.warningIcon;
+    self.statusText.text = graph.realEdgeCount + ' / ' + numVis;
+    self.statusText.title = graph.realEdgeCount + ' of ' + numVis +
+      ' visual channels have been mapped';
+    if (graph.realEdgeCount === 0) {
+      self.ok = false;
     } else {
-      // self.statusIcon = Widget.okayIcon;
+      self.ok = true;
     }
     self.renderIndicators();
 
