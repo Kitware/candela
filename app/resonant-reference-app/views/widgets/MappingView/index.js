@@ -361,9 +361,11 @@ order to display anything.`);
       }
     });
     
+    let numData = lastData ? 1 + lastData - firstData : 0;
+    let numVis = lastVis ? 1 + lastVis - firstVis : 0;
+    
     // Update our little indicator
     // to describe the mapping
-    let numVis = lastVis ? 1 + lastVis - firstVis : 0;
     self.statusText.text = graph.realEdgeCount + ' / ' + numVis;
     self.statusText.title = graph.realEdgeCount + ' of ' + numVis +
       ' visual channels have been mapped';
@@ -388,7 +390,8 @@ order to display anything.`);
 
     // Figure out how we're going to lay things
     // out based on how much space we have
-
+    let nodeHeight = 40;
+    
     // Temporarily force the scroll bars so we
     // account for their size
     self.$el.css('overflow', 'scroll');
@@ -397,6 +400,13 @@ order to display anything.`);
       height: self.el.clientHeight
     };
     self.$el.css('overflow', '');
+    
+    // If there isn't enough room for all
+    // the nodes, extend the height
+    bounds.height = Math.max(bounds.height,
+      1.5 * nodeHeight * (numData + 2),
+      1.5 * nodeHeight * (numVis + 2));
+    
     self.$el.find('svg')
       .attr({
         width: bounds.width,
@@ -412,7 +422,6 @@ order to display anything.`);
     let visY = d3.scale.linear()
       .domain([firstVis - 1, lastVis + 1])
       .range([0, bounds.height]);
-    let nodeHeight = 40;
 
     let nodes = d3.select(self.el).select('svg')
       .select('.nodeLayer')

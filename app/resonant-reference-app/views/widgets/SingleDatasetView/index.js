@@ -159,7 +159,7 @@ you'll probably need to
 
     // Temporarily force the scroll bars so we
     // account for their size
-    self.$el.css('overflow', 'scroll');
+    /*self.$el.css('overflow', 'scroll');
     let bounds = {
       width: self.el.clientWidth,
       height: self.el.clientHeight
@@ -170,7 +170,7 @@ you'll probably need to
     self.$el.find('#editor')
       .css('width', bounds.width + 'px')
       .css('height', (bounds.height - 75) + 'px');
-    self.$el.css('overflow', '');
+    self.$el.css('overflow', '');*/
 
     self.renderAttributeSettings();
 
