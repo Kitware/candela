@@ -55,7 +55,7 @@ let MappingView = Widget.extend({
   },
   createNodeId: function (d) {
     // Generate a valid ID for the node
-    return ('node_' + d.index + d.attrName)
+    return ('node_' + d.index + d.attrName + d.type)
       .replace(/([^A-Za-z0-9[\]{}_.:-])\s?/g, '');
   },
   createEdgeId: function (d) {

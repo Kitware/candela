@@ -101,6 +101,13 @@ let Dataset = girder.models.ItemModel.extend({
       self.set('meta', meta);
       self.trigger('rra:changeSpec');
     });
+  },
+  setAttribute: function (attrName, dataType) {
+    let self = this;
+    let meta = self.get('meta');
+    meta.attributes[attrName] = dataType;
+    self.set('meta', meta);
+    self.trigger('rra:changeSpec');
   }
 });
 

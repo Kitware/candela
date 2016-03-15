@@ -1,0 +1,19 @@
+#attributeSettings {
+  overflow: auto;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+#attributeSettings .cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  text-align: center;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  white-space: nowrap;
+}
+
+#attributeSettings .cell select {
+  width: auto;
+}

@@ -41,6 +41,7 @@
     "webpack": "^1.12.12"
   },
   "dependencies": {
+    "brace": "^0.7.0",
     "d3": "^3.5.14",
     "datalib": "^1.6.3",
     "jquery": "^2.2.0",
