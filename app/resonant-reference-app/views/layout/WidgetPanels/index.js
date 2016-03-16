@@ -50,7 +50,7 @@ let WidgetPanels = Backbone.View.extend({
     let collapsedSections = widgets.length - expandedSections;
     let style = 'calc((100% - (0.5em + ' + // a little grey space at the beginning
       '2.5*' + collapsedSections + 'em + ' + // collapsed sections are 2em wide + a grey space
-      '2.5*' + expandedSections + 'em)) / ' + // expanded sections have a total of 2em of padding, + their grey space
+      '0.5*' + expandedSections + 'em)) / ' + // grey space around each section
       expandedSections + ')';
 
     self.$el.find('section')

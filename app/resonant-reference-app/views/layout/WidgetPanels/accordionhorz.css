@@ -82,7 +82,6 @@ div.accordion section div.content {
 }
 
 div.accordion section.targeted {
-  padding: 0 1em;
   color: #333;
   background-color: #fff;
 }
@@ -99,7 +98,6 @@ div.accordion section.targeted .sectionHeader {
 }
 div.accordion section.targeted .sectionHeader .title {
   line-height: 2em;
-  text-indent: -0.25em;
   color: #333;
 }
 
