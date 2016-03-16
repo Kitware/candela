@@ -216,50 +216,18 @@
             },
             "marks": [
               {
-                "type": "group",
-                "marks": [
-                  "@if",
-                  ["@get", "line", false],
-                  [
-                    {
-                      "type": "line",
-                      "from": {"data": "data"},
-                      "properties": {
-                        "update": {
-                          "x": {"scale": "x", "field": "x"},
-                          "y": {"scale": "y", "field": "y"},
-                          "stroke": {"scale": "color", "field": "color"},
-                          "strokeWidth": ["@get", "lineWidth", 1]
-                        }
-                      }
-                    }
-                  ],
-                  []
-                ]
-              },
-              {
-                "type": "group",
-                "marks": [
-                  "@if",
-                  ["@get", "point", true],
-                  [
-                    {
-                      "type": "symbol",
-                      "from": {"data": "data"},
-                      "properties": {
-                        "update": {
-                          "x": {"scale": "x", "field": "x"},
-                          "y": {"scale": "y", "field": "y"},
-                          "stroke": {"scale": "color", "field": "color"},
-                          "shape": {"scale": "shape", "field": "shape"},
-                          "strokeWidth": {"value": 2},
-                          "size": {"scale": "size", "field": "size"}
-                        }
-                      }
-                    }
-                  ],
-                  []
-                ]
+                "type": "symbol",
+                "from": {"data": "data"},
+                "properties": {
+                  "update": {
+                    "x": {"scale": "x", "field": "x"},
+                    "y": {"scale": "y", "field": "y"},
+                    "stroke": {"scale": "color", "field": "color"},
+                    "shape": {"scale": "shape", "field": "shape"},
+                    "strokeWidth": {"value": 2},
+                    "size": {"scale": "size", "field": "size"}
+                  }
+                }
               },
               {
                 "type": "text",
