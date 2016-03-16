@@ -1,7 +1,7 @@
 import Backbone from 'backbone';
 import d3 from 'd3';
 import jQuery from 'jquery';
-
+import closeIcon from '../../../images/close.svg';
 import './overlay.css';
 
 let Overlay = Backbone.View.extend({
@@ -13,6 +13,16 @@ let Overlay = Backbone.View.extend({
     } else {
       self.render(null);
     }
+    
+    // Hide the overlay whenever someone
+    // clicks on the background
+    self.$el.on('click', function (event) {
+      if (event.target !== this) {
+        return;
+      } else {
+        self.render(null);
+      }
+    })
   },
   render: function (template) {
     let self = this;
@@ -29,9 +39,29 @@ let Overlay = Backbone.View.extend({
     if (template !== null) {
       self.$el.html('');
       
-      let temp = new window.overlays[template]();
-      self.el.appendChild(temp.el);
-      temp.render();
+      if (window.overlays.hasOwnProperty(template)) {
+        let temp = new window.overlays[template]();
+        self.el.appendChild(temp.el);
+        temp.render();
+      } else {
+        // Okay, this is a dynamically-generated overlay
+        // (probably a widget help/info screen)... so
+        // the template string is the actual contents
+        self.$el.html(template);
+      }
+      
+      // If the template doesn't specify a close
+      // button, let's make sure one is there
+      if (self.$el.find('#closeOverlay').length === 0) {
+        let closeOverlay = jQuery('<img/>')
+          .attr('id', 'closeOverlay')
+          .attr('src', closeIcon);
+        self.$el.append(closeOverlay);
+      }
+      
+      jQuery('#closeOverlay').on('click', function () {
+        self.render(null);
+      });
       
       if (template === 'startingGuide') {
         // Don't bother fading in the startingGuide

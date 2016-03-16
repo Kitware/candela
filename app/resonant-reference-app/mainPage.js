@@ -2,7 +2,6 @@ import jQuery from 'jquery';
 
 // Page-wide Styles
 import './stylesheets/pure-css-custom-form-elements/style.css';
-import './stylesheets/tooltip/tooltip.css';
 import './stylesheets/mainPage.css';
 
 // Current toolchain
@@ -35,14 +34,14 @@ window.overlays = {
 
 // Main chunks of the page
 import Header from './views/layout/Header';
-import WidgetPanes from './views/layout/WidgetPanes';
+import WidgetPanels from './views/layout/WidgetPanels';
 import Overlay from './views/layout/Overlay';
 window.layout = {
   header: new Header({
     el: '#Header'
   }),
-  widgetPanes: new WidgetPanes({
-    el: '#WidgetPanes'
+  widgetPanels: new WidgetPanels({
+    el: '#WidgetPanels'
   }),
   overlay: new Overlay({
     el: '#Overlay'
@@ -52,7 +51,7 @@ window.layout = {
 // Draw everything
 function renderEverything () {
   window.layout.header.render();
-  window.layout.widgetPanes.render();
+  window.layout.widgetPanels.render();
   window.layout.overlay.render();
 }
 

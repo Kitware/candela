@@ -5,7 +5,7 @@ let girder = window.girder;
 /*
     A Toolchain represents a user's saved session;
     it includes specific datasets, with specific
-    mappingss to specific visualizations (in the future,
+    mappings to specific visualizations (in the future,
     this may also include faceting settings, etc).
     
     Though behind the scenes we're making room for multiple
@@ -33,10 +33,10 @@ let Toolchain = girder.models.ItemModel.extend({
     
     meta.visualizations = [];
     meta.mappings = [];
-    self.mappingLookup = {};
     meta.datasets = new DatasetCollection();
     // Forward events from dataset changes
     self.listenTo(meta.datasets, 'rra:changeSpec', function () {
+      self.validateMappings();
       self.trigger('rra:changeMappings');
     });
     
@@ -50,12 +50,6 @@ let Toolchain = girder.models.ItemModel.extend({
     meta.datasets.set(newMeta.datasets);
     meta.visualizations = newMeta.visualizations;
     meta.mappings = newMeta.mappings;
-    self.mappingLookup = {};
-    meta.mappings.forEach(function (mapping, index) {
-      let key = mapping.visIndex + mapping.visAttribute +
-                mapping.dataIndex + mapping.dataAttribute;
-      self.mappingLookup[key] = index;
-    });
     self.set('meta', meta);
     self.trigger('rra:changeDatasets');
     self.trigger('rra:changeMappings');
@@ -88,7 +82,6 @@ let Toolchain = girder.models.ItemModel.extend({
         meta.datasets.add(newDataset, { at: index });
         // Swapping in a new dataset invalidates the mappings
         meta.mappings = [];
-        self.mappingLookup = {};
         self.set('meta', meta);
       }
       self.trigger('rra:changeDatasets');
@@ -115,7 +108,6 @@ let Toolchain = girder.models.ItemModel.extend({
         meta.visualizations[index] = newVisualization;
         // Swapping in a new dataset invalidates the mappings
         meta.mappings = [];
-        self.mappingLookup = {};
         self.set('meta', meta);
       }
       self.trigger('rra:changeVisualizations');
@@ -146,28 +138,57 @@ let Toolchain = girder.models.ItemModel.extend({
     });
     return options;
   },
+  validateMappings: function () {
+    let self = this;
+    let meta = self.get('meta');
+    
+    // Go through all the mappings and make sure that:
+    // 1. The data types are still compatible
+    //    (trash them if they're not)
+    // 2. TODO: Other things we should check?
+    let indicesToTrash = [];
+    for (let [index, mapping] of meta.mappings.entries()) {
+      let dataType = meta.datasets.at(mapping.dataIndex)
+        .getSpec().attributes[mapping.dataAttribute];
+      
+      let possibleTypes = [];
+      for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
+        if (optionSpec.name === mapping.visAttribute) {
+          possibleTypes = Dataset.COMPATIBLE_TYPES[optionSpec.type];
+          break;
+        }
+      }
+      
+      if (possibleTypes.indexOf(dataType) === -1) {
+        indicesToTrash.push(index);
+      }
+    }
+    
+    for (let index of indicesToTrash) {
+      meta.mappings.splice(index, 1);
+    }
+    self.set('meta', meta);
+  },
   addMapping: function (mapping) {
     let self = this;
     let meta = self.get('meta');
-    let key = mapping.visIndex + mapping.visAttribute +
-              mapping.dataIndex + mapping.dataAttribute;
     
     // TODO: For now, I assume that vis nodes
-    // can only accept one edge at a time...
+    // can only accept one edge at a time. Replace
+    // a vis mapping if one exists.
+    let addedMapping = false;
     for (let [index, m] of meta.mappings.entries()) {
       if (mapping.visIndex === m.visIndex &&
           mapping.visAttribute === m.visAttribute) {
-        let mKey = m.visIndex + m.visAttribute +
-                   m.dataIndex + m.dataAttribute;
-        
-        meta.mappings.splice(index, 1);
-        delete self.mappingLookup[mKey];
+        meta.mappings[index] = mapping;
+        addedMapping = true;
         break;
       }
     }
     
-    self.mappingLookup[key] = meta.mappings.length;
-    meta.mappings.push(mapping);
+    if (!addedMapping) {
+      meta.mappings.push(mapping);
+    }
     
     self.set('meta', meta);
     self.trigger('rra:changeMappings');
@@ -175,10 +196,21 @@ let Toolchain = girder.models.ItemModel.extend({
   removeMapping: function (mapping) {
     let self = this;
     let meta = self.get('meta');
-    let key = mapping.visIndex + mapping.visAttribute +
-              mapping.dataIndex + mapping.dataAttribute;
-    meta.mappings.splice(self.mappingLookup[key], 1);
-    delete self.mappingLookup[key];
+    
+    let mappingToSplice = null;
+    for (let [index, m] of meta.mappings.entries()) {
+      if (mapping.visIndex === m.visIndex &&
+          mapping.visAttribute === m.visAttribute &&
+          mapping.dataIndex === m.dataIndex &&
+          mapping.dataAttribute === m.dataAttribute) {
+        mappingToSplice = index;
+        break;
+      }
+    }
+    if (mappingToSplice !== null) {
+      meta.mappings.splice(mappingToSplice, 1);
+    }
+    
     self.set('meta', meta);
     self.trigger('rra:changeMappings');
   }

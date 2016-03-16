@@ -13,8 +13,9 @@ class CustomAppRoot:
 </head>
 <body>
     <header id="Header"></header>
-    <div id="WidgetPanes"></div>
+    <div id="WidgetPanels" class="accordion"></div>
     <div id="Overlay"></div>
+    <div id="Tooltip"></div>
     <script src="static/built/libs.min.js"></script>
     <script src="static/built/app.min.js"></script>
     <script src="static/built/plugins/resonant-reference-app/extra/webpack_bundle.js"></script>

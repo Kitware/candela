@@ -76,7 +76,14 @@ let Dataset = girder.models.ItemModel.extend({
         } else {
           formatPrefs.parse = 'auto';
         }
-        let parsedData = datalib.read(rawData, formatPrefs);
+        let parsedData;
+        
+        try {
+          parsedData = datalib.read(rawData, formatPrefs);
+        } catch (e) {
+          parsedData = null;
+        }
+        
         if (cache) {
           self.parsedCache = parsedData;
         }
@@ -97,10 +104,21 @@ let Dataset = girder.models.ItemModel.extend({
     let self = this;
     self.getParsed(function (data) {
       let meta = self.get('meta');
-      meta.attributes = datalib.type.all(data);
+      if (data === null) {
+        meta.attributes = {};
+      } else {
+        meta.attributes = datalib.type.all(data);
+      }
       self.set('meta', meta);
       self.trigger('rra:changeSpec');
     });
+  },
+  setAttribute: function (attrName, dataType) {
+    let self = this;
+    let meta = self.get('meta');
+    meta.attributes[attrName] = dataType;
+    self.set('meta', meta);
+    self.trigger('rra:changeSpec');
   }
 });
 
