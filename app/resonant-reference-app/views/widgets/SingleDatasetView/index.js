@@ -159,7 +159,7 @@ you'll probably need to
 
     // Temporarily force the scroll bars so we
     // account for their size
-    /*self.$el.css('overflow', 'scroll');
+    /* self.$el.css('overflow', 'scroll');
     let bounds = {
       width: self.el.clientWidth,
       height: self.el.clientHeight

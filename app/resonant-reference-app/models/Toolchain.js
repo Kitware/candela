@@ -36,6 +36,7 @@ let Toolchain = girder.models.ItemModel.extend({
     meta.datasets = new DatasetCollection();
     // Forward events from dataset changes
     self.listenTo(meta.datasets, 'rra:changeSpec', function () {
+      self.validateMappings();
       self.trigger('rra:changeMappings');
     });
     
@@ -137,13 +138,44 @@ let Toolchain = girder.models.ItemModel.extend({
     });
     return options;
   },
+  validateMappings: function () {
+    let self = this;
+    let meta = self.get('meta');
+    
+    // Go through all the mappings and make sure that:
+    // 1. The data types are still compatible
+    //    (trash them if they're not)
+    // 2. TODO: Other things we should check?
+    let indicesToTrash = [];
+    for (let [index, mapping] of meta.mappings.entries()) {
+      let dataType = meta.datasets.at(mapping.dataIndex)
+        .getSpec().attributes[mapping.dataAttribute];
+      
+      let possibleTypes = [];
+      for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
+        if (optionSpec.name === mapping.visAttribute) {
+          possibleTypes = Dataset.COMPATIBLE_TYPES[optionSpec.type];
+          break;
+        }
+      }
+      
+      if (possibleTypes.indexOf(dataType) === -1) {
+        indicesToTrash.push(index);
+      }
+    }
+    
+    for (let index of indicesToTrash) {
+      meta.mappings.splice(index, 1);
+    }
+    self.set('meta', meta);
+  },
   addMapping: function (mapping) {
     let self = this;
     let meta = self.get('meta');
     
     // TODO: For now, I assume that vis nodes
     // can only accept one edge at a time. Replace
-    // a vis mapping if one exists
+    // a vis mapping if one exists.
     let addedMapping = false;
     for (let [index, m] of meta.mappings.entries()) {
       if (mapping.visIndex === m.visIndex &&
