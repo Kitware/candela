@@ -425,7 +425,9 @@ order to display anything.`);
 
     let nodes = d3.select(self.el).select('svg')
       .select('.nodeLayer')
-      .selectAll('.node').data(graph.nodes, (d) => d.id);
+      .selectAll('.node').data(graph.nodes, (d) => {
+        return d.id + d.type;
+      });
     let enteringNodes = nodes.enter().append('g');
     nodes.exit().remove();
 
