@@ -11,7 +11,7 @@ let VisualizationLibrary = Backbone.View.extend({
     self.$el.html(myTemplate);
 
     let libraryVisSpecs = [];
-    
+
     libraryVisSpecs.push({
       name: 'Scatter',
       options: [
@@ -22,6 +22,18 @@ let VisualizationLibrary = Backbone.View.extend({
         {
           name: 'y',
           type: 'number'
+        },
+        {
+          name: 'color',
+          type: 'string'
+        },
+        {
+          name: 'size',
+          type: 'number'
+        },
+        {
+          name: 'shape',
+          type: 'string'
         }
       ]
     });
@@ -43,7 +55,7 @@ let VisualizationLibrary = Backbone.View.extend({
       console.log(spec);
     }
     */
-    
+
     let libraryButtons = d3.select('div.visualizationLibrary')
       .selectAll('.circleButton')
       .data(libraryVisSpecs);

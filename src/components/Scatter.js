@@ -11,21 +11,20 @@ export default class Scatter {
   }
 
   constructor (el, data, options) {
-    this.chart = vcharts.chart('xy', {
+    this.chart = vcharts.chart('scatter', {
       el: el,
-      series: [{
-        name: 'values',
-        values: data,
-        x: options.x,
-        y: options.y
-      }],
+      values: data,
+      x: options.x,
+      y: options.y,
+      color: options.color,
+      shape: options.shape,
+      size: options.size,
       xAxis: {
         title: options.x
       },
       yAxis: {
         title: options.y
-      },
-      legend: false
+      }
     });
   }
 
