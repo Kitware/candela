@@ -8,7 +8,7 @@
   [
     "@let",
     [
-      ["legend", ["@and", ["@get", "legend"], ["@get", "color"]]]
+      ["legend", ["@and", ["@get", "legend"], ["@or", ["@get", "color"], ["@get", "shape"], ["@get", "size"]]]]
     ],
     [
       "@merge",
@@ -159,7 +159,7 @@
             "name": "size",
             "type": "linear",
             "domain": {"data": "data", "field": "size"},
-            "range": [9, 361],
+            "range": [["@if", ["@get", "size"], 9, 100], 361],
             "round": true,
             "nice": false,
             "zero": false
@@ -271,7 +271,16 @@
                   "update": {
                     "x": {"scale": "x", "signal": "d.x"},
                     "y": {"scale": "y", "signal": "d.y", "offset": -10},
-                    "text": {"template": ["@get", "tooltip", "({{d.x|number:'.3g'}}, {{d.y|number:'.3g'}})"]},
+                    "text": {
+                      "template": [
+                        "@if", ["@get", "hover"],
+                        [
+                          "@join", "",
+                          [["@get", "hover"], ": ", "{{d['", ["@get", "hover"] ,"']}}"]
+                        ],
+                        ["@get", "tooltip", "({{d.x|number:'.3g'}}, {{d.y|number:'.3g'}})"]
+                      ]
+                    },
                     "fillOpacity": {
                       "rule": [
                         {

@@ -6,7 +6,8 @@ export default class Scatter {
       {name: 'data', type: 'table'},
       {name: 'x', type: 'string'},
       {name: 'y', type: 'string'},
-      {name: 'color', type: 'string'}
+      {name: 'color', type: 'string'},
+      {name: 'hover', type: 'string'}
     ];
   }
 
@@ -19,6 +20,7 @@ export default class Scatter {
       color: options.color,
       shape: options.shape,
       size: options.size,
+      hover: options.hover,
       xAxis: {
         title: options.x
       },

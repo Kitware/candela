@@ -34,6 +34,10 @@ let VisualizationLibrary = Backbone.View.extend({
         {
           name: 'shape',
           type: 'string'
+        },
+        {
+          name: 'hover',
+          type: 'string'
         }
       ]
     });
