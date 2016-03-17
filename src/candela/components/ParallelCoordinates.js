@@ -11,7 +11,7 @@ export default class ParallelCoordinates extends VisualizationComponent {
       $(el).attr('height', height);
     }
 
-    let PC = require('./../external/pc');
+    let PC = require('./../../external/pc');
 
     this.pc = new PC(this.el, (var1, var2, callback) => {
       this.fetchHistogram(var1, var2).then(callback);

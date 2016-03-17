@@ -1,7 +1,6 @@
-import Dummy from './../../src/components/Dummy';
-import LineChart from './../../src/components/VCharts';
-import ParallelCoordinates from './../../src/components/ParallelCoordinates';
-import Scatter from '../../src/components/Scatter';
+import Dummy from './../../src/candela/components/Dummy';
+import LineChart from './../../src/candela/components/VCharts';
+import ParallelCoordinates from './../../src/candela/components/ParallelCoordinates';
 import $ from 'jquery';
 
 function dummy () {
