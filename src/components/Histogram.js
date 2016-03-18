@@ -12,7 +12,13 @@ export default class Histogram {
     this.chart = vcharts.chart('histogram', {
       el: el,
       values: data,
-      bin: options.bin
+      bin: options.bin,
+      xAxis: {
+        title: options.bin
+      },
+      yAxis: {
+        title: 'Count'
+      }
     });
   }
 
