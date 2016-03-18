@@ -374,14 +374,8 @@ let chart = function (type, initialOptions, done) {
     // Transform pass 2 to get the final visualization
     that.spec = transform(that.template, curOptions);
 
-    console.log(that.spec);
-
     vg.parse.spec(that.spec, function (chartObj) {
       let chart = chartObj(vegaOptions);
-      let printSignal = (name, val) => console.log(name + ': ' + val);
-      for (let i = 0; i < that.spec.signals.length; i += 1) {
-        chart.onSignal(that.spec.signals[i].name, printSignal);
-      }
       chart.update();
       if (done) {
         done(chart);
