@@ -41,6 +41,17 @@ let VisualizationLibrary = Backbone.View.extend({
         }
       ]
     });
+
+    libraryVisSpecs.push({
+      name: 'Histogram',
+      options: [
+        {
+          name: 'bin',
+          type: 'string'
+        }
+      ]
+    });
+
     /*
       TODO: build the library from the available
       candela visualizations

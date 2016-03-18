@@ -179,6 +179,19 @@ let templateFunctions = {
     };
   },
 
+  isStringField: function (args, options, scope) {
+    let values = transform(args[0], options, scope);
+    let field = transform(args[1], options, scope);
+
+    if (!Array.isArray(values) ||
+      values.length < 1 ||
+      values[0][field] === undefined ||
+      typeof values[0][field] === 'string') {
+      return true;
+    }
+    return false;
+  },
+
   orient: function (args, options, scope) {
     let dir = transform(args[0], options, scope);
     let obj = transform(args[1], options, scope);
