@@ -1,0 +1,31 @@
+#Header {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  background-color: black;
+  display: flex;
+  align-content: center;
+  align-items: center;
+}
+
+#Header img.configButton {
+  width: 3em;
+  height: 3em;
+  border-radius: 1.5em;
+  cursor: pointer;
+}
+
+#Header img.configButton:hover {
+  background-color: #ccc;
+}
+
+#Header div.pageTitle {
+  margin-left: 1em;
+  margin-right: auto;
+  color: white;
+}
+
+#Header div.loginButtons {
+  padding: 0.5em;
+}

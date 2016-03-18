@@ -1,42 +1,59 @@
 import jQuery from 'jquery';
 
-// Layout views
-import myTemplate from './views/layout/mainPage/mainPage.html';
-import Overlay from './views/layout/Overlay/Overlay.js';
-import UserView from './views/layout/UserView/UserView.js';
-import ToolsView from './views/layout/ToolsView/ToolsView.js';
-
 // Page-wide Styles
 import './stylesheets/pure-css-custom-form-elements/style.css';
-import './stylesheets/tooltip/tooltip.css';
-import './views/layout/mainPage/mainPage.css';
+import './stylesheets/mainPage.css';
 
-// Root model (containing all other models)
-import User from './models/User';
-window.user = new User();
+// Current toolchain
+// TODO: Save/load these as files
+import Toolchain from './models/Toolchain';
+window.toolchain = new Toolchain();
 
-// Set up the page
-function renderEverything () {
-  window.layout.overlay.render();
-  window.layout.userView.render();
-  window.layout.toolsView.render();
-}
+// Currently visible widgets
+// TODO: Add to the set of widgets on
+// screen per the user's skill level
+// and preferences
+import SingleDatasetView from './views/widgets/SingleDatasetView';
+import MappingView from './views/widgets/MappingView';
+import SingleVisualizationView from './views/widgets/SingleVisualizationView';
+window.widgets = [
+  new SingleDatasetView(),
+  new MappingView(),
+  new SingleVisualizationView()
+];
 
-jQuery('body').append(myTemplate);
+// The overlay views
+import StartingGuide from './views/overlays/StartingGuide';
+import DatasetLibrary from './views/overlays/DatasetLibrary';
+import VisualizationLibrary from './views/overlays/VisualizationLibrary';
+window.overlays = {
+  startingGuide: StartingGuide,
+  datasetLibrary: DatasetLibrary,
+  visualizationLibrary: VisualizationLibrary
+};
 
+// Main chunks of the page
+import Header from './views/layout/Header';
+import WidgetPanels from './views/layout/WidgetPanels';
+import Overlay from './views/layout/Overlay';
 window.layout = {
+  header: new Header({
+    el: '#Header'
+  }),
+  widgetPanels: new WidgetPanels({
+    el: '#WidgetPanels'
+  }),
   overlay: new Overlay({
     el: '#Overlay'
-  }),
-  userView: new UserView({
-    model: window.user,
-    el: '#UserView'
-  }),
-  toolsView: new ToolsView({
-    model: window.user,
-    el: '#ToolsView'
   })
 };
+
+// Draw everything
+function renderEverything () {
+  window.layout.header.render();
+  window.layout.widgetPanels.render();
+  window.layout.overlay.render();
+}
 
 jQuery(window).on('hashchange', renderEverything);
 window.onresize = renderEverything;

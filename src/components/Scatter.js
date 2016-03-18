@@ -6,27 +6,31 @@ export default class Scatter {
       {name: 'data', type: 'table'},
       {name: 'x', type: 'string'},
       {name: 'y', type: 'string'},
-      {name: 'color', type: 'string'}
+      {name: 'color', type: 'string'},
+      {name: 'hover', type: 'string'}
     ];
   }
 
-  constructor (el, options) {
-    let chart = vcharts.chart('xy', {
+  constructor (el, data, options) {
+    this.chart = vcharts.chart('scatter', {
       el: el,
-      series: [{
-        name: 'values',
-        values: options.data,
-        x: options.x,
-        y: options.y
-      }],
+      values: data,
+      x: options.x,
+      y: options.y,
+      color: options.color,
+      shape: options.shape,
+      size: options.size,
+      hover: options.hover,
       xAxis: {
         title: options.x
       },
       yAxis: {
         title: options.y
-      },
-      legend: false
+      }
     });
-    window.onresize = () => chart.update();
+  }
+
+  render () {
+    this.chart.update();
   }
 }

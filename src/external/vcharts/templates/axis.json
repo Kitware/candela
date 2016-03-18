@@ -177,6 +177,8 @@
         ],
         "points": ["@get", "points", false],
         "zero": ["@get", "zero", false],
+        "nice": ["@get", "nice", false],
+        "round": ["@get", "round", false],
         "padding": ["@get", "padding", 0],
         "domain": ["@get", "domain"],
         "domainMin": {"signal": ["@get", "minSignal"]},
@@ -189,7 +191,8 @@
         "scale": ["@get", "axis"],
         "grid": ["@get", "grid", false],
         "layer": "back",
-        "title": ["@get", "title", ""]
+        "title": ["@get", "title", ""],
+        "properties": ["@get", "properties", {}]
       }
     ]
   }

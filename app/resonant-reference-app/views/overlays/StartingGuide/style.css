@@ -1,0 +1,15 @@
+#startingGuide {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 16em;
+  left: calc(50% - 10em);
+  width: 16em;
+  text-align: center;
+  top: calc(50% - 12em);
+  padding: 2em 4em 4em 4em;
+  border-radius: 1em;
+  border: 2px solid #ccc;
+  background-color: white;
+}

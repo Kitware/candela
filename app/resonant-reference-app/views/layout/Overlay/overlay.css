@@ -1,0 +1,77 @@
+#Overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.85);
+  z-index: 8;
+  overflow: auto;
+}
+
+div.libraryInterface {
+  position: relative;
+  margin: 5em;
+  padding: 1em 2em 2em 3em;
+  border-radius: 1em;
+  border: 2px solid #ccc;
+  background-color: white;
+}
+
+div.circleset {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: center;
+  align-items: center;
+}
+
+div.circleButton {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-content: center;
+  align-items: center;
+  padding: 1em;
+  cursor: pointer;
+}
+
+div.circleButton img {
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  vertical-align: middle;
+  border-radius: 50px;
+  border: 2px solid rgba(0,0,0,0);
+}
+
+div.circleButton:hover img {
+  border: 2px solid #ccc;
+}
+
+#closeOverlay {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  width: 2em;
+  height: 2em;
+  cursor: pointer;
+}
+
+div.hint {
+  position: relative;
+  margin: 5em;
+  padding: 3em;
+  border-radius: 1em;
+  border: 2px solid #ccc;
+  background-color: white;
+}
+div.hint img.headerIcon {
+  position: relative;
+  left: calc(50% - 2em);
+  width: 4em;
+  height: 4em;
+  margin-bottom: 2em;
+}
+div.hint a {
+  cursor: pointer;
+  text-decoration: underline;
+}

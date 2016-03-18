@@ -36,6 +36,7 @@
     "http-server": "^0.9.0",
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
+    "javascript-detect-element-resize": "^0.5.3",
     "json-loader": "^0.5.4",
     "karma": "^0.13.22",
     "karma-coverage": "^0.5.5",
@@ -54,8 +55,11 @@
     "webpack": "^1.12.12"
   },
   "dependencies": {
+    "brace": "^0.7.0",
     "d3": "^3.5.14",
+    "datalib": "^1.6.3",
     "jquery": "^2.2.0",
+    "underscore": "^1.8.3",
     "vega": "^2.4.2"
   }
 }
