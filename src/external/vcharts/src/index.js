@@ -179,6 +179,19 @@ let templateFunctions = {
     };
   },
 
+  isStringField: function (args, options, scope) {
+    let values = transform(args[0], options, scope);
+    let field = transform(args[1], options, scope);
+
+    if (!Array.isArray(values) ||
+      values.length < 1 ||
+      values[0][field] === undefined ||
+      typeof values[0][field] === 'string') {
+      return true;
+    }
+    return false;
+  },
+
   orient: function (args, options, scope) {
     let dir = transform(args[0], options, scope);
     let obj = transform(args[1], options, scope);
@@ -361,8 +374,14 @@ let chart = function (type, initialOptions, done) {
     // Transform pass 2 to get the final visualization
     that.spec = transform(that.template, curOptions);
 
+    console.log(that.spec);
+
     vg.parse.spec(that.spec, function (chartObj) {
       let chart = chartObj(vegaOptions);
+      let printSignal = (name, val) => console.log(name + ': ' + val);
+      for (let i = 0; i < that.spec.signals.length; i += 1) {
+        chart.onSignal(that.spec.signals[i].name, printSignal);
+      }
       chart.update();
       if (done) {
         done(chart);
