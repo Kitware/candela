@@ -8,7 +8,8 @@
     "build:reference": "cd app/resonant-reference-app && webpack",
     "test": "karma start config/karma-testing.conf.js | faucet",
     "cover": "karma start config/karma-coverage.conf.js",
-    "cover:report": "http-server coverage -p ${PORT-3000}"
+    "cover:report": "http-server coverage -p ${PORT-3000}",
+    "demo": "http-server build -p ${PORT-3000}"
   },
   "repository": {
     "type": "git",
