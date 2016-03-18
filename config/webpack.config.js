@@ -10,7 +10,7 @@ module.exports = {
   devtool: 'source-map',
   __dirname: __dirname,
   entry: {
-    candela: './src/candela/index.js',
+    candela: ['./src/candela/index.js'],
     demo: './app/demo/index.js',
     resize: './app/resize/index.js'
   },
