@@ -13,7 +13,7 @@ export let InfoPane = Backbone.View.extend({
   el: '.info-pane',
 
   initialize: function (settings) {
-    this.percentile = settings.percentile || 95;
+    this.percentile = settings.percentile || 50.0;
     this.name = settings.name || 'Ground Truth';
     this.branch = settings.branch || 'master';
     this.day = settings.day || this.getToday();
@@ -21,7 +21,7 @@ export let InfoPane = Backbone.View.extend({
     this.warning = settings.warning || 3;
     this.fail = settings.fail || 4;
     this.max = settings.max || 5;
-    this.aggregate_metric_name = settings.aggregate_metric_name || '95th percentile RMSE';
+    this.aggregate_metric_name = settings.aggregate_metric_name || '50th percentile RMSE';
 
     this.numSuccess = 0;
     this.numBad = 0;
