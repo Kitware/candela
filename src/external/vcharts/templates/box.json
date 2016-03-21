@@ -36,14 +36,22 @@
           "type": "ordinal",
           "points": true,
           "padding": 1,
-          "domain": {"data": "table", "field": "name", "sort": true}
+          "domain": {"data": "table", "field": "name", "sort": true},
+          "properties": {
+            "labels": {
+              "text": {"template": "{{datum.data | truncate:25}}"},
+              "angle": {"value": ["@if", ["@get", "horiz"], 0, 270]},
+              "align": {"value": ["@if", ["@get", "horiz"], "left", "right"]},
+              "baseline": {"value": "middle"}
+            }
+          }
         }
       ]
     ],
     {
       "name": "boxplot",
       "height": ["@get", "height", 400],
-      "padding": ["@get", "padding", {"left": 100, "right": 10, "top": 10, "bottom": 50}],
+      "padding": ["@get", "padding", {"left": 100, "right": 10, "top": 10, "bottom": ["@if", ["@get", "horiz"], 50, 150]}],
       "width": ["@get", "width", 600],
       "data": [
         {
