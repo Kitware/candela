@@ -29,10 +29,13 @@ let MappingView = Widget.extend({
     self.friendlyName = 'Mapping';
     self.hashName = 'mappingView';
     
-    self.infoHint = true;
+    self.newInfo = true;
     self.icons.splice(0, 0, {
       src: function () {
-        return self.infoHint ? Widget.newInfoIcon : Widget.infoIcon;
+        return self.newInfo ? Widget.newInfoIcon : Widget.infoIcon;
+      },
+      title: function () {
+        return 'About this panel';
       },
       onclick: function () {
         self.renderInfoScreen();
@@ -69,7 +72,7 @@ let MappingView = Widget.extend({
   },
   renderInfoScreen: function () {
     let self = this;
-    self.infoHint = false;
+    self.newInfo = false;
     self.renderIndicators();
     
     window.layout.overlay.render(infoTemplate);

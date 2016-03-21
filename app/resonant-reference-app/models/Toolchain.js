@@ -30,10 +30,12 @@ let Toolchain = girder.models.ItemModel.extend({
     let DatasetCollection = Backbone.Collection.extend({
       model: Dataset
     });
-    
-    meta.visualizations = [];
-    meta.mappings = [];
     meta.datasets = new DatasetCollection();
+    meta.preMapFacets = [];
+    meta.mappings = [];
+    meta.postMapFacets = [];
+    meta.visualizations = [];
+    
     // Forward events from dataset changes
     self.listenTo(meta.datasets, 'rra:changeSpec', function () {
       self.validateMappings();

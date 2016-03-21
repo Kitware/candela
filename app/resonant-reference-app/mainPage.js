@@ -4,6 +4,10 @@ import jQuery from 'jquery';
 import './stylesheets/pure-css-custom-form-elements/style.css';
 import './stylesheets/mainPage.css';
 
+// Current user
+import User from './models/User';
+window.user = new User();
+
 // Current toolchain
 // TODO: Save/load these as files
 import Toolchain from './models/Toolchain';

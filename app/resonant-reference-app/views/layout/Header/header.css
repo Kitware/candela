@@ -4,28 +4,25 @@
   top: 0px;
   width: 100%;
   background-color: black;
+  color: white;
   display: flex;
+  flex-direction: row-reverse;
   align-content: center;
   align-items: center;
 }
 
-#Header img.configButton {
-  width: 3em;
-  height: 3em;
+#Header > div {
+  min-width: 3em;
+}
+
+#Header img.headerButton {
+  width: 2em;
+  height: 2em;
+  padding: 0.5em;
   border-radius: 1.5em;
   cursor: pointer;
 }
 
-#Header img.configButton:hover {
+#Header img.headerButton:hover {
   background-color: #ccc;
-}
-
-#Header div.pageTitle {
-  margin-left: 1em;
-  margin-right: auto;
-  color: white;
-}
-
-#Header div.loginButtons {
-  padding: 0.5em;
 }

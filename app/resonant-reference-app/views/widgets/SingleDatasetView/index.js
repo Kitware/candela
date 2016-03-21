@@ -30,10 +30,13 @@ let SingleDatasetView = Widget.extend({
     };
     self.statusText.title = 'Click to select a different dataset.';
 
-    self.infoHint = true;
+    self.newInfo = true;
     self.icons.splice(0, 0, {
       src: function () {
-        return self.infoHint ? Widget.newInfoIcon : Widget.infoIcon;
+        return self.newInfo ? Widget.newInfoIcon : Widget.infoIcon;
+      },
+      title: function () {
+        return 'About this panel';
       },
       onclick: function () {
         self.renderInfoScreen();
@@ -70,7 +73,7 @@ let SingleDatasetView = Widget.extend({
   },
   renderInfoScreen: function () {
     let self = this;
-    self.infoHint = false;
+    self.newInfo = false;
     self.renderIndicators();
 
     window.layout.overlay.render(infoTemplate);
