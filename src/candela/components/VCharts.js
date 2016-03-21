@@ -1,4 +1,4 @@
-import VisualizationComponent from '../core/VisualizationComponent';
+import { VisualizationComponent } from '..';
 import vcharts from '../../vcharts/src';
 
 export default class LineChart extends VisualizationComponent {

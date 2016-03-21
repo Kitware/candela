@@ -1,4 +1,4 @@
-import VisualizationComponent from '../core/VisualizationComponent';
+import { VisualizationComponent } from '..';
 
 var d3 = require('d3');
 
