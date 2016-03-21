@@ -1,8 +1,8 @@
-import { VisualizationComponent } from '..';
+import VisComponent from '../VisComponent';
 
 var d3 = require('d3');
 
-export default class Dummy extends VisualizationComponent {
+export default class Dummy extends VisComponent {
   constructor (el, data) {
     super(el);
 

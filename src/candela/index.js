@@ -1,9 +1,9 @@
 import components from './components';
-import VisualizationComponent from './VisualizationComponent';
+import VisComponent from './VisComponent';
 
 export default {
   components,
-  VisualizationComponent: {
-    VisualizationComponent
+  VisComponent: {
+    VisComponent
   }
 };

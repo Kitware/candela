@@ -1,7 +1,7 @@
-import { VisualizationComponent } from '..';
+import VisComponent from '../VisComponent';
 import vcharts from '../../vcharts/src';
 
-export default class LineChart extends VisualizationComponent {
+export default class LineChart extends VisComponent {
   constructor (el, data) {
     super(el);
 
