@@ -32,7 +32,7 @@ module.exports = {
     }),
 
     new CleanPlugin([
-      './build'
+      './build/*'
     ]),
 
     new HtmlPlugin({
