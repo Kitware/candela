@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 import d3 from 'd3';
 // import Dataset from '../../../models/Dataset';
 import myTemplate from './template.html';
-import libImage from '../../../images/library.svg';
+import libImage from '../../../images/light/library.svg';
 // import candela from './../../../../../src';
 
 let VisualizationLibrary = Backbone.View.extend({

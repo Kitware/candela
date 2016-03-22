@@ -1,18 +1,34 @@
 let girder = window.girder;
 
-let User = girder.models.UserModel.extend({
+let WIDGET_SETTINGS = {
+  NOT_EARNED: 0,
+  ON_TOOLBAR: 1,
+  HIDDEN: 2
+};
+
+let UserPreferences = girder.Model.extend({
+  defaults: {
+    widgets: {
+      singleDatasetView: WIDGET_SETTINGS.ON_TOOLBAR,
+      mappingView: WIDGET_SETTINGS.ON_TOOLBAR,
+      singleVisualizationView: WIDGET_SETTINGS.ON_TOOLBAR
+    }
+  },
   initialize: function () {
     let self = this;
-
     // Check for who is logged in initially
     girder.restRequest({
-      path: 'api/v1/user/authentication',
+      path: 'api/v1/user/getRRAPreferences',
       error: function () {
         self.clear().set(self.defaults);
-        self.trigger('rra:changeUser');
       }
     }).done(function (resp) {
-      self.set(resp);
+      self.clear();
+      if (resp === null) {
+        self.set(self.defaults);
+      } else {
+        self.set(resp);
+      }
       self.trigger('rra:changeUser');
     });
   }
@@ -62,4 +78,4 @@ girder.events.on('g:login', function () {
     }
 }); */
 
-export default User;
+export default UserPreferences;

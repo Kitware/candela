@@ -84,7 +84,7 @@ let SingleDatasetView = Widget.extend({
     if (self.status === STATUS.NO_DATA) {
       screen = self.getErrorScreen(`
 You have not chosen a dataset yet. Click 
-<a onclick="window.layout.overlay.render('datasetLibrary')">
+<a onclick='window.layout.overlay.render('datasetLibrary')'>
 here</a> to choose one.`);
     } else if (self.status === STATUS.SUCCESS) {
       screen = self.getSuccessScreen(`
@@ -178,6 +178,10 @@ you'll probably need to
     self.renderAttributeSettings();
 
     let editor = ace.edit('editor');
+    editor.setOptions({
+      fontFamily: 'Cutive Mono, Courier, Monospace',
+      fontSize: '10pt'
+    });
     editor.setTheme('ace/theme/clouds');
     editor.$blockScrolling = Infinity;
 

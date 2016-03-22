@@ -3,16 +3,13 @@
   left: 0px;
   top: 0px;
   width: 100%;
+  height: 3em;
   background-color: black;
   color: white;
   display: flex;
-  flex-direction: row-reverse;
   align-content: center;
   align-items: center;
-}
-
-#Header > div {
-  min-width: 3em;
+  justify-content: space-between;
 }
 
 #Header img.headerButton {
@@ -25,4 +22,24 @@
 
 #Header img.headerButton:hover {
   background-color: #ccc;
+}
+
+#Header .headerSeparator {
+  border: 1px solid #666666;
+  height: 2em;
+  margin: 0.5em;
+}
+
+#Header #toolchainHeader {
+  display: flex;
+  align-items: center;
+}
+
+#Header #toolchainName {
+  background-color: inherit;
+  color: inherit;
+  border: none;
+  font-size: inherit;
+  text-align: right;
+  width: 10em;
 }
