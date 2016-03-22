@@ -1,7 +1,7 @@
-import { VisualizationComponent } from '..';
+import VisComponent from '../VisComponent';
 import $ from 'jquery';
 
-export default class ParallelCoordinates extends VisualizationComponent {
+export default class ParallelCoordinates extends VisComponent {
   constructor (el, dataRoot, width, height) {
     super(el);
     this.dataRoot = dataRoot;
