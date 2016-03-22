@@ -1,60 +1,67 @@
-var assert = require('assert'),
-  vcharts = require('../src/index.js');
+import test from 'tape';
+import vcharts from '../src';
 
-describe('chart', function () {
-  describe('basic', function () {
+test('chart - basic - width and height should be based on el properties', t => {
+  t.plan(2);
 
-    it('should set width and height based on el properties', function () {
-      var c,
-        padding = {top: 10, left: 20, bottom: 30, right: 40};
+  const padding = {
+    top: 10,
+    left: 20,
+    bottom: 30,
+    right: 40
+  };
 
-      vcharts.templates.test = {
-        width: ['@get', 'width', 100],
-        height: ['@get', 'height', 200],
-        padding: padding
-      };
+  vcharts.templates.test = {
+    width: ['@get', 'width', 100],
+    height: ['@get', 'height', 200],
+    padding: padding
+  };
 
-      c = vcharts.chart('test', {
-        el: {offsetWidth: 0, offsetHeight: 0}
-      });
-      assert.deepEqual({
-          width: 100,
-          height: 200,
-          padding: padding
-        }, c.spec);
-
-      c = vcharts.chart('test', {
-        el: {offsetWidth: 300, offsetHeight: 400}
-      });
-      assert.deepEqual({
-          width: (300 - 20 - 40),
-          height: (400 - 10 - 30),
-          padding: padding
-        }, c.spec);
-    });
+  let c = vcharts.chart('test', {
+    el: {offsetWidth: 0, offsetHeight: 0}
   });
 
-  describe('vega', function () {
-    it('should produce vega spec', function () {
-      var c = vcharts.chart('vega', {
-        el: {},
-        spec: {marks: []}
-      });
-      assert.deepEqual(vcharts.templates.vega, c.template);
-      assert.deepEqual({marks: []}, c.spec);
-    });
+  t.deepEqual({
+    width: 100,
+    height: 200,
+    padding: padding
+  }, c.spec);
+
+  c = vcharts.chart('test', {
+    el: {offsetWidth: 300, offsetHeight: 400}
   });
 
-  describe('update', function () {
-    it('should update options', function () {
-      var c = vcharts.chart('vega', {
-        el: {},
-        spec: {marks: [1]}
-      });
-      assert.deepEqual(vcharts.templates.vega, c.template);
-      assert.deepEqual({el: {}, spec: {marks: [1]}}, c.options);
-      c.update({spec: {marks: [1, 2, 3]}});
-      assert.deepEqual({el: {}, spec: {marks: [1, 2, 3]}}, c.options);
-    });
+  t.deepEqual({
+    width: (300 - 20 - 40),
+    height: (400 - 10 - 30),
+    padding: padding
+  }, c.spec);
+
+  t.end();
+});
+
+test('vega - should produce vega spec', t => {
+  let c = vcharts.chart('vega', {
+    el: {},
+    spec: {marks: []}
   });
+
+  t.deepEqual(vcharts.templates.vega, c.template);
+  t.deepEqual({marks: []}, c.spec);
+
+  t.end();
+});
+
+test('update - should update options', function () {
+  var c = vcharts.chart('vega', {
+    el: {},
+    spec: {marks: [1]}
+  });
+
+  assert.deepEqual(vcharts.templates.vega, c.template);
+  assert.deepEqual({el: {}, spec: {marks: [1]}}, c.options);
+
+  c.update({spec: {marks: [1, 2, 3]}});
+
+  assert.deepEqual({el: {}, spec: {marks: [1, 2, 3]}}, c.options);
 });
