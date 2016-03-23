@@ -1,4 +1,4 @@
-import candela from './../../src';
+import candela from './../../src/candela';
 import indexContent from './index.jade';
 import 'javascript-detect-element-resize/detect-element-resize';
 import './index.styl';

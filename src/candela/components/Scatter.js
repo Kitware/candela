@@ -1,4 +1,4 @@
-import vcharts from '../external/vcharts/src';
+import vcharts from '../../vcharts/src';
 
 export default class Scatter {
   static get options () {
