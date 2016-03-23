@@ -1,9 +1,9 @@
-import candela from './../../src';
+import candela from './../../src/candela';
 import mainContent from './index.jade';
 import visContent from './vis.jade';
 import 'javascript-detect-element-resize/detect-element-resize';
 import './index.styl';
-import iris from '../../src/external/vcharts/data/iris.json';
+import iris from '../../src/vcharts/data/iris.json';
 import visualizations from './visualizations.json';
 
 let datasets = {
