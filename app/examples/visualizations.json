@@ -1,0 +1,26 @@
+[
+  {
+    "hash": "boxplot",
+    "name": "Box Plot",
+    "description": "A simple box plot",
+    "component": "BoxPlot",
+    "data": "iris",
+    "options": {
+      "field": "petalWidth",
+      "group": "species"
+    }
+  },
+  {
+    "hash": "scatter",
+    "name": "Scatterplot",
+    "description": "A simple scatterplot",
+    "component": "Scatter",
+    "data": "iris",
+    "options": {
+      "x": "petalLength",
+      "y": "petalWidth",
+      "color": "sepalLength",
+      "shape": "species"
+    }
+  }
+]
