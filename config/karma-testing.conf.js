@@ -7,6 +7,10 @@ karmaConfig.reporters = [
   'tap'
 ];
 
+karmaConfig.tapReporter = {
+  disableStdout: true
+};
+
 module.exports = function (config) {
   config.set(karmaConfig);
 };

@@ -7,7 +7,8 @@
     "build": "webpack --config config/webpack.config.js",
     "build:reference": "cd app/resonant-reference-app && webpack",
     "dist": "webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
-    "test": "karma start config/karma-testing.conf.js | faucet",
+    "test": "karma start config/karma-testing.conf.js | grep '^PhantomJS' | sed \"s/^.*LOG: '\\(.*\\)'$/\\1/\" | faucet",
+    "test:raw": "karma start config/karma-testing.conf.js",
     "cover": "karma start config/karma-coverage.conf.js",
     "cover:report": "http-server coverage -p ${PORT-3000}",
     "demo": "http-server build -p ${PORT-3000}"
