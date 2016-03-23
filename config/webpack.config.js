@@ -12,7 +12,8 @@ module.exports = {
   entry: {
     candela: ['./src/index.js'],
     demo: './app/demo/index.js',
-    resize: './app/resize/index.js'
+    resize: './app/resize/index.js',
+    examples: './app/examples/index.js'
   },
   output: {
     library: '[name]',
@@ -45,6 +46,12 @@ module.exports = {
       title: 'Resize Test',
       filename: 'resize/index.html',
       chunks: ['resize']
+    }),
+
+    new HtmlPlugin({
+      title: 'Candela Examples',
+      filename: 'examples/index.html',
+      chunks: ['examples']
     })
   ],
   module: {
