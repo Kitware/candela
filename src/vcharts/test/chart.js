@@ -42,7 +42,7 @@ test('chart - basic - width and height should be based on el properties', t => {
 
 test('vega - should produce vega spec', t => {
   let c = vcharts.chart('vega', {
-    el: {},
+    el: document.createElement('div'),
     spec: {marks: []}
   });
 
@@ -54,7 +54,7 @@ test('vega - should produce vega spec', t => {
 
 test('update - should update options', function () {
   var c = vcharts.chart('vega', {
-    el: {},
+    el: document.createElement('div')
     spec: {marks: [1]}
   });
 
