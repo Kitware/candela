@@ -48,6 +48,10 @@ let VisualizationLibrary = Backbone.View.extend({
         {
           name: 'bin',
           type: 'string'
+        },
+        {
+          name: 'aggregate',
+          type: 'number'
         }
       ]
     });

@@ -108,10 +108,18 @@
                   "type": "aggregate",
                   "groupby": ["bin"],
                   "summarize": [
-                    {
-                      "field": "*",
-                      "ops": ["count"]
-                    }
+                    [
+                      "@if", ["@get", "aggregate"],
+                      {
+                        "field": ["@get", "aggregate"],
+                        "ops": ["sum"],
+                        "as": ["count"]
+                      },
+                      {
+                        "field": "*",
+                        "ops": ["count"]
+                      }
+                    ]
                   ]
                 }
               ],
@@ -130,10 +138,18 @@
                   "type": "aggregate",
                   "groupby": ["bin_start", "bin", "bin_end"],
                   "summarize": [
-                    {
-                      "field": "*",
-                      "ops": ["count"]
-                    }
+                    [
+                      "@if", ["@get", "aggregate"],
+                      {
+                        "field": ["@get", "aggregate"],
+                        "ops": ["sum"],
+                        "as": ["count"]
+                      },
+                      {
+                        "field": "*",
+                        "ops": ["count"]
+                      }
+                    ]
                   ]
                 }
               ]
