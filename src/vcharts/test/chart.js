@@ -1,7 +1,7 @@
 import test from 'tape';
 import vcharts from '../src';
 
-test('chart width and height should be based on el properties', t => {
+test.skip('chart width and height should be based on el properties', t => {
   const padding = {
     top: 10,
     left: 20,
