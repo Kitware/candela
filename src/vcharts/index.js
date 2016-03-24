@@ -8,7 +8,6 @@ let templates = {
   bullet: require('./templates/bullet.json'),
   gantt: require('./templates/gantt.json'),
   histogram: require('./templates/histogram.json'),
-  scatter: require('./templates/scatter.json'),
   vega: require('./templates/vega.json'),
   xy: require('./templates/xy.json'),
   xymatrix: require('./templates/xymatrix.json')
