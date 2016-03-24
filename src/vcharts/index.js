@@ -386,8 +386,8 @@ let chart = function (type, initialOptions, done) {
   return that;
 };
 
-module.exports = {
-  transform: transform,
-  chart: chart,
-  templates: templates
+export default {
+  transform,
+  chart,
+  templates
 };
