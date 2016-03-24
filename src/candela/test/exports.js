@@ -2,7 +2,7 @@ import test from 'tape';
 
 import candela from '..';
 
-test('Verify structure and content of exported library object', t => {
+test('Structure and content of exported Candela library object', t => {
   t.ok(candela, 'candela exists');
 
   t.ok(candela.VisComponent, 'candela.VisComponent exists');
