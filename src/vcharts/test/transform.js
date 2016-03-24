@@ -1,5 +1,5 @@
 import test from 'tape';
-import vcharts from '../src';
+import vcharts from '..';
 
 test('vcharts.transform() without spec', t => {
   t.deepEqual({}, vcharts.transform({}), 'object transform should be identity');

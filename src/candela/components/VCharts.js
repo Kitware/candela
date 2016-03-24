@@ -1,5 +1,5 @@
 import VisComponent from '../VisComponent';
-import vcharts from '../../vcharts/src';
+import vcharts from '../../vcharts';
 
 export default class LineChart extends VisComponent {
   constructor (el, data) {

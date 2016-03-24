@@ -1,4 +1,4 @@
-import vcharts from '../../vcharts/src';
+import vcharts from '../../vcharts';
 
 export default class Histogram {
   static get options () {
