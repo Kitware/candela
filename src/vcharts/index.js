@@ -7,8 +7,7 @@ let templates = {
   box: require('./templates/box.json'),
   bullet: require('./templates/bullet.json'),
   gantt: require('./templates/gantt.json'),
-  vega: require('./templates/vega.json'),
-  xymatrix: require('./templates/xymatrix.json')
+  vega: require('./templates/vega.json')
 };
 
 let getNestedRec = function (spec, parts) {
