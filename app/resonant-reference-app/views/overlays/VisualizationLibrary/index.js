@@ -104,7 +104,7 @@ let VisualizationLibrary = Backbone.View.extend({
 
     libraryButtonsEnter.append('span');
     libraryButtons.selectAll('span')
-      .text((d) => d.name);
+      .text(d => d.name);
 
     d3.select('div.libraryInterface').selectAll('.circleButton')
       .on('click', function (d) {

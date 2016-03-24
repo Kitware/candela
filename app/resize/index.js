@@ -4,7 +4,7 @@ import 'javascript-detect-element-resize/detect-element-resize';
 import './index.styl';
 
 function showPage () {
-  [...document.getElementsByClassName('page')].forEach((el) => {
+  [...document.getElementsByClassName('page')].forEach(el => {
     el.classList.add('hidden');
   });
   let pageId = 'main';
@@ -24,7 +24,7 @@ window.addEventListener('load', () => {
     data.push({x: Math.random(), y: Math.random()});
   }
 
-  [...document.getElementsByClassName('vis-element')].forEach((el) => {
+  [...document.getElementsByClassName('vis-element')].forEach(el => {
     let vis = new candela.components.Scatter(
       el,
       data,

@@ -134,7 +134,7 @@ let Toolchain = girder.models.ItemModel.extend({
     let options = {};
 
     // Figure out which options allow multiple fields
-    meta.mappings.forEach((mapping) => {
+    meta.mappings.forEach(mapping => {
       for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
         if (optionSpec.name === mapping.visAttribute) {
           if (optionSpec.allowMultiple) {
@@ -146,7 +146,7 @@ let Toolchain = girder.models.ItemModel.extend({
     });
 
     // Construct the options
-    meta.mappings.forEach((mapping) => {
+    meta.mappings.forEach(mapping => {
       if (Array.isArray(options[mapping.visAttribute])) {
         options[mapping.visAttribute].push(mapping.dataAttribute);
       } else {

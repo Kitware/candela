@@ -10,7 +10,7 @@ let datasets = {
   iris
 };
 let visMap = {};
-visualizations.forEach((v) => {
+visualizations.forEach(v => {
   visMap[v.hash] = v;
 });
 
