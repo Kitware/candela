@@ -22,5 +22,18 @@
       "color": "sepalLength",
       "shape": "species"
     }
+  },
+  {
+    "hash": "bar",
+    "name": "Bar Chart",
+    "description": "A simple bar chart",
+    "component": "Bar",
+    "data": "iris",
+    "options": {
+      "x": "petalLength",
+      "y": "petalWidth",
+      "color": "steelblue",
+      "hover": "green"
+    }
   }
 ]

@@ -3,7 +3,6 @@ import vg from 'vega';
 
 let templates = {
   axis: require('./templates/axis.json'),
-  bar: require('./templates/bar.json'),
   box: require('./templates/box.json'),
   bullet: require('./templates/bullet.json'),
   gantt: require('./templates/gantt.json'),
