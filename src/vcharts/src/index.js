@@ -1,4 +1,5 @@
-let libs = require('./libs');
+import d3 from 'd3';
+import vg from 'vega';
 
 let templates = {
   axis: require('../templates/axis.json'),
@@ -12,9 +13,6 @@ let templates = {
   xy: require('../templates/xy.json'),
   xymatrix: require('../templates/xymatrix.json')
 };
-
-let d3 = libs.d3;
-let vg = libs.vg;
 
 let getNestedRec = function (spec, parts) {
   if (spec === undefined || parts.length === 0) {
