@@ -1,18 +1,42 @@
 import vcharts from '../../vcharts/src';
 
 export default class BoxPlot {
-  static get options () {
-    return [
-      {name: 'values', type: 'table'},
-      {name: 'field', type: 'string'},
-      {name: 'group', type: 'string'}
-    ];
+  static get spec () {
+    return {
+      options: [
+        {
+          name: 'data',
+          type: 'table',
+          format: 'objectlist'
+        },
+        {
+          name: 'fields',
+          type: 'string_list',
+          format: 'string_list',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'group',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        }
+      ]
+    };
   }
 
-  constructor (el, data, options) {
+  constructor (el, options) {
     this.chart = vcharts.chart('box', {
       el: el,
-      values: data,
+      values: options.data,
       fields: options.fields,
       group: options.group,
       orient: 'vertical',

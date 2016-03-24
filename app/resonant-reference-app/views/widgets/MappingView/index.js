@@ -152,8 +152,7 @@ order to display anything.`);
       } else if (newNode.side === 'vis') {
         // Does the selected data node's type match
         // an of our compatible types?
-        if (Dataset.COMPATIBLE_TYPES[newNode.type]
-          .indexOf(self.selection.baseType) === -1) {
+        if (newNode.type.indexOf(self.selection.baseType) === -1) {
           newNode.mode = NODE_MODES.INELIGIBLE;
         } else {
           newNode.mode = NODE_MODES.WILL_CONNECT;
@@ -161,8 +160,7 @@ order to display anything.`);
       } else {
         // Is our type compatible with any of the
         // vis node's types?
-        if (Dataset.COMPATIBLE_TYPES[self.selection.baseType]
-          .indexOf(newNode.type) === -1) {
+        if (self.selection.baseType.indexOf(newNode.type) === -1) {
           newNode.mode = NODE_MODES.INELIGIBLE;
         } else {
           newNode.mode = NODE_MODES.WILL_CONNECT;
@@ -244,7 +242,7 @@ order to display anything.`);
     });
     specs.vis.forEach(function (visSpec, visIndex) {
       visSpec.options.forEach(function (option, attrIndex) {
-        _createNode('vis', visIndex, option.name, option.type);
+        _createNode('vis', visIndex, option.name, option.domain.fieldTypes);
       });
     });
 
@@ -502,7 +500,7 @@ order to display anything.`);
           return d.type;
         } else {
           // TODO: boldface the connected type
-          return Dataset.COMPATIBLE_TYPES[d.type].join(',');
+          return d.type.join(',');
         }
       });
 

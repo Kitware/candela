@@ -137,7 +137,7 @@ let Toolchain = girder.models.ItemModel.extend({
     meta.mappings.forEach(mapping => {
       for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
         if (optionSpec.name === mapping.visAttribute) {
-          if (optionSpec.allowMultiple) {
+          if (optionSpec.type === 'string_list') {
             options[mapping.visAttribute] = [];
           }
           break;
@@ -171,7 +171,7 @@ let Toolchain = girder.models.ItemModel.extend({
       let possibleTypes = [];
       for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
         if (optionSpec.name === mapping.visAttribute) {
-          possibleTypes = Dataset.COMPATIBLE_TYPES[optionSpec.type];
+          possibleTypes = optionSpec.domain.fieldTypes;
           break;
         }
       }
@@ -194,7 +194,7 @@ let Toolchain = girder.models.ItemModel.extend({
     let addedMapping = false;
     for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
       if (optionSpec.name === mapping.visAttribute) {
-        if (!optionSpec.allowMultiple) {
+        if (optionSpec.type !== 'string_list') {
           // If multiple fields are not allowed, search for the mapping and replace it
           for (let [index, m] of meta.mappings.entries()) {
             if (mapping.visIndex === m.visIndex &&
