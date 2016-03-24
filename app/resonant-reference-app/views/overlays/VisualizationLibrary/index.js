@@ -60,8 +60,9 @@ let VisualizationLibrary = Backbone.View.extend({
       name: 'BoxPlot',
       options: [
         {
-          name: 'field',
-          type: 'number'
+          name: 'fields',
+          type: 'number',
+          allowMultiple: true
         },
         {
           name: 'group',

@@ -13,14 +13,14 @@ export default class BoxPlot {
     this.chart = vcharts.chart('box', {
       el: el,
       values: data,
-      fields: [options.field],
+      fields: options.fields,
       group: options.group,
       orient: 'vertical',
       xAxis: {
         title: options.group || ''
       },
       yAxis: {
-        title: options.field
+        title: 'Value'
       }
     });
   }

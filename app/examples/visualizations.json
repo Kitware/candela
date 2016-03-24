@@ -6,7 +6,7 @@
     "component": "BoxPlot",
     "data": "iris",
     "options": {
-      "field": "petalWidth",
+      "fields": ["petalWidth"],
       "group": "species"
     }
   },

@@ -28,7 +28,7 @@ let MappingView = Widget.extend({
 
     self.friendlyName = 'Mapping';
     self.hashName = 'mappingView';
-    
+
     self.infoHint = true;
     self.icons.splice(0, 0, {
       src: function () {
@@ -38,7 +38,7 @@ let MappingView = Widget.extend({
         self.renderInfoScreen();
       }
     });
-    
+
     self.ok = false;
     self.icons.splice(0, 0, {
       src: function () {
@@ -59,7 +59,7 @@ let MappingView = Widget.extend({
         self.renderHelpScreen();
       }
     });
-    
+
     self.selection = null;
 
     self.listenTo(window.toolchain, 'rra:changeMappings', function () {
@@ -71,7 +71,7 @@ let MappingView = Widget.extend({
     let self = this;
     self.infoHint = false;
     self.renderIndicators();
-    
+
     window.layout.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
@@ -86,15 +86,15 @@ Well done!`);
       if (!meta || !meta.visualizations || !meta.visualizations[0] ||
           !meta.datasets || !meta.datasets[0]) {
         screen = self.getErrorScreen(`
-You need to choose both a Dataset and a Visualization 
+You need to choose both a Dataset and a Visualization
 in order to connect them together.`);
       } else {
         screen = self.getErrorScreen(`
-The visualization needs more connections to data in 
+The visualization needs more connections to data in
 order to display anything.`);
       }
     }
-    
+
     window.layout.overlay.render(screen);
   },
   createNodeId: function (d) {
@@ -360,10 +360,10 @@ order to display anything.`);
         lastData = i;
       }
     });
-    
+
     let numData = lastData ? 1 + lastData - firstData : 0;
     let numVis = lastVis ? 1 + lastVis - firstVis : 0;
-    
+
     // Update our little indicator
     // to describe the mapping
     self.statusText.text = graph.realEdgeCount + ' / ' + numVis;
@@ -391,7 +391,7 @@ order to display anything.`);
     // Figure out how we're going to lay things
     // out based on how much space we have
     let nodeHeight = 40;
-    
+
     // Temporarily force the scroll bars so we
     // account for their size
     self.$el.css('overflow', 'scroll');
@@ -400,13 +400,13 @@ order to display anything.`);
       height: self.el.clientHeight
     };
     self.$el.css('overflow', '');
-    
+
     // If there isn't enough room for all
     // the nodes, extend the height
     bounds.height = Math.max(bounds.height,
       1.5 * nodeHeight * (numData + 2),
       1.5 * nodeHeight * (numVis + 2));
-    
+
     self.$el.find('svg')
       .attr({
         width: bounds.width,

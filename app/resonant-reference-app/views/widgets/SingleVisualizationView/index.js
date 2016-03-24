@@ -1,6 +1,6 @@
 import Widget from '../Widget';
 import myTemplate from './template.html';
-import candela from './../../../../../src';
+import candela from './../../../../../src/candela';
 import './style.css';
 
 import infoTemplate from './infoTemplate.html';
@@ -9,15 +9,15 @@ let SingleVisualizationView = Widget.extend({
   initialize: function (options) {
     let self = this;
     Widget.prototype.initialize.apply(self, options);
-    
+
     self.friendlyName = 'Visualization';
     self.hashName = 'singleVisualizationView';
-    
+
     self.statusText.onclick = function () {
       window.layout.overlay.render('visualizationLibrary');
     };
     self.statusText.title = 'Click to select a different visualization.';
-    
+
     self.infoHint = true;
     self.icons.splice(0, 0, {
       src: function () {
@@ -27,7 +27,7 @@ let SingleVisualizationView = Widget.extend({
         self.renderInfoScreen();
       }
     });
-    
+
     self.ok = null;
     self.icons.splice(0, 0, {
       src: function () {
@@ -60,7 +60,7 @@ let SingleVisualizationView = Widget.extend({
     let self = this;
     self.infoHint = false;
     self.renderIndicators();
-    
+
     window.layout.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
@@ -68,7 +68,7 @@ let SingleVisualizationView = Widget.extend({
     let screen;
     if (self.ok === null) {
       screen = self.getErrorScreen(`
-You have not chosen a visualization yet. Click 
+You have not chosen a visualization yet. Click
 <a onclick="window.layout.overlay.render('visualizationLibrary')">
 here</a> to choose one.`);
     } else if (self.ok === true) {
@@ -76,10 +76,10 @@ here</a> to choose one.`);
 The visualization appears to be functioning correctly.`);
     } else {
       let meta = window.toolchain.get('meta');
-      
+
       if (!meta || !meta.visualizations || !meta.visualizations[0]) {
         screen = self.getErrorScreen(`
-You have not chosen a visualization yet. Click 
+You have not chosen a visualization yet. Click
 <a onclick="window.layout.overlay.render('visualizationLibrary')">
 here</a> to choose one.`);
       } else {
@@ -89,12 +89,12 @@ You encountered an error we didn't anticipate! Please report it
 <a>here</a>.`);
       }
     }
-    
+
     window.layout.overlay.render(screen);
   },
   render: function () {
     let self = this;
-    
+
     // Get the visualization in the toolchain (if there is one)
     let visSpec = window.toolchain.get('meta');
     if (visSpec) {
@@ -103,16 +103,16 @@ You encountered an error we didn't anticipate! Please report it
         visSpec = visSpec[0];
       }
     }
-    
+
     self.$el.html(myTemplate);
-    
+
     if (visSpec) {
       let options = window.toolchain.getVisOptions();
-      
+
       self.ok = null;
       self.statusText.text = 'Loading...';
       self.renderIndicators();
-      
+
       window.toolchain.shapeDataForVis(function (data) {
         // Temporarily force the scrollbars, so
         // the view can account for the needed space
@@ -121,7 +121,7 @@ You encountered an error we didn't anticipate! Please report it
                                                         data, options);
         self.vis.render();
         self.$el.css('overflow', '');
-        
+
         self.ok = true;
         self.statusText.text = visSpec['name'];
         self.renderIndicators();
