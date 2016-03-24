@@ -38,30 +38,30 @@ test.skip('chart width and height should be based on el properties', t => {
   t.end();
 });
 
-test('vcharts.chart() should produce vega spec', t => {
+test('vcharts.chart()', t => {
   let c = vcharts.chart('vega', {
     el: document.createElement('div'),
     spec: {marks: []}
   });
 
-  t.deepEqual(c.template, vcharts.templates.vega);
-  t.deepEqual(c.spec, {marks: []});
+  t.deepEqual(c.template, vcharts.templates.vega, 'template used should be the one requested');
+  t.deepEqual(c.spec, {marks: []}, 'spec used should match the one specified');
 
   t.end();
 });
 
-test('update - should update options', t => {
+test('vcharts.update()', t => {
   var c = vcharts.chart('vega', {
     el: document.createElement('div'),
     spec: {marks: [1]}
   });
 
-  t.deepEqual(c.template, vcharts.templates.vega);
-  t.deepEqual(c.options.spec, {marks: [1]});
+  t.deepEqual(c.template, vcharts.templates.vega, 'template used should be the one requested (precondition)');
+  t.deepEqual(c.options.spec, {marks: [1]}, 'spec used should match the one specified (precondition)');
 
   c.update({spec: {marks: [1, 2, 3]}});
 
-  t.deepEqual(c.options.spec, {marks: [1, 2, 3]});
+  t.deepEqual(c.options.spec, {marks: [1, 2, 3]}, 'update call should change the spec used to the one specified');
 
   t.end();
 });
