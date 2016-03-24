@@ -326,11 +326,11 @@ let merge = function (defaults, options) {
   return defaults;
 };
 
-let chart = function (type, initialOptions, done) {
+let chart = function (template, initialOptions, done) {
   let that = {};
 
   that.options = {};
-  that.template = templates[type];
+  that.template = template;
 
   that.update = function (newOptions) {
     that.options = extend(that.options, newOptions);

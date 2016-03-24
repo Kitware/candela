@@ -39,7 +39,7 @@ test.skip('chart width and height should be based on el properties', t => {
 });
 
 test('vcharts.chart()', t => {
-  let c = vcharts.chart('vega', {
+  let c = vcharts.chart(vcharts.templates.vega, {
     el: document.createElement('div'),
     spec: {marks: []}
   });
@@ -51,7 +51,7 @@ test('vcharts.chart()', t => {
 });
 
 test('vcharts.update()', t => {
-  var c = vcharts.chart('vega', {
+  var c = vcharts.chart(vcharts.templates.vega, {
     el: document.createElement('div'),
     spec: {marks: [1]}
   });
