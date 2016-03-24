@@ -9,7 +9,6 @@ let templates = {
   gantt: require('./templates/gantt.json'),
   histogram: require('./templates/histogram.json'),
   vega: require('./templates/vega.json'),
-  xy: require('./templates/xy.json'),
   xymatrix: require('./templates/xymatrix.json')
 };
 

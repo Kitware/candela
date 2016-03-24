@@ -1,5 +1,5 @@
 import Dummy from './../../src/candela/components/Dummy';
-import LineChart from './../../src/candela/components/VCharts';
+import LineChart from './../../src/candela/components/LineChart';
 import ParallelCoordinates from './../../src/candela/components/ParallelCoordinates';
 import Scatter from './../../src/candela/components/Scatter';
 import $ from 'jquery';
