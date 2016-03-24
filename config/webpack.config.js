@@ -10,9 +10,10 @@ module.exports = {
   devtool: 'source-map',
   __dirname: __dirname,
   entry: {
-    candela: ['./src/index.js'],
+    candela: ['./src/candela/index.js'],
     demo: './app/demo/index.js',
-    resize: './app/resize/index.js'
+    resize: './app/resize/index.js',
+    examples: './app/examples/index.js'
   },
   output: {
     library: '[name]',
@@ -32,7 +33,7 @@ module.exports = {
     }),
 
     new CleanPlugin([
-      './build'
+      './build/*'
     ]),
 
     new HtmlPlugin({
@@ -45,6 +46,12 @@ module.exports = {
       title: 'Resize Test',
       filename: 'resize/index.html',
       chunks: ['resize']
+    }),
+
+    new HtmlPlugin({
+      title: 'Candela Examples',
+      filename: 'examples/index.html',
+      chunks: ['examples']
     })
   ],
   module: {

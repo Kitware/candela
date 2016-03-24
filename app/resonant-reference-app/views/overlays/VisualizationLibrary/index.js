@@ -56,6 +56,20 @@ let VisualizationLibrary = Backbone.View.extend({
       ]
     });
 
+    libraryVisSpecs.push({
+      name: 'BoxPlot',
+      options: [
+        {
+          name: 'field',
+          type: 'number'
+        },
+        {
+          name: 'group',
+          type: 'string'
+        }
+      ]
+    });
+
     /*
       TODO: build the library from the available
       candela visualizations

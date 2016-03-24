@@ -1,6 +1,6 @@
 import telegraph from 'telegraph-events';
 
-export default class VisualizationComponent {
+export default class VisComponent {
   constructor (el) {
     if (!el) {
       throw new Error('"el" is a required argument');

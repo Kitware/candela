@@ -1,7 +1,7 @@
-import VisualizationComponent from '../core/VisualizationComponent';
+import VisComponent from '../VisComponent';
 import $ from 'jquery';
 
-export default class ParallelCoordinates extends VisualizationComponent {
+export default class ParallelCoordinates extends VisComponent {
   constructor (el, dataRoot, width, height) {
     super(el);
     this.dataRoot = dataRoot;
@@ -11,7 +11,7 @@ export default class ParallelCoordinates extends VisualizationComponent {
       $(el).attr('height', height);
     }
 
-    let PC = require('./../external/pc');
+    let PC = require('./../../external/pc');
 
     this.pc = new PC(this.el, (var1, var2, callback) => {
       this.fetchHistogram(var1, var2).then(callback);
