@@ -49,6 +49,7 @@
     "karma-tap-reporter": "0.0.6",
     "karma-webpack": "^1.7.0",
     "legacy-loader": "0.0.2",
+    "less": "^2.3.1",
     "phantomjs-prebuilt": "^2.1.5",
     "semistandard-loader": "0.0.3",
     "style-loader": "^0.13.0",
@@ -61,7 +62,10 @@
     "brace": "^0.7.0",
     "d3": "^3.5.14",
     "datalib": "^1.6.3",
+    "font-awesome": "^4.4.0",
+    "font-awesome-webpack": "^0.0.4",
     "jquery": "^2.2.0",
+    "LineUpJS": "git+https://github.com/Caleydo/lineup.js#51ae6f2bcb55aead3f63357864e90d5799789910",
     "underscore": "^1.8.3",
     "vega": "^2.4.2"
   }

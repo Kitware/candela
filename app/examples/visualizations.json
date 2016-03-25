@@ -33,5 +33,13 @@
       "fields": ["petalWidth", "petalLength", "sepalLength", "sepalWidth"],
       "color": "species"
     }
+  },
+  {
+    "hash": "lineup",
+    "name": "LineUp",
+    "description": "LineUp ranking visualization.",
+    "component": "LineUp",
+    "data": "iris",
+    "options": {}
   }
 ]
