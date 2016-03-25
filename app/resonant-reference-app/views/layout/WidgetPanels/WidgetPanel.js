@@ -9,13 +9,13 @@ let WidgetPanel = Backbone.View.extend({
   },
   render: function () {
     let self = this;
-    
+
     // We need a header
     let header = d3.select(self.el)
       .selectAll('span.sectionHeader').data([0]);
     let headerEnter = header.enter().append('span')
       .attr('class', 'sectionHeader');
-    
+
     // Add a title to the header that collapses / expands
     // the section
     headerEnter.append('h2')
@@ -25,18 +25,18 @@ let WidgetPanel = Backbone.View.extend({
       });
     header.select('h2.title')
       .text(self.widget.friendlyName);
-    
+
     // Add a little space for the widget to
     // store status indicators and icons
     let indicatorsEnter = headerEnter.append('span')
       .attr('class', 'indicators');
-    
+
     indicatorsEnter.append('span')
       .attr('class', 'indicatorText');
     indicatorsEnter.append('span')
       .attr('class', 'indicatorIcons');
     self.renderIndicators();
-    
+
     // Finally, a div (that will scroll)
     // to contain the view
     let container = d3.select(self.el)
@@ -46,33 +46,32 @@ let WidgetPanel = Backbone.View.extend({
       id: self.widget.hashName + 'Container',
       class: 'content'
     });
-    
+
     // Now let's let the widget know
     // that we have its element
     self.widget.setPanel(self);
   },
-  renderIndicators () {
+  renderIndicators() {
     let self = this;
-    
+
     let indicators = d3.select(self.el)
       .select('span.indicators');
-    
+
     indicators.select('span.indicatorText')
       .text(self.widget.statusText.text)
-      .attr('title', self.widget.statusText.title
-            ? self.widget.statusText.title : null)
+      .attr('title', self.widget.statusText.title ? self.widget.statusText.title : null)
       .on('click', () => {
         d3.event.stopPropagation();
         if (self.widget.statusText.onclick) {
           self.widget.statusText.onclick(d3.event);
         }
       });
-    
+
     // Update our set of indicator icons
     let indicatorIcons = d3.select(self.el)
       .select('span.indicatorIcons')
       .selectAll('img').data(self.widget.icons);
-    
+
     indicatorIcons.enter().append('img');
     indicatorIcons.exit().remove();
     indicatorIcons.attr('src', (d) => d.src())

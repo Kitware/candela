@@ -1,64 +1,81 @@
 import jQuery from 'jquery';
+import Backbone from 'backbone';
+
+import User from './models/User';
+import UserPreferences from './models/UserPreferences';
+
+//import Header from './views/layout/Header';
+//import WidgetPanels from './views/layout/WidgetPanels';
+//import Overlay from './views/layout/Overlay';
 
 // Page-wide Styles
 import './stylesheets/pure-css-custom-form-elements/style.css';
 import './stylesheets/mainPage.css';
 
-// Current user
-import User from './models/User';
-window.user = new User();
+// The API root is different
+window.girder.apiRoot = 'api/v1';
 
-// Current toolchain
-// TODO: Save/load these as files
-import Toolchain from './models/Toolchain';
-window.toolchain = new Toolchain();
+let MainView = Backbone.View.extend({
+  initialize: function () {
+    let self = this;
+    self.currentUser = new User();
 
-// Currently visible widgets
-// TODO: Add to the set of widgets on
-// screen per the user's skill level
-// and preferences
-import SingleDatasetView from './views/widgets/SingleDatasetView';
-import MappingView from './views/widgets/MappingView';
-import SingleVisualizationView from './views/widgets/SingleVisualizationView';
-window.widgets = [
-  new SingleDatasetView(),
-  new MappingView(),
-  new SingleVisualizationView()
-];
+    // Get the user's preferences
+    self.userPreferences = new UserPreferences();
 
-// The overlay views
-import StartingGuide from './views/overlays/StartingGuide';
-import DatasetLibrary from './views/overlays/DatasetLibrary';
-import VisualizationLibrary from './views/overlays/VisualizationLibrary';
-window.overlays = {
-  startingGuide: StartingGuide,
-  datasetLibrary: DatasetLibrary,
-  visualizationLibrary: VisualizationLibrary
-};
+    // Whenever they change, we'll need to redraw big
+    // chunks of the screen
+    self.listenTo(self.userPreferences, 'rra:prefsChanged', self.render);
 
-// Main chunks of the page
-import Header from './views/layout/Header';
-import WidgetPanels from './views/layout/WidgetPanels';
-import Overlay from './views/layout/Overlay';
-window.layout = {
-  header: new Header({
-    el: '#Header'
-  }),
-  widgetPanels: new WidgetPanels({
-    el: '#WidgetPanels'
-  }),
-  overlay: new Overlay({
-    el: '#Overlay'
-  })
-};
+    // We won't actually have access to the user's preferences
+    // item in their Private folder until we actually have the
+    // authenticated user...
+    self.listenTo(self.currentUser, 'change', () => {
+      if (self.currentUser.id === undefined) {
+        // Not logged in
+        self.userPreferences.resetToDefaults();
+      } else {
+        // We're logged in! First, let's see if
+        // the user already has preferences stored
+        self.userPreferences.fetch({
+          error: () => {
+            // Okay, they don't. Instead, let's save the
+            // defaults as their starting preferences
+            self.userPreferences.save();
+          }
+        })
+      }
+    });
 
-// Draw everything
-function renderEverything () {
-  window.layout.header.render();
-  window.layout.widgetPanels.render();
-  window.layout.overlay.render();
-}
+    // Main chunks of the page
+    /*
+    self.header = new Header({
+      el: '#Header'
+    });
+    self.widgetPanels = new WidgetPanels({
+      el: '#WidgetPanels'
+    });
+    self.overlay = new Overlay({
+      el: '#Overlay'
+    });
 
-jQuery(window).on('hashchange', renderEverything);
-window.onresize = renderEverything;
-renderEverything();
+    jQuery(window).on('hashchange', () => {
+      self.render();
+    });
+    window.onresize = () => {
+      self.render();
+    };
+    */
+  },
+  render: function () {
+    /*
+    let self = this;
+    self.header.render();
+    self.widgetPanels.render();
+    self.overlay.render();
+    */
+  }
+});
+
+window.mainView = new MainView();
+window.mainView.render();

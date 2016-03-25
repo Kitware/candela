@@ -2,6 +2,19 @@ import Backbone from 'backbone';
 import d3 from 'd3';
 import WidgetPanel from './WidgetPanel.js';
 
+// All widgets that are available
+// TODO: When webpack supports it, this would be
+// an ideal place for code splitting... only load
+// widgets when they're needed
+import SingleDatasetView from './views/widgets/SingleDatasetView';
+import MappingView from './views/widgets/MappingView';
+import SingleVisualizationView from './views/widgets/SingleVisualizationView';
+let VIEWS = {
+  singleDatasetView: SingleDatasetView,
+  mappingView: MappingView,
+  singleVisualizationView: SingleVisualizationView
+}
+
 import './accordionhorz.css';
 import './style.css';
 
@@ -12,14 +25,14 @@ let WidgetPanels = Backbone.View.extend({
   },
   render: function () {
     let self = this;
-    
+
     // Only show widgets that aren't hidden
     let widgets = window.widgets.filter(function (d) {
       return !d.hidden;
     });
-    
+
     let hashes = window.location.hash.split('#');
-    
+
     // Create sections for each panel
     let sections = d3.select(self.el)
       .selectAll('section')
@@ -28,13 +41,13 @@ let WidgetPanels = Backbone.View.extend({
       });
     let sectionsEnter = sections.enter().append('section');
     sections.exit().remove();
-    
+
     sections.attr('id', function (d) {
       return d.hashName;
     }).attr('class', function (d) {
       return hashes.indexOf(d.hashName) !== -1 ? 'targeted' : null;
     });
-    
+
     // Any new widgets need to have a WidgetPanel instantiated
     // and bound to the new section
     sectionsEnter.each(function (d) {
@@ -70,4 +83,5 @@ let WidgetPanels = Backbone.View.extend({
   }
 });
 
+WidgetPanels.VIEWS = VIEWS;
 export default WidgetPanels;

@@ -1,4 +1,4 @@
-from user import RRAUser
+from privateItem import PrivateItem
 
 class CustomAppRoot:
     exposed = True
@@ -29,6 +29,5 @@ def load(info):
     info['serverRoot'], info['serverRoot'].girder = (CustomAppRoot(),
                                                      info['serverRoot'])
     info['serverRoot'].api = info['serverRoot'].girder.api
-    user = RRAUser()
-    info['apiRoot'].user.route('POST', ('setRRAPreferences', ), user.setRRAPreferences)
-    info['apiRoot'].user.route('GET', ('getRRAPreferences', ), user.getRRAPreferences)
+    privateItem = PrivateItem()
+    info['apiRoot'].item.route('GET', ('privateItem', ), privateItem.getOrMakePrivateItem)

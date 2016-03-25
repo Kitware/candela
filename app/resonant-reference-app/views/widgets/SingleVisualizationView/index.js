@@ -1,6 +1,6 @@
 import Widget from '../Widget';
 import myTemplate from './template.html';
-import candela from './../../../../../src';
+import candela from '../../../../../src/candela';
 import './style.css';
 
 import infoTemplate from './infoTemplate.html';

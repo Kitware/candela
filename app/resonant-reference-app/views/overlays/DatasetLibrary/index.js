@@ -10,7 +10,7 @@ let DatasetLibrary = Backbone.View.extend({
     self.$el.html(myTemplate);
 
     girder.restRequest({
-      path: 'api/v1/resource/lookup?path=/collection/ReferenceApp/Data',
+      path: 'resource/lookup?path=/collection/ReferenceApp/Data',
       type: 'GET',
       error: null
     }).done(function (folder) {
