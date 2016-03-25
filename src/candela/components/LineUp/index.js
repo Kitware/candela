@@ -1,9 +1,9 @@
 import $ from 'jquery';
 import datalib from 'datalib';
 import d3 from 'd3';
-import LineUpJS from '../../../../node_modules/LineUpJS/dist/LineUpJS';
-import '../../../../node_modules/LineUpJS/css/style.css';
-import '../../../../node_modules/LineUpJS/demo/css/style-demo.css';
+import LineUpJS from 'LineUpJS/dist/LineUpJS';
+import 'LineUpJS/css/style.css';
+import 'LineUpJS/demo/css/style-demo.css';
 import 'font-awesome-webpack';
 
 let lineUpConfig = {
