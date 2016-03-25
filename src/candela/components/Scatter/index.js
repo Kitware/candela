@@ -1,4 +1,5 @@
-import vcharts from '../../vcharts';
+import vcharts from '../../../vcharts';
+import spec from './spec.json';
 
 export default class Scatter {
   static get options () {
@@ -12,7 +13,7 @@ export default class Scatter {
   }
 
   constructor (el, data, options) {
-    this.chart = vcharts.chart('scatter', {
+    this.chart = vcharts.chart(spec, {
       el: el,
       values: data,
       x: options.x,

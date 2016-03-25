@@ -2,16 +2,7 @@ import d3 from 'd3';
 import vg from 'vega';
 
 let templates = {
-  axis: require('./templates/axis.json'),
-  bar: require('./templates/bar.json'),
-  box: require('./templates/box.json'),
-  bullet: require('./templates/bullet.json'),
-  gantt: require('./templates/gantt.json'),
-  histogram: require('./templates/histogram.json'),
-  scatter: require('./templates/scatter.json'),
-  vega: require('./templates/vega.json'),
-  xy: require('./templates/xy.json'),
-  xymatrix: require('./templates/xymatrix.json')
+  axis: require('./templates/axis.json')
 };
 
 let getNestedRec = function (spec, parts) {
@@ -326,11 +317,11 @@ let merge = function (defaults, options) {
   return defaults;
 };
 
-let chart = function (type, initialOptions, done) {
+let chart = function (template, initialOptions, done) {
   let that = {};
 
   that.options = {};
-  that.template = templates[type];
+  that.template = template;
 
   that.update = function (newOptions) {
     that.options = extend(that.options, newOptions);

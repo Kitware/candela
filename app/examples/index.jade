@@ -1,0 +1,5 @@
+.page#main
+  .test-list
+    each v in visualizations
+      p
+        a(href='#' + v.hash)= v.name
