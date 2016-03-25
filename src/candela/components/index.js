@@ -1,4 +1,5 @@
 import Bar from './Bar';
+import Bullet from './Bullet';
 import Dummy from './Dummy';
 import Histogram from './Histogram';
 import ParallelCoordinates from './ParallelCoordinates';
@@ -7,6 +8,7 @@ import ScatterMatrix from './ScatterMatrix';
 
 export default {
   Bar,
+  Bullet,
   Dummy,
   Histogram,
   ParallelCoordinates,
