@@ -2,8 +2,7 @@ import d3 from 'd3';
 import vg from 'vega';
 
 let templates = {
-  axis: require('./templates/axis.json'),
-  vega: require('./templates/vega.json')
+  axis: require('./templates/axis.json')
 };
 
 let getNestedRec = function (spec, parts) {
