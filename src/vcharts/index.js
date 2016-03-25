@@ -4,7 +4,6 @@ import vg from 'vega';
 let templates = {
   axis: require('./templates/axis.json'),
   box: require('./templates/box.json'),
-  gantt: require('./templates/gantt.json'),
   vega: require('./templates/vega.json')
 };
 
