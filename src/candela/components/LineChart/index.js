@@ -1,5 +1,6 @@
-import VisComponent from '../VisComponent';
-import vcharts from '../../vcharts/src';
+import VisComponent from '../../VisComponent';
+import vcharts from '../../../vcharts';
+import spec from './spec.json';
 
 export default class LineChart extends VisComponent {
   constructor (el, data) {
@@ -25,7 +26,7 @@ export default class LineChart extends VisComponent {
   }
 
   data (data) {
-    this.chart = vcharts.chart('xy', {
+    this.chart = vcharts.chart(spec, {
       el: this.el,
       series: [
         {

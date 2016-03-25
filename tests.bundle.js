@@ -1,2 +1,2 @@
-var context = require.context('./src/candela', true, /\.js$/);
+var context = require.context('./src', true, /\.js$/);
 context.keys().forEach(context);
