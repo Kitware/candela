@@ -2,40 +2,51 @@ import vcharts from '../../../vcharts';
 import spec from './spec.json';
 
 export default class Box {
-  static get options () {
-    return [
-      {
-        name: 'fields',
-        type: 'string_list'
-      },
-      {
-        name: 'data',
-        type: 'table'
-      },
-      {
-        name: 'group',
-        type: 'string'
-      },
-      {
-        name: 'boxSize',
-        type: 'number'
-      },
-      {
-        name: 'capSize',
-        type: 'number'
-      }
-    ];
+  static get spec () {
+    return {
+      options: [
+        {
+          name: 'data',
+          type: 'table',
+          format: 'objectlist'
+        },
+        {
+          name: 'fields',
+          type: 'string_list',
+          format: 'string_list',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'group',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        }
+      ]
+    };
   }
 
-  constructor (el, data, options) {
+  constructor (el, options) {
     this.chart = vcharts.chart(spec, {
       el: el,
-      values: data,
-      group: options.group,
+      values: options.data,
       fields: options.fields,
-      boxSize: options.boxSize,
-      capSize: options.capSize,
-      orient: 'vertical'
+      group: options.group,
+      orient: 'vertical',
+      xAxis: {
+        title: options.group || ''
+      },
+      yAxis: {
+        title: 'Value'
+      }
     });
   }
 

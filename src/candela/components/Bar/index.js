@@ -12,10 +12,10 @@ export default class Bar {
     ];
   }
 
-  constructor (el, data, options) {
+  constructor (el, options) {
     this.chart = vcharts.chart(spec, {
       el: el,
-      values: data,
+      values: options.data,
       x: options.x,
       y: options.y,
       fill: options.color,

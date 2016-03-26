@@ -1,94 +1,30 @@
 import Backbone from 'backbone';
 import d3 from 'd3';
-// import Dataset from '../../../models/Dataset';
 import myTemplate from './template.html';
 import libImage from '../../../images/library.svg';
-// import candela from './../../../../../src';
+import candela from './../../../../../src/candela';
 
 let VisualizationLibrary = Backbone.View.extend({
   render: function () {
     let self = this;
     self.$el.html(myTemplate);
 
+    // For any candela vis that has a spec defined, extract
+    // field options for our mapping options.
+    // TODO: We also need to extract data options - we currently
+    // assume that there will be one table option called "data".
     let libraryVisSpecs = [];
-
-    libraryVisSpecs.push({
-      name: 'Scatter',
-      options: [
-        {
-          name: 'x',
-          type: 'number'
-        },
-        {
-          name: 'y',
-          type: 'number'
-        },
-        {
-          name: 'color',
-          type: 'string'
-        },
-        {
-          name: 'size',
-          type: 'number'
-        },
-        {
-          name: 'shape',
-          type: 'string'
-        },
-        {
-          name: 'hover',
-          type: 'string'
-        }
-      ]
-    });
-
-    libraryVisSpecs.push({
-      name: 'Histogram',
-      options: [
-        {
-          name: 'bin',
-          type: 'string'
-        },
-        {
-          name: 'aggregate',
-          type: 'number'
-        }
-      ]
-    });
-
-    libraryVisSpecs.push({
-      name: 'Box',
-      options: [
-        {
-          name: 'fields',
-          type: 'number',
-          allowMultiple: true
-        },
-        {
-          name: 'group',
-          type: 'string'
-        }
-      ]
-    });
-
-    /*
-      TODO: build the library from the available
-      candela visualizations
-    */
-    /*
     for (let visName of Object.keys(candela.components)) {
-      let spec = {
-        name: visName,
-        options: candela.components[visName]
-          .options.filter(function (option) {
-            // TODO: this spec will change again soon
-            return Dataset.COMPATIBLE_TYPES.hasOwnProperty(option.type);
+      if (candela.components[visName].spec) {
+        let spec = {
+          name: visName,
+          options: candela.components[visName].spec.options.filter(option => {
+            return option.domain && option.domain.mode === 'field';
           })
-      };
-      libraryVisSpecs.push(spec);
-      console.log(spec);
+        };
+        libraryVisSpecs.push(spec);
+      }
     }
-    */
 
     let libraryButtons = d3.select('div.visualizationLibrary')
       .selectAll('.circleButton')

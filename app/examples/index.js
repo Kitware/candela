@@ -29,12 +29,11 @@ function showPage () {
       properties
     );
     let el = document.getElementById('vis-element');
-    let vis;
-    if (properties.data) {
-      vis = new candela.components[properties.component](el, datasets[properties.data], properties.options);
-    } else {
-      vis = new candela.components[properties.component](el, properties.options);
-    }
+    properties.options.data = datasets[properties.data];
+    let vis = new candela.components[properties.component](
+      el,
+      properties.options
+    );
     vis.render();
     window.addResizeListener(el, () => vis.render());
   }

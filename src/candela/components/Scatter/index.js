@@ -2,20 +2,82 @@ import vcharts from '../../../vcharts';
 import spec from './spec.json';
 
 export default class Scatter {
-  static get options () {
-    return [
-      {name: 'data', type: 'table'},
-      {name: 'x', type: 'string'},
-      {name: 'y', type: 'string'},
-      {name: 'color', type: 'string'},
-      {name: 'hover', type: 'string'}
-    ];
+  static get spec () {
+    return {
+      options: [
+        {
+          name: 'data',
+          type: 'table',
+          format: 'objectlist'
+        },
+        {
+          name: 'x',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'y',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'size',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'shape',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'color',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'hover',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        }
+      ]
+    };
   }
 
-  constructor (el, data, options) {
+  constructor (el, options) {
     this.chart = vcharts.chart(spec, {
       el: el,
-      values: data,
+      values: options.data,
       x: options.x,
       y: options.y,
       color: options.color,
