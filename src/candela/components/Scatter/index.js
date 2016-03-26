@@ -75,22 +75,7 @@ export default class Scatter {
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart(spec, {
-      el: el,
-      values: options.data,
-      x: options.x,
-      y: options.y,
-      color: options.color,
-      shape: options.shape,
-      size: options.size,
-      hover: options.hover,
-      xAxis: {
-        title: options.x
-      },
-      yAxis: {
-        title: options.y
-      }
-    });
+    this.chart = vcharts.chart(spec, el, options);
   }
 
   render () {

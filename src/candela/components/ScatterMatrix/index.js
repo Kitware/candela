@@ -35,14 +35,7 @@ export default class ScatterMatrix {
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart(spec, {
-      el: el,
-      values: options.data,
-      fields: options.fields,
-      color: {
-        field: options.color
-      }
-    });
+    this.chart = vcharts.chart(spec, el, options);
   }
 
   render () {

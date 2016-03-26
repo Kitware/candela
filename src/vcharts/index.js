@@ -155,7 +155,7 @@ let templateFunctions = {
       return {
         name: name,
         type: 'ordinal',
-        domain: {data: params.data, field: name},
+        domain: {data: params.data, field: params.field},
         range: 'category10'
       };
     }
@@ -163,7 +163,7 @@ let templateFunctions = {
       name: name,
       type: 'linear',
       zero: false,
-      domain: {data: params.data, field: name},
+      domain: {data: params.data, field: params.field},
       range: ['#dfd', 'green']
     };
   },
@@ -317,9 +317,12 @@ let merge = function (defaults, options) {
   return defaults;
 };
 
-let chart = function (template, initialOptions, done) {
+let chart = function (template, el, initialOptions, done) {
   let that = {};
 
+  initialOptions = initialOptions || {};
+
+  that.el = el;
   that.options = {};
   that.template = template;
 
@@ -331,7 +334,7 @@ let chart = function (template, initialOptions, done) {
 
     // Use padding and element size to set size, unless
     // size explicitly specified or element size is zero.
-    let el = d3.select(that.options.el)[0][0];
+    let el = d3.select(that.el)[0][0];
     let sizeOptions = {};
 
     let style = window.getComputedStyle(el, null);
@@ -356,7 +359,7 @@ let chart = function (template, initialOptions, done) {
 
     // Options that go directly to Vega runtime
     let vegaOptions = {
-      el: curOptions.el,
+      el: el,
       renderer: curOptions.renderer
     };
 

@@ -35,8 +35,7 @@ export default class Histogram {
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart(spec, {
-      el: el,
+    this.chart = vcharts.chart(spec, el, {
       values: options.data,
       bin: options.bin,
       aggregate: options.aggregate,

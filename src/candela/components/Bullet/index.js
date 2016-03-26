@@ -28,8 +28,7 @@ export default class Bullet {
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart(spec, {
-      el: el,
+    this.chart = vcharts.chart(spec, el, {
       value: options.value,
       title: options.title || '',
       subtitle: options.subtitle || '',

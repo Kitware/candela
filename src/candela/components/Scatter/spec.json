@@ -21,6 +21,7 @@
           {
             "axis": "x",
             "size": ["@get", "width"],
+            "title": ["@get", "xAxis.title", ["@get", "x", ""]],
             "domain": [
               "@get", "xAxis.domain", {
                 "fields": [
@@ -43,8 +44,9 @@
           {
             "axis": "y",
             "size": ["@get", "height"],
+            "title": ["@get", "yAxis.title", ["@get", "y", ""]],
             "domain": [
-              "@get", "xAxis.domain", {
+              "@get", "yAxis.domain", {
                 "fields": [
                   {
                     "data": "data",
@@ -70,7 +72,7 @@
         "data": [
           {
             "name": "data",
-            "values": ["@get", "values"],
+            "values": ["@get", "data"],
             "transform": [
               {
                 "type": "formula",
@@ -151,7 +153,7 @@
             {
               "name": "color",
               "data": "data",
-              "values": ["@get", "values"],
+              "values": ["@get", "data"],
               "field": ["@get", "color"]
             }
           ],

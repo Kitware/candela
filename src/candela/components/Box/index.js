@@ -35,8 +35,7 @@ export default class Box {
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart(spec, {
-      el: el,
+    this.chart = vcharts.chart(spec, el, {
       values: options.data,
       fields: options.fields,
       group: options.group,
