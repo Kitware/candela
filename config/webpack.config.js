@@ -61,6 +61,7 @@ module.exports = {
         loader: 'semistandard',
         include: [
           path.resolve(__dirname, 'src/candela'),
+          path.resolve(__dirname, 'src/vcharts'),
           path.resolve(__dirname, 'app')
         ],
         exclude: path.resolve(__dirname, 'src', 'external')

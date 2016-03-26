@@ -1,16 +1,5 @@
 [
   {
-    "hash": "boxplot",
-    "name": "Box Plot",
-    "description": "A simple box plot.",
-    "component": "BoxPlot",
-    "data": "iris",
-    "options": {
-      "fields": ["petalWidth"],
-      "group": "species"
-    }
-  },
-  {
     "hash": "scatter",
     "name": "Scatterplot",
     "description": "A simple scatterplot.",
@@ -32,6 +21,89 @@
     "options": {
       "fields": ["petalWidth", "petalLength", "sepalLength", "sepalWidth"],
       "color": "species"
+    }
+  },
+  {
+    "hash": "bar",
+    "name": "Bar Chart",
+    "description": "A simple bar chart",
+    "component": "Bar",
+    "data": "iris",
+    "options": {
+      "x": "petalLength",
+      "y": "petalWidth",
+      "color": "steelblue",
+      "hover": "green"
+    }
+  },
+  {
+    "hash": "bullet",
+    "name": "Bullet Chart",
+    "description": "A simple bullet chart",
+    "component": "Bullet",
+    "options": {
+      "value": 0.2,
+      "title": "Error",
+      "subtitle": "% dev from ground truth",
+      "markers": [0.05],
+      "ranges": [
+        {
+          "min": 0.0,
+          "max": 0.1,
+          "background": "lightgray",
+          "foreground": "rgb(102,191,103)"
+        },
+        {
+          "min": 0.1,
+          "max": 0.75,
+          "background": "darkgray",
+          "foreground": "rgb(255,179,24)"
+        },
+        {
+          "min": 0.75,
+          "max": 1.0,
+          "background": "dimgray",
+          "foreground": "rgb(228,0,0)"
+        }
+      ]
+    }
+  },
+  {
+    "hash": "gantt",
+    "name": "Gantt Chart",
+    "description": "A simple gantt chart",
+    "component": "Gantt",
+    "options": {
+      "values": [
+        {"label": "1. Algorithms", "level": 1, "enter": 0, "leave": 6},
+        {"label": "Algorithm Specification", "level": 2, "enter": 0, "leave": 2},
+        {"label": "Algorithm Implementation", "level": 2, "enter": 1, "leave": 6},
+        {"label": "2. Software Prototype", "level": 1, "enter": 1, "leave": 8},
+        {"label": "Support Data Formats", "level": 2, "enter": 1, "leave": 3},
+        {"label": "Modular Analyses/Workflows", "level": 2, "enter": 3, "leave": 5},
+        {"label": "Web Interface and Mockups", "level": 2, "enter": 5, "leave": 8},
+        {"label": "3. Evaluation and Team-Building", "level": 1, "enter": 0, "leave": 9},
+        {"label": "Data Collection", "level": 2, "enter": 0, "leave": 2},
+        {"label": "Algorithmic Evaluation", "level": 2, "enter": 6, "leave": 8},
+        {"label": "Usability Evaluation", "level": 2, "enter": 7, "leave": 9},
+        {"label": "Final Report", "level": 2, "enter": 8, "leave": 9}
+      ],
+      "xAxis": {
+        "values": [0, 3, 6, 9]
+      }
+    }
+  },
+  {
+    "hash": "box",
+    "name": "Box Plot",
+    "description": "A simple box plot",
+    "component": "Box",
+    "data": "iris",
+    "options": {
+      "fields": ["sepalLength", "sepalWidth"],
+      "group": "species",
+      "boxSize": 0.5,
+      "capSize": 0.25
     }
   }
 ]
