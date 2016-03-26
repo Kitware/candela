@@ -7,13 +7,13 @@ let girder = window.girder;
     it includes specific datasets, with specific
     mappings to specific visualizations (in the future,
     this may also include faceting settings, etc).
-    
+
     Though behind the scenes we're making room for multiple
     datasets and multiple visualizations,
     for now, toolchains are expected to only contain one
     dataset and one visualization. Any more are ignored
     by the currently implemented views.
-    
+
     Also, while we're extending a Girder ItemModel
     (we intend toolchains to be saved as files eventually,
     we're not using any Girder functionality yet)
@@ -26,11 +26,11 @@ let Toolchain = girder.models.ItemModel.extend({
     if (!meta) {
       meta = {};
     }
-    
+
     let DatasetCollection = Backbone.Collection.extend({
       model: Dataset
     });
-    
+
     meta.visualizations = [];
     meta.mappings = [];
     meta.datasets = new DatasetCollection();
@@ -39,7 +39,7 @@ let Toolchain = girder.models.ItemModel.extend({
       self.validateMappings();
       self.trigger('rra:changeMappings');
     });
-    
+
     self.set('meta', meta);
   },
   setToolchain: function (newMeta) {
@@ -61,7 +61,7 @@ let Toolchain = girder.models.ItemModel.extend({
     // (when we add it to meta.datasets, it gets
     // auto-converted to our Dataset model)
     newDataset = newDataset.toJSON();
-    
+
     let meta = self.get('meta');
     if (newDataset.exampleToolchain &&
         meta.visualizations.length === 0) {
@@ -117,7 +117,7 @@ let Toolchain = girder.models.ItemModel.extend({
   shapeDataForVis: function (callback, index = 0) {
     let self = this;
     let meta = self.get('meta');
-    
+
     // TODO: use the mapping to transform
     // the parsed data into the shape that
     // the visualization expects
@@ -132,16 +132,33 @@ let Toolchain = girder.models.ItemModel.extend({
     let self = this;
     let meta = self.get('meta');
     let options = {};
-    
-    meta.mappings.forEach((mapping) => {
-      options[mapping.visAttribute] = mapping.dataAttribute;
+
+    // Figure out which options allow multiple fields
+    meta.mappings.forEach(mapping => {
+      for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
+        if (optionSpec.name === mapping.visAttribute) {
+          if (optionSpec.allowMultiple) {
+            options[mapping.visAttribute] = [];
+          }
+          break;
+        }
+      }
+    });
+
+    // Construct the options
+    meta.mappings.forEach(mapping => {
+      if (Array.isArray(options[mapping.visAttribute])) {
+        options[mapping.visAttribute].push(mapping.dataAttribute);
+      } else {
+        options[mapping.visAttribute] = mapping.dataAttribute;
+      }
     });
     return options;
   },
   validateMappings: function () {
     let self = this;
     let meta = self.get('meta');
-    
+
     // Go through all the mappings and make sure that:
     // 1. The data types are still compatible
     //    (trash them if they're not)
@@ -150,7 +167,7 @@ let Toolchain = girder.models.ItemModel.extend({
     for (let [index, mapping] of meta.mappings.entries()) {
       let dataType = meta.datasets.at(mapping.dataIndex)
         .getSpec().attributes[mapping.dataAttribute];
-      
+
       let possibleTypes = [];
       for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
         if (optionSpec.name === mapping.visAttribute) {
@@ -158,12 +175,12 @@ let Toolchain = girder.models.ItemModel.extend({
           break;
         }
       }
-      
+
       if (possibleTypes.indexOf(dataType) === -1) {
         indicesToTrash.push(index);
       }
     }
-    
+
     for (let index of indicesToTrash) {
       meta.mappings.splice(index, 1);
     }
@@ -172,31 +189,37 @@ let Toolchain = girder.models.ItemModel.extend({
   addMapping: function (mapping) {
     let self = this;
     let meta = self.get('meta');
-    
-    // TODO: For now, I assume that vis nodes
-    // can only accept one edge at a time. Replace
-    // a vis mapping if one exists.
+
+    // Figure out if the vis option allows multiple fields
     let addedMapping = false;
-    for (let [index, m] of meta.mappings.entries()) {
-      if (mapping.visIndex === m.visIndex &&
-          mapping.visAttribute === m.visAttribute) {
-        meta.mappings[index] = mapping;
-        addedMapping = true;
+    for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
+      if (optionSpec.name === mapping.visAttribute) {
+        if (!optionSpec.allowMultiple) {
+          // If multiple fields are not allowed, search for the mapping and replace it
+          for (let [index, m] of meta.mappings.entries()) {
+            if (mapping.visIndex === m.visIndex &&
+                mapping.visAttribute === m.visAttribute) {
+              meta.mappings[index] = mapping;
+              addedMapping = true;
+              break;
+            }
+          }
+        }
         break;
       }
     }
-    
+
     if (!addedMapping) {
       meta.mappings.push(mapping);
     }
-    
+
     self.set('meta', meta);
     self.trigger('rra:changeMappings');
   },
   removeMapping: function (mapping) {
     let self = this;
     let meta = self.get('meta');
-    
+
     let mappingToSplice = null;
     for (let [index, m] of meta.mappings.entries()) {
       if (mapping.visIndex === m.visIndex &&
@@ -210,7 +233,7 @@ let Toolchain = girder.models.ItemModel.extend({
     if (mappingToSplice !== null) {
       meta.mappings.splice(mappingToSplice, 1);
     }
-    
+
     self.set('meta', meta);
     self.trigger('rra:changeMappings');
   }

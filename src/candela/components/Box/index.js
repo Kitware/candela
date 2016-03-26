@@ -27,14 +27,15 @@ export default class Box {
     ];
   }
 
-  constructor (el, options) {
+  constructor (el, data, options) {
     this.chart = vcharts.chart(spec, {
       el: el,
-      values: options.data,
+      values: data,
       group: options.group,
       fields: options.fields,
       boxSize: options.boxSize,
-      capSize: options.capSize
+      capSize: options.capSize,
+      orient: 'vertical'
     });
   }
 

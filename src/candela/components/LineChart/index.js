@@ -6,7 +6,7 @@ export default class LineChart extends VisComponent {
   constructor (el, data) {
     super(el);
 
-    let values = data.map((x) => x[1]);
+    let values = data.map(x => x[1]);
 
     let minY = Math.min(...values);
     if (minY === -Infinity) {
