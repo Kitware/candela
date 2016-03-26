@@ -2,7 +2,7 @@
   {
     "hash": "scatter",
     "name": "Scatterplot",
-    "description": "A simple scatterplot",
+    "description": "A simple scatterplot.",
     "component": "Scatter",
     "data": "iris",
     "options": {
@@ -10,6 +10,17 @@
       "y": "petalWidth",
       "color": "sepalLength",
       "shape": "species"
+    }
+  },
+  {
+    "hash": "scattermatrix",
+    "name": "Scatterplot Matrix",
+    "description": "A simple scatterplot matrix.",
+    "component": "ScatterMatrix",
+    "data": "iris",
+    "options": {
+      "fields": ["petalWidth", "petalLength", "sepalLength", "sepalWidth"],
+      "color": "species"
     }
   },
   {
