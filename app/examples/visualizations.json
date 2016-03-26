@@ -24,6 +24,14 @@
     }
   },
   {
+    "hash": "lineup",
+    "name": "LineUp",
+    "description": "LineUp ranking visualization.",
+    "component": "LineUp",
+    "data": "iris",
+    "options": {}
+  },
+  {
     "hash": "bar",
     "name": "Bar Chart",
     "description": "A simple bar chart",

@@ -19,16 +19,16 @@ module.exports = {
   module: {
     loaders: [
       {
+        test: /\.jpe?g$|\.gif$|\.png$|\.woff$|\.wav$|\.mp3$|\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$|\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: 'url'
+      },
+      {
         test: /\.css$/,
         loader: 'style-loader!css-loader'
       },
       {
         test: /\.html$/,
         loader: 'html?attrs=img:src'
-      },
-      {
-        test: /\.jpe?g$|\.gif$|\.png$|\.svg$|\.woff$|\.ttf$|\.wav$|\.mp3$/,
-        loader: 'url'
       },
       {
         test: /\.json$/,

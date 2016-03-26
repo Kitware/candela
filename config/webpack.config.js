@@ -86,8 +86,16 @@ module.exports = {
         loader: 'legacy'
       },
       {
+        test: /\.jpe?g$|\.gif$|\.png$|\.woff$|\.wav$|\.mp3$|\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$|\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: 'url'
+      },
+      {
         test: /\.styl$/,
         loaders: ['style', 'css', 'stylus']
+      },
+      {
+        test: /\.css$/,
+        loaders: ['style', 'css']
       },
       {
         test: /\.jade$/,
