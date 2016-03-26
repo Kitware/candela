@@ -57,7 +57,7 @@ let VisualizationLibrary = Backbone.View.extend({
     });
 
     libraryVisSpecs.push({
-      name: 'BoxPlot',
+      name: 'Box',
       options: [
         {
           name: 'fields',
