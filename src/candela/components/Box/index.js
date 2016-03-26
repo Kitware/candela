@@ -1,6 +1,7 @@
-import vcharts from '../../vcharts/src';
+import vcharts from '../../../vcharts';
+import spec from './spec.json';
 
-export default class BoxPlot {
+export default class Box {
   static get spec () {
     return {
       options: [
@@ -34,7 +35,7 @@ export default class BoxPlot {
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart('box', {
+    this.chart = vcharts.chart(spec, {
       el: el,
       values: options.data,
       fields: options.fields,
