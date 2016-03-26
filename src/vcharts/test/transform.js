@@ -1,372 +1,302 @@
-var assert = require('assert'),
-  vcharts = require('../src/index.js');
+import test from 'tape';
+import vcharts from '..';
 
-describe('transform', function () {
-  describe('base', function () {
-    it('should pass through basic structures', function () {
-      assert.deepEqual({}, vcharts.transform({}));
-      assert.deepEqual([], vcharts.transform([]));
-      assert.deepEqual('hi', vcharts.transform('hi'));
-      assert.deepEqual(1.2, vcharts.transform(1.2));
-      assert.deepEqual(true, vcharts.transform(true));
-      assert.deepEqual(null, vcharts.transform(null));
-    });
+test('vcharts.transform() without spec', t => {
+  t.deepEqual({}, vcharts.transform({}), 'object transform should be identity');
+  t.deepEqual([], vcharts.transform([]), 'array transform should be identity');
+  t.deepEqual('hi', vcharts.transform('hi'), 'string transform should be identity');
+  t.deepEqual(1.2, vcharts.transform(1.2), 'number transform should be identity');
+  t.deepEqual(true, vcharts.transform(true), 'boolean transform should be identity');
+  t.deepEqual(null, vcharts.transform(null), 'null transform should be identity');
 
-    it('should pass through deeper objects', function () {
-      var deeper = {
-        a: [1, 2, 'abc'],
-        b: {c: false},
-        c: null
-      };
-      assert.deepEqual(deeper, vcharts.transform(deeper));
-    });
-  });
+  let deeper = {
+    a: [1, 2, 'abc'],
+    b: {c: false},
+    c: null
+  };
+  t.deepEqual(deeper, vcharts.transform(deeper), 'nested object transform should be identity');
 
-  describe('@get', function () {
-    it('should lookup values', function () {
-      var spec = ['@get', 'a'];
-      assert.deepEqual(12, vcharts.transform(spec, {a: 12}));
-    });
+  t.end();
+});
 
-    it('should default values', function () {
-      var spec = ['@get', 'a', 5];
-      assert.deepEqual(5, vcharts.transform(spec, {b: 12}));
-    });
+test('vcharts.transform() with @get spec', t => {
+  let spec = ['@get', 'a'];
+  t.deepEqual(12, vcharts.transform(spec, {a: 12}), '@get spec should pick out field "a"');
 
-    it('should only override undefined values', function () {
-      var spec = ['@get', 'a', 5];
-      assert.deepEqual(0, vcharts.transform(spec, {a: 0}));
-      assert.deepEqual(false, vcharts.transform(spec, {a: false}));
-      assert.deepEqual(5, vcharts.transform(spec, {a: undefined}));
-    });
+  spec = ['@get', 'a', 5];
+  t.deepEqual(5, vcharts.transform(spec, {b: 12}), '@get spec with default should return default value');
 
-    it('should evaluate default values', function () {
-      var spec = ['@get', 'a', ['@eq', 5, 2]];
-      assert.deepEqual(false, vcharts.transform(spec, {b: 12}));
-    });
+  spec = ['@get', 'a', 5];
+  t.deepEqual(0, vcharts.transform(spec, {a: 0}), '@get spec with value should pick out value');
+  t.deepEqual(false, vcharts.transform(spec, {a: false}), '@get spec with value should pick out value');
+  t.deepEqual(5, vcharts.transform(spec, {a: undefined}), '@get spec with undefined value should return default');
 
-    it('should not reuse default values later', function () {
-      var spec = [['@get', 'a', 5], ['@get', 'a']];
-      assert.deepEqual([5, null], vcharts.transform(spec, {b: 12}));
-    });
+  spec = ['@get', 'a', ['@eq', 5, 2]];
+  t.deepEqual(false, vcharts.transform(spec, {b: 12}), '@get spec with expression default should evaluate the expression');
 
-    it('should not modify options', function () {
-      var spec = [['@get', 'a', 5], ['@get', 'a']];
-      var options = {b: 12};
-      vcharts.transform(spec, options);
-      assert.deepEqual({b: 12}, options);
-    });
-  });
+  spec = [['@get', 'a', 5], ['@get', 'a']];
+  t.deepEqual([5, null], vcharts.transform(spec, {b: 12}), '@get spec should not reuse default values later');
 
-  describe('@defaults', function () {
-    it('should allow nested defaulting on defined parent', function () {
-      var spec = [
-        '@defaults',
-        [['a.b', 5]],
-        [['@get', 'a.b'], ['@get', 'a.d']]
-      ];
-      assert.deepEqual([5, 1], vcharts.transform(spec, {a: {d: 1}}));
-    });
+  spec = [['@get', 'a', 5], ['@get', 'a']];
+  let options = {b: 12};
+  vcharts.transform(spec, options);
+  t.deepEqual({b: 12}, options, '@get spec should not mutate options');
 
-    it('should allow nested defaulting on undefined parent', function () {
-      var spec = [
-        '@defaults',
-        [['a.b', 5]],
-        ['@get', 'a.b']
-      ];
-      assert.deepEqual(5, vcharts.transform(spec));
-    });
+  t.end();
+});
 
-    it('should not override options', function () {
-      var spec = [
-        '@defaults',
-        [['a', 5]],
-        ['@get', 'a']
-      ];
-      assert.deepEqual(7, vcharts.transform(spec, {a: 7}));
-    });
+test('vcharts.transform() with @defaults spec', t => {
+  var spec = [
+    '@defaults',
+    [['a.b', 5]],
+    [['@get', 'a.b'], ['@get', 'a.d']]
+  ];
+  t.deepEqual([5, 1], vcharts.transform(spec, {a: {d: 1}}), '@defaults should allow nested defaulting on defined parent');
 
-    it('should not override values from current scope', function () {
-      var spec = [
-        '@map',
-        [1, 2, 3],
-        'd',
-        [
-          '@defaults',
-          [['d', 5]],
-          ['@get', 'd']
-        ]
-      ];
-      assert.deepEqual([1, 2, 3], vcharts.transform(spec));
-    });
+  spec = [
+    '@defaults',
+    [['a', 5]],
+    ['@get', 'a']
+  ];
+  t.deepEqual(7, vcharts.transform(spec, {a: 7}), '@defaults should not override options');
 
-    it('should only override undefined values', function () {
-      var spec = ['@defaults', [['a', 5]], ['@get', 'a']];
-      assert.deepEqual(0, vcharts.transform(spec, {a: 0}));
-      assert.deepEqual(false, vcharts.transform(spec, {a: false}));
-      assert.deepEqual(5, vcharts.transform(spec, {a: undefined}));
-    });
-  });
+  spec = [
+    '@map',
+    [1, 2, 3],
+    'd',
+    [
+      '@defaults',
+      [['d', 5]],
+      ['@get', 'd']
+    ]
+  ];
+  t.deepEqual([1, 2, 3], vcharts.transform(spec), '@defaults should not override values from current scope');
 
-  describe('@let', function () {
-    it('should allow nested defaulting on defined parent', function () {
-      var spec = [
-        '@let',
-        [['a', {}], ['a.b', 5]],
-        [['@get', 'a.b'], ['@get', 'a.d']]
-      ];
-      assert.deepEqual([5, 1], vcharts.transform(spec, {a: {d: 1}}));
-    });
+  spec = ['@defaults', [['a', 5]], ['@get', 'a']];
+  t.deepEqual(0, vcharts.transform(spec, {a: 0}), '@defaults should not override defined value');
+  t.deepEqual(false, vcharts.transform(spec, {a: false}), '@defaults should not override defined value');
+  t.deepEqual(5, vcharts.transform(spec, {a: undefined}), '@defaults should override undefined value');
 
-    it('should allow nested defaulting on undefined parent', function () {
-      var spec = [
-        '@let',
-        [['a.b', 5]],
-        ['@get', 'a.b']
-      ];
-      assert.deepEqual(5, vcharts.transform(spec));
-    });
+  t.end();
+});
 
-    it('should override options', function () {
-      var spec = [
-        '@let',
-        [['a', 5]],
-        ['@get', 'a']
-      ];
-      assert.deepEqual(5, vcharts.transform(spec, {a: 7}));
-    });
+test('vcharts.transform() with @let spec', t => {
+  let spec = [
+    '@let',
+    [['a', {}], ['a.b', 5]],
+    [['@get', 'a.b'], ['@get', 'a.d']]
+  ];
+  t.deepEqual([5, 1], vcharts.transform(spec, {a: {d: 1}}), '@let should allow nested defaulting on defined parent');
 
-    it('should override values from current scope', function () {
-      var spec = [
-        '@map',
-        [1, 2, 3],
-        'd',
-        [
-          '@let',
-          [['d', 5]],
-          ['@get', 'd']
-        ]
-      ];
-      assert.deepEqual([5, 5, 5], vcharts.transform(spec));
-    });
+  spec = [
+    '@let',
+    [['a.b', 5]],
+    ['@get', 'a.b']
+  ];
+  t.deepEqual(5, vcharts.transform(spec), '@let should allow nested defaulting on undefined parent');
 
-    it('should only override undefined values', function () {
-      var spec = ['@defaults', [['a', 5]], ['@get', 'a']];
-      assert.deepEqual(0, vcharts.transform(spec, {a: 0}));
-      assert.deepEqual(false, vcharts.transform(spec, {a: false}));
-      assert.deepEqual(5, vcharts.transform(spec, {a: undefined}));
-    });
-  });
+  spec = [
+    '@let',
+    [['a', 5]],
+    ['@get', 'a']
+  ];
+  t.deepEqual(5, vcharts.transform(spec, {a: 7}), '@let should override options');
 
-  describe('@map', function () {
-    it('should build an array', function () {
-      var spec = ['@map', [1, 2, 3], 'd', ['@get', 'd']];
-      assert.deepEqual([1, 2, 3], vcharts.transform(spec));
-    });
+  spec = [
+    '@map',
+    [1, 2, 3],
+    'd',
+    [
+      '@let',
+      [['d', 5]],
+      ['@get', 'd']
+    ]
+  ];
+  t.deepEqual([5, 5, 5], vcharts.transform(spec), '@let should override values from current scope');
 
-    it('should not add null array items', function () {
-      var spec = ['@map', [1, null, 3], 'd', ['@get', 'd']];
-      assert.deepEqual([1, 3], vcharts.transform(spec));
-    });
+  spec = ['@defaults', [['a', 5]], ['@get', 'a']];
+  t.deepEqual(0, vcharts.transform(spec, {a: 0}), '@let should not override defined values');
+  t.deepEqual(false, vcharts.transform(spec, {a: false}), '@let should not override defined values');
+  t.deepEqual(5, vcharts.transform(spec, {a: undefined}), '@let should override undefined values');
 
-    it('can contain complex objects', function () {
-      var spec = ['@map', [1, 2, 3], 'd', {a: ['@get', 'd']}];
-      assert.deepEqual([{a: 1}, {a: 2}, {a: 3}], vcharts.transform(spec));
-    });
+  t.end();
+});
 
-    it('can nest', function () {
-      var spec = [
-        '@map',
-        [1, 2, 3],
-        'd',
-        [
-          '@map',
-          ['a', 'b'],
-          'dd',
-          {
-            d: ['@get', 'd'],
-            dd: ['@get', 'dd']
-          }
-        ]
-      ];
-      assert.deepEqual([
-        [{d: 1, dd: 'a'}, {d: 1, dd: 'b'}],
-        [{d: 2, dd: 'a'}, {d: 2, dd: 'b'}],
-        [{d: 3, dd: 'a'}, {d: 3, dd: 'b'}]
-      ], vcharts.transform(spec));
-    });
+test('vcharts.transform() with @map spec', t => {
+  let spec = ['@map', [1, 2, 3], 'd', ['@get', 'd']];
+  t.deepEqual([1, 2, 3], vcharts.transform(spec), '@map should build an array');
 
-    it('should not modify options', function () {
-      var spec = ['@map', [1, 2, 3], 'd', ['@get', 'd']];
-      var options = {b: 12};
-      vcharts.transform(spec, options);
-      assert.deepEqual({b: 12}, options);
-    });
+  spec = ['@map', [1, null, 3], 'd', ['@get', 'd']];
+  t.deepEqual([1, 3], vcharts.transform(spec));
 
-    it('should override option with loop variable', function () {
-      var spec = ['@map', [1, 2, 3], 'd', ['@get', 'd']];
-      var options = {d: 12};
-      assert.deepEqual([1, 2, 3], vcharts.transform(spec, options));
-      assert.deepEqual({d: 12}, options);
-    });
-  });
+  spec = ['@map', [1, null, 3], 'd', ['@get', 'd']];
+  t.deepEqual([1, 3], vcharts.transform(spec), '@map should not add null array items');
 
-  describe('@if', function () {
-    it('should choose first option when true', function () {
-      var spec = ['@if', true, 10, 20];
-      assert.deepEqual(10, vcharts.transform(spec));
-    });
+  spec = ['@map', [1, 2, 3], 'd', {a: ['@get', 'd']}];
+  t.deepEqual([{a: 1}, {a: 2}, {a: 3}], vcharts.transform(spec), '@map can produce complex objects');
 
-    it('should choose second option when false', function () {
-      var spec = ['@if', false, 10, 20];
-      assert.deepEqual(20, vcharts.transform(spec));
-    });
+  spec = [
+    '@map',
+    [1, 2, 3],
+    'd',
+    [
+      '@map',
+      ['a', 'b'],
+      'dd',
+      {
+        d: ['@get', 'd'],
+        dd: ['@get', 'dd']
+      }
+    ]
+  ];
+  t.deepEqual([
+    [{d: 1, dd: 'a'}, {d: 1, dd: 'b'}],
+    [{d: 2, dd: 'a'}, {d: 2, dd: 'b'}],
+    [{d: 3, dd: 'a'}, {d: 3, dd: 'b'}]
+  ], vcharts.transform(spec), '@map can nest');
 
-    it('should work with sub-expressions', function () {
-      var spec = ['@if', ['@get', 'a'], ['@get', 'b'], 20];
-      assert.deepEqual(5, vcharts.transform(spec, {a: true, b: 5}));
-    });
+  spec = ['@map', [1, 2, 3], 'd', ['@get', 'd']];
+  let options = {b: 12};
+  vcharts.transform(spec, options);
+  t.deepEqual({b: 12}, options, '@map should not modify options');
 
-    it('should treat JavaScript falsy values as false', function () {
-      var spec = [
-        ['@if', null, 10, 20],
-        ['@if', undefined, 10, 20],
-        ['@if', 0, 10, 20],
-        ['@if', NaN, 10, 20],
-        ['@if', '', 10, 20]
-      ]
-      assert.deepEqual(
-        [20, 20, 20, 20, 20],
-        vcharts.transform(spec)
-      );
-    });
-  });
+  spec = ['@map', [1, 2, 3], 'd', ['@get', 'd']];
+  options = {d: 12};
+  t.deepEqual([1, 2, 3], vcharts.transform(spec, options), '@map should override option with loop variable');
+  t.deepEqual({d: 12}, options, '@map should not modify options');
 
-  describe('@eq', function () {
-    it('should test for JavaScript === equality', function () {
-      var spec = [
-        ['@eq', {}, {}],
-        ['@eq', 0, 0],
-        ['@eq', 'abc', 'abc'],
-        ['@eq', 1, '1'],
-        ['@eq', null, null]
-      ]
-      assert.deepEqual(
-        [false, true, true, false, true],
-        vcharts.transform(spec)
-      );
-    });
+  t.end();
+});
 
-    it('can work with sub-expressions', function () {
-      var spec = [
-        ['@eq', ['@get', 'a'], 10],
-        ['@eq', ['@get', 'b'], ['@get', 'c']]
-      ];
-      assert.deepEqual(
-        [true, true],
-        vcharts.transform(spec, {a: 10, b: 5, c: 5})
-      );
-    });
-  });
+test('vcharts.transform() with @if spec', t => {
+  var spec = ['@if', true, 10, 20];
+  t.deepEqual(10, vcharts.transform(spec), '@if should choose first option when condition is true');
 
-  describe('@join', function () {
-    it('should join strings', function () {
-      var spec = [
-        '@join', ',', ['a', 'b', 'c', 'd']
-      ]
-      assert.equal('a,b,c,d', vcharts.transform(spec));
-    });
-  });
+  spec = ['@if', false, 10, 20];
+  t.deepEqual(20, vcharts.transform(spec), '@if should choose second option when condition is false');
 
-  describe('@orient', function () {
-    it('should leave horizontal specs unchanged', function () {
-      var spec = [
-        '@orient',
-        'horizontal',
-        {x: 1, y: 2, yc: 3, width: 5}
-      ];
-      assert.deepEqual({x: 1, y: 2, yc: 3, width: 5}, vcharts.transform(spec));
-    });
+  spec = ['@if', ['@get', 'a'], ['@get', 'b'], 20];
+  t.deepEqual(5, vcharts.transform(spec, {a: true, b: 5}), '@if should work with subexpressions');
 
-    it('should re-orient vertical specs and leave other props', function () {
-      var spec = [
-        '@orient',
-        'vertical',
-        {x: 1, y: 2, yc: 2, width: 5, hello: 10}
-      ];
-      assert.deepEqual({y: 1, x: 2, xc: 2, height: 5, hello: 10}, vcharts.transform(spec));
-    });
-  });
+  spec = [
+    ['@if', null, 10, 20],
+    ['@if', undefined, 10, 20],
+    ['@if', 0, 10, 20],
+    ['@if', NaN, 10, 20],
+    ['@if', '', 10, 20]
+  ]
+  t.deepEqual([20, 20, 20, 20, 20], vcharts.transform(spec), '@if should treat falsy values as false');
 
-  describe('@merge', function () {
-    it('should merge objects', function () {
-      var spec = [
-        '@merge',
-        {a: 1},
-        {b: 2},
-        {c: 3}
-      ];
-      assert.deepEqual({a: 1, b: 2, c: 3}, vcharts.transform(spec));
-    });
+  t.end();
+});
 
-    it('should merge arrays', function () {
-      var spec = [
-        '@merge',
-        {a: [1]},
-        {a: []},
-        {a: [2, 3]}
-      ];
-      assert.deepEqual({a: [1, 2, 3]}, vcharts.transform(spec));
-    });
+test('vcharts.transform() with @eq spec', t => {
+  var spec = [
+    ['@eq', {}, {}],
+    ['@eq', 0, 0],
+    ['@eq', 'abc', 'abc'],
+    ['@eq', 1, '1'],
+    ['@eq', null, null]
+  ]
+  t.deepEqual([false, true, true, false, true], vcharts.transform(spec), '@eq should test for JavaScript strict (===) equality');
 
-    it('should give precedence to first data type if they dont match', function () {
-      var spec = [
-        '@merge',
-        {a: [1]},
-        {a: 'b'}
-      ];
-      assert.deepEqual({a: [1]}, vcharts.transform(spec));
-      spec = [
-        '@merge',
-        {a: 'b'},
-        {a: [1]}
-      ];
-      assert.deepEqual({a: 'b'}, vcharts.transform(spec));
-    });
+  spec = [
+    ['@eq', ['@get', 'a'], 10],
+    ['@eq', ['@get', 'b'], ['@get', 'c']]
+  ];
+  t.deepEqual([true, true], vcharts.transform(spec, {a: 10, b: 5, c: 5}), '@eq should work with subexpressions');
 
-    it('should use the other if one is null or undefined', function () {
-      var spec = [
-        '@merge',
-        {
-          a: null,
-          b: undefined
-        },
-        {a: 'a', b: 'b'}
-      ];
-      assert.deepEqual({a: 'a', b: 'b'}, vcharts.transform(spec));
-      spec = [
-        '@merge',
-        {a: 'a', b: 'b'},
-        {
-          a: null,
-          b: undefined
-        }
-      ];
-      assert.deepEqual({a: 'a', b: 'b'}, vcharts.transform(spec));
-    });
+  t.end();
+});
 
-  });
+test('vcharts.transform() with @join spec', t => {
+  var spec = [
+    '@join', ',', ['a', 'b', 'c', 'd']
+  ]
+  t.equal('a,b,c,d', vcharts.transform(spec), '@join should join strings');
 
-  describe('@apply', function () {
-    it('should apply template', function () {
-      var spec = [
-        '@apply',
-        'test',
-        {a: 'world'}
-      ];
-      vcharts.templates.test = {hello: ['@get', 'a']};
-      assert.deepEqual({hello: 'world'}, vcharts.transform(spec));
-    });
-  });
+  t.end();
+});
 
+test('vcharts.transform() with @orient spec', t => {
+  var spec = [
+    '@orient',
+    'horizontal',
+    {x: 1, y: 2, yc: 3, width: 5}
+  ];
+  t.deepEqual({x: 1, y: 2, yc: 3, width: 5}, vcharts.transform(spec), '@orient should leave horizontal specs unchanged');
+
+  spec = [
+    '@orient',
+    'vertical',
+    {x: 1, y: 2, yc: 2, width: 5, hello: 10}
+  ];
+  t.deepEqual({y: 1, x: 2, xc: 2, height: 5, hello: 10}, vcharts.transform(spec), '@orient should re-orient vertical specs and leave other props');
+
+  t.end();
+});
+
+test('vcharts.transform() with @merge spec', t => {
+  var spec = [
+    '@merge',
+    {a: 1},
+    {b: 2},
+    {c: 3}
+  ];
+  t.deepEqual({a: 1, b: 2, c: 3}, vcharts.transform(spec), '@merge should merge objects');
+
+  spec = [
+    '@merge',
+    {a: [1]},
+    {a: []},
+    {a: [2, 3]}
+  ];
+  t.deepEqual({a: [1, 2, 3]}, vcharts.transform(spec), '@merge should merge arrays');
+
+  spec = [
+    '@merge',
+    {a: [1]},
+    {a: 'b'}
+  ];
+  t.deepEqual({a: [1]}, vcharts.transform(spec), '@merge should favor first occurrence on duplicate keys');
+
+  spec = [
+    '@merge',
+    {a: 'b'},
+    {a: [1]}
+  ];
+  t.deepEqual({a: 'b'}, vcharts.transform(spec), '@merge should favor first occurrence on duplicate keys');
+
+  spec = [
+    '@merge',
+    {
+      a: null,
+      b: undefined
+    },
+    {a: 'a', b: 'b'}
+  ];
+  t.deepEqual({a: 'a', b: 'b'}, vcharts.transform(spec), '@merge should favor non-null, non-undefined values');
+  spec = [
+    '@merge',
+    {a: 'a', b: 'b'},
+    {
+      a: null,
+      b: undefined
+    }
+  ];
+  t.deepEqual({a: 'a', b: 'b'}, vcharts.transform(spec), '@merge should favor non-null, non-undefined values');
+
+  t.end();
+});
+
+test('vcharts.transform() with @apply spec', t => {
+  var spec = [
+    '@apply',
+    'test',
+    {a: 'world'}
+  ];
+  vcharts.templates.test = {hello: ['@get', 'a']};
+  t.deepEqual({hello: 'world'}, vcharts.transform(spec), '@apply should apply template');
+
+  t.end();
 });

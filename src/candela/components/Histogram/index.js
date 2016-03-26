@@ -1,4 +1,5 @@
-import vcharts from '../../vcharts/src';
+import vcharts from '../../../vcharts';
+import spec from './spec.json';
 
 export default class Histogram {
   static get spec () {
@@ -34,7 +35,7 @@ export default class Histogram {
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart('histogram', {
+    this.chart = vcharts.chart(spec, {
       el: el,
       values: options.data,
       bin: options.bin,

@@ -1,6 +1,7 @@
-import vcharts from '../../vcharts/src';
+import vcharts from '../../../vcharts';
+import spec from './spec.json';
 
-export default class ScatterMatrix {
+export default class Box {
   static get spec () {
     return {
       options: [
@@ -16,11 +17,11 @@ export default class ScatterMatrix {
           domain: {
             mode: 'field',
             from: 'data',
-            fieldTypes: ['number', 'integer', 'boolean']
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
           }
         },
         {
-          name: 'color',
+          name: 'group',
           type: 'string',
           format: 'text',
           domain: {
@@ -34,12 +35,17 @@ export default class ScatterMatrix {
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart('xymatrix', {
+    this.chart = vcharts.chart(spec, {
       el: el,
       values: options.data,
       fields: options.fields,
-      color: {
-        field: options.color
+      group: options.group,
+      orient: 'vertical',
+      xAxis: {
+        title: options.group || ''
+      },
+      yAxis: {
+        title: 'Value'
       }
     });
   }
