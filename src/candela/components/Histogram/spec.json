@@ -2,14 +2,22 @@
   "@defaults",
   [
     ["bin", "value"],
-    ["discrete", false],
     ["width", 800],
-    ["height", 500]
+    ["height", 500],
+    ["xAxis.title", ["@get", "bin"]],
+    [
+      "yAxis.title",
+      [
+        "@if", ["@get", "aggregate"],
+        ["@join", "", ["Sum of ", ["@get", "aggregate"]]],
+        "Count"
+      ]
+    ]
   ],
   [
     "@let",
     [
-      ["discrete", ["@or", ["@get", "discrete"], ["@isStringField", ["@get", "values"], ["@get", "bin"]]]]
+      ["discrete", ["@or", ["@get", "discrete"], ["@isStringField", ["@get", "data"], ["@get", "bin"]]]]
     ],
     [
       "@merge",
@@ -94,7 +102,7 @@
         "data": [
           {
             "name": "series",
-            "values": ["@get", "values"],
+            "values": ["@get", "data"],
             "transform": [
               "@if",
               ["@get", "discrete"],

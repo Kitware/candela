@@ -35,17 +35,7 @@ export default class Histogram {
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart(spec, el, {
-      values: options.data,
-      bin: options.bin,
-      aggregate: options.aggregate,
-      xAxis: {
-        title: options.bin
-      },
-      yAxis: {
-        title: options.aggregate ? 'Sum of ' + options.aggregate : 'Count'
-      }
-    });
+    this.chart = vcharts.chart(spec, el, options);
   }
 
   render () {

@@ -17,7 +17,7 @@ export default class Box {
           domain: {
             mode: 'field',
             from: 'data',
-            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+            fieldTypes: ['number', 'integer', 'boolean']
           }
         },
         {
@@ -35,18 +35,7 @@ export default class Box {
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart(spec, el, {
-      values: options.data,
-      fields: options.fields,
-      group: options.group,
-      orient: 'vertical',
-      xAxis: {
-        title: options.group || ''
-      },
-      yAxis: {
-        title: 'Value'
-      }
-    });
+    this.chart = vcharts.chart(spec, el, options);
   }
 
   render () {

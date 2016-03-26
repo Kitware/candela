@@ -113,5 +113,15 @@
       "boxSize": 0.5,
       "capSize": 0.25
     }
+  },
+  {
+    "hash": "histogram",
+    "name": "Histogram",
+    "description": "A simple histogram.",
+    "component": "Histogram",
+    "data": "iris",
+    "options": {
+      "bin": "sepalLength"
+    }
   }
 ]
