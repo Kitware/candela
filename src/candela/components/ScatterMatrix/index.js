@@ -1,4 +1,5 @@
-import vcharts from '../../vcharts/src';
+import vcharts from '../../../vcharts';
+import spec from './spec.json';
 
 export default class ScatterMatrix {
   static get options () {
@@ -10,7 +11,7 @@ export default class ScatterMatrix {
   }
 
   constructor (el, options) {
-    let chart = vcharts.chart('xymatrix', {
+    let chart = vcharts.chart(spec, {
       el: el,
       values: options.data,
       fields: options.fields,
