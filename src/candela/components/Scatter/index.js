@@ -62,8 +62,8 @@ export default class Scatter {
         },
         {
           name: 'hover',
-          type: 'string',
-          format: 'text',
+          type: 'string_list',
+          format: 'string_list',
           domain: {
             mode: 'field',
             from: 'data',

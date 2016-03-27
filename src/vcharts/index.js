@@ -74,6 +74,7 @@ let templateFunctions = {
 
     for (let elementIndex = 0; elementIndex < elements.length; elementIndex += 1) {
       scope[args[1]] = elements[elementIndex];
+      scope.index = elementIndex;
       for (let itemIndex = 2; itemIndex < args.length; itemIndex += 1) {
         let element = transform(args[itemIndex], options, scope);
         if (element !== null) {
@@ -116,6 +117,24 @@ let templateFunctions = {
       }
     }
     return false;
+  },
+
+  mult: function (args, options, scope) {
+    let arr = transform(args, options, scope);
+    let value = 1;
+    for (let i = 0; i < arr.length; i += 1) {
+      value *= arr[i];
+    }
+    return value;
+  },
+
+  add: function (args, options, scope) {
+    let arr = transform(args, options, scope);
+    let value = 0;
+    for (let i = 0; i < arr.length; i += 1) {
+      value += arr[i];
+    }
+    return value;
   },
 
   join: function (args, options, scope) {
