@@ -6,35 +6,34 @@ export default class Bullet {
     return [
       {
         name: 'value',
-        type: 'number'
+        type: 'number',
+        format: 'number'
       },
       {
         name: 'title',
-        type: 'string'
+        type: 'string',
+        format: 'text'
       },
       {
         name: 'subtitle',
-        type: 'string'
+        type: 'string',
+        format: 'text'
       },
       {
         name: 'markers',
-        type: 'number_list'
+        type: 'number_list',
+        format: 'number_list'
       },
       {
         name: 'ranges',
-        type: 'table'
+        type: 'table',
+        format: 'objectlist'
       }
     ];
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart(spec, el, {
-      value: options.value,
-      title: options.title || '',
-      subtitle: options.subtitle || '',
-      markers: options.markers.map(v => ({value: v})),
-      ranges: options.ranges
-    });
+    this.chart = vcharts.chart(spec, el, options);
   }
 
   render () {

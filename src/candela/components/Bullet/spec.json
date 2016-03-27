@@ -3,6 +3,8 @@
   [
     ["width", 300],
     ["height", 40],
+    ["title", ""],
+    ["subtitle", ""],
     [
       "ranges",
       [
@@ -126,11 +128,11 @@
         "from": {"data": "markers"},
         "properties": {
           "enter": {
-            "xc": {"scale": "x", "field": "value"},
+            "xc": {"scale": "x", "field": "data"},
             "width": {"value": 2},
             "yc": {"scale": "y", "value": 0.5},
             "height": {"scale": "y", "value": 0.75},
-            "fill": {"scale": "color", "field": "value"}
+            "fill": {"scale": "color", "field": "data"}
           }
         }
       },

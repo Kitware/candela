@@ -5,21 +5,15 @@ export default class Gantt {
   static get options () {
     return [
       {
-        name: 'values',
-        type: 'table'
-      },
-      {
-        name: 'xAxis',
-        type: 'number_list'
+        name: 'data',
+        type: 'table',
+        format: 'objectlist'
       }
     ];
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart(spec, el, {
-      values: options.values,
-      xAxis: options.xAxis
-    });
+    this.chart = vcharts.chart(spec, el, options);
   }
 
   render () {

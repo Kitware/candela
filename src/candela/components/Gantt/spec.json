@@ -4,7 +4,7 @@
   "data": [
     {
       "name": "data",
-      "values": ["@get", "values"]
+      "values": ["@get", "data"]
     }
   ],
   "scales": [
