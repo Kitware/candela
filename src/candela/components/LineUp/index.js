@@ -35,7 +35,6 @@ export default class LineUp {
   constructor (el, options) {
     this.el = el;
     this.options = options;
-    console.log(LineUpJS);
   }
 
   /* Get the width of a column.  If the user has changed the width, scale based
