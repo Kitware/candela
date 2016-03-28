@@ -2,25 +2,60 @@ import vcharts from '../../../vcharts';
 import spec from './spec.json';
 
 export default class Gantt {
-  static get options () {
-    return [
-      {
-        name: 'values',
-        type: 'table'
-      },
-      {
-        name: 'xAxis',
-        type: 'number_list'
-      }
-    ];
+  static get spec () {
+    return {
+      options: [
+        {
+          name: 'data',
+          type: 'table',
+          format: 'objectlist'
+        },
+        {
+          name: 'label',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'level',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'start',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'end',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['number', 'integer', 'boolean']
+          }
+        }
+      ]
+    };
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart(spec, {
-      el: el,
-      values: options.values,
-      xAxis: options.xAxis
-    });
+    this.chart = vcharts.chart(spec, el, options);
   }
 
   render () {

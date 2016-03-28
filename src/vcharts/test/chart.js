@@ -15,9 +15,7 @@ test.skip('chart width and height should be based on el properties', t => {
     padding: padding
   };
 
-  let c = vcharts.chart('test', {
-    el: {offsetWidth: 0, offsetHeight: 0}
-  });
+  let c = vcharts.chart('test', {offsetWidth: 0, offsetHeight: 0});
 
   t.deepEqual(c.spec, {
     width: 100,
@@ -25,9 +23,7 @@ test.skip('chart width and height should be based on el properties', t => {
     padding: padding
   });
 
-  c = vcharts.chart('test', {
-    el: {offsetWidth: 300, offsetHeight: 400}
-  });
+  c = vcharts.chart('test', {offsetWidth: 300, offsetHeight: 400});
 
   t.deepEqual(c.spec, {
     width: (300 - 20 - 40),
@@ -39,9 +35,7 @@ test.skip('chart width and height should be based on el properties', t => {
 });
 
 test('vcharts.chart()', t => {
-  let c = vcharts.chart({marks: []}, {
-    el: document.createElement('div')
-  });
+  let c = vcharts.chart({marks: []}, document.createElement('div'));
 
   t.deepEqual(c.spec, {marks: []}, 'spec used should match the one specified');
 
@@ -52,9 +46,7 @@ test('vcharts.update()', t => {
   let template = {
     marks: [1]
   };
-  let c = vcharts.chart(template, {
-    el: document.createElement('div')
-  });
+  let c = vcharts.chart(template, document.createElement('div'));
 
   t.deepEqual(c.template, template, 'template used should be the one requested (precondition)');
   t.deepEqual(c.spec, template, 'spec used should match the one specified (precondition)');

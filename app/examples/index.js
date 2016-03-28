@@ -29,7 +29,9 @@ function showPage () {
       properties
     );
     let el = document.getElementById('vis-element');
-    properties.options.data = datasets[properties.data];
+    if (!Array.isArray(properties.options.data)) {
+      properties.options.data = datasets[properties.options.data];
+    }
     let vis = new candela.components[properties.component](
       el,
       properties.options

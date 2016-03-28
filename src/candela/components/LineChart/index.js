@@ -26,8 +26,7 @@ export default class LineChart extends VisComponent {
   }
 
   data (data) {
-    this.chart = vcharts.chart(spec, {
-      el: this.el,
+    this.chart = vcharts.chart(spec, this.el, {
       series: [
         {
           name: 'series1',

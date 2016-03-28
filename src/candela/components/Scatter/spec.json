@@ -3,7 +3,8 @@
   [
     ["width", 800],
     ["height", 500],
-    ["legend", true]
+    ["legend", true],
+    ["hover", [["@get", "x"], ["@get", "y"]]]
   ],
   [
     "@let",
@@ -21,6 +22,7 @@
           {
             "axis": "x",
             "size": ["@get", "width"],
+            "title": ["@get", "xAxis.title", ["@get", "x", ""]],
             "domain": [
               "@get", "xAxis.domain", {
                 "fields": [
@@ -43,8 +45,9 @@
           {
             "axis": "y",
             "size": ["@get", "height"],
+            "title": ["@get", "yAxis.title", ["@get", "y", ""]],
             "domain": [
-              "@get", "xAxis.domain", {
+              "@get", "yAxis.domain", {
                 "fields": [
                   {
                     "data": "data",
@@ -70,7 +73,7 @@
         "data": [
           {
             "name": "data",
-            "values": ["@get", "values"],
+            "values": ["@get", "data"],
             "transform": [
               {
                 "type": "formula",
@@ -151,7 +154,7 @@
             {
               "name": "color",
               "data": "data",
-              "values": ["@get", "values"],
+              "values": ["@get", "data"],
               "field": ["@get", "color"]
             }
           ],
@@ -230,39 +233,43 @@
                 }
               },
               {
-                "type": "text",
-                "properties": {
-                  "enter": {
-                    "align": {"value": "center"},
-                    "fill": {"value": "#333"}
-                  },
-                  "update": {
-                    "x": {"scale": "x", "signal": "d.x"},
-                    "y": {"scale": "y", "signal": "d.y", "offset": -10},
-                    "text": {
-                      "template": [
-                        "@if", ["@get", "hover"],
-                        [
-                          "@join", "",
-                          [["@get", "hover"], ": ", "{{d['", ["@get", "hover"] ,"']}}"]
-                        ],
-                        ["@get", "tooltip", "({{d.x|number:'.3g'}}, {{d.y|number:'.3g'}})"]
-                      ]
-                    },
-                    "fillOpacity": {
-                      "rule": [
-                        {
-                          "predicate": {
-                            "name": "tooltip",
-                            "id": {"value": null}
-                          },
-                          "value": 0
+                "type": "group",
+                "marks": [
+                  "@map",
+                  ["@get", "hover"],
+                  "h",
+                  {
+                    "type": "text",
+                    "properties": {
+                      "enter": {
+                        "align": {"value": "center"},
+                        "fill": {"value": "#333"}
+                      },
+                      "update": {
+                        "x": {"scale": "x", "signal": "d.x"},
+                        "y": {"scale": "y", "signal": "d.y", "offset": ["@add", -15, ["@mult", -15, ["@get", "index"]]]},
+                        "text": {
+                          "template": [
+                            "@join", "",
+                            [["@get", "h"], ": ", "{{d['", ["@get", "h"] ,"']}}"]
+                          ]
                         },
-                        {"value": 1}
-                      ]
+                        "fillOpacity": {
+                          "rule": [
+                            {
+                              "predicate": {
+                                "name": "tooltip",
+                                "id": {"value": null}
+                              },
+                              "value": 0
+                            },
+                            {"value": 1}
+                          ]
+                        }
+                      }
                     }
                   }
-                }
+                ]
               }
             ]
           }

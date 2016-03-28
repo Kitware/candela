@@ -74,6 +74,7 @@ let templateFunctions = {
 
     for (let elementIndex = 0; elementIndex < elements.length; elementIndex += 1) {
       scope[args[1]] = elements[elementIndex];
+      scope.index = elementIndex;
       for (let itemIndex = 2; itemIndex < args.length; itemIndex += 1) {
         let element = transform(args[itemIndex], options, scope);
         if (element !== null) {
@@ -118,6 +119,24 @@ let templateFunctions = {
     return false;
   },
 
+  mult: function (args, options, scope) {
+    let arr = transform(args, options, scope);
+    let value = 1;
+    for (let i = 0; i < arr.length; i += 1) {
+      value *= arr[i];
+    }
+    return value;
+  },
+
+  add: function (args, options, scope) {
+    let arr = transform(args, options, scope);
+    let value = 0;
+    for (let i = 0; i < arr.length; i += 1) {
+      value += arr[i];
+    }
+    return value;
+  },
+
   join: function (args, options, scope) {
     let result = '';
     let sep = transform(args[0], options, scope);
@@ -155,7 +174,7 @@ let templateFunctions = {
       return {
         name: name,
         type: 'ordinal',
-        domain: {data: params.data, field: name},
+        domain: {data: params.data, field: params.field},
         range: 'category10'
       };
     }
@@ -163,7 +182,7 @@ let templateFunctions = {
       name: name,
       type: 'linear',
       zero: false,
-      domain: {data: params.data, field: name},
+      domain: {data: params.data, field: params.field},
       range: ['#dfd', 'green']
     };
   },
@@ -317,9 +336,12 @@ let merge = function (defaults, options) {
   return defaults;
 };
 
-let chart = function (template, initialOptions, done) {
+let chart = function (template, el, initialOptions, done) {
   let that = {};
 
+  initialOptions = initialOptions || {};
+
+  that.el = el;
   that.options = {};
   that.template = template;
 
@@ -331,7 +353,7 @@ let chart = function (template, initialOptions, done) {
 
     // Use padding and element size to set size, unless
     // size explicitly specified or element size is zero.
-    let el = d3.select(that.options.el)[0][0];
+    let el = d3.select(that.el)[0][0];
     let sizeOptions = {};
 
     let style = window.getComputedStyle(el, null);
@@ -356,7 +378,7 @@ let chart = function (template, initialOptions, done) {
 
     // Options that go directly to Vega runtime
     let vegaOptions = {
-      el: curOptions.el,
+      el: el,
       renderer: curOptions.renderer
     };
 

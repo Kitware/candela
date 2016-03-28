@@ -4,7 +4,7 @@
     ["group", "key"],
     ["boxSize", 0.75],
     ["capSize", 0.5],
-    ["orient", "horizontal"],
+    ["orient", "vertical"],
     ["horiz", ["@eq", ["@get", "orient"], "horizontal"]],
     ["valueAxis", ["@if", ["@get", "horiz"], "x", "y"]],
     ["categoryAxis", ["@if", ["@get", "horiz"], "y", "x"]]
@@ -56,7 +56,7 @@
       "data": [
         {
           "name": "table",
-          "values": ["@get", "values"],
+          "values": ["@get", "data"],
           "transform": [
             {
               "type": "fold",

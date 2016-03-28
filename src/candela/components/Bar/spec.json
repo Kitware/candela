@@ -2,7 +2,9 @@
   "@defaults",
   [
     ["x", "x"],
-    ["y", "y"]
+    ["y", "y"],
+    ["xAxis.title", ["@get", "x"]],
+    ["yAxis.title", ["@get", "y"]]
   ],
   {
     "width": ["@get", "width", 800],
@@ -18,7 +20,7 @@
     "data": [
       {
         "name": "series",
-        "values": ["@get", "values"]
+        "values": ["@get", "data"]
       }
     ],
     "signals": [
@@ -78,7 +80,7 @@
             "y2": {"scale": "y", "value": 0}
           },
           "update": {
-            "fill": {"value": ["@get", "fill", "steelblue"]}
+            "fill": {"value": ["@get", "color", "steelblue"]}
           },
           "hover": {
             "fill": {"value": ["@get", "hover", "red"]}

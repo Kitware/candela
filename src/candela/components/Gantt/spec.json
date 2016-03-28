@@ -1,89 +1,156 @@
-{
-  "width": ["@get", "width", 700],
-  "height": ["@get", "height", 600],
-  "data": [
-    {
-      "name": "data",
-      "values": ["@get", "values"]
-    }
+[
+  "@defaults",
+  [
+    ["width", 700],
+    ["height", 600],
+    ["start", "start"],
+    ["end", "end"],
+    ["label", "label"],
+    ["level", "level"]
   ],
-  "scales": [
-    {
-      "name": "y",
-      "type": "ordinal",
-      "range": "height",
-      "domain": {"data": "data", "field": "label"}
-    },
-    {
-      "name": "x",
-      "type": "linear",
-      "range": "width",
-      "domain": {"data": "data", "field": ["enter", "leave"]}
-    },
-    {
-      "name": "weight",
-      "type": "ordinal",
-      "range": ["bold", "normal"],
-      "domain": {"data": "data", "field": "level"}
-    },
-    {
-      "name": "color",
-      "type": "ordinal",
-      "range": ["steelblue", "#bbb"],
-      "domain": {"data": "data", "field": "level"}
-    }
-  ],
-  "axes": [
-    {
-      "type": "x",
-      "scale": "x",
-      "values": ["@get", "xAxis.values", [0, 6, 12, 18, 24]],
-      "title": ["@get", "xAxis.title", "Month"]
-    }
-  ],
-  "marks": [
-    {
-      "type": "text",
-      "from": {"data": "data"},
-      "properties": {
-        "enter": {
-          "x": {"scale": "x", "value": 0, "offset": -5},
-          "y": {"scale": "y", "field": "label"},
-          "fill": {"value": "#000"},
-          "text": {"field": "label"},
-          "font": {"value": "Helvetica Neue"},
-          "fontSize": {"value": 10},
-          "fontWeight": {"scale": "weight", "field": "level"},
-          "align": {"value": "right"},
-          "baseline": {"value": "middle"}
+  [
+    "@merge",
+    [
+      "@apply",
+      "axis",
+      [
+        "@merge",
+        ["@get", "xAxis"],
+        {
+          "axis": "x",
+          "size": ["@get", "width"],
+          "domain": [
+            "@get", "xAxis.domain", {
+              "fields": [
+                {
+                  "data": "data",
+                  "field": ["start", "end"]
+                }
+              ]
+            }
+          ]
         }
-      }
-    },
+      ]
+    ],
     {
-      "type": "rect",
-      "from": {"data": "data"},
-      "properties": {
-        "enter": {
-          "x": {"value": 0},
-          "y": {"scale": "y", "field": "label", "offset": -1},
-          "width": {"field": {"group": "width"}},
-          "height": {"value": 1},
-          "fill": {"value": "#ccc"}
+      "width": ["@get", "width"],
+      "height": ["@get", "height"],
+      "padding": ["@get", "padding", {"top": 10, "bottom": 50, "left": 200, "right": 10}],
+      "data": [
+        {
+          "name": "data",
+          "values": ["@get", "data"],
+          "transform": [
+            {
+              "type": "formula",
+              "field": "label",
+              "expr": [
+                "@join",
+                "",
+                ["datum['", ["@get", "label"], "']"]
+              ]
+            },
+            {
+              "type": "formula",
+              "field": "level",
+              "expr": [
+                "@join",
+                "",
+                ["datum['", ["@get", "level"], "']"]
+              ]
+            },
+            {
+              "type": "formula",
+              "field": "start",
+              "expr": [
+                "@join",
+                "",
+                ["datum['", ["@get", "start"], "']"]
+              ]
+            },
+            {
+              "type": "formula",
+              "field": "end",
+              "expr": [
+                "@join",
+                "",
+                ["datum['", ["@get", "end"], "']"]
+              ]
+            }
+          ]
         }
-      }
-    },
-    {
-      "type": "rect",
-      "from": {"data": "data"},
-      "properties": {
-        "enter": {
-          "x": {"scale": "x", "field": "enter"},
-          "x2": {"scale": "x", "field": "leave"},
-          "yc": {"scale": "y", "field": "label"},
-          "height": {"value": 7},
-          "fill": {"scale": "color", "field": "level"}
+      ],
+      "scales": [
+        {
+          "name": "y",
+          "type": "ordinal",
+          "range": "height",
+          "domain": {"data": "data", "field": "label"}
+        },
+        {
+          "name": "x",
+          "type": "linear",
+          "range": "width",
+          "domain": {"data": "data", "field": ["start", "end"]}
+        },
+        {
+          "name": "weight",
+          "type": "ordinal",
+          "range": ["bold", "normal"],
+          "domain": {"data": "data", "field": "level"}
+        },
+        {
+          "name": "color",
+          "type": "ordinal",
+          "range": ["steelblue", "#bbb"],
+          "domain": {"data": "data", "field": "level"}
         }
-      }
+      ],
+      "marks": [
+        {
+          "type": "text",
+          "from": {"data": "data"},
+          "properties": {
+            "enter": {
+              "x": {"scale": "x", "value": 0, "offset": -5},
+              "y": {"scale": "y", "field": "label"},
+              "fill": {"value": "#000"},
+              "text": {"field": "label"},
+              "font": {"value": "Helvetica Neue"},
+              "fontSize": {"value": 10},
+              "fontWeight": {"scale": "weight", "field": "level"},
+              "align": {"value": "right"},
+              "baseline": {"value": "middle"}
+            }
+          }
+        },
+        {
+          "type": "rect",
+          "from": {"data": "data"},
+          "properties": {
+            "enter": {
+              "x": {"value": 0},
+              "y": {"scale": "y", "field": "label", "offset": -1},
+              "width": {"field": {"group": "width"}},
+              "height": {"value": 1},
+              "fill": {"value": "#ccc"}
+            }
+          }
+        },
+        {
+          "type": "rect",
+          "from": {"data": "data"},
+          "properties": {
+            "enter": {
+              "x": {"scale": "x", "field": "start"},
+              "x2": {"scale": "x", "field": "end"},
+              "yc": {"scale": "y", "field": "label"},
+              "height": {"value": 7},
+              "fill": {"scale": "color", "field": "level"}
+            }
+          }
+        }
+      ]
     }
   ]
-}
+]
