@@ -32,7 +32,7 @@ module.exports = {
       },
       {
         test: /\.json$/,
-        loader: 'json-loader'
+        loaders: ['json', 'strip-json-comments-loader']
       },
       {
         test: /\.jade$/,
