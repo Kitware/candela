@@ -9,7 +9,7 @@
   {
     "width": ["@get", "width", 800],
     "height": ["@get", "height", 500],
-    "padding": ["@get", "padding", {"top": 20, "bottom": 50, "left": 50, "right": 10}],
+    "padding": ["@get", "padding", {"top": 20, "bottom": 200, "left": 100, "right": ["@if", ["@get", "color"], 150, 10]}],
     "predicates": [
       {
         "name": "tooltip",
@@ -19,7 +19,7 @@
     ],
     "data": [
       {
-        "name": "series",
+        "name": "data",
         "values": ["@get", "data"]
       }
     ],
@@ -38,8 +38,10 @@
         "name": "x",
         "type": "ordinal",
         "range": "width",
+        "nice": false,
+        "round": false,
         "domain": {
-          "data": "series",
+          "data": "data",
           "field": ["@get", "x"]
         }
       },
@@ -49,17 +51,49 @@
         "range": "height",
         "zero": true,
         "domain": {
-          "data": "series",
+          "data": "data",
           "field": ["@get", "y"]
         }
-      }
+      },
+      [
+        "@colorScale",
+        {
+          "name": "color",
+          "data": "data",
+          "values": ["@get", "data"],
+          "field": ["@get", "color"]
+        }
+      ]
+    ],
+    "legends": [
+      "@if", ["@get", "color"],
+      [
+        {
+          "fill": "color",
+          "title": ["@get", "color"],
+          "properties": {
+            "symbols": {
+              "strokeWidth": {"value": 0}
+            }
+          }
+        }
+      ],
+      []
     ],
     "axes": [
       {
         "type": "x",
         "scale": "x",
         "layer": "back",
-        "title": ["@get", "xAxis.title", ""]
+        "title": ["@get", "xAxis.title", ""],
+        "properties": {
+          "labels": {
+            "text": {"template": "{{datum.data | truncate:25}}"},
+            "angle": {"value": 270},
+            "align": {"value": "right"},
+            "baseline": {"value": "middle"}
+          }
+        }
       },
       {
         "type": "y",
@@ -71,7 +105,7 @@
     "marks": [
       {
         "type": "rect",
-        "from": {"data": "series"},
+        "from": {"data": "data"},
         "properties": {
           "enter": {
             "x": {"scale": "x", "field": ["@get", "x"], "offset": 1},
@@ -79,11 +113,17 @@
             "y": {"scale": "y", "field": ["@get", "y"]},
             "y2": {"scale": "y", "value": 0}
           },
-          "update": {
-            "fill": {"value": ["@get", "color", "steelblue"]}
-          },
+          "update": [
+            "@if", ["@get", "color"],
+            {
+              "fill": {"scale": "color", "field": ["@get", "color"]}
+            },
+            {
+              "fill": {"scale": "color", "value": 0}
+            }
+          ],
           "hover": {
-            "fill": {"value": ["@get", "hover", "red"]}
+            "fill": {"value": "red"}
           }
         }
       },
