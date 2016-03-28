@@ -6,19 +6,6 @@ import 'LineUpJS/css/style.css';
 import 'LineUpJS/demo/css/style-demo.css';
 import 'font-awesome-webpack';
 
-let lineUpConfig = {
-  interaction: {
-    tooltips: false
-  },
-  renderingOptions: {
-    animation: true
-  },
-  svgLayout: {
-    mode: 'separate',
-    rowPadding: 0
-  }
-};
-
 export default class LineUp {
   static get spec () {
     return {
@@ -27,6 +14,21 @@ export default class LineUp {
           name: 'data',
           type: 'table',
           format: 'objectlist'
+        },
+        {
+          name: 'stacked',
+          type: 'boolean',
+          format: 'boolean'
+        },
+        {
+          name: 'histograms',
+          type: 'boolean',
+          format: 'boolean'
+        },
+        {
+          name: 'animation',
+          type: 'boolean',
+          format: 'boolean'
         }
       ]
     };
@@ -35,6 +37,20 @@ export default class LineUp {
   constructor (el, options) {
     this.el = el;
     this.options = options;
+    this.lineUpConfig = {
+      interaction: {
+        tooltips: false
+      },
+      renderingOptions: {
+        animation: options.animation !== undefined ? options.animation : true,
+        histograms: options.histograms !== undefined ? options.histograms : true,
+        stacked: options.stacked !== undefined ? options.stacked : false
+      },
+      svgLayout: {
+        mode: 'separate',
+        rowPadding: 0
+      }
+    };
   }
 
   /* Get the width of a column.  If the user has changed the width, scale based
@@ -119,7 +135,7 @@ export default class LineUp {
     delete spec.dataspec.separator;
     spec.dataspec.data = dataset;
     spec.storage = LineUpJS.createLocalStorage(dataset, desc.columns, desc.layout, desc.primaryKey);
-    var config = ((lineupObj ? lineupObj.config : $.extend({}, lineUpConfig)) || {});
+    var config = ((lineupObj ? lineupObj.config : $.extend({}, this.lineUpConfig)) || {});
     if (!config.renderingOptions) {
       config.renderingOptions = {};
     }
@@ -136,7 +152,7 @@ export default class LineUp {
     } else {
       $(elem).empty();
       /* Lineup takes a d3 element */
-      lineupObj = LineUpJS.create(spec, d3.select(elem), lineUpConfig);
+      lineupObj = LineUpJS.create(spec, d3.select(elem), this.lineUpConfig);
       config = lineupObj.config;
       // lineupObj.dragWeight.on('dragend.docrank', function (evt) {
       //   lineupDragColumnEnd(name, evt);
