@@ -4,7 +4,8 @@
     ["x", "x"],
     ["y", "y"],
     ["xAxis.title", ["@get", "x"]],
-    ["yAxis.title", ["@get", "y"]]
+    ["yAxis.title", ["@get", "y"]],
+    ["hover", [["@get", "x"], ["@get", "y"]]]
   ],
   {
     "width": ["@get", "width", 800],
@@ -39,7 +40,7 @@
         "type": "ordinal",
         "range": "width",
         "nice": false,
-        "round": false,
+        "round": true,
         "domain": {
           "data": "data",
           "field": ["@get", "x"]
@@ -128,47 +129,44 @@
         }
       },
       {
-        "type": "text",
-        "properties": {
-          "enter": {
-            "align": {"value": "center"},
-            "fill": {"value": "#333"}
-          },
-          "update": {
-            "x": {"scale": "x", "signal": ["@join", "", ["d['", ["@get", "x"] , "']"]]},
-            "dx": {"scale": "x", "band": true, "mult": 0.5},
-            "y": {"scale": "y", "signal": ["@join", "", ["d['", ["@get", "y"] , "']"]], "offset": -5},
-            "text": {
-              "template": [
-                "@get",
-                "tooltip",
-                [
-                  "@join",
-                  "",
-                  [
-                    "{{d['",
-                    ["@get", "x"],
-                    "']}}: {{d['",
-                    ["@get", "y"],
-                    "']}}"
+        "type": "group",
+        "marks": [
+          "@map",
+          ["@get", "hover"],
+          "h",
+          {
+            "type": "text",
+            "properties": {
+              "enter": {
+                "align": {"value": "center"},
+                "fill": {"value": "#333"}
+              },
+              "update": {
+                "x": {"scale": "x", "signal": ["@join", "", ["d[", ["@get", "x"], "]"]]},
+                "dx": {"scale": "x", "band": true, "mult": 0.5},
+                "y": {"scale": "y", "signal": ["@join", "", ["d[", ["@get", "y"], "]"]], "offset": ["@add", -5, ["@mult", -15, ["@get", "index"]]]},
+                "text": {
+                  "template": [
+                    "@join", "",
+                    [["@get", "h"], ": ", "{{d['", ["@get", "h"] ,"']}}"]
                   ]
-                ]
-              ]
-            },
-            "fillOpacity": {
-              "rule": [
-                {
-                  "predicate": {
-                    "name": "tooltip",
-                    "id": {"value": null}
-                  },
-                  "value": 0
                 },
-                {"value": 1}
-              ]
+                "fillOpacity": {
+                  "rule": [
+                    {
+                      "predicate": {
+                        "name": "tooltip",
+                        "id": {"value": null}
+                      },
+                      "value": 0
+                    },
+                    {"value": 1}
+                  ]
+                }
+              }
             }
           }
-        }
+        ]
       }
     ]
   }

@@ -51,7 +51,8 @@
       ],
       "x": "id",
       "y": "a",
-      "color": "b"
+      "color": "b",
+      "hover": ["id", "c"]
     }
   },
   {

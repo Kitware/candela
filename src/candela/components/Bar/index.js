@@ -39,6 +39,16 @@ export default class Bar {
             from: 'data',
             fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
           }
+        },
+        {
+          name: 'hover',
+          type: 'string_list',
+          format: 'string_list',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
         }
       ]
     };
