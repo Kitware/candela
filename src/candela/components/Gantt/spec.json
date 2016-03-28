@@ -11,8 +11,7 @@
   [
     "@merge",
     [
-      "@apply",
-      "axis",
+      "@axis",
       [
         "@merge",
         ["@get", "xAxis"],
