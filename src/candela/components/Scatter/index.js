@@ -1,5 +1,5 @@
 import VisComponent from '../../VisComponent';
-import vcharts from '../../../vcharts';
+import vega from '../../util/vega';
 import spec from './spec.json';
 
 export default class Scatter extends VisComponent {
@@ -77,7 +77,7 @@ export default class Scatter extends VisComponent {
 
   constructor (el, options) {
     super(el);
-    this.chart = vcharts.chart(spec, el, options);
+    this.chart = vega.chart(spec, el, options);
   }
 
   render () {
