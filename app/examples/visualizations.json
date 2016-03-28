@@ -28,9 +28,11 @@
     "name": "LineUp",
     "description": "LineUp ranking visualization.",
     "component": "LineUp",
-    "data": "iris",
     "options": {
-      "data": "iris"
+      "data": "iris",
+      "stacked": true,
+      "animation": true,
+      "histograms": true
     }
   },
   {
