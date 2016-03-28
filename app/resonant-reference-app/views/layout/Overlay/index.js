@@ -3,13 +3,19 @@ import d3 from 'd3';
 import jQuery from 'jquery';
 
 // Modal overlay views
-import StartingGuide from '../overlays/StartingGuide';
-import DatasetLibrary from '../overlays/DatasetLibrary';
-import VisualizationLibrary from '../overlays/VisualizationLibrary';
+import HamburgerMenu from '../../overlays/HamburgerMenu';
+import AchievementLibrary from '../../overlays/AchievementLibrary';
+import StartingGuide from '../../overlays/StartingGuide';
+import DatasetLibrary from '../../overlays/DatasetLibrary';
+import VisualizationLibrary from '../../overlays/VisualizationLibrary';
+import ToolchainLibrary from '../../overlays/ToolchainLibrary';
 let VIEWS = {
-  startingGuide: StartingGuide,
-  datasetLibrary: DatasetLibrary,
-  visualizationLibrary: VisualizationLibrary
+  HamburgerMenu: HamburgerMenu,
+  AchievementLibrary: AchievementLibrary,
+  ToolchainLibrary: ToolchainLibrary,
+  StartingGuide: StartingGuide,
+  DatasetLibrary: DatasetLibrary,
+  VisualizationLibrary: VisualizationLibrary
 };
 
 import closeIcon from '../../../images/close.svg';
@@ -20,7 +26,7 @@ let Overlay = Backbone.View.extend({
     let self = this;
 
     if (window.location.hash === '') {
-      self.render('startingGuide');
+      self.render('StartingGuide');
     } else {
       self.render(null);
     }
@@ -37,10 +43,12 @@ let Overlay = Backbone.View.extend({
   },
   render: function (template) {
     let self = this;
-
+    let rerendering = false;
+    
     if (template === undefined) {
       // we're just re-rendering, not switching
       template = self.template;
+      rerendering = true;
     } else {
       // because we're switching, save the setting
       // for next time we just re-render
@@ -51,7 +59,7 @@ let Overlay = Backbone.View.extend({
       self.$el.html('');
 
       if (VIEWS.hasOwnProperty(template)) {
-        let temp = new window.overlays[template]();
+        let temp = new VIEWS[template]();
         self.el.appendChild(temp.el);
         temp.render();
       } else {
@@ -74,8 +82,8 @@ let Overlay = Backbone.View.extend({
         self.render(null);
       });
 
-      if (template === 'startingGuide') {
-        // Don't bother fading in the startingGuide
+      if (rerendering || template === 'StartingGuide') {
+        // Don't fade in
         d3.select(self.el).style('opacity', 1.0);
       } else {
         d3.select(self.el)

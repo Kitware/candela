@@ -16,21 +16,44 @@ let MetadataItem = girder.models.ItemModel.extend({
   sync: function (method, model, options) {
     let self = this;
     options = options || {};
-    let errorFunc = options.error || (() => {
-      self.syncError(arguments);
-    });
+    
+    // Clear any leftover girder callbacks
+    self.stopListening(self, 'g:error');
+    self.stopListening(self, 'g:saved');
+    self.stopListening(self, 'g:fetched');
+    self.stopListening(self, 'g:deleted');
+    
+    // Error and success functions to make sure
+    // the regular events get fired
+    let errorFunc = () => {
+      let defaultErrorFunc = options.error || (() => {
+        self.syncError(arguments);
+      });
+      defaultErrorFunc();
+      if (options.silent !== true) {
+        // self.trigger('error');
+      }
+    };
+    let successFunc = () => {
+      let defaultSuccessFunc = options.success || (() => {});
+      defaultSuccessFunc();
+      if (options.silent !== true) {
+        // self.trigger('sync');
+        // self.trigger('change');
+      }
+    };
 
     if (method === 'create') {
       // By default, we want to save new items in the user's
       // Private folder... so we're going to ask the server
-      // to create a new private item. If it already happens
-      // to exist, we use / overwrite the item that's there
+      // to create a new private item.
 
       girder.restRequest({
         path: 'item/privateItem',
         data: {
           name: self.get('name'),
-          description: self.get('description') || ''
+          description: self.get('description') || '',
+          reuseExisting: false
         },
         type: 'GET',
         error: errorFunc
@@ -51,19 +74,21 @@ let MetadataItem = girder.models.ItemModel.extend({
       // metadata before we sync the rest,
       // or else it will get nuked
       girder.restRequest({
-        path: '/item/' + this.get(self.idAttribute) + '/metadata',
+        path: '/item/' + self.getId() + '/metadata',
         contentType: 'application/json',
         data: JSON.stringify(self.get('meta')),
         type: 'PUT',
         error: errorFunc
       }).done((resp) => {
         // Okay, go ahead and finish the sync the girder way
+        self.listenToOnce(self, 'g:saved', successFunc);
+        self.listenToOnce(self, 'g:error', errorFunc);
         girder.models.ItemModel.prototype.save.apply(self);
       }).error((err) => {
         errorFunc(err.responseJSON.message);
       });
     } else if (method === 'read') {
-      if (self.get(self.idAttribute) === undefined) {
+      if (self.getId() === undefined) {
         // If we haven't yet identified the id, so look
         // in the Private folder by item name
         girder.restRequest({
@@ -77,19 +102,21 @@ let MetadataItem = girder.models.ItemModel.extend({
         }).done((resp) => {
           // Load up everything we just got
           self.set(resp);
-          if (options.success) {
-            options.success(self.toJSON(), resp, options);
-          }
+          successFunc(self.toJSON(), resp, options);
         }).error((err) => {
           errorFunc(err.responseJSON.message);
         });
       } else {
         // Otherwise, just go with the default girder behavior
+        self.listenToOnce(self, 'g:fetched', successFunc);
+        self.listenToOnce(self, 'g:error', errorFunc);
         girder.models.ItemModel.prototype.fetch.apply(self);
       }
     } else if (method === 'delete') {
-      // I think we can safely assume we'll have an id if we
-      // want to delete something... so just use the default girder behavior
+      // We'll already have an id if there's something to delete...
+      // so just use the default girder behavior
+      self.listenToOnce(self, 'g:deleted', successFunc);
+      self.listenToOnce(self, 'g:error', errorFunc);
       girder.models.ItemModel.prototype.destroy.apply(self);
       // Now let's delete the id so we don't go thinking we're synced anymore
       self.unset(self.idAttribute);
@@ -103,14 +130,29 @@ let MetadataItem = girder.models.ItemModel.extend({
     let self = this;
     self.sync('read', self.toJSON(), options);
   },
+  create: function (attributes, options) {
+    let self = this;
+    self.set(attributes);
+    self.unset(self.idAttribute, {
+      silent: true
+    });
+    self.sync('create', self.toJSON(), options);
+  },
   save: function (attributes, options) {
     let self = this;
     self.set(attributes);
-    if (self.get(self.idAttribute) === undefined) {
-      self.sync('create', self.toJSON(), options);
+
+    if (self.getId() === undefined) {
+      if (options && options.error) {
+        options.error('Can\'t save without an ID');
+      }
     } else {
       self.sync('update', self.toJSON(), options);
     }
+  },
+  destroy: function (options) {
+    let self = this;
+    self.sync('delete', self.toJSON(), options);
   },
   setMeta: function (key, value) {
     let self = this;
@@ -126,6 +168,17 @@ let MetadataItem = girder.models.ItemModel.extend({
     }
     self.set('meta', meta);
   },
+  unsetMeta: function (key) {
+    let self = this;
+    let meta = self.get('meta');
+    meta = meta || {};
+    if (key !== undefined) {
+      meta[key] = null;
+      self.set('meta', meta);
+    } else {
+      self.unset('meta');
+    }
+  },
   getMeta: function (key) {
     let self = this;
     let meta = self.get('meta');
@@ -134,6 +187,31 @@ let MetadataItem = girder.models.ItemModel.extend({
       return meta[key];
     } else {
       return meta;
+    }
+  },
+  getId: function () {
+    let self = this;
+    return self.get(self.idAttribute);
+  },
+  previousMeta: function (key) {
+    let self = this;
+    let prevMeta = self.previous('meta');
+    prevMeta = prevMeta || {};
+    if (key !== undefined) {
+      return prevMeta[key];
+    } else {
+      return prevMeta;
+    }
+  },
+  hasMetaChanged: function (key, eqFunc) {
+    let self = this;
+    eqFunc = eqFunc || function (a, b) {
+      return a === b;
+    };
+    if (key === undefined) {
+      return self.hasChanged('meta');
+    } else {
+      return !eqFunc(self.previousMeta(key), self.getMeta(key));
     }
   }
 });

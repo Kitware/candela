@@ -18,15 +18,15 @@ let STATUS = {
   NO_ATTRIBUTES: 5
 };
 
-let SingleDatasetView = Widget.extend({
+let DatasetView = Widget.extend({
   initialize: function (options) {
     let self = this;
     Widget.prototype.initialize.apply(self, options);
     self.friendlyName = 'Dataset';
-    self.hashName = 'singleDatasetView';
+    self.hashName = 'DatasetView';
 
     self.statusText.onclick = function () {
-      window.layout.overlay.render('datasetLibrary');
+      window.mainPage.overlay.render('DatasetLibrary');
     };
     self.statusText.title = 'Click to select a different dataset.';
 
@@ -68,15 +68,15 @@ let SingleDatasetView = Widget.extend({
       }
     });
 
-    self.listenTo(window.toolchain, 'rra:changeDatasets', self.render);
-    self.listenTo(window.toolchain, 'rra:changeMappings', self.renderAttributeSettings);
+    self.listenTo(window.mainPage.toolchain, 'rra:changeDatasets', self.render);
+    self.listenTo(window.mainPage.toolchain, 'rra:changeMappings', self.renderAttributeSettings);
   },
   renderInfoScreen: function () {
     let self = this;
     self.newInfo = false;
     self.renderIndicators();
 
-    window.layout.overlay.render(infoTemplate);
+    window.mainPage.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
     let self = this;
@@ -84,7 +84,7 @@ let SingleDatasetView = Widget.extend({
     if (self.status === STATUS.NO_DATA) {
       screen = self.getErrorScreen(`
 You have not chosen a dataset yet. Click 
-<a onclick="window.layout.overlay.render('datasetLibrary')">
+<a onclick="window.mainPage.overlay.render('DatasetLibrary')">
 here</a> to choose one.`);
     } else if (self.status === STATUS.SUCCESS) {
       screen = self.getSuccessScreen(`
@@ -105,15 +105,15 @@ you'll probably need to
 <a>edit</a> or <a>reshape</a> the data in order to use it.`);
     }
 
-    window.layout.overlay.render(screen);
+    window.mainPage.overlay.render(screen);
   },
   renderAttributeSettings: function () {
     let self = this;
-    let meta = window.toolchain.get('meta');
+    let datasets = window.mainPage.toolchain.getMeta('datasets');
     let dataset;
     let attrs;
-    if (meta && meta.datasets && meta.datasets.at(0)) {
-      dataset = meta.datasets.at(0);
+    if (datasets && datasets.at(0)) {
+      dataset = datasets.at(0);
       attrs = dataset.getSpec().attributes;
     } else {
       attrs = {};
@@ -150,12 +150,9 @@ you'll probably need to
     let self = this;
 
     // Get the dataset in the toolchain (if there is one)
-    let dataset = window.toolchain.get('meta');
+    let dataset = window.mainPage.toolchain.getMeta('datasets');
     if (dataset) {
-      dataset = dataset.datasets;
-      if (dataset) {
-        dataset = dataset.at(0);
-      }
+      dataset = dataset.at(0);
     }
 
     self.$el.html(myTemplate);
@@ -228,4 +225,4 @@ you'll probably need to
   }
 });
 
-export default SingleDatasetView;
+export default DatasetView;

@@ -1,7 +1,6 @@
-import Backbone from 'backbone';
 import MetadataItem from './MetadataItem';
 import Dataset from './Dataset';
-
+let girder = window.girder;
 /*
     A Toolchain represents a user's saved session;
     it includes specific datasets, with specific
@@ -16,30 +15,106 @@ import Dataset from './Dataset';
 */
 
 let Toolchain = MetadataItem.extend({
-  defaults: {
-    name: 'Untitled Toolchain',
-    meta: {
-      datasets: [],
-      mappings: [],
-      visualizations: []
-    }
+  /*
+    resetToDefaults doesn't work unless defaults
+    is a function. If defaults are a simple object,
+    changes to the model mutate the defaults object.
+  */
+  defaults: () => {
+    return {
+      name: 'Untitled Toolchain',
+      meta: {
+        datasets: [],
+        mappings: [],
+        visualizations: [],
+        preferredWidgets: [],
+        requiredIcons: [
+          'DatasetView',
+          'MappingView',
+          'VisualizationView'
+        ]
+      }
+    };
   },
   initialize: function () {
     let self = this;
 
-    let DatasetCollection = Backbone.Collection.extend({
-      model: Dataset
-    });
-
     let meta = self.getMeta();
-    meta.datasets = new DatasetCollection(meta.datasets);
+
+    self.isPublic = undefined;
 
     // Forward events from dataset changes
-    self.listenTo(meta.datasets, 'rra:changeSpec', function () {
+    self.listenTo(meta.datasets, 'rra:changeSpec', () => {
       self.validateMappings();
     });
 
-    self.setMeta(meta);
+    self.listenTo(self, 'change', () => {
+      self.getVisibility();
+    });
+
+    if (self.getId() !== undefined) {
+      // We actually have some settings!
+      // Get them from the server
+      self.fetch();
+    }
+  },
+  getVisibility: function () {
+    let self = this;
+    let parentId = self.get('folderId');
+
+    if (parentId) {
+      // Look up which folder the toolchain lives in
+      girder.restRequest({
+        path: 'folder/' + parentId,
+        type: 'GET',
+        error: function () {
+          self.isPublic = undefined;
+        }
+      }).done(function (folder) {
+        if (folder && folder['name']) {
+          if (folder['name'] === 'Public') {
+            self.isPublic = true;
+          } else if (folder['name'] === 'Private') {
+            self.isPublic = false;
+          } else {
+            self.isPublic = undefined;
+          }
+        } else {
+          self.isPublic = undefined;
+        }
+      });
+    }
+  },
+  togglePublic: function () {
+    let self = this;
+    let id = self.getId();
+
+    if (id && self.isPublic !== undefined) {
+      girder.restRequest({
+        path: 'item/togglePublic/' + id,
+        type: 'POST',
+        error: function () {
+          self.isPublic = undefined;
+        }
+      }).done(function (newState) {
+        self.isPublic = newState;
+        self.trigger('change');
+      });
+    }
+  },
+  getMeta: function (key) {
+    let self = this;
+    let meta = MetadataItem.prototype.getMeta.apply(self, [key]);
+
+    if (key === undefined) {
+      if (meta.datasets instanceof Array) {
+        meta.datasets = new Dataset.Collection(meta.datasets);
+      }
+    } else if (key === 'datasets' && meta instanceof Array) {
+      meta = new Dataset.Collection(meta);
+    }
+
+    return meta;
   },
   isEmpty: function () {
     let self = this;
@@ -47,6 +122,30 @@ let Toolchain = MetadataItem.extend({
     return meta.datasets.length === 0 &&
       meta.visualizations.length === 0 &&
       meta.mappings.length === 0;
+  },
+  rename: function (newName) {
+    let self = this;
+    self.set('name', newName);
+    self.save();
+  },
+  resetToDefaults: function () {
+    let self = this;
+    self.clear({
+      silent: true
+    });
+    self.set(self.defaults());
+    self.isPublic = undefined;
+  },
+  getDatasetIds: function () {
+    let self = this;
+    let datasets = self.getMeta('datasets');
+    let ids = [];
+    datasets.each(function (dataset) {
+      if (dataset.id) {
+        ids.push(dataset.id);
+      }
+    });
+    return ids;
   },
   setDataset: function (newDataset, index = 0) {
     let self = this;
@@ -56,62 +155,48 @@ let Toolchain = MetadataItem.extend({
     newDataset = newDataset.toJSON();
 
     let meta = self.getMeta();
-    if (newDataset.exampleToolchain &&
-      meta.visualizations.length === 0) {
-      // The user is starting off with this dataset;
-      // we want to load up the example visualization and
-      // the mappings that go with it
-      self.setToolchain(newDataset.exampleToolchain);
+
+    // Okay, we're actually swapping
+    // in a different dataset
+    if (index >= meta.datasets.length) {
+      meta.datasets.push(newDataset);
+      self.setMeta(meta);
     } else {
-      // Okay, we're actually swapping
-      // in a different dataset
-      if (index >= meta.datasets.length) {
-        meta.datasets.push(newDataset);
-        self.setMeta(meta);
-      } else {
-        let oldDataset = meta.datasets.at(index);
-        if (oldDataset.get('_id') === newDataset['_id']) {
-          return;
-        }
-        meta.datasets.remove(oldDataset);
-        meta.datasets.add(newDataset, {
-          at: index
-        });
-        // Swapping in a new dataset invalidates the mappings
-        meta.mappings = [];
-        self.setMeta(meta);
+      let oldDataset = meta.datasets.at(index);
+      if (oldDataset.get('_id') === newDataset['_id']) {
+        return;
       }
-      self.save();
-      self.trigger('rra:changeDatasets');
-      self.trigger('rra:changeMappings');
+      meta.datasets.remove(oldDataset);
+      meta.datasets.add(newDataset, {
+        at: index
+      });
+      // Swapping in a new dataset invalidates the mappings
+      meta.mappings = [];
+      self.setMeta(meta);
     }
+    self.save();
+    self.trigger('rra:changeDatasets');
+    self.trigger('rra:changeMappings');
   },
   setVisualization: function (newVisualization, index = 0) {
     let self = this;
     let meta = self.getMeta();
-    if (newVisualization.exampleToolchain &&
-      meta.datasets.length === 0) {
-      // The user is starting off with this visualization;
-      // we want to load up the example dataset and
-      // the mappings that goes with it
-      self.setToolchain(newVisualization.exampleToolchain);
+
+    if (index >= meta.visualizations.length) {
+      meta.visualizations.push(newVisualization);
+      self.set('meta', meta);
     } else {
-      if (index >= meta.visualizations.length) {
-        meta.visualizations.push(newVisualization);
-        self.set('meta', meta);
-      } else {
-        if (meta.visualizations[index].name === newVisualization.name) {
-          return;
-        }
-        meta.visualizations[index] = newVisualization;
-        // Swapping in a new dataset invalidates the mappings
-        meta.mappings = [];
-        self.setMeta(meta);
+      if (meta.visualizations[index].name === newVisualization.name) {
+        return;
       }
-      self.save();
-      self.trigger('rra:changeVisualizations');
-      self.trigger('rra:changeMappings');
+      meta.visualizations[index] = newVisualization;
+      // Swapping in a new dataset invalidates the mappings
+      meta.mappings = [];
+      self.setMeta(meta);
     }
+    self.save();
+    self.trigger('rra:changeVisualizations');
+    self.trigger('rra:changeMappings');
   },
   shapeDataForVis: function (callback, index = 0) {
     let self = this;
@@ -219,6 +304,46 @@ let Toolchain = MetadataItem.extend({
     self.setMeta(meta);
     self.save();
     self.trigger('rra:changeMappings');
+  },
+  closeWidget: function (widgetName) {
+    let self = this;
+    // Remove widgetName from the list of widgets that this
+    // toolchain last had open (save the new configuration)
+    let widgetList = self.getMeta('preferredWidgets');
+    let index = widgetList.indexOf(widgetName);
+    if (index !== -1) {
+      widgetList.splice(index, 1);
+      self.setMeta('preferredWidgets', widgetList);
+      self.save();
+      self.trigger('rra:changeWidget');
+    }
+  },
+  openWidget: function (widgetName) {
+    let self = this;
+
+    // Figure out where the widget should go;
+    // it should match the order of the icons
+    let iconList = self.getMeta('requiredIcons');
+    let widgetList = self.getMeta('preferredWidgets');
+
+    if (iconList.indexOf(widgetName) === -1) {
+      throw new Error(`Attempted to open a widget that
+        isn't on the toolbar: ` + widgetName);
+    }
+    if (widgetList.indexOf(widgetName) !== -1) {
+      // The widget is already open
+      return;
+    }
+
+    // TODO: probably a more efficient way to do this...
+    widgetList.push(widgetName);
+    widgetList.sort((a, b) => {
+      return iconList.indexOf(a) - iconList.indexOf(b);
+    });
+
+    self.setMeta('preferredWidgets', widgetList);
+    self.save();
+    self.trigger('rra:changeWidget');
   }
 });
 

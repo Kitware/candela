@@ -27,8 +27,8 @@ let MappingView = Widget.extend({
     Widget.prototype.initialize.apply(self, options);
 
     self.friendlyName = 'Mapping';
-    self.hashName = 'mappingView';
-    
+    self.hashName = 'MappingView';
+
     self.newInfo = true;
     self.icons.splice(0, 0, {
       src: function () {
@@ -41,7 +41,7 @@ let MappingView = Widget.extend({
         self.renderInfoScreen();
       }
     });
-    
+
     self.ok = false;
     self.icons.splice(0, 0, {
       src: function () {
@@ -62,10 +62,10 @@ let MappingView = Widget.extend({
         self.renderHelpScreen();
       }
     });
-    
+
     self.selection = null;
 
-    self.listenTo(window.toolchain, 'rra:changeMappings', function () {
+    self.listenTo(window.mainPage.toolchain, 'rra:changeMappings', function () {
       self.selection = null;
       self.render();
     });
@@ -74,8 +74,8 @@ let MappingView = Widget.extend({
     let self = this;
     self.newInfo = false;
     self.renderIndicators();
-    
-    window.layout.overlay.render(infoTemplate);
+
+    window.mainPage.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
     let self = this;
@@ -85,9 +85,9 @@ let MappingView = Widget.extend({
 You've wired up all the connections that the visualization needs.
 Well done!`);
     } else {
-      let meta = window.toolchain.get('meta');
+      let meta = window.mainPage.toolchain.get('meta');
       if (!meta || !meta.visualizations || !meta.visualizations[0] ||
-          !meta.datasets || !meta.datasets[0]) {
+        !meta.datasets || !meta.datasets[0]) {
         screen = self.getErrorScreen(`
 You need to choose both a Dataset and a Visualization 
 in order to connect them together.`);
@@ -97,8 +97,8 @@ The visualization needs more connections to data in
 order to display anything.`);
       }
     }
-    
-    window.layout.overlay.render(screen);
+
+    window.mainPage.overlay.render(screen);
   },
   createNodeId: function (d) {
     // Generate a valid ID for the node
@@ -113,12 +113,13 @@ order to display anything.`);
   constructLookups: function () {
     let self = this;
 
-    let meta = window.toolchain.get('meta');
+    let meta = window.mainPage.toolchain.getMeta();
 
     let specs = {
       data: [],
       vis: []
     };
+
     meta.datasets.each(function (d) {
       specs.data.push(d.getSpec());
     });
@@ -134,7 +135,7 @@ order to display anything.`);
     let nodeEdgeLookup = {};
 
     // Helper functions
-    function _createNode (side, groupIndex, attrName, attrType) {
+    function _createNode(side, groupIndex, attrName, attrType) {
       let newNode = {
         side: side,
         index: groupIndex,
@@ -175,7 +176,7 @@ order to display anything.`);
       nodeEdgeLookup[newNode.id] = [];
     }
 
-    function _createEdge (established, visIndex, visAttrName, dataIndex, dataAttrName) {
+    function _createEdge(established, visIndex, visAttrName, dataIndex, dataAttrName) {
       // Edges always go from data to vis
       let sourceId = self.createNodeId({
         index: dataIndex,
@@ -311,7 +312,7 @@ order to display anything.`);
         visNode = self.selection;
         dataNode = d;
       }
-      window.toolchain.addMapping({
+      window.mainPage.toolchain.addMapping({
         visIndex: visNode.index,
         visAttribute: visNode.attrName,
         dataIndex: dataNode.index,
@@ -327,7 +328,7 @@ order to display anything.`);
         visNode = self.selection;
         dataNode = d;
       }
-      window.toolchain.removeMapping({
+      window.mainPage.toolchain.removeMapping({
         visIndex: visNode.index,
         visAttribute: visNode.attrName,
         dataIndex: dataNode.index,
@@ -363,10 +364,10 @@ order to display anything.`);
         lastData = i;
       }
     });
-    
+
     let numData = lastData ? 1 + lastData - firstData : 0;
     let numVis = lastVis ? 1 + lastVis - firstVis : 0;
-    
+
     // Update our little indicator
     // to describe the mapping
     self.statusText.text = graph.realEdgeCount + ' / ' + numVis;
@@ -394,7 +395,7 @@ order to display anything.`);
     // Figure out how we're going to lay things
     // out based on how much space we have
     let nodeHeight = 40;
-    
+
     // Temporarily force the scroll bars so we
     // account for their size
     self.$el.css('overflow', 'scroll');
@@ -403,13 +404,13 @@ order to display anything.`);
       height: self.el.clientHeight
     };
     self.$el.css('overflow', '');
-    
+
     // If there isn't enough room for all
     // the nodes, extend the height
     bounds.height = Math.max(bounds.height,
       1.5 * nodeHeight * (numData + 2),
       1.5 * nodeHeight * (numVis + 2));
-    
+
     self.$el.find('svg')
       .attr({
         width: bounds.width,
@@ -469,7 +470,7 @@ order to display anything.`);
         graph.nodeEdgeLookup[d.id].forEach(function (edgeIndex) {
           let edge = graph.edges[edgeIndex];
           if (graph.nodes[edge.source].id === self.selection.id ||
-              graph.nodes[edge.target].id === self.selection.id) {
+            graph.nodes[edge.target].id === self.selection.id) {
             jQuery('#' + graph.edges[edgeIndex].id).addClass('hovered');
           }
         });

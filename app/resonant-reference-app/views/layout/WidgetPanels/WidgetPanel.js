@@ -1,11 +1,23 @@
 import Backbone from 'backbone';
 import d3 from 'd3';
 
+// All widgets that are available
+// TODO: When webpack supports it, this would be
+// an ideal place for code splitting... only load
+// widgets as they're needed
+import DatasetView from '../../widgets/DatasetView';
+import MappingView from '../../widgets/MappingView';
+import VisualizationView from '../../widgets/VisualizationView';
+let WIDGETS = {
+  DatasetView: DatasetView,
+  MappingView: MappingView,
+  VisualizationView: VisualizationView
+};
+
 let WidgetPanel = Backbone.View.extend({
   initialize: function (options) {
     let self = this;
-    self.widget = options.widget;
-    self.hidden = false;
+    self.widget = new WIDGETS[options.widget]();
   },
   render: function () {
     let self = this;
@@ -15,6 +27,10 @@ let WidgetPanel = Backbone.View.extend({
       .selectAll('span.sectionHeader').data([0]);
     let headerEnter = header.enter().append('span')
       .attr('class', 'sectionHeader');
+
+    // Add the icon that goes with the panel
+    headerEnter.append('img')
+      .attr('src', window.mainPage.ICONS[self.widget.hashName]);
 
     // Add a title to the header that collapses / expands
     // the section
@@ -35,7 +51,6 @@ let WidgetPanel = Backbone.View.extend({
       .attr('class', 'indicatorText');
     indicatorsEnter.append('span')
       .attr('class', 'indicatorIcons');
-    self.renderIndicators();
 
     // Finally, a div (that will scroll)
     // to contain the view
@@ -50,6 +65,10 @@ let WidgetPanel = Backbone.View.extend({
     // Now let's let the widget know
     // that we have its element
     self.widget.setPanel(self);
+
+    self.widget.render();
+
+    self.renderIndicators();
   },
   renderIndicators() {
     let self = this;
@@ -74,30 +93,32 @@ let WidgetPanel = Backbone.View.extend({
 
     indicatorIcons.enter().append('img');
     indicatorIcons.exit().remove();
-    indicatorIcons.attr('src', (d) => d.src())
-      .attr('title', (d) => d.title ? d.title() : null)
-      .on('click', (d) => {
-        d3.event.stopPropagation();
-        if (d.onclick) {
-          d.onclick(d3.event);
-        }
-      });
+    indicatorIcons.attr('src', (d) => {
+      return typeof d.src === 'function' ? d.src() : d.src;
+    }).attr('title', (d) => {
+      let title = typeof d.title === 'function' ? d.title() : d.title;
+      return title || null;
+    }).on('click', (d) => {
+      d3.event.stopPropagation();
+      if (d.onclick) {
+        d.onclick(d3.event);
+      }
+    });
   },
   toggle: function () {
     let self = this;
-    let hashes = window.location.hash.split('#');
-    let index = hashes.indexOf(self.widget.hashName);
+    let widgets = window.mainPage.router.getCurrentWidgets();
+    let index = widgets.indexOf(self.widget.hashName);
 
     if (index === -1) {
-      // Toggle on; add this view
-      hashes.push(self.widget.hashName);
+      // Toggle on; expand this view
+      window.mainPage.router.expandWidget(self.widget.hashName);
     } else {
-      // Toggle off; collapse this view
-      hashes.splice(index, 1);
+      // Toggle off; minimize this view
+      window.mainPage.router.minimizeWidget(self.widget.hashName);
     }
-    window.location.hash = hashes.join('#');
-    window.layout.widgetPanels.render();
   }
 });
 
+WidgetPanel.WIDGETS = WIDGETS;
 module.exports = WidgetPanel;

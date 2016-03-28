@@ -45,6 +45,7 @@ div.accordion section .sectionHeader {
 }
 
 div.accordion section .sectionHeader .title {
+  display: inline-block;
   line-height: 1.75em;
   text-indent: 0.5em;
   font-weight: bold;
@@ -96,6 +97,7 @@ div.accordion section.targeted .sectionHeader {
   -o-transform: rotate(0deg);
   transform: rotate(0deg);
 }
+
 div.accordion section.targeted .sectionHeader .title {
   line-height: 2em;
   color: #333;

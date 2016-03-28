@@ -2,6 +2,7 @@ import Underscore from 'underscore';
 import Backbone from 'backbone';
 import jQuery from 'jquery';
 
+import closeIcon from '../../../images/close.svg';
 import collapseIcon from '../../../images/collapse.svg';
 import expandIcon from '../../../images/expand.svg';
 import okayIcon from '../../../images/okay.svg';
@@ -25,7 +26,7 @@ let Widget = Backbone.View.extend({
         self.panel.toggle();
       }
     };
-    
+
     self.icons = [{
       src: function () {
         return self.isTargeted() ? collapseIcon : expandIcon;
@@ -35,6 +36,12 @@ let Widget = Backbone.View.extend({
       },
       onclick: function () {
         self.panel.toggle();
+      }
+    }, {
+      src: closeIcon,
+      title: 'Close Panel',
+      onclick: function () {
+        window.mainPage.widgetPanels.close(self.hashName);
       }
     }];
     self.panel = null;
@@ -53,13 +60,19 @@ let Widget = Backbone.View.extend({
     self.panel.renderIndicators();
   },
   getLoadingScreen: function (message) {
-    return Underscore.template(loadingTemplate)({message: message});
+    return Underscore.template(loadingTemplate)({
+      message: message
+    });
   },
   getErrorScreen: function (message) {
-    return Underscore.template(errorTemplate)({message: message});
+    return Underscore.template(errorTemplate)({
+      message: message
+    });
   },
   getSuccessScreen: function (message) {
-    return Underscore.template(successTemplate)({message: message});
+    return Underscore.template(successTemplate)({
+      message: message
+    });
   }
 });
 

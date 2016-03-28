@@ -24,6 +24,27 @@
   background-color: #ccc;
 }
 
+#Header div.indicators {
+  position: relative;
+  width: 0px;
+  height: 0px;
+}
+
+#Header div.indicators img {
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  top: 0.5em;
+}
+
+#Header div.indicators img.left {
+  left: -3em;
+}
+
+#Header div.indicators img.right {
+  left: -1em;
+}
+
 #Header .headerSeparator {
   border: 1px solid #666666;
   height: 2em;
@@ -40,6 +61,5 @@
   color: inherit;
   border: none;
   font-size: inherit;
-  text-align: right;
   width: 10em;
 }

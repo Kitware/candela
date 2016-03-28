@@ -1,4 +1,4 @@
-from privateItem import PrivateItem
+from currentUser import CurrentUser
 
 class CustomAppRoot:
     exposed = True
@@ -29,5 +29,8 @@ def load(info):
     info['serverRoot'], info['serverRoot'].girder = (CustomAppRoot(),
                                                      info['serverRoot'])
     info['serverRoot'].api = info['serverRoot'].girder.api
-    privateItem = PrivateItem()
-    info['apiRoot'].item.route('GET', ('privateItem', ), privateItem.getOrMakePrivateItem)
+    currentUser = CurrentUser()
+    info['apiRoot'].item.route('GET', ('privateItem', ), currentUser.getOrMakePrivateItem)
+    info['apiRoot'].folder.route('GET', ('privateFolder', ), currentUser.getOrMakePrivateFolder)
+    info['apiRoot'].folder.route('GET', ('publicFolder', ), currentUser.getOrMakePublicFolder)
+    info['apiRoot'].item.route('POST', ('togglePublic', ':id'), currentUser.togglePublic)
