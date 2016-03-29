@@ -103,7 +103,7 @@ module.exports = {
       },
       {
         test: /\.json$/,
-        loader: 'json'
+        loaders: ['json', 'strip-json-comments-loader']
       }
     ]
   }
