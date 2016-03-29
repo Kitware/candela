@@ -20,7 +20,7 @@ module.exports = {
     loaders: [
       {
         test: /\.jpe?g$|\.gif$|\.png$|\.woff$|\.wav$|\.mp3$|\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$|\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'url'
+        loader: 'url-loader'
       },
       {
         test: /\.css$/,
@@ -28,15 +28,15 @@ module.exports = {
       },
       {
         test: /\.html$/,
-        loader: 'html?attrs=img:src'
+        loader: 'html-loader?attrs=img:src'
       },
       {
         test: /\.json$/,
-        loaders: ['json', 'strip-json-comments-loader']
+        loaders: ['json-loader', 'strip-json-comments-loader']
       },
       {
         test: /\.jade$/,
-        loaders: ['jade']
+        loaders: ['jade-loader']
       },
       {
         test: /\.js$/,
