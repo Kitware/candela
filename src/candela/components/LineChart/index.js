@@ -1,8 +1,9 @@
 import VisComponent from '../../VisComponent';
+import Events from '../../VisComponent/mixin/Events';
 import vcharts from '../../../vcharts';
 import spec from './spec.json';
 
-export default class LineChart extends VisComponent {
+export default class LineChart extends Events(VisComponent) {
   constructor (el, data) {
     super(el);
 
