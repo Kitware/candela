@@ -1,6 +1,6 @@
 import candela from './../../src/candela';
+import AutoResize from './../../src/candela/VisComponent/mixin/AutoResize';
 import indexContent from './index.jade';
-import 'javascript-detect-element-resize/detect-element-resize';
 import './index.styl';
 
 function showPage () {
@@ -25,16 +25,20 @@ window.addEventListener('load', () => {
   }
 
   [...document.getElementsByClassName('vis-element')].forEach(el => {
-    let vis = new candela.components.Scatter(
+    let vis = new (AutoResize(candela.components.Scatter))(
       el,
-      data,
       {
+        data,
         x: 'x',
         y: 'y'
       }
     );
     vis.render();
-    window.addResizeListener(el, () => vis.render());
+
+    vis.on('resize', (w, h, me) => {
+      console.log(`resize event: ${w}, ${h}`);
+      me.render();
+    });
   });
 
   window.setInterval(() => {

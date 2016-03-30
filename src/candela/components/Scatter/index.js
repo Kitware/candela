@@ -1,7 +1,8 @@
+import VisComponent from '../../VisComponent';
 import vcharts from '../../../vcharts';
 import spec from './spec.json';
 
-export default class Scatter {
+export default class Scatter extends VisComponent {
   static get spec () {
     return {
       options: [
@@ -75,6 +76,7 @@ export default class Scatter {
   }
 
   constructor (el, options) {
+    super(el);
     this.chart = vcharts.chart(spec, el, options);
   }
 
