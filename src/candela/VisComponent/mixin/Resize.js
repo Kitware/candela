@@ -1,7 +1,7 @@
 import 'javascript-detect-element-resize/detect-element-resize';
 import Events from './Events';
 
-let AutoResize = Base => class extends Events(Base) {
+let Resize = Base => class extends Events(Base) {
   constructor (...args) {
     super(...args);
 
@@ -15,4 +15,4 @@ let AutoResize = Base => class extends Events(Base) {
   }
 };
 
-export default AutoResize;
+export default Resize;
