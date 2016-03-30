@@ -1,10 +1,12 @@
+import { getElementSize } from '../../util';
+
 let InitSize = Base => class extends Base {
   constructor (...args) {
     super(...args);
 
-    const style = window.getComputedStyle(this.el);
-    this.width = window.parseInt(style.getPropertyValue('width'));
-    this.height = window.parseInt(style.getPropertyValue('height'));
+    const size = getElementSize(this.el);
+    this.width = size.width;
+    this.height = size.height;
   }
 };
 

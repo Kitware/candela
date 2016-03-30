@@ -1,16 +1,14 @@
 import 'javascript-detect-element-resize/detect-element-resize';
 import Events from './Events';
+import { getElementSize } from '../../util';
 
 let Resize = Base => class extends Events(Base) {
   constructor (...args) {
     super(...args);
 
     window.addResizeListener(this.el, () => {
-      const style = window.getComputedStyle(this.el);
-      const width = window.parseInt(style.getPropertyValue('width'));
-      const height = window.parseInt(style.getPropertyValue('height'));
-
-      this.emit('resize', width, height, this);
+      const size = getElementSize(this.el);
+      this.emit('resize', size.width, size.height, this);
     });
   }
 };

@@ -1,6 +1,7 @@
 import d3 from 'd3';
 import vg from 'vega';
 import axisTemplate from './axis.json';
+import { getElementSize } from '..';
 
 let getNestedRec = function (spec, parts) {
   if (spec === undefined || parts.length === 0) {
@@ -352,9 +353,9 @@ let chart = function (template, el, initialOptions, done) {
     let el = d3.select(that.el)[0][0];
     let sizeOptions = {};
 
-    let style = window.getComputedStyle(el, null);
-    let elWidth = window.parseInt(style.getPropertyValue('width'));
-    let elHeight = window.parseInt(style.getPropertyValue('height'));
+    const size = getElementSize(el);
+    const elWidth = size.width;
+    const elHeight = size.height;
 
     if (elWidth !== 0 && elHeight !== 0) {
       if (that.options.width === undefined) {
