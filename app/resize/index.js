@@ -27,8 +27,8 @@ window.addEventListener('load', () => {
   [...document.getElementsByClassName('vis-element')].forEach(el => {
     let vis = new candela.components.Scatter(
       el,
-      data,
       {
+        data,
         x: 'x',
         y: 'y'
       }
