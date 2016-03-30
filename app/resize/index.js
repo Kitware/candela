@@ -25,14 +25,11 @@ window.addEventListener('load', () => {
   }
 
   [...document.getElementsByClassName('vis-element')].forEach(el => {
-    let vis = new candela.components.Scatter(
-      el,
-      {
-        data,
-        x: 'x',
-        y: 'y'
-      }
-    );
+    let vis = new candela.components.Scatter(el, {
+      data,
+      x: 'x',
+      y: 'y'
+    });
     vis.render();
     window.addResizeListener(el, () => vis.render());
   });
