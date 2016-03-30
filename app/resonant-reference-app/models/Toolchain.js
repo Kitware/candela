@@ -64,7 +64,7 @@ let Toolchain = girder.models.ItemModel.extend({
 
     let meta = self.get('meta');
     if (newDataset.exampleToolchain &&
-        meta.visualizations.length === 0) {
+      meta.visualizations.length === 0) {
       // The user is starting off with this dataset;
       // we want to load up the example visualization and
       // the mappings that goes with it
@@ -79,7 +79,9 @@ let Toolchain = girder.models.ItemModel.extend({
           return;
         }
         meta.datasets.remove(oldDataset);
-        meta.datasets.add(newDataset, { at: index });
+        meta.datasets.add(newDataset, {
+          at: index
+        });
         // Swapping in a new dataset invalidates the mappings
         meta.mappings = [];
         self.set('meta', meta);
@@ -92,7 +94,7 @@ let Toolchain = girder.models.ItemModel.extend({
     let self = this;
     let meta = self.get('meta');
     if (newVisualization.exampleToolchain &&
-        meta.datasets.length === 0) {
+      meta.datasets.length === 0) {
       // The user is starting off with this visualization;
       // we want to load up the example dataset and
       // the mappings that goes with it
@@ -118,14 +120,45 @@ let Toolchain = girder.models.ItemModel.extend({
     let self = this;
     let meta = self.get('meta');
 
-    // TODO: use the mapping to transform
+    // Use the mapping to transform
     // the parsed data into the shape that
     // the visualization expects
     let dataset = meta.datasets.at(0);
     if (!dataset) {
       callback([]);
     } else {
-      dataset.getParsed(callback);
+      dataset.getParsed(function (data) {
+        let attributes = dataset.getAttributes();
+        data.forEach(function (row) {
+          for (let key of Object.keys(attributes)) {
+            let value = row[key];
+            let valueType = typeof value;
+            if (valueType !== attributes[key]) {
+              // Coerce the value into whatever the
+              // datalib / the user has specified
+
+              // TODO: are there better ways to do this?
+              // what about null / NaN / undefined / null / blank values?
+              if (attributes[key] === 'date') {
+                row[key] = new Date(value);
+              } else if (attributes[key] === 'integer') {
+                row[key] = parseInt(value);
+              } else if (attributes[key] === 'number') {
+                row[key] = parseFloat(value);
+              } else if (attributes[key] === 'boolean') {
+                try {
+                  row[key] = Boolean(JSON.parse(value.toLowerCase()));
+                } catch (e) {
+                  row[key] = null;
+                }
+              } else if (attributes[key] === 'string') {
+                row[key] = String(value);
+              }
+            }
+          }
+        });
+        callback(data);
+      });
     }
   },
   getVisOptions: function (index = 0) {
@@ -134,7 +167,7 @@ let Toolchain = girder.models.ItemModel.extend({
     let options = {};
 
     // Figure out which options allow multiple fields
-    meta.mappings.forEach(mapping => {
+    meta.mappings.forEach((mapping) => {
       for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
         if (optionSpec.name === mapping.visAttribute) {
           if (optionSpec.type === 'string_list') {
@@ -146,7 +179,7 @@ let Toolchain = girder.models.ItemModel.extend({
     });
 
     // Construct the options
-    meta.mappings.forEach(mapping => {
+    meta.mappings.forEach((mapping) => {
       if (Array.isArray(options[mapping.visAttribute])) {
         options[mapping.visAttribute].push(mapping.dataAttribute);
       } else {
@@ -198,7 +231,7 @@ let Toolchain = girder.models.ItemModel.extend({
           // If multiple fields are not allowed, search for the mapping and replace it
           for (let [index, m] of meta.mappings.entries()) {
             if (mapping.visIndex === m.visIndex &&
-                mapping.visAttribute === m.visAttribute) {
+              mapping.visAttribute === m.visAttribute) {
               meta.mappings[index] = mapping;
               addedMapping = true;
               break;
@@ -223,9 +256,9 @@ let Toolchain = girder.models.ItemModel.extend({
     let mappingToSplice = null;
     for (let [index, m] of meta.mappings.entries()) {
       if (mapping.visIndex === m.visIndex &&
-          mapping.visAttribute === m.visAttribute &&
-          mapping.dataIndex === m.dataIndex &&
-          mapping.dataAttribute === m.dataAttribute) {
+        mapping.visAttribute === m.visAttribute &&
+        mapping.dataIndex === m.dataIndex &&
+        mapping.dataAttribute === m.dataAttribute) {
         mappingToSplice = index;
         break;
       }

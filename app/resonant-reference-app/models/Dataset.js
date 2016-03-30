@@ -77,13 +77,13 @@ let Dataset = girder.models.ItemModel.extend({
           formatPrefs.parse = 'auto';
         }
         let parsedData;
-        
+
         try {
           parsedData = datalib.read(rawData, formatPrefs);
         } catch (e) {
           parsedData = null;
         }
-        
+
         if (cache) {
           self.parsedCache = parsedData;
         }
@@ -116,9 +116,18 @@ let Dataset = girder.models.ItemModel.extend({
   setAttribute: function (attrName, dataType) {
     let self = this;
     let meta = self.get('meta');
-    meta.attributes[attrName] = dataType;
-    self.set('meta', meta);
-    self.trigger('rra:changeSpec');
+    if (meta.attributes[attrName] !== dataType) {
+      // This invalidates the parsed cache...
+      self.parsedCache = null;
+      meta.attributes[attrName] = dataType;
+      self.set('meta', meta);
+      self.trigger('rra:changeSpec');
+    }
+  },
+  getAttributes: function () {
+    let self = this;
+    let meta = self.get('meta');
+    return meta.attributes;
   }
 });
 
