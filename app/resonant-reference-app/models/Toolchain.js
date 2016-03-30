@@ -141,18 +141,6 @@ let Toolchain = girder.models.ItemModel.extend({
               // what about null / NaN / undefined / null / blank values?
               if (attributes[key] === 'date') {
                 row[key] = new Date(value);
-              } else if (attributes[key] === 'integer') {
-                row[key] = parseInt(value);
-              } else if (attributes[key] === 'number') {
-                row[key] = parseFloat(value);
-              } else if (attributes[key] === 'boolean') {
-                try {
-                  row[key] = Boolean(JSON.parse(value.toLowerCase()));
-                } catch (e) {
-                  row[key] = null;
-                }
-              } else if (attributes[key] === 'string') {
-                row[key] = String(value);
               }
             }
           }
@@ -167,7 +155,7 @@ let Toolchain = girder.models.ItemModel.extend({
     let options = {};
 
     // Figure out which options allow multiple fields
-    meta.mappings.forEach((mapping) => {
+    meta.mappings.forEach(mapping => {
       for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
         if (optionSpec.name === mapping.visAttribute) {
           if (optionSpec.type === 'string_list') {
@@ -179,7 +167,7 @@ let Toolchain = girder.models.ItemModel.extend({
     });
 
     // Construct the options
-    meta.mappings.forEach((mapping) => {
+    meta.mappings.forEach(mapping => {
       if (Array.isArray(options[mapping.visAttribute])) {
         options[mapping.visAttribute].push(mapping.dataAttribute);
       } else {
