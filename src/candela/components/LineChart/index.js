@@ -1,6 +1,6 @@
 import VisComponent from '../../VisComponent';
 import Events from '../../VisComponent/mixin/Events';
-import vcharts from '../../../vcharts';
+import vega from '../../util/vega';
 import spec from './spec.json';
 
 export default class LineChart extends Events(VisComponent) {
@@ -27,7 +27,7 @@ export default class LineChart extends Events(VisComponent) {
   }
 
   data (data) {
-    this.chart = vcharts.chart(spec, this.el, {
+    this.chart = vega.chart(spec, this.el, {
       series: [
         {
           name: 'series1',

@@ -1,9 +1,6 @@
 import d3 from 'd3';
 import vg from 'vega';
-
-let templates = {
-  axis: require('./templates/axis.json')
-};
+import axisTemplate from './axis.json';
 
 let getNestedRec = function (spec, parts) {
   if (spec === undefined || parts.length === 0) {
@@ -158,12 +155,6 @@ let templateFunctions = {
     return merged;
   },
 
-  apply: function (args, options, scope) {
-    let templateName = transform(args[0], options, scope);
-    let templateOptions = transform(args[1], options, scope);
-    return transform(templates[templateName], templateOptions);
-  },
-
   colorScale: function (args, options, scope) {
     let params = transform(args[0], options, scope);
     let name = params.name || 'color';
@@ -185,6 +176,11 @@ let templateFunctions = {
       domain: {data: params.data, field: params.field},
       range: ['#dfd', 'green']
     };
+  },
+
+  axis: function (args, options, scope) {
+    let templateOptions = transform(args[0], options, scope);
+    return transform(axisTemplate, templateOptions);
   },
 
   isStringField: function (args, options, scope) {
@@ -401,6 +397,5 @@ let chart = function (template, el, initialOptions, done) {
 
 export default {
   transform,
-  chart,
-  templates
+  chart
 };

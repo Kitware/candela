@@ -9,13 +9,13 @@ test.skip('chart width and height should be based on el properties', t => {
     right: 40
   };
 
-  vcharts.templates.test = {
+  let testSpec = {
     width: ['@get', 'width', 100],
     height: ['@get', 'height', 200],
     padding: padding
   };
 
-  let c = vcharts.chart('test', {offsetWidth: 0, offsetHeight: 0});
+  let c = vcharts.chart(testSpec, {offsetWidth: 0, offsetHeight: 0});
 
   t.deepEqual(c.spec, {
     width: 100,
@@ -23,7 +23,7 @@ test.skip('chart width and height should be based on el properties', t => {
     padding: padding
   });
 
-  c = vcharts.chart('test', {offsetWidth: 300, offsetHeight: 400});
+  c = vcharts.chart(testSpec, {offsetWidth: 300, offsetHeight: 400});
 
   t.deepEqual(c.spec, {
     width: (300 - 20 - 40),

@@ -22,8 +22,7 @@
     [
       "@merge",
       [
-        "@apply",
-        "axis",
+        "@axis",
         [
           "@merge",
           ["@get", "xAxis"],
@@ -69,8 +68,7 @@
         ]
       ],
       [
-        "@apply",
-        "axis",
+        "@axis",
         [
           "@merge",
           ["@get", "yAxis"],
