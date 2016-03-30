@@ -11,6 +11,6 @@ let AutoResize = Base => class extends Resize(Base) {
       this.render();
     });
   }
-}
+};
 
 export default AutoResize;
