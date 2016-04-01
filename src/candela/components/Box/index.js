@@ -17,7 +17,7 @@ export default class Box {
           domain: {
             mode: 'field',
             from: 'data',
-            fieldTypes: ['number', 'integer', 'boolean']
+            fieldTypes: ['date', 'number', 'integer', 'boolean']
           }
         },
         {

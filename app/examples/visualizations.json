@@ -140,5 +140,15 @@
       "data": "iris",
       "bin": "sepalLength"
     }
+  },
+  {
+    "hash": "date-histogram",
+    "name": "Date Histogram",
+    "description": "A simple histogram where the x-axis should be a date scale. Shows how types can be inferred within Candela.",
+    "component": "Histogram",
+    "options": {
+      "data": "stocks",
+      "bin": "date"
+    }
   }
 ]

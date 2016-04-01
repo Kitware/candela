@@ -18,6 +18,8 @@
         ["@if", ["@get", "horiz"], ["@get", "xAxis"], ["@get", "yAxis"]],
         {
           "axis": ["@get", "valueAxis"],
+          "data": ["@get", "data"],
+          "field": ["@get", "fields.0"],
           "size": ["@if", ["@get", "horiz"], ["@get", "width"], ["@get", "height"]],
           "domain": {"data": "table", "field": "value"}
         }
@@ -32,6 +34,8 @@
           "axis": ["@get", "categoryAxis"],
           "size": ["@if", ["@get", "horiz"], ["@get", "height"], ["@get", "width"]],
           "type": "ordinal",
+          "data": ["@get", "data"],
+          "field": ["@get", "group"],
           "points": true,
           "padding": 1,
           "domain": {"data": "table", "field": "name", "sort": true},

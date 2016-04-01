@@ -90,6 +90,10 @@ module.exports = {
         loader: 'url-loader'
       },
       {
+        test: /\.csv$/,
+        loader: 'raw-loader'
+      },
+      {
         test: /\.styl$/,
         loaders: ['style-loader', 'css-loader', 'stylus-loader']
       },

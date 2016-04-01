@@ -4,6 +4,7 @@ import Bullet from './Bullet';
 import Dummy from './Dummy';
 import Gantt from './Gantt';
 import Histogram from './Histogram';
+import Line from './Line';
 import LineUp from './LineUp';
 import ParallelCoordinates from './ParallelCoordinates';
 import Scatter from './Scatter';
@@ -16,6 +17,7 @@ export default {
   Dummy,
   Gantt,
   Histogram,
+  Line,
   LineUp,
   ParallelCoordinates,
   Scatter,
