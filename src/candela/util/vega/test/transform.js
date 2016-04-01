@@ -9,6 +9,9 @@ test('vcharts.transform() without spec', t => {
   t.deepEqual(true, vcharts.transform(true), 'boolean transform should be identity');
   t.deepEqual(null, vcharts.transform(null), 'null transform should be identity');
 
+  let d = new Date();
+  t.deepEqual(d, vcharts.transform(d), 'Date objects should be identity');
+
   let deeper = {
     a: [1, 2, 'abc'],
     b: {c: false},
@@ -41,6 +44,9 @@ test('vcharts.transform() with @get spec', t => {
   let options = {b: 12};
   vcharts.transform(spec, options);
   t.deepEqual({b: 12}, options, '@get spec should not mutate options');
+
+  spec = ['@get', ['@get', 'a']];
+  t.deepEqual(10, vcharts.transform(spec, {a: 'b', b: 10}), '@get spec should allow computed names');
 
   t.end();
 });
@@ -76,6 +82,9 @@ test('vcharts.transform() with @defaults spec', t => {
   t.deepEqual(0, vcharts.transform(spec, {a: 0}), '@defaults should not override defined value');
   t.deepEqual(false, vcharts.transform(spec, {a: false}), '@defaults should not override defined value');
   t.deepEqual(5, vcharts.transform(spec, {a: undefined}), '@defaults should override undefined value');
+
+  spec = ['@defaults', [[['@get', 'a'], 10]], ['@get', 'b']];
+  t.deepEqual(10, vcharts.transform(spec, {a: 'b'}), '@defaults spec should allow computed names');
 
   t.end();
 });
@@ -114,10 +123,8 @@ test('vcharts.transform() with @let spec', t => {
   ];
   t.deepEqual([5, 5, 5], vcharts.transform(spec), '@let should override values from current scope');
 
-  spec = ['@defaults', [['a', 5]], ['@get', 'a']];
-  t.deepEqual(0, vcharts.transform(spec, {a: 0}), '@let should not override defined values');
-  t.deepEqual(false, vcharts.transform(spec, {a: false}), '@let should not override defined values');
-  t.deepEqual(5, vcharts.transform(spec, {a: undefined}), '@let should override undefined values');
+  spec = ['@let', [[['@get', 'a'], 10]], ['@get', 'b']];
+  t.deepEqual(10, vcharts.transform(spec, {a: 'b'}), '@let spec should allow computed names');
 
   t.end();
 });
@@ -127,7 +134,10 @@ test('vcharts.transform() with @map spec', t => {
   t.deepEqual([1, 2, 3], vcharts.transform(spec), '@map should build an array');
 
   spec = ['@map', [1, null, 3], 'd', ['@get', 'd']];
-  t.deepEqual([1, 3], vcharts.transform(spec));
+  t.deepEqual([1, 3], vcharts.transform(spec), '@map should skip null values in outpus');
+
+  spec = ['@map', null, 'd', ['@get', 'd']];
+  t.deepEqual([], vcharts.transform(spec), '@map should send non-arrays to empty array');
 
   spec = ['@map', [1, null, 3], 'd', ['@get', 'd']];
   t.deepEqual([1, 3], vcharts.transform(spec), '@map should not add null array items');
@@ -210,10 +220,13 @@ test('vcharts.transform() with @eq spec', t => {
 });
 
 test('vcharts.transform() with @join spec', t => {
-  var spec = [
+  let spec = [
     '@join', ',', ['a', 'b', 'c', 'd']
   ];
   t.equal('a,b,c,d', vcharts.transform(spec), '@join should join strings');
+
+  spec = ['@join', ',', null];
+  t.equal('', vcharts.transform(spec), '@join should send non-arrays to the empty string');
 
   t.end();
 });
@@ -232,6 +245,51 @@ test('vcharts.transform() with @orient spec', t => {
     {x: 1, y: 2, yc: 2, width: 5, hello: 10}
   ];
   t.deepEqual({y: 1, x: 2, xc: 2, height: 5, hello: 10}, vcharts.transform(spec), '@orient should re-orient vertical specs and leave other props');
+
+  t.end();
+});
+
+test('vcharts.transform() with @axis spec', t => {
+  let data = [
+    {a: 1, b: 'Mar 1 2012', c: '10'},
+    {a: 13, b: 'Mar 10 2012', c: '14'}
+  ];
+
+  let spec = [
+    '@axis',
+    { data: data, field: 'a' }
+  ];
+  t.deepEqual(vcharts.transform(spec).axes[0].formatType, 'number', '@axis should detect numeric');
+
+  spec = [
+    '@axis',
+    { data: data, field: 'b' }
+  ];
+  t.deepEqual(vcharts.transform(spec).axes[0].formatType, 'time', '@axis should detect time from string');
+
+  spec = [
+    '@axis',
+    { data: data, field: 'c' }
+  ];
+  t.deepEqual(vcharts.transform(spec).axes[0].formatType, 'number', '@axis should detect number from string');
+
+  data = [
+    {b: 'Mar 1 2012', c: '10'},
+    {b: 'Mar 10 2012', c: '14'}
+  ];
+  data.__types__ = {'b': 'string', 'c': 'string'};
+
+  spec = [
+    '@axis',
+    { data: ['@get', 'data'], field: 'b' }
+  ];
+  t.deepEqual(vcharts.transform(spec, {data: data}).axes[0].formatType, 'string', '@axis should respect __types__ to override date');
+
+  spec = [
+    '@axis',
+    { data: ['@get', 'data'], field: 'c' }
+  ];
+  t.deepEqual(vcharts.transform(spec, {data: data}).axes[0].formatType, 'string', '@axis should respect __types__ to override number');
 
   t.end();
 });
