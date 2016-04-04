@@ -1,4 +1,4 @@
-# [candela](../..#readme) / [components](..#readme) / Bar
+# [candela](../..#readme).[components](..#readme).Bar
 
 A bar chart. The **x** field should contain a distinct value for each bar, while
 the **y** field will correspond to the height of each bar.
@@ -13,11 +13,11 @@ the **y** field will correspond to the height of each bar.
 
 | Option    | Type   | Description  |
 | :-------- | :----- | :----------- |
-| width     | Number | Width of the chart in pixels. |
-| height    | Number | Height of the chart in pixels. |
+| width     | Number | Width of the chart in pixels. See [Sizing](../../#sizing). |
+| height    | Number | Height of the chart in pixels. See [Sizing](../../#sizing). |
 | renderer  | String | Whether to render in "svg" or "canvas" mode (default "canvas"). |
 | data      | [Table](../..#table) | The data table. |
-| x         | String | The x axis field. |
-| y         | String | The y axis field. Must contain numeric data. |
-| color     | String | The color field. |
-| hover     | Array of String | The fields to show on hovering. |
+| x         | String | The x axis field. See [Axis Scales](../../#color-scales). |
+| y         | String | The y axis field. Must contain numeric data. See [Axis Scales](../../#color-scales). |
+| color     | String | The color field. See [Color Scales](../../#color-scales). |
+| hover     | Array of String | The fields to display on hovering. |
