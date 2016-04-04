@@ -1,3 +1,3 @@
 # candela
 
-* [components](components)
+* [components](components#readme)

@@ -1,3 +1,3 @@
 # [candela](..) / components
 
-* [Bar](Bar)
+* [Bar](Bar#readme)
