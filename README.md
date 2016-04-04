@@ -1,6 +1,8 @@
 # Candela
 Visualization components for the web
 
+# [Documentation](src/candela)
+
 # Installation from source
 
 ## Prerequisites
