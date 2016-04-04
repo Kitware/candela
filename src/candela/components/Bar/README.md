@@ -17,7 +17,7 @@ the **y** field will correspond to the height of each bar.
 | height    | Number | Height of the chart in pixels. See [Sizing](../../#sizing). |
 | renderer  | String | Whether to render in "svg" or "canvas" mode (default "canvas"). |
 | data      | [Table](../..#table) | The data table. |
-| x         | String | The x axis field. See [Axis Scales](../../#color-scales). |
-| y         | String | The y axis field. Must contain numeric data. See [Axis Scales](../../#color-scales). |
+| x         | String | The x axis field. See [Axis Scales](../../#axis-scales). |
+| y         | String | The y axis field. Must contain numeric data. See [Axis Scales](../../#axis-scales). |
 | color     | String | The color field. See [Color Scales](../../#color-scales). |
 | hover     | Array of String | The fields to display on hovering. |

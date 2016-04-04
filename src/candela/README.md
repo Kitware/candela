@@ -39,7 +39,7 @@ a smooth color gradient from low to high values.
 
 ### Table
 
-A candela table is an array of records of the form
+A candela table is an array of records of the form:
 
 ```json
 [
