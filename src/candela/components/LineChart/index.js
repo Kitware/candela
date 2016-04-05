@@ -1,6 +1,7 @@
 import VisComponent from '../../VisComponent';
 import Events from '../../VisComponent/mixin/Events';
 import vega from '../../util/vega';
+import Events from '../../VisComponent/mixin/Events';
 import spec from './spec.json';
 
 export default class LineChart extends Events(VisComponent) {
