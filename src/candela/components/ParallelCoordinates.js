@@ -17,7 +17,7 @@ export default class ParallelCoordinates extends VisComponent {
       this.fetchHistogram(var1, var2).then(callback);
     });
 
-    let mouseHandler = (action) => (e) => {
+    let mouseHandler = action => e => {
       let rect = this.el.getBoundingClientRect();
       let x = e.clientX - rect.left;
       let y = e.clientY - rect.top;

@@ -1,0 +1,267 @@
+[
+  "@defaults",
+  [
+    ["bin", "value"],
+    ["width", 800],
+    ["height", 500],
+    ["xAxis.title", ["@get", "bin"]],
+    [
+      "yAxis.title",
+      [
+        "@if", ["@get", "aggregate"],
+        ["@join", "", ["Sum of ", ["@get", "aggregate"]]],
+        "Count"
+      ]
+    ]
+  ],
+  [
+    "@let",
+    [
+      ["discrete", ["@or", ["@get", "discrete"], ["@isStringField", ["@get", "data"], ["@get", "bin"]]]]
+    ],
+    [
+      "@merge",
+      [
+        "@axis",
+        [
+          "@merge",
+          ["@get", "xAxis"],
+          [
+            "@if",
+            ["@get", "discrete"],
+            {
+              "axis": "x",
+              "size": ["@get", "width"],
+              "type": "ordinal",
+              "data": ["@get", "data"],
+              "field": ["@get", "bin"],
+              "pan": false,
+              "zoom": false,
+              "nice": true,
+              "round": true,
+              "domain": {
+                "data": "series",
+                "field": "bin",
+                "sort": true
+              },
+              "properties": {
+                "labels": {
+                  "text": {"template": "{{datum.data | truncate:25}}"},
+                  "angle": {"value": 270},
+                  "align": {"value": "right"},
+                  "baseline": {"value": "middle"}
+                }
+              }
+            },
+            {
+              "axis": "x",
+              "size": ["@get", "width"],
+              "type": "linear",
+              "data": ["@get", "data"],
+              "field": ["@get", "bin"],
+              "pan": true,
+              "zoom": true,
+              "nice": false,
+              "round": false,
+              "domain": {
+                "data": "series",
+                "field": ["bin_start", "bin_end"]
+              }
+            }
+          ]
+        ]
+      ],
+      [
+        "@axis",
+        [
+          "@merge",
+          ["@get", "yAxis"],
+          {
+            "axis": "y",
+            "size": ["@get", "height"],
+            "type": "linear",
+            "data": ["@get", "data"],
+            "field": ["@get", "aggregate"],
+            "zero": true,
+            "pan": false,
+            "zoom": false,
+            "domain": {
+              "data": "series",
+              "field": "count"
+            }
+          }
+        ]
+      ],
+      {
+        "width": ["@get", "width"],
+        "height": ["@get", "height"],
+        "padding": ["@get", "padding", {"top": 20, "bottom": ["@if", ["@get", "discrete"], 150, 50], "left": 50, "right": 10}],
+        "predicates": [
+          {
+            "name": "tooltip",
+            "type": "==",
+            "operands": [{"signal": "d._id"}, {"arg": "id"}]
+          }
+        ],
+        "data": [
+          {
+            "name": "series",
+            "values": ["@get", "data"],
+            "transform": [
+              "@if",
+              ["@get", "discrete"],
+              [
+                {
+                  "type": "formula",
+                  "expr": ["@join", "", ["datum['", ["@get", "bin"], "']"]],
+                  "field": "bin"
+                },
+                {
+                  "type": "aggregate",
+                  "groupby": ["bin"],
+                  "summarize": [
+                    [
+                      "@if", ["@get", "aggregate"],
+                      {
+                        "field": ["@get", "aggregate"],
+                        "ops": ["sum"],
+                        "as": ["count"]
+                      },
+                      {
+                        "field": "*",
+                        "ops": ["count"]
+                      }
+                    ]
+                  ]
+                }
+              ],
+              [
+                {
+                  "type": "bin",
+                  "field": ["@get", "bin"],
+                  "output": {
+                    "start": "bin_start",
+                    "mid": "bin",
+                    "end": "bin_end"
+                  },
+                  "maxbins": ["@get", "maxBins", 20]
+                },
+                {
+                  "type": "aggregate",
+                  "groupby": ["bin_start", "bin", "bin_end"],
+                  "summarize": [
+                    [
+                      "@if", ["@get", "aggregate"],
+                      {
+                        "field": ["@get", "aggregate"],
+                        "ops": ["sum"],
+                        "as": ["count"]
+                      },
+                      {
+                        "field": "*",
+                        "ops": ["count"]
+                      }
+                    ]
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        "signals": [
+          {
+            "name": "d",
+            "init": {},
+            "streams": [
+              {"type": "rect:mouseover", "expr": "datum"},
+              {"type": "rect:mouseout", "expr": "{}"}
+            ]
+          }
+        ],
+        "marks": [
+          {
+            "type": "group",
+            "properties": {
+              "enter": {
+                "x": {"value": 0},
+                "width": {"field": {"group": "width"}},
+                "y": {"value": 0},
+                "height": {"field": {"group": "height"}},
+                "clip": {"value": true}
+              }
+            },
+            "marks": [
+              {
+                "type": "rect",
+                "from": {"data": "series"},
+                "properties": {
+                  "update": [
+                    "@merge",
+                    [
+                      "@if",
+                      ["@get", "discrete"],
+                      {
+                        "x": {"scale": "x", "field": "bin", "offset": 1},
+                        "width": {"scale": "x", "band": true, "offset": -1}
+                      },
+                      {
+                        "x": {"scale": "x", "field": "bin_start", "offset": 1},
+                        "x2": {"scale": "x", "field": "bin_end"}
+                      }
+                    ],
+                    {
+                      "y": {"scale": "y", "field": "count"},
+                      "y2": {"scale": "y", "value": 0},
+                      "fill": {"value": ["@get", "fill", "steelblue"]}
+                    }
+                  ],
+                  "hover": {
+                    "fill": {"value": ["@get", "hover", "red"]}
+                  }
+                }
+              },
+              {
+                "type": "text",
+                "properties": {
+                  "enter": {
+                    "align": {"value": "center"},
+                    "fill": {"value": "#333"}
+                  },
+                  "update": [
+                    "@merge",
+                    [
+                      "@if", ["@get", "discrete"],
+                      {
+                        "dx": {"scale": "x", "band": true, "mult": 0.5},
+                        "text": {"template": ["@get", "tooltip", "{{d.bin}}: {{d.count}}"]}
+                      },
+                      {
+                        "text": {"template": ["@get", "tooltip", "{{d.count}}"]}
+                      }
+                    ],
+                    {
+                      "x": {"scale": "x", "signal": "d.bin"},
+                      "y": {"scale": "y", "signal": "d.count", "offset": -5},
+                      "fillOpacity": {
+                        "rule": [
+                          {
+                            "predicate": {
+                              "name": "tooltip",
+                              "id": {"value": null}
+                            },
+                            "value": 0
+                          },
+                          {"value": 1}
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  ]
+]

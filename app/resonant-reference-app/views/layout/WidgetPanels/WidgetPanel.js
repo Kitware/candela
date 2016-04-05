@@ -36,7 +36,7 @@ let WidgetPanel = Backbone.View.extend({
     // the section
     headerEnter.append('h2')
       .attr('class', 'title')
-      .on('click', (d) => {
+      .on('click', d => {
         self.toggle();
       });
     header.select('h2.title')
@@ -78,7 +78,8 @@ let WidgetPanel = Backbone.View.extend({
 
     indicators.select('span.indicatorText')
       .text(self.widget.statusText.text)
-      .attr('title', self.widget.statusText.title ? self.widget.statusText.title : null)
+      .attr('title', self.widget.statusText.title
+            ? self.widget.statusText.title : null)
       .on('click', () => {
         d3.event.stopPropagation();
         if (self.widget.statusText.onclick) {

@@ -3,14 +3,19 @@ import mainContent from './index.jade';
 import visContent from './vis.jade';
 import 'javascript-detect-element-resize/detect-element-resize';
 import './index.styl';
-import iris from '../../src/vcharts/data/iris.json';
+import iris from './data/iris.json';
+import stocks from './data/stocks.csv';
+import msft from './data/msft.csv';
+import dl from 'datalib';
 import visualizations from './visualizations.json';
 
 let datasets = {
-  iris
+  iris,
+  stocks: dl.read(stocks, {type: 'csv'}),
+  msft: dl.read(msft, {type: 'csv'})
 };
 let visMap = {};
-visualizations.forEach((v) => {
+visualizations.forEach(v => {
   visMap[v.hash] = v;
 });
 
@@ -29,9 +34,11 @@ function showPage () {
       properties
     );
     let el = document.getElementById('vis-element');
+    if (!Array.isArray(properties.options.data)) {
+      properties.options.data = datasets[properties.options.data];
+    }
     let vis = new candela.components[properties.component](
       el,
-      datasets[properties.data],
       properties.options
     );
     vis.render();

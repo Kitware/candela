@@ -91,17 +91,17 @@ here</a> to choose one.`);
 The dataset appears to have loaded correctly.`);
     } else if (self.status === STATUS.CANT_LOAD) {
       screen = self.getErrorScreen(`
-The dataset could not be loaded; there is a good chance 
+The dataset could not be loaded; there is a good chance
 that there is a permissions problem.`);
     } else if (self.status === STATUS.CANT_PARSE) {
       screen = self.getErrorScreen(`
-There was a problem parsing the data; you'll probably need to 
+There was a problem parsing the data; you'll probably need to
 <a>edit</a> or <a>reshape</a> the data in order to use it.`);
     } else if (self.status === STATUS.NO_ATTRIBUTES) {
       screen = self.getErrorScreen(`
-There was a problem parsing the data. Specifically, we're having 
-trouble understanding the dataset attributes (usually column headers); 
-you'll probably need to 
+There was a problem parsing the data. Specifically, we're having
+trouble understanding the dataset attributes (usually column headers);
+you'll probably need to
 <a>edit</a> or <a>reshape</a> the data in order to use it.`);
     }
 
@@ -124,24 +124,24 @@ you'll probably need to
 
     let cells = d3.select(self.el).select('#attributeSettings')
       .selectAll('div.cell')
-      .data(attrOrder, (d) => d + attrs[d]);
+      .data(attrOrder, d => d + attrs[d]);
     let cellsEnter = cells.enter().append('div')
       .attr('class', 'cell');
     cells.exit().remove();
 
     cellsEnter.append('span');
-    cells.selectAll('span').text((d) => d);
+    cells.selectAll('span').text(d => d);
 
     cellsEnter.append('select');
     let typeMenuOptions = cells.selectAll('select').selectAll('option')
       .data(d3.keys(Dataset.COMPATIBLE_TYPES));
     typeMenuOptions.enter().append('option');
-    typeMenuOptions.attr('value', (d) => d)
-      .text((d) => d);
+    typeMenuOptions.attr('value', d => d)
+      .text(d => d);
 
     cells.selectAll('select')
-      .property('value', (d) => attrs[d])
-      .on('change', (d) => {
+      .property('value', d => attrs[d])
+      .on('change', d => {
         let newType = jQuery(d3.event.target).val();
         dataset.setAttribute(d, newType);
       });

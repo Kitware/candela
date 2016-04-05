@@ -9,6 +9,7 @@
     "dist": "webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
     "test": "karma start config/karma-testing.conf.js | grep '^PhantomJS' | sed \"s/^.*LOG: '\\(.*\\)'$/\\1/\" | faucet",
     "test:raw": "karma start config/karma-testing.conf.js",
+    "test:karma": "karma start config/karma-testing.conf.js --no-single-run",
     "cover": "karma start config/karma-coverage.conf.js",
     "cover:report": "http-server coverage -p ${PORT-3000}",
     "demo": "http-server build -p ${PORT-3000}"
@@ -49,10 +50,15 @@
     "karma-tap-reporter": "0.0.6",
     "karma-webpack": "^1.7.0",
     "legacy-loader": "0.0.2",
+    "less": "^2.3.1",
     "phantomjs-prebuilt": "^2.1.5",
+    "raw-loader": "^0.5.1",
     "semistandard-loader": "0.0.3",
+    "strip-json-comments": "^2.0.1",
+    "strip-json-comments-loader": "0.0.2",
     "style-loader": "^0.13.0",
     "stylus-loader": "^1.5.1",
+    "tape": "^4.5.1",
     "telegraph-events": "^1.0.3",
     "url-loader": "^0.5.7",
     "webpack": "^1.12.12"
@@ -61,7 +67,10 @@
     "brace": "^0.7.0",
     "d3": "^3.5.14",
     "datalib": "^1.6.3",
+    "font-awesome": "^4.4.0",
+    "font-awesome-webpack": "^0.0.4",
     "jquery": "^2.2.0",
+    "LineUpJS": "git+https://github.com/Caleydo/lineup.js#51ae6f2bcb55aead3f63357864e90d5799789910",
     "underscore": "^1.8.3",
     "vega": "^2.4.2"
   }

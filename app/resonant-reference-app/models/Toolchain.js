@@ -6,7 +6,7 @@ let girder = window.girder;
     it includes specific datasets, with specific
     mappings to specific visualizations (in the future,
     this may also include faceting settings, etc).
-    
+
     Though behind the scenes we're making room for multiple
     datasets and multiple visualizations,
     for now, toolchains are expected to only contain one
@@ -217,8 +217,25 @@ let Toolchain = MetadataItem.extend({
     let mappings = self.getMeta('mappings');
     let options = {};
 
-    mappings.forEach((mapping) => {
-      options[mapping.visAttribute] = mapping.dataAttribute;
+    // Figure out which options allow multiple fields
+    meta.mappings.forEach(mapping => {
+      for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
+        if (optionSpec.name === mapping.visAttribute) {
+          if (optionSpec.type === 'string_list') {
+            options[mapping.visAttribute] = [];
+          }
+          break;
+        }
+      }
+    });
+
+    // Construct the options
+    meta.mappings.forEach(mapping => {
+      if (Array.isArray(options[mapping.visAttribute])) {
+        options[mapping.visAttribute].push(mapping.dataAttribute);
+      } else {
+        options[mapping.visAttribute] = mapping.dataAttribute;
+      }
     });
     return options;
   },
@@ -260,17 +277,23 @@ let Toolchain = MetadataItem.extend({
   },
   addMapping: function (mapping) {
     let self = this;
-    let meta = self.getMeta();
+    let meta = self.get('meta');
 
-    // TODO: For now, I assume that vis nodes
-    // can only accept one edge at a time. Replace
-    // a vis mapping if one exists.
+    // Figure out if the vis option allows multiple fields
     let addedMapping = false;
-    for (let [index, m] of meta.mappings.entries()) {
-      if (mapping.visIndex === m.visIndex &&
-        mapping.visAttribute === m.visAttribute) {
-        meta.mappings[index] = mapping;
-        addedMapping = true;
+    for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
+      if (optionSpec.name === mapping.visAttribute) {
+        if (optionSpec.type !== 'string_list') {
+          // If multiple fields are not allowed, search for the mapping and replace it
+          for (let [index, m] of meta.mappings.entries()) {
+            if (mapping.visIndex === m.visIndex &&
+                mapping.visAttribute === m.visAttribute) {
+              meta.mappings[index] = mapping;
+              addedMapping = true;
+              break;
+            }
+          }
+        }
         break;
       }
     }
@@ -290,9 +313,9 @@ let Toolchain = MetadataItem.extend({
     let mappingToSplice = null;
     for (let [index, m] of meta.mappings.entries()) {
       if (mapping.visIndex === m.visIndex &&
-        mapping.visAttribute === m.visAttribute &&
-        mapping.dataIndex === m.dataIndex &&
-        mapping.dataAttribute === m.dataAttribute) {
+          mapping.visAttribute === m.visAttribute &&
+          mapping.dataIndex === m.dataIndex &&
+          mapping.dataAttribute === m.dataAttribute) {
         mappingToSplice = index;
         break;
       }

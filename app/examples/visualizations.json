@@ -1,26 +1,165 @@
 [
   {
-    "hash": "boxplot",
-    "name": "Box Plot",
-    "description": "A simple box plot",
-    "component": "BoxPlot",
-    "data": "iris",
-    "options": {
-      "field": "petalWidth",
-      "group": "species"
-    }
-  },
-  {
     "hash": "scatter",
     "name": "Scatterplot",
-    "description": "A simple scatterplot",
+    "description": "A simple scatterplot.",
     "component": "Scatter",
-    "data": "iris",
     "options": {
+      "data": "iris",
       "x": "petalLength",
       "y": "petalWidth",
       "color": "sepalLength",
       "shape": "species"
+    }
+  },
+  {
+    "hash": "line",
+    "name": "Line Plot",
+    "description": "A simple line plot.",
+    "component": "Line",
+    "options": {
+      "data": "msft",
+      "x": "date",
+      "y": ["price"]
+    }
+  },
+  {
+    "hash": "scattermatrix",
+    "name": "Scatterplot Matrix",
+    "description": "A simple scatterplot matrix.",
+    "component": "ScatterMatrix",
+    "options": {
+      "data": "iris",
+      "fields": ["petalWidth", "petalLength", "sepalLength", "sepalWidth"],
+      "color": "species"
+    }
+  },
+  {
+    "hash": "lineup",
+    "name": "LineUp",
+    "description": "LineUp ranking visualization.",
+    "component": "LineUp",
+    "options": {
+      "data": "iris",
+      "stacked": true,
+      "animation": true,
+      "histograms": true
+    }
+  },
+  {
+    "hash": "bar",
+    "name": "Bar Chart",
+    "description": "A simple bar chart",
+    "component": "Bar",
+    "options": {
+      "data": [
+        {"id": 0, "a": 1, "b": 3, "c": 3},
+        {"id": 1, "a": 10, "b": 4, "c": 3},
+        {"id": 2, "a": 7, "b": 6, "c": 3},
+        {"id": 3, "a": 4, "b": 2, "c": 3},
+        {"id": 4, "a": 5, "b": 5, "c": 3},
+        {"id": 5, "a": 7, "b": 6, "c": 3},
+        {"id": 6, "a": 2, "b": 9, "c": 3},
+        {"id": 7, "a": 5, "b": 7, "c": 3}
+      ],
+      "x": "id",
+      "y": "a",
+      "color": "b",
+      "hover": ["id", "c"]
+    }
+  },
+  {
+    "hash": "bullet",
+    "name": "Bullet Chart",
+    "description": "A simple bullet chart",
+    "component": "Bullet",
+    "options": {
+      "value": 0.2,
+      "title": "Error",
+      "subtitle": "% dev from ground truth",
+      "markers": [0.05],
+      "ranges": [
+        {
+          "min": 0.0,
+          "max": 0.1,
+          "background": "lightgray",
+          "foreground": "rgb(102,191,103)"
+        },
+        {
+          "min": 0.1,
+          "max": 0.75,
+          "background": "darkgray",
+          "foreground": "rgb(255,179,24)"
+        },
+        {
+          "min": 0.75,
+          "max": 1.0,
+          "background": "dimgray",
+          "foreground": "rgb(228,0,0)"
+        }
+      ]
+    }
+  },
+  {
+    "hash": "gantt",
+    "name": "Gantt Chart",
+    "description": "A simple gantt chart",
+    "component": "Gantt",
+    "options": {
+      "data": [
+        {"name": "1. Algorithms", "level": 1, "enter": 0, "leave": 6},
+        {"name": "Algorithm Specification", "level": 2, "enter": 0, "leave": 2},
+        {"name": "Algorithm Implementation", "level": 2, "enter": 1, "leave": 6},
+        {"name": "2. Software Prototype", "level": 1, "enter": 1, "leave": 8},
+        {"name": "Support Data Formats", "level": 2, "enter": 1, "leave": 3},
+        {"name": "Modular Analyses/Workflows", "level": 2, "enter": 3, "leave": 5},
+        {"name": "Web Interface and Mockups", "level": 2, "enter": 5, "leave": 8},
+        {"name": "3. Evaluation and Team-Building", "level": 1, "enter": 0, "leave": 9},
+        {"name": "Data Collection", "level": 2, "enter": 0, "leave": 2},
+        {"name": "Algorithmic Evaluation", "level": 2, "enter": 6, "leave": 8},
+        {"name": "Usability Evaluation", "level": 2, "enter": 7, "leave": 9},
+        {"name": "Final Report", "level": 2, "enter": 8, "leave": 9}
+      ],
+      "start": "enter",
+      "end": "leave",
+      "label": "name",
+      "level": "level",
+      "xAxis": {
+        "values": [0, 3, 6, 9]
+      }
+    }
+  },
+  {
+    "hash": "box",
+    "name": "Box Plot",
+    "description": "A simple box plot",
+    "component": "Box",
+    "options": {
+      "data": "iris",
+      "fields": ["sepalLength", "sepalWidth"],
+      "group": "species",
+      "boxSize": 0.5,
+      "capSize": 0.25
+    }
+  },
+  {
+    "hash": "histogram",
+    "name": "Histogram",
+    "description": "A simple histogram.",
+    "component": "Histogram",
+    "options": {
+      "data": "iris",
+      "bin": "sepalLength"
+    }
+  },
+  {
+    "hash": "date-histogram",
+    "name": "Date Histogram",
+    "description": "A simple histogram where the x-axis should be a date scale. Shows how types can be inferred within Candela.",
+    "component": "Histogram",
+    "options": {
+      "data": "stocks",
+      "bin": "date"
     }
   }
 ]

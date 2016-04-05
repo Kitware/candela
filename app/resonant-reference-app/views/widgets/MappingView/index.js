@@ -89,11 +89,11 @@ Well done!`);
       if (!meta || !meta.visualizations || !meta.visualizations[0] ||
         !meta.datasets || !meta.datasets[0]) {
         screen = self.getErrorScreen(`
-You need to choose both a Dataset and a Visualization 
+You need to choose both a Dataset and a Visualization
 in order to connect them together.`);
       } else {
         screen = self.getErrorScreen(`
-The visualization needs more connections to data in 
+The visualization needs more connections to data in
 order to display anything.`);
       }
     }
@@ -429,13 +429,13 @@ order to display anything.`);
 
     let nodes = d3.select(self.el).select('svg')
       .select('.nodeLayer')
-      .selectAll('.node').data(graph.nodes, (d) => {
+      .selectAll('.node').data(graph.nodes, d => {
         return d.id + d.type;
       });
     let enteringNodes = nodes.enter().append('g');
     nodes.exit().remove();
 
-    nodes.attr('id', (d) => d.id).attr('class', (d) => {
+    nodes.attr('id', d => d.id).attr('class', d => {
       let classString = '';
       // Node mode
       if (d.mode === NODE_MODES.WILL_SELECT) {
@@ -513,11 +513,11 @@ order to display anything.`);
     // Draw the connections
     let edges = d3.select(self.el).select('svg')
       .select('.linkLayer')
-      .selectAll('.edge').data(graph.edges, (d) => d.id);
+      .selectAll('.edge').data(graph.edges, d => d.id);
     edges.enter().append('path');
     edges.exit().remove();
 
-    edges.attr('id', (d) => d.id).attr('class', (d) => {
+    edges.attr('id', d => d.id).attr('class', d => {
       let classString = '';
       // Edge type
       if (d.mode === EDGE_MODES.POTENTIAL) {

@@ -24,8 +24,8 @@ export default class Dummy extends VisComponent {
     d.exit()
       .remove();
 
-    d.text((d) => d.text)
-      .style('color', (d) => d.color);
+    d.text(d => d.text)
+      .style('color', d => d.color);
   }
 
   data (newData) {
