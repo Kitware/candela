@@ -255,6 +255,19 @@ test('vcharts.transform() with @gt spec', t => {
   t.end();
 });
 
+test('vcharts.transform() with @length spec', t => {
+  var spec = [
+    ['@length', [1, 2, 3]],
+    ['@length', 'hello'],
+    ['@length', 2],
+    ['@length', {a: 1, b: 2}],
+    ['@length', null]
+  ];
+  t.deepEqual([3, 5, 0, 0, 0], vcharts.transform(spec), '@length returns length of strings and arrays, 0 for other types');
+
+  t.end();
+});
+
 test('vcharts.transform() with @join spec', t => {
   let spec = [
     '@join', ',', ['a', 'b', 'c', 'd']

@@ -116,6 +116,14 @@ let templateFunctions = {
     return (a > b);
   },
 
+  length: function (args, options, scope) {
+    let a = transform(args[0], options, scope);
+    if (dl.isArray(a) || dl.isString(a)) {
+      return a.length;
+    }
+    return 0;
+  },
+
   and: function (args, options, scope) {
     let arr = transform(args, options, scope);
     for (let i = 0; i < arr.length; i += 1) {
