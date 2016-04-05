@@ -1,7 +1,7 @@
 import vega from '../../util/vega';
 import spec from './spec.json';
 
-export default class Box {
+export default class Line {
   static get spec () {
     return {
       options: [
@@ -11,9 +11,9 @@ export default class Box {
           format: 'objectlist'
         },
         {
-          name: 'fields',
-          type: 'string_list',
-          format: 'string_list',
+          name: 'x',
+          type: 'string',
+          format: 'text',
           domain: {
             mode: 'field',
             from: 'data',
@@ -21,13 +21,13 @@ export default class Box {
           }
         },
         {
-          name: 'group',
-          type: 'string',
-          format: 'text',
+          name: 'y',
+          type: 'string_list',
+          format: 'string_list',
           domain: {
             mode: 'field',
             from: 'data',
-            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+            fieldTypes: ['date', 'number', 'integer', 'boolean']
           }
         }
       ]

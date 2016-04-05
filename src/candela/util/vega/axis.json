@@ -192,6 +192,8 @@
         "grid": ["@get", "grid", false],
         "layer": "back",
         "title": ["@get", "title", ""],
+        "formatType": ["@get", "formatType"],
+        "format": ["@get", "format"],
         "properties": ["@get", "properties", {}]
       }
     ]

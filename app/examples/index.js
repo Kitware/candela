@@ -4,10 +4,15 @@ import visContent from './vis.jade';
 import 'javascript-detect-element-resize/detect-element-resize';
 import './index.styl';
 import iris from './data/iris.json';
+import stocks from './data/stocks.csv';
+import msft from './data/msft.csv';
+import dl from 'datalib';
 import visualizations from './visualizations.json';
 
 let datasets = {
-  iris
+  iris,
+  stocks: dl.read(stocks, {type: 'csv'}),
+  msft: dl.read(msft, {type: 'csv'})
 };
 let visMap = {};
 visualizations.forEach(v => {

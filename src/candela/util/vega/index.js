@@ -1,5 +1,6 @@
 import d3 from 'd3';
 import vg from 'vega';
+import dl from 'datalib';
 import axisTemplate from './axis.json';
 import { getElementSize } from '..';
 
@@ -32,13 +33,14 @@ let setNested = function (spec, name, value) {
 let templateFunctions = {
   defaults: function (args, options, scope) {
     for (let index = 0; index < args[0].length; index += 1) {
-      let value = getNested(scope, args[0][index][0]);
+      let name = transform(args[0][index][0], options, scope);
+      let value = getNested(scope, name);
       if (value === undefined) {
-        value = getNested(options, args[0][index][0]);
+        value = getNested(options, name);
       }
       if (value === undefined) {
         value = transform(args[0][index][1], options, scope);
-        setNested(scope, args[0][index][0], value);
+        setNested(scope, name, value);
       }
     }
     return transform(args[1], options, scope);
@@ -46,16 +48,18 @@ let templateFunctions = {
 
   let: function (args, options, scope) {
     for (let index = 0; index < args[0].length; index += 1) {
+      let name = transform(args[0][index][0], options, scope);
       let value = transform(args[0][index][1], options, scope);
-      setNested(scope, args[0][index][0], value);
+      setNested(scope, name, value);
     }
     return transform(args[1], options, scope);
   },
 
   get: function (args, options, scope) {
-    let value = getNested(scope, args[0]);
+    let name = transform(args[0], options, scope);
+    let value = getNested(scope, name);
     if (value === undefined) {
-      value = getNested(options, args[0]);
+      value = getNested(options, name);
     }
     if (value === undefined) {
       value = transform(args[1], options, scope);
@@ -69,6 +73,10 @@ let templateFunctions = {
   map: function (args, options, scope) {
     let transformed = [];
     let elements = transform(args[0], options, scope);
+
+    if (!Array.isArray(elements)) {
+      return transformed;
+    }
 
     for (let elementIndex = 0; elementIndex < elements.length; elementIndex += 1) {
       scope[args[1]] = elements[elementIndex];
@@ -95,6 +103,26 @@ let templateFunctions = {
     let a = transform(args[0], options, scope);
     let b = transform(args[1], options, scope);
     return (a === b);
+  },
+
+  lt: function (args, options, scope) {
+    let a = transform(args[0], options, scope);
+    let b = transform(args[1], options, scope);
+    return (a < b);
+  },
+
+  gt: function (args, options, scope) {
+    let a = transform(args[0], options, scope);
+    let b = transform(args[1], options, scope);
+    return (a > b);
+  },
+
+  length: function (args, options, scope) {
+    let a = transform(args[0], options, scope);
+    if (dl.isArray(a) || dl.isString(a)) {
+      return a.length;
+    }
+    return 0;
   },
 
   and: function (args, options, scope) {
@@ -139,6 +167,9 @@ let templateFunctions = {
     let result = '';
     let sep = transform(args[0], options, scope);
     let arr = transform(args[1], options, scope);
+    if (!Array.isArray(arr)) {
+      return result;
+    }
     for (let i = 0; i < arr.length; i += 1) {
       if (i > 0) {
         result += sep;
@@ -180,8 +211,24 @@ let templateFunctions = {
   },
 
   axis: function (args, options, scope) {
-    let templateOptions = transform(args[0], options, scope);
-    return transform(axisTemplate, templateOptions);
+    let opt = transform(args[0], options, scope);
+    if (opt.data && Array.isArray(opt.data) && opt.field) {
+      if (!opt.data.__types__) {
+        dl.read(opt.data, {parse: 'auto'});
+      }
+      let type = opt.data.__types__[opt.field];
+      if (type === 'string') {
+        opt.formatType = 'string';
+      } else if (type === 'date') {
+        opt.type = opt.type || 'time';
+        opt.formatType = 'time';
+        opt.format = '%Y-%m-%d';
+      } else {
+        opt.formatType = 'number';
+        opt.format = 's';
+      }
+    }
+    return transform(axisTemplate, opt);
   },
 
   isStringField: function (args, options, scope) {
@@ -242,6 +289,9 @@ let transform = function (spec, options, scope) {
     return transformed;
   }
   if (spec === null) {
+    return spec;
+  }
+  if (spec instanceof Date) {
     return spec;
   }
   if (typeof spec === 'object') {

@@ -29,6 +29,8 @@
           {
             "axis": "x",
             "size": ["@get", "width"],
+            "data": ["@get", "data"],
+            "field": ["@get", "x"],
             "domain": [
               "@get", "xAxis.domain", {
                 "fields": [
@@ -50,6 +52,8 @@
           {
             "axis": "y",
             "size": ["@get", "height"],
+            "data": ["@get", "data"],
+            "field": ["@get", "y"],
             "domain": [
               "@get", "yAxis.domain", {
                 "fields": [

@@ -1,0 +1,173 @@
+[
+  "@defaults",
+  [
+    ["width", 800],
+    ["height", 500],
+    ["legend", true],
+
+    // Default to showing the x and y fields on hover.
+    ["hover", ["@merge", [["@get", "x"]], ["@get", "y"]]],
+
+    // Default axis titles to x and y field names.
+    ["xAxis.title", ["@get", "x"]],
+    ["yAxis.title", ["@join", ", ", ["@get", "y"]]]
+],
+  [
+    "@let",
+    [
+      // Create a legend boolean variable to use in the spec.
+      // Only show the legend if we have more than one line.
+      ["legend", ["@gt", ["@length", ["@get", "y"]], 1]]
+    ],
+    [
+      "@merge",
+      [
+        "@axis",
+        [
+          "@merge",
+          ["@get", "xAxis"],
+          {
+            "axis": "x",
+            "size": ["@get", "width"],
+            "data": ["@get", "data"],
+            "field": ["@get", "x"],
+            "domain": [
+              "@get", "xAxis.domain", {
+                "fields": [
+                  {
+                    "data": "data",
+                    "field": "x"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      ],
+      [
+        "@axis",
+        [
+          "@merge",
+          ["@get", "yAxis"],
+          {
+            "axis": "y",
+            "size": ["@get", "height"],
+            "data": ["@get", "data"],
+            "field": ["@get", "y.0"],
+            "domain": [
+              "@get", "yAxis.domain", {
+                "fields": [
+                  {
+                    "data": "data",
+                    "field": ["@get", "y"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      ],
+      {
+        "width": ["@get", "width"],
+        "height": ["@get", "height"],
+        "padding": ["@get", "padding", {"top": 10, "bottom": 50, "left": 50, "right": ["@if", ["@get", "legend"], 150, 10]}],
+        "predicates": [
+          {
+            "name": "tooltip",
+            "type": "==",
+            "operands": [{"signal": "d._id"}, {"arg": "id"}]
+          }
+        ],
+        "data": [
+          {
+            "name": "data",
+            "values": ["@get", "data"],
+            "transform": [
+              {
+                "type": "sort",
+                "by": ["@get", "x"]
+              },
+              {
+                "type": "formula",
+                "field": "x",
+                "expr": [
+                  "@join",
+                  "",
+                  ["datum['", ["@get", "x", "x"], "']"]
+                ]
+              },
+              {
+                "type": "formula",
+                "field": "y",
+                "expr": [
+                  "@join",
+                  "",
+                  ["datum['", ["@get", "y", "y"], "']"]
+                ]
+              }
+            ]
+          }
+        ],
+        "signals": [
+          {
+            "name": "d",
+            "init": {},
+            "streams": [
+              {"type": "symbol:mouseover", "expr": "datum"},
+              {"type": "symbol:mouseout", "expr": "{}"}
+            ]
+          }
+        ],
+        "scales": [
+          {
+            "name": "color",
+            "type": "ordinal",
+            "domain": ["@get", "y"],
+            "range": "category10"
+          }
+        ],
+        "legends": [
+          "@if", ["@get", "legend"],
+          [
+            {
+              "stroke": "color",
+              "title": ["@get", "color"]
+            }
+          ],
+          []
+        ],
+        "marks": [
+          {
+            "type": "group",
+            "properties": {
+              "enter": {
+                "x": {"value": 0},
+                "width": {"field": {"group": "width"}},
+                "y": {"value": 0},
+                "height": {"field": {"group": "height"}},
+                "clip": {"value": true}
+              }
+            },
+            "marks": [
+              "@map",
+              ["@get", "y"],
+              "yfield",
+              {
+                "type": "line",
+                "from": {"data": "data"},
+                "properties": {
+                  "update": {
+                    "x": {"scale": "x", "field": "x"},
+                    "y": {"scale": "y", "field": ["@get", "yfield"]},
+                    "stroke": {"scale": "color", "value": ["@get", "yfield"]},
+                    "strokeWidth": {"value": 2}
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  ]
+]

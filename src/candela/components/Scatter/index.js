@@ -18,7 +18,7 @@ export default class Scatter extends VisComponent {
           domain: {
             mode: 'field',
             from: 'data',
-            fieldTypes: ['number', 'integer', 'boolean']
+            fieldTypes: ['date', 'number', 'integer', 'boolean']
           }
         },
         {
@@ -28,7 +28,7 @@ export default class Scatter extends VisComponent {
           domain: {
             mode: 'field',
             from: 'data',
-            fieldTypes: ['number', 'integer', 'boolean']
+            fieldTypes: ['date', 'number', 'integer', 'boolean']
           }
         },
         {
