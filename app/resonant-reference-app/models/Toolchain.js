@@ -214,7 +214,7 @@ let Toolchain = MetadataItem.extend({
   },
   getVisOptions: function (index = 0) {
     let self = this;
-    let mappings = self.getMeta('mappings');
+    let meta = self.getMeta();
     let options = {};
 
     // Figure out which options allow multiple fields
@@ -255,7 +255,7 @@ let Toolchain = MetadataItem.extend({
       let possibleTypes = [];
       for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
         if (optionSpec.name === mapping.visAttribute) {
-          possibleTypes = Dataset.COMPATIBLE_TYPES[optionSpec.type];
+          possibleTypes = optionSpec.domain.fieldTypes;
           break;
         }
       }

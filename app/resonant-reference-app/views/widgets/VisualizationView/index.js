@@ -116,9 +116,10 @@ You encountered an error we didn't anticipate! Please report it
       window.mainPage.toolchain.shapeDataForVis(function (data) {
         // Temporarily force the scrollbars, so
         // the view can account for the needed space
+        options.data = data;
         self.$el.css('overflow', 'scroll');
         self.vis = new candela.components[visSpec.name]('.visualization',
-          data, options);
+                                                        options);
         self.vis.render();
         self.$el.css('overflow', '');
 

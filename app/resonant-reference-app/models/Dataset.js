@@ -9,7 +9,8 @@ let COMPATIBLE_TYPES = {
   integer: ['integer', 'boolean'],
   number: ['number', 'integer', 'boolean'],
   date: ['date'],
-  string: ['string', 'date', 'number', 'integer', 'boolean']
+  string: ['string', 'date', 'number', 'integer', 'boolean'],
+  'string_list': ['string_list']
 };
 
 let VALID_EXTENSIONS = [
