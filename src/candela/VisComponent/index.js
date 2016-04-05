@@ -1,5 +1,3 @@
-import telegraph from 'telegraph-events';
-
 export default class VisComponent {
   constructor (el) {
     if (!el) {
@@ -7,8 +5,6 @@ export default class VisComponent {
     }
 
     this.el = el;
-
-    telegraph(this);
   }
 
   render () {
