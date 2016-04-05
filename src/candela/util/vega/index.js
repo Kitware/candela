@@ -104,6 +104,18 @@ let templateFunctions = {
     return (a === b);
   },
 
+  lt: function (args, options, scope) {
+    let a = transform(args[0], options, scope);
+    let b = transform(args[1], options, scope);
+    return (a < b);
+  },
+
+  gt: function (args, options, scope) {
+    let a = transform(args[0], options, scope);
+    let b = transform(args[1], options, scope);
+    return (a > b);
+  },
+
   and: function (args, options, scope) {
     let arr = transform(args, options, scope);
     for (let i = 0; i < arr.length; i += 1) {

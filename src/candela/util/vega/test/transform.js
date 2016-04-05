@@ -9,8 +9,8 @@ test('vcharts.transform() without spec', t => {
   t.deepEqual(true, vcharts.transform(true), 'boolean transform should be identity');
   t.deepEqual(null, vcharts.transform(null), 'null transform should be identity');
 
-  let d = new Date();
-  t.deepEqual(d, vcharts.transform(d), 'Date objects should be identity');
+  let d = new Date('01-01-2012');
+  t.deepEqual(d, vcharts.transform(d), 'Date object transform should be identity');
 
   let deeper = {
     a: [1, 2, 'abc'],
@@ -215,6 +215,42 @@ test('vcharts.transform() with @eq spec', t => {
     ['@eq', ['@get', 'b'], ['@get', 'c']]
   ];
   t.deepEqual([true, true], vcharts.transform(spec, {a: 10, b: 5, c: 5}), '@eq should work with subexpressions');
+
+  t.end();
+});
+
+test('vcharts.transform() with @lt spec', t => {
+  var spec = [
+    ['@lt', {}, {}],
+    ['@lt', 0, 5],
+    ['@lt', 'abc', 'abd'],
+    ['@lt', null, null]
+  ];
+  t.deepEqual([false, true, true, false], vcharts.transform(spec), '@lt should test for JavaScript <');
+
+  spec = [
+    ['@lt', ['@get', 'a'], 15],
+    ['@lt', ['@get', 'b'], ['@get', 'c']]
+  ];
+  t.deepEqual([true, false], vcharts.transform(spec, {a: 10, b: 5, c: 5}), '@lt should work with subexpressions');
+
+  t.end();
+});
+
+test('vcharts.transform() with @gt spec', t => {
+  var spec = [
+    ['@gt', {}, {}],
+    ['@gt', 0, -5],
+    ['@gt', 'abc', 'abb'],
+    ['@gt', null, null]
+  ];
+  t.deepEqual([false, true, true, false], vcharts.transform(spec), '@gt should test for JavaScript <');
+
+  spec = [
+    ['@gt', ['@get', 'a'], 5],
+    ['@gt', ['@get', 'b'], ['@get', 'c']]
+  ];
+  t.deepEqual([true, false], vcharts.transform(spec, {a: 10, b: 5, c: 5}), '@gt should work with subexpressions');
 
   t.end();
 });
