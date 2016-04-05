@@ -1,5 +1,6 @@
 import candela from './../../src/candela';
-import Resize from './../../src/candela/VisComponent/mixin/Resize';
+import AutoResize from './../../src/candela/VisComponent/mixin/AutoResize';
+import InitSize from './../../src/candela/VisComponent/mixin/InitSize';
 import indexContent from './index.jade';
 import './index.styl';
 
@@ -25,7 +26,7 @@ window.addEventListener('load', () => {
   }
 
   [...document.getElementsByClassName('vis-element')].forEach(el => {
-    let vis = new (Resize(candela.components.Scatter))(
+    let vis = new (AutoResize(InitSize(candela.components.Scatter)))(
       el,
       {
         data,
@@ -33,11 +34,11 @@ window.addEventListener('load', () => {
         y: 'y'
       }
     );
+    console.log(`initial size: ${vis.width}, ${vis.height}`);
     vis.render();
 
-    vis.on('resize', (w, h, me) => {
-      console.log(`resize event: ${w}, ${h}`);
-      me.render();
+    vis.on('resize', () => {
+      console.log(`resize event: ${vis.width}, ${vis.height}`);
     });
   });
 
