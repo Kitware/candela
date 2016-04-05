@@ -1,0 +1,104 @@
+[
+  "@defaults",
+  [
+    ["id", "_id"],
+    ["fields", []],
+    ["sort", ["@get", "id"]]
+  ],
+  {
+    "width": ["@get", "width"],
+    "height": ["@get", "height"],
+    "padding": "strict",
+
+    "data": [
+      {
+        "name": "data",
+        "values": ["@get", "data"],
+        "transform": [
+          {
+            "type": "formula",
+            "field": "index",
+            "expr": ["@join", "", ["datum['", ["@get", "id"], "']"]]
+          },
+          {
+            "type": "rank",
+            "field": ["@get", "sort"]
+          }
+        ]
+      },
+      {
+        "name": "fields",
+        "values": ["@get", "fields"]
+      }
+    ],
+
+    "scales": [
+      "@merge",
+      [
+        {
+          "name": "x",
+          "type": "ordinal",
+          "domain": {"data": "fields", "field": "data"},
+          "range": "width",
+          "round": false
+        },
+        {
+          "name": "y",
+          "type": "ordinal",
+          "domain": {
+            "data": "data",
+            "field": "index",
+            "sort": {
+              "field": [
+                "@if", ["@isStringField", ["@get", "data"], ["@get", "sort"]],
+                "rank",
+                ["@get", "sort"]
+              ],
+              "op": "mean"
+            }
+          },
+          "range": "height",
+          "round": false
+        }
+      ],
+      [
+        "@map",
+        ["@get", "fields"],
+        "field",
+        [
+          "@colorScale",
+          {
+            "name": ["@get", "field"],
+            "data": "data",
+            "values": ["@get", "data"],
+            "field": ["@get", "field"]
+          }
+        ]
+      ]
+    ],
+
+    "axes": [
+      {"type": "x", "scale": "x"},
+      {"type": "y", "scale": "y"}
+    ],
+
+    "marks": [
+      "@map",
+      ["@get", "fields"],
+      "field",
+      {
+        "type": "rect",
+        "from": {"data": "data"},
+        "properties": {
+          "enter": {
+            "x": {"scale": "x", "value": ["@get", "field"]},
+            "width": {"scale": "x", "band": true, "offset": 1},
+            "y": {"scale": "y", "field": "index"},
+            "height": {"scale": "y", "band": true, "offset": 1},
+            "fill": {"scale": ["@get", "field"], "field": ["@get", "field"]}
+          }
+        }
+      }
+    ]
+  }
+]
