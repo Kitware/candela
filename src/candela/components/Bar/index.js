@@ -1,4 +1,4 @@
-import vcharts from '../../../vcharts';
+import vega from '../../util/vega';
 import spec from './spec.json';
 
 export default class Bar {
@@ -29,13 +29,33 @@ export default class Bar {
             from: 'data',
             fieldTypes: ['number', 'integer', 'boolean']
           }
+        },
+        {
+          name: 'color',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'hover',
+          type: 'string_list',
+          format: 'string_list',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
         }
       ]
     };
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart(spec, el, options);
+    this.chart = vega.chart(spec, el, options);
   }
 
   render () {

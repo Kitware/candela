@@ -58,7 +58,7 @@ module.exports = {
     preLoaders: [
       {
         test: /\.js$/,
-        loader: 'semistandard',
+        loader: 'semistandard-loader',
         include: [
           path.resolve(__dirname, 'src/candela'),
           path.resolve(__dirname, 'src/vcharts'),
@@ -83,27 +83,27 @@ module.exports = {
         test: function (path) {
           return path.endsWith('/src/external/pc.js');
         },
-        loader: 'legacy'
+        loader: 'legacy-loader'
       },
       {
         test: /\.jpe?g$|\.gif$|\.png$|\.woff$|\.wav$|\.mp3$|\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$|\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'url'
+        loader: 'url-loader'
       },
       {
         test: /\.styl$/,
-        loaders: ['style', 'css', 'stylus']
+        loaders: ['style-loader', 'css-loader', 'stylus-loader']
       },
       {
         test: /\.css$/,
-        loaders: ['style', 'css']
+        loaders: ['style-loader', 'css-loader']
       },
       {
         test: /\.jade$/,
-        loaders: ['jade']
+        loaders: ['jade-loader']
       },
       {
         test: /\.json$/,
-        loader: 'json'
+        loaders: ['json-loader', 'strip-json-comments-loader']
       }
     ]
   }

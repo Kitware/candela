@@ -1,4 +1,4 @@
-import vcharts from '../../../vcharts';
+import vega from '../../util/vega';
 import spec from './spec.json';
 
 export default class Gantt {
@@ -55,7 +55,7 @@ export default class Gantt {
   }
 
   constructor (el, options) {
-    this.chart = vcharts.chart(spec, el, options);
+    this.chart = vega.chart(spec, el, options);
   }
 
   render () {

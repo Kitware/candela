@@ -184,7 +184,7 @@ test('vcharts.transform() with @if spec', t => {
     ['@if', 0, 10, 20],
     ['@if', NaN, 10, 20],
     ['@if', '', 10, 20]
-  ]
+  ];
   t.deepEqual([20, 20, 20, 20, 20], vcharts.transform(spec), '@if should treat falsy values as false');
 
   t.end();
@@ -197,7 +197,7 @@ test('vcharts.transform() with @eq spec', t => {
     ['@eq', 'abc', 'abc'],
     ['@eq', 1, '1'],
     ['@eq', null, null]
-  ]
+  ];
   t.deepEqual([false, true, true, false, true], vcharts.transform(spec), '@eq should test for JavaScript strict (===) equality');
 
   spec = [
@@ -212,7 +212,7 @@ test('vcharts.transform() with @eq spec', t => {
 test('vcharts.transform() with @join spec', t => {
   var spec = [
     '@join', ',', ['a', 'b', 'c', 'd']
-  ]
+  ];
   t.equal('a,b,c,d', vcharts.transform(spec), '@join should join strings');
 
   t.end();
@@ -285,18 +285,6 @@ test('vcharts.transform() with @merge spec', t => {
     }
   ];
   t.deepEqual({a: 'a', b: 'b'}, vcharts.transform(spec), '@merge should favor non-null, non-undefined values');
-
-  t.end();
-});
-
-test('vcharts.transform() with @apply spec', t => {
-  var spec = [
-    '@apply',
-    'test',
-    {a: 'world'}
-  ];
-  vcharts.templates.test = {hello: ['@get', 'a']};
-  t.deepEqual({hello: 'world'}, vcharts.transform(spec), '@apply should apply template');
 
   t.end();
 });
