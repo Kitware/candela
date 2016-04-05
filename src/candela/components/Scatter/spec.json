@@ -4,11 +4,19 @@
     ["width", 800],
     ["height", 500],
     ["legend", true],
-    ["hover", [["@get", "x"], ["@get", "y"]]]
-  ],
+
+    // Default to showing the x and y fields on hover.
+    ["hover", [["@get", "x"], ["@get", "y"]]],
+
+    // Default axis titles to x and y field names.
+    ["xAxis.title", ["@get", "x"]],
+    ["yAxis.title", ["@get", "y"]]
+],
   [
     "@let",
     [
+      // Create a legend boolean variable to use in the spec.
+      // Only show the legend if we have a color, shape, or size field specified.
       ["legend", ["@and", ["@get", "legend"], ["@or", ["@get", "color"], ["@get", "shape"], ["@get", "size"]]]]
     ],
     [
@@ -21,7 +29,6 @@
           {
             "axis": "x",
             "size": ["@get", "width"],
-            "title": ["@get", "xAxis.title", ["@get", "x", ""]],
             "domain": [
               "@get", "xAxis.domain", {
                 "fields": [
@@ -43,7 +50,6 @@
           {
             "axis": "y",
             "size": ["@get", "height"],
-            "title": ["@get", "yAxis.title", ["@get", "y", ""]],
             "domain": [
               "@get", "yAxis.domain", {
                 "fields": [
