@@ -13,6 +13,17 @@
     }
   },
   {
+    "hash": "line",
+    "name": "Line Plot",
+    "description": "A simple line plot.",
+    "component": "Line",
+    "options": {
+      "data": "msft",
+      "x": "date",
+      "y": ["price"]
+    }
+  },
+  {
     "hash": "scattermatrix",
     "name": "Scatterplot Matrix",
     "description": "A simple scatterplot matrix.",
