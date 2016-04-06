@@ -10,6 +10,25 @@
     "height": ["@get", "height"],
     "padding": "strict",
 
+    "predicates": [
+      {
+        "name": "tooltip",
+        "type": "==",
+        "operands": [{"signal": "d._id"}, {"arg": "id"}]
+      }
+    ],
+
+    "signals": [
+      {
+        "name": "d",
+        "init": {},
+        "streams": [
+          {"type": "rect:mouseover", "expr": "datum"},
+          {"type": "rect:mouseout", "expr": "{}"}
+        ]
+      }
+    ],
+
     "data": [
       {
         "name": "data",
@@ -83,22 +102,75 @@
     ],
 
     "marks": [
-      "@map",
-      ["@get", "fields"],
-      "field",
-      {
-        "type": "rect",
-        "from": {"data": "data"},
-        "properties": {
-          "enter": {
-            "x": {"scale": "x", "value": ["@get", "field"]},
-            "width": {"scale": "x", "band": true, "offset": 1},
-            "y": {"scale": "y", "field": "index"},
-            "height": {"scale": "y", "band": true, "offset": 1},
-            "fill": {"scale": ["@get", "field"], "field": ["@get", "field"]}
+      "@merge",
+      [
+        "@map",
+        ["@get", "fields"],
+        "field",
+        {
+          "type": "rect",
+          "from": {"data": "data"},
+          "properties": {
+            "enter": {
+              "x": {"scale": "x", "value": ["@get", "field"]},
+              "width": {"scale": "x", "band": true, "offset": 1},
+              "y": {"scale": "y", "field": "index"},
+              "height": {"scale": "y", "band": true, "offset": 1}
+            },
+            "update": {
+              "fill": {"scale": ["@get", "field"], "field": ["@get", "field"]}
+            },
+            "hover": {
+              "fill": {"value": "yellow"}
+            }
           }
         }
-      }
+      ],
+      [
+        {
+          "type": "group",
+          "marks": [
+            "@map",
+            ["@get", "fields"],
+            "h",
+            {
+              "type": "text",
+              "properties": {
+                "enter": {
+                  "align": {"value": "center"},
+                  "fill": {"value": "#333"}
+                },
+                "update": {
+                  "x": {"scale": "x", "value": ["@get", "h"]},
+                  "dy": {"scale": "x", "band": true, "mult": 0.5},
+                  "y": {"scale": "y", "signal": "d.index", "offset": -5},
+                  "angle": {"value": 270},
+                  "align": {"value": "left"},
+                  "baseline": {"value": "middle"},
+                  "text": {
+                    "template": [
+                      "@join", "",
+                      [["@get", "h"], ": ", "{{d['", ["@get", "h"] ,"']}}"]
+                    ]
+                  },
+                  "fillOpacity": {
+                    "rule": [
+                      {
+                        "predicate": {
+                          "name": "tooltip",
+                          "id": {"value": null}
+                        },
+                        "value": 0
+                      },
+                      {"value": 1}
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
     ]
   }
 ]
