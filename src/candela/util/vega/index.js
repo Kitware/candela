@@ -410,13 +410,13 @@ let chart = function (template, el, initialOptions, done) {
     if (elWidth !== 0 && elHeight !== 0) {
       if (that.options.width === undefined) {
         sizeOptions.width = elWidth;
-        if (spec.padding) {
+        if (isObjectLiteral(spec.padding)) {
           sizeOptions.width -= spec.padding.left + spec.padding.right;
         }
       }
       if (that.options.height === undefined) {
         sizeOptions.height = elHeight;
-        if (spec.padding) {
+        if (isObjectLiteral(spec.padding)) {
           sizeOptions.height -= spec.padding.top + spec.padding.bottom;
         }
       }

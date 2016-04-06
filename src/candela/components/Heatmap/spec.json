@@ -1,0 +1,176 @@
+[
+  "@defaults",
+  [
+    ["id", "_id"],
+    ["fields", []],
+    ["sort", ["@get", "id"]]
+  ],
+  {
+    "width": ["@get", "width"],
+    "height": ["@get", "height"],
+    "padding": "strict",
+
+    "predicates": [
+      {
+        "name": "tooltip",
+        "type": "==",
+        "operands": [{"signal": "d._id"}, {"arg": "id"}]
+      }
+    ],
+
+    "signals": [
+      {
+        "name": "d",
+        "init": {},
+        "streams": [
+          {"type": "rect:mouseover", "expr": "datum"},
+          {"type": "rect:mouseout", "expr": "{}"}
+        ]
+      }
+    ],
+
+    "data": [
+      {
+        "name": "data",
+        "values": ["@get", "data"],
+        "transform": [
+          {
+            "type": "formula",
+            "field": "index",
+            "expr": ["@join", "", ["datum['", ["@get", "id"], "']"]]
+          },
+          {
+            "type": "rank",
+            "field": ["@get", "sort"]
+          }
+        ]
+      },
+      {
+        "name": "fields",
+        "values": ["@get", "fields"]
+      }
+    ],
+
+    "scales": [
+      "@merge",
+      [
+        {
+          "name": "x",
+          "type": "ordinal",
+          "domain": {"data": "fields", "field": "data"},
+          "range": "width",
+          "round": false
+        },
+        {
+          "name": "y",
+          "type": "ordinal",
+          "domain": {
+            "data": "data",
+            "field": "index",
+            "sort": {
+              "field": [
+                "@if", ["@isStringField", ["@get", "data"], ["@get", "sort"]],
+                "rank",
+                ["@get", "sort"]
+              ],
+              "op": "mean"
+            }
+          },
+          "range": "height",
+          "round": false
+        }
+      ],
+      [
+        "@map",
+        ["@get", "fields"],
+        "field",
+        [
+          "@colorScale",
+          {
+            "name": ["@get", "field"],
+            "data": "data",
+            "values": ["@get", "data"],
+            "field": ["@get", "field"]
+          }
+        ]
+      ]
+    ],
+
+    "axes": [
+      {"type": "x", "scale": "x"},
+      {"type": "y", "scale": "y"}
+    ],
+
+    "marks": [
+      "@merge",
+      [
+        "@map",
+        ["@get", "fields"],
+        "field",
+        {
+          "type": "rect",
+          "from": {"data": "data"},
+          "properties": {
+            "enter": {
+              "x": {"scale": "x", "value": ["@get", "field"]},
+              "width": {"scale": "x", "band": true, "offset": 1},
+              "y": {"scale": "y", "field": "index"},
+              "height": {"scale": "y", "band": true, "offset": 1}
+            },
+            "update": {
+              "fill": {"scale": ["@get", "field"], "field": ["@get", "field"]}
+            },
+            "hover": {
+              "fill": {"value": "yellow"}
+            }
+          }
+        }
+      ],
+      [
+        {
+          "type": "group",
+          "marks": [
+            "@map",
+            ["@get", "fields"],
+            "h",
+            {
+              "type": "text",
+              "properties": {
+                "enter": {
+                  "align": {"value": "center"},
+                  "fill": {"value": "#333"}
+                },
+                "update": {
+                  "x": {"scale": "x", "value": ["@get", "h"]},
+                  "dy": {"scale": "x", "band": true, "mult": 0.5},
+                  "y": {"scale": "y", "signal": "d.index", "offset": -5},
+                  "angle": {"value": 270},
+                  "align": {"value": "left"},
+                  "baseline": {"value": "middle"},
+                  "text": {
+                    "template": [
+                      "@join", "",
+                      [["@get", "h"], ": ", "{{d['", ["@get", "h"] ,"']}}"]
+                    ]
+                  },
+                  "fillOpacity": {
+                    "rule": [
+                      {
+                        "predicate": {
+                          "name": "tooltip",
+                          "id": {"value": null}
+                        },
+                        "value": 0
+                      },
+                      {"value": 1}
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    ]
+  }
+]
