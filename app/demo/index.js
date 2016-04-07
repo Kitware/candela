@@ -1,6 +1,5 @@
 import LineChart from './../../src/candela/components/LineChart';
 import ParallelCoordinates from './../../src/candela/components/ParallelCoordinates';
-import Scatter from './../../src/candela/components/Scatter';
 import $ from 'jquery';
 
 function linechart () {
@@ -50,20 +49,6 @@ function parallelCoordinates () {
   vis.render(data);
 }
 
-function scatterplot () {
-  let el = document.getElementById('scatter');
-
-  let data = [0, 1, 2, 3, 4, 5].map((v) => ({
-    x: v,
-    y: v * v
-  }));
-
-  let vis = new Scatter(el, data, {
-    color: 'firebrick'
-  });
-  vis.render();
-}
-
 import indexContent from './index.jade';
 import './index.styl';
 
@@ -72,5 +57,4 @@ window.onload = () => {
 
   linechart();
   parallelCoordinates();
-  scatterplot();
 };
