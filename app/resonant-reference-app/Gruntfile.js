@@ -32,7 +32,7 @@ module.exports = function (grunt) {
     watch: {
       'plugin-resonant-reference-app-npm': {
         files: [packageJson],
-        tasks: ['shell:osumo-npm']
+        tasks: ['shell:resonant-reference-app-npm']
       }
     },
 

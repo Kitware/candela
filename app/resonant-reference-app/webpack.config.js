@@ -5,7 +5,7 @@ var GruntWatchPlugin = require('./grunt-watch-plugin.js');
 module.exports = {
   entry: './mainPage.js',
   output: {
-    path: 'web_client/extra',
+    path: 'web_client/lib',
     filename: 'webpack_bundle.js'
   },
   plugins: [
