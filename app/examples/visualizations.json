@@ -178,5 +178,24 @@
       ],
       "sort": "petalLength"
     }
+  },
+  {
+    "hash": "parallel-coords",
+    "name": "Parallel Coordinates",
+    "description": "An interactive parallel coordinates view of the NBA dataset",
+    "component": "ParallelCoordinates",
+    "elementType": "canvas",
+    "options": {
+      "dataRoot": "nba-heatmaps",
+      "fields": [
+        "games",
+        "age",
+        "free throw percent",
+        "minutes",
+        "versatility index"
+      ],
+      "width": 540,
+      "height": 360
+    }
   }
 ]
