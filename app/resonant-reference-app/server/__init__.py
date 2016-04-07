@@ -10,10 +10,6 @@ class ReferenceApp(Resource):
     def __init__(self):
         super(ReferenceApp, self).__init__()
         self.resourceName = 'referenceapp'
-        # self.route('POST', (), self.processTask)
-
-    # def processTask():
-    #     pass
 
 
 def load(info):
