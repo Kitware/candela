@@ -1,7 +1,7 @@
 import Resize from './Resize';
 import InitSize from './InitSize';
 
-let AutoResize = Base => class extends Resize(SizeInit(Base)) {
+let AutoResize = Base => class extends Resize(InitSize(Base)) {
   constructor (...args) {
     super(...args);
 

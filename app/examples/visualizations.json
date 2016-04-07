@@ -161,5 +161,22 @@
       "data": "stocks",
       "bin": "date"
     }
+  },
+  {
+    "hash": "heatmap",
+    "name": "Heatmap",
+    "description": "A simple heatmap of the Iris dataset, with records sorted by petalLength.",
+    "component": "Heatmap",
+    "options": {
+      "data": "iris",
+      "fields": [
+        "sepalLength",
+        "sepalWidth",
+        "petalLength",
+        "petalWidth",
+        "species"
+      ],
+      "sort": "petalLength"
+    }
   }
 ]

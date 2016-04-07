@@ -1,7 +1,7 @@
 import components from './components';
 import VisComponent from './VisComponent';
 
-export default {
+module.exports = {
   components,
   VisComponent: {
     VisComponent
