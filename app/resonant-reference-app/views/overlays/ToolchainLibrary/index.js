@@ -129,11 +129,12 @@ let ToolchainLibrary = Backbone.View.extend({
           d.attributes.meta.mappings &&
           d.attributes.meta.visualizations;
       });
+      
       if (toolchainModels.length > 0) {
         jQuery('#' + divId).show();
         jQuery('#' + divId + 'Header').show();
       }
-
+      
       let libraryButtons = d3.select('#' + divId)
         .selectAll('.circleButton')
         .data(toolchainModels);
