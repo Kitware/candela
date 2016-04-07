@@ -33,7 +33,10 @@ function showPage () {
     document.getElementsByTagName('body')[0].innerHTML = visContent(
       properties
     );
-    let el = document.getElementById('vis-element');
+    let el = document.getElementById('vis-container')
+      .appendChild(document.createElement(properties.elementType || 'div'));
+    el.setAttribute('id', 'vis-element');
+    el.className = 'vis-full';
     if (!Array.isArray(properties.options.data)) {
       properties.options.data = datasets[properties.options.data];
     }
