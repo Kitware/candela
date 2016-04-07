@@ -106,7 +106,7 @@ let Dataset = MetadataItem.extend({
       fileType = fileType[fileType.length - 1];
     }
     self.setMeta('fileType', fileType);
-    // self.save();
+    self.save();
   },
   inferAttributes: function () {
     let self = this;
@@ -116,7 +116,7 @@ let Dataset = MetadataItem.extend({
       } else {
         self.setMeta('attributes', datalib.type.all(data));
       }
-      // self.save();
+      self.save();
       self.trigger('rra:changeSpec');
     });
   },
@@ -125,7 +125,7 @@ let Dataset = MetadataItem.extend({
     let attributes = self.getMeta('attributes');
     attributes[attrName] = dataType;
     self.setMeta('attributes', attributes);
-    // self.save();
+    self.save();
     self.trigger('rra:changeSpec');
   }
 });

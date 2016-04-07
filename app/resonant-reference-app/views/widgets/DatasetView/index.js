@@ -68,8 +68,10 @@ let DatasetView = Widget.extend({
       }
     });
 
-    self.listenTo(window.mainPage.toolchain, 'rra:changeDatasets', self.render);
-    self.listenTo(window.mainPage.toolchain, 'rra:changeMappings', self.renderAttributeSettings);
+    self.listenTo(window.mainPage.toolchain, 'rra:changeDatasets',
+                  self.render);
+    self.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
+                  self.renderAttributeSettings);
   },
   renderInfoScreen: function () {
     let self = this;

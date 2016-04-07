@@ -38,15 +38,8 @@ let Toolchain = MetadataItem.extend({
   },
   initialize: function () {
     let self = this;
-
-    let meta = self.getMeta();
-
+    
     self.isPublic = undefined;
-
-    // Forward events from dataset changes
-    self.listenTo(meta.datasets, 'rra:changeSpec', () => {
-      self.validateMappings();
-    });
 
     self.listenTo(self, 'change', () => {
       self.getVisibility();
@@ -109,9 +102,11 @@ let Toolchain = MetadataItem.extend({
     if (key === undefined) {
       if (meta.datasets instanceof Array) {
         meta.datasets = new Dataset.Collection(meta.datasets);
+        self.listenTo(meta.datasets, 'rra:changeSpec', self.changeSpec);
       }
     } else if (key === 'datasets' && meta instanceof Array) {
       meta = new Dataset.Collection(meta);
+      self.listenTo(meta, 'rra:changeSpec', self.changeSpec);
     }
 
     return meta;
@@ -163,16 +158,15 @@ let Toolchain = MetadataItem.extend({
       self.setMeta(meta);
     } else {
       let oldDataset = meta.datasets.at(index);
-      if (oldDataset.get('_id') === newDataset['_id']) {
-        return;
+      if (oldDataset.get('_id') !== newDataset['_id']) {
+        meta.datasets.remove(oldDataset);
+        meta.datasets.add(newDataset, {
+          at: index
+        });
+        // Swapping in a new dataset invalidates the mappings
+        meta.mappings = [];
+        self.setMeta(meta);
       }
-      meta.datasets.remove(oldDataset);
-      meta.datasets.add(newDataset, {
-        at: index
-      });
-      // Swapping in a new dataset invalidates the mappings
-      meta.mappings = [];
-      self.setMeta(meta);
     }
     self.save();
     self.trigger('rra:changeDatasets');
@@ -186,13 +180,12 @@ let Toolchain = MetadataItem.extend({
       meta.visualizations.push(newVisualization);
       self.set('meta', meta);
     } else {
-      if (meta.visualizations[index].name === newVisualization.name) {
-        return;
+      if (meta.visualizations[index].name !== newVisualization.name) {
+        meta.visualizations[index] = newVisualization;
+        // Swapping in a new dataset invalidates the mappings
+        meta.mappings = [];
+        self.setMeta(meta);
       }
-      meta.visualizations[index] = newVisualization;
-      // Swapping in a new dataset invalidates the mappings
-      meta.mappings = [];
-      self.setMeta(meta);
     }
     self.save();
     self.trigger('rra:changeVisualizations');
@@ -239,10 +232,18 @@ let Toolchain = MetadataItem.extend({
     });
     return options;
   },
+  changeSpec: function () {
+    let self = this;
+    if (self.validateMappings() === true) {
+      // validateMappings will trigger this on its own
+      // if the mappings were invalid
+      self.trigger('rra:changeMappings');
+    }
+  },
   validateMappings: function () {
     let self = this;
     let meta = self.getMeta();
-
+    
     // Go through all the mappings and make sure that:
     // 1. The data types are still compatible
     //    (trash them if they're not)
@@ -273,6 +274,9 @@ let Toolchain = MetadataItem.extend({
       self.setMeta(meta);
       self.save();
       self.trigger('rra:changeMappings');
+      return false;
+    } else {
+      return true;
     }
   },
   addMapping: function (mapping) {
