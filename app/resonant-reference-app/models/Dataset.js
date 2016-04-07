@@ -39,12 +39,12 @@ let Dataset = MetadataItem.extend({
     if (cache && self.rawCache !== null) {
       callback(self.rawCache);
     } else {
-      girder.restRequest({
+      Promise.resolve(girder.restRequest({
         path: 'item/' + self.id + '/download',
         type: 'GET',
         error: null,
         dataType: 'text'
-      }).done(function (data) {
+      })).then(function (data) {
         if (cache) {
           self.rawCache = data;
         }
@@ -106,7 +106,12 @@ let Dataset = MetadataItem.extend({
       fileType = fileType[fileType.length - 1];
     }
     self.setMeta('fileType', fileType);
-    self.save();
+    self.saveThenTrigger(['rra:changeType']);
+  },
+  setFileType: function (fileType) {
+    let self = this;
+    self.setMeta('fileType', fileType);
+    self.saveThenTrigger(['rra:changeType']);
   },
   inferAttributes: function () {
     let self = this;
@@ -116,8 +121,7 @@ let Dataset = MetadataItem.extend({
       } else {
         self.setMeta('attributes', datalib.type.all(data));
       }
-      self.save();
-      self.trigger('rra:changeSpec');
+      self.saveThenTrigger(['rra:changeSpec']);
     });
   },
   setAttribute: function (attrName, dataType) {
@@ -125,8 +129,7 @@ let Dataset = MetadataItem.extend({
     let attributes = self.getMeta('attributes');
     attributes[attrName] = dataType;
     self.setMeta('attributes', attributes);
-    self.save();
-    self.trigger('rra:changeSpec');
+    self.saveThenTrigger(['rra:changeSpec']);
   }
 });
 

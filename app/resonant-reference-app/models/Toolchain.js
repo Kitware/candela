@@ -15,85 +15,168 @@ let girder = window.girder;
 */
 
 let Toolchain = MetadataItem.extend({
-  /*
-    resetToDefaults doesn't work unless defaults
-    is a function. If defaults are a simple object,
-    changes to the model mutate the defaults object.
-  */
-  defaults: () => {
+  defaults: function () {
     return {
       name: 'Untitled Toolchain',
       meta: {
         datasets: [],
         mappings: [],
         visualizations: [],
-        preferredWidgets: [],
-        requiredIcons: [
-          'DatasetView',
-          'MappingView',
-          'VisualizationView'
-        ]
+        preferredWidgets: []
       }
     };
   },
   initialize: function () {
     let self = this;
-    
-    self.isPublic = undefined;
 
-    self.listenTo(self, 'change', () => {
-      self.getVisibility();
-    });
+    self.status = {
+      editable: false,
+      location: null
+    };
 
-    if (self.getId() !== undefined) {
-      // We actually have some settings!
-      // Get them from the server
-      self.fetch();
-    }
+    self.listenTo(self, 'change', self.updateStatus);
   },
-  getVisibility: function () {
-    let self = this;
-    let parentId = self.get('folderId');
-
-    if (parentId) {
-      // Look up which folder the toolchain lives in
-      girder.restRequest({
-        path: 'folder/' + parentId,
-        type: 'GET',
-        error: function () {
-          self.isPublic = undefined;
-        }
-      }).done(function (folder) {
-        if (folder && folder['name']) {
-          if (folder['name'] === 'Public') {
-            self.isPublic = true;
-          } else if (folder['name'] === 'Private') {
-            self.isPublic = false;
-          } else {
-            self.isPublic = undefined;
-          }
-        } else {
-          self.isPublic = undefined;
-        }
-      });
-    }
-  },
-  togglePublic: function () {
+  updateStatus: function (copyOnError) {
     let self = this;
     let id = self.getId();
 
-    if (id && self.isPublic !== undefined) {
-      girder.restRequest({
-        path: 'item/togglePublic/' + id,
-        type: 'POST',
-        error: function () {
-          self.isPublic = undefined;
+    // Look up where the toolchain lives,
+    // and whether the user can edit it
+    
+    let oldStatus = {
+      editable: self.status.editable,
+      location: self.status.location
+    };
+    
+    self.status = {
+      editable: false,
+      location: null
+    };
+
+    if (id === undefined) {
+      if (copyOnError) {
+        self.makeCopy();
+      } else {
+        throw new Error('Toolchain has no ID');
+      }
+    }
+
+    let itemXhr = Promise.resolve(girder.restRequest({
+      path: 'item/' + id,
+      type: 'GET'
+    }));
+
+    let parentId = self.get('folderId');
+    let parentAccessXhr = Promise.resolve(girder.restRequest({
+      path: 'folder/' + parentId + '/access',
+      type: 'GET',
+      error: null
+    }));
+
+    let allXhr = Promise.all([itemXhr, parentAccessXhr]).then((responses) => {
+      let item = responses[0];
+      let folder = responses[1];
+
+      if (item.baseParentType === 'user') {
+        // Get information about where the toolchain item lives
+
+        /* TODO: for now, I'm assuming the UI still makes sense,
+        regardless of whether the user is looking at their own
+        public/private items, or at a different user's public/private
+        items that they have access to. If not, we may need to look up
+        whether this actually is the same user */
+        if (item.public === true) {
+          self.status.location = 'UserPublic';
+        } else {
+          self.status.location = 'UserPrivate';
         }
-      }).done(function (newState) {
-        self.isPublic = newState;
-        self.trigger('change');
+      } else {
+        if (folder.name === 'Public Scratch Space') {
+          self.status.location = 'PublicScratch';
+        } else {
+          self.status.location = 'PublicLibrary';
+        }
+      }
+      
+      if (self.status.location === 'PublicScratch') {
+        /*
+          Use localStorage to do an easily-hackable "security"
+          check (when people aren't logged in, we behave like
+          jsfiddle) to see if this non-logged-in user was the one
+          that created the public scratch item in the first place
+        */
+        let ownedToolchains = window.localStorage.getItem('scratchToolchains');
+        if (ownedToolchains) {
+          self.status.editable = JSON.parse(ownedToolchains)
+            .indexOf(id) !== -1;
+        }
+      } else {
+        // Get information about whether the current user has
+        // write access to edit the item
+        let userId = window.mainPage.currentUser.id;
+        if (userId && folder && folder.users) {
+          for (let i = 0; i < folder.users.length; i += 1) {
+            if (folder.users[i].id === userId) {
+              if (folder.users[i].level > 0) {
+                self.status.editable = true;
+              }
+              break;
+            }
+          }
+        }
+      }
+      
+      if (self.status.editable !== oldStatus.editable ||
+          self.status.location !== oldStatus.location) {
+        self.trigger('rra:changeStatus');
+      }
+    });
+
+    if (copyOnError) {
+      allXhr = allXhr.catch(() => {
+        self.makeCopy();
       });
     }
+
+    return allXhr;
+  },
+  makeCopy: function () {
+    let self = this;
+    /*
+    When something weird happens (e.g. the user is
+    trying to edit a toolchain that they don't have write
+    access to, or the toolchain is in an unexpected location),
+    we want to make sure that the user's actions are still
+    always saved. This function copies the current state of
+    the toolchain to either the user's Private directory, or
+    to the public scratch space if the user is logged out
+    */
+    let _fail = function () {
+      // If we can't even save a copy, something
+      // is seriously wrong.
+      window.mainPage.switchToolchain(null, arguments);
+    }
+
+    self.unset('_id');
+    return Promise.resolve(girder.restRequest({
+      path: 'item/scratchItem/',
+      type: 'GET',
+      error: _fail
+    })).then(function (item) {
+      self.set('_id', item.id);
+      self.fetch({
+        success: self.updateStatus,
+        error: _fail
+      })
+    }).catch(_fail);
+  },
+  togglePublic: function () {
+    let self = this;
+    girder.restRequest({
+      path: 'item/togglePublic/' + self.getId(),
+      type: 'POST',
+      error: self.updateStatus
+    }).always(self.updateStatus);
   },
   getMeta: function (key) {
     let self = this;
@@ -121,15 +204,9 @@ let Toolchain = MetadataItem.extend({
   rename: function (newName) {
     let self = this;
     self.set('name', newName);
-    self.save();
-  },
-  resetToDefaults: function () {
-    let self = this;
-    self.clear({
-      silent: true
+    self.save().then(() => {
+      self.trigger('rra:rename');
     });
-    self.set(self.defaults());
-    self.isPublic = undefined;
   },
   getDatasetIds: function () {
     let self = this;
@@ -168,9 +245,10 @@ let Toolchain = MetadataItem.extend({
         self.setMeta(meta);
       }
     }
-    self.save();
-    self.trigger('rra:changeDatasets');
-    self.trigger('rra:changeMappings');
+    self.save().then(() => {
+      self.trigger('rra:changeDatasets');
+      self.trigger('rra:changeMappings');
+    });
   },
   setVisualization: function (newVisualization, index = 0) {
     let self = this;
@@ -187,9 +265,10 @@ let Toolchain = MetadataItem.extend({
         self.setMeta(meta);
       }
     }
-    self.save();
-    self.trigger('rra:changeVisualizations');
-    self.trigger('rra:changeMappings');
+    self.save().then(() => {
+      self.trigger('rra:changeVisualizations');
+      self.trigger('rra:changeMappings');
+    });
   },
   shapeDataForVis: function (callback, index = 0) {
     let self = this;
@@ -243,7 +322,7 @@ let Toolchain = MetadataItem.extend({
   validateMappings: function () {
     let self = this;
     let meta = self.getMeta();
-    
+
     // Go through all the mappings and make sure that:
     // 1. The data types are still compatible
     //    (trash them if they're not)
@@ -272,8 +351,9 @@ let Toolchain = MetadataItem.extend({
 
     if (indicesToTrash.length > 0) {
       self.setMeta(meta);
-      self.save();
-      self.trigger('rra:changeMappings');
+      self.save().then(() => {
+        self.trigger('rra:changeMappings');
+      });
       return false;
     } else {
       return true;
@@ -291,7 +371,7 @@ let Toolchain = MetadataItem.extend({
           // If multiple fields are not allowed, search for the mapping and replace it
           for (let [index, m] of meta.mappings.entries()) {
             if (mapping.visIndex === m.visIndex &&
-                mapping.visAttribute === m.visAttribute) {
+              mapping.visAttribute === m.visAttribute) {
               meta.mappings[index] = mapping;
               addedMapping = true;
               break;
@@ -307,8 +387,9 @@ let Toolchain = MetadataItem.extend({
     }
 
     self.setMeta(meta);
-    self.save();
-    self.trigger('rra:changeMappings');
+    self.save().then(() => {
+      self.trigger('rra:changeMappings');
+    });
   },
   removeMapping: function (mapping) {
     let self = this;
@@ -317,9 +398,9 @@ let Toolchain = MetadataItem.extend({
     let mappingToSplice = null;
     for (let [index, m] of meta.mappings.entries()) {
       if (mapping.visIndex === m.visIndex &&
-          mapping.visAttribute === m.visAttribute &&
-          mapping.dataIndex === m.dataIndex &&
-          mapping.dataAttribute === m.dataAttribute) {
+        mapping.visAttribute === m.visAttribute &&
+        mapping.dataIndex === m.dataIndex &&
+        mapping.dataAttribute === m.dataAttribute) {
         mappingToSplice = index;
         break;
       }
@@ -329,48 +410,34 @@ let Toolchain = MetadataItem.extend({
     }
 
     self.setMeta(meta);
-    self.save();
-    self.trigger('rra:changeMappings');
-  },
-  closeWidget: function (widgetName) {
-    let self = this;
-    // Remove widgetName from the list of widgets that this
-    // toolchain last had open (save the new configuration)
-    let widgetList = self.getMeta('preferredWidgets');
-    let index = widgetList.indexOf(widgetName);
-    if (index !== -1) {
-      widgetList.splice(index, 1);
-      self.setMeta('preferredWidgets', widgetList);
-      self.save();
-      self.trigger('rra:changeWidget');
-    }
-  },
-  openWidget: function (widgetName) {
-    let self = this;
-
-    // Figure out where the widget should go;
-    // it should match the order of the icons
-    let iconList = self.getMeta('requiredIcons');
-    let widgetList = self.getMeta('preferredWidgets');
-
-    if (iconList.indexOf(widgetName) === -1) {
-      throw new Error(`Attempted to open a widget that
-        isn't on the toolbar: ` + widgetName);
-    }
-    if (widgetList.indexOf(widgetName) !== -1) {
-      // The widget is already open
-      return;
-    }
-
-    // TODO: probably a more efficient way to do this...
-    widgetList.push(widgetName);
-    widgetList.sort((a, b) => {
-      return iconList.indexOf(a) - iconList.indexOf(b);
+    self.save().then(() => {
+      self.trigger('rra:changeMappings');
     });
+  },
+  getAllWidgetSpecs: function () {
+    let self = this;
 
-    self.setMeta('preferredWidgets', widgetList);
-    self.save();
-    self.trigger('rra:changeWidget');
+    // Construct a list of all the widgets that
+    // this toolchain needs
+    let meta = self.getMeta();
+    let result = [];
+
+    let i;
+    for (i = 0; i < meta.datasets.length; i += 1) {
+      result.push({
+        widget: 'DatasetView',
+        spec: meta.datasets.at(i).getSpec()
+      });
+    }
+    result.push({
+      widget: 'MappingView'
+    });
+    for (i = 0; i < meta.visualizations.length; i += 1) {
+      result.push({
+        widget: 'VisualizationView',
+        spec: meta.visualizations[i]
+      });
+    }
   }
 });
 

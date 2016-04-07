@@ -7,6 +7,7 @@
   background-color: black;
   color: white;
   display: flex;
+  flex-direction: row-reverse;
   align-content: center;
   align-items: center;
   justify-content: space-between;
@@ -43,12 +44,6 @@
 
 #Header div.indicators img.right {
   left: -1em;
-}
-
-#Header .headerSeparator {
-  border: 1px solid #666666;
-  height: 2em;
-  margin: 0.5em;
 }
 
 #Header #toolchainHeader {

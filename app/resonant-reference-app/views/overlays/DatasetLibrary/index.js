@@ -19,27 +19,27 @@ let DatasetLibrary = Backbone.View.extend({
     // errors when you try to fetch() them)
     jQuery('.hideable').hide();
 
-    girder.restRequest({
+    Promise.resolve(girder.restRequest({
       path: 'resource/lookup?path=/collection/ReferenceApp/Data',
       type: 'GET',
       error: null
-    }).done(function (folder) {
+    })).then(function (folder) {
       self.renderFolderContents(folder, 'datasetLibrary', libImage);
     });
 
-    girder.restRequest({
+    Promise.resolve(girder.restRequest({
       path: 'folder/privateFolder',
       type: 'GET',
       error: null
-    }).done(function (folder) {
+    })).then(function (folder) {
       self.renderFolderContents(folder, 'privateDatasets', privateImage);
     });
     
-    girder.restRequest({
+    Promise.resolve(girder.restRequest({
       path: 'folder/publicFolder',
       type: 'GET',
       error: null
-    }).done(function (folder) {
+    })).then(function (folder) {
       self.renderFolderContents(folder, 'publicDatasets', publicImage);
     });
   },
@@ -70,7 +70,8 @@ let DatasetLibrary = Backbone.View.extend({
         .selectAll('.circleButton')
         .data(datasetModels);
       
-      let datasetIds = window.mainPage.toolchain.getDatasetIds();
+      let datasetIds = window.mainPage.toolchain
+        ? window.mainPage.toolchain.getDatasetIds() : [];
       
       let libraryButtonsEnter = libraryButtons.enter().append('div')
         .attr('class', (d) => {
@@ -94,9 +95,27 @@ let DatasetLibrary = Backbone.View.extend({
 
       d3.select('#' + divId).selectAll('.circleButton')
         .on('click', function (d) {
-          window.mainPage.toolchain.setDataset(d);
-          window.mainPage.toolchain.openWidget('DatasetView');
-          window.mainPage.router.expandWidget('DatasetView');
+          if (window.mainPage.toolchain) {
+            // We already have a toolchain loaded, so
+            // swap it in (TODO: load multiple datasets)
+            window.mainPage.toolchain.setDataset(d);
+          } else {
+            console.log(d);
+            if (d.meta && d.meta.exampleToolchainId) {
+              // Load the example toolchain that this dataset's
+              // metadata specifies
+              window.mainPage.switchToolchain(d.meta.exampleToolchainId);
+            } else {
+              // No default example toolchain has been
+              // specified for this dataset; create an empty
+              // toolchain
+              window.mainPage.newToolchain().then(() => {
+                window.mainPage.toolchain.setDataset(d);
+              });
+            }
+          }
+          
+          // window.mainPage.widgetPanels.expandWidget('DatasetView');
           window.mainPage.overlay.render(null);
         });
     });

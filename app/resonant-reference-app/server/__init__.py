@@ -1,4 +1,4 @@
-from currentUser import CurrentUser
+from anonymousAccess import AnonymousAccess
 
 class CustomAppRoot:
     exposed = True
@@ -29,8 +29,10 @@ def load(info):
     info['serverRoot'], info['serverRoot'].girder = (CustomAppRoot(),
                                                      info['serverRoot'])
     info['serverRoot'].api = info['serverRoot'].girder.api
-    currentUser = CurrentUser()
-    info['apiRoot'].item.route('GET', ('privateItem', ), currentUser.getOrMakePrivateItem)
-    info['apiRoot'].folder.route('GET', ('privateFolder', ), currentUser.getOrMakePrivateFolder)
-    info['apiRoot'].folder.route('GET', ('publicFolder', ), currentUser.getOrMakePublicFolder)
-    info['apiRoot'].item.route('POST', ('togglePublic', ':id'), currentUser.togglePublic)
+    anonymousAccess = AnonymousAccess()
+    info['apiRoot'].item.route('GET', ('privateItem', ), anonymousAccess.getOrMakePrivateItem)
+    info['apiRoot'].item.route('GET', ('scratchItem', ), anonymousAccess.getOrMakeScratchItem)
+    info['apiRoot'].folder.route('GET', ('privateFolder', ), anonymousAccess.getOrMakePrivateFolder)
+    info['apiRoot'].folder.route('GET', ('publicFolder', ), anonymousAccess.getOrMakePublicFolder)
+    info['apiRoot'].item.route('POST', ('togglePublic', ':id'), anonymousAccess.togglePublic)
+    info['apiRoot'].item.route('POST', ('updateScratch', ':id'), anonymousAccess.updateScratchItem)

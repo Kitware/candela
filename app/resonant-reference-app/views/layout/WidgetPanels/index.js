@@ -15,7 +15,7 @@ let WidgetPanels = Backbone.View.extend({
     let toolchainIcons = window.mainPage.toolchain.getMeta('requiredIcons');
     return toolchainIcons.indexOf(widgetName) !== -1;
   },
-  close: function (widgetName) {
+  expandWidget: function (widgetSpec) {
     let self = this;
     /*
       Close the widget, but leave its icon up on the toolbar.
@@ -32,7 +32,7 @@ let WidgetPanels = Backbone.View.extend({
     // (this already triggers render calls)
     window.mainPage.router.minimizeWidget(widgetName);
   },
-  open: function (widgetName) {
+  collapseWidget: function (widgetSpec) {
     let self = this;
     /*
       Add the widget if it isn't already open, and target it (in case

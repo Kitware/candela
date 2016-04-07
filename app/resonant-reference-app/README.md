@@ -2,7 +2,7 @@
 
 Choose your own visualization adventure.
 
-## Installation
+## Setup: Installation
 
 1. [Install Girder prerequisites](http://girder.readthedocs.org/en/latest/prerequisites.html).
 
@@ -29,7 +29,7 @@ Choose your own visualization adventure.
   grunt
   ```
 
-## Running
+## Setup: First Run
 
 1. Start girder:
 
@@ -37,7 +37,7 @@ Choose your own visualization adventure.
   girder-server
   ```
 
-2. Register at ([localhost:8080](http://localhost:8080))
+2. Register an admin account at ([localhost:8080](http://localhost:8080))
 
 3. Go to Admin console -> Plugins to enable the Resonant Reference App plugin
 
@@ -46,9 +46,25 @@ Choose your own visualization adventure.
 The Resonant Reference App will replace the Girder interface at ([localhost:8080](http://localhost:8080))
 (you can still access the girder interface at ([localhost:8080/girder](http://localhost:8080/girder)))
 
+5. Set up the girder instance for the reference app by running
+   this script (in this directory):
+
+  ```bash
+  cd candela_repo_dir/app/resonant-reference-app
+  python girderSetup.py
+  ```
+
+6. Optionally, you can add an example library to the girder instance
+   by running this script from the `examples` directory:
+   
+   ```bash
+   cd examples
+   python populateGirder.py
+   ```
+
 ## Development
 
-There are several build steps before changes will
+There are several build steps before changes to the code will
 be visible in the browser. The Girder server has an option
 to recognize internal changes without necessitating a restart:
 
@@ -58,7 +74,7 @@ to recognize internal changes without necessitating a restart:
   ```
 
 We've also added to webpack's watch mode, so that it triggers
-a grunt step when you change code in resonant-reference-app. To
+girder's grunt build step when you change code in resonant-reference-app. To
 use it:
 
   ```bash

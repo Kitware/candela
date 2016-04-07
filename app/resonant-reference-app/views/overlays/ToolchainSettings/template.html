@@ -1,0 +1,71 @@
+<div class="libraryInterface">
+  <img src="../../../images/close.svg" id="closeOverlay" />
+
+  <h1 id="toolchainSettingsHeader">
+    Toolchain Settings
+  </h1>
+  <div id="toolchainSettings">
+    <p>A toolchain connects datasets to visualizations. If your toolchain is public, you can share your work simply by sharing the URL.</p>
+
+    <div class="form">
+      <div>
+        <label>Name:</label>
+        <input id="toolchainNameField" type="text" />
+        <button id="saveAsButton">Save A Copy</button>
+        <button id="deleteButton">Delete</button>
+        <button id="newButton">New Empty Toolchain</button>
+      </div>
+      
+      <div>
+        <img id="copyLinkButton" src="../../../images/copyLink.svg" class="button" />
+        <label>Copy a link to this toolchain</label>
+      </div>
+      
+      <div>
+        <img id="girderButton" src="../../../images/girder.svg" class="button" />
+        <label>Manage this toolchain in Girder</label>
+      </div>
+
+      <div>
+        <img id="editabilityIcon" />
+        <label id="editabilityLabel"></label>
+      </div>
+      
+      <div>
+        <img id="visibilityIcon" />
+        <label id="visibilityLabel"></label>
+      </div>
+      
+      <div>
+        <input value="UserPrivate" id="privateVisibility" name="toolchainVisibility" type="radio">
+        <label for="privateVisibility">Private</label>
+        <input value="UserPublic" id="publicVisibility" name="toolchainVisibility" type="radio">
+        <label for="publicVisibility">Public</label>
+        <input value="PublicScratch" id="scratchVisibility" name="toolchainVisibility" type="radio" disabled>
+        <label for="scratchVisibility">Public Scratch Space</label>
+        <input value="PublicLibrary" id="libraryVisibility" name="toolchainVisibility" type="radio" disabled>
+        <label for="libraryVisibility">Library</label>
+      </div>
+    </div>
+
+  </div>
+
+  <h1 id="privateToolchainsHeader" class="hideable">
+    Your Private Toolchains
+  </h1>
+  <div id="privateToolchains" class="hideable circleset">
+
+  </div>
+  <h1 id="publicToolchainsHeader" class="hideable">
+    Your Public Toolchains
+  </h1>
+  <div id="publicToolchains" class="hideable circleset">
+
+  </div>
+  <h1 id="toolchainLibraryHeader" class="hideable">
+    Our Toolchain Library
+  </h1>
+  <div id="toolchainLibrary" class="hideable circleset">
+
+  </div>
+</div>

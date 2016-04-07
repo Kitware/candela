@@ -1,134 +1,165 @@
 import Backbone from 'backbone';
+import jQuery from 'jquery';
+import SetOps from './shims/SetOps';
+import 'jquery-deparam';
 
 var Router = Backbone.Router.extend({
   routes: {
-    'toolchain/:toolchain/*widgets': 'loadToolchain',
-    '*widgets': 'defaultRoute'
+    'toolchain/:toolchain/:params': 'handleRoute',
+    'toolchain/:toolchain': 'handleRoute',
+    '': 'emptyRoute',
+    '*notFound': 'defaultRoute'
+  },
+  _extractParameters: function (route, fragment) {
+    // Fancy URL cleaning / standardization
+    let result = route.exec(fragment).slice(1, -1);
+
+    // A valid URL will have one or two chunks,
+    // and the second should have a widgets property
+    // that is a Set of strings
+    if (result.length === 1) {
+      result.push({
+        widgets: new Set([])
+      });
+    } else if (result.length === 2) {
+      result[1] = jQuery.deparam(result[1]);
+      if (result[1].widgets === undefined) {
+        result[1].widgets = new Set([]);
+      } else {
+        result[1].widgets = new Set(result[1].widgets);
+      }
+    }
+    return result;
   },
   initialize: function () {
     let self = this;
-    self.on('loadToolchain', function (id, widgets) {
-      window.mainPage.openToolchain(id, widgets);
-    });
-    self.on('defaultRoute', function (widgets) {
-      window.mainPage.openToolchain(undefined, widgets);
-    });
 
+    self.on('route:handleRoute', self.handleRoute);
+    self.on('route:emptyRoute', self.emptyRoute);
+    self.on('route:defaultRoute', self.defaultRoute);
     Backbone.history.start();
   },
-  storeInitialRoute: function () {
+  emptyRoute: function () {
     let self = this;
-    if (window.location.hash.length === 0) {
-      self.initialToolchainId = undefined;
-      self.initialWidgets = [];
-    } else {
-      let hashChunks = window.location.hash.substr(1).split('/');
-      if (hashChunks.length < 2) {
-        self.initialToolchainId = undefined;
-        self.initialWidgets = hashChunks[0].split('&');
-      } else {
-        self.initialToolchainId = hashChunks[1];
-        if (hashChunks.length === 2) {
-          self.initialWidgets = [];
-        } else {
-          self.initialWidgets = hashChunks[2].split('&');
+    
+    if (!self.initialRoute) {
+      // This is the first url we've come to;
+      // because we have nothing better to go
+      // on, we'll start with no toolchain and
+      // no widget
+      self.initialRoute = {
+        toolchainId: null,
+        params: {
+          widgets: new Set()
         }
-      }
-    }
-  },
-  clearInitials: function () {
-    let self = this;
-    self.initialToolchainId = undefined;
-    self.initialWidgets = [];
-  },
-  getCurrentWidgets: function () {
-    if (window.location.hash.length === 0) {
-      return [];
-    }
-    let hashChunks = window.location.hash.substr(1).split('/');
-    if (hashChunks.length === 0) {
-      return [];
+      };
     } else {
-      return hashChunks[hashChunks.length - 1].split('&');
+      self.handleRoute(null, {
+        widgets: new Set()
+      });
     }
   },
-  minimizeWidget: function (widgetName) {
+  defaultRoute: function () {
     let self = this;
-    let currentWidgets = self.getCurrentWidgets();
-    let widgetIndex = currentWidgets.indexOf(widgetName);
-    if (widgetIndex === -1) {
-      return;
-    }
-    currentWidgets.splice(widgetIndex, 1);
-    window.location.hash = self.composeHash(currentWidgets);
-    window.mainPage.render();
-  },
-  expandWidget: function (widgetName) {
-    let self = this;
-    let currentWidgets = self.getCurrentWidgets();
-    if (currentWidgets.indexOf(widgetName) !== -1) {
-      return;
-    }
-    currentWidgets.push(widgetName);
-    window.location.hash = self.composeHash(currentWidgets);
-    window.mainPage.render();
-  },
-  composeHash: function (widgets) {
-    // Clean the list of widgets to only contain
-    // the ones that the current preferences/toolchain
-    // allow
-    let leftWidgetNames = window.mainPage.userPreferences
-      .getMeta('leftWidgets');
-    let toolchainWidgetNames = window.mainPage.toolchain
-      .getMeta('preferredWidgets');
-    let rightWidgetNames = window.mainPage.userPreferences
-      .getMeta('rightWidgets');
-
-    // Stitch together the list of widgets from
-    // the user preferences and from the
-    // currently open toolchain
-    let widgetNames = leftWidgetNames
-      .concat(toolchainWidgetNames)
-      .concat(rightWidgetNames);
-
-    // Ignore any hashes that aren't visible
-    widgets = widgets.filter((d) => {
-      return widgetNames.indexOf(d) !== -1;
+    // Bad url; nuke whatever weird crap
+    // is in the URL, and treat it like an empty one
+    self.navigate('', {
+      replace: true,
+      trigger: false
     });
-
-    let newHash = '#';
-    let toolchainId = window.mainPage.toolchain.getId();
-    if (toolchainId !== undefined) {
-      newHash += 'toolchain/' + toolchainId + '/';
-    }
-    newHash += widgets.join('&');
-    return newHash;
+    self.emptyRoute();
   },
-  setWidgets: function (widgets) {
+  handleRoute: function (toolchainId, params) {
     let self = this;
-    // Get the widgets that are already in the URL
-    let hashes = self.getCurrentWidgets();
-
-    // Set the new URL
-    window.location.hash = self.composeHash(widgets);
-
-    // Compare the list of widgets; any mismatch means a re-render
-    if (hashes.length !== widgets.length) {
-      window.mainPage.render();
-      return;
-    }
-
-    for (let i = 0; i < widgets.length; i += 1) {
-      if (widgets.indexOf(hashes[i]) === -1 ||
-        hashes.indexOf(widgets[i]) === -1) {
-        window.mainPage.render();
-        return;
+    
+    if (!self.initialRoute) {
+      // Store the preferred route; our first time through,
+      // there won't be a toolchain or widgetPanels to work with
+      self.initialRoute = {
+        toolchainId: toolchainId,
+        params: params
+      };
+    } else if (window.mainPage) {
+      // We've actually navigated
+      let currentId = window.mainPage.toolchain
+        ? window.mainPage.toolchain.getId() : null;
+      let currentWidgets = window.mainPage.widgetPanels
+        ? window.mainPage.widgetPanels.currentWidgetNames() : new Set();
+      
+      let changedToolchain = toolchainId !== currentId;
+      let changedWidgets = SetOps.symmetric_difference(
+        params.widgets, currentWidgets).size > 0;
+      
+      if (changedToolchain && changedWidgets) {
+        // We've been given a specific toolchain URL, and we're also
+        // overriding whatever widgets it saved last time it was open
+        window.mainPage.switchToolchain(toolchainId);
+        window.mainPage.widgetPanels.setWidgets(params.widgets);
+      } else if (changedToolchain) {
+        // The user didn't change the widgets that were
+        // open. As we're switching to a new toolchain,
+        // use whatever widgets that toolchain had open
+        // the last time it was saved
+        window.mainPage.switchToolchain(toolchainId);
+      } else if (changedWidgets) {
+        // We've changed whatever widgets should be open
+        window.mainPage.widgetPanels.setWidgets(params.widgets);
       }
     }
   },
-  cleanHash: function () {
+  applyInitialRoute: function () {
     let self = this;
-    window.location.hash = self.composeHash(self.getCurrentWidgets());
+    // We wait to apply the initial route until
+    // after the whole DOM has been set up
+    window.mainPage.switchToolchain(self.initialRoute.toolchainId);
+    /* window.mainPage.widgetPanels.setWidgets(self.initialRoute
+                                            .params.widgets);*/
+    
+    if (self.initialRoute.toolchainId) {
+      // The user specified which toolchain they want in
+      // the URL, so don't bother them with a dialog asking
+      // them to pick one
+      window.mainPage.overlay.render(null);
+    }
+  },
+  addListeners: function () {
+    let self = this;
+    // Listen to events that signal that the url needs to be updated
+    self.listenTo(window.mainPage, 'rra:changeToolchain', self.updateUrl);
+    self.listenTo(window.mainPage.widgetPanels,
+                  'rra:expandWidget', self.updateUrl);
+    self.listenTo(window.mainPage.widgetPanels,
+                  'rra:minimizeWidget', self.updateUrl);
+  },
+  constructFragment: function (toolchainId, widgets) {
+    let fragment = 'toolchain/' + toolchainId;
+    if (widgets.size > 0) {
+      fragment += '/' + jQuery.param({
+        widgets: [...widgets]
+      });
+    }
+    return fragment;
+  },
+  updateUrl: function () {
+    let self = this;
+    if (!window.mainPage ||
+        !window.mainPage.toolchain) { // ||
+      //  !window.mainPage.widgetPanels) {
+      // We haven't actually set up our
+      // important pieces yet, so don't
+      // change anything yet
+      return;
+    }
+    
+    let toolchainId = window.mainPage.toolchain.getId();
+    let widgets = []; // window.mainPage.widgetPanels.currentWidgetNames();
+    self.navigate(self.constructFragment(toolchainId, widgets), {
+      trigger: true
+    });
+  },
+  openToolchainInGirder: function () {
+    let url = 'girder#folder/' + window.mainPage.toolchain.get('folderId');
+    window.open(url, '_blank');
   }
 });
 

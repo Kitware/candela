@@ -7,8 +7,17 @@
   background-color: white;
 }
 
+.hamburgerMenu > div {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.hamburgerMenu > div:hover {
+  background-color: #ccc;
+  cursor: pointer;
+}
+
 .hamburgerMenu img {
-  display: inline-block;
   width: 2em;
   height: 2em;
   vertical-align: middle;
@@ -17,22 +26,4 @@
 .hamburgerMenu p {
   padding: 1em;
   margin: 0px;
-}
-
-.hamburgerMenu table {
-  width: 100%;
-}
-
-.hamburgerMenu td.control {
-  text-align: center;
-}
-
-.hamburgerMenu td p {
-  display: inline-block;
-}
-
-.hamburgerMenu > p:hover,
-.hamburgerMenu td.tool:hover {
-  background-color: #ccc;
-  cursor: pointer;
 }
