@@ -94,12 +94,20 @@ module.exports = {
         loader: 'raw-loader'
       },
       {
+        test: /\.html$/,
+        loader: 'html-loader?attrs=img:src'
+      },
+      {
         test: /\.styl$/,
         loaders: ['style-loader', 'css-loader', 'stylus-loader']
       },
       {
         test: /\.css$/,
         loaders: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.scss$/,
+        loaders: ['style-loader', 'css-loader', 'sass-loader']
       },
       {
         test: /\.jade$/,

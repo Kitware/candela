@@ -51,8 +51,11 @@
     "karma-webpack": "^1.7.0",
     "legacy-loader": "0.0.2",
     "less": "^2.3.1",
+    "node-sass": "^3.4.2",
     "phantomjs-prebuilt": "^2.1.5",
     "raw-loader": "^0.5.1",
+    "sass-loader": "^3.2.0",
+    "script-loader": "^0.6.1",
     "semistandard-loader": "0.0.3",
     "strip-json-comments": "^2.0.1",
     "strip-json-comments-loader": "0.0.2",
@@ -72,6 +75,7 @@
     "jquery": "^2.2.0",
     "LineUpJS": "git+https://github.com/Caleydo/lineup.js#51ae6f2bcb55aead3f63357864e90d5799789910",
     "underscore": "^1.8.3",
+    "UpSet": "git+https://github.com/VCG/upset#33e1c4140896c4705127df4dc38a3a6b48827c7a",
     "vega": "^2.4.2"
   }
 }

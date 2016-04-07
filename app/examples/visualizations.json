@@ -178,5 +178,23 @@
       ],
       "sort": "petalLength"
     }
+  },
+  {
+    "hash": "upset",
+    "name": "UpSet",
+    "description": "Set visualization with UpSet.",
+    "component": "UpSet",
+    "options": {
+      "data": "simpsons",
+      "id": "Name",
+      "sets": [
+        "Male",
+        "Power Plant",
+        "Evil",
+        "Blue Hair",
+        "Duff Fan",
+        "School"
+      ]
+    }
   }
 ]
