@@ -1,21 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 19.2.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generator: Adobe Illustrator 19.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st0{fill:#4DAF4A;}
+	.st1{fill-rule:evenodd;clip-rule:evenodd;fill:#4DAF4A;}
 </style>
-<g>
-	<path vector-effect="non-scaling-stroke" class="st0" d="M382.9,310.9c0.8-10.2,1.6-20.3,2.6-30.5c0.1-0.8,0.4-1.7,0.4-2.5c0.3-40.8,1.8-81.6,0.9-122.4
-		c-0.3-11.7-2.4-23.3-3.9-35c-0.6-4.8-3-6.5-7.9-6.5c-79.8,0-159.6,0-239.3,0c-4.9,0-6.3,1.2-7.4,8.5c-1.6,10.3-3.1,20.5-3.1,31
-		c-0.2,36.3-1.6,72.6-0.8,108.9c0.2,9.7,0.9,19.4,2.7,29c1.1,5.9,1.1,12,1.6,18"/>
-	<path vector-effect="non-scaling-stroke" class="st0" d="M128.1,309.9c-2.8,1.4-5.8,2-9,2c-9.2,0-18.3,0-27.5,0c-7.6,0-10.5,2.9-10.5,10.5c0,21.8,0.2,43.6-0.1,65.5
-		c-0.1,6.7,3.4,10.1,10.1,10.1c109.8-0.1,219.5-0.1,329.3,0c6.4,0,10.7-4.2,10.6-10.6c-0.3-21.5-0.2-43-0.1-64.5
-		c0.1-7.6-3.5-11.4-11.1-11c-12,0.7-24-0.5-36-0.3c-27,0.5-54,0.2-81,0.3c-54.8,0.1-109.6,0-164.4,0.1c-3.3,0-6.5-0.5-9.5-2"/>
-	<path vector-effect="non-scaling-stroke" class="st0" d="M175.5,340.4c-21.3,0-42.6,0-64,0"/>
-	<path vector-effect="non-scaling-stroke" class="st0" d="M166,143.5c-7.5,1.8-9,1.9-9.6,10.5c-0.6,8-0.3,16-0.4,24c-0.1,24.5-0.1,49,0,73.5c0,4,0.2,8,0.5,12
-		c0.3,4.4,2.5,6.8,7,7.5c2,0.3,4,0.5,6,0.5c56,0,111.9,0,167.9,0c2.8,0,5.7-0.1,8.5-0.5c4.4-0.6,7-4.6,7-10.5c0-19.5,0-39,0-58.5
-		c0-15.7,0-31.3,0-47c0-6.4-2.5-10.4-7-11c-3-0.4-6-0.5-9-0.5c-56.8,0-113.6,0-170.4,0"/>
-</g>
+<path class="st0" d="M90.8,347.6l-47.1,0.6l-13.6,13.6L30,446.3l13,13h425.3l13.7-13.7l-0.1-83.3l-14.3-14.2l-375.7-0.5 M152,411
+	H69.4v-32H152V411L152,411L152,411z"/>
+<path class="st1" d="M419.9,306.9l3.4-39.4l0.5-3.2l1.2-158.1l-5-45.2l-10.2-8.4h-309l-9.6,11l-4,40l-1,140.6l5.6,60.7 M139.8,90.7
+	l-12.4,13.6l-0.5,125.9l0.6,15.5l9,9.7l7.7,0.6h216.8l11-0.6l9-13.6V105.6l-9-14.2l-11.6-0.6H140.4"/>
 </svg>

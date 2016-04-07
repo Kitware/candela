@@ -5,7 +5,7 @@
   bottom: 0px;
 }
 
-span.indicators {
+#WidgetPanels span.indicators {
   position: absolute;
   right: 0.5em;
   height: 2em;
@@ -14,15 +14,20 @@ span.indicators {
   cursor: pointer;
 }
 
-.targeted span.indicators {
+#WidgetPanels .targeted span.indicators {
   top: 0em;
 }
 
-span.indicatorIcons img {
+#WidgetPanels span.indicatorText {
+  color: #999;
+  font-size: 0.75em;
+}
+
+#WidgetPanels .sectionHeader img {
   width: 1em;
   height: 1em;
   display: inline-block;
-  vertical-align: middle;
+  vertical-align: text-top;
   -webkit-transform: rotate(90deg);
   -moz-transform: rotate(90deg);
   -ms-transform: rotate(90deg);
@@ -30,12 +35,12 @@ span.indicatorIcons img {
   transform: rotate(90deg);
   margin-left: 0.5em;
 }
-span.indicatorText {
-  color: #999;
-  font-size: 0.75em;
+
+#WidgetPanels .indicators img {
+  vertical-align: middle;
 }
 
-.targeted span.indicatorIcons img {
+#WidgetPanels .targeted .sectionHeader img {
   -webkit-transform: rotate(0deg);
   -moz-transform: rotate(0deg);
   -ms-transform: rotate(0deg);

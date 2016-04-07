@@ -1,3 +1,5 @@
+from currentUser import CurrentUser
+
 class CustomAppRoot:
     exposed = True
 
@@ -7,7 +9,7 @@ class CustomAppRoot:
 <html lang="en">
 <head>
     <title>Resonant Reference App</title>
-    <link href='https://fonts.googleapis.com/css?family=Gentium+Basic:400,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Cutive+Mono|Gentium+Basic:400,700' rel='stylesheet' type='text/css'>
     <!--link rel="stylesheet" href="static/built/app.min.css"-->
     <link rel="icon" type="image/png" href="static/img/Girder_Favicon.png">
 </head>
@@ -22,9 +24,13 @@ class CustomAppRoot:
 </body>
 """
 
-
 def load(info):
     # Move girder app to /girder, serve our custom app from /
     info['serverRoot'], info['serverRoot'].girder = (CustomAppRoot(),
                                                      info['serverRoot'])
     info['serverRoot'].api = info['serverRoot'].girder.api
+    currentUser = CurrentUser()
+    info['apiRoot'].item.route('GET', ('privateItem', ), currentUser.getOrMakePrivateItem)
+    info['apiRoot'].folder.route('GET', ('privateFolder', ), currentUser.getOrMakePrivateFolder)
+    info['apiRoot'].folder.route('GET', ('publicFolder', ), currentUser.getOrMakePublicFolder)
+    info['apiRoot'].item.route('POST', ('togglePublic', ':id'), currentUser.togglePublic)

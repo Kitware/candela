@@ -2,7 +2,6 @@ import d3 from 'd3';
 import jQuery from 'jquery';
 import myTemplate from './template.html';
 import Widget from '../Widget';
-import Dataset from '../../../models/Dataset';
 import './style.css';
 
 import infoTemplate from './infoTemplate.html';
@@ -27,12 +26,15 @@ let MappingView = Widget.extend({
     Widget.prototype.initialize.apply(self, options);
 
     self.friendlyName = 'Mapping';
-    self.hashName = 'mappingView';
+    self.hashName = 'MappingView';
 
-    self.infoHint = true;
+    self.newInfo = true;
     self.icons.splice(0, 0, {
       src: function () {
-        return self.infoHint ? Widget.newInfoIcon : Widget.infoIcon;
+        return self.newInfo ? Widget.newInfoIcon : Widget.infoIcon;
+      },
+      title: function () {
+        return 'About this panel';
       },
       onclick: function () {
         self.renderInfoScreen();
@@ -62,17 +64,17 @@ let MappingView = Widget.extend({
 
     self.selection = null;
 
-    self.listenTo(window.toolchain, 'rra:changeMappings', function () {
+    self.listenTo(window.mainPage.toolchain, 'rra:changeMappings', function () {
       self.selection = null;
       self.render();
     });
   },
   renderInfoScreen: function () {
     let self = this;
-    self.infoHint = false;
+    self.newInfo = false;
     self.renderIndicators();
 
-    window.layout.overlay.render(infoTemplate);
+    window.mainPage.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
     let self = this;
@@ -82,9 +84,9 @@ let MappingView = Widget.extend({
 You've wired up all the connections that the visualization needs.
 Well done!`);
     } else {
-      let meta = window.toolchain.get('meta');
+      let meta = window.mainPage.toolchain.get('meta');
       if (!meta || !meta.visualizations || !meta.visualizations[0] ||
-          !meta.datasets || !meta.datasets[0]) {
+        !meta.datasets || !meta.datasets[0]) {
         screen = self.getErrorScreen(`
 You need to choose both a Dataset and a Visualization
 in order to connect them together.`);
@@ -95,7 +97,7 @@ order to display anything.`);
       }
     }
 
-    window.layout.overlay.render(screen);
+    window.mainPage.overlay.render(screen);
   },
   createNodeId: function (d) {
     // Generate a valid ID for the node
@@ -110,12 +112,13 @@ order to display anything.`);
   constructLookups: function () {
     let self = this;
 
-    let meta = window.toolchain.get('meta');
+    let meta = window.mainPage.toolchain.getMeta();
 
     let specs = {
       data: [],
       vis: []
     };
+
     meta.datasets.each(function (d) {
       specs.data.push(d.getSpec());
     });
@@ -131,7 +134,7 @@ order to display anything.`);
     let nodeEdgeLookup = {};
 
     // Helper functions
-    function _createNode (side, groupIndex, attrName, attrType) {
+    function _createNode(side, groupIndex, attrName, attrType) {
       let newNode = {
         side: side,
         index: groupIndex,
@@ -170,7 +173,7 @@ order to display anything.`);
       nodeEdgeLookup[newNode.id] = [];
     }
 
-    function _createEdge (established, visIndex, visAttrName, dataIndex, dataAttrName) {
+    function _createEdge(established, visIndex, visAttrName, dataIndex, dataAttrName) {
       // Edges always go from data to vis
       let sourceId = self.createNodeId({
         index: dataIndex,
@@ -306,7 +309,7 @@ order to display anything.`);
         visNode = self.selection;
         dataNode = d;
       }
-      window.toolchain.addMapping({
+      window.mainPage.toolchain.addMapping({
         visIndex: visNode.index,
         visAttribute: visNode.attrName,
         dataIndex: dataNode.index,
@@ -322,7 +325,7 @@ order to display anything.`);
         visNode = self.selection;
         dataNode = d;
       }
-      window.toolchain.removeMapping({
+      window.mainPage.toolchain.removeMapping({
         visIndex: visNode.index,
         visAttribute: visNode.attrName,
         dataIndex: dataNode.index,
@@ -464,7 +467,7 @@ order to display anything.`);
         graph.nodeEdgeLookup[d.id].forEach(function (edgeIndex) {
           let edge = graph.edges[edgeIndex];
           if (graph.nodes[edge.source].id === self.selection.id ||
-              graph.nodes[edge.target].id === self.selection.id) {
+            graph.nodes[edge.target].id === self.selection.id) {
             jQuery('#' + graph.edges[edgeIndex].id).addClass('hovered');
           }
         });

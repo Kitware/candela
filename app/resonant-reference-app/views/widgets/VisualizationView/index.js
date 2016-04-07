@@ -1,27 +1,30 @@
 import Widget from '../Widget';
 import myTemplate from './template.html';
-import candela from './../../../../../src/candela';
+import candela from '../../../../../src/candela';
 import './style.css';
 
 import infoTemplate from './infoTemplate.html';
 
-let SingleVisualizationView = Widget.extend({
+let VisualizationView = Widget.extend({
   initialize: function (options) {
     let self = this;
     Widget.prototype.initialize.apply(self, options);
 
     self.friendlyName = 'Visualization';
-    self.hashName = 'singleVisualizationView';
+    self.hashName = 'VisualizationView';
 
     self.statusText.onclick = function () {
-      window.layout.overlay.render('visualizationLibrary');
+      window.mainPage.overlay.render('VisualizationLibrary');
     };
     self.statusText.title = 'Click to select a different visualization.';
 
-    self.infoHint = true;
+    self.newInfo = true;
     self.icons.splice(0, 0, {
       src: function () {
-        return self.infoHint ? Widget.newInfoIcon : Widget.infoIcon;
+        return self.newInfo ? Widget.newInfoIcon : Widget.infoIcon;
+      },
+      title: function () {
+        return 'About this panel';
       },
       onclick: function () {
         self.renderInfoScreen();
@@ -53,34 +56,34 @@ let SingleVisualizationView = Widget.extend({
       }
     });
 
-    self.listenTo(window.toolchain, 'rra:changeVisualizations', self.render);
-    self.listenTo(window.toolchain, 'rra:changeMappings', self.render);
+    self.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations', self.render);
+    self.listenTo(window.mainPage.toolchain, 'rra:changeMappings', self.render);
   },
   renderInfoScreen: function () {
     let self = this;
-    self.infoHint = false;
+    self.newInfo = false;
     self.renderIndicators();
 
-    window.layout.overlay.render(infoTemplate);
+    window.mainPage.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
     let self = this;
     let screen;
     if (self.ok === null) {
       screen = self.getErrorScreen(`
-You have not chosen a visualization yet. Click
-<a onclick="window.layout.overlay.render('visualizationLibrary')">
+You have not chosen a visualization yet. Click 
+<a onclick="window.mainPage.overlay.render('VisualizationLibrary')">
 here</a> to choose one.`);
     } else if (self.ok === true) {
       screen = self.getSuccessScreen(`
 The visualization appears to be functioning correctly.`);
     } else {
-      let meta = window.toolchain.get('meta');
+      let meta = window.mainPage.toolchain.get('meta');
 
       if (!meta || !meta.visualizations || !meta.visualizations[0]) {
         screen = self.getErrorScreen(`
-You have not chosen a visualization yet. Click
-<a onclick="window.layout.overlay.render('visualizationLibrary')">
+You have not chosen a visualization yet. Click 
+<a onclick="window.mainPage.overlay.render('VisualizationLibrary')">
 here</a> to choose one.`);
       } else {
         // TODO: Auto-log unexpected errors
@@ -90,30 +93,27 @@ You encountered an error we didn't anticipate! Please report it
       }
     }
 
-    window.layout.overlay.render(screen);
+    window.mainPage.overlay.render(screen);
   },
   render: function () {
     let self = this;
 
     // Get the visualization in the toolchain (if there is one)
-    let visSpec = window.toolchain.get('meta');
+    let visSpec = window.mainPage.toolchain.getMeta('visualizations');
     if (visSpec) {
-      visSpec = visSpec.visualizations;
-      if (visSpec) {
-        visSpec = visSpec[0];
-      }
+      visSpec = visSpec[0];
     }
 
     self.$el.html(myTemplate);
 
     if (visSpec) {
-      let options = window.toolchain.getVisOptions();
+      let options = window.mainPage.toolchain.getVisOptions();
 
       self.ok = null;
       self.statusText.text = 'Loading...';
       self.renderIndicators();
 
-      window.toolchain.shapeDataForVis(function (data) {
+      window.mainPage.toolchain.shapeDataForVis(function (data) {
         // Temporarily force the scrollbars, so
         // the view can account for the needed space
         options.data = data;
@@ -135,4 +135,4 @@ You encountered an error we didn't anticipate! Please report it
   }
 });
 
-export default SingleVisualizationView;
+export default VisualizationView;
