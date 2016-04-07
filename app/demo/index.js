@@ -1,44 +1,7 @@
-import Dummy from './../../src/candela/components/Dummy';
 import LineChart from './../../src/candela/components/LineChart';
 import ParallelCoordinates from './../../src/candela/components/ParallelCoordinates';
 import Scatter from './../../src/candela/components/Scatter';
 import $ from 'jquery';
-
-function dummy () {
-  let el = document.getElementById('raw');
-
-  let data = [
-    {
-      text: 'one, two',
-      color: 'blue'
-    },
-
-    {
-      text: 'buckle my shoe',
-      color: 'green'
-    }
-  ];
-
-  let vis = new Dummy(el, data);
-  vis.render();
-
-  window.setTimeout(() => {
-    data = [
-      {
-        text: 'three, four',
-        color: 'red'
-      },
-
-      {
-        text: 'open the door',
-        color: 'chartreuse'
-      }
-    ];
-
-    vis.data(data);
-    vis.render();
-  }, 1000);
-}
 
 function linechart () {
   let el = document.getElementById('vcharts-line');
@@ -107,7 +70,6 @@ import './index.styl';
 window.onload = () => {
   $('body').html(indexContent());
 
-  dummy();
   linechart();
   parallelCoordinates();
   scatterplot();
