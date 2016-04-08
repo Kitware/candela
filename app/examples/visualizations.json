@@ -197,5 +197,20 @@
       "width": 540,
       "height": 360
     }
+  },
+  {
+    "hash": "resize-full",
+    "name": "Resize Full",
+    "template": "resize-full"
+  },
+  {
+    "hash": "resize-table",
+    "name": "Resize Table",
+    "template": "resize-table"
+  },
+  {
+    "hash": "resize-matrix",
+    "name": "Resize Matrix",
+    "template": "resize-matrix"
   }
 ]

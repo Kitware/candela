@@ -13,7 +13,6 @@ module.exports = {
   entry: {
     candela: ['./src/candela/index.js'],
     demo: './app/demo/index.js',
-    resize: './app/resize/index.js',
     examples: './app/examples/index.js'
   },
   output: {
