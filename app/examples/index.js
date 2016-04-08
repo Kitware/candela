@@ -30,22 +30,32 @@ function showPage () {
     });
   } else {
     let properties = visMap[pageId];
-    document.getElementsByTagName('body')[0].innerHTML = visContent(
-      properties
-    );
-    let el = document.getElementById('vis-container')
-      .appendChild(document.createElement(properties.elementType || 'div'));
-    el.setAttribute('id', 'vis-element');
-    el.className = 'vis-full';
-    if (!Array.isArray(properties.options.data)) {
-      properties.options.data = datasets[properties.options.data];
+
+    if (properties.template) {
+      switch (properties.template) {
+        case 'resize-full':
+          const customTemplate = require('./custom/resize-full/index.jade');
+          document.getElementsByTagName('body')[0].innerHTML = customTemplate(properties);
+          require('./custom/resize-full/index.js');
+          break;
+
+        default:
+          console.log(`unregistered custom example: ${properties.template}`);
+          break;
+      }
+    } else {
+      document.getElementsByTagName('body')[0].innerHTML = visContent(properties);
+      let el = document.getElementById('vis-container')
+        .appendChild(document.createElement(properties.elementType || 'div'));
+      el.setAttribute('id', 'vis-element');
+      el.className = 'vis-full';
+      if (!Array.isArray(properties.options.data)) {
+        properties.options.data = datasets[properties.options.data];
+      }
+      let vis = new candela.components[properties.component](el, properties.options);
+      vis.render();
+      window.addResizeListener(el, () => vis.render());
     }
-    let vis = new candela.components[properties.component](
-      el,
-      properties.options
-    );
-    vis.render();
-    window.addResizeListener(el, () => vis.render());
   }
 }
 
