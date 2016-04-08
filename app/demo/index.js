@@ -1,5 +1,4 @@
 import LineChart from './../../src/candela/components/LineChart';
-import ParallelCoordinates from './../../src/candela/components/ParallelCoordinates';
 import $ from 'jquery';
 
 function linechart () {
@@ -33,22 +32,6 @@ function linechart () {
   });
 }
 
-function parallelCoordinates () {
-  let el = document.getElementById('parallel-coords');
-
-  let data = [
-    'games',
-    'age',
-    'free throw percent',
-    'minutes',
-    'versatility index'
-  ];
-
-  let vis = new ParallelCoordinates(el, 'nba-heatmaps', 540, 360);
-  vis.data(data);
-  vis.render(data);
-}
-
 import indexContent from './index.jade';
 import './index.styl';
 
@@ -56,5 +39,4 @@ window.onload = () => {
   $('body').html(indexContent());
 
   linechart();
-  parallelCoordinates();
 };
