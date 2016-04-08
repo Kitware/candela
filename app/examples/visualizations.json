@@ -202,5 +202,10 @@
     "hash": "resize-full",
     "name": "Resize Full",
     "template": "resize-full"
+  },
+  {
+    "hash": "resize-table",
+    "name": "Resize Table",
+    "template": "resize-table"
   }
 ]

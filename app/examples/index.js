@@ -32,11 +32,18 @@ function showPage () {
     let properties = visMap[pageId];
 
     if (properties.template) {
+      let customTemplate;
       switch (properties.template) {
         case 'resize-full':
-          const customTemplate = require('./custom/resize-full/index.jade');
+          customTemplate = require('./custom/resize-full/index.jade');
           document.getElementsByTagName('body')[0].innerHTML = customTemplate(properties);
           require('./custom/resize-full/index.js');
+          break;
+
+        case 'resize-table':
+          customTemplate = require('./custom/resize-table/index.jade');
+          document.getElementsByTagName('body')[0].innerHTML = customTemplate(properties);
+          require('./custom/resize-table/index.js');
           break;
 
         default:
