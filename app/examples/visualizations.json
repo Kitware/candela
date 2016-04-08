@@ -207,5 +207,10 @@
     "hash": "resize-table",
     "name": "Resize Table",
     "template": "resize-table"
+  },
+  {
+    "hash": "resize-matrix",
+    "name": "Resize Matrix",
+    "template": "resize-matrix"
   }
 ]

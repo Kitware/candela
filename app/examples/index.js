@@ -46,6 +46,12 @@ function showPage () {
           require('./custom/resize-table/index.js');
           break;
 
+        case 'resize-matrix':
+          customTemplate = require('./custom/resize-matrix/index.jade');
+          document.getElementsByTagName('body')[0].innerHTML = customTemplate(properties);
+          require('./custom/resize-matrix/index.js');
+          break;
+
         default:
           console.log(`unregistered custom example: ${properties.template}`);
           break;
