@@ -52,6 +52,12 @@ function showPage () {
           require('./custom/resize-matrix/index.js');
           break;
 
+        case 'dynamic-linechart':
+          customTemplate = require('./custom/dynamic-linechart/index.jade');
+          document.getElementsByTagName('body')[0].innerHTML = customTemplate(properties);
+          require('./custom/dynamic-linechart/index.js');
+          break;
+
         default:
           console.log(`unregistered custom example: ${properties.template}`);
           break;

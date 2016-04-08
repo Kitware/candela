@@ -12,7 +12,6 @@ module.exports = {
   __dirname: __dirname,
   entry: {
     candela: ['./src/candela/index.js'],
-    demo: './app/demo/index.js',
     examples: './app/examples/index.js'
   },
   output: {

@@ -212,5 +212,10 @@
     "hash": "resize-matrix",
     "name": "Resize Matrix",
     "template": "resize-matrix"
+  },
+  {
+    "hash": "dynamic-linechart",
+    "name": "Dynamic Line Chart",
+    "template": "dynamic-linechart"
   }
 ]
