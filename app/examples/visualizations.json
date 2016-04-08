@@ -197,5 +197,10 @@
       "width": 540,
       "height": 360
     }
+  },
+  {
+    "hash": "resize-full",
+    "name": "Resize Full",
+    "template": "resize-full"
   }
 ]
