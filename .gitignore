@@ -1,4 +1,4 @@
-*.swp
+*.sw*
 node_modules
 build
 coverage
