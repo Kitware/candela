@@ -2,7 +2,7 @@ import VisComponent from '../VisComponent';
 import $ from 'jquery';
 
 export default class ParallelCoordinates extends VisComponent {
-  constructor (el, dataRoot, width, height) {
+  constructor (el, {dataRoot, fields, width, height}) {
     super(el);
     this.dataRoot = dataRoot;
 
@@ -25,6 +25,8 @@ export default class ParallelCoordinates extends VisComponent {
       this.pc.mouseHandler({x, y, action});
     };
 
+    this.pc.updateAxisList(fields);
+
     $(el).on('mousedown', mouseHandler('mousedown'));
     $(el).on('mousemove', mouseHandler('mousemove'));
     $(el).on('mouseup', mouseHandler('mouseup'));
@@ -32,10 +34,6 @@ export default class ParallelCoordinates extends VisComponent {
 
   render (data) {
     this.pc.render();
-  }
-
-  data (data) {
-    this.pc.updateAxisList(data);
   }
 
   fetchHistogram (var1, var2) {

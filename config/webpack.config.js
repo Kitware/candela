@@ -2,6 +2,7 @@ var webpack = require('webpack');
 var path = require('path');
 
 var CleanPlugin = require('clean-webpack-plugin');
+var CopyPlugin = require('copy-webpack-plugin');
 var HtmlPlugin = require('html-webpack-plugin');
 
 __dirname = path.resolve(__dirname, '..');
@@ -11,8 +12,6 @@ module.exports = {
   __dirname: __dirname,
   entry: {
     candela: ['./src/candela/index.js'],
-    demo: './app/demo/index.js',
-    resize: './app/resize/index.js',
     examples: './app/examples/index.js'
   },
   output: {
@@ -52,7 +51,12 @@ module.exports = {
       title: 'Candela Examples',
       filename: 'examples/index.html',
       chunks: ['examples']
-    })
+    }),
+
+    new CopyPlugin([{
+      from: 'app/examples/data/nba-heatmaps',
+      to: 'examples/nba-heatmaps'
+    }])
   ],
   module: {
     preLoaders: [
