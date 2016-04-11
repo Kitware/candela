@@ -55,9 +55,6 @@ export default class UpSet {
     this.options.data.forEach(d => {
       data.push(header.map(h => '' + d[h]));
     });
-    console.log(header);
-    console.log(data);
-    console.log(this.options);
 
     let datasets = [
       {
