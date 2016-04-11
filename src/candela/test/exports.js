@@ -12,9 +12,6 @@ test('Structure and content of exported Candela library object', t => {
 
   t.ok(candela.components, 'candela.components exists');
 
-  t.ok(candela.components.Dummy, 'candela.components.Dummy exists');
-  t.equal(typeof candela.components.Dummy, 'function', 'candela.components.Dummy is a function');
-
   t.ok(candela.components.Histogram, 'candela.components.Histogram exists');
   t.equal(typeof candela.components.Histogram, 'function', 'candela.components.Histogram is a function');
 
