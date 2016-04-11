@@ -1,0 +1,198 @@
+<div class="upset-body">
+
+<div class="ui-header">
+  <div class="header-container">
+    <span class="header">UpSet - Visualizing Intersecting Sets</span>
+    <span id="data-loading-indicator">
+           <i class="fa fa-refresh fa-spin"></i>
+    </span>
+    <span class="header-right-clickable"><a href="https://github.com/hms-dbmi/UpSetR/">UpSet for R</a></span>
+    <span class="header-right-clickable"><a href="http://caleydo.org/tools/upset/">About UpSet</a></span>
+    <span id="load-data-header" class="header-right-clickable">Load Data</span>
+    <span id="dataset-selector" class="header-right"></span>
+  </div>
+</div>
+
+<div class="ui-menu">
+  <div class="menu-container">
+      <span>Provide a <a href="https://github.com/VCG/upset/wiki/Data-Import">JSON file</a> defining your data: <input
+              id="custom-dataset-url"
+              type="text" style="width: 500px"
+              value="https://dl.dropboxusercontent.com/u/36962787/UpSet/movies.json"/> <input id="custom-dataset-submit"
+                                                                                              type="submit"
+                                                                                              value="Submit"> | <a
+              href="https://github.com/VCG/upset/wiki/">Learn how to create the JSON file</a></span>
+  </div>
+</div>
+
+<div class="ui-fader">
+</div>
+
+
+<div class="ui-container">
+  <div class="ui-row">
+
+    <!--------------- Left Side configuration menu ------------------>
+
+    <div class="ui-column ui-layout-west" style="width:120px;">
+      <div id="groupConfig" class="configTable">
+
+
+        <div class="configHeader">First, aggregate by</div>
+        <div id="firstLevelGrouping"></div>
+        <div id='firstLevelMinCardinality' style="padding-top: 5px;" hidden>overlap degree:<br/> <input
+                id='firstLevelMinCardinalityInput' type='number' min='0' max='12' value='0'>
+
+        </div>
+      </div>
+
+
+      <div id="groupL2Config" class="configTable">
+        <div class="configHeader">Then, aggregate by</div>
+        <div id="secondLevelGrouping"></div>
+        <div id='secondLevelMinCardinality' style="padding-top: 5px;" hidden>overlap degree:<br/> <input
+                id='secondLevelMinCardinalityInput' type='number' min='0' max='12' value='0'>
+        </div>
+      </div>
+
+      <div id="sortConfig" class="configTable">
+        <div class="configHeader"> Sort by</div>
+        <div><input type='radio' id='sortNrSetsInIntersection' name='sort' checked="true">
+          <label for="sortNrSetsInIntersection">Degree</label></div>
+        <div><input type='radio' id='sortIntersectionSize' name='sort'><label for="sortIntersectionSize">
+          Cardinality</label></div>
+        <div><input type='radio' id="sortRelevanceMeasure" name='sort'>
+          <label for="sortRelevanceMeasure"> Deviation</label></div>
+      </div>
+
+      <div id='options' class='configTable'>
+        <div class="configHeader">Aggregates</div>
+        <div><span class="option level-1-button" id="collapseAll">Collapse All</span></div>
+        <div><span class="option level-1-button" id="expandAll">Expand All</span></div>
+      </div>
+
+
+      <div id='rowSize' class='configTable'>
+        <div class="configHeader">Row Height</div>
+        <div>
+          <select id='rowSizeValue'>
+            <option value="20">Large</option>
+            <option value="15">Medium</option>
+            <option value="12">Small</option>
+          </select>
+        </div>
+      </div>
+
+
+      <div id='intersectionSize' class='configTable'>
+        <div class="configHeader">Data</div>
+        <div>Min Degree:<br/> <input id='minCardinality' type='number' min='0' max='12' value='0'>
+
+        </div>
+        <div>Max Degree:<br/><input id='maxCardinality' type='number' min='0' max='12'></div>
+        <div><input type='checkbox' id='hideEmpties' checked='true'><label for="hideEmpties">Hide Empty
+          Intersections</label></div>
+      </div>
+
+
+      <div id='venn-diagram-viewer' class='configTable'>
+        <div class="configHeader">Venn Diagram</div>
+        <div id="venn-vis"></div>
+      </div>
+
+      <div id='dataset-info-viewer'>
+        <div class="configH1">Dataset Information</div>
+        <div id='dataset-info-content'>Was</div>
+      </div>
+
+
+    </div>
+
+
+    <!---------------center panel with set view  ------------------>
+
+    <!--padding: 0px;-->
+    <div class="ui-column ui-layout-center">
+      <div id="set-vis-container" data-height-ratio="1" class="fixed-y-container">
+
+        <!--<div class="matrixTableContainer">-->
+        <div style="display: table;">
+          <div style="display: table-row;">
+            <div style="display: table-cell">
+              <div id="headerVis">
+                <!--style="width:200px"-->
+
+              </div>
+            </div>
+          </div>
+          <div style="display: table-row">
+            <div style="display: table-cell">
+
+              <div id="bodyVis">
+                <!--style="height:300px; width:200px"-->
+
+              </div>
+
+            </div>
+          </div>
+
+
+        </div>
+        <!--</div>-->
+
+        <!--<div id="vis"></div>-->
+      </div>
+    </div>
+
+    <!---------------right panel with element view  ------------------>
+
+    <div class="ui-column ui-layout-east">
+
+      <span id="moveHandle"></span>
+
+      <div class="element-view-header">
+        <div class="element-view-title">
+          Element Visualizations
+        </div>
+      </div>
+      <div id="element-viewers-container" class="element-view-container">
+        <div id="element-viewers-visualization"></div>
+        <div id="element-viewers-controls" class="element-view-controls"></div>
+      </div>
+
+      <div class="element-view-header">
+        <div class="element-view-title">
+          Element Queries
+        </div>
+      </div>
+
+      <div id="selection-vis-container" class="element-view-container">
+        <div id="selection-tabs"></div>
+        <div id="selection-controls" class="element-view-controls"></div>
+      </div>
+
+      <div class="element-view-header">
+        <div class="element-view-subtitle">
+          Query Filters
+        </div>
+      </div>
+
+      <div id="filters-container" class="element-view-container">
+        <div id="filters-list"></div>
+        <div id="filters-controls" class="element-view-controls"></div>
+      </div>
+
+      <div class="element-view-header">
+        <div class="element-view-subtitle">
+          Query Results
+        </div>
+      </div>
+
+      <div id="item-table-container" data-height-ratio="1" class="fixed-y-container element-view-container">
+        <div id="item-table"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
