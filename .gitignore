@@ -1,4 +1,5 @@
 *.sw*
+*.pyc
 node_modules
 build
 coverage
