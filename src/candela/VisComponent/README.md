@@ -23,7 +23,7 @@ visualization. Options are specified in the form `{name: value}`.
 
 ## VisComponent.spec
 
-**Note**: The specification for the abstract superclass is empty. You should access the specification for specific subclasses of VisComponent.
+**Note**: The specification for the abstract superclass is empty.
 
 The `spec` field is a static property on the component's class which describes
 how to set up the visualization.
