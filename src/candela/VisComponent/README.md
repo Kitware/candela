@@ -2,14 +2,32 @@
 
 The base class for Candela visualization components.
 
-This class is intentionally very minimal, because there are only a few common features of
-all Candela components:
+This class is intentionally minimal, because there are only a few common
+features of all Candela components:
 
-1. Candela components perform some type of visualization that may be rendered in a web environment.
-2. Candela components are instantiated with the syntax [new VisComponent(el, options)](#new-viscomponentel-options).
-3. Candela components report their expected inputs in [VisComponent.spec](#viscomponentspec).
+1. Candela components work on the web, so the constructor looks like ``new
+   VisComponent(el)``, where ``el`` is (usually) a DOM element. The
+   ``VisComponent`` constructor attaches ``el`` to the object, so you can always
+   refer to it using ``this.el``.
 
-## new VisComponent(el, options)
+2. Candela components perform some type of visualization, so they have a
+   ``render()`` method. The ``VisComponent`` ``render()`` method simply throws
+   an exception; if you truly want your component to do nothing when it renders,
+   simply redefine the method to be a no-op.
+
+You can create a concrete visualization component by extending ``VisComponent``.
+The following best practices maximize clarity, reusability, and interopability
+of your components (in the rest of this document, imagine that ``MyComponent``
+is declared as an extension of ``VisComponent``):
+
+1. The constructor should take an [additional parameter
+   ``options``](#new-mycomponentel-options) encapsulating all runtime options
+   for the component.
+
+2. The component should report its expected inputs in
+   [MyComponent.spec](#viscomponentspec).
+
+## new MyComponent(el, options)
 
 **Note**: The constructor for the abstract superclass is empty. You should use the constructor for specific subclasses of VisComponent.
 
@@ -21,9 +39,7 @@ visualizations.
 This includes any data, visual mappings, or other settings pertinent to the
 visualization. Options are specified in the form `{name: value}`.
 
-## VisComponent.spec
-
-**Note**: The specification for the abstract superclass is empty.
+## MyComponent.spec
 
 The `spec` field is a static property on the component's class which describes
 how to set up the visualization.
