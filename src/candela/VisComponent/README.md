@@ -29,15 +29,16 @@ is declared as an extension of ``VisComponent``):
 
 ## new MyComponent(el, options)
 
-**Note**: The constructor for the abstract superclass is empty. You should use the constructor for specific subclasses of VisComponent.
+**Note**: The constructor for the abstract superclass is empty. You should use
+the constructor for specific subclasses of VisComponent.
 
 * **el** is a valid container for the visualization. The container will often be
-a DOM element such as `<div>`, but may need to be another type for certain
-visualizations.
+  a DOM element such as `<div>`, but may need to be another type for certain
+  visualizations.
 
 * **options** is an object containing the initial options for the visualization.
-This includes any data, visual mappings, or other settings pertinent to the
-visualization. Options are specified in the form `{name: value}`.
+  This includes any data, visual mappings, or other settings pertinent to the
+  visualization. Options are specified in the form `{name: value}`.
 
 ## MyComponent.spec
 
@@ -51,7 +52,8 @@ how to set up the visualization.
 
 ### Option Specification
 
-The specification for an option is an object containing the following properties:
+The specification for an option is an object containing the following
+properties:
 
 | Property    | Type   | Description  |
 | :--------   | :----- | :----------- |
@@ -62,7 +64,8 @@ The specification for an option is an object containing the following properties
 
 ### Domain Specification
 
-The domain of an option restricts the set of allowed values for an option. It is an object with the following properties:
+The domain of an option restricts the set of allowed values for an option. It is
+an object with the following properties:
 
 | Property    | Type   | Description  |
 | :--------   | :----- | :----------- |
