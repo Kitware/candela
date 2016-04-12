@@ -52,6 +52,7 @@
     "karma-webpack": "^1.7.0",
     "legacy-loader": "0.0.2",
     "less": "^2.3.1",
+    "nightmare": "^2.3.1",
     "phantomjs-prebuilt": "^2.1.5",
     "raw-loader": "^0.5.1",
     "semistandard-loader": "0.0.3",
