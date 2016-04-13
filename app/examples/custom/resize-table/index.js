@@ -21,7 +21,12 @@ vis.on('resize', () => {
   console.log(`resize event: ${vis.width}, ${vis.height}`);
 });
 
-window.setInterval(() => {
-  document.getElementById('containing-table').style.width = (500 + Math.floor(Math.random() * 500)) + 'px';
-}, 1000);
+let callback = () => {
+  let table = document.getElementById('containing-table');
+  if (table) {
+    table.style.width = (500 + Math.floor(Math.random() * 500)) + 'px';
+    window.setTimeout(callback, 1000);
+  }
+};
 
+callback();
