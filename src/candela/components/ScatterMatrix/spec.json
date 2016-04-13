@@ -1,16 +1,7 @@
 {
   "width": ["@get", "width", 600],
   "height": ["@get", "height", 600],
-  "padding": [
-    "@get",
-    "padding",
-    {
-      "top": 30,
-      "bottom": 10,
-      "left": 100,
-      "right": ["@if", ["@get", "color"], 150, 10]
-    }
-  ],
+  "padding": "strict",
   "data": [
     {
       "name": "data",

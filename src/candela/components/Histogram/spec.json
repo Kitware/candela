@@ -95,7 +95,7 @@
       {
         "width": ["@get", "width"],
         "height": ["@get", "height"],
-        "padding": ["@get", "padding", {"top": 20, "bottom": ["@if", ["@get", "discrete"], 150, 50], "left": 50, "right": 10}],
+        "padding": "strict",
         "predicates": [
           {
             "name": "tooltip",

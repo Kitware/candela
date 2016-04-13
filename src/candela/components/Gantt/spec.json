@@ -34,7 +34,7 @@
     {
       "width": ["@get", "width"],
       "height": ["@get", "height"],
-      "padding": ["@get", "padding", {"top": 10, "bottom": 50, "left": 200, "right": 10}],
+      "padding": "strict",
       "data": [
         {
           "name": "data",

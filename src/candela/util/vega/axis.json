@@ -5,7 +5,10 @@
       "event",
       ["@if", ["@eq", ["@get", "axis"], "x"], "eventX()", "eventY()"]
     ],
-    ["sizeSignal", ["@join", "", [["@get", "axis"], "size"]]],
+    [
+      "sizeSignal",
+      ["@if", ["@eq", ["@get", "axis"], "x"], "width", "height"]
+    ],
     ["pointSignal", ["@join", "", [["@get", "axis"], "point"]]],
     ["deltaSignal", ["@join", "", [["@get", "axis"], "delta"]]],
     ["anchorSignal", ["@join", "", [["@get", "axis"], "anchor"]]],
@@ -17,10 +20,6 @@
   ],
   {
     "signals": [
-      {
-        "name": ["@get", "sizeSignal"],
-        "init": ["@get", "size"]
-      },
       {
         "name": ["@get", "pointSignal"],
         "init": 0,
@@ -171,10 +170,7 @@
       {
         "name": ["@get", "axis"],
         "type": ["@get", "type", "linear"],
-        "range": ["@if", ["@eq", ["@get", "axis"], "x"],
-          [0, ["@get", "size"]],
-          [["@get", "size"], 0]
-        ],
+        "range": ["@get", "sizeSignal"],
         "points": ["@get", "points", false],
         "zero": ["@get", "zero", false],
         "nice": ["@get", "nice", false],
