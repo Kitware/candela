@@ -395,11 +395,8 @@ let chart = function (template, el, initialOptions, done) {
   that.update = function (newOptions) {
     that.options = extend(that.options, newOptions);
 
-    // Transform pass 1 to get the padding
-    let spec = transform(that.template, that.options);
-
-    // Use padding and element size to set size, unless
-    // size explicitly specified or element size is zero.
+    // Use element size to set size, unless size explicitly specified or
+    // element size is zero.
     let el = d3.select(that.el)[0][0];
     let sizeOptions = {};
 
@@ -410,15 +407,9 @@ let chart = function (template, el, initialOptions, done) {
     if (elWidth !== 0 && elHeight !== 0) {
       if (that.options.width === undefined) {
         sizeOptions.width = elWidth;
-        if (isObjectLiteral(spec.padding)) {
-          sizeOptions.width -= spec.padding.left + spec.padding.right;
-        }
       }
       if (that.options.height === undefined) {
         sizeOptions.height = elHeight;
-        if (isObjectLiteral(spec.padding)) {
-          sizeOptions.height -= spec.padding.top + spec.padding.bottom;
-        }
       }
     }
     let curOptions = extend(that.options, sizeOptions);
@@ -429,7 +420,6 @@ let chart = function (template, el, initialOptions, done) {
       renderer: curOptions.renderer
     };
 
-    // Transform pass 2 to get the final visualization
     that.spec = transform(that.template, curOptions);
 
     vg.parse.spec(that.spec, function (chartObj) {

@@ -17,17 +17,7 @@
   {
     "width": ["@get", "width"],
     "height": ["@get", "height"],
-    "padding": {
-      "top": 10,
-      "left": [
-        "@if",
-        ["@get", "title", ""],
-        150,
-        10
-      ],
-      "bottom": 30,
-      "right": 10
-    },
+    "padding": "strict",
     "data": [
       {
         "name": "ranges",
@@ -66,7 +56,7 @@
       {
         "name": "y",
         "type": "linear",
-        "range": [0, ["@get", "height"]],
+        "range": "height",
         "domain": [0, 1]
       },
       {
