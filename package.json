@@ -9,6 +9,8 @@
     "dist": "webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
     "test": "karma start config/karma-testing.conf.js | grep '^PhantomJS' | sed \"s/^.*LOG: '\\(.*\\)'$/\\1/\" | faucet",
     "test:raw": "karma start config/karma-testing.conf.js",
+    "test:image:server": "sh script/test-server-up.sh",
+    "test:image:server:down": "sh script/test-server-down.sh",
     "test:image": "babel-node test/basic.js | faucet",
     "test:image:raw": "babel-node test/basic.js",
     "test:karma": "karma start config/karma-testing.conf.js --no-single-run",
