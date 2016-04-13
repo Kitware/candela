@@ -1,8 +1,6 @@
 import Nightmare from 'nightmare';
 import test from 'tape';
 
-let count = 0;
-
 test('Google site', t => {
   let nightmare = Nightmare({
     show: false
@@ -16,9 +14,8 @@ test('Google site', t => {
     t.equal(title, 'Google', 'Google page\'s title should be "Google"');
   })
   .then(() => {
-    nightmare.end();
     t.end();
-    count++;
+    return nightmare.end().then();
   });
 });
 
@@ -40,9 +37,8 @@ test('Google logo', t => {
     t.equal(height, 92, 'Google logo height should be 92');
   })
   .then(() => {
-    nightmare.end();
     t.end();
-    count++;
+    return nightmare.end().then();
   });
 });
 
@@ -73,15 +69,9 @@ test('Google image comparison', t => {
   .then((image) => {
     console.log(image);
     t.ok(true);
-
-    nightmare.end();
+  })
+  .then(() => {
     t.end();
-    count++;
+    return nightmare.end().then();
   });
 });
-
-setInterval(() => {
-  if (count === 3) {
-    process.exit();
-  }
-}, 200);
