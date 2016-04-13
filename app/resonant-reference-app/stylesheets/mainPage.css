@@ -16,6 +16,10 @@ hr {
   width: 100%;
 }
 
+a {
+  color: #377eb8;
+}
+
 ::-webkit-scrollbar {
   width: 12px;
   height: 12px;

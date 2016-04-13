@@ -1,5 +1,6 @@
 import MetadataItem from './MetadataItem';
-import SetOps from '../shims/SetOps';
+
+let girder = window.girder;
 
 let UserPreferences = MetadataItem.extend({
   /*
@@ -14,23 +15,61 @@ let UserPreferences = MetadataItem.extend({
 Contains your preferences for the Reference application. If
 you move or delete this item, your preferences will be lost.`,
       meta: {
-        recentToolchains: [],
         achievements: {}
       }
     };
   },
-  initialize: function () {
+  addListeners: function () {
     let self = this;
-    self.collectScratchToolchains();
+    self.listenTo(window.mainPage.currentUser, 'rra:login',
+      self.adoptScratchToolchains);
+    self.listenTo(window.mainPage, 'rra:createToolchain',
+      self.claimToolchain);
   },
-  collectScratchToolchains: function () {
-    let self = this;
-    let recentToolchains = new Set(self.getMeta('recentToolchains'));
+  claimToolchain: function () {
+    if (!window.mainPage.currentUser.isLoggedIn()) {
+      // Because we created this toolchain while not logged in,
+      // store the toolchain's ID in localStorage so that we
+      // can claim "ownership" when we log in / visit this page again
+      // (of course, this is easy to hack, but that's the assumption
+      // with public scratch space)
+      let scratchToolchains = window.localStorage.getItem('scratchToolchains');
+      if (!scratchToolchains) {
+        scratchToolchains = [];
+      } else {
+        scratchToolchains = JSON.parse(scratchToolchains);
+      }
+      scratchToolchains.push(window.mainPage.toolchain.getId());
+      window.localStorage.setItem('scratchToolchains',
+        JSON.stringify(scratchToolchains));
+    }
+  },
+  adoptScratchToolchains: function () {
+    if (!window.mainPage.currentUser.isLoggedIn()) {
+      return;
+    }
+    // Attempt to adopt any toolchains that this browser
+    // created in the public scratch space into the
+    // now-logged-in user's Private folder
+    
     let scratchToolchains = window.localStorage.getItem('scratchToolchains');
+    
     if (scratchToolchains) {
-      scratchToolchains = new Set(JSON.parse(scratchToolchains));
-      scratchToolchains = SetOps.intersection(recentToolchains, scratchToolchains);
-      self.setMeta('recentToolchains', Array.from(scratchToolchains));
+      Promise.resolve(girder.restRequest({
+        path: 'item/adoptScratchItems',
+        data: {
+          'ids': scratchToolchains // already JSON.stringified
+        },
+        type: 'PUT'
+      })).then(() => {
+        window.mainPage.currentUser.trigger('rra:updateLibrary');
+        // In addition to changing the library, the current
+        // toolchain will (pretty much always) have just changed
+        // as well
+        if (window.mainPage.toolchain) {
+          window.mainPage.toolchain.updateStatus();
+        }
+      });
     }
   },
   resetToDefaults: function () {
@@ -42,31 +81,7 @@ you move or delete this item, your preferences will be lost.`,
       silent: true
     });
     self.set(self.defaults);
-    self.collectScratchToolchains();
-  },
-  addRecentToolchain: function (id) {
-    let self = this;
-    let recentToolchains = self.getMeta('recentToolchains');
-    
-    let oldIndex = recentToolchains.indexOf(id);
-    if (oldIndex !== -1) {
-      recentToolchains.splice(oldIndex, 1);
-    }
-    
-    recentToolchains.unshift(id);
-    while (recentToolchains.length > 5) {
-      recentToolchains.pop();
-    }
-    
-    self.setMeta('recentToolchains', recentToolchains);
-    if (self.getId()) {
-      self.save();
-    } else {
-      // Until the user logs in, store the ids of their
-      // scratch toolchains in localStorage
-      window.localStorage.setItem('scratchToolchains',
-        JSON.stringify(recentToolchains));
-    }
+    self.adoptScratchToolchains();
   },
   levelUp: function (achievement) {
     let self = this;

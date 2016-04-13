@@ -5,21 +5,25 @@ import jQuery from 'jquery';
 
 // Modal overlay views
 import HamburgerMenu from '../../overlays/HamburgerMenu';
+import LoginView from '../../overlays/LoginView';
+import RegisterView from '../../overlays/RegisterView';
+import ResetPasswordView from '../../overlays/ResetPasswordView';
 import AchievementLibrary from '../../overlays/AchievementLibrary';
 import StartingScreen from '../../overlays/StartingScreen';
-import ErrorScreen from '../../overlays/ErrorScreen';
 import DatasetLibrary from '../../overlays/DatasetLibrary';
 import VisualizationLibrary from '../../overlays/VisualizationLibrary';
 import ToolchainSettings from '../../overlays/ToolchainSettings';
 
-let girder = window.girder;
+import errorTemplate from './generalErrorTemplate.html';
 
 let VIEWS = {
   HamburgerMenu: HamburgerMenu,
+  LoginView: LoginView,
+  ResetPasswordView: ResetPasswordView,
+  RegisterView: RegisterView,
   AchievementLibrary: AchievementLibrary,
   ToolchainSettings: ToolchainSettings,
   StartingScreen: StartingScreen,
-  ErrorScreen: ErrorScreen,
   DatasetLibrary: DatasetLibrary,
   VisualizationLibrary: VisualizationLibrary
 };
@@ -33,7 +37,56 @@ let Overlay = Backbone.View.extend({
     self.template = undefined;
     self.view = null;
     
-    // TODO: listen to events
+    self.listenTo(window.mainPage, 'rra:changeToolchain',
+        self.handleChangeToolchain);
+    self.listenTo(window.mainPage, 'rra:error',
+        self.handleError);
+  },
+  handleChangeToolchain: function () {
+    let self = this;
+    if (window.mainPage.toolchain === null) {
+      // No toolchain is loaded; show the StartingScreen
+      self.render('StartingScreen');
+    }
+    // Otherwise, we just stay as we are (either no
+    // overlay, or the overlay that just changed stuff
+    // is responsible for picking the appropriate next
+    // view)
+  },
+  handleError: function (errorObj) {
+    let self = this;
+    let message;
+    
+    // Sometimes errors are wrapped in arrays...
+    if (errorObj.length) {
+      errorObj = errorObj[0];
+    }
+    
+    if (errorObj.responseJSON && errorObj.responseJSON.message) {
+      message = errorObj.responseJSON.message;
+    } else if (errorObj instanceof Error) {
+      message = errorObj.message;
+    } else {
+      // Fallback if I can't tell what it is
+      message = 'Unknown error; maybe the console contains some clues';
+      console.warn('Unknown error! Here\'s what I was given:', arguments);
+    }
+    // Let the user know something funky is up
+    self.render(self.getErrorScreen(message));
+    
+    // Actually throw the error if it's a real one
+    if (errorObj instanceof Error) {
+      throw errorObj;
+    }
+  },
+  getErrorScreen: function (message) {
+    return Underscore.template(errorTemplate)({
+      message: message
+    });
+  },
+  renderErrorScreen: function (message) {
+    let self = this;
+    self.render(self.getErrorScreen(message));
   },
   addCloseListeners: function () {
     let self = this;
@@ -105,8 +158,7 @@ let Overlay = Backbone.View.extend({
       } else {
         // Instantiate and add the new view
         if (template.prototype &&
-            (template.prototype instanceof Backbone.View ||
-             template.prototoype instanceof girder.View)) {
+            template.prototype instanceof Backbone.View) {
           // This is a View object already
           let Template = template;
           self.$el.html('');
@@ -116,7 +168,11 @@ let Overlay = Backbone.View.extend({
         } else if (VIEWS.hasOwnProperty(template)) {
           // This is a named template
           self.$el.html('');
-          self.view = new VIEWS[template]();
+          self.view = new VIEWS[template]({
+            // Some girder views expect a parent, but
+            // in this app, we just run them headless
+            parentView: null
+          });
           self.el.appendChild(self.view.el);
           self.view.render();
         } else {

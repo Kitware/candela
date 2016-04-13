@@ -1,8 +1,11 @@
-import md5, random, sys
+import md5, random, sys, json
 from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
 from girder.constants import AccessType
+
+TRUE_TESTS = ['true', '1', 't', 'y', 'yes']
+FALSE_TESTS = ['false', '0', 'f', 'n', 'no']
 
 class AnonymousAccess(Resource):
     def _getAnonymousUser(self):
@@ -63,10 +66,7 @@ class AnonymousAccess(Resource):
         privateFolder = self.getOrMakePrivateFolder({})
 
         if params.has_key('reuseExisting'):
-            noreuse = params['reuseExisting']
-            if isinstance(noreuse, str):
-                noreuse = noreuse.lower() not in ['false', '0', 'f', 'n', 'no']
-            reuseExisting = noreuse is not False
+            reuseExisting = str(params['reuseExisting']).lower() not in FALSE_TESTS
         else:
             reuseExisting = True
         
@@ -104,7 +104,7 @@ class AnonymousAccess(Resource):
         .param('description', 'The description of the item.', required=False)
         .errorResponse()
     )
-    def getOrMakeScratchItem(self, params):
+    def makeScratchItem(self, params):
         user = self.getCurrentUser()
         
         if user is not None:
@@ -115,10 +115,111 @@ class AnonymousAccess(Resource):
             
             publicFolder = self.getOrMakePublicFolder({})
             
-            # Do the same thing with the item
             return self.model('item').createItem(name=params['name'],
                 folder=publicFolder, description=params.get('description', ''),
                 creator=user, reuseExisting=False)
+    
+    @access.public
+    @loadmodel(model='item', level=AccessType.READ)
+    @describeRoute(
+        Description('''Get information about where an item is stored,
+        as well as whether the user can write to the item.''')
+        .param('id', 'The ID of the item.', paramType='path')
+        .errorResponse()
+    )
+    def itemInfo(self, item, params):
+        info = {}
+        
+        anonUser = self._getAnonymousUser()
+        user = self.getCurrentUser()
+        if user is None:
+            user = anonUser
+        
+        folder = self.model('folder').load(
+            item['folderId'], user=user,
+            level=AccessType.READ, exc=True)
+        
+        if item['baseParentType'] == 'user':
+            if item['baseParentId'] == anonUser['_id']:
+                info['location'] = 'PublicScratch'
+            elif folder['public'] is True:
+                info['location'] = 'PublicUser'
+            else:
+                info['location'] = 'PrivateUser'
+        else:
+            info['location'] = 'PublicLibrary'
+        
+        try:
+            self.model('item').load(item['_id'],
+                level=AccessType.WRITE, user=user, exc=True)
+            info['editable'] = True
+        except:
+            info['editable'] = False
+        
+        return info
+    
+    @access.public
+    @describeRoute(
+        Description('''Validate that a specific set of items are
+        in the public scratch space, and return those items''')
+        .param('ids', 'A JSON list of item IDs', required=True)
+        .errorResponse()
+    )
+    def validateScratchItems(self, params):
+        idList = json.loads(params['ids'])
+        
+        user = self.getCurrentUser()
+        anonUser = self._getAnonymousUser()
+        
+        scratchFolder = self.model('folder').createFolder(parent=anonUser,
+            name='Public', parentType='user', public=True,
+            creator=anonUser, reuseExisting=True)
+        
+        result = []
+        for itemId in idList:
+            try:
+                item = self.model('item').load(itemId,
+                    level=AccessType.READ, user=user, exc=True)
+            except:
+                continue
+            if item['folderId'] == scratchFolder['_id']:
+                result.append(item)
+        
+        return result
+    
+    @access.public
+    @describeRoute(
+        Description('''Attempt to move a set of items in the
+        anonymous user's Public folder to the current user's
+        Private folder. The list of items that were successfully
+        adopted is returned.''')
+        .param('ids', 'A JSON list of item IDs', required=True)
+        .errorResponse()
+    )
+    def adoptScratchItems(self, params):
+        idList = json.loads(params['ids'])
+        
+        user = self.getCurrentUser()
+        if user is None:
+            return []
+        privateFolder = self.getOrMakePrivateFolder({})
+        
+        anonUser = self._getAnonymousUser()
+        scratchFolder = self.model('folder').createFolder(parent=anonUser,
+            name='Public', parentType='user', public=True,
+            creator=anonUser, reuseExisting=True)
+        
+        result = []
+        for itemId in idList:
+            try:
+                item = self.model('item').load(itemId,
+                    level=AccessType.WRITE, user=anonUser, exc=True)
+                self.model('item').move(item, privateFolder)
+                result.append(item)
+            except:
+                continue
+        
+        return result
     
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
@@ -200,18 +301,12 @@ class AnonymousAccess(Resource):
             level=AccessType.READ, exc=True)
         
         if params.has_key('makePublic'):
-            pub = params['makePublic']
-            if isinstance(pub, str):
-                pub = pub.lower() in ['true', '1', 't', 'y', 'yes']
-            makePublic = pub is True
+            makePublic = str(params['makePublic']).lower() in TRUE_TESTS
         else:
             makePublic = currentFolder['name'] == 'Private'
         
         if params.has_key('forceCopy'):
-            fc = params['forceCopy']
-            if isinstance(fc, str):
-                fc = fc.lower() in ['true', '1', 't', 'y', 'yes']
-            forceCopy = fc is True
+            forceCopy = str(params['forceCopy']).lower() in TRUE_TESTS
         else:
             forceCopy = False
         

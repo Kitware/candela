@@ -1,3 +1,4 @@
+import jQuery from 'jquery';
 let girder = window.girder;
 
 /*
@@ -12,7 +13,7 @@ let girder = window.girder;
        
        This file patches that support back. It also
        converts girder's jQuery deferreds into
-       ES6 deferreds
+       ES6 promises
        
      - Girder relies on its own internal g:event
        events instead of the standard Backbone
@@ -24,16 +25,88 @@ let girder = window.girder;
        
      - Girder ignores+discards 'meta' when syncing!
      
-       This file patches it by syncing metadata
-       before the rest of the model
+       We use our own custom endpoint to sync metadata
+       with the rest of the Item
        
   2. Do smart(ish) things with items in the user's
-     private folder and the public scratch space
+     private folder and the anonymous user's scratch
+     space (the server endpoints handle most of this
+     logic)
 */
 
 let MetadataItem = girder.models.ItemModel.extend({
   // idAttribute: '_id',
+  wrapInPromise: function (promiseObj, options, beforeSuccess, callbacks) {
+    /*
+      I do some sneaky stuff here. There are three ways
+      callbacks and errors are fired / caught across
+      Backbone and Girder:
+      
+      - options object ('success' and 'error' functions)
+      - jQuery deferreds
+      - g:events
+      
+      This function tries to capture and route all of
+      them appropriately.
+    */
+    let self = this;
 
+    promiseObj = Promise.resolve(promiseObj);
+
+    if (callbacks) {
+      /*
+        Crap. We actually won't know the result
+        of the call until an event is fired.
+        We'll wait for a few seconds for the events before
+        rejecting the promise because we never heard back
+      */
+      let timeout, forceResolve, forceReject;
+      
+      let waiter = new Promise((resolve, reject) => {
+        forceResolve = resolve;
+        forceReject = reject;
+      });
+      promiseObj = Promise.all([promiseObj, waiter]);
+
+      self.listenToOnce(self, callbacks.successEvent, function () {
+        window.clearTimeout(timeout);
+        forceResolve.apply(waiter, arguments);
+      });
+      self.listenToOnce(self, callbacks.errorEvent, function () {
+        window.clearTimeout(timeout);
+        forceReject.apply(waiter, arguments);
+      });
+
+      timeout = window.setTimeout(() => {
+        forceReject(new Error(`MetadataItem timed out waiting for
+        an event from Girder.`));
+      }, 10000);
+    }
+
+    // beforeSuccess is a function that should
+    // be called before options.success
+    beforeSuccess = beforeSuccess || (() => {});
+
+    promiseObj.then(function () {
+      // Things were successfully; call whatToDo first,
+      // and then call options.success if it exists
+      beforeSuccess.apply(self, arguments);
+      if (options.success) {
+        options.success.apply(self, arguments);
+      }
+    });
+
+    if (options.error) {
+      /*
+        Attaching .catch() resumes the Promise chain,
+        which we DON'T want to do unless the user has
+        explicitly supplied an error catching function
+      */
+      promiseObj.catch(options.error);
+    }
+
+    return promiseObj;
+  },
   sync: function (method, model, options) {
     let self = this;
     options = options || {};
@@ -46,104 +119,107 @@ let MetadataItem = girder.models.ItemModel.extend({
 
     // Error and success functions to make sure
     // the regular events get fired
-    let errorFunc = () => {
-      let defaultErrorFunc = options.error || (() => {
-        throw new Error('Error syncing MetadataItem');
-      });
-      defaultErrorFunc(arguments);
-      if (options.silent !== true) {
-        // self.trigger('error');
-      }
-    };
-    let successFunc = () => {
-      let defaultSuccessFunc = options.success || (() => {});
-      defaultSuccessFunc(arguments);
-      if (options.silent !== true) {
-        // self.trigger('sync');
-        // self.trigger('change');
-      }
-    };
 
     if (method === 'create') {
       // By default, we want to save new items in the user's
       // Private folder or in the public scratch space:
 
-      return Promise.resolve(girder.restRequest({
+      return self.wrapInPromise(girder.restRequest({
         path: 'item/scratchItem',
         data: {
           name: self.get('name'),
           description: self.get('description') || '',
           reuseExisting: false
         },
-        type: 'GET',
-        error: errorFunc
-      })).then((resp) => {
-        // This will assign us our new ID:
+        type: 'GET'
+      }), options, (resp) => {
+        // This *should* assign us our new ID:
         self.set(resp, {
           silent: true
         });
-
-        // And now we want to finish creating
-        // the item by saving our current state
-        // (this calls sync again, but that's
-        // a good thing in case we have metadata)
-        self.sync('update', model, options);
-      }).catch((err) => {
-        errorFunc(err.responseJSON.message);
+        
+        if (!self.getId()) {
+          throw new Error('Got a scratch item without an ID');
+        } else {
+          // And now we want to finish creating
+          // the item by saving our current state
+          // (this calls sync again, but that's
+          // a good thing in case we have metadata
+          
+          self.sync('update', model, options);
+        }
       });
     } else if (method === 'update') {
-      // When we update, we want to sync our
-      // metadata before we sync the rest,
-      // or else it will get nuked
-      return Promise.resolve(girder.restRequest({
-        path: '/item/' + self.getId() + '/metadata',
+      // When we update, we sync to our custom endpoint
+      // (does two things: syncs metadata with the
+      // rest of the item, as well as doing fancy
+      // user state logic)
+      let args = {
+        name: self.get('name')
+      };
+      let desc = self.get('description');
+      if (desc) {
+        args.description = desc
+      }
+      
+      if (!self.getId()) {
+        // We don't have anywhere to save to! Create
+        // the item instead
+        return self.sync('create', model, options);
+      }
+      
+      return self.wrapInPromise(girder.restRequest({
+        path: 'item/' + self.getId() + '/updateScratch?' +
+          jQuery.param(args),
         contentType: 'application/json',
         data: JSON.stringify(self.get('meta')),
-        type: 'PUT',
-        error: errorFunc
-      })).then((resp) => {
-        // Okay, go ahead and finish the sync the girder way
-        self.listenToOnce(self, 'g:saved', successFunc);
-        self.listenToOnce(self, 'g:error', errorFunc);
-        girder.models.ItemModel.prototype.save.apply(self);
-      }).catch((err) => {
-        errorFunc(err.responseJSON.message);
+        type: 'POST'
+      }), options, (resp) => {
+        // It's possible that the id changed
+        // in the process (e.g. a copy of
+        // the toolchain was made
+        // because the user is logged out)
+        self.set(resp, {
+          silent: true
+        });
       });
     } else if (method === 'read') {
       if (self.getId() === undefined) {
         // If we haven't yet identified the id, look for it
         // in the Private folder by item name / create
         // an item there if it doesn't exist
-        return Promise.resolve(girder.restRequest({
+        return self.wrapInPromise(girder.restRequest({
           path: 'item/privateItem',
           data: {
-            name: self.get('name'),
+            name: self.get('name') || 'Untitled Item',
             description: self.get('description') || ''
           },
-          type: 'GET',
-          error: errorFunc
-        })).then((resp) => {
+          type: 'GET'
+        }), options, (resp) => {
           // Load up everything we just got
           self.set(resp, {
             silent: true
           });
-          successFunc(self.toJSON(), resp, options);
-        }).catch((err) => {
-          errorFunc(err.responseJSON.message);
         });
       } else {
         // Otherwise, just go with the default girder behavior
-        self.listenToOnce(self, 'g:fetched', successFunc);
-        self.listenToOnce(self, 'g:error', errorFunc);
-        return Promise.resolve(girder.models.ItemModel.prototype.fetch.apply(self));
+        return self.wrapInPromise(
+          girder.models.ItemModel.prototype.fetch.apply(self),
+          options, null, {
+            successEvent: 'g:fetched',
+            errorEvent: 'g:error'
+          });
       }
     } else if (method === 'delete') {
       // We'll already have an id if there's something to delete...
       // so just use the default girder behavior
-      self.listenToOnce(self, 'g:deleted', successFunc);
-      self.listenToOnce(self, 'g:error', errorFunc);
-      let promise = Promise.resolve(girder.models.ItemModel.prototype.destroy.apply(self));
-      // In the mean time let's delete the id so we
+      let promise = self.wrapInPromise(
+        girder.models.ItemModel.prototype.destroy.apply(self),
+        options, null, {
+          successEvent: 'g:deleted',
+          errorEvent: 'g:error'
+        });
+      // In the mean time let's clear the id so we
       // don't go thinking we're synced anymore
       self.unset(self.idAttribute, {
         silent: true
@@ -157,9 +233,11 @@ let MetadataItem = girder.models.ItemModel.extend({
   },
   create: function (attributes, options) {
     let self = this;
-    self.set(attributes, {
-      silent: true
-    });
+    if (attributes) {
+      self.set(attributes, {
+        silent: true
+      });
+    }
     self.unset(self.idAttribute, {
       silent: true
     });
@@ -167,7 +245,9 @@ let MetadataItem = girder.models.ItemModel.extend({
   },
   save: function (attributes, options) {
     let self = this;
-    self.set(attributes, options);
+    if (attributes) {
+      self.set(attributes, options);
+    }
     return self.sync('update', self.toJSON(), options);
   },
   destroy: function (options) {

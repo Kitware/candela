@@ -4,18 +4,23 @@ let girder = window.girder;
 let User = girder.models.UserModel.extend({
   initialize: function () {
     let self = this;
+    self.loggedIn = false;
     self.preferences = new UserPreferences();
     self.listenTo(self, 'rra:logout', self.handleUpdate);
     self.listenTo(self, 'rra:login', self.handleUpdate);
     self.authenticate();
   },
+  addListeners: function () {
+    let self = this;
+    self.preferences.addListeners();
+  },
   authenticate: function (login) {
     let self = this;
-    
+
     if (login !== false) {
       login = true;
     }
-    
+
     return Promise.resolve(girder.restRequest({
       path: 'user/authentication',
       error: () => {
@@ -23,9 +28,10 @@ let User = girder.models.UserModel.extend({
       },
       type: login ? 'GET' : 'DELETE'
     })).then(function (resp) {
-      if (resp === null) {
+      if (resp === null || login === false) {
         self.finishLogout();
       } else {
+        self.loggedIn = true;
         self.clear({
           silent: true
         }).set(resp.user);
@@ -33,37 +39,49 @@ let User = girder.models.UserModel.extend({
         self.trigger('rra:login');
         girder.events.trigger('g:login');
       }
-    }).catch(() => {
-      self.finishLogout();
+    }).catch(function (errorObj) {
+      if (errorObj.statusText === 'Unauthorized') {
+        // We don't yet have the appropriate
+        // HTTP headers... so keep us logged out
+        self.finishLogout();
+      } else {
+        // Something else happened
+        window.mainPage.trigger('rra:error', errorObj);
+      }
     });
   },
   finishLogout: function () {
     let self = this;
+    let wasLoggedIn = self.loggedIn;
+    self.loggedIn = false;
     self.clear({
       silent: true
     }).set({});
     self.authToken = undefined;
-    self.trigger('rra:logout');
-    // Girder uses g:login for both log in and log out
-    girder.events.trigger('g:login');
+    if (wasLoggedIn) {
+      self.trigger('rra:logout');
+      // Girder uses g:login for both log in and log out
+      girder.events.trigger('g:login');
+    }
   },
   handleUpdate: function () {
     let self = this;
 
-    if (self.id === undefined) {
-      // Not logged in
+    if (self.loggedIn === false) {
+      // Not logged in; clear all the preferences
       self.preferences.resetToDefaults();
     } else {
       // We're logged in! First, let's see if
       // the user already has preferences stored
-      self.preferences.fetch({
-        error: () => {
-          // Okay, they don't. Instead, let's save the
-          // current state as their starting preferences
-          self.preferences.create();
-        }
-      });
+      self.preferences.fetch()
+        .catch((errorObj) => {
+          window.mainPage.trigger('rra:error', errorObj);
+        });
     }
+  },
+  isLoggedIn: function () {
+    let self = this;
+    return self.loggedIn;
   }
 });
 

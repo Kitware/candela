@@ -1,7 +1,7 @@
 div.form > * {
-  margin: 0.5em;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
 }
 div.form > div > * {
   margin: 0.5em;
@@ -12,13 +12,19 @@ div.form button {
 div.form img {
   width: 2em;
   height: 2em;
+  padding: 0.5em;
   border: 2px solid rgba(0,0,0,0);
 }
-div.form img.button:hover {
+div.form div.clickable {
+  cursor: pointer;
+  color: #377eb8;
+}
+div.form div.clickable:hover img.button {
   border: 2px solid #ccc;
-  border-radius: 1em;
+  border-radius: 2em;
   cursor: pointer;
 }
 div.form label {
   line-height: 2em;
+  cursor: inherit;
 }

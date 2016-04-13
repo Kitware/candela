@@ -1,3 +1,4 @@
+import Underscore from 'underscore';
 import MetadataItem from './MetadataItem';
 import Dataset from './Dataset';
 let girder = window.girder;
@@ -33,113 +34,51 @@ let Toolchain = MetadataItem.extend({
       editable: false,
       location: null
     };
-
-    self.listenTo(self, 'change', self.updateStatus);
+    
+    self.listenTo(window.mainPage.currentUser, 'rra:login',
+      self.updateStatus);
+    self.listenTo(window.mainPage.currentUser, 'rra:logout',
+      self.updateStatus);
   },
-  updateStatus: function (copyOnError) {
+  updateStatus: Underscore.debounce(function (copyOnError) {
     let self = this;
     let id = self.getId();
 
     // Look up where the toolchain lives,
     // and whether the user can edit it
     
-    let oldStatus = {
-      editable: self.status.editable,
-      location: self.status.location
-    };
-    
-    self.status = {
-      editable: false,
-      location: null
-    };
-
     if (id === undefined) {
       if (copyOnError) {
         self.makeCopy();
       } else {
-        throw new Error('Toolchain has no ID');
+        self.status = {
+          editable: false,
+          location: null
+        };
+        self.trigger('rra:changeStatus');
+        return Promise.reject(new Error('Toolchain has no ID'));
       }
     }
 
-    let itemXhr = Promise.resolve(girder.restRequest({
-      path: 'item/' + id,
+    let statusPromise = Promise.resolve(girder.restRequest({
+      path: 'item/' + id + '/info',
       type: 'GET'
-    }));
-
-    let parentId = self.get('folderId');
-    let parentAccessXhr = Promise.resolve(girder.restRequest({
-      path: 'folder/' + parentId + '/access',
-      type: 'GET',
-      error: null
-    }));
-
-    let allXhr = Promise.all([itemXhr, parentAccessXhr]).then((responses) => {
-      let item = responses[0];
-      let folder = responses[1];
-
-      if (item.baseParentType === 'user') {
-        // Get information about where the toolchain item lives
-
-        /* TODO: for now, I'm assuming the UI still makes sense,
-        regardless of whether the user is looking at their own
-        public/private items, or at a different user's public/private
-        items that they have access to. If not, we may need to look up
-        whether this actually is the same user */
-        if (item.public === true) {
-          self.status.location = 'UserPublic';
-        } else {
-          self.status.location = 'UserPrivate';
-        }
-      } else {
-        if (folder.name === 'Public Scratch Space') {
-          self.status.location = 'PublicScratch';
-        } else {
-          self.status.location = 'PublicLibrary';
-        }
+    })).then((resp) => {
+      self.status = resp;
+    }).catch(() => {
+      self.status = {
+        editable: false,
+        location: null
+      };
+      if (copyOnError) {
+        self.makeCopy();
       }
-      
-      if (self.status.location === 'PublicScratch') {
-        /*
-          Use localStorage to do an easily-hackable "security"
-          check (when people aren't logged in, we behave like
-          jsfiddle) to see if this non-logged-in user was the one
-          that created the public scratch item in the first place
-        */
-        let ownedToolchains = window.localStorage.getItem('scratchToolchains');
-        if (ownedToolchains) {
-          self.status.editable = JSON.parse(ownedToolchains)
-            .indexOf(id) !== -1;
-        }
-      } else {
-        // Get information about whether the current user has
-        // write access to edit the item
-        let userId = window.mainPage.currentUser.id;
-        if (userId && folder && folder.users) {
-          for (let i = 0; i < folder.users.length; i += 1) {
-            if (folder.users[i].id === userId) {
-              if (folder.users[i].level > 0) {
-                self.status.editable = true;
-              }
-              break;
-            }
-          }
-        }
-      }
-      
-      if (self.status.editable !== oldStatus.editable ||
-          self.status.location !== oldStatus.location) {
-        self.trigger('rra:changeStatus');
-      }
+    }).then(() => {
+      self.trigger('rra:changeStatus');
     });
 
-    if (copyOnError) {
-      allXhr = allXhr.catch(() => {
-        self.makeCopy();
-      });
-    }
-
-    return allXhr;
-  },
+    return statusPromise;
+  }, 300),
   makeCopy: function () {
     let self = this;
     /*
@@ -151,32 +90,19 @@ let Toolchain = MetadataItem.extend({
     the toolchain to either the user's Private directory, or
     to the public scratch space if the user is logged out
     */
-    let _fail = function () {
+    let _fail = function (err) {
       // If we can't even save a copy, something
       // is seriously wrong.
-      window.mainPage.switchToolchain(null, arguments);
+      window.mainPage.switchToolchain(null);
+      window.mainPage.trigger('rra:error', err);
     }
-
+    
     self.unset('_id');
-    return Promise.resolve(girder.restRequest({
-      path: 'item/scratchItem/',
-      type: 'GET',
-      error: _fail
-    })).then(function (item) {
-      self.set('_id', item.id);
-      self.fetch({
-        success: self.updateStatus,
-        error: _fail
-      })
-    }).catch(_fail);
-  },
-  togglePublic: function () {
-    let self = this;
-    girder.restRequest({
-      path: 'item/togglePublic/' + self.getId(),
-      type: 'POST',
-      error: self.updateStatus
-    }).always(self.updateStatus);
+    return self.create()
+      .then(() => {
+        window.mainPage.trigger('rra:createToolchain');
+        self.updateStatus();
+      }).catch(_fail);
   },
   getMeta: function (key) {
     let self = this;
@@ -206,6 +132,8 @@ let Toolchain = MetadataItem.extend({
     self.set('name', newName);
     self.save().then(() => {
       self.trigger('rra:rename');
+    }).catch((errorObj) => {
+      window.mainPage.trigger('rra:error', errorObj);
     });
   },
   getDatasetIds: function () {
@@ -248,6 +176,8 @@ let Toolchain = MetadataItem.extend({
     self.save().then(() => {
       self.trigger('rra:changeDatasets');
       self.trigger('rra:changeMappings');
+    }).catch((errorObj) => {
+      window.mainPage.trigger('rra:error', errorObj);
     });
   },
   setVisualization: function (newVisualization, index = 0) {
@@ -268,6 +198,8 @@ let Toolchain = MetadataItem.extend({
     self.save().then(() => {
       self.trigger('rra:changeVisualizations');
       self.trigger('rra:changeMappings');
+    }).catch((errorObj) => {
+      window.mainPage.trigger('rra:error', errorObj);
     });
   },
   shapeDataForVis: function (callback, index = 0) {
@@ -389,6 +321,8 @@ let Toolchain = MetadataItem.extend({
     self.setMeta(meta);
     self.save().then(() => {
       self.trigger('rra:changeMappings');
+    }).catch((errorObj) => {
+      window.mainPage.trigger('rra:error', errorObj);
     });
   },
   removeMapping: function (mapping) {
@@ -412,6 +346,8 @@ let Toolchain = MetadataItem.extend({
     self.setMeta(meta);
     self.save().then(() => {
       self.trigger('rra:changeMappings');
+    }).catch((errorObj) => {
+      window.mainPage.trigger('rra:error', errorObj);
     });
   },
   getAllWidgetSpecs: function () {

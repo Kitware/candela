@@ -1,6 +1,10 @@
 <div class="libraryInterface">
   <img src="../../../images/close.svg" id="closeOverlay" />
 
+  <div id="loginLinks">
+    For more control, <a id="registerLink">Register</a> or <a id="loginLink">Log In</a>
+  </div>
+  
   <h1 id="toolchainSettingsHeader">
     Toolchain Settings
   </h1>
@@ -17,55 +21,47 @@
       </div>
       
       <div>
-        <img id="copyLinkButton" src="../../../images/copyLink.svg" class="button" />
-        <label>Copy a link to this toolchain</label>
-      </div>
-      
-      <div>
-        <img id="girderButton" src="../../../images/girder.svg" class="button" />
-        <label>Manage this toolchain in Girder</label>
-      </div>
-
-      <div>
-        <img id="editabilityIcon" />
-        <label id="editabilityLabel"></label>
-      </div>
-      
-      <div>
         <img id="visibilityIcon" />
         <label id="visibilityLabel"></label>
       </div>
       
       <div>
-        <input value="UserPrivate" id="privateVisibility" name="toolchainVisibility" type="radio">
+        <img id="editabilityIcon" />
+        <label id="editabilityLabel"></label>
+      </div>
+      
+      <div class="clickable" id="girderButton">
+        <img src="../../../images/girder.svg" class="button" />
+        <label>Set advanced permissions for this toolchain in Girder</label>
+      </div>
+      
+      <div class="clickable" id="copyLinkButton">
+        <img src="../../../images/copyLink.svg" class="button" />
+        <label>Copy a link to this toolchain (only those with access
+        can use it)</label>
+      </div>
+      
+      <div>
+        <input value="PrivateUser" id="privateVisibility" name="toolchainVisibility" type="radio">
         <label for="privateVisibility">Private</label>
-        <input value="UserPublic" id="publicVisibility" name="toolchainVisibility" type="radio">
+        <input value="PublicUser" id="publicVisibility" name="toolchainVisibility" type="radio">
         <label for="publicVisibility">Public</label>
-        <input value="PublicScratch" id="scratchVisibility" name="toolchainVisibility" type="radio" disabled>
+        <input value="PublicScratch" id="scratchVisibility" name="toolchainVisibility" type="radio">
         <label for="scratchVisibility">Public Scratch Space</label>
-        <input value="PublicLibrary" id="libraryVisibility" name="toolchainVisibility" type="radio" disabled>
+        <input value="PublicLibrary" id="libraryVisibility" name="toolchainVisibility" type="radio">
         <label for="libraryVisibility">Library</label>
       </div>
     </div>
-
   </div>
-
-  <h1 id="privateToolchainsHeader" class="hideable">
-    Your Private Toolchains
-  </h1>
-  <div id="privateToolchains" class="hideable circleset">
-
-  </div>
-  <h1 id="publicToolchainsHeader" class="hideable">
-    Your Public Toolchains
-  </h1>
-  <div id="publicToolchains" class="hideable circleset">
-
-  </div>
-  <h1 id="toolchainLibraryHeader" class="hideable">
-    Our Toolchain Library
-  </h1>
-  <div id="toolchainLibrary" class="hideable circleset">
-
+  <div id="libraryChunk">
+  
   </div>
 </div>
+
+<style type="text/css">
+  #loginLinks {
+    position: absolute;
+    top: 1.5em;
+    right: 4em;
+  }
+</style>

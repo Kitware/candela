@@ -143,23 +143,36 @@ var Router = Backbone.Router.extend({
   updateUrl: function () {
     let self = this;
     if (!window.mainPage ||
-        !window.mainPage.toolchain) { // ||
+        window.mainPage.toolchain === undefined) { // ||
       //  !window.mainPage.widgetPanels) {
       // We haven't actually set up our
       // important pieces yet, so don't
       // change anything yet
       return;
     }
-    
-    let toolchainId = window.mainPage.toolchain.getId();
-    let widgets = []; // window.mainPage.widgetPanels.currentWidgetNames();
-    self.navigate(self.constructFragment(toolchainId, widgets), {
-      trigger: true
-    });
+    if (window.mainPage.toolchain === null) {
+      // There is no toolchain loaded, so clear the URL
+      self.navigate('', {
+        trigger: true
+      });
+      return;
+    } else {
+      let toolchainId = window.mainPage.toolchain.getId();
+      let widgets = []; // window.mainPage.widgetPanels.currentWidgetNames();
+      self.navigate(self.constructFragment(toolchainId, widgets), {
+        trigger: true
+      });
+    }
   },
   openToolchainInGirder: function () {
     let url = 'girder#folder/' + window.mainPage.toolchain.get('folderId');
     window.open(url, '_blank');
+  },
+  openUserDirectoriesInGirder: function () {
+    if (window.mainPage.currentUser.isLoggedIn()) {
+      let url = 'girder#user/' + window.mainPage.currentUser.id;
+      window.open(url, '_blank');
+    }
   }
 });
 

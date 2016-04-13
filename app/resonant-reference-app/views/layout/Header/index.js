@@ -22,8 +22,8 @@ let ICONS = {
   'DatasetView': datasetIcon,
   'MappingView': mappingIcon,
   'VisualizationView': visualizationIcon,
-  'UserPublic': publicIcon,
-  'UserPrivate': privateIcon,
+  'PublicUser': publicIcon,
+  'PrivateUser': privateIcon,
   'PublicLibrary': libraryIcon,
   'PublicScratch': scratchSpaceIcon
 };
@@ -47,11 +47,9 @@ let Header = Backbone.View.extend({
     let self = this;
     if (window.mainPage.toolchain) {
       self.listenTo(window.mainPage.toolchain,
-        'rra:updateStatus',
-        self.render);
+        'rra:changeStatus', self.render);
       self.listenTo(window.mainPage.toolchain,
-        'rra:rename',
-        self.render);
+        'rra:rename', self.render);
     }
     self.render();
   },
@@ -68,13 +66,7 @@ let Header = Backbone.View.extend({
       jQuery('#achievementsButton').on('click', () => {
         window.mainPage.overlay.render('AchievementLibrary');
       });
-      jQuery('#toolchainCopyLinkButton').on('click', () => {
-        window.copyTextToClipboard(window.location.href);
-      });
-      jQuery('#toolchainGirderButton').on('click', () => {
-        window.mainPage.router.openToolchainInGirder();
-      });
-      jQuery('#toolchainLocationButton, #toolchainEditabilityButton')
+      jQuery('#toolchainLocationButton')
         .on('click', () => {
           window.mainPage.overlay.render('ToolchainSettings');
         });

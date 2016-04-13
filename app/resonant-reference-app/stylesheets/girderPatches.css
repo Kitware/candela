@@ -1,0 +1,96 @@
+/*
+  Girder's (and Bootstrap's) massive stylesheets interfere with
+  the reference app's styles in lots of places. Instead, while
+  we essentially use some of Girder's views in place, we adapt
+  the styles to fit our app
+*/
+
+#Overlay .modal-dialog {
+  position: absolute;
+  height: auto;
+  left: calc(50% - 17em);
+  width: 30em;
+  text-align: center;
+  top: calc(50% - 16em);
+  padding: 2em 4em 2em 4em;
+  border-radius: 1em;
+  border: 2px solid #ccc;
+  background-color: white;
+}
+
+#Overlay button.close {
+  position: absolute;
+  color: rgba(0,0,0,0);
+  background-image: url('../images/close.svg');
+  top: 1em;
+  right: 1em;
+  width: 2em;
+  height: 2em;
+  padding: 0px;
+  box-shadow: none;
+  border: none;
+  outline: none;
+}
+
+#Overlay a {
+  cursor: pointer;
+}
+
+#Overlay .modal-footer a.btn {
+  background-color: white;
+  padding: 0.5em 1em;
+  line-height: 1em;
+  cursor: pointer;
+  border-radius: 4px;
+  color: #000;
+  font-weight: bold;
+  font-size: inherit;
+  border: solid 1px #ccc;
+  background-position: center bottom;
+}
+
+#Overlay .modal-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+#Overlay .modal-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+#Overlay .modal-footer,
+#Overlay .g-bottom-message,
+#Overlay .g-validation-failed-message,
+#Overlay .form-group {
+  display: flex;
+  align-items: center;
+  margin: 0.5em 0em;
+}
+
+#Overlay .form-group input {
+  width: 100%;
+}
+
+#Overlay .g-bottom-message,
+#Overlay .g-validation-failed-message {
+  flex-wrap: wrap;
+}
+
+#Overlay .g-validation-failed-message {
+  color: #e41a1c;
+}
+
+#Overlay .modal-footer > *,
+#Overlay .g-bottom-message > *,
+#Overlay .g-validation-failed-message > *,
+#Overlay .form-group > * {
+  margin: 0em 0.5em;
+  white-space: nowrap;
+}
+
+#Overlay .modal-footer {
+  justify-content: flex-end;
+}

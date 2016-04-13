@@ -3,8 +3,6 @@ import jQuery from 'jquery';
 import Backbone from 'backbone';
 import template from './template.html';
 
-let girder = window.girder;
-
 import './style.css';
 
 let HamburgerMenu = Backbone.View.extend({
@@ -22,7 +20,7 @@ let HamburgerMenu = Backbone.View.extend({
       window.mainPage.overlay.render('ToolchainSettings');
     });
     
-    if (window.mainPage.currentUser.id) {
+    if (window.mainPage.currentUser.isLoggedIn()) {
       jQuery('#loginMenuItem > p').text('Log Out');
       jQuery('#loginMenuItem').on('click', () => {
         window.mainPage.currentUser.authenticate(false)
@@ -33,7 +31,7 @@ let HamburgerMenu = Backbone.View.extend({
     } else {
       jQuery('#loginMenuItem > p').text('Log In');
       jQuery('#loginMenuItem').on('click', () => {
-        window.mainPage.overlay.render(girder.views.LoginView);
+        window.mainPage.overlay.render('LoginView');
       });
     }
   }

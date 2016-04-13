@@ -40,15 +40,18 @@ let Dataset = MetadataItem.extend({
       callback(self.rawCache);
     } else {
       Promise.resolve(girder.restRequest({
-        path: 'item/' + self.id + '/download',
+        path: 'item/' + self.getId() + '/download',
         type: 'GET',
         error: null,
         dataType: 'text'
-      })).then(function (data) {
+      })).then((data) => {
         if (cache) {
           self.rawCache = data;
         }
         callback(data);
+      }).catch(() => {
+        self.rawCache = null;
+        callback(null);
       });
     }
   },
@@ -71,26 +74,31 @@ let Dataset = MetadataItem.extend({
     if (cache && self.parsedCache !== null) {
       callback(self.parsedCache);
     } else {
+      let parsedData;
       self.loadData(function (rawData) {
-        let meta = self.getMeta();
-        let formatPrefs = {
-          type: meta.fileType
-        };
-        if (meta.attributes) {
-          formatPrefs.parse = meta.attributes;
+        if (rawData === null) {
+          self.parsedCache = parsedData = null;
         } else {
-          formatPrefs.parse = 'auto';
-        }
-        let parsedData;
+          let meta = self.getMeta();
+          let formatPrefs = {
+            type: meta.fileType
+          };
+          if (meta.attributes) {
+            formatPrefs.parse = meta.attributes;
+          } else {
+            formatPrefs.parse = 'auto';
+          }
+          let parsedData;
 
-        try {
-          parsedData = datalib.read(rawData, formatPrefs);
-        } catch (e) {
-          parsedData = null;
-        }
+          try {
+            parsedData = datalib.read(rawData, formatPrefs);
+          } catch (e) {
+            parsedData = null;
+          }
 
-        if (cache) {
-          self.parsedCache = parsedData;
+          if (cache) {
+            self.parsedCache = parsedData;
+          }
         }
         callback(parsedData);
       });
@@ -121,7 +129,9 @@ let Dataset = MetadataItem.extend({
       } else {
         self.setMeta('attributes', datalib.type.all(data));
       }
-      self.saveThenTrigger(['rra:changeSpec']);
+      self.save().then(() => {
+        self.trigger('rra:changeSpec')
+      });
     });
   },
   setAttribute: function (attrName, dataType) {
@@ -129,7 +139,9 @@ let Dataset = MetadataItem.extend({
     let attributes = self.getMeta('attributes');
     attributes[attrName] = dataType;
     self.setMeta('attributes', attributes);
-    self.saveThenTrigger(['rra:changeSpec']);
+    self.save().then(() => {
+      self.trigger('rra:changeSpec')
+    });
   }
 });
 

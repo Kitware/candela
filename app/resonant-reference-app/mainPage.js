@@ -11,6 +11,7 @@ import Overlay from './views/layout/Overlay';
 // Page-wide Styles
 import './stylesheets/pure-css-custom-form-elements/style.css';
 import './stylesheets/mainPage.css';
+import './stylesheets/girderPatches.css';
 
 // The API root is different
 window.girder.apiRoot = 'api/v1';
@@ -22,10 +23,14 @@ let MainPage = Backbone.View.extend({
 
     // Set up navigation
     self.router = new Router();
-    
+
     // Initial empty state (assume no logged in user)
     self.currentUser = new User();
-    
+
+    self.listenTo(self.currentUser, 'rra:logout', () => {
+      self.switchToolchain(null);
+    });
+
     // Start without a toolchain
     self.toolchain = null;
 
@@ -52,6 +57,7 @@ let MainPage = Backbone.View.extend({
         el: '#Overlay'
       });
       self.router.addListeners();
+      self.currentUser.addListeners();
       self.addedPageChunks = true;
     }
 
@@ -62,44 +68,34 @@ let MainPage = Backbone.View.extend({
   newToolchain: function () {
     let self = this;
     self.toolchain = new Toolchain();
-    return self.toolchain.create(self.toolchain.defaults(), {
-      success: function () {
-        self.currentUser.preferences
-          .addRecentToolchain(self.toolchain.getId());
+    return self.toolchain.save()
+      .then(() => {
+        self.trigger('rra:createToolchain');
         self.trigger('rra:changeToolchain');
-      },
-      error: function (err) {
-        self.switchToolchain(null, err);
-      }
-    });
+        self.toolchain.updateStatus();
+      }).catch((err) => {
+        self.switchToolchain(null);
+        self.trigger('rra:error', err);
+      });
   },
-  switchToolchain: function (id, displayError) {
+  switchToolchain: function (id) {
     let self = this;
-    
+
     if (id === null) {
       self.toolchain = null;
-      if (displayError) {
-        self.overlay.render('ErrorScreen');
-      } else {
-        self.overlay.render('StartingScreen');
-      }
-
       self.trigger('rra:changeToolchain');
       return new Promise(() => {});
     } else {
       self.toolchain = new Toolchain({
         _id: id
       });
-
-      return self.toolchain.fetch({
-        success: function () {
-          self.currentUser.preferences
-            .addRecentToolchain(self.toolchain.getId());
-          self.trigger('rra:changeToolchain');
-        },
-        error: function (err) {
-          self.switchToolchain(null, err);
-        }
+      
+      return self.toolchain.fetch().then(() => {
+        self.trigger('rra:changeToolchain');
+        self.toolchain.updateStatus();
+      }).catch((err) => {
+        self.switchToolchain(null);
+        self.trigger('rra:error', err);
       });
     }
   }

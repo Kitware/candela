@@ -14,15 +14,15 @@
 }
 
 #Header img.headerButton {
-  width: 2em;
-  height: 2em;
-  padding: 0.5em;
-  border-radius: 1.5em;
-  cursor: pointer;
+  width: 2.25em;
+  height: 2.25em;
+  margin: 0.25em;
 }
 
 #Header img.headerButton:hover {
-  background-color: #ccc;
+  cursor: pointer;
+  -webkit-filter: brightness(3);
+  filter: brightness(3);
 }
 
 #Header div.indicators {
@@ -46,9 +46,14 @@
   left: -1em;
 }
 
+#Header #interfaceIcons {
+  padding-right: 0.25em;
+}
+
 #Header #toolchainHeader {
   display: flex;
   align-items: center;
+  padding-left: 0.25em;
 }
 
 #Header #toolchainName {
@@ -57,4 +62,5 @@
   border: none;
   font-size: inherit;
   width: 10em;
+  margin: 0.25em;
 }
