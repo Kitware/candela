@@ -1,3 +1,4 @@
+import Underscore from 'underscore';
 import Backbone from 'backbone';
 import d3 from 'd3';
 import WidgetPanel from './WidgetPanel.js';
@@ -8,81 +9,47 @@ import './style.css';
 let WidgetPanels = Backbone.View.extend({
   initialize: function () {
     let self = this;
-    self.widgets = {};
+    self.widgets = [];
+    self.widgetSpecs = [];
+    self.expandedWidgets = [];
+    self.listenTo(window.mainPage, 'rra:changeToolchain',
+      self.handleNewToolchain);
   },
-  isWidgetInToolchain: function (widgetName) {
-    // let self = this;
-    let toolchainIcons = window.mainPage.toolchain.getMeta('requiredIcons');
-    return toolchainIcons.indexOf(widgetName) !== -1;
+  handleNewToolchain: function () {
+    let self = this;
+    if (window.mainPage.toolchain) {
+      self.listenTo(window.mainPage.toolchain, 'rra:changeDatasets',
+        self.changeWidgetSpecs);
+      self.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations',
+        self.changeWidgetSpecs);
+    }
+    self.changeWidgetSpecs();
+  },
+  changeWidgetSpecs: function () {
+    let self = this;
+    if (window.mainPage.toolchain) {
+      self.widgetSpecs = window.mainPage.toolchain.getAllWidgetSpecs();
+    } else {
+      self.widgetSpecs = [];
+    }
+    // TODO: test if widgets have actually changed
+    self.trigger('rra:changeWidgetSpecs');
   },
   expandWidget: function (widgetSpec) {
-    let self = this;
-    /*
-      Close the widget, but leave its icon up on the toolbar.
-      Whether a widget is open or not is saved as part of the
-      user preferences, or as part of the toolchain preferences
-    */
-    if (self.isWidgetInToolchain(widgetName)) {
-      window.mainPage.toolchain.closeWidget(widgetName);
-    } else {
-      window.mainPage.userPreferences.closeWidget(widgetName);
-    }
-
-    // Remove the widget's name from the url
-    // (this already triggers render calls)
-    window.mainPage.router.minimizeWidget(widgetName);
   },
   collapseWidget: function (widgetSpec) {
-    let self = this;
-    /*
-      Add the widget if it isn't already open, and target it (in case
-      it was open, but it was collapsed)
-    */
-    if (self.isWidgetInToolchain(widgetName)) {
-      window.mainPage.toolchain.openWidget(widgetName);
-    } else {
-      window.mainPage.userPreferences.openWidget(widgetName);
-    }
-
-    // Remove the widget's name from the url
-    // (this already triggers render calls)
-    window.mainPage.router.expandWidget(widgetName);
   },
-  render: function () {
+  render: Underscore.debounce(() => {
     let self = this;
-
-    let leftWidgetNames = window.mainPage.userPreferences
-      .getMeta('leftWidgets');
-    let toolchainWidgetNames = window.mainPage.toolchain
-      .getMeta('preferredWidgets');
-    let rightWidgetNames = window.mainPage.userPreferences
-      .getMeta('rightWidgets');
-
-    // Stitch together the list of widgets from
-    // the user preferences and from the
-    // currently open toolchain
-    let widgetNames = leftWidgetNames
-      .concat(toolchainWidgetNames)
-      .concat(rightWidgetNames);
-
-    // The hashes tell us which
-    // ones should be expanded
-    let hashes = window.mainPage.router.getCurrentWidgets();
 
     // Create sections for each panel
     let sections = d3.select(self.el)
       .selectAll('section')
-      .data(widgetNames, (d) => d);
+      .data(self.widgetSpecs, (d) => d);
     let sectionsEnter = sections.enter().append('section');
     sections.exit().each((d) => {
-      delete self.widgets[d];
+      // delete self.widgets[d];
     }).remove();
-
-    sections.order()
-      .attr('id', (d) => d)
-      .attr('class', (d) => {
-        return hashes.indexOf(d) !== -1 ? 'targeted' : null;
-      });
 
     // Any new widgets need to have a WidgetPanel instantiated
     // and bound to the new section
@@ -96,8 +63,8 @@ let WidgetPanels = Backbone.View.extend({
     });
 
     // Distribute the space for each section
-    let expandedSections = hashes.length;
-    let collapsedSections = widgetNames.length - expandedSections;
+    let expandedSections = self.expandedWidgets.length;
+    let collapsedSections = self.widgetSpecs.length - expandedSections;
     let style = 'calc((100% - (0.5em + ' + // a little grey space at the beginning
       '2.5*' + collapsedSections + 'em + ' + // collapsed sections are 2em wide + a grey space
       '0.5*' + expandedSections + 'em)) / ' + // grey space around each section
@@ -117,7 +84,7 @@ let WidgetPanels = Backbone.View.extend({
         self.widgets[widgetName].render();
       };
     }, 1000);
-  }
+  }, 300)
 });
 
 export default WidgetPanels;

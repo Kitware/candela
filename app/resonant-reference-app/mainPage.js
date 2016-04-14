@@ -5,7 +5,7 @@ import User from './models/User';
 import Toolchain from './models/Toolchain';
 
 import Header from './views/layout/Header';
-// import WidgetPanels from './views/layout/WidgetPanels';
+import WidgetPanels from './views/layout/WidgetPanels';
 import Overlay from './views/layout/Overlay';
 
 // Page-wide Styles
@@ -50,9 +50,9 @@ let MainPage = Backbone.View.extend({
       self.header = new Header({
         el: '#Header'
       });
-      /* self.widgetPanels = new WidgetPanels({
+      self.widgetPanels = new WidgetPanels({
         el: '#WidgetPanels'
-      });*/
+      });
       self.overlay = new Overlay({
         el: '#Overlay'
       });
@@ -62,7 +62,7 @@ let MainPage = Backbone.View.extend({
     }
 
     self.header.render();
-    // self.widgetPanels.render();
+    self.widgetPanels.render();
     self.overlay.render();
   },
   newToolchain: function () {
