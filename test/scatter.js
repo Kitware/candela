@@ -1,11 +1,16 @@
 import test from 'tape';
 import Nightmare from 'nightmare';
 import fs from 'fs';
+import path from 'path';
 import Promise from 'bluebird';
 import resemble from 'node-resemble';
 
 function dataUrl(raw, type='image/jpeg') {
   return `data:${type};base64,${raw.toString('base64')}`;
+}
+
+function rawData(dataUrl) {
+  return dataUrl.split(',')[1];
 }
 
 function extractData(durl) {
@@ -42,14 +47,19 @@ test('Scatter plot image test', t => {
     return n.screenshot(undefined, rect);
   })
   .then(imageBuf => {
-    console.log('hello');
-    const refImage = dataUrl(fs.readFileSync('test/scatter.png'));
+    const refImage = dataUrl(fs.readFileSync(path.join(__dirname, 'scatter.png')));
     const image = dataUrl(imageBuf);
-    console.log('ok');
+
     resemble(image)
       .compareTo(refImage)
       .onComplete(analysis => {
-        console.log(analysis);
+        const passed = Number(analysis.misMatchPercentage) < 0.01;
+        if (!passed) {
+          fs.writeFileSync(path.join(__dirname, 'scatter-test.png'), imageBuf.toString('base64'), 'base64');
+          fs.writeFileSync(path.join(__dirname, 'scatter-diff.png'), rawData(analysis.getImageDataUrl()), 'base64');
+        }
+
+        t.ok(passed, 'scatter image matches reference image');
 
         t.end();
         return n.end().then();
