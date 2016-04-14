@@ -13,13 +13,6 @@ function rawData(dataUrl) {
   return dataUrl.split(',')[1];
 }
 
-function extractData(durl) {
-  const s = durl.indexOf(',');
-  if (s > -1) {
-    return durl.slice(s+1);
-  }
-}
-
 Promise.onPossiblyUnhandledRejection(err => {
   throw err;
 });
