@@ -1,6 +1,7 @@
 import test from 'tape';
 import Nightmare from 'nightmare';
 import fs from 'fs';
+import Promise from 'bluebird';
 import resemble from 'node-resemble';
 
 function dataUrl(raw, type='image/jpeg') {
@@ -13,6 +14,10 @@ function extractData(durl) {
     return durl.slice(s+1);
   }
 }
+
+Promise.onPossiblyUnhandledRejection(err => {
+  throw err;
+});
 
 test('Scatter plot image test', t => {
   let n = Nightmare({
