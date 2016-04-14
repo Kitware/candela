@@ -76,7 +76,7 @@
     "jquery": "^2.2.0",
     "LineUpJS": "git+https://github.com/Caleydo/lineup.js#51ae6f2bcb55aead3f63357864e90d5799789910",
     "underscore": "^1.8.3",
-    "UpSet": "git+https://github.com/VCG/upset#33e1c4140896c4705127df4dc38a3a6b48827c7a",
+    "UpSet": "git+https://github.com/VCG/upset#6e8b7a172443dd6b4f4324d1a3368287e9e9c089",
     "vega": "^2.4.2"
   }
 }
