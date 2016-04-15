@@ -85,19 +85,27 @@ will be 1.2.0.
    git branch -d release-1.2.0
    ````
 
-9. Merge the ``save-point`` branch into ``master`` (do not use a fast-forward
-   merge, since this is a special type of commit to prepare master for development
-   with a new version number, rather than adding any new functionality), push,
-   then delete ``save-point``. *Be sure you are not merging ``release-1.2`` or
-   ``release`` into master; we do not want the distribution files to enter the
-   mainline development branch.*
+9. Publish the new package to NPM. You will need to log in with your NPM
+   credentials first.
 
    ````
-   git checkout master
-   git merge save-point
-   git branch -d save-point
-   git push
-   ```
+   npm login
+   npm publish
+   ````
+
+10. Merge the ``save-point`` branch into ``master`` (do not use a fast-forward
+    merge, since this is a special type of commit to prepare master for development
+    with a new version number, rather than adding any new functionality), push,
+    then delete ``save-point``. *Be sure you are not merging ``release-1.2`` or
+    ``release`` into master; we do not want the distribution files to enter the
+    mainline development branch.*
+
+    ````
+    git checkout master
+    git merge save-point
+    git branch -d save-point
+    git push
+    ```
 
 This concludes the release process. You will have a new, tagged release
 published, with a corresponding commit on the ``release`` branch, while
