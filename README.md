@@ -45,7 +45,8 @@ will be 1.2.0.
    git push -u origin release-1.2.0
    ````
 
-3. Make a new local branch to save your spot in the commit tree here.
+3. Make a new local branch to save your spot in the commit tree here. Be sure
+   your checkout remains on ``release-1.2.0``. You can do this with:
 
    ```` 
    git branch save-point 
