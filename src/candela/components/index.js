@@ -2,6 +2,7 @@ import BarChart from './BarChart';
 import BoxPlot from './BoxPlot';
 import BulletChart from './BulletChart';
 import GanttChart from './GanttChart';
+import Geo from './Geo';
 import Heatmap from './Heatmap';
 import Histogram from './Histogram';
 import LineChart from './LineChart';
@@ -16,12 +17,11 @@ export default {
   BoxPlot,
   BulletChart,
   GanttChart,
+  Geo,
   Heatmap,
   Histogram,
   LineChart,
   LineUp,
   ParallelCoordinates,
-  ScatterPlot,
-  ScatterPlotMatrix,
   UpSet
 };
