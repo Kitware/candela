@@ -1,4 +1,5 @@
 import d3 from 'd3';
+import dl from 'datalib';
 import * as upset from 'UpSet';
 import template from './template.html';
 
@@ -28,6 +29,16 @@ export default class UpSet {
           domain: {
             mode: 'field',
             from: 'data',
+            fieldTypes: ['integer', 'boolean']
+          }
+        },
+        {
+          name: 'fields',
+          type: 'string_list',
+          format: 'string_list',
+          domain: {
+            mode: 'field',
+            from: 'data',
             fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
           }
         }
@@ -41,7 +52,7 @@ export default class UpSet {
   }
 
   render () {
-    if (!this.options.id || !this.options.sets) {
+    if (!this.options.id || (!this.options.sets && !this.options.fields)) {
       return;
     }
 
@@ -50,11 +61,34 @@ export default class UpSet {
     // Swizzle the data into what UpSet expects (array of arrays)
     let data = [];
     let header = [this.options.id];
-    this.options.sets.forEach(s => header.push(s));
     data.push(header);
     this.options.data.forEach(d => {
-      data.push(header.map(h => '' + d[h]));
+      data.push([d[this.options.id]]);
     });
+
+    // Add 0/1 sets.
+    if (this.options.sets) {
+      this.options.sets.forEach(s => header.push(s));
+      this.options.data.forEach((d, i) => {
+        this.options.sets.forEach(s => {
+          data[i + 1].push('' + d[s]);
+        });
+      });
+    }
+
+    // Add sets derived from general fields.
+    // A set is defined by records sharing a field value.
+    if (this.options.fields) {
+      this.options.fields.forEach(field => {
+        let distinct = dl.unique(this.options.data, d => d[field]);
+        distinct.forEach(v => header.push(field + ' ' + v));
+        this.options.data.forEach((d, i) => {
+          distinct.forEach(v => {
+            data[i + 1].push(v === d[field] ? '1' : '0');
+          });
+        });
+      });
+    }
 
     let datasets = [
       {
@@ -72,7 +106,7 @@ export default class UpSet {
           {
             format: 'binary',
             start: 1,
-            end: this.options.sets.length
+            end: header.length - 1
           }
         ],
         author: '',

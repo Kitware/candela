@@ -194,7 +194,8 @@
         "Blue Hair",
         "Duff Fan",
         "School"
-      ]
+      ],
+      "fields": ["School"]
     }
   },
   {
