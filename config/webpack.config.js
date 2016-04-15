@@ -29,7 +29,6 @@ module.exports = {
   },
   externals: {
     jQuery: 'jQuery',
-    d3: 'd3'
   },
   plugins: [
     new webpack.ProvidePlugin({
