@@ -298,5 +298,13 @@
     "hash": "serialize",
     "name": "Serialization",
     "template": "serialize"
+  },
+  {
+    "hash": "geo",
+    "name": "Geo Chart",
+    "description": "Geospatial plot",
+    "component": "Geo",
+    "options": {
+    }
   }
 ]
