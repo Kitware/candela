@@ -178,5 +178,13 @@
       ],
       "sort": "petalLength"
     }
+  },
+  {
+    "hash": "geo",
+    "name": "Geo Chart",
+    "description": "Geospatial plot",
+    "component": "Geo",
+    "options": {
+    }
   }
 ]
