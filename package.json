@@ -1,6 +1,6 @@
 {
   "name": "candela",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Visualization components for the web",
   "main": "dist/candela.js",
   "scripts": {
