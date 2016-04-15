@@ -31,7 +31,7 @@ will be 1.2.0.
 
 1. Create a new release branch, named `release-1.2.0`:
 
-   ```
+   ```shell
    git checkout -b release-1.2.0 master 
    ```
 
@@ -39,7 +39,7 @@ will be 1.2.0.
    with the commit message "Bump version number for release" and push the
    branch:
 
-   ```
+   ```shell
    vim package.json
    git commit -am 'Bump version number for release'
    git push -u origin release-1.2.0
@@ -48,13 +48,13 @@ will be 1.2.0.
 3. Make a new local branch to save your spot in the commit tree here. Be sure
    your checkout remains on `release-1.2.0`. You can do this with:
 
-   ```
+   ```shell
    git branch save-point 
    ```
 
 4. Build the distribution files by using the "production" NPM script:
 
-   ```
+   ```shell
    npm run build:production
    ```
 
@@ -63,7 +63,7 @@ will be 1.2.0.
 
 5. Commit the production files and push again.
 
-   ```
+   ```shell
    git add dist
    git commit -m 'Add production files for release'
    git push
@@ -78,7 +78,7 @@ will be 1.2.0.
 8. Check out the `release` branch, pull, tag a release, push, and then delete the
    `release-1.2.0` branch.
 
-   ```
+   ```shell
    git checkout release
    git pull
    git tag v1.2.0
@@ -89,7 +89,7 @@ will be 1.2.0.
 9. Publish the new package to NPM. You will need to log in with your NPM
    credentials first.
 
-   ```
+   ```shell
    npm login
    npm publish
    ```
@@ -101,7 +101,7 @@ will be 1.2.0.
     `release` into master; we do not want the distribution files to enter the
     mainline development branch.*
 
-    ```
+    ```shell
     git checkout master
     git merge save-point
     git branch -d save-point
