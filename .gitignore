@@ -1,4 +1,6 @@
-*.swp
+*.sw*
+*.pyc
 node_modules
 build
 coverage
+.ipynb_checkpoints

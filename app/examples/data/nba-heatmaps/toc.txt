@@ -1,0 +1,5 @@
+age
+free throw percent
+games
+minutes
+versatility index

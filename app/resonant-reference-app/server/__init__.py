@@ -1,32 +1,34 @@
+import os
+from girder.api.rest import Resource
 from anonymousAccess import AnonymousAccess
 
-class CustomAppRoot:
-    exposed = True
 
-    def GET(self):
-        return """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Resonant Reference App</title>
-    <link href='https://fonts.googleapis.com/css?family=Cutive+Mono|Gentium+Basic:400,700' rel='stylesheet' type='text/css'>
-    <link rel="icon" type="image/png" href="static/img/Girder_Favicon.png">
-</head>
-<body>
-    <header id="Header"></header>
-    <div id="WidgetPanels" class="accordion"></div>
-    <div id="Overlay"></div>
-    <div id="Tooltip"></div>
-    <script src="static/built/libs.min.js"></script>
-    <script src="static/built/app.min.js"></script>
-    <script src="static/built/plugins/resonant-reference-app/extra/webpack_bundle.js"></script>
-</body>
-"""
+class ReferenceApp(Resource):
+    _cp_config = {'tools.staticdir.on': True,
+                  'tools.staticdir.index': 'index.html'}
+
+    def __init__(self):
+        super(ReferenceApp, self).__init__()
+        self.resourceName = 'referenceapp'
+
 
 def load(info):
-    # Move girder app to /girder, serve our custom app from /
-    info['serverRoot'], info['serverRoot'].girder = (CustomAppRoot(),
-                                                     info['serverRoot'])
+    ReferenceApp._cp_config['tools.staticdir.dir'] = os.path.join(
+        os.path.relpath(info['pluginRootDir'],
+                        info['config']['/']['tools.staticdir.root']),
+        'web_client')
+
+    # Move girder app to /girder, serve sumo app from /
+    info['apiRoot'].referenceapp = ReferenceApp()
+
+    (
+        info['serverRoot'],
+        info['serverRoot'].girder
+    ) = (
+        info['apiRoot'].referenceapp,
+        info['serverRoot']
+    )
+
     info['serverRoot'].api = info['serverRoot'].girder.api
     anonymousAccess = AnonymousAccess()
     info['apiRoot'].item.route('GET', ('privateItem', ), anonymousAccess.getOrMakePrivateItem)

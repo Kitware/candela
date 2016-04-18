@@ -53,7 +53,7 @@
     {
       "name": "boxplot",
       "height": ["@get", "height", 400],
-      "padding": ["@get", "padding", {"left": 100, "right": 10, "top": 10, "bottom": ["@if", ["@get", "horiz"], 50, 150]}],
+      "padding": "strict",
       "width": ["@get", "width", 600],
       "data": [
         {

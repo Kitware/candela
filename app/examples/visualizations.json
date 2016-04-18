@@ -178,5 +178,63 @@
       ],
       "sort": "petalLength"
     }
+  },
+  {
+    "hash": "upset",
+    "name": "UpSet",
+    "description": "Set visualization with UpSet.",
+    "component": "UpSet",
+    "options": {
+      "data": "simpsons",
+      "id": "Name",
+      "sets": [
+        "Male",
+        "Power Plant",
+        "Evil",
+        "Blue Hair",
+        "Duff Fan",
+        "School"
+      ],
+      "fields": ["School"]
+    }
+  },
+  {
+    "hash": "parallel-coords",
+    "name": "Parallel Coordinates",
+    "description": "An interactive parallel coordinates view of the NBA dataset",
+    "component": "ParallelCoordinates",
+    "elementType": "canvas",
+    "options": {
+      "dataRoot": "nba-heatmaps",
+      "fields": [
+        "games",
+        "age",
+        "free throw percent",
+        "minutes",
+        "versatility index"
+      ],
+      "width": 540,
+      "height": 360
+    }
+  },
+  {
+    "hash": "resize-full",
+    "name": "Resize Full",
+    "template": "resize-full"
+  },
+  {
+    "hash": "resize-table",
+    "name": "Resize Table",
+    "template": "resize-table"
+  },
+  {
+    "hash": "resize-matrix",
+    "name": "Resize Matrix",
+    "template": "resize-matrix"
+  },
+  {
+    "hash": "dynamic-linechart",
+    "name": "Dynamic Line Chart",
+    "template": "dynamic-linechart"
   }
 ]
