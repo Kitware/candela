@@ -39,6 +39,10 @@ let Toolchain = MetadataItem.extend({
       self.updateStatus);
     self.listenTo(window.mainPage.currentUser, 'rra:logout',
       self.updateStatus);
+    self.listenTo(window.mainPage.widgetPanels, 'rra:expandWidget',
+      self.storePreferredWidgets);
+    self.listenTo(window.mainPage.widgetPanels, 'rra:collapseWidget',
+      self.storePreferredWidgets);
   },
   updateStatus: Underscore.debounce(function (copyOnError) {
     let self = this;
@@ -357,23 +361,38 @@ let Toolchain = MetadataItem.extend({
     // this toolchain needs
     let meta = self.getMeta();
     let result = [];
+    let widgetSpec;
 
     let i;
     for (i = 0; i < meta.datasets.length; i += 1) {
-      result.push({
-        widget: 'DatasetView',
+      widgetSpec = {
+        widgetType: 'DatasetView',
+        index: i,
         spec: meta.datasets.at(i).getSpec()
-      });
+      };
+      widgetSpec.hashName = widgetSpec.spec.name + 'DatasetView' + i;
+      result.push(widgetSpec);
     }
     result.push({
-      widget: 'MappingView'
+      widgetType: 'MappingView',
+      hashName: 'MappingView'
     });
     for (i = 0; i < meta.visualizations.length; i += 1) {
-      result.push({
-        widget: 'VisualizationView',
+      widgetSpec = {
+        widgetType: 'VisualizationView',
+        index: i,
         spec: meta.visualizations[i]
-      });
+      };
+      widgetSpec.hashName = widgetSpec.spec.name + 'VisualizationView' + i;
+      result.push(widgetSpec);
     }
+    
+    return result;
+  },
+  storePreferredWidgets: function () {
+    let self = this;
+    self.setMeta('preferredWidgets',
+      Object.keys(window.mainPage.widgetPanels.expandedWidgets));
   }
 });
 

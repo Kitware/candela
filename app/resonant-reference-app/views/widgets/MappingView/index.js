@@ -21,12 +21,11 @@ let EDGE_MODES = {
 };
 
 let MappingView = Widget.extend({
-  initialize: function (options) {
+  initialize: function () {
     let self = this;
-    Widget.prototype.initialize.apply(self, options);
-
+    Widget.prototype.initialize.apply(self, arguments);
+    
     self.friendlyName = 'Mapping';
-    self.hashName = 'MappingView';
 
     self.newInfo = true;
     self.icons.splice(0, 0, {

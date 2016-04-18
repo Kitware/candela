@@ -13,11 +13,20 @@ let WIDGETS = {
   MappingView: MappingView,
   VisualizationView: VisualizationView
 };
+import DatasetIcon from '../../../images/dataset.svg';
+import MappingIcon from '../../../images/mapping.svg';
+import VisualizationIcon from '../../../images/scatterplot.svg';
+let ICONS = {
+  DatasetView: DatasetIcon,
+  MappingView: MappingIcon,
+  VisualizationView: VisualizationIcon
+};
 
 let WidgetPanel = Backbone.View.extend({
-  initialize: function (options) {
+  initialize: function (spec) {
     let self = this;
-    self.widget = new WIDGETS[options.widget]();
+    self.spec = spec;
+    self.widget = new WIDGETS[spec.widgetType](self, spec);
   },
   render: function () {
     let self = this;
@@ -26,19 +35,19 @@ let WidgetPanel = Backbone.View.extend({
     let header = d3.select(self.el)
       .selectAll('span.sectionHeader').data([0]);
     let headerEnter = header.enter().append('span')
-      .attr('class', 'sectionHeader');
+      .attr('class', 'sectionHeader')
+      .on('click', () => {
+        self.widget.toggle();
+      });
 
     // Add the icon that goes with the panel
     headerEnter.append('img')
-      .attr('src', window.mainPage.ICONS[self.widget.hashName]);
+      .attr('src', ICONS[self.widget.spec.widgetType]);
 
     // Add a title to the header that collapses / expands
     // the section
     headerEnter.append('h2')
-      .attr('class', 'title')
-      .on('click', d => {
-        self.toggle();
-      });
+      .attr('class', 'title');
     header.select('h2.title')
       .text(self.widget.friendlyName);
 
@@ -105,19 +114,6 @@ let WidgetPanel = Backbone.View.extend({
         d.onclick(d3.event);
       }
     });
-  },
-  toggle: function () {
-    let self = this;
-    let widgets = window.mainPage.router.getCurrentWidgets();
-    let index = widgets.indexOf(self.widget.hashName);
-
-    if (index === -1) {
-      // Toggle on; expand this view
-      window.mainPage.router.expandWidget(self.widget.hashName);
-    } else {
-      // Toggle off; minimize this view
-      window.mainPage.router.minimizeWidget(self.widget.hashName);
-    }
   }
 });
 

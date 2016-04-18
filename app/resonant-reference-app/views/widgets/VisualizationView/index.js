@@ -6,12 +6,11 @@ import './style.css';
 import infoTemplate from './infoTemplate.html';
 
 let VisualizationView = Widget.extend({
-  initialize: function (options) {
+  initialize: function () {
     let self = this;
-    Widget.prototype.initialize.apply(self, options);
+    Widget.prototype.initialize.apply(self, arguments);
 
     self.friendlyName = 'Visualization';
-    self.hashName = 'VisualizationView';
 
     self.statusText.onclick = function () {
       window.mainPage.overlay.render('VisualizationLibrary');

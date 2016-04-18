@@ -9,23 +9,26 @@ import './style.css';
 let WidgetPanels = Backbone.View.extend({
   initialize: function () {
     let self = this;
-    self.widgets = [];
     self.widgetSpecs = [];
-    self.expandedWidgets = [];
+    self.widgets = {};
+    self.expandedWidgets = new Set();
     self.listenTo(window.mainPage, 'rra:changeToolchain',
       self.handleNewToolchain);
+    self.listenTo(self, 'rra:updateWidgetSpecs', self.render);
+    self.listenTo(self, 'rra:expandWidget', self.render);
+    self.listenTo(self, 'rra:minimizeWidget', self.render);
   },
   handleNewToolchain: function () {
     let self = this;
     if (window.mainPage.toolchain) {
       self.listenTo(window.mainPage.toolchain, 'rra:changeDatasets',
-        self.changeWidgetSpecs);
+        self.updateWidgetSpecs);
       self.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations',
-        self.changeWidgetSpecs);
+        self.updateWidgetSpecs);
     }
-    self.changeWidgetSpecs();
+    self.updateWidgetSpecs();
   },
-  changeWidgetSpecs: function () {
+  updateWidgetSpecs: function () {
     let self = this;
     if (window.mainPage.toolchain) {
       self.widgetSpecs = window.mainPage.toolchain.getAllWidgetSpecs();
@@ -33,37 +36,45 @@ let WidgetPanels = Backbone.View.extend({
       self.widgetSpecs = [];
     }
     // TODO: test if widgets have actually changed
-    self.trigger('rra:changeWidgetSpecs');
+    self.trigger('rra:updateWidgetSpecs');
   },
-  expandWidget: function (widgetSpec) {
+  toggleWidget: function (widgetSpec, expand) {
+    let self = this;
+    if (!self.expandedWidgets[widgetSpec.hashName] || expand === true) {
+      self.expandedWidgets[widgetSpec.hashName] = true;
+      self.trigger('rra:expandWidget');
+    } else {
+      delete self.expandedWidgets[widgetSpec.hashName];
+      self.trigger('rra:minimizeWidget');
+    }
   },
-  collapseWidget: function (widgetSpec) {
-  },
-  render: Underscore.debounce(() => {
+  render: Underscore.debounce(function () {
     let self = this;
 
     // Create sections for each panel
     let sections = d3.select(self.el)
       .selectAll('section')
-      .data(self.widgetSpecs, (d) => d);
+      .data(self.widgetSpecs, (d) => d.hashName);
     let sectionsEnter = sections.enter().append('section');
     sections.exit().each((d) => {
-      // delete self.widgets[d];
+      delete self.widgets[d.hashName];
     }).remove();
+    
+    sections.attr('class', (d) => {
+      return self.expandedWidgets[d.hashName] === true ? 'targeted' : null;
+    });
 
     // Any new widgets need to have a WidgetPanel instantiated
     // and bound to the new section
     sectionsEnter.each(function (d) {
-      let panel = new WidgetPanel({
-        widget: d,
-        el: this
-      });
+      d.el = this;
+      let panel = new WidgetPanel(d);
+      self.widgets[d.hashName] = panel;
       panel.render();
-      self.widgets[d] = panel;
     });
 
     // Distribute the space for each section
-    let expandedSections = self.expandedWidgets.length;
+    let expandedSections = Object.keys(self.expandedWidgets).length;
     let collapsedSections = self.widgetSpecs.length - expandedSections;
     let style = 'calc((100% - (0.5em + ' + // a little grey space at the beginning
       '2.5*' + collapsedSections + 'em + ' + // collapsed sections are 2em wide + a grey space
@@ -80,8 +91,8 @@ let WidgetPanels = Backbone.View.extend({
     // (don't tell them to render themselves
     // until after the animation has finished)
     window.setTimeout(function () {
-      for (let widgetName of Object.keys(self.widgets)) {
-        self.widgets[widgetName].render();
+      for (let hash of Object.keys(self.widgets)) {
+        self.widgets[hash].render();
       };
     }, 1000);
   }, 300)

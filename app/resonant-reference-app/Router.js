@@ -84,7 +84,8 @@ var Router = Backbone.Router.extend({
       let currentId = window.mainPage.toolchain
         ? window.mainPage.toolchain.getId() : null;
       let currentWidgets = window.mainPage.widgetPanels
-        ? window.mainPage.widgetPanels.currentWidgetNames() : new Set();
+        ? Object.keys(window.mainPage.widgetPanels.expandedWidgets) : [];
+      currentWidgets = new Set(currentWidgets);
       
       let changedToolchain = toolchainId !== currentId;
       let changedWidgets = SetOps.symmetric_difference(
@@ -93,16 +94,22 @@ var Router = Backbone.Router.extend({
       if (changedToolchain && changedWidgets) {
         // We've been given a specific toolchain URL, and we're also
         // overriding whatever widgets it saved last time it was open
-        window.mainPage.switchToolchain(toolchainId);
-        window.mainPage.widgetPanels.setWidgets(params.widgets);
+        window.mainPage.switchToolchain(toolchainId)
+          .then(() => {
+            window.mainPage.widgetPanels.setWidgets(params.widgets);
+          });
       } else if (changedToolchain) {
         // The user didn't change the widgets that were
         // open. As we're switching to a new toolchain,
         // use whatever widgets that toolchain had open
         // the last time it was saved
-        window.mainPage.switchToolchain(toolchainId);
+        window.mainPage.switchToolchain(toolchainId)
+          .then(() => {
+            window.mainPage.widgetPanels.setWidgets(
+              window.mainPage.toolchain.getMeta('preferredWidgets'));
+          });
       } else if (changedWidgets) {
-        // We've changed whatever widgets should be open
+        // We're only changing which widgets should be open
         window.mainPage.widgetPanels.setWidgets(params.widgets);
       }
     }

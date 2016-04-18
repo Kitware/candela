@@ -7,7 +7,11 @@ let ResetPasswordView = girder.views.ResetPasswordView.extend({
     self.listenToOnce(girder.events, 'g:alert', () => {
       // TODO: display a message that the
       // password reset request was successful
-      window.mainPage.overlay.render(null);
+      if (window.toolchain) {
+        window.mainPage.overlay.render(null);
+      } else {
+        window.mainPage.overlay.render('StartingScreen');
+      }
     });
   },
   render: function () {

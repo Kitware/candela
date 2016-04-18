@@ -5,8 +5,14 @@ let LoginView = girder.views.LoginView.extend({
     let self = this;
     window.mainPage.overlay.addCloseListeners();
     self.listenToOnce(girder.events, 'g:login.success', () => {
-      window.mainPage.currentUser.authenticate();
-      window.mainPage.overlay.render(null);
+      window.mainPage.currentUser.authenticate()
+        .then(() => {
+          if (window.toolchain) {
+            window.mainPage.overlay.render(null);
+          } else {
+            window.mainPage.overlay.render('StartingScreen');
+          }
+        });
     });
   },
   render: function () {

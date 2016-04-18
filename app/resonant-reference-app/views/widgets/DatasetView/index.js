@@ -19,11 +19,10 @@ let STATUS = {
 };
 
 let DatasetView = Widget.extend({
-  initialize: function (options) {
+  initialize: function () {
     let self = this;
-    Widget.prototype.initialize.apply(self, options);
+    Widget.prototype.initialize.apply(self, arguments);
     self.friendlyName = 'Dataset';
-    self.hashName = 'DatasetView';
 
     self.statusText.onclick = function () {
       window.mainPage.overlay.render('DatasetLibrary');

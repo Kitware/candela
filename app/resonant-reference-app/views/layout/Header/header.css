@@ -56,6 +56,10 @@
   padding-left: 0.25em;
 }
 
+#Header #toolchainHeader #toolchainIcons {
+  display: inherit;
+}
+
 #Header #toolchainName {
   background-color: inherit;
   color: inherit;
@@ -63,4 +67,5 @@
   font-size: inherit;
   width: 10em;
   margin: 0.25em;
+  text-align: center;
 }

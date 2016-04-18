@@ -52,6 +52,8 @@ let DatasetLibrary = Backbone.View.extend({
     });
     datasets.on('reset', function (items) {
       let datasetModels = items.models.filter(function (d) {
+        // TODO: find a more precise way of differentiating
+        // what items are datasets vs toolchains vs something else
         let ext = d.name();
         if (ext) {
           ext = ext.split('.');
@@ -61,6 +63,7 @@ let DatasetLibrary = Backbone.View.extend({
         }
         return Dataset.VALID_EXTENSIONS.indexOf(ext) !== -1;
       });
+      
       if (datasetModels.length > 0) {
         jQuery('#' + divId).show();
         jQuery('#' + divId + 'Header').show();
@@ -100,7 +103,6 @@ let DatasetLibrary = Backbone.View.extend({
             // swap it in (TODO: load multiple datasets)
             window.mainPage.toolchain.setDataset(d);
           } else {
-            console.log(d);
             if (d.meta && d.meta.exampleToolchainId) {
               // Load the example toolchain that this dataset's
               // metadata specifies
@@ -108,14 +110,14 @@ let DatasetLibrary = Backbone.View.extend({
             } else {
               // No default example toolchain has been
               // specified for this dataset; create an empty
-              // toolchain
+              // toolchain with this dataset
               window.mainPage.newToolchain().then(() => {
                 window.mainPage.toolchain.setDataset(d);
               });
             }
           }
           
-          // window.mainPage.widgetPanels.expandWidget('DatasetView');
+          // window.mainPage.widgetPanels.toggleWidget();
           window.mainPage.overlay.render(null);
         });
     });

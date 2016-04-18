@@ -13,6 +13,9 @@ import datasetIcon from '../../../images/dataset.svg';
 import mappingIcon from '../../../images/mapping.svg';
 import visualizationIcon from '../../../images/scatterplot.svg';
 
+import addDatasetIcon from '../../../images/addDataset.svg';
+import addVisualizationIcon from '../../../images/addVisualization.svg';
+
 import publicIcon from '../../../images/public.svg';
 import privateIcon from '../../../images/private.svg';
 import libraryIcon from '../../../images/library.svg';
@@ -22,6 +25,8 @@ let ICONS = {
   'DatasetView': datasetIcon,
   'MappingView': mappingIcon,
   'VisualizationView': visualizationIcon,
+  'AddDataset': addDatasetIcon,
+  'AddVisualization': addVisualizationIcon,
   'PublicUser': publicIcon,
   'PrivateUser': privateIcon,
   'PublicLibrary': libraryIcon,
@@ -100,16 +105,30 @@ let Header = Backbone.View.extend({
       
       // Set up all the widget icons
       let widgetIcons = window.mainPage.toolchain.getAllWidgetSpecs();
-
-      let widgetButtons = d3.select(self.el).select('#widgetIcons')
+      
+      // Prepend and append adding buttons
+      widgetIcons.unshift({
+        widgetType: 'AddDataset'
+      });
+      widgetIcons.push({
+        widgetType: 'AddVisualization'
+      })
+      
+      let widgetButtons = d3.select(self.el).select('#toolchainIcons')
         .selectAll('img.headerButton').data(widgetIcons);
       widgetButtons.enter().append('img')
         .attr('class', 'headerButton');
       widgetButtons.exit().remove();
       widgetButtons.attr('src', (d) => {
-        return ICONS[d.widget];
+        return ICONS[d.widgetType];
       }).on('click', (d) => {
-        window.mainPage.widgetPanels.expandWidget(d);
+        if (d.widgetType === 'AddDataset') {
+          // TODO: add a dataset
+        } else if (d.widgetType === 'AddVisualization') {
+          // TODO: add a visualization
+        } else {
+          window.mainPage.widgetPanels.toggleWidget(d, true);
+        }
       });
     } else {
       // We're in an empty state with no toolchain loaded
