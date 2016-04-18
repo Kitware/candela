@@ -3,20 +3,16 @@ let girder = window.girder;
 
 let User = girder.models.UserModel.extend({
   initialize: function () {
-    let self = this;
-    self.loggedIn = false;
-    self.preferences = new UserPreferences();
-    self.listenTo(self, 'rra:logout', self.handleUpdate);
-    self.listenTo(self, 'rra:login', self.handleUpdate);
-    self.authenticate();
+    this.loggedIn = false;
+    this.preferences = new UserPreferences();
+    this.listenTo(this, 'rra:logout', this.handleUpdate);
+    this.listenTo(this, 'rra:login', this.handleUpdate);
+    this.authenticate();
   },
   addListeners: function () {
-    let self = this;
-    self.preferences.addListeners();
+    this.preferences.addListeners();
   },
   authenticate: function (login) {
-    let self = this;
-
     if (login !== false) {
       login = true;
     }
@@ -24,26 +20,26 @@ let User = girder.models.UserModel.extend({
     return Promise.resolve(girder.restRequest({
       path: 'user/authentication',
       error: () => {
-        self.finishLogout();
+        this.finishLogout();
       },
       type: login ? 'GET' : 'DELETE'
-    })).then(function (resp) {
+    })).then(resp => {
       if (resp === null || login === false) {
-        self.finishLogout();
+        this.finishLogout();
       } else {
-        self.loggedIn = true;
-        self.clear({
+        this.loggedIn = true;
+        this.clear({
           silent: true
         }).set(resp.user);
-        self.authToken = resp.authToken;
-        self.trigger('rra:login');
+        this.authToken = resp.authToken;
+        this.trigger('rra:login');
         girder.events.trigger('g:login');
       }
-    }).catch(function (errorObj) {
+    }).catch(errorObj => {
       if (errorObj.statusText === 'Unauthorized') {
         // We don't yet have the appropriate
         // HTTP headers... so keep us logged out
-        self.finishLogout();
+        this.finishLogout();
       } else {
         // Something else happened
         window.mainPage.trigger('rra:error', errorObj);
@@ -51,37 +47,33 @@ let User = girder.models.UserModel.extend({
     });
   },
   finishLogout: function () {
-    let self = this;
-    let wasLoggedIn = self.loggedIn;
-    self.loggedIn = false;
-    self.clear({
+    let wasLoggedIn = this.loggedIn;
+    this.loggedIn = false;
+    this.clear({
       silent: true
     }).set({});
-    self.authToken = undefined;
+    this.authToken = undefined;
     if (wasLoggedIn) {
-      self.trigger('rra:logout');
+      this.trigger('rra:logout');
       // Girder uses g:login for both log in and log out
       girder.events.trigger('g:login');
     }
   },
   handleUpdate: function () {
-    let self = this;
-
-    if (self.loggedIn === false) {
+    if (this.loggedIn === false) {
       // Not logged in; clear all the preferences
-      self.preferences.resetToDefaults();
+      this.preferences.resetToDefaults();
     } else {
       // We're logged in! First, let's see if
       // the user already has preferences stored
-      self.preferences.fetch()
+      this.preferences.fetch()
         .catch((errorObj) => {
           window.mainPage.trigger('rra:error', errorObj);
         });
     }
   },
   isLoggedIn: function () {
-    let self = this;
-    return self.loggedIn;
+    return this.loggedIn;
   }
 });
 

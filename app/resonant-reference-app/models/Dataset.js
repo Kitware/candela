@@ -21,45 +21,42 @@ let VALID_EXTENSIONS = [
 
 let Dataset = MetadataItem.extend({
   initialize: function () {
-    let self = this;
-    self.rawCache = null;
-    self.parsedCache = null;
+    this.rawCache = null;
+    this.parsedCache = null;
     let meta = this.getMeta();
     if (!meta.fileType) {
-      self.inferFileType();
+      this.inferFileType();
     }
     if (!meta.attributes) {
-      self.inferAttributes();
+      this.inferAttributes();
     }
   },
   loadData: function (callback, cache = true) {
-    let self = this;
     // TODO: support more file formats / non-Girder
     // files (e.g. pasted browser data)
-    if (cache && self.rawCache !== null) {
-      callback(self.rawCache);
+    if (cache && this.rawCache !== null) {
+      callback(this.rawCache);
     } else {
       Promise.resolve(girder.restRequest({
-        path: 'item/' + self.getId() + '/download',
+        path: 'item/' + this.getId() + '/download',
         type: 'GET',
         error: null,
         dataType: 'text'
       })).then((data) => {
         if (cache) {
-          self.rawCache = data;
+          this.rawCache = data;
         }
         callback(data);
       }).catch(() => {
-        self.rawCache = null;
+        this.rawCache = null;
         callback(null);
       });
     }
   },
   getSpec: function () {
-    let self = this;
-    let meta = self.getMeta();
+    let meta = this.getMeta();
     let spec = {
-      name: self.name()
+      name: this.name()
     };
     if (!meta.attributes) {
       // We haven't inferred the attributes yet...
@@ -70,16 +67,15 @@ let Dataset = MetadataItem.extend({
     return spec;
   },
   getParsed: function (callback, cache = true) {
-    let self = this;
-    if (cache && self.parsedCache !== null) {
-      callback(self.parsedCache);
+    if (cache && this.parsedCache !== null) {
+      callback(this.parsedCache);
     } else {
       let parsedData;
-      self.loadData(function (rawData) {
+      this.loadData(rawData => {
         if (rawData === null) {
-          self.parsedCache = parsedData = null;
+          this.parsedCache = parsedData = null;
         } else {
-          let meta = self.getMeta();
+          let meta = this.getMeta();
           let formatPrefs = {
             type: meta.fileType
           };
@@ -97,7 +93,7 @@ let Dataset = MetadataItem.extend({
           }
 
           if (cache) {
-            self.parsedCache = parsedData;
+            this.parsedCache = parsedData;
           }
         }
         callback(parsedData);
@@ -105,42 +101,38 @@ let Dataset = MetadataItem.extend({
     }
   },
   inferFileType: function () {
-    let self = this;
-    let fileType = self.get('name');
+    let fileType = this.get('name');
     if (fileType === undefined || fileType.indexOf('.') === -1) {
       fileType = 'txt';
     } else {
       fileType = fileType.split('.');
       fileType = fileType[fileType.length - 1];
     }
-    self.setMeta('fileType', fileType);
-    self.saveThenTrigger(['rra:changeType']);
+    this.setMeta('fileType', fileType);
+    this.saveThenTrigger(['rra:changeType']);
   },
   setFileType: function (fileType) {
-    let self = this;
-    self.setMeta('fileType', fileType);
-    self.saveThenTrigger(['rra:changeType']);
+    this.setMeta('fileType', fileType);
+    this.saveThenTrigger(['rra:changeType']);
   },
   inferAttributes: function () {
-    let self = this;
-    self.getParsed(function (data) {
+    this.getParsed(data => {
       if (data === null) {
-        self.setMeta('attributes', {});
+        this.setMeta('attributes', {});
       } else {
-        self.setMeta('attributes', datalib.type.all(data));
+        this.setMeta('attributes', datalib.type.all(data));
       }
-      self.save().then(() => {
-        self.trigger('rra:changeSpec')
+      this.save().then(() => {
+        this.trigger('rra:changeSpec')
       });
     });
   },
   setAttribute: function (attrName, dataType) {
-    let self = this;
-    let attributes = self.getMeta('attributes');
+    let attributes = this.getMeta('attributes');
     attributes[attrName] = dataType;
-    self.setMeta('attributes', attributes);
-    self.save().then(() => {
-      self.trigger('rra:changeSpec')
+    this.setMeta('attributes', attributes);
+    this.save().then(() => {
+      this.trigger('rra:changeSpec')
     });
   }
 });

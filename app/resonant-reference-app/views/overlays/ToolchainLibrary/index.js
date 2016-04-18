@@ -11,34 +11,30 @@ let girder = window.girder;
 
 let ToolchainLibrary = Backbone.View.extend({
   initialize: function (params) {
-    let self = this;
-    self.keepOpenOnSelect = params.keepOpenOnSelect === true;
+    this.keepOpenOnSelect = params.keepOpenOnSelect === true;
     
-    self.listenTo(window.mainPage.currentUser, 'rra:updateLibrary', self.render);
-    self.listenTo(window.mainPage.currentUser, 'rra:updateLibrary', self.render);
+    this.listenTo(window.mainPage.currentUser, 'rra:updateLibrary', this.render);
+    this.listenTo(window.mainPage.currentUser, 'rra:updateLibrary', this.render);
     
     // The ToolchainLibrary is part of other views that may or
     // may not expect a toolchain to be open right now...
-    self.listenTo(window.mainPage, 'rra:changeToolchain',
-      self.handleNewToolchain);
-    self.handleNewToolchain();
+    this.listenTo(window.mainPage, 'rra:changeToolchain',
+      this.handleNewToolchain);
+    this.handleNewToolchain();
   },
   handleNewToolchain: function () {
-    let self = this;
     if (window.mainPage.toolchain) {
       // Don't bother re-rendering this view until we have the new toolchain's
       // updated status
-      self.listenTo(window.mainPage.toolchain, 'rra:changeStatus', self.render);
-      self.listenTo(window.mainPage.toolchain, 'rra:rename', self.render);
+      this.listenTo(window.mainPage.toolchain, 'rra:changeStatus', this.render);
+      this.listenTo(window.mainPage.toolchain, 'rra:rename', this.render);
     } else {
-      self.render();
+      this.render();
     }
   },
   render: Underscore.debounce(function () {
-    let self = this;
-
-    if (!self.addedTemplate) {
-      self.$el.html(myTemplate);
+    if (!this.addedTemplate) {
+      this.$el.html(myTemplate);
       
       jQuery('#girderLink').on('click', () => {
         window.mainPage.router.openUserDirectoriesInGirder();
@@ -52,7 +48,7 @@ let ToolchainLibrary = Backbone.View.extend({
         window.mainPage.overlay.render('RegisterView');
       });
       
-      self.addedTemplate = true;
+      this.addedTemplate = true;
     }
 
     // Start off with every section hidden
@@ -63,8 +59,8 @@ let ToolchainLibrary = Backbone.View.extend({
       path: 'resource/lookup?path=/collection/ReferenceApp/Toolchains',
       type: 'GET',
       error: null
-    })).then(function (folder) {
-      self.getFolderContents(folder, 'toolchainLibrary', libraryFileIcon);
+    })).then(folder => {
+      this.getFolderContents(folder, 'toolchainLibrary', libraryFileIcon);
     }).catch(() => {});
 
     if (window.mainPage.currentUser.isLoggedIn()) {
@@ -75,8 +71,8 @@ let ToolchainLibrary = Backbone.View.extend({
         path: 'folder/privateFolder',
         type: 'GET',
         error: null
-      })).then(function (folder) {
-        self.getFolderContents(folder, 'privateToolchains', privateFileIcon);
+      })).then(folder => {
+        this.getFolderContents(folder, 'privateToolchains', privateFileIcon);
       }).catch(() => {});
 
       // Get the set of the user's public toolchains
@@ -84,8 +80,8 @@ let ToolchainLibrary = Backbone.View.extend({
         path: 'folder/publicFolder',
         type: 'GET',
         error: null
-      })).then(function (folder) {
-        self.getFolderContents(folder, 'publicToolchains', publicFileIcon);
+      })).then(folder => {
+        this.getFolderContents(folder, 'publicToolchains', publicFileIcon);
       }).catch(() => {});
     } else {
       // The user is logged out
@@ -101,15 +97,14 @@ let ToolchainLibrary = Backbone.View.extend({
           },
           type: 'GET',
           error: null
-        })).then(function (items) {
-          self.renderToolchains(new girder.collections.ItemCollection(items),
+        })).then(items => {
+          this.renderToolchains(new girder.collections.ItemCollection(items),
             'scratchToolchains', scratchFileIcon);
         }).catch(() => {});
       }
     }
   }, 300),
   getFolderContents: function (folder, divId, icon) {
-    let self = this;
     let toolchains = new girder.collections.ItemCollection();
     toolchains.altUrl = 'item';
     toolchains.pageLimit = 100;
@@ -117,12 +112,11 @@ let ToolchainLibrary = Backbone.View.extend({
       folderId: folder._id
     });
     toolchains.on('reset', (items) => {
-      self.renderToolchains(items, divId, icon);
+      this.renderToolchains(items, divId, icon);
     });
   },
   renderToolchains: function (items, divId, icon) {
-    let self = this;
-    let toolchainModels = items.models.filter(function (d) {
+    let toolchainModels = items.models.filter(d => {
       if (!d.attributes || !d.attributes.meta) {
         return false;
       }
@@ -139,7 +133,9 @@ let ToolchainLibrary = Backbone.View.extend({
 
     let libraryButtons = d3.select('#' + divId)
       .selectAll('.circleButton')
-      .data(toolchainModels, (d) => d.id + d.name());
+      .data(toolchainModels, d => {
+        return d.id + d.name()
+      });
 
     let libraryButtonsEnter = libraryButtons.enter().append('div');
     libraryButtons.exit().remove();
@@ -158,14 +154,12 @@ let ToolchainLibrary = Backbone.View.extend({
 
     libraryButtonsEnter.append('span');
     libraryButtons.selectAll('span')
-      .text(function (d) {
-        return d.name();
-      });
+      .text(d => d.name());
 
     d3.select('#' + divId).selectAll('.circleButton')
-      .on('click', function (d) {
+      .on('click', d => {
         window.mainPage.switchToolchain(d.id);
-        if (!self.keepOpenOnSelect) {
+        if (!this.keepOpenOnSelect) {
           window.mainPage.overlay.render(null);
         }
       });

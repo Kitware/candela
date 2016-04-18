@@ -10,8 +10,7 @@ let girder = window.girder;
 
 let DatasetLibrary = Backbone.View.extend({
   render: function () {
-    let self = this;
-    self.$el.html(myTemplate);
+    this.$el.html(myTemplate);
     
     // Start off with every section hidden
     // (I know, this is dumb, but girder's
@@ -23,24 +22,24 @@ let DatasetLibrary = Backbone.View.extend({
       path: 'resource/lookup?path=/collection/ReferenceApp/Data',
       type: 'GET',
       error: null
-    })).then(function (folder) {
-      self.renderFolderContents(folder, 'datasetLibrary', libImage);
+    })).then(folder => {
+      this.renderFolderContents(folder, 'datasetLibrary', libImage);
     });
 
     Promise.resolve(girder.restRequest({
       path: 'folder/privateFolder',
       type: 'GET',
       error: null
-    })).then(function (folder) {
-      self.renderFolderContents(folder, 'privateDatasets', privateImage);
+    })).then(folder => {
+      this.renderFolderContents(folder, 'privateDatasets', privateImage);
     });
     
     Promise.resolve(girder.restRequest({
       path: 'folder/publicFolder',
       type: 'GET',
       error: null
-    })).then(function (folder) {
-      self.renderFolderContents(folder, 'publicDatasets', publicImage);
+    })).then(folder => {
+      this.renderFolderContents(folder, 'publicDatasets', publicImage);
     });
   },
   renderFolderContents: function (folder, divId, image) {
@@ -51,7 +50,7 @@ let DatasetLibrary = Backbone.View.extend({
       folderId: folder._id
     });
     datasets.on('reset', function (items) {
-      let datasetModels = items.models.filter(function (d) {
+      let datasetModels = items.models.filter(d => {
         // TODO: find a more precise way of differentiating
         // what items are datasets vs toolchains vs something else
         let ext = d.name();
@@ -92,12 +91,10 @@ let DatasetLibrary = Backbone.View.extend({
 
       libraryButtonsEnter.append('span');
       libraryButtons.selectAll('span')
-        .text(function (d) {
-          return d.name();
-        });
+        .text(d => d.name());
 
       d3.select('#' + divId).selectAll('.circleButton')
-        .on('click', function (d) {
+        .on('click', d => {
           if (window.mainPage.toolchain) {
             // We already have a toolchain loaded, so
             // swap it in (TODO: load multiple datasets)

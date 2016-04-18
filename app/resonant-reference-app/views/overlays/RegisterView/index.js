@@ -2,9 +2,8 @@ let girder = window.girder;
 
 let RegisterView = girder.views.RegisterView.extend({
   initialize: function () {
-    let self = this;
     window.mainPage.overlay.addCloseListeners();
-    self.listenToOnce(girder.events, 'g:login', () => {
+    this.listenToOnce(girder.events, 'g:login', () => {
       window.mainPage.currentUser.authenticate()
         .then(() => {
           if (window.toolchain) {
@@ -16,11 +15,10 @@ let RegisterView = girder.views.RegisterView.extend({
     });
   },
   render: function () {
-    let self = this;
-    girder.views.RegisterView.prototype.render.apply(self, arguments);
+    girder.views.RegisterView.prototype.render.apply(this, arguments);
       
-    self.$el.find('button.close, .modal-footer > a')
-      .on('click', function () {
+    this.$el.find('button.close, .modal-footer > a')
+      .on('click', () => {
         if (window.mainPage.toolchain) {
           window.mainPage.overlay.render(null);
         } else {
@@ -28,7 +26,7 @@ let RegisterView = girder.views.RegisterView.extend({
         }
       });
     
-    self.$el.find('a.g-login-link').on('click', () => {
+    this.$el.find('a.g-login-link').on('click', () => {
       window.mainPage.overlay.render('LoginView');
     });
   }

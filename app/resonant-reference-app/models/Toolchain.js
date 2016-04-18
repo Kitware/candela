@@ -28,36 +28,33 @@ let Toolchain = MetadataItem.extend({
     };
   },
   initialize: function () {
-    let self = this;
-
-    self.status = {
+    this.status = {
       editable: false,
       location: null
     };
-    
-    self.listenTo(window.mainPage.currentUser, 'rra:login',
-      self.updateStatus);
-    self.listenTo(window.mainPage.currentUser, 'rra:logout',
-      self.updateStatus);
-    self.listenTo(window.mainPage.widgetPanels, 'rra:navigateWidgets',
-      self.storePreferredWidgets);
+
+    this.listenTo(window.mainPage.currentUser, 'rra:login',
+      this.updateStatus);
+    this.listenTo(window.mainPage.currentUser, 'rra:logout',
+      this.updateStatus);
+    this.listenTo(window.mainPage.widgetPanels, 'rra:navigateWidgets',
+      this.storePreferredWidgets);
   },
   updateStatus: Underscore.debounce(function (copyOnError) {
-    let self = this;
-    let id = self.getId();
+    let id = this.getId();
 
     // Look up where the toolchain lives,
     // and whether the user can edit it
-    
+
     if (id === undefined) {
       if (copyOnError) {
-        self.makeCopy();
+        this.makeCopy();
       } else {
-        self.status = {
+        this.status = {
           editable: false,
           location: null
         };
-        self.trigger('rra:changeStatus');
+        this.trigger('rra:changeStatus');
         return Promise.reject(new Error('Toolchain has no ID'));
       }
     }
@@ -66,23 +63,22 @@ let Toolchain = MetadataItem.extend({
       path: 'item/' + id + '/info',
       type: 'GET'
     })).then((resp) => {
-      self.status = resp;
+      this.status = resp;
     }).catch(() => {
-      self.status = {
+      this.status = {
         editable: false,
         location: null
       };
       if (copyOnError) {
-        self.makeCopy();
+        this.makeCopy();
       }
     }).then(() => {
-      self.trigger('rra:changeStatus');
+      this.trigger('rra:changeStatus');
     });
 
     return statusPromise;
   }, 300),
   makeCopy: function () {
-    let self = this;
     /*
     When something weird happens (e.g. the user is
     trying to edit a toolchain that they don't have write
@@ -98,17 +94,16 @@ let Toolchain = MetadataItem.extend({
       window.mainPage.switchToolchain(null);
       window.mainPage.trigger('rra:error', err);
     }
-    
-    self.unset('_id');
-    return self.create()
+
+    this.unset('_id');
+    return this.create()
       .then(() => {
         window.mainPage.trigger('rra:createToolchain');
-        self.updateStatus();
+        this.updateStatus();
       }).catch(_fail);
   },
   getMeta: function (key) {
-    let self = this;
-    let meta = MetadataItem.prototype.getMeta.apply(self, [key]);
+    let meta = MetadataItem.prototype.getMeta.apply(this, [key]);
 
     /*
       Everything in metadata is squashed down into JSON-compatible
@@ -117,18 +112,18 @@ let Toolchain = MetadataItem.extend({
       re-attach any listeners that would have been lost in
       round-trips to the server
     */
-    
+
     if (key === undefined) {
       if (meta.datasets instanceof Array) {
         meta.datasets = new Dataset.Collection(meta.datasets);
-        self.listenTo(meta.datasets, 'rra:changeSpec', self.changeSpec);
+        this.listenTo(meta.datasets, 'rra:changeSpec', this.changeSpec);
       }
       if (meta.preferredWidgets instanceof Array) {
         meta.preferredWidgets = new Set(meta.preferredWidgets);
       }
     } else if (key === 'datasets' && meta instanceof Array) {
       meta = new Dataset.Collection(meta);
-      self.listenTo(meta, 'rra:changeSpec', self.changeSpec);
+      this.listenTo(meta, 'rra:changeSpec', this.changeSpec);
     } else if (key === 'preferredWidgets' && meta instanceof Array) {
       meta = new Set(meta.preferredWidgets);
     }
@@ -136,47 +131,43 @@ let Toolchain = MetadataItem.extend({
     return meta;
   },
   setMeta: function (key, value) {
-    let self = this;
-    let meta = self.get('meta') || {};
-    
+    let meta = this.get('meta') || {};
+
     /*
       For the same reason as getMeta, we need to override setMeta
       so that we appropriately handle the flattening process
     */
-    
+
     if (typeof key === 'object') {
       let obj = key;
       for (key of Object.keys(obj)) {
         meta[key] = obj[key];
         if (key === 'preferredWidgets' &&
-            meta[key] instanceof Set) {
+          meta[key] instanceof Set) {
           meta[key] = [...meta[key]];
         }
       }
     } else {
       meta[key] = value;
     }
-    self.set('meta', meta);
+    this.set('meta', meta);
   },
   isEmpty: function () {
-    let self = this;
-    let meta = self.getMeta();
+    let meta = this.getMeta();
     return meta.datasets.length === 0 &&
       meta.visualizations.length === 0 &&
       meta.mappings.length === 0;
   },
   rename: function (newName) {
-    let self = this;
-    self.set('name', newName);
-    self.save().then(() => {
-      self.trigger('rra:rename');
+    this.set('name', newName);
+    this.save().then(() => {
+      this.trigger('rra:rename');
     }).catch((errorObj) => {
       window.mainPage.trigger('rra:error', errorObj);
     });
   },
   getDatasetIds: function () {
-    let self = this;
-    let datasets = self.getMeta('datasets');
+    let datasets = this.getMeta('datasets');
     let ids = [];
     datasets.each(function (dataset) {
       if (dataset.id) {
@@ -186,19 +177,18 @@ let Toolchain = MetadataItem.extend({
     return ids;
   },
   setDataset: function (newDataset, index = 0) {
-    let self = this;
     // Need to convert the raw girder.ItemModel
     // (when we add it to meta.datasets, it gets
     // auto-converted to our Dataset model)
     newDataset = newDataset.toJSON();
 
-    let meta = self.getMeta();
+    let meta = this.getMeta();
 
     // Okay, we're actually swapping
     // in a different dataset
     if (index >= meta.datasets.length) {
       meta.datasets.push(newDataset);
-      self.setMeta(meta);
+      this.setMeta(meta);
     } else {
       let oldDataset = meta.datasets.at(index);
       if (oldDataset.get('_id') !== newDataset['_id']) {
@@ -208,41 +198,39 @@ let Toolchain = MetadataItem.extend({
         });
         // Swapping in a new dataset invalidates the mappings
         meta.mappings = [];
-        self.setMeta(meta);
+        this.setMeta(meta);
       }
     }
-    self.save().then(() => {
-      self.trigger('rra:changeDatasets');
-      self.trigger('rra:changeMappings');
+    this.save().then(() => {
+      this.trigger('rra:changeDatasets');
+      this.trigger('rra:changeMappings');
     }).catch((errorObj) => {
       window.mainPage.trigger('rra:error', errorObj);
     });
   },
   setVisualization: function (newVisualization, index = 0) {
-    let self = this;
-    let meta = self.getMeta();
+    let meta = this.getMeta();
 
     if (index >= meta.visualizations.length) {
       meta.visualizations.push(newVisualization);
-      self.set('meta', meta);
+      this.set('meta', meta);
     } else {
       if (meta.visualizations[index].name !== newVisualization.name) {
         meta.visualizations[index] = newVisualization;
         // Swapping in a new dataset invalidates the mappings
         meta.mappings = [];
-        self.setMeta(meta);
+        this.setMeta(meta);
       }
     }
-    self.save().then(() => {
-      self.trigger('rra:changeVisualizations');
-      self.trigger('rra:changeMappings');
+    this.save().then(() => {
+      this.trigger('rra:changeVisualizations');
+      this.trigger('rra:changeMappings');
     }).catch((errorObj) => {
       window.mainPage.trigger('rra:error', errorObj);
     });
   },
   shapeDataForVis: function (callback, index = 0) {
-    let self = this;
-    let meta = self.getMeta();
+    let meta = this.getMeta();
 
     // TODO: use the mapping to transform
     // the parsed data into the shape that
@@ -255,8 +243,7 @@ let Toolchain = MetadataItem.extend({
     }
   },
   getVisOptions: function (index = 0) {
-    let self = this;
-    let meta = self.getMeta();
+    let meta = this.getMeta();
     let options = {};
 
     // Figure out which options allow multiple fields
@@ -282,16 +269,14 @@ let Toolchain = MetadataItem.extend({
     return options;
   },
   changeSpec: function () {
-    let self = this;
-    if (self.validateMappings() === true) {
+    if (this.validateMappings() === true) {
       // validateMappings will trigger this on its own
       // if the mappings were invalid
-      self.trigger('rra:changeMappings');
+      this.trigger('rra:changeMappings');
     }
   },
   validateMappings: function () {
-    let self = this;
-    let meta = self.getMeta();
+    let meta = this.getMeta();
 
     // Go through all the mappings and make sure that:
     // 1. The data types are still compatible
@@ -320,9 +305,9 @@ let Toolchain = MetadataItem.extend({
     }
 
     if (indicesToTrash.length > 0) {
-      self.setMeta(meta);
-      self.save().then(() => {
-        self.trigger('rra:changeMappings');
+      this.setMeta(meta);
+      this.save().then(() => {
+        this.trigger('rra:changeMappings');
       });
       return false;
     } else {
@@ -330,8 +315,7 @@ let Toolchain = MetadataItem.extend({
     }
   },
   addMapping: function (mapping) {
-    let self = this;
-    let meta = self.get('meta');
+    let meta = this.get('meta');
 
     // Figure out if the vis option allows multiple fields
     let addedMapping = false;
@@ -356,16 +340,15 @@ let Toolchain = MetadataItem.extend({
       meta.mappings.push(mapping);
     }
 
-    self.setMeta(meta);
-    self.save().then(() => {
-      self.trigger('rra:changeMappings');
+    this.setMeta(meta);
+    this.save().then(() => {
+      this.trigger('rra:changeMappings');
     }).catch((errorObj) => {
       window.mainPage.trigger('rra:error', errorObj);
     });
   },
   removeMapping: function (mapping) {
-    let self = this;
-    let meta = self.getMeta();
+    let meta = this.getMeta();
 
     let mappingToSplice = null;
     for (let [index, m] of meta.mappings.entries()) {
@@ -381,19 +364,17 @@ let Toolchain = MetadataItem.extend({
       meta.mappings.splice(mappingToSplice, 1);
     }
 
-    self.setMeta(meta);
-    self.save().then(() => {
-      self.trigger('rra:changeMappings');
+    this.setMeta(meta);
+    this.save().then(() => {
+      this.trigger('rra:changeMappings');
     }).catch((errorObj) => {
       window.mainPage.trigger('rra:error', errorObj);
     });
   },
   getAllWidgetSpecs: function () {
-    let self = this;
-
     // Construct a list of all the widgets that
     // this toolchain needs
-    let meta = self.getMeta();
+    let meta = this.getMeta();
     let result = [];
     let widgetSpec;
 
@@ -420,12 +401,11 @@ let Toolchain = MetadataItem.extend({
       widgetSpec.hashName = 'VisualizationView' + i;
       result.push(widgetSpec);
     }
-    
+
     return result;
   },
   storePreferredWidgets: function () {
-    let self = this;
-    self.setMeta('preferredWidgets',
+    this.setMeta('preferredWidgets',
       window.mainPage.widgetPanels.expandedWidgets);
   }
 });

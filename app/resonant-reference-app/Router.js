@@ -31,54 +31,47 @@ var Router = Backbone.Router.extend({
     return result;
   },
   initialize: function () {
-    let self = this;
-
-    self.on('route:handleRoute', self.handleRoute);
-    self.on('route:emptyRoute', self.emptyRoute);
-    self.on('route:defaultRoute', self.defaultRoute);
+    this.on('route:handleRoute', this.handleRoute);
+    this.on('route:emptyRoute', this.emptyRoute);
+    this.on('route:defaultRoute', this.defaultRoute);
     Backbone.history.start();
   },
   emptyRoute: function () {
-    let self = this;
-
-    if (!self.initialRoute) {
+    if (!this.initialRoute) {
       // This is the first url we've come to;
       // because we have nothing better to go
       // on, we'll start with no toolchain and
       // no widget
-      self.initialRoute = {
+      this.initialRoute = {
         toolchainId: null,
         params: {
           widgets: new Set()
         }
       };
     } else {
-      self.handleRoute(null, {
+      this.handleRoute(null, {
         widgets: new Set()
       });
     }
   },
   defaultRoute: function () {
-    let self = this;
     // Bad url; nuke whatever weird crap
     // is in the URL, and treat it like an empty one
-    self.navigate('', {
+    this.navigate('', {
       replace: true,
       trigger: false
     });
-    self.emptyRoute();
+    this.emptyRoute();
 
     // TODO: We should probably display a nicer error
     // like Github's this-is-not-the-page-you-were-
     // looking-for 404 screen
   },
   handleRoute: function (toolchainId, params) {
-    let self = this;
-
-    if (!self.initialRoute) {
+    if (!this.initialRoute) {
       // Store the preferred route; our first time through,
       // there won't be a toolchain or widgetPanels to work with
-      self.initialRoute = {
+      this.initialRoute = {
         toolchainId: toolchainId,
         params: params
       };
@@ -115,14 +108,13 @@ var Router = Backbone.Router.extend({
     }
   },
   applyInitialRoute: function () {
-    let self = this;
     // We wait to apply the initial route until
     // after the whole DOM has been set up
-    window.mainPage.switchToolchain(self.initialRoute.toolchainId)
+    window.mainPage.switchToolchain(this.initialRoute.toolchainId)
       .then(() => {
-        window.mainPage.widgetPanels.setWidgets(self.initialRoute
+        window.mainPage.widgetPanels.setWidgets(this.initialRoute
           .params.widgets);
-        if (self.initialRoute.toolchainId) {
+        if (this.initialRoute.toolchainId) {
           // The user specified which toolchain they want in
           // the URL, so don't bother them with a dialog asking
           // them to pick one
@@ -131,11 +123,10 @@ var Router = Backbone.Router.extend({
       });
   },
   addListeners: function () {
-    let self = this;
     // Listen to events that signal that the url needs to be updated
-    self.listenTo(window.mainPage, 'rra:changeToolchain', self.updateUrl);
-    self.listenTo(window.mainPage.widgetPanels,
-      'rra:navigateWidgets', self.updateUrl);
+    this.listenTo(window.mainPage, 'rra:changeToolchain', this.updateUrl);
+    this.listenTo(window.mainPage.widgetPanels,
+      'rra:navigateWidgets', this.updateUrl);
   },
   constructFragment: function (toolchainId, widgets) {
     let fragment = 'toolchain/' + toolchainId;
@@ -147,7 +138,6 @@ var Router = Backbone.Router.extend({
     return fragment;
   },
   updateUrl: function () {
-    let self = this;
     if (!window.mainPage ||
       window.mainPage.toolchain === undefined ||
       !window.mainPage.widgetPanels) {
@@ -158,14 +148,14 @@ var Router = Backbone.Router.extend({
     }
     if (window.mainPage.toolchain === null) {
       // There is no toolchain loaded, so clear the URL
-      self.navigate('', {
+      this.navigate('', {
         trigger: true
       });
       return;
     } else {
       let toolchainId = window.mainPage.toolchain.getId();
       let widgets = window.mainPage.widgetPanels.expandedWidgets;
-      self.navigate(self.constructFragment(toolchainId, widgets), {
+      this.navigate(this.constructFragment(toolchainId, widgets), {
         trigger: true
       });
     }

@@ -49,7 +49,6 @@ let MetadataItem = girder.models.ItemModel.extend({
       This function tries to capture and route all of
       them appropriately.
     */
-    let self = this;
 
     promiseObj = Promise.resolve(promiseObj);
 
@@ -61,18 +60,18 @@ let MetadataItem = girder.models.ItemModel.extend({
         rejecting the promise because we never heard back
       */
       let timeout, forceResolve, forceReject;
-      
+
       let waiter = new Promise((resolve, reject) => {
         forceResolve = resolve;
         forceReject = reject;
       });
       promiseObj = Promise.all([promiseObj, waiter]);
 
-      self.listenToOnce(self, callbacks.successEvent, function () {
+      this.listenToOnce(this, callbacks.successEvent, function () {
         window.clearTimeout(timeout);
         forceResolve.apply(waiter, arguments);
       });
-      self.listenToOnce(self, callbacks.errorEvent, function () {
+      this.listenToOnce(this, callbacks.errorEvent, function () {
         window.clearTimeout(timeout);
         forceReject.apply(waiter, arguments);
       });
@@ -86,7 +85,8 @@ let MetadataItem = girder.models.ItemModel.extend({
     // beforeSuccess is a function that should
     // be called before options.success
     beforeSuccess = beforeSuccess || (() => {});
-
+    
+    let self = this;
     promiseObj.then(function () {
       // Things were successfully; call whatToDo first,
       // and then call options.success if it exists
@@ -108,14 +108,13 @@ let MetadataItem = girder.models.ItemModel.extend({
     return promiseObj;
   },
   sync: function (method, model, options) {
-    let self = this;
     options = options || {};
 
     // Clear any leftover girder callbacks
-    self.stopListening(self, 'g:error');
-    self.stopListening(self, 'g:saved');
-    self.stopListening(self, 'g:fetched');
-    self.stopListening(self, 'g:deleted');
+    this.stopListening(this, 'g:error');
+    this.stopListening(this, 'g:saved');
+    this.stopListening(this, 'g:fetched');
+    this.stopListening(this, 'g:deleted');
 
     // Error and success functions to make sure
     // the regular events get fired
@@ -124,29 +123,29 @@ let MetadataItem = girder.models.ItemModel.extend({
       // By default, we want to save new items in the user's
       // Private folder or in the public scratch space:
 
-      return self.wrapInPromise(girder.restRequest({
+      return this.wrapInPromise(girder.restRequest({
         path: 'item/scratchItem',
         data: {
-          name: self.get('name'),
-          description: self.get('description') || '',
+          name: this.get('name'),
+          description: this.get('description') || '',
           reuseExisting: false
         },
         type: 'GET'
       }), options, (resp) => {
         // This *should* assign us our new ID:
-        self.set(resp, {
+        this.set(resp, {
           silent: true
         });
-        
-        if (!self.getId()) {
+
+        if (!this.getId()) {
           throw new Error('Got a scratch item without an ID');
         } else {
           // And now we want to finish creating
           // the item by saving our current state
           // (this calls sync again, but that's
           // a good thing in case we have metadata
-          
-          self.sync('update', model, options);
+
+          this.sync('update', model, options);
         }
       });
     } else if (method === 'update') {
@@ -155,56 +154,56 @@ let MetadataItem = girder.models.ItemModel.extend({
       // rest of the item, as well as doing fancy
       // user state logic)
       let args = {
-        name: self.get('name')
+        name: this.get('name')
       };
-      let desc = self.get('description');
+      let desc = this.get('description');
       if (desc) {
         args.description = desc
       }
-      
-      if (!self.getId()) {
+
+      if (!this.getId()) {
         // We don't have anywhere to save to! Create
         // the item instead
-        return self.sync('create', model, options);
+        return this.sync('create', model, options);
       }
-      
-      return self.wrapInPromise(girder.restRequest({
-        path: 'item/' + self.getId() + '/updateScratch?' +
+
+      return this.wrapInPromise(girder.restRequest({
+        path: 'item/' + this.getId() + '/updateScratch?' +
           jQuery.param(args),
         contentType: 'application/json',
-        data: JSON.stringify(self.get('meta')),
+        data: JSON.stringify(this.get('meta')),
         type: 'POST'
       }), options, (resp) => {
         // It's possible that the id changed
         // in the process (e.g. a copy of
         // the toolchain was made
         // because the user is logged out)
-        self.set(resp, {
+        this.set(resp, {
           silent: true
         });
       });
     } else if (method === 'read') {
-      if (self.getId() === undefined) {
+      if (this.getId() === undefined) {
         // If we haven't yet identified the id, look for it
         // in the Private folder by item name / create
         // an item there if it doesn't exist
-        return self.wrapInPromise(girder.restRequest({
+        return this.wrapInPromise(girder.restRequest({
           path: 'item/privateItem',
           data: {
-            name: self.get('name') || 'Untitled Item',
-            description: self.get('description') || ''
+            name: this.get('name') || 'Untitled Item',
+            description: this.get('description') || ''
           },
           type: 'GET'
         }), options, (resp) => {
           // Load up everything we just got
-          self.set(resp, {
+          this.set(resp, {
             silent: true
           });
         });
       } else {
         // Otherwise, just go with the default girder behavior
-        return self.wrapInPromise(
-          girder.models.ItemModel.prototype.fetch.apply(self),
+        return this.wrapInPromise(
+          girder.models.ItemModel.prototype.fetch.apply(this),
           options, null, {
             successEvent: 'g:fetched',
             errorEvent: 'g:error'
@@ -213,50 +212,45 @@ let MetadataItem = girder.models.ItemModel.extend({
     } else if (method === 'delete') {
       // We'll already have an id if there's something to delete...
       // so just use the default girder behavior
-      let promise = self.wrapInPromise(
-        girder.models.ItemModel.prototype.destroy.apply(self),
+      let promise = this.wrapInPromise(
+        girder.models.ItemModel.prototype.destroy.apply(this),
         options, null, {
           successEvent: 'g:deleted',
           errorEvent: 'g:error'
         });
       // In the mean time let's clear the id so we
       // don't go thinking we're synced anymore
-      self.unset(self.idAttribute, {
+      this.unset(this.idAttribute, {
         silent: true
       });
       return promise;
     }
   },
   fetch: function (options) {
-    let self = this;
-    return self.sync('read', self.toJSON(), options);
+    return this.sync('read', this.toJSON(), options);
   },
   create: function (attributes, options) {
-    let self = this;
     if (attributes) {
-      self.set(attributes, {
+      this.set(attributes, {
         silent: true
       });
     }
-    self.unset(self.idAttribute, {
+    this.unset(this.idAttribute, {
       silent: true
     });
-    return self.sync('create', self.toJSON(), options);
+    return this.sync('create', this.toJSON(), options);
   },
   save: function (attributes, options) {
-    let self = this;
     if (attributes) {
-      self.set(attributes, options);
+      this.set(attributes, options);
     }
-    return self.sync('update', self.toJSON(), options);
+    return this.sync('update', this.toJSON(), options);
   },
   destroy: function (options) {
-    let self = this;
-    return self.sync('delete', self.toJSON(), options);
+    return this.sync('delete', this.toJSON(), options);
   },
   setMeta: function (key, value) {
-    let self = this;
-    let meta = self.get('meta');
+    let meta = this.get('meta');
     meta = meta || {};
     if (typeof key === 'object') {
       let obj = key;
@@ -266,22 +260,20 @@ let MetadataItem = girder.models.ItemModel.extend({
     } else {
       meta[key] = value;
     }
-    self.set('meta', meta);
+    this.set('meta', meta);
   },
   unsetMeta: function (key) {
-    let self = this;
-    let meta = self.get('meta');
+    let meta = this.get('meta');
     meta = meta || {};
     if (key !== undefined) {
       meta[key] = null;
-      self.set('meta', meta);
+      this.set('meta', meta);
     } else {
-      self.unset('meta');
+      this.unset('meta');
     }
   },
   getMeta: function (key) {
-    let self = this;
-    let meta = self.get('meta');
+    let meta = this.get('meta');
     meta = meta || {};
     if (key !== undefined) {
       return meta[key];
@@ -290,12 +282,10 @@ let MetadataItem = girder.models.ItemModel.extend({
     }
   },
   getId: function () {
-    let self = this;
-    return self.get(self.idAttribute);
+    return this.get(this.idAttribute);
   },
   previousMeta: function (key) {
-    let self = this;
-    let prevMeta = self.previous('meta');
+    let prevMeta = this.previous('meta');
     prevMeta = prevMeta || {};
     if (key !== undefined) {
       return prevMeta[key];
@@ -304,14 +294,13 @@ let MetadataItem = girder.models.ItemModel.extend({
     }
   },
   hasMetaChanged: function (key, eqFunc) {
-    let self = this;
-    eqFunc = eqFunc || function (a, b) {
+    eqFunc = eqFunc || ((a, b) => {
       return a === b;
-    };
+    });
     if (key === undefined) {
-      return self.hasChanged('meta');
+      return this.hasChanged('meta');
     } else {
-      return !eqFunc(self.previousMeta(key), self.getMeta(key));
+      return !eqFunc(this.previousMeta(key), this.getMeta(key));
     }
   }
 });

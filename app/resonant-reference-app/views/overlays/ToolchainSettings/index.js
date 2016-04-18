@@ -61,60 +61,56 @@ function toggleCallback() {
 
 let ToolchainSettings = Backbone.View.extend({
   initialize: function () {
-    let self = this;
-    self.listenTo(window.mainPage.toolchain, 'rra:changeStatus', self.render);
-    self.listenTo(window.mainPage, 'rra:changeToolchain', self.handleNewToolchain);
+    this.listenTo(window.mainPage.toolchain, 'rra:changeStatus', this.render);
+    this.listenTo(window.mainPage, 'rra:changeToolchain', this.handleNewToolchain);
   },
   handleNewToolchain: function () {
-    let self = this;
     if (window.mainPage.toolchain) {
       // Don't bother re-rendering this view until we have the new toolchain's
       // updated status
-      self.listenTo(window.mainPage.toolchain, 'rra:changeStatus', self.render);
-      self.listenTo(window.mainPage.toolchain, 'rra:rename', self.render);
+      this.listenTo(window.mainPage.toolchain, 'rra:changeStatus', this.render);
+      this.listenTo(window.mainPage.toolchain, 'rra:rename', this.render);
     }
   },
   render: function () {
-    let self = this;
-    
     if (!window.mainPage.toolchain) {
       // Ignore spurious render calls (there should always
       // be a toolchain to see this view)
       return;
     }
 
-    if (!self.addedTemplate) {
-      self.$el.html(myTemplate);
+    if (!this.addedTemplate) {
+      this.$el.html(myTemplate);
 
-      self.library = new ToolchainLibrary({
+      this.library = new ToolchainLibrary({
         el: '#libraryChunk',
         keepOpenOnSelect: true
       });
 
       // Wire up simple events that don't change
-      self.$el.find('#copyLinkButton').on('click', () => {
+      this.$el.find('#copyLinkButton').on('click', () => {
         window.copyTextToClipboard(window.location.href);
       });
 
-      self.$el.find('#girderButton').on('click', () => {
+      this.$el.find('#girderButton').on('click', () => {
         window.mainPage.router.openToolchainInGirder();
       });
 
-      self.$el.find('#saveAsButton').on('click', function () {
+      this.$el.find('#saveAsButton').on('click', () => {
         window.mainPage.toolchain.makeCopy();
       });
-      
-      self.$el.find('a#loginLink').on('click', () => {
+
+      this.$el.find('a#loginLink').on('click', () => {
         window.mainPage.overlay.render('LoginView');
       });
 
-      self.$el.find('a#registerLink').on('click', () => {
+      this.$el.find('a#registerLink').on('click', () => {
         window.mainPage.overlay.render('RegisterView');
       });
-      
-      self.$el.find('input[name="toolchainVisibility"]').off('click');
 
-      self.$el.find('#deleteButton').on('click', function () {
+      this.$el.find('input[name="toolchainVisibility"]').off('click');
+
+      this.$el.find('#deleteButton').on('click', () => {
         window.mainPage.toolchain.destroy()
           .then(() => {
             window.mainPage.switchToolchain(null);
@@ -135,66 +131,67 @@ let ToolchainSettings = Backbone.View.extend({
           });
       });
 
-      self.$el.find('#newButton').on('click', function () {
+      this.$el.find('#newButton').on('click', () => {
         window.mainPage.newToolchain();
       });
 
-      self.addedTemplate = true;
-    }
-    
-    if (window.mainPage.currentUser.isLoggedIn()) {
-      self.$el.find('#loginLinks').hide();
-    } else {
-      self.$el.find('#loginLinks').show();
+      this.addedTemplate = true;
     }
 
-    self.library.render();
+    if (window.mainPage.currentUser.isLoggedIn()) {
+      this.$el.find('#loginLinks').hide();
+    } else {
+      this.$el.find('#loginLinks').show();
+    }
+
+    this.library.render();
 
     // Set up the settings part of the dialog
-    self.$el.find('#toolchainNameField')
+    this.$el.find('#toolchainNameField')
       .val(window.mainPage.toolchain.get('name'));
-    self.$el.find('#toolchainNameField').on('keyup',
+    this.$el.find('#toolchainNameField').on('keyup',
       Underscore.debounce(function () {
+        // this refers to the DOM element
         window.mainPage.toolchain.rename(this.value);
       }, 300));
 
     let status = window.mainPage.toolchain.status;
 
     if (status.editable) {
-      self.$el.find('#editabilityIcon')
+      this.$el.find('#editabilityIcon')
         .attr('src', canEditIcon);
-      self.$el.find('#editabilityLabel')
+      this.$el.find('#editabilityLabel')
         .text('You can edit this toolchain');
     } else {
-      self.$el.find('#editabilityIcon')
+      this.$el.find('#editabilityIcon')
         .attr('src', cantEditIcon);
-      self.$el.find('#editabilityLabel')
+      this.$el.find('#editabilityLabel')
         .text('You can\'t edit this toolchain');
     }
-    
+
     if (status.editable && window.mainPage.currentUser.isLoggedIn()) {
-      self.$el.find('#deleteButton').prop('disabled', '');
+      this.$el.find('#deleteButton').prop('disabled', '');
     } else {
-      self.$el.find('#deleteButton').prop('disabled', true);
+      this.$el.find('#deleteButton').prop('disabled', true);
     }
 
-    self.$el.find('#visibilityIcon')
+    this.$el.find('#visibilityIcon')
       .attr('src', visibilityIcons[status.location]);
-    self.$el.find('#visibilityLabel')
+    this.$el.find('#visibilityLabel')
       .text(visibilityLabels[status.location]);
-    self.$el.find('input[name="toolchainVisibility"][value="' + status.location + '"]')
+    this.$el.find('input[name="toolchainVisibility"][value="' + status.location + '"]')
       .prop('checked', true);
     if (window.mainPage.currentUser.isLoggedIn()) {
-      self.$el.find('#scratchVisibility, #libraryVisibility')
+      this.$el.find('#scratchVisibility, #libraryVisibility')
         .prop('disabled', true);
-      self.$el.find('#publicVisibility, #privateVisibility')
+      this.$el.find('#publicVisibility, #privateVisibility')
         .prop('disabled', '')
         .on('click', toggleCallback);
     } else {
-      self.$el.find('#scratchVisibility')
+      this.$el.find('#scratchVisibility')
         .prop('disabled', '')
         .on('click', toggleCallback);
-      self.$el.find('#publicVisibility, #privateVisibility, #libraryVisibility')
+      this.$el.find('#publicVisibility, #privateVisibility, #libraryVisibility')
         .prop('disabled', true);
     }
   }

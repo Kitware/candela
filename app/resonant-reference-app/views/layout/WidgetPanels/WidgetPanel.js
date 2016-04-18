@@ -24,32 +24,29 @@ let ICONS = {
 
 let WidgetPanel = Backbone.View.extend({
   initialize: function (spec) {
-    let self = this;
-    self.spec = spec;
-    self.widget = new WIDGETS[spec.widgetType](spec);
+    this.spec = spec;
+    this.widget = new WIDGETS[spec.widgetType](spec);
   },
   render: function () {
-    let self = this;
-
     // We need a header
-    let header = d3.select(self.el)
+    let header = d3.select(this.el)
       .selectAll('span.sectionHeader').data([0]);
     let headerEnter = header.enter().append('span')
       .attr('class', 'sectionHeader')
       .on('click', () => {
-        self.widget.toggle();
+        this.widget.toggle();
       });
 
     // Add the icon that goes with the panel
     headerEnter.append('img')
-      .attr('src', ICONS[self.widget.spec.widgetType]);
+      .attr('src', ICONS[this.widget.spec.widgetType]);
 
     // Add a title to the header that collapses / expands
     // the section
     headerEnter.append('h2')
       .attr('class', 'title');
     header.select('h2.title')
-      .text(self.widget.friendlyName);
+      .text(this.widget.friendlyName);
 
     // Add a little space for the widget to
     // store status indicators and icons
@@ -63,43 +60,41 @@ let WidgetPanel = Backbone.View.extend({
 
     // Finally, a div (that will scroll)
     // to contain the view
-    let container = d3.select(self.el)
-      .selectAll('div#' + self.spec.hashName + 'Container')
+    let container = d3.select(this.el)
+      .selectAll('div#' + this.spec.hashName + 'Container')
       .data([0]);
     container.enter().append('div').attr({
-      id: self.spec.hashName + 'Container',
-      class: self.spec.widgetType + ' content'
+      id: this.spec.hashName + 'Container',
+      class: this.spec.widgetType + ' content'
     });
 
     // Now let's let the widget know
     // that we have its element
-    self.widget.setPanel(self);
+    this.widget.setPanel(this);
 
-    self.widget.render();
+    this.widget.render();
 
-    self.renderIndicators();
+    this.renderIndicators();
   },
   renderIndicators() {
-    let self = this;
-
-    let indicators = d3.select(self.el)
+    let indicators = d3.select(this.el)
       .select('span.indicators');
 
     indicators.select('span.indicatorText')
-      .text(self.widget.statusText.text)
-      .attr('title', self.widget.statusText.title
-            ? self.widget.statusText.title : null)
+      .text(this.widget.statusText.text)
+      .attr('title', this.widget.statusText.title
+        ? this.widget.statusText.title : null)
       .on('click', () => {
         d3.event.stopPropagation();
-        if (self.widget.statusText.onclick) {
-          self.widget.statusText.onclick(d3.event);
+        if (this.widget.statusText.onclick) {
+          this.widget.statusText.onclick(d3.event);
         }
       });
 
     // Update our set of indicator icons
-    let indicatorIcons = d3.select(self.el)
+    let indicatorIcons = d3.select(this.el)
       .select('span.indicatorIcons')
-      .selectAll('img').data(self.widget.icons);
+      .selectAll('img').data(this.widget.icons);
 
     indicatorIcons.enter().append('img');
     indicatorIcons.exit().remove();

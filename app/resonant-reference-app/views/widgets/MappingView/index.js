@@ -22,75 +22,72 @@ let EDGE_MODES = {
 
 let MappingView = Widget.extend({
   initialize: function () {
-    let self = this;
-    Widget.prototype.initialize.apply(self, arguments);
+    Widget.prototype.initialize.apply(this, arguments);
     
-    self.friendlyName = 'Mapping';
+    this.friendlyName = 'Mapping';
 
-    self.newInfo = true;
-    self.icons.splice(0, 0, {
-      src: function () {
-        return self.newInfo ? Widget.newInfoIcon : Widget.infoIcon;
+    this.newInfo = true;
+    this.icons.splice(0, 0, {
+      src: () => {
+        return this.newInfo ? Widget.newInfoIcon : Widget.infoIcon;
       },
-      title: function () {
+      title: () => {
         return 'About this panel';
       },
-      onclick: function () {
-        self.renderInfoScreen();
+      onclick: () => {
+        this.renderInfoScreen();
       }
     });
 
-    self.ok = false;
-    self.icons.splice(0, 0, {
-      src: function () {
-        if (self.ok === true) {
+    this.ok = false;
+    this.icons.splice(0, 0, {
+      src: () => {
+        if (this.ok === true) {
           return Widget.okayIcon;
         } else {
           return Widget.warningIcon;
         }
       },
-      title: function () {
-        if (self.ok === true) {
+      title: () => {
+        if (this.ok === true) {
           return 'All the needed mappings have been specified';
         } else {
           return 'Something isn\'t quite right; click for details';
         }
       },
-      onclick: function () {
-        self.renderHelpScreen();
+      onclick: () => {
+        this.renderHelpScreen();
       }
     });
 
-    self.selection = null;
+    this.selection = null;
 
-    self.listenTo(window.mainPage.toolchain, 'rra:changeMappings', function () {
-      self.selection = null;
-      self.render();
+    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings', () => {
+      this.selection = null;
+      this.render();
     });
   },
   renderInfoScreen: function () {
-    let self = this;
-    self.newInfo = false;
-    self.renderIndicators();
+    this.newInfo = false;
+    this.renderIndicators();
 
     window.mainPage.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
-    let self = this;
     let screen;
-    if (self.ok === true) {
-      screen = self.getSuccessScreen(`
+    if (this.ok === true) {
+      screen = this.getSuccessScreen(`
 You've wired up all the connections that the visualization needs.
 Well done!`);
     } else {
       let meta = window.mainPage.toolchain.get('meta');
       if (!meta || !meta.visualizations || !meta.visualizations[0] ||
         !meta.datasets || !meta.datasets[0]) {
-        screen = self.getErrorScreen(`
+        screen = this.getErrorScreen(`
 You need to choose both a Dataset and a Visualization
 in order to connect them together.`);
       } else {
-        screen = self.getErrorScreen(`
+        screen = this.getErrorScreen(`
 The visualization needs more connections to data in
 order to display anything.`);
       }
@@ -109,8 +106,6 @@ order to display anything.`);
       .replace(/([^A-Za-z0-9[\]{}_.:-])\s?/g, '');
   },
   constructLookups: function () {
-    let self = this;
-
     let meta = window.mainPage.toolchain.getMeta();
 
     let specs = {
@@ -118,10 +113,10 @@ order to display anything.`);
       vis: []
     };
 
-    meta.datasets.each(function (d) {
+    meta.datasets.each(d => {
       specs.data.push(d.getSpec());
     });
-    meta.visualizations.forEach(function (d) {
+    meta.visualizations.forEach(d => {
       specs.vis.push(d);
     });
 
@@ -133,28 +128,28 @@ order to display anything.`);
     let nodeEdgeLookup = {};
 
     // Helper functions
-    function _createNode(side, groupIndex, attrName, attrType) {
+    let _createNode = (side, groupIndex, attrName, attrType) => {
       let newNode = {
         side: side,
         index: groupIndex,
         attrName: attrName,
         type: attrType
       };
-      newNode.id = self.createNodeId(newNode);
+      newNode.id = this.createNodeId(newNode);
       nodeLookup[newNode.id] = nodes.length;
 
-      if (self.selection === null) {
+      if (this.selection === null) {
         newNode.mode = NODE_MODES.WILL_SELECT;
-      } else if (self.selection.id === newNode.id) {
+      } else if (this.selection.id === newNode.id) {
         newNode.mode = NODE_MODES.SELECTED;
-      } else if (self.selection.side === newNode.side) {
+      } else if (this.selection.side === newNode.side) {
         // You can always switch to selecting
         // a different node on the same side
         newNode.mode = NODE_MODES.WILL_SELECT;
       } else if (newNode.side === 'vis') {
         // Does the selected data node's type match
         // an of our compatible types?
-        if (newNode.type.indexOf(self.selection.baseType) === -1) {
+        if (newNode.type.indexOf(this.selection.baseType) === -1) {
           newNode.mode = NODE_MODES.INELIGIBLE;
         } else {
           newNode.mode = NODE_MODES.WILL_CONNECT;
@@ -162,7 +157,7 @@ order to display anything.`);
       } else {
         // Is our type compatible with any of the
         // vis node's types?
-        if (self.selection.baseType.indexOf(newNode.type) === -1) {
+        if (this.selection.baseType.indexOf(newNode.type) === -1) {
           newNode.mode = NODE_MODES.INELIGIBLE;
         } else {
           newNode.mode = NODE_MODES.WILL_CONNECT;
@@ -172,13 +167,15 @@ order to display anything.`);
       nodeEdgeLookup[newNode.id] = [];
     }
 
-    function _createEdge(established, visIndex, visAttrName, dataIndex, dataAttrName) {
+    let _createEdge = (established, visIndex,
+                       visAttrName, dataIndex,
+                       dataAttrName) => {
       // Edges always go from data to vis
-      let sourceId = self.createNodeId({
+      let sourceId = this.createNodeId({
         index: dataIndex,
         attrName: dataAttrName
       });
-      let targetId = self.createNodeId({
+      let targetId = this.createNodeId({
         index: visIndex,
         attrName: visAttrName
       });
@@ -186,18 +183,18 @@ order to display anything.`);
         source: nodeLookup[sourceId],
         target: nodeLookup[targetId]
       };
-      newEdge.id = self.createEdgeId(newEdge);
+      newEdge.id = this.createEdgeId(newEdge);
       if (established) {
         // These edges already exist
         newEdge.mode = EDGE_MODES.ESTABLISHED;
-        if (self.selection !== null) {
+        if (this.selection !== null) {
           // Special settings for edges attached
           // to the selected node, as well as
           // the nodes on the other end
-          if (sourceId === self.selection.id) {
+          if (sourceId === this.selection.id) {
             nodes[nodeLookup[targetId]].mode = NODE_MODES.WILL_DISCONNECT;
             newEdge.mode = EDGE_MODES.ESTABLISHED_SELECTED;
-          } else if (targetId === self.selection.id) {
+          } else if (targetId === this.selection.id) {
             nodes[nodeLookup[sourceId]].mode = NODE_MODES.WILL_DISCONNECT;
             newEdge.mode = EDGE_MODES.ESTABLISHED_SELECTED;
           }
@@ -214,11 +211,11 @@ order to display anything.`);
         // filtered the list before calling _createEdge, but
         // it's easier to filter based on the node modes
         // that we already set up)
-        if (self.selection.side === 'vis') {
+        if (this.selection.side === 'vis') {
           if (nodes[newEdge.source].mode !== NODE_MODES.WILL_CONNECT) {
             return;
           }
-        } else if (self.selection.side === 'data') {
+        } else if (this.selection.side === 'data') {
           if (nodes[newEdge.target].mode !== NODE_MODES.WILL_CONNECT) {
             return;
           }
@@ -237,36 +234,36 @@ order to display anything.`);
     }
 
     // Extract all the nodes (from both sides)
-    specs.data.forEach(function (dataSpec, dataIndex) {
+    specs.data.forEach((dataSpec, dataIndex) => {
       for (let attrName of Object.keys(dataSpec.attributes)) {
         _createNode('data', dataIndex, attrName, dataSpec.attributes[attrName]);
       }
     });
-    specs.vis.forEach(function (visSpec, visIndex) {
-      visSpec.options.forEach(function (option, attrIndex) {
+    specs.vis.forEach((visSpec, visIndex) => {
+      visSpec.options.forEach((option, attrIndex) => {
         _createNode('vis', visIndex, option.name, option.domain.fieldTypes);
       });
     });
 
     // Get the established edges
-    meta.mappings.forEach(function (mapping) {
+    meta.mappings.forEach(mapping => {
       _createEdge(true, mapping.visIndex, mapping.visAttribute,
         mapping.dataIndex, mapping.dataAttribute);
     });
 
     // Add the potential and probable edges
-    if (self.selection !== null) {
-      if (self.selection.side === 'data') {
-        specs.vis.forEach(function (visSpec, visIndex) {
-          visSpec.options.forEach(function (option) {
+    if (this.selection !== null) {
+      if (this.selection.side === 'data') {
+        specs.vis.forEach((visSpec, visIndex) => {
+          visSpec.options.forEach(option => {
             _createEdge(false, visIndex, option.name,
-              self.selection.index, self.selection.attrName);
+              this.selection.index, this.selection.attrName);
           });
         });
       } else {
-        specs.data.forEach(function (dataSpec, dataIndex) {
+        specs.data.forEach((dataSpec, dataIndex) => {
           for (let attrName of Object.keys(dataSpec.attributes)) {
-            _createEdge(false, self.selection.index, self.selection.attrName,
+            _createEdge(false, this.selection.index, this.selection.attrName,
               dataIndex, attrName);
           }
         });
@@ -281,8 +278,6 @@ order to display anything.`);
     };
   },
   handleClick: function (d) {
-    let self = this;
-
     d3.event.stopPropagation();
     let visNode;
     let dataNode;
@@ -290,22 +285,22 @@ order to display anything.`);
     // Interactions are different, depending on our state
     if (d.mode === NODE_MODES.WILL_SELECT) {
       // Change the selection
-      self.selection = {
+      this.selection = {
         side: d.side,
         index: d.index,
         attrName: d.attrName,
         baseType: d.type
       };
-      self.selection.id = self.createNodeId(self.selection);
-      self.render();
+      this.selection.id = this.createNodeId(this.selection);
+      this.render();
     } else if (d.mode === NODE_MODES.WILL_CONNECT) {
       // Establish a connection from the
       // selected node to the clicked node
       if (d.side === 'vis') {
         visNode = d;
-        dataNode = self.selection;
+        dataNode = this.selection;
       } else {
-        visNode = self.selection;
+        visNode = this.selection;
         dataNode = d;
       }
       window.mainPage.toolchain.addMapping({
@@ -319,9 +314,9 @@ order to display anything.`);
       // selected node and the clicked node
       if (d.side === 'vis') {
         visNode = d;
-        dataNode = self.selection;
+        dataNode = this.selection;
       } else {
-        visNode = self.selection;
+        visNode = this.selection;
         dataNode = d;
       }
       window.mainPage.toolchain.removeMapping({
@@ -331,23 +326,21 @@ order to display anything.`);
         dataAttribute: dataNode.attrName
       });
     } else if (d.mode === NODE_MODES.SELECTED) {
-      self.selection = null;
-      self.render();
+      this.selection = null;
+      this.render();
     }
   },
   render: function () {
-    let self = this;
-
     // Construct a graph from each of the specs
     // (and the currently selected node)
-    let graph = self.constructLookups();
+    let graph = this.constructLookups();
 
     // The vis and data nodes will be in contiguous
     // blocks in graph.nodes... rather than split them
     // into their own lists and render them seperately,
     // we can just do a little index trickery:
     let firstData, lastData, firstVis, lastVis;
-    graph.nodes.forEach(function (d, i) {
+    graph.nodes.forEach((d, i) => {
       if (d.side === 'vis') {
         if (firstVis === undefined) {
           firstVis = i;
@@ -366,25 +359,25 @@ order to display anything.`);
 
     // Update our little indicator
     // to describe the mapping
-    self.statusText.text = graph.realEdgeCount + ' / ' + numVis;
-    self.statusText.title = graph.realEdgeCount + ' of ' + numVis +
+    this.statusText.text = graph.realEdgeCount + ' / ' + numVis;
+    this.statusText.title = graph.realEdgeCount + ' of ' + numVis +
       ' visual channels have been mapped';
     if (graph.realEdgeCount === 0) {
-      self.ok = false;
+      this.ok = false;
     } else {
-      self.ok = true;
+      this.ok = true;
     }
-    self.renderIndicators();
+    this.renderIndicators();
 
     // Add our template if it's not already there
-    if (self.$el.find('svg').length === 0) {
-      self.$el.html(myTemplate);
+    if (this.$el.find('svg').length === 0) {
+      this.$el.html(myTemplate);
       // Add the function to deselect everything when
       // the canvas is clicked
-      d3.select(self.el).select('svg')
-        .on('click', function () {
-          self.selection = null;
-          self.render();
+      d3.select(this.el).select('svg')
+        .on('click', () => {
+          this.selection = null;
+          this.render();
         });
     }
 
@@ -394,12 +387,12 @@ order to display anything.`);
 
     // Temporarily force the scroll bars so we
     // account for their size
-    self.$el.css('overflow', 'scroll');
+    this.$el.css('overflow', 'scroll');
     let bounds = {
-      width: self.el.clientWidth,
-      height: self.el.clientHeight
+      width: this.el.clientWidth,
+      height: this.el.clientHeight
     };
-    self.$el.css('overflow', '');
+    this.$el.css('overflow', '');
 
     // If there isn't enough room for all
     // the nodes, extend the height
@@ -407,7 +400,7 @@ order to display anything.`);
       1.5 * nodeHeight * (numData + 2),
       1.5 * nodeHeight * (numVis + 2));
 
-    self.$el.find('svg')
+    this.$el.find('svg')
       .attr({
         width: bounds.width,
         height: bounds.height
@@ -423,7 +416,7 @@ order to display anything.`);
       .domain([firstVis - 1, lastVis + 1])
       .range([0, bounds.height]);
 
-    let nodes = d3.select(self.el).select('svg')
+    let nodes = d3.select(this.el).select('svg')
       .select('.nodeLayer')
       .selectAll('.node').data(graph.nodes, d => {
         return d.id + d.type;
@@ -452,30 +445,30 @@ order to display anything.`);
         classString += ' attribute';
       }
       return classString + ' node';
-    }).attr('transform', function (d, i) {
+    }).attr('transform', (d, i) => {
       if (d.side === 'vis') {
         return 'translate(' + visX + ',' + visY(i) + ')';
       } else {
         return 'translate(' + dataX + ',' + dataY(i) + ')';
       }
-    }).on('mouseover', function (d) {
+    }).on('mouseover', d => {
       // Highlight this node
       jQuery(this).addClass('hovered');
       // Highlight the edge between this node and the selection
-      if (self.selection !== null && self.selection.id !== d.id) {
-        graph.nodeEdgeLookup[d.id].forEach(function (edgeIndex) {
+      if (this.selection !== null && this.selection.id !== d.id) {
+        graph.nodeEdgeLookup[d.id].forEach(edgeIndex => {
           let edge = graph.edges[edgeIndex];
-          if (graph.nodes[edge.source].id === self.selection.id ||
-            graph.nodes[edge.target].id === self.selection.id) {
+          if (graph.nodes[edge.source].id === this.selection.id ||
+            graph.nodes[edge.target].id === this.selection.id) {
             jQuery('#' + graph.edges[edgeIndex].id).addClass('hovered');
           }
         });
       }
-    }).on('mouseout', function (d) {
+    }).on('mouseout', d => {
       // Clear any highlights
-      self.$el.find('.hovered').removeClass('hovered');
-    }).on('click', function (d) {
-      self.handleClick(d);
+      this.$el.find('.hovered').removeClass('hovered');
+    }).on('click', d => {
+      this.handleClick(d);
     });
 
     enteringNodes.append('rect');
@@ -489,7 +482,7 @@ order to display anything.`);
     enteringNodes.append('text')
       .attr('class', 'label')
       .attr('y', 0);
-    nodes.selectAll('text.label').text(function (d) {
+    nodes.selectAll('text.label').text(d => {
       return d.attrName;
     });
 
@@ -497,7 +490,7 @@ order to display anything.`);
       .attr('class', 'types');
     nodes.selectAll('text.types')
       .attr('y', nodeHeight / 3)
-      .text(function (d) {
+      .text(d => {
         if (d.side === 'data') {
           return d.type;
         } else {
@@ -507,7 +500,7 @@ order to display anything.`);
       });
 
     // Draw the connections
-    let edges = d3.select(self.el).select('svg')
+    let edges = d3.select(this.el).select('svg')
       .select('.linkLayer')
       .selectAll('.edge').data(graph.edges, d => d.id);
     edges.enter().append('path');
@@ -526,34 +519,34 @@ order to display anything.`);
         classString = 'probable';
       }
       return classString + ' edge';
-    }).attr('d', function (d) {
+    }).attr('d', d => {
       let pathString = 'M' + (dataX + nodeWidth / 2) + ',' +
         dataY(d.source) +
         'L' + (visX - nodeWidth / 2) + ',' +
         visY(d.target);
       return pathString;
-    }).on('mouseover', function (d) {
+    }).on('mouseover', d => {
       jQuery(this).addClass('hovered');
       // If one end is selected, highlight the other end
       let nodeToHighlight;
-      if (self.selection === null) {
+      if (this.selection === null) {
         return;
-      } else if (self.selection.side === 'vis') {
+      } else if (this.selection.side === 'vis') {
         nodeToHighlight = graph.nodes[d.source];
       } else {
         nodeToHighlight = graph.nodes[d.target];
       }
-      self.$el.find('#' + nodeToHighlight.id).addClass('hovered');
-    }).on('mouseout', function (d) {
+      this.$el.find('#' + nodeToHighlight.id).addClass('hovered');
+    }).on('mouseout', d => {
       // Clear any highlights
-      self.$el.find('.hovered').removeClass('hovered');
-    }).on('click', function (d) {
-      if (self.selection === null) {
+      this.$el.find('.hovered').removeClass('hovered');
+    }).on('click', d => {
+      if (this.selection === null) {
         return;
-      } else if (self.selection.side === 'vis') {
-        self.handleClick(graph.nodes[d.source]);
+      } else if (this.selection.side === 'vis') {
+        this.handleClick(graph.nodes[d.source]);
       } else {
-        self.handleClick(graph.nodes[d.target]);
+        this.handleClick(graph.nodes[d.target]);
       }
     });
   }

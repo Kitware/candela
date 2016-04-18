@@ -6,8 +6,7 @@ import candela from './../../../../../src/candela';
 
 let VisualizationLibrary = Backbone.View.extend({
   render: function () {
-    let self = this;
-    self.$el.html(myTemplate);
+    this.$el.html(myTemplate);
 
     // For any candela vis that has a spec defined, extract
     // field options for our mapping options.
@@ -43,7 +42,7 @@ let VisualizationLibrary = Backbone.View.extend({
       .text(d => d.name);
 
     d3.select('div.libraryInterface').selectAll('.circleButton')
-      .on('click', function (d) {
+      .on('click', d => {
         if (window.mainPage.toolchain) {
           // We already have a toolchain loaded, so
           // swap it in (TODO: load multiple visualizations?)

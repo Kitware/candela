@@ -16,47 +16,42 @@ import successTemplate from './successTemplate.html';
 
 let Widget = Backbone.View.extend({
   initialize: function (spec) {
-    let self = this;
-    self.friendlyName = 'ERROR! Abstract Widget!';
-    self.spec = spec;
-    self.statusText = {
+    this.friendlyName = 'ERROR! Abstract Widget!';
+    this.spec = spec;
+    this.statusText = {
       text: '',
-      onclick: function () {
-        self.panel.toggle();
+      onclick: () => {
+        this.panel.toggle();
       }
     };
 
-    self.icons = [{
-      src: function () {
-        return self.isTargeted() ? collapseIcon : expandIcon;
+    this.icons = [{
+      src: () => {
+        return this.isTargeted() ? collapseIcon : expandIcon;
       },
-      title: function () {
-        return self.isTargeted() ? 'Collapse Panel' : 'Expand Panel';
+      title: () => {
+        return this.isTargeted() ? 'Collapse Panel' : 'Expand Panel';
       },
-      onclick: function () {
-        self.toggle();
+      onclick: () => {
+        this.toggle();
       }
     }];
-    
-    self.panel = null;
+
+    this.panel = null;
   },
   toggle: function () {
-    let self = this;
-    window.mainPage.widgetPanels.toggleWidget(self.spec);
+    window.mainPage.widgetPanels.toggleWidget(this.spec);
   },
   isTargeted: function () {
-    let self = this;
     return window.mainPage.widgetPanels.expandedWidgets
-      .has(self.spec.hashName);
+      .has(this.spec.hashName);
   },
   setPanel: function (panel) {
-    let self = this;
-    self.panel = panel;
-    self.setElement(jQuery('#' + self.spec.hashName + 'Container')[0]);
+    this.panel = panel;
+    this.setElement(jQuery('#' + this.spec.hashName + 'Container')[0]);
   },
   renderIndicators: function () {
-    let self = this;
-    self.panel.renderIndicators();
+    this.panel.renderIndicators();
   },
   getLoadingScreen: function (message) {
     return Underscore.template(loadingTemplate)({

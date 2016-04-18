@@ -20,11 +20,10 @@ you move or delete this item, your preferences will be lost.`,
     };
   },
   addListeners: function () {
-    let self = this;
-    self.listenTo(window.mainPage.currentUser, 'rra:login',
-      self.adoptScratchToolchains);
-    self.listenTo(window.mainPage, 'rra:createToolchain',
-      self.claimToolchain);
+    this.listenTo(window.mainPage.currentUser, 'rra:login',
+      this.adoptScratchToolchains);
+    this.listenTo(window.mainPage, 'rra:createToolchain',
+      this.claimToolchain);
   },
   claimToolchain: function () {
     if (!window.mainPage.currentUser.isLoggedIn()) {
@@ -51,9 +50,9 @@ you move or delete this item, your preferences will be lost.`,
     // Attempt to adopt any toolchains that this browser
     // created in the public scratch space into the
     // now-logged-in user's Private folder
-    
+
     let scratchToolchains = window.localStorage.getItem('scratchToolchains');
-    
+
     if (scratchToolchains) {
       Promise.resolve(girder.restRequest({
         path: 'item/adoptScratchItems',
@@ -73,24 +72,22 @@ you move or delete this item, your preferences will be lost.`,
     }
   },
   resetToDefaults: function () {
-    let self = this;
     // The user has logged out, or some other authentication
     // problem is going on. This sets the app to the initial
     // empty state as if no one is logged in
-    self.clear({
+    this.clear({
       silent: true
     });
-    self.set(self.defaults);
-    self.adoptScratchToolchains();
+    this.set(this.defaults);
+    this.adoptScratchToolchains();
   },
   levelUp: function (achievement) {
-    let self = this;
-    let achievements = self.getMeta('achievements');
+    let achievements = this.getMeta('achievements');
     if (achievements[achievement] !== true) {
       achievements[achievement] = true;
-      self.setMeta('achievements', achievements);
-      self.save();
-      self.trigger('rra:levelUp');
+      this.setMeta('achievements', achievements);
+      this.save();
+      this.trigger('rra:levelUp');
     }
   }
 });

@@ -20,86 +20,83 @@ let STATUS = {
 
 let DatasetView = Widget.extend({
   initialize: function () {
-    let self = this;
-    Widget.prototype.initialize.apply(self, arguments);
-    self.friendlyName = 'Dataset';
+    Widget.prototype.initialize.apply(this, arguments);
+    this.friendlyName = 'Dataset';
 
-    self.statusText.onclick = function () {
+    this.statusText.onclick = () => {
       window.mainPage.overlay.render('DatasetLibrary');
     };
-    self.statusText.title = 'Click to select a different dataset.';
+    this.statusText.title = 'Click to select a different dataset.';
 
-    self.newInfo = true;
-    self.icons.splice(0, 0, {
-      src: function () {
-        return self.newInfo ? Widget.newInfoIcon : Widget.infoIcon;
+    this.newInfo = true;
+    this.icons.splice(0, 0, {
+      src: () => {
+        return this.newInfo ? Widget.newInfoIcon : Widget.infoIcon;
       },
-      title: function () {
+      title: () => {
         return 'About this panel';
       },
-      onclick: function () {
-        self.renderInfoScreen();
+      onclick: () => {
+        this.renderInfoScreen();
       }
     });
 
-    self.status = STATUS.NO_DATA;
-    self.icons.splice(0, 0, {
-      src: function () {
-        if (self.status === STATUS.LOADING) {
+    this.status = STATUS.NO_DATA;
+    this.icons.splice(0, 0, {
+      src: () => {
+        if (this.status === STATUS.LOADING) {
           return Widget.spinnerIcon;
-        } else if (self.status === STATUS.SUCCESS) {
+        } else if (this.status === STATUS.SUCCESS) {
           return Widget.okayIcon;
         } else {
           return Widget.warningIcon;
         }
       },
-      title: function () {
-        if (self.status === STATUS.LOADING) {
+      title: () => {
+        if (this.status === STATUS.LOADING) {
           return 'The dataset hasn\'t finished loading yet';
-        } else if (self.status === STATUS.SUCCESS) {
+        } else if (this.status === STATUS.SUCCESS) {
           return 'The dataset appears to have loaded correctly';
         } else {
           return 'Something isn\'t quite right; click for details';
         }
       },
-      onclick: function () {
-        self.renderHelpScreen();
+      onclick: () => {
+        this.renderHelpScreen();
       }
     });
 
-    self.listenTo(window.mainPage.toolchain, 'rra:changeDatasets',
-                  self.render);
-    self.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
-                  self.renderAttributeSettings);
+    this.listenTo(window.mainPage.toolchain, 'rra:changeDatasets',
+                  this.render);
+    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
+                  this.renderAttributeSettings);
   },
   renderInfoScreen: function () {
-    let self = this;
-    self.newInfo = false;
-    self.renderIndicators();
+    this.newInfo = false;
+    this.renderIndicators();
 
     window.mainPage.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
-    let self = this;
     let screen;
-    if (self.status === STATUS.NO_DATA) {
-      screen = self.getErrorScreen(`
+    if (this.status === STATUS.NO_DATA) {
+      screen = this.getErrorScreen(`
 You have not chosen a dataset yet. Click 
 <a onclick="window.mainPage.overlay.render('DatasetLibrary')">
 here</a> to choose one.`);
-    } else if (self.status === STATUS.SUCCESS) {
-      screen = self.getSuccessScreen(`
+    } else if (this.status === STATUS.SUCCESS) {
+      screen = this.getSuccessScreen(`
 The dataset appears to have loaded correctly.`);
-    } else if (self.status === STATUS.CANT_LOAD) {
-      screen = self.getErrorScreen(`
+    } else if (this.status === STATUS.CANT_LOAD) {
+      screen = this.getErrorScreen(`
 The dataset could not be loaded; there is a good chance
 that there is a permissions problem.`);
-    } else if (self.status === STATUS.CANT_PARSE) {
-      screen = self.getErrorScreen(`
+    } else if (this.status === STATUS.CANT_PARSE) {
+      screen = this.getErrorScreen(`
 There was a problem parsing the data; you'll probably need to
 <a>edit</a> or <a>reshape</a> the data in order to use it.`);
-    } else if (self.status === STATUS.NO_ATTRIBUTES) {
-      screen = self.getErrorScreen(`
+    } else if (this.status === STATUS.NO_ATTRIBUTES) {
+      screen = this.getErrorScreen(`
 There was a problem parsing the data. Specifically, we're having
 trouble understanding the dataset attributes (usually column headers);
 you'll probably need to
@@ -109,7 +106,6 @@ you'll probably need to
     window.mainPage.overlay.render(screen);
   },
   renderAttributeSettings: function () {
-    let self = this;
     let datasets = window.mainPage.toolchain.getMeta('datasets');
     let dataset;
     let attrs;
@@ -123,7 +119,7 @@ you'll probably need to
     // TODO: this is technically cheating; relying on the order
     // of the dict entries to preserve the order on screen
 
-    let cells = d3.select(self.el).select('#attributeSettings')
+    let cells = d3.select(this.el).select('#attributeSettings')
       .selectAll('div.cell')
       .data(attrOrder, d => d + attrs[d]);
     let cellsEnter = cells.enter().append('div')
@@ -148,32 +144,30 @@ you'll probably need to
       });
   },
   render: function () {
-    let self = this;
-
     // Get the dataset in the toolchain (if there is one)
     let dataset = window.mainPage.toolchain.getMeta('datasets');
     if (dataset) {
       dataset = dataset.at(0);
     }
 
-    self.$el.html(myTemplate);
+    this.$el.html(myTemplate);
 
     // Temporarily force the scroll bars so we
     // account for their size
-    /* self.$el.css('overflow', 'scroll');
+    /* this.$el.css('overflow', 'scroll');
     let bounds = {
-      width: self.el.clientWidth,
-      height: self.el.clientHeight
+      width: this.el.clientWidth,
+      height: this.el.clientHeight
     };
-    self.$el.find('#attributeSettings')
+    this.$el.find('#attributeSettings')
       .css('width', bounds.width + 'px')
       .css('height', '75px');
-    self.$el.find('#editor')
+    this.$el.find('#editor')
       .css('width', bounds.width + 'px')
       .css('height', (bounds.height - 75) + 'px');
-    self.$el.css('overflow', '');*/
+    this.$el.css('overflow', '');*/
 
-    self.renderAttributeSettings();
+    this.renderAttributeSettings();
 
     let editor = ace.edit('editor');
     editor.setOptions({
@@ -185,37 +179,37 @@ you'll probably need to
 
     if (!dataset) {
       editor.setValue('');
-      self.status = STATUS.NO_DATA;
-      self.statusText.text = 'No file loaded';
-      self.renderIndicators();
+      this.status = STATUS.NO_DATA;
+      this.statusText.text = 'No file loaded';
+      this.renderIndicators();
     } else {
-      self.status = STATUS.LOADING;
-      self.statusText.text = 'Loading...';
-      self.renderIndicators();
+      this.status = STATUS.LOADING;
+      this.statusText.text = 'Loading...';
+      this.renderIndicators();
 
-      dataset.getParsed(function (parsedData) {
+      dataset.getParsed(parsedData => {
         let rawData = dataset.rawCache;
         let spec = dataset.getSpec();
         if (rawData === null) {
           editor.setValue('');
-          self.status = STATUS.CANT_LOAD;
-          self.statusText.text = 'ERROR';
-          self.renderIndicators();
+          this.status = STATUS.CANT_LOAD;
+          this.statusText.text = 'ERROR';
+          this.renderIndicators();
         } else if (parsedData === null) {
           editor.setValue(rawData);
-          self.status = STATUS.CANT_PARSE;
-          self.statusText.text = 'ERROR';
-          self.renderIndicators();
+          this.status = STATUS.CANT_PARSE;
+          this.statusText.text = 'ERROR';
+          this.renderIndicators();
         } else if (Object.keys(spec.attributes).length === 0) {
           editor.setValue(rawData);
-          self.status = STATUS.NO_ATTRIBUTES;
-          self.statusText.text = 'ERROR';
-          self.renderIndicators();
+          this.status = STATUS.NO_ATTRIBUTES;
+          this.statusText.text = 'ERROR';
+          this.renderIndicators();
         } else {
           editor.setValue(rawData);
-          self.status = STATUS.SUCCESS;
-          self.statusText.text = dataset.get('name');
-          self.renderIndicators();
+          this.status = STATUS.SUCCESS;
+          this.statusText.text = dataset.get('name');
+          this.renderIndicators();
         }
       });
     }

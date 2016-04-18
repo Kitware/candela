@@ -37,34 +37,29 @@ import './header.css';
 
 let Header = Backbone.View.extend({
   initialize: function () {
-    let self = this;
+    this.listenTo(window.mainPage.currentUser, 'rra:logout', this.render);
+    this.listenTo(window.mainPage.currentUser, 'rra:login', this.render);
 
-    self.listenTo(window.mainPage.currentUser, 'rra:logout', self.render);
-    self.listenTo(window.mainPage.currentUser, 'rra:login', self.render);
+    this.listenTo(window.mainPage, 'rra:changeToolchain',
+      this.newToolchainResponse);
 
-    self.listenTo(window.mainPage, 'rra:changeToolchain',
-      self.newToolchainResponse);
-
-    self.listenTo(window.mainPage.userPreferences,
-      'rra:levelUp', self.notifyLevelUp);
+    this.listenTo(window.mainPage.userPreferences,
+      'rra:levelUp', this.notifyLevelUp);
   },
   newToolchainResponse: function () {
-    let self = this;
     if (window.mainPage.toolchain) {
-      self.listenTo(window.mainPage.toolchain,
-        'rra:changeStatus', self.render);
-      self.listenTo(window.mainPage.toolchain,
-        'rra:rename', self.render);
+      this.listenTo(window.mainPage.toolchain,
+        'rra:changeStatus', this.render);
+      this.listenTo(window.mainPage.toolchain,
+        'rra:rename', this.render);
     }
-    self.render();
+    this.render();
   },
   render: Underscore.debounce(function () {
-    let self = this;
-
-    if (!self.templateAdded) {
+    if (!this.templateAdded) {
       // Add the template and wire up all the default
       // button events
-      self.$el.html(myTemplate);
+      this.$el.html(myTemplate);
       jQuery('#hamburgerButton').on('click', () => {
         window.mainPage.overlay.render('HamburgerMenu');
       });
@@ -76,15 +71,16 @@ let Header = Backbone.View.extend({
           window.mainPage.overlay.render('ToolchainSettings');
         });
       jQuery('#toolchainName').on('change', function () {
+        // this refers to the DOM element
         window.mainPage.toolchain.rename(this.value);
       });
-      self.templateAdded = true;
+      this.templateAdded = true;
     }
 
     if (window.mainPage.toolchain) {
       // Render information about the toolchain
       jQuery('#toolchainHeader, #toolchainIcons').show();
-      
+
       let toolchainStatus = window.mainPage.toolchain.status;
       if (toolchainStatus.location === null) {
         jQuery('#toolchainLocationButton')
@@ -102,10 +98,10 @@ let Header = Backbone.View.extend({
       }
 
       jQuery('#toolchainName').val(window.mainPage.toolchain.get('name'));
-      
+
       // Set up all the widget icons
       let widgetIcons = window.mainPage.toolchain.getAllWidgetSpecs();
-      
+
       // Prepend and append adding buttons
       /* widgetIcons.unshift({
         widgetType: 'AddDataset'
@@ -113,8 +109,8 @@ let Header = Backbone.View.extend({
       widgetIcons.push({
         widgetType: 'AddVisualization'
       })*/
-      
-      let widgetButtons = d3.select(self.el).select('#toolchainIcons')
+
+      let widgetButtons = d3.select(this.el).select('#toolchainIcons')
         .selectAll('img.headerButton').data(widgetIcons);
       widgetButtons.enter().append('img')
         .attr('class', 'headerButton');
@@ -139,7 +135,6 @@ let Header = Backbone.View.extend({
   notifyLevelUp: function () {
     // TODO
     console.log('level up!');
-    // let self = this;
   }
 });
 

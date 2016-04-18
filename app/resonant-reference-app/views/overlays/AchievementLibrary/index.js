@@ -4,8 +4,7 @@ import myTemplate from './template.html';
 
 let AchievementLibrary = Backbone.View.extend({
   render: function () {
-    let self = this;
-    self.$el.html(myTemplate);
+    this.$el.html(myTemplate);
   }
 });
 

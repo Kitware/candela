@@ -7,10 +7,9 @@ import './style.css';
 
 let HamburgerMenu = Backbone.View.extend({
   render: function () {
-    let self = this;
-    if (!self.addedTemplate) {
-      self.$el.html(template);
-      self.addedTemplate = true;
+    if (!this.addedTemplate) {
+      this.$el.html(template);
+      this.addedTemplate = true;
     }
     
     // Main menu items

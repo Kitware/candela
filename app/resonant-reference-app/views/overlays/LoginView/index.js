@@ -2,9 +2,8 @@ let girder = window.girder;
 
 let LoginView = girder.views.LoginView.extend({
   initialize: function () {
-    let self = this;
     window.mainPage.overlay.addCloseListeners();
-    self.listenToOnce(girder.events, 'g:login.success', () => {
+    this.listenToOnce(girder.events, 'g:login.success', () => {
       window.mainPage.currentUser.authenticate()
         .then(() => {
           if (window.toolchain) {
@@ -16,11 +15,10 @@ let LoginView = girder.views.LoginView.extend({
     });
   },
   render: function () {
-    let self = this;
-    girder.views.LoginView.prototype.render.apply(self, arguments);
+    girder.views.LoginView.prototype.render.apply(this, arguments);
 
-    self.$el.find('button.close, .modal-footer > a')
-      .on('click', function () {
+    this.$el.find('button.close, .modal-footer > a')
+      .on('click', () => {
         if (window.mainPage.toolchain) {
           window.mainPage.overlay.render(null);
         } else {
@@ -28,11 +26,11 @@ let LoginView = girder.views.LoginView.extend({
         }
       });
 
-    self.$el.find('a.g-register-link').on('click', () => {
+    this.$el.find('a.g-register-link').on('click', () => {
       window.mainPage.overlay.render('RegisterView');
     });
 
-    self.$el.find('a.g-forgot-password').on('click', () => {
+    this.$el.find('a.g-forgot-password').on('click', () => {
       window.mainPage.overlay.render('ResetPasswordView');
     });
   }
