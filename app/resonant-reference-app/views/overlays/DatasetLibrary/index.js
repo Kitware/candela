@@ -11,7 +11,7 @@ let girder = window.girder;
 let DatasetLibrary = Backbone.View.extend({
   render: function () {
     this.$el.html(myTemplate);
-    
+
     // Start off with every section hidden
     // (I know, this is dumb, but girder's
     // collections have no way of detecting
@@ -33,7 +33,7 @@ let DatasetLibrary = Backbone.View.extend({
     })).then(folder => {
       this.renderFolderContents(folder, 'privateDatasets', privateImage);
     });
-    
+
     Promise.resolve(girder.restRequest({
       path: 'folder/publicFolder',
       type: 'GET',
@@ -62,7 +62,7 @@ let DatasetLibrary = Backbone.View.extend({
         }
         return Dataset.VALID_EXTENSIONS.indexOf(ext) !== -1;
       });
-      
+
       if (datasetModels.length > 0) {
         jQuery('#' + divId).show();
         jQuery('#' + divId + 'Header').show();
@@ -71,10 +71,9 @@ let DatasetLibrary = Backbone.View.extend({
       let libraryButtons = d3.select('#' + divId)
         .selectAll('.circleButton')
         .data(datasetModels);
-      
-      let datasetIds = window.mainPage.toolchain
-        ? window.mainPage.toolchain.getDatasetIds() : [];
-      
+
+      let datasetIds = window.mainPage.toolchain ? window.mainPage.toolchain.getDatasetIds() : [];
+
       let libraryButtonsEnter = libraryButtons.enter().append('div')
         .attr('class', (d) => {
           if (datasetIds.indexOf(d.id) !== -1) {
@@ -99,23 +98,34 @@ let DatasetLibrary = Backbone.View.extend({
             // We already have a toolchain loaded, so
             // swap it in (TODO: load multiple datasets)
             window.mainPage.toolchain.setDataset(d);
+            window.mainPage.widgetPanels.toggleWidget({
+              hashName: 'DatasetView0'
+            }, true);
+            window.mainPage.overlay.closeOverlay();
           } else {
             if (d.meta && d.meta.exampleToolchainId) {
               // Load the example toolchain that this dataset's
               // metadata specifies
-              window.mainPage.switchToolchain(d.meta.exampleToolchainId);
+              window.mainPage.switchToolchain(d.meta.exampleToolchainId)
+                .then(() => {
+                  window.mainPage.widgetPanels.toggleWidget({
+                    hashName: 'DatasetView0'
+                  }, true);
+                  window.mainPage.overlay.closeOverlay();
+                });
             } else {
               // No default example toolchain has been
               // specified for this dataset; create an empty
               // toolchain with this dataset
               window.mainPage.newToolchain().then(() => {
                 window.mainPage.toolchain.setDataset(d);
+                window.mainPage.widgetPanels.toggleWidget({
+                  hashName: 'DatasetView0'
+                }, true);
+                window.mainPage.overlay.closeOverlay();
               });
             }
           }
-          
-          // window.mainPage.widgetPanels.toggleWidget();
-          window.mainPage.overlay.render(null);
         });
     });
   }

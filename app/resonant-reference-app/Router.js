@@ -118,7 +118,7 @@ var Router = Backbone.Router.extend({
           // The user specified which toolchain they want in
           // the URL, so don't bother them with a dialog asking
           // them to pick one
-          window.mainPage.overlay.render(null);
+          window.mainPage.overlay.closeOverlay();
         }
       });
   },

@@ -160,7 +160,7 @@ let ToolchainLibrary = Backbone.View.extend({
       .on('click', d => {
         window.mainPage.switchToolchain(d.id);
         if (!this.keepOpenOnSelect) {
-          window.mainPage.overlay.render(null);
+          window.mainPage.overlay.closeOverlay();
         }
       });
   }

@@ -47,23 +47,33 @@ let VisualizationLibrary = Backbone.View.extend({
           // We already have a toolchain loaded, so
           // swap it in (TODO: load multiple visualizations?)
           window.mainPage.toolchain.setVisualization(d);
+          window.mainPage.widgetPanels.toggleWidget({
+            hashName: 'VisualizationView0'
+          }, true);
         } else {
           if (d.meta && d.meta.exampleToolchainId) {
             // TODO: Load the example toolchain that this
             // visualization specifies
-            // window.mainPage.switchToolchain(d.meta.exampleToolchainId);
+            // window.mainPage.switchToolchain(d.meta.exampleToolchainId)
+            //  .then(() => {
+            window.mainPage.widgetPanels.toggleWidget({
+              hashName: 'VisualizationView0'
+            }, true);
+            window.mainPage.overlay.closeOverlay();
+            // });
           } else {
             // No default example toolchain has been
             // specified for this visualization; create an empty
             // toolchain with this visualization
             window.mainPage.newToolchain().then(() => {
               window.mainPage.toolchain.setVisualization(d);
+              window.mainPage.widgetPanels.toggleWidget({
+                hashName: 'VisualizationView0'
+              }, true);
+              window.mainPage.overlay.closeOverlay();
             });
           }
         }
-
-        // window.mainPage.widgetPanels.toggleWidget();
-        window.mainPage.overlay.render(null);
       });
   }
 });

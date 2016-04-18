@@ -5,27 +5,15 @@ let LoginView = girder.views.LoginView.extend({
     window.mainPage.overlay.addCloseListeners();
     this.listenToOnce(girder.events, 'g:login.success', () => {
       window.mainPage.currentUser.authenticate()
-        .then(() => {
-          if (window.toolchain) {
-            window.mainPage.overlay.render(null);
-          } else {
-            window.mainPage.overlay.render('StartingScreen');
-          }
-        });
+        .then(window.mainPage.overlay.closeOverlay);
     });
   },
   render: function () {
     girder.views.LoginView.prototype.render.apply(this, arguments);
 
     this.$el.find('button.close, .modal-footer > a')
-      .on('click', () => {
-        if (window.mainPage.toolchain) {
-          window.mainPage.overlay.render(null);
-        } else {
-          window.mainPage.overlay.render('StartingScreen');
-        }
-      });
-
+      .on('click', window.mainPage.overlay.closeOverlay);
+    
     this.$el.find('a.g-register-link').on('click', () => {
       window.mainPage.overlay.render('RegisterView');
     });

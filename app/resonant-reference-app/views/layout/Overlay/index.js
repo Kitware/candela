@@ -83,13 +83,20 @@ let Overlay = Backbone.View.extend({
   renderErrorScreen: function (message) {
     this.render(this.getErrorScreen(message));
   },
+  closeOverlay: function () {
+    // If we don't have a toolchain, jump straight to the
+    // opening overlay (don't actually close)
+    if (window.mainPage.toolchain) {
+      window.mainPage.overlay.render(null);
+    } else {
+      window.mainPage.overlay.render('StartingScreen');
+    }
+  },
   addCloseListeners: function () {
     // Add a bunch of ways to close out of the overlay
 
     // Close button:
-    this.$el.find('#closeOverlay').on('click', () => {
-      this.render(null);
-    });
+    this.$el.find('#closeOverlay').on('click', this.closeOverlay);
 
     // Clicking on the area outside the overlay:
     let self = this;
@@ -98,14 +105,14 @@ let Overlay = Backbone.View.extend({
       if (event.target !== this) {
         return;
       } else {
-        self.render(null);
+        this.closeOverlay();
       }
     });
 
     // Hitting the escape key:
     jQuery(window).on('keyup', e => {
       if (e.keyCode === 27) {
-        this.render(null);
+        this.closeOverlay();
       }
     });
   },
