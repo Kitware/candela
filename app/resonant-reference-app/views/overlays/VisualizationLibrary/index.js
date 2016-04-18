@@ -44,9 +44,26 @@ let VisualizationLibrary = Backbone.View.extend({
 
     d3.select('div.libraryInterface').selectAll('.circleButton')
       .on('click', function (d) {
-        window.mainPage.toolchain.setVisualization(d);
-        window.mainPage.toolchain.openWidget('VisualizationView');
-        window.mainPage.router.expandWidget('VisualizationView');
+        if (window.mainPage.toolchain) {
+          // We already have a toolchain loaded, so
+          // swap it in (TODO: load multiple visualizations?)
+          window.mainPage.toolchain.setVisualization(d);
+        } else {
+          if (d.meta && d.meta.exampleToolchainId) {
+            // TODO: Load the example toolchain that this
+            // visualization specifies
+            // window.mainPage.switchToolchain(d.meta.exampleToolchainId);
+          } else {
+            // No default example toolchain has been
+            // specified for this visualization; create an empty
+            // toolchain with this visualization
+            window.mainPage.newToolchain().then(() => {
+              window.mainPage.toolchain.setVisualization(d);
+            });
+          }
+        }
+
+        // window.mainPage.widgetPanels.toggleWidget();
         window.mainPage.overlay.render(null);
       });
   }

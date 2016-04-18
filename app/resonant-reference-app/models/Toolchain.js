@@ -39,9 +39,7 @@ let Toolchain = MetadataItem.extend({
       self.updateStatus);
     self.listenTo(window.mainPage.currentUser, 'rra:logout',
       self.updateStatus);
-    self.listenTo(window.mainPage.widgetPanels, 'rra:expandWidget',
-      self.storePreferredWidgets);
-    self.listenTo(window.mainPage.widgetPanels, 'rra:collapseWidget',
+    self.listenTo(window.mainPage.widgetPanels, 'rra:navigateWidgets',
       self.storePreferredWidgets);
   },
   updateStatus: Underscore.debounce(function (copyOnError) {
@@ -112,17 +110,53 @@ let Toolchain = MetadataItem.extend({
     let self = this;
     let meta = MetadataItem.prototype.getMeta.apply(self, [key]);
 
+    /*
+      Everything in metadata is squashed down into JSON-compatible
+      objects; by overriding getMeta(), we can wrap everything in
+      the special objects each thing is supposed to be, and
+      re-attach any listeners that would have been lost in
+      round-trips to the server
+    */
+    
     if (key === undefined) {
       if (meta.datasets instanceof Array) {
         meta.datasets = new Dataset.Collection(meta.datasets);
         self.listenTo(meta.datasets, 'rra:changeSpec', self.changeSpec);
       }
+      if (meta.preferredWidgets instanceof Array) {
+        meta.preferredWidgets = new Set(meta.preferredWidgets);
+      }
     } else if (key === 'datasets' && meta instanceof Array) {
       meta = new Dataset.Collection(meta);
       self.listenTo(meta, 'rra:changeSpec', self.changeSpec);
+    } else if (key === 'preferredWidgets' && meta instanceof Array) {
+      meta = new Set(meta.preferredWidgets);
     }
 
     return meta;
+  },
+  setMeta: function (key, value) {
+    let self = this;
+    let meta = self.get('meta') || {};
+    
+    /*
+      For the same reason as getMeta, we need to override setMeta
+      so that we appropriately handle the flattening process
+    */
+    
+    if (typeof key === 'object') {
+      let obj = key;
+      for (key of Object.keys(obj)) {
+        meta[key] = obj[key];
+        if (key === 'preferredWidgets' &&
+            meta[key] instanceof Set) {
+          meta[key] = [...meta[key]];
+        }
+      }
+    } else {
+      meta[key] = value;
+    }
+    self.set('meta', meta);
   },
   isEmpty: function () {
     let self = this;
@@ -370,7 +404,7 @@ let Toolchain = MetadataItem.extend({
         index: i,
         spec: meta.datasets.at(i).getSpec()
       };
-      widgetSpec.hashName = widgetSpec.spec.name + 'DatasetView' + i;
+      widgetSpec.hashName = 'DatasetView' + i;
       result.push(widgetSpec);
     }
     result.push({
@@ -383,7 +417,7 @@ let Toolchain = MetadataItem.extend({
         index: i,
         spec: meta.visualizations[i]
       };
-      widgetSpec.hashName = widgetSpec.spec.name + 'VisualizationView' + i;
+      widgetSpec.hashName = 'VisualizationView' + i;
       result.push(widgetSpec);
     }
     
@@ -392,7 +426,7 @@ let Toolchain = MetadataItem.extend({
   storePreferredWidgets: function () {
     let self = this;
     self.setMeta('preferredWidgets',
-      Object.keys(window.mainPage.widgetPanels.expandedWidgets));
+      window.mainPage.widgetPanels.expandedWidgets);
   }
 });
 

@@ -1,5 +1,4 @@
 import Backbone from 'backbone';
-import jQuery from 'jquery';
 import SetOps from './shims/SetOps';
 import 'jquery-deparam';
 
@@ -15,14 +14,14 @@ var Router = Backbone.Router.extend({
     let result = route.exec(fragment).slice(1, -1);
 
     // A valid URL will have one or two chunks,
-    // and the second should have a widgets property
-    // that is a Set of strings
+    // and the second should be a URI encoded JSON object
+    // with a widgets property that is a Set of strings
     if (result.length === 1) {
       result.push({
         widgets: new Set([])
       });
     } else if (result.length === 2) {
-      result[1] = jQuery.deparam(result[1]);
+      result[1] = JSON.parse(decodeURIComponent(result[1]));
       if (result[1].widgets === undefined) {
         result[1].widgets = new Set([]);
       } else {
@@ -41,7 +40,7 @@ var Router = Backbone.Router.extend({
   },
   emptyRoute: function () {
     let self = this;
-    
+
     if (!self.initialRoute) {
       // This is the first url we've come to;
       // because we have nothing better to go
@@ -68,10 +67,14 @@ var Router = Backbone.Router.extend({
       trigger: false
     });
     self.emptyRoute();
+
+    // TODO: We should probably display a nicer error
+    // like Github's this-is-not-the-page-you-were-
+    // looking-for 404 screen
   },
   handleRoute: function (toolchainId, params) {
     let self = this;
-    
+
     if (!self.initialRoute) {
       // Store the preferred route; our first time through,
       // there won't be a toolchain or widgetPanels to work with
@@ -81,16 +84,13 @@ var Router = Backbone.Router.extend({
       };
     } else if (window.mainPage) {
       // We've actually navigated
-      let currentId = window.mainPage.toolchain
-        ? window.mainPage.toolchain.getId() : null;
-      let currentWidgets = window.mainPage.widgetPanels
-        ? Object.keys(window.mainPage.widgetPanels.expandedWidgets) : [];
-      currentWidgets = new Set(currentWidgets);
-      
+      let currentId = window.mainPage.toolchain ? window.mainPage.toolchain.getId() : null;
+      let currentWidgets = window.mainPage.widgetPanels ? window.mainPage.widgetPanels.expandedWidgets : new Set();
+
       let changedToolchain = toolchainId !== currentId;
       let changedWidgets = SetOps.symmetric_difference(
         params.widgets, currentWidgets).size > 0;
-      
+
       if (changedToolchain && changedWidgets) {
         // We've been given a specific toolchain URL, and we're also
         // overriding whatever widgets it saved last time it was open
@@ -118,43 +118,42 @@ var Router = Backbone.Router.extend({
     let self = this;
     // We wait to apply the initial route until
     // after the whole DOM has been set up
-    window.mainPage.switchToolchain(self.initialRoute.toolchainId);
-    /* window.mainPage.widgetPanels.setWidgets(self.initialRoute
-                                            .params.widgets);*/
-    
-    if (self.initialRoute.toolchainId) {
-      // The user specified which toolchain they want in
-      // the URL, so don't bother them with a dialog asking
-      // them to pick one
-      window.mainPage.overlay.render(null);
-    }
+    window.mainPage.switchToolchain(self.initialRoute.toolchainId)
+      .then(() => {
+        window.mainPage.widgetPanels.setWidgets(self.initialRoute
+          .params.widgets);
+        if (self.initialRoute.toolchainId) {
+          // The user specified which toolchain they want in
+          // the URL, so don't bother them with a dialog asking
+          // them to pick one
+          window.mainPage.overlay.render(null);
+        }
+      });
   },
   addListeners: function () {
     let self = this;
     // Listen to events that signal that the url needs to be updated
     self.listenTo(window.mainPage, 'rra:changeToolchain', self.updateUrl);
     self.listenTo(window.mainPage.widgetPanels,
-                  'rra:expandWidget', self.updateUrl);
-    self.listenTo(window.mainPage.widgetPanels,
-                  'rra:minimizeWidget', self.updateUrl);
+      'rra:navigateWidgets', self.updateUrl);
   },
   constructFragment: function (toolchainId, widgets) {
     let fragment = 'toolchain/' + toolchainId;
     if (widgets.size > 0) {
-      fragment += '/' + jQuery.param({
+      fragment += '/' + encodeURIComponent(JSON.stringify({
         widgets: [...widgets]
-      });
+      }));
     }
     return fragment;
   },
   updateUrl: function () {
     let self = this;
     if (!window.mainPage ||
-        window.mainPage.toolchain === undefined) { // ||
-      //  !window.mainPage.widgetPanels) {
+      window.mainPage.toolchain === undefined ||
+      !window.mainPage.widgetPanels) {
       // We haven't actually set up our
       // important pieces yet, so don't
-      // change anything yet
+      // mess with the URL
       return;
     }
     if (window.mainPage.toolchain === null) {
@@ -165,7 +164,7 @@ var Router = Backbone.Router.extend({
       return;
     } else {
       let toolchainId = window.mainPage.toolchain.getId();
-      let widgets = []; // window.mainPage.widgetPanels.currentWidgetNames();
+      let widgets = window.mainPage.widgetPanels.expandedWidgets;
       self.navigate(self.constructFragment(toolchainId, widgets), {
         trigger: true
       });

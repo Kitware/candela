@@ -15,8 +15,7 @@ let WidgetPanels = Backbone.View.extend({
     self.listenTo(window.mainPage, 'rra:changeToolchain',
       self.handleNewToolchain);
     self.listenTo(self, 'rra:updateWidgetSpecs', self.render);
-    self.listenTo(self, 'rra:expandWidget', self.render);
-    self.listenTo(self, 'rra:minimizeWidget', self.render);
+    self.listenTo(self, 'rra:navigateWidgets', self.render);
   },
   handleNewToolchain: function () {
     let self = this;
@@ -40,13 +39,17 @@ let WidgetPanels = Backbone.View.extend({
   },
   toggleWidget: function (widgetSpec, expand) {
     let self = this;
-    if (!self.expandedWidgets[widgetSpec.hashName] || expand === true) {
-      self.expandedWidgets[widgetSpec.hashName] = true;
-      self.trigger('rra:expandWidget');
+    if (!self.expandedWidgets.has(widgetSpec.hashName) || expand === true) {
+      self.expandedWidgets.add(widgetSpec.hashName);
     } else {
-      delete self.expandedWidgets[widgetSpec.hashName];
-      self.trigger('rra:minimizeWidget');
+      self.expandedWidgets.delete(widgetSpec.hashName);
     }
+    self.trigger('rra:navigateWidgets');
+  },
+  setWidgets: function (newWidgets) {
+    let self = this;
+    self.expandedWidgets = newWidgets;
+    self.trigger('rra:navigateWidgets');
   },
   render: Underscore.debounce(function () {
     let self = this;
@@ -61,7 +64,7 @@ let WidgetPanels = Backbone.View.extend({
     }).remove();
     
     sections.attr('class', (d) => {
-      return self.expandedWidgets[d.hashName] === true ? 'targeted' : null;
+      return self.expandedWidgets.has(d.hashName) ? 'targeted' : null;
     });
 
     // Any new widgets need to have a WidgetPanel instantiated
@@ -74,7 +77,7 @@ let WidgetPanels = Backbone.View.extend({
     });
 
     // Distribute the space for each section
-    let expandedSections = Object.keys(self.expandedWidgets).length;
+    let expandedSections = self.expandedWidgets.size;
     let collapsedSections = self.widgetSpecs.length - expandedSections;
     let style = 'calc((100% - (0.5em + ' + // a little grey space at the beginning
       '2.5*' + collapsedSections + 'em + ' + // collapsed sections are 2em wide + a grey space

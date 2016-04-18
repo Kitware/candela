@@ -26,7 +26,7 @@ let WidgetPanel = Backbone.View.extend({
   initialize: function (spec) {
     let self = this;
     self.spec = spec;
-    self.widget = new WIDGETS[spec.widgetType](self, spec);
+    self.widget = new WIDGETS[spec.widgetType](spec);
   },
   render: function () {
     let self = this;
@@ -64,11 +64,11 @@ let WidgetPanel = Backbone.View.extend({
     // Finally, a div (that will scroll)
     // to contain the view
     let container = d3.select(self.el)
-      .selectAll('div#' + self.widget.hashName + 'Container')
+      .selectAll('div#' + self.spec.hashName + 'Container')
       .data([0]);
     container.enter().append('div').attr({
-      id: self.widget.hashName + 'Container',
-      class: 'content'
+      id: self.spec.hashName + 'Container',
+      class: self.spec.widgetType + ' content'
     });
 
     // Now let's let the widget know

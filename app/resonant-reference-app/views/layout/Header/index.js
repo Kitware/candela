@@ -107,12 +107,12 @@ let Header = Backbone.View.extend({
       let widgetIcons = window.mainPage.toolchain.getAllWidgetSpecs();
       
       // Prepend and append adding buttons
-      widgetIcons.unshift({
+      /* widgetIcons.unshift({
         widgetType: 'AddDataset'
       });
       widgetIcons.push({
         widgetType: 'AddVisualization'
-      })
+      })*/
       
       let widgetButtons = d3.select(self.el).select('#toolchainIcons')
         .selectAll('img.headerButton').data(widgetIcons);

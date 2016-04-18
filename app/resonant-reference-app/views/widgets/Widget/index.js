@@ -15,10 +15,9 @@ import errorTemplate from './errorTemplate.html';
 import successTemplate from './successTemplate.html';
 
 let Widget = Backbone.View.extend({
-  initialize: function (panel, spec) {
+  initialize: function (spec) {
     let self = this;
     self.friendlyName = 'ERROR! Abstract Widget!';
-    self.panel = panel;
     self.spec = spec;
     self.statusText = {
       text: '',
@@ -38,6 +37,8 @@ let Widget = Backbone.View.extend({
         self.toggle();
       }
     }];
+    
+    self.panel = null;
   },
   toggle: function () {
     let self = this;
@@ -45,13 +46,13 @@ let Widget = Backbone.View.extend({
   },
   isTargeted: function () {
     let self = this;
-    return window.mainPage.widgetPanels
-      .expandedWidgets[self.spec.hashName] === true;
+    return window.mainPage.widgetPanels.expandedWidgets
+      .has(self.spec.hashName);
   },
   setPanel: function (panel) {
     let self = this;
     self.panel = panel;
-    self.setElement(jQuery('#' + self.hashName + 'Container')[0]);
+    self.setElement(jQuery('#' + self.spec.hashName + 'Container')[0]);
   },
   renderIndicators: function () {
     let self = this;

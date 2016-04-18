@@ -1,20 +1,20 @@
-#DatasetViewContainer {
+.DatasetView.content {
   display: flex;
   align-items: stretch;
   justify-content: flex-end;
 }
 
-#DatasetViewContainer #editor {
+.DatasetView.content #editor {
   flex-grow: 1;
 }
 
-#DatasetViewContainer #attributeSettings {
+.DatasetView.content #attributeSettings {
   overflow-y: auto;
   overflow-x: hidden;
   display: block;
 }
 
-#DatasetViewContainer #attributeSettings .cell {
+.DatasetView.content #attributeSettings .cell {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -24,6 +24,6 @@
   white-space: nowrap;
 }
 
-#DatasetViewContainer #attributeSettings .cell select {
+.DatasetView.content #attributeSettings .cell select {
   width: auto;
 }
