@@ -9,6 +9,8 @@ let VisualizationView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
 
+    this.vis = null;
+    
     this.friendlyName = 'Visualization';
 
     this.statusText.onclick = () => {
@@ -28,7 +30,7 @@ let VisualizationView = Widget.extend({
         this.renderInfoScreen();
       }
     });
-
+    
     this.ok = null;
     this.icons.splice(0, 0, {
       src: () => {
@@ -54,8 +56,8 @@ let VisualizationView = Widget.extend({
       }
     });
 
-    this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations', this.render);
-    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings', this.render);
+    this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations', this.renderNewVis);
+    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings', this.renderNewVis);
   },
   renderInfoScreen: function () {
     this.newInfo = false;
@@ -91,41 +93,56 @@ You encountered an error we didn't anticipate! Please report it
 
     window.mainPage.overlay.render(screen);
   },
-  render: function () {
+  renderNewVis: function () {
     // Get the visualization in the toolchain (if there is one)
     let visSpec = window.mainPage.toolchain.getMeta('visualizations');
     if (visSpec) {
       visSpec = visSpec[0];
     }
-
+    
     this.$el.html(myTemplate);
-
+    this.addedTemplate = true;
+    
+    this.vis = null;
+    
     if (visSpec) {
       let options = window.mainPage.toolchain.getVisOptions();
-
+      
       this.ok = null;
       this.statusText.text = 'Loading...';
-      this.renderIndicators();
 
-      window.mainPage.toolchain.shapeDataForVis(function (data) {
+      window.mainPage.toolchain.shapeDataForVis(data => {
         // Temporarily force the scrollbars, so
         // the view can account for the needed space
         options.data = data;
         this.$el.css('overflow', 'scroll');
-        this.vis = new candela.components[visSpec.name]('.visualization',
-          options);
+        let targetDiv = '#' + this.spec.hashName + 'Container .visualization';
+        this.vis = new candela.components[visSpec.name](targetDiv, options);
         this.vis.render();
         this.$el.css('overflow', '');
 
         this.ok = true;
         this.statusText.text = visSpec['name'];
-        this.renderIndicators();
+        this.render();
       });
     } else {
       this.ok = false;
+      this.vis = null;
       this.statusText.text = 'None selected';
-      this.renderIndicators();
     }
+    
+    this.render();
+  },
+  render: function () {
+    if (!this.addedTemplate) {
+      this.renderNewVis();
+    }
+    
+    if (this.vis !== null) {
+      this.vis.render();
+    }
+    
+    this.renderIndicators();
   }
 });
 

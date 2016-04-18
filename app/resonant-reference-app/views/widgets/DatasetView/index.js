@@ -149,7 +149,7 @@ you'll probably need to
     if (dataset) {
       dataset = dataset.at(0);
     }
-
+    
     this.$el.html(myTemplate);
 
     // Temporarily force the scroll bars so we

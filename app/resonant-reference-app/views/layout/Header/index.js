@@ -102,13 +102,19 @@ let Header = Backbone.View.extend({
       // Set up all the widget icons
       let widgetIcons = window.mainPage.toolchain.getAllWidgetSpecs();
 
-      // Prepend and append adding buttons
-      /* widgetIcons.unshift({
-        widgetType: 'AddDataset'
-      });
-      widgetIcons.push({
-        widgetType: 'AddVisualization'
-      })*/
+      // Prepend and append the buttons for adding stuff
+      // (TODO: *always* include these when multiple datasets /
+      // multiple visualizations are supported)
+      if (window.mainPage.toolchain.getMeta('datasets').length === 0) {
+        widgetIcons.unshift({
+          widgetType: 'AddDataset'
+        });
+      }
+      if (window.mainPage.toolchain.getMeta('visualizations').length === 0) {
+        widgetIcons.push({
+          widgetType: 'AddVisualization'
+        })
+      }
 
       let widgetButtons = d3.select(this.el).select('#toolchainIcons')
         .selectAll('img.headerButton').data(widgetIcons);
@@ -119,9 +125,9 @@ let Header = Backbone.View.extend({
         return ICONS[d.widgetType];
       }).on('click', (d) => {
         if (d.widgetType === 'AddDataset') {
-          // TODO: add a dataset
+          window.mainPage.overlay.render('DatasetLibrary');
         } else if (d.widgetType === 'AddVisualization') {
-          // TODO: add a visualization
+          window.mainPage.overlay.render('VisualizationLibrary');
         } else {
           window.mainPage.widgetPanels.toggleWidget(d, true);
         }
