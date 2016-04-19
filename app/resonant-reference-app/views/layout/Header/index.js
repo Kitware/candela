@@ -36,12 +36,15 @@ let ICONS = {
 import './header.css';
 
 let Header = Backbone.View.extend({
-  initialize: function () {
+  addListeners: function () {
     this.listenTo(window.mainPage.currentUser, 'rra:logout', this.render);
     this.listenTo(window.mainPage.currentUser, 'rra:login', this.render);
 
     this.listenTo(window.mainPage, 'rra:changeToolchain',
       this.newToolchainResponse);
+    
+    this.listenTo(window.mainPage.widgetPanels, 'rra:updateWidgetSpecs',
+      this.render);
 
     this.listenTo(window.mainPage.userPreferences,
       'rra:levelUp', this.notifyLevelUp);

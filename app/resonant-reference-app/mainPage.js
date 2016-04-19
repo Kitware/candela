@@ -55,6 +55,7 @@ let MainPage = Backbone.View.extend({
       });
       this.router.addListeners();
       this.currentUser.addListeners();
+      this.header.addListeners();
       this.addedPageChunks = true;
     }
 

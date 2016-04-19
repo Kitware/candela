@@ -57,9 +57,11 @@ let WidgetPanels = Backbone.View.extend({
       delete this.widgets[d.hashName];
     }).remove();
 
-    sections.attr('class', (d) => {
-      return this.expandedWidgets.has(d.hashName) ? 'targeted' : null;
-    });
+    sections.order()
+      .attr('id', (d) => d.hashName)
+      .attr('class', (d) => {
+        return this.expandedWidgets.has(d.hashName) ? 'targeted' : null;
+      });
 
     // Any new widgets need to have a WidgetPanel instantiated
     // and bound to the new section
