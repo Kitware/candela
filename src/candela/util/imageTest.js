@@ -29,7 +29,7 @@ Promise.onPossiblyUnhandledRejection(err => {
   throw err;
 });
 
-export default function imageTest ({name, url, selector, threshold}) {
+export default function imageTest ({name, url, selector, delay = 0, threshold}) {
   const dirname = callerDirname();
 
   test(`${name} image test`, t => {
@@ -42,6 +42,7 @@ export default function imageTest ({name, url, selector, threshold}) {
     .then(() => {
       return n.goto(url)
         .wait('body')
+        .wait(delay)
         // TODO: allow for a custom evaluate function?
         .evaluate((_selector) => {
           const box = document.querySelector(_selector).getBoundingClientRect();
