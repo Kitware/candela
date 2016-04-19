@@ -4,3 +4,6 @@ build
 coverage
 .server.pid
 .server.log
+npm-debug.log
+*-diff.png
+*-test.png
