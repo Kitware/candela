@@ -84,8 +84,7 @@ let Dataset = MetadataItem.extend({
           } else {
             formatPrefs.parse = 'auto';
           }
-          let parsedData;
-
+          
           try {
             parsedData = datalib.read(rawData, formatPrefs);
           } catch (e) {
@@ -109,11 +108,15 @@ let Dataset = MetadataItem.extend({
       fileType = fileType[fileType.length - 1];
     }
     this.setMeta('fileType', fileType);
-    this.saveThenTrigger(['rra:changeType']);
+    this.save().then(() => {
+      this.trigger('rra:changeType');
+    });
   },
   setFileType: function (fileType) {
     this.setMeta('fileType', fileType);
-    this.saveThenTrigger(['rra:changeType']);
+    this.save().then(() => {
+      this.trigger('rra:changeType');
+    });
   },
   inferAttributes: function () {
     this.getParsed(data => {

@@ -8,8 +8,6 @@ import infoTemplate from './infoTemplate.html';
 let VisualizationView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
-
-    this.vis = null;
     
     this.friendlyName = 'Visualization';
 
@@ -56,8 +54,8 @@ let VisualizationView = Widget.extend({
       }
     });
 
-    this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations', this.renderNewVis);
-    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings', this.renderNewVis);
+    this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations', this.render);
+    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings', this.render);
   },
   renderInfoScreen: function () {
     this.newInfo = false;
@@ -93,56 +91,67 @@ You encountered an error we didn't anticipate! Please report it
 
     window.mainPage.overlay.render(screen);
   },
-  renderNewVis: function () {
+  render: function () {
     // Get the visualization in the toolchain (if there is one)
-    let visSpec = window.mainPage.toolchain.getMeta('visualizations');
-    if (visSpec) {
-      visSpec = visSpec[0];
-    }
-    
-    this.$el.html(myTemplate);
-    this.addedTemplate = true;
-    
-    this.vis = null;
-    
-    if (visSpec) {
+    let spec = window.mainPage.toolchain.getMeta('visualizations');
+    if (spec) {
+      // Use the first spec (TODO: support multiple visualizations)
+      spec = spec[0];
+      
+      // Get the options for the vis
       let options = window.mainPage.toolchain.getVisOptions();
       
+      // Start with an initial empty dataset (gets populated
+      // asynchronously)
+      options.data = [];
+      
+      // How is this render pass different from the last?
+      if (!this.vis || this.vis.spec.name !== spec.name) {
+        // We've changed visualizations; nuke the DOM element
+        // and create a new candela component
+        this.$el.html(myTemplate);
+        
+        this.vis = {
+          spec: spec,
+          options: options,
+          component: new candela.components[spec.name](
+            '#' + this.spec.hashName + 'Container .visualization', options)
+        };
+      } else {
+        // The visualization hasn't changed, but the options may have.
+        Object.keys(this.vis.options).forEach(key => {
+          if (!options.hasOwnProperty(key)) {
+            // This option is no longer specified; set it to
+            // null so that it's removed from the visualization
+            options[key] = null;
+          }
+        })
+        
+        this.vis.options = options;
+      }
+      
+      // Okay, now ask the toolchain if it has any new data for
+      // us (changing the mappings, editing the data, or grabbing
+      // a new dataset will invalidate the parsed cache).
+      this.vis.component.render();
       this.ok = null;
       this.statusText.text = 'Loading...';
-
+      this.renderIndicators();
       window.mainPage.toolchain.shapeDataForVis(data => {
-        // Temporarily force the scrollbars, so
-        // the view can account for the needed space
-        options.data = data;
-        this.$el.css('overflow', 'scroll');
-        let targetDiv = '#' + this.spec.hashName + 'Container .visualization';
-        this.vis = new candela.components[visSpec.name](targetDiv, options);
-        this.vis.render();
-        this.$el.css('overflow', '');
-
+        this.vis.options.data = data;
+        this.vis.component.chart.update(this.vis.options);
+        this.vis.component.render();
         this.ok = true;
-        this.statusText.text = visSpec['name'];
-        this.render();
+        this.statusText.text = this.vis.spec.name;
+        this.renderIndicators();
       });
     } else {
-      this.ok = false;
+      this.$el.html(myTemplate);
       this.vis = null;
+      this.ok = false;
       this.statusText.text = 'None selected';
+      this.renderIndicators();
     }
-    
-    this.render();
-  },
-  render: function () {
-    if (!this.addedTemplate) {
-      this.renderNewVis();
-    }
-    
-    if (this.vis !== null) {
-      this.vis.render();
-    }
-    
-    this.renderIndicators();
   }
 });
 

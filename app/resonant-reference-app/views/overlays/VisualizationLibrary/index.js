@@ -50,6 +50,7 @@ let VisualizationLibrary = Backbone.View.extend({
           window.mainPage.widgetPanels.toggleWidget({
             hashName: 'VisualizationView0'
           }, true);
+          window.mainPage.overlay.closeOverlay();
         } else {
           if (d.meta && d.meta.exampleToolchainId) {
             // TODO: Load the example toolchain that this
