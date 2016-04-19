@@ -20,6 +20,10 @@ function callerDirname () {
   return path.dirname(frame);
 }
 
+function doSaveImage (name) {
+  return process.env.CANDELA_SAVE_IMAGE && process.env.CANDELA_SAVE_IMAGE.split(',').indexOf(name) > -1;
+}
+
 Promise.onPossiblyUnhandledRejection(err => {
   console.log(err);
   throw err;
@@ -49,12 +53,10 @@ export default function imageTest ({name, url, selector, threshold}) {
           };
         }, selector);
     })
-    // TODO: allow for a mode that saves screenshot to disk (uses filename in
-    // place of undefined).
-    .then(rect => n.screenshot(undefined, rect))
+    .then(rect => n.screenshot(doSaveImage(name) ? path.join(dirname, `${name}.png`) : undefined, rect))
     .then(imageBuf => {
       const refImage = dataUrl(fs.readFileSync(path.join(dirname, `${name}.png`)));
-      const image = dataUrl(imageBuf);
+      const image = imageBuf ? dataUrl(imageBuf) : refImage;
 
       resemble(image)
         .compareTo(refImage)
