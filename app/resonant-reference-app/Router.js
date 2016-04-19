@@ -1,5 +1,5 @@
 import Backbone from 'backbone';
-import SetOps from './shims/SetOps';
+import SetOps, {Set} from './shims/SetOps';
 import 'jquery-deparam';
 
 var Router = Backbone.Router.extend({

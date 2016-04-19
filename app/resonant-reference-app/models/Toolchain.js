@@ -1,6 +1,7 @@
 import Underscore from 'underscore';
 import MetadataItem from './MetadataItem';
 import Dataset from './Dataset';
+import {Set} from '../shims/SetOps.js';
 let girder = window.girder;
 /*
     A Toolchain represents a user's saved session;

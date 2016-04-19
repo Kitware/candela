@@ -2,6 +2,7 @@ import Underscore from 'underscore';
 import Backbone from 'backbone';
 import d3 from 'd3';
 import WidgetPanel from './WidgetPanel.js';
+import {Set} from '../../../shims/SetOps.js';
 
 import './accordionhorz.css';
 import './style.css';
