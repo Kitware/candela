@@ -132,7 +132,9 @@ let ToolchainSettings = Backbone.View.extend({
       });
 
       this.$el.find('#newButton').on('click', () => {
-        window.mainPage.newToolchain();
+        window.mainPage.newToolchain().then(() => {
+          window.mainPage.overlay.closeOverlay();
+        });
       });
 
       this.addedTemplate = true;
