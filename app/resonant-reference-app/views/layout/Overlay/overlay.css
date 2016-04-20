@@ -22,6 +22,15 @@
   padding: 1em 2em 2em 3em;
 }
 
+#Overlay .libraryInterface hr {
+  position: relative;
+  left: -3em;
+  width: calc(100% + 5em);
+  border: none;
+  height: 1px;
+  background-color: #e5e5e5;
+}
+
 #Overlay div.hint {
   position: relative;
   margin: 5em;

@@ -15,6 +15,8 @@ let UserPreferences = MetadataItem.extend({
 Contains your preferences for the Reference application. If
 you move or delete this item, your preferences will be lost.`,
       meta: {
+        showHelp: false,
+        seenTips: {},
         achievements: {}
       }
     };

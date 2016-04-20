@@ -5,8 +5,9 @@
 <style type="text/css">
 	.st0{fill:none;stroke:#000000;stroke-miterlimit:10;}
 </style>
-<polygon vector-effect="non-scaling-stroke" class="st0" points="160.5,351.4 160.5,107.1 108,107.1 108,351.4 108,403.9 160.5,403.9 404,403.9 404,351.4 "/>
-<rect vector-effect="non-scaling-stroke" x="277.7" y="254.7" class="st0" width="52.5" height="52.5"/>
-<rect vector-effect="non-scaling-stroke" x="185.1" y="178.8" class="st0" width="52.5" height="52.5"/>
-<rect vector-effect="non-scaling-stroke" x="259.7" y="123.1" class="st0" width="52.5" height="52.5"/>
+<rect x="198.2" y="191.9" vector-effect="non-scaling-stroke" class="st0" width="26.2" height="26.2"/>
+<rect x="272.8" y="136.2" vector-effect="non-scaling-stroke" class="st0" width="26.2" height="26.2"/>
+<rect x="290.8" y="267.8" vector-effect="non-scaling-stroke" class="st0" width="26.2" height="26.2"/>
+<line vector-effect="non-scaling-stroke" class="st0" x1="160" y1="403.9" x2="160" y2="107.1"/>
+<line vector-effect="non-scaling-stroke" class="st0" x1="107.6" y1="351.5" x2="404.4" y2="351.5"/>
 </svg>

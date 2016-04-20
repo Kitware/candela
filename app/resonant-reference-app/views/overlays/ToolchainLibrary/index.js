@@ -127,6 +127,7 @@ let ToolchainLibrary = Backbone.View.extend({
 
     if (toolchainModels.length > 0) {
       jQuery('#' + divId).show();
+      jQuery('#' + divId + 'Divider').show();
       jQuery('#' + divId + 'Header').show();
       jQuery('#' + divId + 'Explanation').show();
     }

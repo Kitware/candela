@@ -6,6 +6,9 @@ import myTemplate from './template.html';
 
 import loadingIcon from '../../../images/spinner.gif';
 
+import infoIcon from '../../../images/info.svg';
+import newInfoIcon from '../../../images/newInfo.svg';
+
 import editableIcon from '../../../images/canEdit.svg';
 import uneditableIcon from '../../../images/cantEdit.svg';
 
@@ -45,6 +48,8 @@ let Header = Backbone.View.extend({
     
     this.listenTo(window.mainPage.widgetPanels, 'rra:updateWidgetSpecs',
       this.render);
+    
+    this.listenTo(window.mainPage.helpLayer, 'rra:updateHelp', this.render);
 
     this.listenTo(window.mainPage.userPreferences,
       'rra:levelUp', this.notifyLevelUp);
@@ -69,6 +74,9 @@ let Header = Backbone.View.extend({
       jQuery('#achievementsButton').on('click', () => {
         window.mainPage.overlay.render('AchievementLibrary');
       });
+      jQuery('#helpButton').on('click', () => {
+        window.mainPage.helpLayer.toggle();
+      });
       jQuery('#toolchainLocationButton')
         .on('click', () => {
           window.mainPage.overlay.render('ToolchainSettings');
@@ -78,6 +86,12 @@ let Header = Backbone.View.extend({
         window.mainPage.toolchain.rename(this.value);
       });
       this.templateAdded = true;
+    }
+    
+    if (window.mainPage.helpLayer.hasNewTips()) {
+      jQuery('#helpButton').attr('src', newInfoIcon);
+    } else {
+      jQuery('#helpButton').attr('src', infoIcon);
     }
 
     if (window.mainPage.toolchain) {

@@ -46,15 +46,7 @@ Choose your own visualization adventure.
 The Resonant Reference App will replace the Girder interface at ([localhost:8080](http://localhost:8080))
 (you can still access the girder interface at ([localhost:8080/girder](http://localhost:8080/girder)))
 
-5. Set up the girder instance for the reference app by running
-   this script (in this directory):
-
-  ```bash
-  cd candela_repo_dir/app/resonant-reference-app
-  python girderSetup.py
-  ```
-
-6. Optionally, you can add an example library to the girder instance
+5. Optionally, you can add an example library to the girder instance
    by running this script from the `examples` directory:
    
    ```bash

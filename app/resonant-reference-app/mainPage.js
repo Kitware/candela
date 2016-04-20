@@ -7,6 +7,7 @@ import Toolchain from './models/Toolchain';
 import Header from './views/layout/Header';
 import WidgetPanels from './views/layout/WidgetPanels';
 import Overlay from './views/layout/Overlay';
+import HelpLayer from './views/layout/HelpLayer';
 
 // Page-wide Styles
 import './stylesheets/pure-css-custom-form-elements/style.css';
@@ -53,6 +54,9 @@ let MainPage = Backbone.View.extend({
       this.overlay = new Overlay({
         el: '#Overlay'
       });
+      this.helpLayer = new HelpLayer({
+        el: '#HelpLayer'
+      });
       this.router.addListeners();
       this.currentUser.addListeners();
       this.header.addListeners();
@@ -62,6 +66,7 @@ let MainPage = Backbone.View.extend({
     this.header.render();
     this.widgetPanels.render();
     this.overlay.render();
+    this.helpLayer.render();
   },
   newToolchain: function () {
     this.toolchain = new Toolchain();
