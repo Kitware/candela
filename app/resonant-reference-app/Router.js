@@ -90,6 +90,7 @@ var Router = Backbone.Router.extend({
         window.mainPage.switchToolchain(toolchainId)
           .then(() => {
             window.mainPage.widgetPanels.setWidgets(params.widgets);
+            window.mainPage.overlay.closeOverlay();
           });
       } else if (changedToolchain) {
         // The user didn't change the widgets that were
@@ -100,10 +101,12 @@ var Router = Backbone.Router.extend({
           .then(() => {
             window.mainPage.widgetPanels.setWidgets(
               window.mainPage.toolchain.getMeta('preferredWidgets'));
+            window.mainPage.overlay.closeOverlay();
           });
       } else if (changedWidgets) {
         // We're only changing which widgets should be open
         window.mainPage.widgetPanels.setWidgets(params.widgets);
+        window.mainPage.overlay.closeOverlay();
       }
     }
   },
