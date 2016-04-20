@@ -70,7 +70,7 @@ export default function imageTest ({name, url, selector, delay = 0, threshold}) 
       resemble(image)
         .compareTo(refImage)
         .onComplete(analysis => {
-          const passed = Number(analysis.misMatchPercentage) < threshold;
+          const passed = Number(analysis.misMatchPercentage) < threshold * 100;
           if (!passed) {
             fs.writeFileSync(path.join(dirname, `${name}-test.png`), imageBuf.toString('base64'), 'base64');
             fs.writeFileSync(path.join(dirname, `${name}-diff.png`), rawData(analysis.getImageDataUrl()), 'base64');
