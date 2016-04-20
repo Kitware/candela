@@ -13,6 +13,11 @@ addons:
         packages:
             - g++-4.8
             - libgif-dev
+    artifacts:
+      s3_region: "us-east-1"
+      paths:
+        - $(find src/candela/components -name '*.png' | tr "\n" ":")
+      debug: true
 
 cache:
   directories:
