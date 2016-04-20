@@ -2,7 +2,6 @@
   position: absolute;
   top: 0px;
   right: 0px;
-  padding: 1em;
   background-color: white;
   border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
@@ -10,18 +9,19 @@
 }
 
 .hamburgerMenu hr {
-  width: calc(100% + 2em);
-  position: relative;
-  left: -1em;
+  width: 100%;
   border: none;
   height: 1px;
   background-color: #e5e5e5;
+  margin: 0px;
 }
 
 .hamburgerMenu > div {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
+  padding: 0em 0.5em;
+  margin: 0.25em 0em;
 }
 
 .hamburgerMenu > div:hover {

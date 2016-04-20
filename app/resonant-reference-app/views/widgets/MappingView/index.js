@@ -74,26 +74,23 @@ let MappingView = Widget.extend({
     window.mainPage.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
-    let screen;
     if (this.ok === true) {
-      screen = this.getSuccessScreen(`
+      window.mainPage.overlay.renderSuccessScreen(`
 You've wired up all the connections that the visualization needs.
 Well done!`);
     } else {
       let meta = window.mainPage.toolchain.get('meta');
       if (!meta || !meta.visualizations || !meta.visualizations[0] ||
         !meta.datasets || !meta.datasets[0]) {
-        screen = this.getErrorScreen(`
+        window.mainPage.overlay.renderUserErrorScreen(`
 You need to choose both a Dataset and a Visualization
 in order to connect them together.`);
       } else {
-        screen = this.getErrorScreen(`
+        window.mainPage.overlay.renderUserErrorScreen(`
 The visualization needs more connections to data in
 order to display anything.`);
       }
     }
-
-    window.mainPage.overlay.render(screen);
   },
   createNodeId: function (d) {
     // Generate a valid ID for the node

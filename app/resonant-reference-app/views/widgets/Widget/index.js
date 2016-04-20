@@ -1,4 +1,3 @@
-import Underscore from 'underscore';
 import Backbone from 'backbone';
 import jQuery from 'jquery';
 
@@ -9,10 +8,6 @@ import spinnerIcon from '../../../images/spinner.gif';
 import warningIcon from '../../../images/warning.svg';
 import infoIcon from '../../../images/info.svg';
 import newInfoIcon from '../../../images/newInfo.svg';
-
-import loadingTemplate from './loadingTemplate.html';
-import errorTemplate from './errorTemplate.html';
-import successTemplate from './successTemplate.html';
 
 let Widget = Backbone.View.extend({
   initialize: function (spec) {
@@ -52,21 +47,6 @@ let Widget = Backbone.View.extend({
   },
   renderIndicators: function () {
     this.panel.renderIndicators();
-  },
-  getLoadingScreen: function (message) {
-    return Underscore.template(loadingTemplate)({
-      message: message
-    });
-  },
-  getErrorScreen: function (message) {
-    return Underscore.template(errorTemplate)({
-      message: message
-    });
-  },
-  getSuccessScreen: function (message) {
-    return Underscore.template(successTemplate)({
-      message: message
-    });
   }
 });
 

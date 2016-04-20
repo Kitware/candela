@@ -13,6 +13,7 @@
   background-color: white;
   border: 1px solid rgba(0,0,0,0.2);
   box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  min-height: 15em;
 }
 
 #Overlay div.libraryInterface {
@@ -26,12 +27,12 @@
   margin: 5em;
   padding: 3em;
 }
-#Overlay div.hint img.headerIcon {
-  position: relative;
-  left: calc(50% - 2em);
-  width: 4em;
-  height: 4em;
-  margin-bottom: 2em;
+
+#Overlay img.headerIcon {
+  float: right;
+  height: 16em;
+  margin-right: -1em;
+  margin-left: 1em;
 }
 
 #Overlay div.circleset {

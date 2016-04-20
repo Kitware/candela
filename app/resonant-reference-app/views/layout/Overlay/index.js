@@ -14,7 +14,11 @@ import DatasetLibrary from '../../overlays/DatasetLibrary';
 import VisualizationLibrary from '../../overlays/VisualizationLibrary';
 import ToolchainSettings from '../../overlays/ToolchainSettings';
 
-import errorTemplate from './generalErrorTemplate.html';
+import reallyBadErrorTemplate from './reallyBadErrorTemplate.html';
+import errorTemplate from './errorTemplate.html';
+import userErrorTemplate from './userErrorTemplate.html';
+import successTemplate from './successTemplate.html';
+import loadingTemplate from './loadingTemplate.html';
 
 let VIEWS = {
   HamburgerMenu: HamburgerMenu,
@@ -68,20 +72,35 @@ let Overlay = Backbone.View.extend({
       console.warn('Unknown error! Here\'s what I was given:', arguments);
     }
     // Let the user know something funky is up
-    this.render(this.getErrorScreen(message));
+    this.renderReallyBadErrorScreen(message);
 
     // Actually throw the error if it's a real one
     if (errorObj instanceof Error) {
       throw errorObj;
     }
   },
-  getErrorScreen: function (message) {
-    return Underscore.template(errorTemplate)({
-      message: message
-    });
+  getScreen: function (template, message) {
+    let options = {
+      message: message,
+      bugReportLink: 'mailto:alex.bigelow@kitware.com',
+      consultingLink: 'http://www.kitware.com/company/contact_kitware.php'
+    };
+    return Underscore.template(template)(options);
+  },
+  renderLoadingScreen: function (message) {
+    this.render(this.getScreen(loadingTemplate, message));
   },
   renderErrorScreen: function (message) {
-    this.render(this.getErrorScreen(message));
+    this.render(this.getScreen(errorTemplate, message));
+  },
+  renderUserErrorScreen: function (message) {
+    this.render(this.getScreen(userErrorTemplate, message));
+  },
+  renderReallyBadErrorScreen: function (message) {
+    this.render(this.getScreen(reallyBadErrorTemplate, message));
+  },
+  renderSuccessScreen: function (message) {
+    this.render(this.getScreen(successTemplate, message));
   },
   closeOverlay: function () {
     // If we don't have a toolchain, jump straight to the

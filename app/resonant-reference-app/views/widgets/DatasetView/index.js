@@ -74,36 +74,33 @@ let DatasetView = Widget.extend({
   renderInfoScreen: function () {
     this.newInfo = false;
     this.renderIndicators();
-
+    
     window.mainPage.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
-    let screen;
     if (this.status === STATUS.NO_DATA) {
-      screen = this.getErrorScreen(`
+      window.mainPage.overlay.renderUserErrorScreen(`
 You have not chosen a dataset yet. Click 
 <a onclick="window.mainPage.overlay.render('DatasetLibrary')">
 here</a> to choose one.`);
     } else if (this.status === STATUS.SUCCESS) {
-      screen = this.getSuccessScreen(`
+      window.mainPage.overlay.renderSuccessScreen(`
 The dataset appears to have loaded correctly.`);
     } else if (this.status === STATUS.CANT_LOAD) {
-      screen = this.getErrorScreen(`
+      window.mainPage.overlay.renderErrorScreen(`
 The dataset could not be loaded; there is a good chance
 that there is a permissions problem.`);
     } else if (this.status === STATUS.CANT_PARSE) {
-      screen = this.getErrorScreen(`
+      window.mainPage.overlay.renderUserErrorScreen(`
 There was a problem parsing the data; you'll probably need to
 <a>edit</a> or <a>reshape</a> the data in order to use it.`);
     } else if (this.status === STATUS.NO_ATTRIBUTES) {
-      screen = this.getErrorScreen(`
+      window.mainPage.overlay.renderUserErrorScreen(`
 There was a problem parsing the data. Specifically, we're having
 trouble understanding the dataset attributes (usually column headers);
 you'll probably need to
 <a>edit</a> or <a>reshape</a> the data in order to use it.`);
     }
-
-    window.mainPage.overlay.render(screen);
   },
   renderAttributeSettings: function () {
     let datasets = window.mainPage.toolchain.getMeta('datasets');

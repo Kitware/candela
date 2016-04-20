@@ -64,32 +64,27 @@ let VisualizationView = Widget.extend({
     window.mainPage.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
-    let screen;
     if (this.ok === null) {
-      screen = this.getErrorScreen(`
+      window.mainPage.overlay.renderUserErrorScreen(`
 You have not chosen a visualization yet. Click 
 <a onclick="window.mainPage.overlay.render('VisualizationLibrary')">
 here</a> to choose one.`);
     } else if (this.ok === true) {
-      screen = this.getSuccessScreen(`
+      window.mainPage.overlay.renderSuccessScreen(`
 The visualization appears to be functioning correctly.`);
     } else {
       let meta = window.mainPage.toolchain.get('meta');
 
       if (!meta || !meta.visualizations || !meta.visualizations[0]) {
-        screen = this.getErrorScreen(`
+        window.mainPage.overlay.renderUserErrorScreen(`
 You have not chosen a visualization yet. Click 
 <a onclick="window.mainPage.overlay.render('VisualizationLibrary')">
 here</a> to choose one.`);
       } else {
-        // TODO: Auto-log unexpected errors
-        screen = this.getErrorScreen(`
-You encountered an error we didn't anticipate! Please report it
-<a>here</a>.`);
+        window.mainPage.overlay.renderReallyBadErrorScreen(`
+Corrupted visualization meta information.`);
       }
     }
-
-    window.mainPage.overlay.render(screen);
   },
   render: function () {
     // Get the visualization in the toolchain (if there is one)
