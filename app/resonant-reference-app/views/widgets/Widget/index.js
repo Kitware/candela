@@ -13,10 +13,11 @@ let Widget = Backbone.View.extend({
   initialize: function (spec) {
     this.friendlyName = 'ERROR! Abstract Widget!';
     this.spec = spec;
+    this.panel = null;
     this.statusText = {
       text: '',
       onclick: () => {
-        this.panel.toggle();
+        this.toggle();
       }
     };
 
@@ -31,8 +32,6 @@ let Widget = Backbone.View.extend({
         this.toggle();
       }
     }];
-
-    this.panel = null;
   },
   toggle: function () {
     window.mainPage.widgetPanels.toggleWidget(this.spec);
