@@ -21,7 +21,15 @@ function callerDirname () {
 }
 
 function doSaveImage (name) {
-  return process.env.CANDELA_SAVE_IMAGE && process.env.CANDELA_SAVE_IMAGE.split(',').indexOf(name) > -1;
+  // This function returns true if (1) there is an environment variable set
+  // called "CANDELA_SAVE_IMAGE", and either (2a) the name of the test appears
+  // in the value of the variable when treated as a comma separated list of
+  // strings, or (2b) the variable reads "all".
+  const go = process.env.CANDELA_SAVE_IMAGE;
+  const mentionsName = go && process.env.CANDELA_SAVE_IMAGE.split(',').indexOf(name) > -1;
+  const doAll = go && process.env.CANDELA_SAVE_IMAGE === 'all';
+
+  return go && mentionsName || doAll;
 }
 
 Promise.onPossiblyUnhandledRejection(err => {
