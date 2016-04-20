@@ -30,38 +30,41 @@ let WidgetPanel = Backbone.View.extend({
   render: function () {
     // We need a header
     let header = d3.select(this.el)
-      .selectAll('span.sectionHeader').data([0]);
-    let headerEnter = header.enter().append('span')
+      .selectAll('div.sectionHeader').data([0]);
+    let headerEnter = header.enter().append('div')
       .attr('class', 'sectionHeader')
       .on('click', () => {
         this.widget.toggle();
       });
+    
+    let titleEnter = headerEnter.append('div')
+      .attr('class', 'titleSection');
 
     // Add the icon that goes with the panel
-    headerEnter.append('img')
+    titleEnter.append('img')
       .attr('src', ICONS[this.widget.spec.widgetType]);
 
     // Add a title to the header that collapses / expands
     // the section
-    headerEnter.append('h2')
+    titleEnter.append('h2')
       .attr('class', 'title');
     header.select('h2.title')
       .text(this.widget.friendlyName);
 
     // Add a little space for the widget to
     // store status indicators and icons
-    let indicatorsEnter = headerEnter.append('span')
+    let indicatorsEnter = headerEnter.append('div')
       .attr('class', 'indicators');
 
-    indicatorsEnter.append('span')
+    indicatorsEnter.append('h2')
       .attr('class', 'indicatorText');
-    indicatorsEnter.append('span')
+    indicatorsEnter.append('div')
       .attr('class', 'indicatorIcons');
 
     // Finally, a div (that will scroll)
     // to contain the view
     let container = d3.select(this.el)
-      .selectAll('div#' + this.spec.hashName + 'Container')
+      .selectAll('#' + this.spec.hashName + 'Container')
       .data([0]);
     container.enter().append('div').attr({
       id: this.spec.hashName + 'Container',
@@ -78,9 +81,9 @@ let WidgetPanel = Backbone.View.extend({
   },
   renderIndicators() {
     let indicators = d3.select(this.el)
-      .select('span.indicators');
+      .select('.indicators');
 
-    indicators.select('span.indicatorText')
+    indicators.select('.indicatorText')
       .text(this.widget.statusText.text)
       .attr('title', this.widget.statusText.title
         ? this.widget.statusText.title : null)
@@ -93,7 +96,7 @@ let WidgetPanel = Backbone.View.extend({
 
     // Update our set of indicator icons
     let indicatorIcons = d3.select(this.el)
-      .select('span.indicatorIcons')
+      .select('.indicatorIcons')
       .selectAll('img').data(this.widget.icons);
 
     indicatorIcons.enter().append('img');

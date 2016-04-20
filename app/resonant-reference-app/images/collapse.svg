@@ -4,7 +4,7 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#666666;}
+	.st0{fill:#999999;}
 </style>
 <path class="st0" d="M512,512H0V0h512V512z M480,32H224v448h256V32z M192,32H32v448h160V32z"/>
 <polygon class="st0" points="265,256 437.2,156.7 437.2,355.3 "/>

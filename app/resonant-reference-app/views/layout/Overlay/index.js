@@ -100,12 +100,12 @@ let Overlay = Backbone.View.extend({
 
     // Clicking on the area outside the overlay:
     let self = this;
-    this.$el.on('click', event => {
+    this.$el.on('click', function (event) {
       // this refers to the DOM element
       if (event.target !== this) {
         return;
       } else {
-        this.closeOverlay();
+        self.closeOverlay();
       }
     });
 

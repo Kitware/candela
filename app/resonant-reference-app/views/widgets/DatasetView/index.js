@@ -1,7 +1,7 @@
 import d3 from 'd3';
 import jQuery from 'jquery';
 import ace from 'brace';
-import 'brace/theme/clouds';
+import 'brace/theme/textmate';
 import Widget from '../Widget';
 import Dataset from '../../../models/Dataset';
 import myTemplate from './template.html';
@@ -174,7 +174,7 @@ you'll probably need to
       fontFamily: 'Cutive Mono, Courier, Monospace',
       fontSize: '10pt'
     });
-    editor.setTheme('ace/theme/clouds');
+    editor.setTheme('ace/theme/textmate');
     editor.$blockScrolling = Infinity;
 
     if (!dataset) {

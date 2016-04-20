@@ -14,24 +14,6 @@ a {
   color: #0181bc;
 }
 
-p {
-  margin: 0 0 1em;
-}
-
-h1 {
-  line-height: 1.25em;
-}
-
-h2,
-h3 {
-  margin: 0 0 0.5em;
-  font-size: 1.2em;
-}
-
-h3 {
-  font-size: 1em
-}
-
 pre,
 code {
   font-size: 0.7em;
@@ -47,22 +29,6 @@ code {
 pre {
   padding: 1em;
   white-space: pre-line;
-}
-
-#first ~ h2 {
-  margin-top: 2em
-}
-
-.small {
-  font-size: 0.75em;
-  line-height: 1.5em;
-}
-
-hr {
-  border: none;
-  height: 0;
-  border-top: solid 1px #ccc;
-  margin: 1.5em 0;
 }
 
 

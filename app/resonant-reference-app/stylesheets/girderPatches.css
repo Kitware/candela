@@ -13,9 +13,6 @@
   text-align: center;
   top: calc(50% - 16em);
   padding: 2em 4em 2em 4em;
-  border-radius: 1em;
-  border: 2px solid #ccc;
-  background-color: white;
 }
 
 #Overlay button.close {
@@ -43,8 +40,11 @@
   cursor: pointer;
   border-radius: 4px;
   color: #000;
-  font-weight: bold;
-  font-size: inherit;
+  font-family: "Montserrat", "Arial", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 400;
+  font-size: 0.75em;
   border: solid 1px #ccc;
   background-position: center bottom;
 }
@@ -58,6 +58,7 @@
 #Overlay .modal-body {
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   justify-content: space-around;
 }
 
@@ -71,12 +72,16 @@
 }
 
 #Overlay .form-group input {
-  width: 100%;
+  width: 22em;
 }
 
+#Overlay .g-password-reset-explanation,
 #Overlay .g-bottom-message,
 #Overlay .g-validation-failed-message {
+  text-align: left;
+  width: 100%;
   flex-wrap: wrap;
+  font-size: 0.75em;
 }
 
 #Overlay .g-validation-failed-message {

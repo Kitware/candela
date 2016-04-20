@@ -2,21 +2,39 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(0,0,0,0.35);
   z-index: 8;
   overflow: auto;
 }
 
-div.libraryInterface {
+#Overlay .modal-dialog,
+#Overlay div.libraryInterface,
+#Overlay div.hint {
+  background-color: white;
+  border: 1px solid rgba(0,0,0,0.2);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+#Overlay div.libraryInterface {
   position: relative;
   margin: 5em;
   padding: 1em 2em 2em 3em;
-  border-radius: 1em;
-  border: 2px solid #ccc;
-  background-color: white;
 }
 
-div.circleset {
+#Overlay div.hint {
+  position: relative;
+  margin: 5em;
+  padding: 3em;
+}
+#Overlay div.hint img.headerIcon {
+  position: relative;
+  left: calc(50% - 2em);
+  width: 4em;
+  height: 4em;
+  margin-bottom: 2em;
+}
+
+#Overlay div.circleset {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
@@ -24,7 +42,7 @@ div.circleset {
   align-items: center;
 }
 
-div.circleButton {
+#Overlay div.circleButton {
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -34,7 +52,7 @@ div.circleButton {
   cursor: pointer;
 }
 
-div.circleButton img {
+#Overlay div.circleButton img {
   width: 100px;
   height: 100px;
   text-align: center;
@@ -42,39 +60,19 @@ div.circleButton img {
   border-radius: 50px;
   border: 2px solid rgba(0,0,0,0);
 }
-div.current.circleButton img {
+#Overlay div.current.circleButton img {
   background-color: #ccc;
 }
 
-div.circleButton:hover img {
+#Overlay div.circleButton:hover img {
   border: 2px solid #ccc;
 }
 
-#closeOverlay {
+#Overlay #closeOverlay {
   position: absolute;
   top: 1em;
   right: 1em;
   width: 2em;
   height: 2em;
   cursor: pointer;
-}
-
-div.hint {
-  position: relative;
-  margin: 5em;
-  padding: 3em;
-  border-radius: 1em;
-  border: 2px solid #ccc;
-  background-color: white;
-}
-div.hint img.headerIcon {
-  position: relative;
-  left: calc(50% - 2em);
-  width: 4em;
-  height: 4em;
-  margin-bottom: 2em;
-}
-div.hint a {
-  cursor: pointer;
-  text-decoration: underline;
 }

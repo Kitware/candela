@@ -3,8 +3,19 @@
   top: 0px;
   right: 0px;
   padding: 1em;
-  border: 2px solid #ccc;
   background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  border-radius: 4px;
+}
+
+.hamburgerMenu hr {
+  width: calc(100% + 2em);
+  position: relative;
+  left: -1em;
+  border: none;
+  height: 1px;
+  background-color: #e5e5e5;
 }
 
 .hamburgerMenu > div {
@@ -12,8 +23,9 @@
   flex-wrap: nowrap;
   align-items: center;
 }
+
 .hamburgerMenu > div:hover {
-  background-color: #ccc;
+  background-color: #eee;
   cursor: pointer;
 }
 

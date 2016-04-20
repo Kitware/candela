@@ -4,7 +4,7 @@
   top: 0px;
   width: 100%;
   height: 3em;
-  background-color: black;
+  background-color: #3f3b3b;
   color: white;
   display: flex;
   flex-direction: row-reverse;
@@ -21,8 +21,8 @@
 
 #Header img.headerButton:hover {
   cursor: pointer;
-  -webkit-filter: brightness(3);
-  filter: brightness(3);
+  -webkit-filter: grayscale(100%) brightness(1000%);
+  filter: grayscale(100%) brightness(1000%);
 }
 
 #Header div.indicators {
@@ -64,8 +64,7 @@
   background-color: inherit;
   color: inherit;
   border: none;
-  font-size: inherit;
-  width: 10em;
   margin: 0.25em;
   text-align: center;
+  box-shadow: none;
 }
