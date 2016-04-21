@@ -1,0 +1,29 @@
+#DatasetViewContainer {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+}
+
+#DatasetViewContainer #editor {
+  flex-grow: 1;
+}
+
+#DatasetViewContainer #attributeSettings {
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: block;
+}
+
+#DatasetViewContainer #attributeSettings .cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  text-align: center;
+  padding: 0.5em;
+  min-height: 3em;
+  white-space: nowrap;
+}
+
+#DatasetViewContainer #attributeSettings .cell select {
+  width: auto;
+}

@@ -1,7 +1,7 @@
 import Backbone from 'backbone';
 import d3 from 'd3';
 import myTemplate from './template.html';
-import libImage from '../../../images/library.svg';
+import libImage from '../../../images/light/library.svg';
 import candela from './../../../../../src/candela';
 
 let VisualizationLibrary = Backbone.View.extend({
@@ -44,8 +44,10 @@ let VisualizationLibrary = Backbone.View.extend({
 
     d3.select('div.libraryInterface').selectAll('.circleButton')
       .on('click', function (d) {
-        window.toolchain.setVisualization(d);
-        window.layout.overlay.render(null);
+        window.mainPage.toolchain.setVisualization(d);
+        window.mainPage.toolchain.openWidget('VisualizationView');
+        window.mainPage.router.expandWidget('VisualizationView');
+        window.mainPage.overlay.render(null);
       });
   }
 });

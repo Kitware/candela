@@ -42,6 +42,9 @@ div.circleButton img {
   border-radius: 50px;
   border: 2px solid rgba(0,0,0,0);
 }
+div.current.circleButton img {
+  background-color: #ccc;
+}
 
 div.circleButton:hover img {
   border: 2px solid #ccc;
@@ -74,4 +77,31 @@ div.hint img.headerIcon {
 div.hint a {
   cursor: pointer;
   text-decoration: underline;
+}
+
+div.form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+div.form > * {
+  margin: 0.5em;
+  display: flex;
+}
+div.form > div > * {
+  white-space: nowrap;
+  margin: 0em 0.5em;
+}
+div.form img {
+  width: 2em;
+  height: 2em;
+  border: 2px solid rgba(0,0,0,0);
+}
+div.form img.button:hover {
+  border: 2px solid #ccc;
+  border-radius: 1em;
+  cursor: pointer;
+}
+div.form label {
+  line-height: 2em;
 }

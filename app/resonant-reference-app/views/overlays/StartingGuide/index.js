@@ -10,11 +10,9 @@ let StartingGuide = Backbone.View.extend({
 
     jQuery('#startingGuide button').on('click', function () {
       if (this.textContent === 'Start With Data') {
-        window.location.href = '#singleDatasetView';
-        window.layout.overlay.render('datasetLibrary');
+        window.mainPage.overlay.render('DatasetLibrary');
       } else {
-        window.location.href = '#singleVisualizationView';
-        window.layout.overlay.render('visualizationLibrary');
+        window.mainPage.overlay.render('VisualizationLibrary');
       }
     });
   }

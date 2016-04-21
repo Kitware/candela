@@ -9,6 +9,7 @@ import LineUp from './LineUp';
 import ParallelCoordinates from './ParallelCoordinates';
 import Scatter from './Scatter';
 import ScatterMatrix from './ScatterMatrix';
+import UpSet from './UpSet';
 
 export default {
   Bar,
@@ -21,5 +22,6 @@ export default {
   LineUp,
   ParallelCoordinates,
   Scatter,
-  ScatterMatrix
+  ScatterMatrix,
+  UpSet
 };

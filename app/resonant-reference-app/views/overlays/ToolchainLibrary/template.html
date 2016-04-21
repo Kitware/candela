@@ -1,0 +1,53 @@
+<div class="libraryInterface">
+  <img src="../../../images/close.svg" id="closeOverlay" />
+
+  <h1 id="toolchainSettingsHeader">
+    Toolchain Settings
+  </h1>
+  <div id="toolchainSettings">
+    <p>A toolchain connects datasets to visualizations. If your toolchain is public, you can share your work simply by sharing the URL.</p>
+    
+    <div class="form">      
+      <input id="toolchainName" type="text" />
+      
+      <div id="saveAsControls">
+        <img src="../../../images/warning.svg"/>
+        <label>You do not have a saved copy of this toolchain.</label>
+        <button id="saveAsButton">Save</button>
+      </div>
+      
+      <div id="visibilityControls">
+        <img id="copyLinkButton" src="../../../images/copyLink.svg" class="button" title="Click to copy a link to this toolchain"/>
+        <img id="visibilityIcon"/>
+        <input id="privateVisibility" name="toolchainVisibility" type="radio">
+        <label for="privateVisibility">Private</label>
+        <input id="publicVisibility" name="toolchainVisibility" type="radio">
+        <label for="publicVisibility">Public</label>
+        
+        <button id="deleteButton">Delete</button>
+        
+        <button id="newButton">New Empty Toolchain</button>
+      </div>
+    </div>
+    
+  </div>
+
+  <h1 id="privateToolchainsHeader" class="hideable">
+    Your Private Toolchains
+  </h1>
+  <div id="privateToolchains" class="hideable circleset">
+
+  </div>
+  <h1 id="publicToolchainsHeader" class="hideable">
+    Your Public Toolchains
+  </h1>
+  <div id="publicToolchains" class="hideable circleset">
+
+  </div>
+  <h1 id="toolchainLibraryHeader" class="hideable">
+    Our Toolchain Library
+  </h1>
+  <div id="toolchainLibrary" class="hideable circleset">
+
+  </div>
+</div>

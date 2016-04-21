@@ -36,18 +36,6 @@ module.exports = {
     ]),
 
     new HtmlPlugin({
-      title: 'Candela Demo',
-      filename: 'demo/index.html',
-      chunks: ['demo']
-    }),
-
-    new HtmlPlugin({
-      title: 'Resize Test',
-      filename: 'resize/index.html',
-      chunks: ['resize']
-    }),
-
-    new HtmlPlugin({
       title: 'Candela Examples',
       filename: 'examples/index.html',
       chunks: ['examples']
@@ -98,12 +86,20 @@ module.exports = {
         loader: 'raw-loader'
       },
       {
+        test: /\.html$/,
+        loader: 'html-loader?attrs=img:src'
+      },
+      {
         test: /\.styl$/,
         loaders: ['style-loader', 'css-loader', 'stylus-loader']
       },
       {
         test: /\.css$/,
         loaders: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.scss$/,
+        loaders: ['style-loader', 'css-loader', 'sass-loader']
       },
       {
         test: /\.jade$/,

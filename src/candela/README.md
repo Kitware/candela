@@ -3,6 +3,7 @@
 * candela.[components](components#readme) - The built-in candela components.
 * candela.[VisComponent](VisComponent#readme) - The base class and mixins for
 candela components.
+* candela.[util](util#readme) - Candela utility functions.
 * [Sizing](#sizing)
 * [Field Mappings](#field-mappings)
 * [Data Types](#data-types)

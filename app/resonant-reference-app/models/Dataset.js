@@ -1,3 +1,5 @@
+import Backbone from 'backbone';
+import MetadataItem from './MetadataItem';
 import datalib from 'datalib';
 
 let girder = window.girder;
@@ -7,19 +9,22 @@ let COMPATIBLE_TYPES = {
   integer: ['integer', 'boolean'],
   number: ['number', 'integer', 'boolean'],
   date: ['date'],
-  string: ['string', 'date', 'number', 'integer', 'boolean']
+  string: ['string', 'date', 'number', 'integer', 'boolean'],
+  'string_list': ['string_list']
 };
 
-let Dataset = girder.models.ItemModel.extend({
+let VALID_EXTENSIONS = [
+  'csv',
+  'tsv',
+  'json'
+];
+
+let Dataset = MetadataItem.extend({
   initialize: function () {
     let self = this;
     self.rawCache = null;
     self.parsedCache = null;
-    let meta = this.get('meta');
-    if (!meta) {
-      meta = {};
-      self.set('meta', meta);
-    }
+    let meta = this.getMeta();
     if (!meta.fileType) {
       self.inferFileType();
     }
@@ -35,7 +40,7 @@ let Dataset = girder.models.ItemModel.extend({
       callback(self.rawCache);
     } else {
       girder.restRequest({
-        path: 'api/v1/item/' + self.id + '/download',
+        path: 'item/' + self.id + '/download',
         type: 'GET',
         error: null,
         dataType: 'text'
@@ -49,7 +54,7 @@ let Dataset = girder.models.ItemModel.extend({
   },
   getSpec: function () {
     let self = this;
-    let meta = self.get('meta');
+    let meta = self.getMeta();
     let spec = {
       name: self.name()
     };
@@ -67,7 +72,7 @@ let Dataset = girder.models.ItemModel.extend({
       callback(self.parsedCache);
     } else {
       self.loadData(function (rawData) {
-        let meta = self.get('meta');
+        let meta = self.getMeta();
         let formatPrefs = {
           type: meta.fileType
         };
@@ -77,13 +82,13 @@ let Dataset = girder.models.ItemModel.extend({
           formatPrefs.parse = 'auto';
         }
         let parsedData;
-        
+
         try {
           parsedData = datalib.read(rawData, formatPrefs);
         } catch (e) {
           parsedData = null;
         }
-        
+
         if (cache) {
           self.parsedCache = parsedData;
         }
@@ -93,34 +98,41 @@ let Dataset = girder.models.ItemModel.extend({
   },
   inferFileType: function () {
     let self = this;
-    let fileType = self.name();
-    fileType = fileType.split('.');
-    fileType = fileType[fileType.length - 1];
-    let meta = self.get('meta');
-    meta.fileType = fileType;
-    this.set('meta', meta);
+    let fileType = self.get('name');
+    if (fileType === undefined || fileType.indexOf('.') === -1) {
+      fileType = 'txt';
+    } else {
+      fileType = fileType.split('.');
+      fileType = fileType[fileType.length - 1];
+    }
+    self.setMeta('fileType', fileType);
+    self.save();
   },
   inferAttributes: function () {
     let self = this;
     self.getParsed(function (data) {
-      let meta = self.get('meta');
       if (data === null) {
-        meta.attributes = {};
+        self.setMeta('attributes', {});
       } else {
-        meta.attributes = datalib.type.all(data);
+        self.setMeta('attributes', datalib.type.all(data));
       }
-      self.set('meta', meta);
+      self.save();
       self.trigger('rra:changeSpec');
     });
   },
   setAttribute: function (attrName, dataType) {
     let self = this;
-    let meta = self.get('meta');
-    meta.attributes[attrName] = dataType;
-    self.set('meta', meta);
+    let attributes = self.getMeta('attributes');
+    attributes[attrName] = dataType;
+    self.setMeta('attributes', attributes);
+    self.save();
     self.trigger('rra:changeSpec');
   }
 });
 
 Dataset.COMPATIBLE_TYPES = COMPATIBLE_TYPES;
+Dataset.VALID_EXTENSIONS = VALID_EXTENSIONS;
+Dataset.Collection = Backbone.Collection.extend({
+  model: Dataset
+});
 export default Dataset;

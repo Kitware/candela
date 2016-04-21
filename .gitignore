@@ -1,4 +1,5 @@
-*.swp
+*.sw*
+*.pyc
 node_modules
 build
 coverage
@@ -7,3 +8,4 @@ coverage
 npm-debug.log
 *-diff.png
 *-test.png
+.ipynb_checkpoints
