@@ -32,6 +32,14 @@ function doSaveImage (name) {
   return go && mentionsName || doAll;
 }
 
+function doDumpImage (name) {
+  const go = process.env.CANDELA_DUMP_IMAGE;
+  const mentionsName = go && process.env.CANDELA_DUMP_IMAGE.split(',').indexOf(name) > -1;
+  const doAll = go && process.env.CANDELA_DUMP_IMAGE === 'all';
+
+  return go && mentionsName || doAll;
+}
+
 Promise.onPossiblyUnhandledRejection(err => {
   console.log(err);
   throw err;
@@ -71,7 +79,7 @@ export default function imageTest ({name, url, selector, delay = 0, threshold}) 
         .compareTo(refImage)
         .onComplete(analysis => {
           const passed = Number(analysis.misMatchPercentage) < threshold * 100;
-          if (!passed) {
+          if (!passed || doDumpImage(name)) {
             fs.writeFileSync(path.join(dirname, `${name}-test.png`), imageBuf.toString('base64'), 'base64');
             fs.writeFileSync(path.join(dirname, `${name}-diff.png`), rawData(analysis.getImageDataUrl()), 'base64');
 
