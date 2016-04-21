@@ -82,11 +82,9 @@ export default function imageTest ({name, url, selector, delay = 0, threshold}) 
           if (!passed || doDumpImage(name)) {
             fs.writeFileSync(path.join(dirname, `${name}-test.png`), imageBuf.toString('base64'), 'base64');
             fs.writeFileSync(path.join(dirname, `${name}-diff.png`), rawData(analysis.getImageDataUrl()), 'base64');
-
-            console.log(analysis);
           }
 
-          t.ok(passed, `${name} image matches reference image to within ${threshold * 100}%`);
+          t.ok(passed, `${name} image matches reference image to within ${threshold * 100}% (actual diff: ${analysis.misMatchPercentage}%)`);
 
           t.end();
           return n.end().then();
