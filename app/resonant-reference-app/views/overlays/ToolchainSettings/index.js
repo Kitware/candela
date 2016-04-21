@@ -134,6 +134,7 @@ let ToolchainSettings = Backbone.View.extend({
       this.$el.find('#newButton').on('click', () => {
         window.mainPage.newToolchain().then(() => {
           window.mainPage.overlay.closeOverlay();
+          window.mainPage.widgetPanels.closeWidgets();
         });
       });
 

@@ -25,22 +25,25 @@ let DatasetLibrary = Backbone.View.extend({
     })).then(folder => {
       this.renderFolderContents(folder, 'datasetLibrary', libImage);
     }).catch(() => {}); // fail silently
+    
+    // Only show the per-account datasets if the user is logged in
+    if (window.mainPage.currentUser.isLoggedIn()) {
+      Promise.resolve(girder.restRequest({
+        path: 'folder/privateFolder',
+        type: 'GET',
+        error: null
+      })).then(folder => {
+        this.renderFolderContents(folder, 'privateDatasets', privateImage);
+      }).catch(() => {}); // fail silently
 
-    Promise.resolve(girder.restRequest({
-      path: 'folder/privateFolder',
-      type: 'GET',
-      error: null
-    })).then(folder => {
-      this.renderFolderContents(folder, 'privateDatasets', privateImage);
-    }).catch(() => {}); // fail silently
-
-    Promise.resolve(girder.restRequest({
-      path: 'folder/publicFolder',
-      type: 'GET',
-      error: null
-    })).then(folder => {
-      this.renderFolderContents(folder, 'publicDatasets', publicImage);
-    }).catch(() => {}); // fail silently
+      Promise.resolve(girder.restRequest({
+        path: 'folder/publicFolder',
+        type: 'GET',
+        error: null
+      })).then(folder => {
+        this.renderFolderContents(folder, 'publicDatasets', publicImage);
+      }).catch(() => {}); // fail silently
+    }
   },
   renderFolderContents: function (folder, divId, image) {
     let datasets = new girder.collections.ItemCollection();

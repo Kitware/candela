@@ -137,7 +137,7 @@ You encountered an error we didn't anticipate! Please report it
       this.ok = null;
       this.statusText.text = 'Loading...';
       this.renderIndicators();
-      window.mainPage.toolchain.shapeDataForVis(data => {
+      window.mainPage.toolchain.shapeDataForVis().then(data => {
         this.vis.options.data = data;
         this.vis.component.chart.update(this.vis.options);
         this.vis.component.render();

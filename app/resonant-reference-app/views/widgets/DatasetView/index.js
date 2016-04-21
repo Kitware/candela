@@ -187,7 +187,7 @@ you'll probably need to
       this.statusText.text = 'Loading...';
       this.renderIndicators();
 
-      dataset.getParsed(parsedData => {
+      dataset.parse().then(parsedData => {
         let rawData = dataset.rawCache;
         let spec = dataset.getSpec();
         if (rawData === null) {

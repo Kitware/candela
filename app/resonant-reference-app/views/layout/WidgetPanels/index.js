@@ -47,6 +47,9 @@ let WidgetPanels = Backbone.View.extend({
     this.expandedWidgets = newWidgets;
     this.trigger('rra:navigateWidgets');
   },
+  closeWidgets: function () {
+    this.setWidgets(new Set());
+  },
   render: Underscore.debounce(function () {
     // Create sections for each panel
     let sections = d3.select(this.el)

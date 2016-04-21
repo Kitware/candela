@@ -118,6 +118,7 @@ let Toolchain = MetadataItem.extend({
       if (meta.datasets instanceof Array) {
         meta.datasets = new Dataset.Collection(meta.datasets);
         this.listenTo(meta.datasets, 'rra:changeSpec', this.changeSpec);
+        this.listenTo(meta.datasets, 'rra:swapId', this.swapDataset);
       }
       if (meta.preferredWidgets instanceof Array) {
         meta.preferredWidgets = new Set(meta.preferredWidgets);
@@ -177,6 +178,24 @@ let Toolchain = MetadataItem.extend({
     });
     return ids;
   },
+  swapDataset: function (newDataset) {
+    // A dataset has changed behind the scenes (e.g. a
+    // copy was made)... if the ID is different, Backbone
+    // isn't going to update it for us. Instead, we need to
+    // swap out the old copy for the new one that we were using
+    let datasets = this.getMeta('datasets');
+    let oldDataset = datasets.get(newDataset._oldId);
+    let index = datasets.indexOf(oldDataset);
+    datasets.remove(oldDataset);
+    oldDataset.markObsolete();
+      
+    delete newDataset._oldId;
+    datasets.add(newDataset, {
+      at: index
+    });
+
+    this.setMeta('datasets', datasets);
+  },
   setDataset: function (newDataset, index = 0) {
     // Need to convert the raw girder.ItemModel
     // (when we add it to meta.datasets, it gets
@@ -230,7 +249,7 @@ let Toolchain = MetadataItem.extend({
       window.mainPage.trigger('rra:error', errorObj);
     });
   },
-  shapeDataForVis: function (callback, index = 0) {
+  shapeDataForVis: function (index = 0) {
     let meta = this.getMeta();
 
     // TODO: use the mapping to transform
@@ -238,9 +257,9 @@ let Toolchain = MetadataItem.extend({
     // the visualization expects
     let dataset = meta.datasets.at(0);
     if (!dataset) {
-      callback([]);
+      return Promise.resolve([]);
     } else {
-      dataset.getParsed(callback);
+      return dataset.parse();
     }
   },
   getVisOptions: function (index = 0) {
@@ -309,6 +328,8 @@ let Toolchain = MetadataItem.extend({
       this.setMeta(meta);
       this.save().then(() => {
         this.trigger('rra:changeMappings');
+      }).catch(errorObj => {
+        window.mainPage.trigger('rra:error', errorObj);
       });
       return false;
     } else {

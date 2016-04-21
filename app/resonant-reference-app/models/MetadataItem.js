@@ -178,9 +178,17 @@ let MetadataItem = girder.models.ItemModel.extend({
         // in the process (e.g. a copy of
         // the toolchain was made
         // because the user is logged out)
+        let swappedId = false;
+        if (this.getId() !== resp[this.idAttribute]) {
+          resp['_oldId'] = this.getId();
+          swappedId = true;
+        }
         this.set(resp, {
           silent: true
         });
+        if (swappedId) {
+          this.trigger('rra:swapId', resp);
+        }
       });
     } else if (method === 'read') {
       if (this.getId() === undefined) {

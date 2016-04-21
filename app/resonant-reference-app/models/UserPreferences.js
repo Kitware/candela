@@ -1,5 +1,5 @@
 import MetadataItem from './MetadataItem';
-
+import {Set} from '../shims/SetOps.js';
 let girder = window.girder;
 
 let UserPreferences = MetadataItem.extend({
@@ -60,7 +60,29 @@ you move or delete this item, your preferences will be lost.`,
           'ids': scratchToolchains // already JSON.stringified
         },
         type: 'PUT'
-      })).then(() => {
+      })).then(successfulAdoptions => {
+        // Now we need to adopt any datasets that these toolchains refer to
+        let datasetIds = new Set();
+        successfulAdoptions.forEach(adoptedToolchain => {
+          if (adoptedToolchain.meta && adoptedToolchain.meta.datasets) {
+            adoptedToolchain.meta.datasets.forEach(datasetToAdopt => {
+              if (datasetToAdopt._id) {
+                datasetIds.add(datasetToAdopt._id);
+              }
+            });
+          }
+        });
+        
+        Promise.resolve(girder.restRequest({
+          path: 'item/adoptScratchItems',
+          data: {
+            'ids': JSON.stringify([...datasetIds])
+          },
+          type: 'PUT'
+        })).catch(errorObj => {
+          window.mainPage.trigger('rra:error', errorObj);
+        });
+        
         window.mainPage.currentUser.trigger('rra:updateLibrary');
         // In addition to changing the library, the current
         // toolchain will (pretty much always) have just changed
@@ -68,6 +90,8 @@ you move or delete this item, your preferences will be lost.`,
         if (window.mainPage.toolchain) {
           window.mainPage.toolchain.updateStatus();
         }
+      }).catch(errorObj => {
+        window.mainPage.trigger('rra:error', errorObj);
       });
     }
   },
@@ -86,7 +110,7 @@ you move or delete this item, your preferences will be lost.`,
     if (achievements[achievement] !== true) {
       achievements[achievement] = true;
       this.setMeta('achievements', achievements);
-      this.save();
+      this.save().catch(() => {});  // fail silently
       this.trigger('rra:levelUp');
     }
   }
