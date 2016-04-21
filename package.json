@@ -12,7 +12,7 @@
     "test:image:server": "sh script/test-server-up.sh >.server.log",
     "test:image:server:down": "sh script/test-server-down.sh",
     "test:image": "npm run test:image:raw | tap-spec",
-    "test:image:raw": "npm run test:image:server:down && npm run test:image:server && find src/ -name '*.image.js' | xargs -n 1 babel-node || npm run test:image:server:down",
+    "test:image:raw": "npm run test:image:server:down && npm run test:image:server && find src/ -name '*.image.js' | xargs -n 1 babel-node --presets es2015 || npm run test:image:server:down",
     "test:karma": "karma start config/karma-testing.conf.js --no-single-run",
     "cover": "karma start config/karma-coverage.conf.js",
     "cover:report": "http-server coverage -p ${PORT-3000}",
@@ -25,6 +25,7 @@
   "author": "Roni Choudhury",
   "license": "Apache-2.0",
   "devDependencies": {
+    "babel-cli": "^6.7.5",
     "babel-core": "^6.4.5",
     "babel-istanbul-loader": "^0.1.0",
     "babel-loader": "^6.2.1",
