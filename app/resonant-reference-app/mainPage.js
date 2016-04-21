@@ -29,7 +29,8 @@ let MainPage = Backbone.View.extend({
       this.switchToolchain(null);
     });
 
-    // Start without a toolchain
+    // Start no datasets and no toolchain
+    this.loadedDatasets = {};
     this.toolchain = null;
 
     // Respond to resize events

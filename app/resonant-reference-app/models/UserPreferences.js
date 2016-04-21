@@ -65,10 +65,8 @@ you move or delete this item, your preferences will be lost.`,
         let datasetIds = new Set();
         successfulAdoptions.forEach(adoptedToolchain => {
           if (adoptedToolchain.meta && adoptedToolchain.meta.datasets) {
-            adoptedToolchain.meta.datasets.forEach(datasetToAdopt => {
-              if (datasetToAdopt._id) {
-                datasetIds.add(datasetToAdopt._id);
-              }
+            adoptedToolchain.meta.datasets.forEach(datasetId => {
+              datasetIds.add(datasetId);
             });
           }
         });

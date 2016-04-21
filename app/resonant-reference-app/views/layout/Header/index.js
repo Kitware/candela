@@ -52,6 +52,10 @@ let Header = Backbone.View.extend({
   newToolchainResponse: function () {
     if (window.mainPage.toolchain) {
       this.listenTo(window.mainPage.toolchain,
+        'rra:changeDatasets', this.render);
+      this.listenTo(window.mainPage.toolchain,
+        'rra:changeVisualizations', this.render);
+      this.listenTo(window.mainPage.toolchain,
         'rra:changeStatus', this.render);
       this.listenTo(window.mainPage.toolchain,
         'rra:rename', this.render);

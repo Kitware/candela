@@ -1,11 +1,14 @@
 import Underscore from 'underscore';
 import MetadataItem from './MetadataItem';
 import Dataset from './Dataset';
-import {Set} from '../shims/SetOps.js';
+import {
+  Set
+}
+from '../shims/SetOps.js';
 let girder = window.girder;
 /*
     A Toolchain represents a user's saved session;
-    it includes specific datasets, with specific
+    it includes specific dataset IDs, with specific
     mappings to specific visualizations (in the future,
     this may also include faceting settings, etc).
 
@@ -40,6 +43,25 @@ let Toolchain = MetadataItem.extend({
       this.updateStatus);
     this.listenTo(window.mainPage.widgetPanels, 'rra:navigateWidgets',
       this.storePreferredWidgets);
+
+    let datasetPromises = [];
+
+    this.getMeta('datasets').forEach(datasetId => {
+      datasetPromises.push(Promise.resolve(girder.restRequest({
+        path: 'item/' + datasetId,
+        type: 'GET'
+      })));
+    });
+    Promise.all(datasetPromises).catch(errorObj => {
+      window.mainPage.trigger('rra:error', errorObj);
+    }).then(respObjects => {
+      respObjects.forEach(resp => {
+        let newDataset = new Dataset(resp);
+        this.listenTo(newDataset, 'rra:changeSpec', this.changeDataSpec);
+        this.listenTo(newDataset, 'rra:swapId', this.swapDatasetId);
+      });
+      this.trigger('rra:changeDatasets');
+    });
   },
   updateStatus: Underscore.debounce(function (copyOnError) {
     let id = this.getId();
@@ -109,23 +131,13 @@ let Toolchain = MetadataItem.extend({
     /*
       Everything in metadata is squashed down into JSON-compatible
       objects; by overriding getMeta(), we can wrap everything in
-      the special objects each thing is supposed to be, and
-      re-attach any listeners that would have been lost in
-      round-trips to the server
+      the special objects each thing is supposed to be
     */
 
     if (key === undefined) {
-      if (meta.datasets instanceof Array) {
-        meta.datasets = new Dataset.Collection(meta.datasets);
-        this.listenTo(meta.datasets, 'rra:changeSpec', this.changeSpec);
-        this.listenTo(meta.datasets, 'rra:swapId', this.swapDataset);
-      }
       if (meta.preferredWidgets instanceof Array) {
         meta.preferredWidgets = new Set(meta.preferredWidgets);
       }
-    } else if (key === 'datasets' && meta instanceof Array) {
-      meta = new Dataset.Collection(meta);
-      this.listenTo(meta, 'rra:changeSpec', this.changeSpec);
     } else if (key === 'preferredWidgets' && meta instanceof Array) {
       meta = new Set(meta.preferredWidgets);
     }
@@ -169,82 +181,63 @@ let Toolchain = MetadataItem.extend({
     });
   },
   getDatasetIds: function () {
-    let datasets = this.getMeta('datasets');
-    let ids = [];
-    datasets.each(function (dataset) {
-      if (dataset.id) {
-        ids.push(dataset.id);
-      }
-    });
-    return ids;
+    return this.getMeta('datasets');
   },
-  swapDataset: function (newDataset) {
-    // A dataset has changed behind the scenes (e.g. a
-    // copy was made)... if the ID is different, Backbone
-    // isn't going to update it for us. Instead, we need to
-    // swap out the old copy for the new one that we were using
+  changeDataSpec: function () {
+    this.trigger('rra:changeDatasets');
+    this.validateMappings();
+  },
+  swapDatasetId: function (newData) {
     let datasets = this.getMeta('datasets');
-    let oldDataset = datasets.get(newDataset._oldId);
-    let index = datasets.indexOf(oldDataset);
-    datasets.remove(oldDataset);
-    oldDataset.markObsolete();
-      
-    delete newDataset._oldId;
-    datasets.add(newDataset, {
-      at: index
-    });
-
-    this.setMeta('datasets', datasets);
+    let index = datasets.indexOf(newData._oldId);
+    if (index !== -1) {
+      datasets[index] = newData._id;
+      this.setMeta('datasets', datasets);
+    } else {
+      window.mainPage.trigger('rra:error',
+        new Error('Encountered a problem handling swapped dataset id'));
+    }
   },
   setDataset: function (newDataset, index = 0) {
     // Need to convert the raw girder.ItemModel
-    // (when we add it to meta.datasets, it gets
-    // auto-converted to our Dataset model)
-    newDataset = newDataset.toJSON();
+    newDataset = new Dataset(newDataset.toJSON());
+    this.listenTo(newDataset, 'rra:changeSpec', this.changeDataSpec);
+    this.listenTo(newDataset, 'rra:swapId', this.swapDatasetId);
+    let newId = newDataset.getId();
+    let datasets = this.getMeta('datasets');
 
-    let meta = this.getMeta();
-
-    // Okay, we're actually swapping
-    // in a different dataset
-    if (index >= meta.datasets.length) {
-      meta.datasets.push(newDataset);
-      this.setMeta(meta);
+    if (index >= datasets.length) {
+      datasets.push(newId);
     } else {
-      let oldDataset = meta.datasets.at(index);
-      if (oldDataset.get('_id') !== newDataset['_id']) {
-        meta.datasets.remove(oldDataset);
-        meta.datasets.add(newDataset, {
-          at: index
-        });
-        // Swapping in a new dataset invalidates the mappings
-        meta.mappings = [];
-        this.setMeta(meta);
+      let oldDataset = window.mainPage.loadedDatasets[datasets[index]];
+      if (oldDataset) {
+        // If the dataset hasn't already dropped itself...
+        this.stopListening(oldDataset, 'rra:changeSpec', this.changeDataSpec);
+        this.stopListening(oldDataset, 'rra:swapId', this.swapDatasetId);
+        oldDataset.drop();
       }
+      datasets[index] = newId;
     }
+    this.setMeta('datasets', datasets);
     this.save().then(() => {
       this.trigger('rra:changeDatasets');
-      this.trigger('rra:changeMappings');
+      this.validateMappings();
     }).catch((errorObj) => {
       window.mainPage.trigger('rra:error', errorObj);
     });
   },
   setVisualization: function (newVisualization, index = 0) {
-    let meta = this.getMeta();
+    let visualizations = this.getMeta('visualizations');
 
-    if (index >= meta.visualizations.length) {
-      meta.visualizations.push(newVisualization);
-      this.set('meta', meta);
+    if (index >= visualizations.length) {
+      visualizations.push(newVisualization);
     } else {
-      if (meta.visualizations[index].name !== newVisualization.name) {
-        meta.visualizations[index] = newVisualization;
-        // Swapping in a new dataset invalidates the mappings
-        meta.mappings = [];
-        this.setMeta(meta);
-      }
+      visualizations[index] = newVisualization;
     }
+    this.setMeta('visualizations', visualizations);
     this.save().then(() => {
       this.trigger('rra:changeVisualizations');
-      this.trigger('rra:changeMappings');
+      this.validateMappings();
     }).catch((errorObj) => {
       window.mainPage.trigger('rra:error', errorObj);
     });
@@ -255,11 +248,11 @@ let Toolchain = MetadataItem.extend({
     // TODO: use the mapping to transform
     // the parsed data into the shape that
     // the visualization expects
-    let dataset = meta.datasets.at(0);
-    if (!dataset) {
+    let datasetId = meta.datasets[0];
+    if (!window.mainPage.loadedDatasets[datasetId]) {
       return Promise.resolve([]);
     } else {
-      return dataset.parse();
+      return window.mainPage.loadedDatasets[datasetId].parse();
     }
   },
   getVisOptions: function (index = 0) {
@@ -288,34 +281,42 @@ let Toolchain = MetadataItem.extend({
     });
     return options;
   },
-  changeSpec: function () {
-    if (this.validateMappings() === true) {
-      // validateMappings will trigger this on its own
-      // if the mappings were invalid
-      this.trigger('rra:changeMappings');
-    }
-  },
   validateMappings: function () {
     let meta = this.getMeta();
 
     // Go through all the mappings and make sure that:
-    // 1. The data types are still compatible
-    //    (trash them if they're not)
-    // 2. TODO: Other things we should check?
+    // 1. The referenced dataset and visualization
+    //    are still in this toolchain
+    // 2. The dataset and visualization still have
+    //    the named attribute
+    // 3. The data types are still compatible
+    // 4. TODO: Other things we should check?
+    // Trash any mappings that don't make sense anymore
     let indicesToTrash = [];
     for (let [index, mapping] of meta.mappings.entries()) {
-      let dataType = meta.datasets.at(mapping.dataIndex)
-        .getSpec().attributes[mapping.dataAttribute];
-
-      let possibleTypes = [];
-      for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
-        if (optionSpec.name === mapping.visAttribute) {
-          possibleTypes = optionSpec.domain.fieldTypes;
-          break;
-        }
+      if (meta.datasets.length <= mapping.dataIndex ||
+        meta.visualizations.length <= mapping.visIndex) {
+        indicesToTrash.push(index);
+        continue;
       }
 
-      if (possibleTypes.indexOf(dataType) === -1) {
+      let dataset = window.mainPage.loadedDatasets[meta.datasets[mapping.dataIndex]];
+      if (!dataset) {
+        indicesToTrash.push(index);
+        continue;
+      }
+
+      let dataType = meta.datasets[mapping.dataIndex].getSpec()
+        .attributes[mapping.dataAttribute];
+      let optionSpec = meta.visualizations[mapping.visAttribute]
+        .options.find(spec => spec.name === mapping.visAttribute);
+
+      if (!dataType || !optionSpec) {
+        indicesToTrash.push(index);
+        continue;
+      }
+
+      if (optionSpec.domain.fieldTypes.indexOf(dataType) === -1) {
         indicesToTrash.push(index);
       }
     }
@@ -340,56 +341,46 @@ let Toolchain = MetadataItem.extend({
     let meta = this.get('meta');
 
     // Figure out if the vis option allows multiple fields
-    let addedMapping = false;
-    for (let optionSpec of meta.visualizations[mapping.visIndex].options) {
-      if (optionSpec.name === mapping.visAttribute) {
-        if (optionSpec.type !== 'string_list') {
-          // If multiple fields are not allowed, search for the mapping and replace it
-          for (let [index, m] of meta.mappings.entries()) {
-            if (mapping.visIndex === m.visIndex &&
-              mapping.visAttribute === m.visAttribute) {
-              meta.mappings[index] = mapping;
-              addedMapping = true;
-              break;
-            }
-          }
-        }
-        break;
-      }
+    let optionSpec = meta.visualizations[mapping.visIndex]
+      .options.find(spec => spec.name === mapping.visAttribute);
+
+    // If the vis option doesn't allow multiple fields,
+    // remove any existing mappings for that vis option
+    if (optionSpec.type !== 'string_list') {
+      meta.mappings = meta.mappings.filter(m => {
+        return m.visIndex !== mapping.visIndex ||
+          m.visAttribute !== mapping.visAttribute;
+      });
     }
 
-    if (!addedMapping) {
-      meta.mappings.push(mapping);
-    }
+    // Add the mapping
+    meta.mappings.push(mapping);
 
     this.setMeta(meta);
     this.save().then(() => {
       this.trigger('rra:changeMappings');
-    }).catch((errorObj) => {
+    }).catch(errorObj => {
       window.mainPage.trigger('rra:error', errorObj);
     });
   },
   removeMapping: function (mapping) {
-    let meta = this.getMeta();
+    let mappings = this.getMeta('mappings');
 
-    let mappingToSplice = null;
-    for (let [index, m] of meta.mappings.entries()) {
-      if (mapping.visIndex === m.visIndex &&
+    let index;
+    let temp = mappings.find((m, i) => {
+      index = i;
+      return mapping.visIndex === m.visIndex &&
         mapping.visAttribute === m.visAttribute &&
         mapping.dataIndex === m.dataIndex &&
-        mapping.dataAttribute === m.dataAttribute) {
-        mappingToSplice = index;
-        break;
-      }
+        mapping.dataAttribute === m.dataAttribute;
+    });
+    if (temp) {
+      mappings.splice(index, 1);
     }
-    if (mappingToSplice !== null) {
-      meta.mappings.splice(mappingToSplice, 1);
-    }
-
-    this.setMeta(meta);
+    this.setMeta('mappings', mappings);
     this.save().then(() => {
       this.trigger('rra:changeMappings');
-    }).catch((errorObj) => {
+    }).catch(errorObj => {
       window.mainPage.trigger('rra:error', errorObj);
     });
   },
@@ -398,31 +389,27 @@ let Toolchain = MetadataItem.extend({
     // this toolchain needs
     let meta = this.getMeta();
     let result = [];
-    let widgetSpec;
 
-    let i;
-    for (i = 0; i < meta.datasets.length; i += 1) {
-      widgetSpec = {
+    meta.datasets.forEach((id, i) => {
+      result.push({
         widgetType: 'DatasetView',
+        hashName: 'DatasetView' + i,
         index: i,
-        spec: meta.datasets.at(i).getSpec()
-      };
-      widgetSpec.hashName = 'DatasetView' + i;
-      result.push(widgetSpec);
-    }
+        id: id
+      });
+    });
     result.push({
       widgetType: 'MappingView',
       hashName: 'MappingView'
     });
-    for (i = 0; i < meta.visualizations.length; i += 1) {
-      widgetSpec = {
+    meta.visualizations.forEach((spec, i) => {
+      result.push({
         widgetType: 'VisualizationView',
+        hashName: 'VisualizationView' + i,
         index: i,
-        spec: meta.visualizations[i]
-      };
-      widgetSpec.hashName = 'VisualizationView' + i;
-      result.push(widgetSpec);
-    }
+        spec: spec
+      });
+    });
 
     return result;
   },

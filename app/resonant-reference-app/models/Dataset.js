@@ -1,4 +1,3 @@
-import Backbone from 'backbone';
 import MetadataItem from './MetadataItem';
 import datalib from 'datalib';
 
@@ -21,9 +20,13 @@ let VALID_EXTENSIONS = [
 
 let Dataset = MetadataItem.extend({
   initialize: function () {
+    window.mainPage.loadedDatasets[this.getId()] = this;
+    
     this.rawCache = null;
     this.parsedCache = null;
     let meta = this.getMeta();
+    
+    this.listenTo(this, 'rra:swapId', this.swapId);
     
     let fileTypePromise;
     if (meta.fileType) {
@@ -43,18 +46,26 @@ let Dataset = MetadataItem.extend({
       this.save().then(() => {
         this.trigger('rra:changeType');
         this.trigger('rra:changeSpec');
+      }).catch(errorObj => {
+        throw errorObj;
       });
     });
   },
-  markObsolete: function () {
-    this.obsolete = true;
+  swapId: function (newData) {
+    window.mainPage.loadedDatasets[newData._id] = window.mainPage.loadedDatasets[newData._oldId];
+    delete window.mainPage.loadedDatasets[newData._oldId];
+    window.mainPage.loadedDatasets[newData._id].set(newData);
+  },
+  drop: function () {
+    this.dropped = true;
+    delete window.mainPage.loadedDatasets[this.getId()];
   },
   save: function () {
     // It's possible for a dataset to be dropped from a collection
     // (e.g. it's replaced with a copy). In this case, we want to
-    // stop all future attempts to save any changes to the obsolete
+    // stop all future attempts to save any changes to the dropped
     // dataset)
-    if (this.obsolete) {
+    if (this.dropped) {
       return Promise.resolve();
     } else {
       return MetadataItem.prototype.save.apply(this).catch(this.saveFailure);
@@ -171,8 +182,5 @@ let Dataset = MetadataItem.extend({
 });
 
 Dataset.COMPATIBLE_TYPES = COMPATIBLE_TYPES;
-Dataset.VALID_EXTENSIONS = VALID_EXTENSIONS;
-Dataset.Collection = Backbone.Collection.extend({
-  model: Dataset
-});
+Dataset.VALID_EXTENSIONS = VALID_EXTENSIONS
 export default Dataset;

@@ -113,8 +113,10 @@ order to display anything.`);
       vis: []
     };
 
-    meta.datasets.each(d => {
-      specs.data.push(d.getSpec());
+    meta.datasets.forEach(d => {
+      if (window.mainPage.loadedDatasets[d]) {
+        specs.data.push(window.mainPage.loadedDatasets[d].getSpec());
+      }
     });
     meta.visualizations.forEach(d => {
       specs.vis.push(d);
