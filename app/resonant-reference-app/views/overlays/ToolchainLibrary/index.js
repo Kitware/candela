@@ -73,7 +73,7 @@ let ToolchainLibrary = Backbone.View.extend({
         error: null
       })).then(folder => {
         this.getFolderContents(folder, 'privateToolchains', privateFileIcon);
-      }).catch(() => {});
+      }).catch(() => {}); // fail silently
 
       // Get the set of the user's public toolchains
       Promise.resolve(girder.restRequest({
@@ -82,7 +82,7 @@ let ToolchainLibrary = Backbone.View.extend({
         error: null
       })).then(folder => {
         this.getFolderContents(folder, 'publicToolchains', publicFileIcon);
-      }).catch(() => {});
+      }).catch(() => {}); // fail silently
     } else {
       // The user is logged out
       let ids = window.localStorage.getItem('scratchToolchains');
@@ -100,7 +100,7 @@ let ToolchainLibrary = Backbone.View.extend({
         })).then(items => {
           this.renderToolchains(new girder.collections.ItemCollection(items),
             'scratchToolchains', scratchFileIcon);
-        }).catch(() => {});
+        }).catch(() => {}); // fail silently
       }
     }
   }, 300),

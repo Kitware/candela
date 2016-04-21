@@ -24,7 +24,7 @@ let DatasetLibrary = Backbone.View.extend({
       error: null
     })).then(folder => {
       this.renderFolderContents(folder, 'datasetLibrary', libImage);
-    });
+    }).catch(() => {}); // fail silently
 
     Promise.resolve(girder.restRequest({
       path: 'folder/privateFolder',
@@ -32,7 +32,7 @@ let DatasetLibrary = Backbone.View.extend({
       error: null
     })).then(folder => {
       this.renderFolderContents(folder, 'privateDatasets', privateImage);
-    });
+    }).catch(() => {}); // fail silently
 
     Promise.resolve(girder.restRequest({
       path: 'folder/publicFolder',
@@ -40,7 +40,7 @@ let DatasetLibrary = Backbone.View.extend({
       error: null
     })).then(folder => {
       this.renderFolderContents(folder, 'publicDatasets', publicImage);
-    });
+    }).catch(() => {}); // fail silently
   },
   renderFolderContents: function (folder, divId, image) {
     let datasets = new girder.collections.ItemCollection();
