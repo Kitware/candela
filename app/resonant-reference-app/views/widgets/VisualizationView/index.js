@@ -53,9 +53,16 @@ let VisualizationView = Widget.extend({
         this.renderHelpScreen();
       }
     });
-
-    this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations', this.render);
-    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings', this.render);
+    
+    this.listenTo(window.mainPage, 'rra:changeToolchain',
+      this.handleNewToolchain);
+    this.handleNewToolchain();
+  },
+  handleNewToolchain: function () {
+    this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations',
+      this.render);
+    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
+      this.render);
   },
   renderInfoScreen: function () {
     this.newInfo = false;
@@ -92,6 +99,10 @@ You encountered an error we didn't anticipate! Please report it
     window.mainPage.overlay.render(screen);
   },
   render: function () {
+    if (!this.canRender()) {
+      return;
+    }
+    
     // Get the visualization in the toolchain (if there is one)
     let spec = window.mainPage.toolchain.getMeta('visualizations');
     if (spec) {

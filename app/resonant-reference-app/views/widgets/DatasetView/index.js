@@ -66,10 +66,15 @@ let DatasetView = Widget.extend({
       }
     });
 
+    this.listenTo(window.mainPage, 'rra:changeToolchain',
+      this.updateListeners);
+    this.updateListeners();
+  },
+  updateListeners: function () {
     this.listenTo(window.mainPage.toolchain, 'rra:changeDatasets',
-                  this.render);
+      this.render);
     this.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
-                  this.renderAttributeSettings);
+      this.renderAttributeSettings);
   },
   renderInfoScreen: function () {
     this.newInfo = false;
@@ -144,6 +149,10 @@ you'll probably need to
       });
   },
   render: function () {
+    if (!this.canRender()) {
+      return;
+    }
+    
     // Get the dataset in the toolchain (if there is one)
     let dataset = window.mainPage.toolchain.getMeta('datasets');
     if (dataset) {

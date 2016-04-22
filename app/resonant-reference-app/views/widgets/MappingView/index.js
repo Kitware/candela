@@ -62,6 +62,11 @@ let MappingView = Widget.extend({
 
     this.selection = null;
 
+    this.listenTo(window.mainPage, 'rra:changeToolchain',
+      this.updateListeners);
+    this.updateListeners();
+  },
+  updateListeners: function () {
     this.listenTo(window.mainPage.toolchain, 'rra:changeMappings', () => {
       this.selection = null;
       this.render();
@@ -333,6 +338,10 @@ order to display anything.`);
     }
   },
   render: function () {
+    if (!this.canRender()) {
+      return;
+    }
+    
     // Construct a graph from each of the specs
     // (and the currently selected node)
     let graph = this.constructLookups();

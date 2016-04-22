@@ -37,6 +37,9 @@ let Widget = Backbone.View.extend({
         this.toggle();
       }
     }];
+    
+    this.listenTo(window.mainPage.widgetPanels, 'rra:navigateWidgets',
+      this.render);
   },
   toggle: function () {
     window.mainPage.widgetPanels.toggleWidget(this.spec);
@@ -66,6 +69,10 @@ let Widget = Backbone.View.extend({
     return Underscore.template(successTemplate)({
       message: message
     });
+  },
+  canRender: function () {
+    return window.mainPage.toolchain &&
+      document.getElementById(this.$el.attr('id'));
   }
 });
 
