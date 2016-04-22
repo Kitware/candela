@@ -2,7 +2,7 @@ import Underscore from 'underscore';
 import Backbone from 'backbone';
 import d3 from 'd3';
 import WidgetPanel from './WidgetPanel.js';
-import {Set} from '../../../shims/SetOps.js';
+import SetOps, {Set} from '../../../shims/SetOps.js';
 
 import './accordionhorz.css';
 import './style.css';
@@ -14,8 +14,8 @@ let WidgetPanels = Backbone.View.extend({
     this.expandedWidgets = new Set();
     this.listenTo(window.mainPage, 'rra:changeToolchain',
       this.handleNewToolchain);
+    this.widgetsChanged = true;
     this.listenTo(this, 'rra:updateWidgetSpecs', this.render);
-    this.listenTo(this, 'rra:navigateWidgets', this.render);
   },
   handleNewToolchain: function () {
     if (window.mainPage.toolchain) {
@@ -32,7 +32,9 @@ let WidgetPanels = Backbone.View.extend({
     } else {
       this.widgetSpecs = [];
     }
-    // TODO: test if widgets have actually changed
+    this.expandedWidgets = SetOps.intersection(this.expandedWidgets,
+      new Set(this.widgetSpecs.map(spec => spec.hashName)));
+    this.widgetsChanged = true;
     this.trigger('rra:updateWidgetSpecs');
   },
   toggleWidget: function (widgetSpec, expand) {
@@ -41,11 +43,16 @@ let WidgetPanels = Backbone.View.extend({
     } else {
       this.expandedWidgets.delete(widgetSpec.hashName);
     }
-    this.trigger('rra:navigateWidgets');
+    this.widgetsChanged = true;
+    this.render();
   },
   setWidgets: function (newWidgets) {
     this.expandedWidgets = newWidgets;
-    this.trigger('rra:navigateWidgets');
+    this.widgetsChanged = true;
+    this.render();
+  },
+  closeWidgets: function () {
+    this.setWidgets(new Set());
   },
   render: Underscore.debounce(function () {
     // Create sections for each panel
@@ -91,11 +98,12 @@ let WidgetPanels = Backbone.View.extend({
     // Finally, get all the widgets to render
     // (don't tell them to render themselves
     // until after the animation has finished)
-    window.setTimeout(() => {
-      for (let hash of Object.keys(this.widgets)) {
-        this.widgets[hash].render();
-      };
-    }, 1000);
+    if (this.widgetsChanged === true) {
+      this.widgetsChanged = false;
+      window.setTimeout(() => {
+        this.trigger('rra:navigateWidgets');
+      }, 1000);
+    }
   }, 300)
 });
 

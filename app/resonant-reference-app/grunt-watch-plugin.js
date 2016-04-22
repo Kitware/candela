@@ -14,6 +14,7 @@ module.exports = {
       if (compilation.options.watch === true) {
         exec('cd $GIRDER_PATH && grunt', function (error, stdout, stderr) {
           if (error) {
+            console.log('Couldn\'t run grunt. Did you forget to export GIRDER_PATH ?');
             process.exit(1);
           }
           console.log(stdout);

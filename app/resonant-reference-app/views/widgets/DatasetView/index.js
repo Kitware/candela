@@ -66,10 +66,15 @@ let DatasetView = Widget.extend({
       }
     });
 
+    this.listenTo(window.mainPage, 'rra:changeToolchain',
+      this.updateListeners);
+    this.updateListeners();
+  },
+  updateListeners: function () {
     this.listenTo(window.mainPage.toolchain, 'rra:changeDatasets',
-                  this.render);
+      this.render);
     this.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
-                  this.renderAttributeSettings);
+      this.renderAttributeSettings);
   },
   renderInfoScreen: function () {
     this.newInfo = false;
@@ -106,8 +111,8 @@ you'll probably need to
     let datasets = window.mainPage.toolchain.getMeta('datasets');
     let dataset;
     let attrs;
-    if (datasets && datasets.at(0)) {
-      dataset = datasets.at(0);
+    if (datasets && datasets[0] && window.mainPage.loadedDatasets[datasets[0]]) {
+      dataset = window.mainPage.loadedDatasets[datasets[0]];
       attrs = dataset.getSpec().attributes;
     } else {
       attrs = {};
@@ -141,28 +146,17 @@ you'll probably need to
       });
   },
   render: function () {
+    if (!this.canRender()) {
+      return;
+    }
+    
     // Get the dataset in the toolchain (if there is one)
     let dataset = window.mainPage.toolchain.getMeta('datasets');
     if (dataset) {
-      dataset = dataset.at(0);
+      dataset = window.mainPage.loadedDatasets[dataset[0]];
     }
     
     this.$el.html(myTemplate);
-
-    // Temporarily force the scroll bars so we
-    // account for their size
-    /* this.$el.css('overflow', 'scroll');
-    let bounds = {
-      width: this.el.clientWidth,
-      height: this.el.clientHeight
-    };
-    this.$el.find('#attributeSettings')
-      .css('width', bounds.width + 'px')
-      .css('height', '75px');
-    this.$el.find('#editor')
-      .css('width', bounds.width + 'px')
-      .css('height', (bounds.height - 75) + 'px');
-    this.$el.css('overflow', '');*/
 
     this.renderAttributeSettings();
 
@@ -184,7 +178,7 @@ you'll probably need to
       this.statusText.text = 'Loading...';
       this.renderIndicators();
 
-      dataset.getParsed(parsedData => {
+      dataset.parse().then(parsedData => {
         let rawData = dataset.rawCache;
         let spec = dataset.getSpec();
         if (rawData === null) {

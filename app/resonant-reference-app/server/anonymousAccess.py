@@ -3,6 +3,7 @@ from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
 from girder.constants import AccessType
+from girder.models.model_base import AccessException
 
 TRUE_TESTS = ['true', '1', 't', 'y', 'yes']
 FALSE_TESTS = ['false', '0', 'f', 'n', 'no']
@@ -153,7 +154,7 @@ class AnonymousAccess(Resource):
             self.model('item').load(item['_id'],
                 level=AccessType.WRITE, user=user, exc=True)
             info['editable'] = True
-        except:
+        except AccessException:
             info['editable'] = False
         
         return info
@@ -180,7 +181,7 @@ class AnonymousAccess(Resource):
             try:
                 item = self.model('item').load(itemId,
                     level=AccessType.READ, user=user, exc=True)
-            except:
+            except AccessException:
                 continue
             if item['folderId'] == scratchFolder['_id']:
                 result.append(item)
@@ -205,9 +206,6 @@ class AnonymousAccess(Resource):
         privateFolder = self.getOrMakePrivateFolder({})
         
         anonUser = self._getAnonymousUser()
-        scratchFolder = self.model('folder').createFolder(parent=anonUser,
-            name='Public', parentType='user', public=True,
-            creator=anonUser, reuseExisting=True)
         
         result = []
         for itemId in idList:
@@ -216,7 +214,7 @@ class AnonymousAccess(Resource):
                     level=AccessType.WRITE, user=anonUser, exc=True)
                 self.model('item').move(item, privateFolder)
                 result.append(item)
-            except:
+            except AccessException:
                 continue
         
         return result
@@ -251,21 +249,28 @@ class AnonymousAccess(Resource):
                     metadata[k] = v
         
         user = self.getCurrentUser()
-        
+        anonymous = False
         if user is None:
+            anonymous = True
             user = self._getAnonymousUser()
         
         try:
             targetItem = self.model('item').load(item['_id'],
                 level=AccessType.WRITE, user=user, exc=True)
-        except:
-            targetItem = None
+        except AccessException as err:
+            srcItem = self.model('item').load(item['_id'],
+                level=AccessType.READ, user=user, exc=True)
+            
+            if anonymous:
+                targetFolder = self.getOrMakePublicFolder({})
+            else:
+                targetFolder = self.getOrMakePrivateFolder({})
+            
+            targetItem = self.model('item').copyItem(srcItem=srcItem,
+                    creator=user, folder=targetFolder)
         
-        if targetItem is not None:
-            targetItem['name'] = params['name']
-            targetItem['description'] = params['description']
-        else:
-            targetItem = self.getOrMakeScratchItem(params)
+        targetItem['name'] = params['name']
+        targetItem['description'] = params['description']
         
         targetItem['meta'] = metadata
         

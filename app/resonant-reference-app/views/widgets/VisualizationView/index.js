@@ -53,9 +53,16 @@ let VisualizationView = Widget.extend({
         this.renderHelpScreen();
       }
     });
-
-    this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations', this.render);
-    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings', this.render);
+    
+    this.listenTo(window.mainPage, 'rra:changeToolchain',
+      this.handleNewToolchain);
+    this.handleNewToolchain();
+  },
+  handleNewToolchain: function () {
+    this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations',
+      this.render);
+    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
+      this.render);
   },
   renderInfoScreen: function () {
     this.newInfo = false;
@@ -87,6 +94,10 @@ Corrupted visualization meta information.`);
     }
   },
   render: function () {
+    if (!this.canRender()) {
+      return;
+    }
+    
     // Get the visualization in the toolchain (if there is one)
     let spec = window.mainPage.toolchain.getMeta('visualizations');
     if (spec) {
@@ -132,7 +143,7 @@ Corrupted visualization meta information.`);
       this.ok = null;
       this.statusText.text = 'Loading...';
       this.renderIndicators();
-      window.mainPage.toolchain.shapeDataForVis(data => {
+      window.mainPage.toolchain.shapeDataForVis().then(data => {
         this.vis.options.data = data;
         this.vis.component.chart.update(this.vis.options);
         this.vis.component.render();

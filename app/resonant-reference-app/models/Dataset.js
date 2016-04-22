@@ -1,4 +1,3 @@
-import Backbone from 'backbone';
 import MetadataItem from './MetadataItem';
 import datalib from 'datalib';
 
@@ -21,23 +20,67 @@ let VALID_EXTENSIONS = [
 
 let Dataset = MetadataItem.extend({
   initialize: function () {
+    window.mainPage.loadedDatasets[this.getId()] = this;
+    
     this.rawCache = null;
     this.parsedCache = null;
     let meta = this.getMeta();
-    if (!meta.fileType) {
-      this.inferFileType();
+    
+    this.listenTo(this, 'rra:swapId', this.swapId);
+    
+    let fileTypePromise;
+    if (meta.fileType) {
+      fileTypePromise = Promise.resolve(meta.fileType);
+    } else {
+      fileTypePromise = this.inferFileType();
     }
-    if (!meta.attributes) {
-      this.inferAttributes();
+    
+    let attributePromise;
+    if (meta.attributes) {
+      attributePromise = Promise.resolve(meta.attributes);
+    } else {
+      attributePromise = this.inferAttributes();
+    }
+    
+    Promise.all([fileTypePromise, attributePromise]).then(() => {
+      this.save().then(() => {
+        this.trigger('rra:changeType');
+        this.trigger('rra:changeSpec');
+      }).catch(errorObj => {
+        throw errorObj;
+      });
+    });
+  },
+  swapId: function (newData) {
+    window.mainPage.loadedDatasets[newData._id] = window.mainPage.loadedDatasets[newData._oldId];
+    delete window.mainPage.loadedDatasets[newData._oldId];
+    window.mainPage.loadedDatasets[newData._id].set(newData);
+  },
+  drop: function () {
+    this.dropped = true;
+    delete window.mainPage.loadedDatasets[this.getId()];
+  },
+  save: function () {
+    // It's possible for a dataset to be dropped from a collection
+    // (e.g. it's replaced with a copy). In this case, we want to
+    // stop all future attempts to save any changes to the dropped
+    // dataset)
+    if (this.dropped) {
+      return Promise.resolve();
+    } else {
+      return MetadataItem.prototype.save.apply(this).catch(this.saveFailure);
     }
   },
-  loadData: function (callback, cache = true) {
+  saveFailure: function (errorObj) {
+    window.mainPage.trigger('rra:error', errorObj);
+  },
+  loadData: function (cache = true) {
     // TODO: support more file formats / non-Girder
     // files (e.g. pasted browser data)
     if (cache && this.rawCache !== null) {
-      callback(this.rawCache);
+      return Promise.resolve(this.rawCache);
     } else {
-      Promise.resolve(girder.restRequest({
+      return Promise.resolve(girder.restRequest({
         path: 'item/' + this.getId() + '/download',
         type: 'GET',
         error: null,
@@ -46,10 +89,10 @@ let Dataset = MetadataItem.extend({
         if (cache) {
           this.rawCache = data;
         }
-        callback(data);
+        return data;
       }).catch(() => {
         this.rawCache = null;
-        callback(null);
+        return null;
       });
     }
   },
@@ -66,12 +109,12 @@ let Dataset = MetadataItem.extend({
     }
     return spec;
   },
-  getParsed: function (callback, cache = true) {
+  parse: function (cache = true) {
     if (cache && this.parsedCache !== null) {
-      callback(this.parsedCache);
+      return Promise.resolve(this.parsedCache);
     } else {
       let parsedData;
-      this.loadData(rawData => {
+      return this.loadData().then(rawData => {
         if (rawData === null) {
           this.parsedCache = parsedData = null;
         } else {
@@ -84,7 +127,7 @@ let Dataset = MetadataItem.extend({
           } else {
             formatPrefs.parse = 'auto';
           }
-          
+
           try {
             parsedData = datalib.read(rawData, formatPrefs);
           } catch (e) {
@@ -95,7 +138,7 @@ let Dataset = MetadataItem.extend({
             this.parsedCache = parsedData;
           }
         }
-        callback(parsedData);
+        return parsedData;
       });
     }
   },
@@ -108,41 +151,36 @@ let Dataset = MetadataItem.extend({
       fileType = fileType[fileType.length - 1];
     }
     this.setMeta('fileType', fileType);
-    this.save().then(() => {
-      this.trigger('rra:changeType');
-    });
+    return fileType;
   },
   setFileType: function (fileType) {
     this.setMeta('fileType', fileType);
-    this.save().then(() => {
+    return this.save().then(() => {
       this.trigger('rra:changeType');
     });
   },
   inferAttributes: function () {
-    this.getParsed(data => {
+    return this.parse().then(data => {
+      let attributes;
       if (data === null) {
-        this.setMeta('attributes', {});
+        attributes = {};
       } else {
-        this.setMeta('attributes', datalib.type.all(data));
+        attributes = datalib.type.all(data);
       }
-      this.save().then(() => {
-        this.trigger('rra:changeSpec')
-      });
+      this.setMeta('attributes', attributes);
+      return attributes;
     });
   },
   setAttribute: function (attrName, dataType) {
     let attributes = this.getMeta('attributes');
     attributes[attrName] = dataType;
     this.setMeta('attributes', attributes);
-    this.save().then(() => {
+    return this.save().then(() => {
       this.trigger('rra:changeSpec')
     });
   }
 });
 
 Dataset.COMPATIBLE_TYPES = COMPATIBLE_TYPES;
-Dataset.VALID_EXTENSIONS = VALID_EXTENSIONS;
-Dataset.Collection = Backbone.Collection.extend({
-  model: Dataset
-});
+Dataset.VALID_EXTENSIONS = VALID_EXTENSIONS
 export default Dataset;

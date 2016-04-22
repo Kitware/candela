@@ -25,7 +25,10 @@ let StartingScreen = Backbone.View.extend({
 
       this.$el.find('#emptyToolchainButton').on('click', () => {
         window.mainPage.newToolchain()
-          .then(window.mainPage.overlay.closeOverlay);
+          .then(() => {
+            window.mainPage.overlay.closeOverlay();
+            window.mainPage.widgetPanels.closeWidgets();
+          });
       });
 
       this.$el.find('a#loginLink').on('click', () => {
