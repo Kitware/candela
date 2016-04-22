@@ -57,7 +57,7 @@ let MappingView = Widget.extend({
           return Widget.okayIcon;
         } else if (this.status === STATUS.DATASETS_NOT_LOADED ||
                    this.status === STATUS.STALE_MAPPINGS) {
-          return Widget.loadingIcon;
+          return Widget.spinnerIcon;
         } else {
           return Widget.warningIcon;
         }
@@ -428,11 +428,13 @@ in order to connect them together.`);
       ' visual channels have been mapped';
     if (graph.realEdgeCount > 0) {
       this.status = STATUS.OK;
-    } else if (numData === 0 || numVis === 0) {
-      this.status = STATUS.NOTHING_TO_MAP;
     } else if (this.status !== STATUS.STALE_MAPPINGS &&
                this.status !== STATUS.DATASETS_NOT_LOADED) {
-      this.status = STATUS.NOT_ENOUGH_MAPPINGS;
+      if (numData === 0 || numVis === 0) {
+        this.status = STATUS.NOTHING_TO_MAP;
+      } else {
+        this.status = STATUS.NOT_ENOUGH_MAPPINGS;
+      }
     }
     this.renderIndicators();
 

@@ -328,21 +328,16 @@ let Toolchain = MetadataItem.extend({
       }
     }
 
-    for (let index of indicesToTrash) {
+    for (let index of indicesToTrash.reverse()) {
       meta.mappings.splice(index, 1);
     }
 
-    if (indicesToTrash.length > 0) {
-      this.setMeta(meta);
-      this.save().then(() => {
-        this.trigger('rra:changeMappings');
-      }).catch(errorObj => {
-        window.mainPage.trigger('rra:error', errorObj);
-      });
-      return false;
-    } else {
-      return true;
-    }
+    this.setMeta(meta);
+    this.save().then(() => {
+      this.trigger('rra:changeMappings');
+    }).catch(errorObj => {
+      window.mainPage.trigger('rra:error', errorObj);
+    });
   },
   addMapping: function (mapping) {
     let meta = this.get('meta');
