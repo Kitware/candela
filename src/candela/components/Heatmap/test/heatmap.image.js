@@ -4,5 +4,5 @@ imageTest({
   name: 'heatmap',
   url: 'http://localhost:38000/examples/#heatmap',
   selector: '#vis-element',
-  threshold: 0.01
+  threshold: 0.15
 });
