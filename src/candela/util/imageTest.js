@@ -82,6 +82,7 @@ export default function imageTest ({name, url, selector, delay = 0, threshold}) 
 
       resemble(image)
         .compareTo(refImage)
+        .ignoreAntialiasing()
         .onComplete(analysis => {
           const passed = Number(analysis.misMatchPercentage) < threshold * 100;
           if (!passed || doDumpImage(name)) {
