@@ -54,7 +54,7 @@ let Overlay = Backbone.View.extend({
     let message;
 
     // Sometimes errors are wrapped in arrays...
-    if (errorObj.length) {
+    if (errorObj instanceof Array && errorObj.length) {
       errorObj = errorObj[0];
     }
 

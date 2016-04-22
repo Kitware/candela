@@ -1,6 +1,5 @@
 import Underscore from 'underscore';
 import Backbone from 'backbone';
-import jQuery from 'jquery';
 
 import collapseIcon from '../../../images/collapse.svg';
 import expandIcon from '../../../images/expand.svg';
@@ -48,9 +47,9 @@ let Widget = Backbone.View.extend({
     return window.mainPage.widgetPanels.expandedWidgets
       .has(this.spec.hashName);
   },
-  setPanel: function (panel) {
+  setPanel: function (panel, node) {
     this.panel = panel;
-    this.setElement(jQuery('#' + this.spec.hashName + 'Container')[0]);
+    this.setElement(node);
   },
   renderIndicators: function () {
     this.panel.renderIndicators();
@@ -71,8 +70,11 @@ let Widget = Backbone.View.extend({
     });
   },
   canRender: function () {
-    return window.mainPage.toolchain &&
-      document.getElementById(this.$el.attr('id'));
+    // Don't render if there's no toolchain, or
+    // if our WidgetPanel hasn't given us a legitimate
+    // element in the document yet
+    return !!(window.mainPage.toolchain &&
+      document.getElementById(this.$el.attr('id')) === this.el);
   }
 });
 

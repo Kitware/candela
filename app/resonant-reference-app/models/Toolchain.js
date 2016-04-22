@@ -43,25 +43,6 @@ let Toolchain = MetadataItem.extend({
       this.updateStatus);
     this.listenTo(window.mainPage.widgetPanels, 'rra:navigateWidgets',
       this.storePreferredWidgets);
-
-    let datasetPromises = [];
-
-    this.getMeta('datasets').forEach(datasetId => {
-      datasetPromises.push(Promise.resolve(girder.restRequest({
-        path: 'item/' + datasetId,
-        type: 'GET'
-      })));
-    });
-    Promise.all(datasetPromises).catch(errorObj => {
-      window.mainPage.trigger('rra:error', errorObj);
-    }).then(respObjects => {
-      respObjects.forEach(resp => {
-        let newDataset = new Dataset(resp);
-        this.listenTo(newDataset, 'rra:changeSpec', this.changeDataSpec);
-        this.listenTo(newDataset, 'rra:swapId', this.swapDatasetId);
-      });
-      this.trigger('rra:changeDatasets');
-    });
   },
   updateStatus: Underscore.debounce(function (copyOnError) {
     let id = this.getId();
@@ -81,7 +62,33 @@ let Toolchain = MetadataItem.extend({
         return Promise.reject(new Error('Toolchain has no ID'));
       }
     }
+    
+    // Load up any datasets that the toolchain references
+    let datasetPromises = [];
 
+    this.getMeta('datasets').forEach(datasetId => {
+      datasetPromises.push(Promise.resolve(girder.restRequest({
+        path: 'item/' + datasetId,
+        type: 'GET'
+      })));
+    });
+    Promise.all(datasetPromises).catch(errorObj => {
+      window.mainPage.trigger('rra:error', errorObj);
+    }).then(respObjects => {
+      if (!respObjects) {
+        window.mainPage.trigger('rra:error',
+          new Error('Could not access this toolchain\'s dataset(s)'));
+      } else {
+        respObjects.forEach(resp => {
+          let newDataset = new Dataset(resp);
+          this.listenTo(newDataset, 'rra:changeSpec', this.changeDataSpec);
+          this.listenTo(newDataset, 'rra:swapId', this.swapDatasetId);
+        });
+      }
+      this.trigger('rra:changeDatasets');
+    });
+    
+    // Get access information about this toolchain
     let statusPromise = Promise.resolve(girder.restRequest({
       path: 'item/' + id + '/info',
       type: 'GET'
@@ -184,8 +191,8 @@ let Toolchain = MetadataItem.extend({
     return this.getMeta('datasets');
   },
   changeDataSpec: function () {
-    this.trigger('rra:changeDatasets');
     this.validateMappings();
+    this.trigger('rra:changeDatasets');
   },
   swapDatasetId: function (newData) {
     let datasets = this.getMeta('datasets');
@@ -306,9 +313,9 @@ let Toolchain = MetadataItem.extend({
         continue;
       }
 
-      let dataType = meta.datasets[mapping.dataIndex].getSpec()
+      let dataType = dataset.getSpec()
         .attributes[mapping.dataAttribute];
-      let optionSpec = meta.visualizations[mapping.visAttribute]
+      let optionSpec = meta.visualizations[mapping.visIndex]
         .options.find(spec => spec.name === mapping.visAttribute);
 
       if (!dataType || !optionSpec) {
@@ -393,7 +400,7 @@ let Toolchain = MetadataItem.extend({
     meta.datasets.forEach((id, i) => {
       result.push({
         widgetType: 'DatasetView',
-        hashName: 'DatasetView' + i,
+        hashName: 'DatasetView' + id,
         index: i,
         id: id
       });
@@ -405,7 +412,7 @@ let Toolchain = MetadataItem.extend({
     meta.visualizations.forEach((spec, i) => {
       result.push({
         widgetType: 'VisualizationView',
-        hashName: 'VisualizationView' + i,
+        hashName: 'VisualizationView' + spec.name + i,
         index: i,
         spec: spec
       });
