@@ -126,7 +126,8 @@
       "level": "level",
       "xAxis": {
         "values": [0, 3, 6, 9]
-      }
+      },
+      "renderer": "svg"
     }
   },
   {
