@@ -52,6 +52,8 @@ export default function imageTest ({name, url, selector, delay = 0, threshold}) 
     // TODO: allow options to appear in args.
     let n = Nightmare({
       show: false,
+      useContentSize: true,
+      frame: false,
       webPreferences: {
         // This disables session sharing, allowing each test to begin with an
         // emtpy cache, etc.
