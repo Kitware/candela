@@ -1,7 +1,8 @@
+import VisComponent from '../../VisComponent';
 import vega from '../../util/vega';
 import spec from './spec.json';
 
-export default class Bar {
+export default class Bar extends VisComponent {
   static get spec () {
     return {
       options: [
@@ -55,10 +56,11 @@ export default class Bar {
   }
 
   constructor (el, options) {
-    this.chart = vega.chart(spec, el, options);
+    super(el, options);
+    this.render();
   }
 
   render () {
-    this.chart.update();
+    vega.parseChart(spec, this.el, this.options);
   }
 }

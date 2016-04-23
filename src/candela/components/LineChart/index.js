@@ -5,7 +5,7 @@ import spec from './spec.json';
 
 export default class LineChart extends Events(VisComponent) {
   constructor (el, data) {
-    super(el);
+    super(el, data);
 
     let values = data.map(x => x[1]);
 
@@ -23,15 +23,20 @@ export default class LineChart extends Events(VisComponent) {
     maxY += (maxY - minY) * 0.20;
     this.maxY = maxY;
 
-    this.data(data);
+    this.render();
   }
 
   data (data) {
-    this.chart = vega.chart(spec, this.el, {
+    this.options = data;
+    this.render();
+  }
+
+  render () {
+    vega.parseChart(spec, this.el, {
       series: [
         {
           name: 'series1',
-          values: data,
+          values: this.options,
           x: '0',
           y: '1',
           color: 'darkslategray',
@@ -56,12 +61,6 @@ export default class LineChart extends Events(VisComponent) {
         right: 100
       }
     });
-  }
-
-  render () {
-    this.chart.update();
     this.emit('render');
   }
 }
-
-export default LineChart;
