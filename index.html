@@ -21,13 +21,14 @@
       'ALGA': [0.4, 0.5, 0.6, 0.8, 1.2, 0.55, 0.2],
       'ALGASBR': [0.4, 0.6, 0.6, 0.8, 1.2, 4, 5],
       'ALGC': [0.1, 0.1, 0.2, 0.3, 1.5, 1.55, 0.2],
-      'ALGD-ONLINE': [0.4, 0.5, 0.6, 0.8, 2.2, 3.1415, 0.2]
+      'ALGD-ONLINE': [0.4, 0.5, 0.6, 0.8, 2.2, 3.1415, 0.2],
+      'ALGD-OFFLINE': [0.4, 0.45, 0.52, 0.74, 2.4, 2.7, 0.1]
     },
     totalDatasets: 15,
     totalDistance: 1243,
     percentErrorByDataset: [{
       dataset: 'dataset0.jpg',
-      algorithm: 'alga',
+      trend: 'ALGA RMSE Euclidean Distance',
       length: 300,
       mean: 11,
       current: 5,
@@ -37,7 +38,7 @@
       max: 50
     }, {
       dataset: 'dataset0.jpg',
-      algorithm: 'sm',
+      trend: 'ALGC RMSE Euclidean Distance',
       length: 300,
       mean: 11,
       current: 5,
@@ -47,7 +48,7 @@
       max: 50
     }, {
       dataset: 'dataset0.jpg',
-      algorithm: 'ba',
+      trend: 'ALGASBR RMSE Euclidean Distance',
       length: 300,
       mean: 11,
       current: 0.3,
@@ -56,8 +57,28 @@
       fail: 25,
       max: 50
     }, {
+      dataset: 'dataset0.jpg',
+      trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
+      length: 300,
+      mean: 11,
+      current: 0.25,
+      target: 7,
+      warning: 10,
+      fail: 25,
+      max: 50
+    }, {
+      dataset: 'dataset0.jpg',
+      trend: 'ALGD-ONLINE RMSE Euclidean Distance',
+      length: 300,
+      mean: 11,
+      current: 0.15,
+      target: 7,
+      warning: 10,
+      fail: 25,
+      max: 50
+    }, {
       dataset: 'dataset1',
-      algorithm: 'alga',
+      trend: 'ALGA RMSE Euclidean Distance',
       length: 300,
       mean: 11,
       current: 5,
@@ -67,7 +88,7 @@
       max: 50
     }, {
       dataset: 'dataset1',
-      algorithm: 'sm',
+      trend: 'ALGC RMSE Euclidean Distance',
       length: 300,
       mean: 15,
       current: 14,
@@ -77,7 +98,7 @@
       max: 50
     }, {
       dataset: 'dataset1',
-      algorithm: 'ba',
+      trend: 'ALGASBR RMSE Euclidean Distance',
       length: 300,
       mean: 11,
       current: 0.2,
@@ -86,8 +107,28 @@
       fail: 25,
       max: 50
     }, {
+      dataset: 'dataset1',
+      trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
+      length: 300,
+      mean: 11,
+      current: 0.10,
+      target: 7,
+      warning: 10,
+      fail: 25,
+      max: 50
+    }, {
+      dataset: 'dataset1',
+      trend: 'ALGD-ONLINE RMSE Euclidean Distance',
+      length: 300,
+      mean: 11,
+      current: 0.12,
+      target: 7,
+      warning: 10,
+      fail: 25,
+      max: 50
+    }, {
       dataset: 'dataset2',
-      algorithm: 'alga',
+      trend: 'ALGA RMSE Euclidean Distance',
       length: 300,
       mean: 11,
       current: 5,
@@ -97,7 +138,7 @@
       max: 50
     }, {
       dataset: 'dataset2',
-      algorithm: 'sm',
+      trend: 'ALGC RMSE Euclidean Distance',
       length: 300,
       mean: 11,
       current: 5,
@@ -107,7 +148,7 @@
       max: 50
     }, {
       dataset: 'dataset2',
-      algorithm: 'ba',
+      trend: 'ALGASBR RMSE Euclidean Distance',
       length: 300,
       mean: 11,
       current: 0.3,
@@ -116,8 +157,28 @@
       fail: 25,
       max: 50
     }, {
+      dataset: 'dataset2',
+      trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
+      length: 300,
+      mean: 11,
+      current: 0.22,
+      target: 7,
+      warning: 10,
+      fail: 25,
+      max: 50
+    }, {
+      dataset: 'dataset2',
+      trend: 'ALGD-ONLINE RMSE Euclidean Distance',
+      length: 300,
+      mean: 11,
+      current: 0.18,
+      target: 7,
+      warning: 10,
+      fail: 25,
+      max: 50
+    }, {
       dataset: 'dataset3',
-      algorithm: 'alga',
+      trend: 'ALGA RMSE Euclidean Distance',
       length: 300,
       mean: 11,
       current: 28,
@@ -127,7 +188,7 @@
       max: 50
     }, {
       dataset: 'dataset3',
-      algorithm: 'sm',
+      trend: 'ALGC RMSE Euclidean Distance',
       length: 300,
       mean: 11,
       current: 5,
@@ -137,7 +198,7 @@
       max: 50
     }, {
       dataset: 'dataset3',
-      algorithm: 'ba',
+      trend: 'ALGASBR RMSE Euclidean Distance',
       length: 300,
       mean: 11,
       current: 0.3,
@@ -145,29 +206,29 @@
       warning: 10,
       fail: 25,
       max: 27,
-      callback: function () { console.log('dataset3-ba'); }
+      callback: function () { console.log('dataset3-algasbr'); }
     }, {
       dataset: 'dataset3',
-      algorithm: 'com',
+      trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
       length: 300,
       mean: 11,
-      current: 38,
+      current: 25,
       target: 7,
       warning: 10,
       fail: 25,
       max: 25,
-      callback: function () { console.log('dataset3-com'); }
+      callback: function () { console.log('dataset3-algd-offline'); }
     }, {
-      dataset: 'dataset2',
-      algorithm: 'com',
+      dataset: 'dataset3',
+      trend: 'ALGD-ONLINE RMSE Euclidean Distance',
       length: 300,
       mean: 11,
-      current: 3,
+      current: 21,
       target: 7,
       warning: 10,
       fail: 25,
       max: 27,
-      callback: function () { console.log('dataset2-com'); }
+      callback: function () { console.log('dataset3--algd-online'); }
     }],
     datasetLabelMap: {
       'dataset2': 'rotation',
@@ -181,18 +242,21 @@
       'dataset0.jpg': function () { console.log('dataset 0 -- trajectory'); },
       'dataset1': 'https://github.com'
     },
-    algorithms: [{
-      name: 'Visual-Inertial Odometry',
+    trends: [{
+      name: 'ALGC RMSE Euclidean Distance',
+      abbreviation: 'ALGC'
+    }, {
+      name: 'ALGA RMSE Euclidean Distance',
       abbreviation: 'ALGA'
     }, {
-      name: 'ALGB (Pose Graph)',
-      abbreviation: 'SM'
+      name: 'ALGASBR RMSE Euclidean Distance',
+      abbreviation: 'ALGASBR'
     }, {
-      name: 'Bundle Adjustment',
-      abbreviation: 'BA'
+      name: 'ALGD-OFFLINE RMSE Euclidean Distance',
+      abbreviation: 'ALGD-OFFLINE'
     }, {
-      name: 'Concurrent Odometry and Mapping',
-      abbreviation: 'ALGC'
+      name: 'ALGD-ONLINE RMSE Euclidean Distance',
+      abbreviation: 'ALGD-ONLINE'
     }]
   });
   app.render();
