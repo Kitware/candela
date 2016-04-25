@@ -11,7 +11,7 @@ export let ResultTablePane = Backbone.View.extend({
 
   initialize: function (settings) {
     this.results = settings.percentErrorByDataset;
-    this.algorithms = settings.algorithms || {};
+    this.trends = settings.trends || {};
     this.datasetMap = settings.datasetMap || {};
     this.trajectoryMap = settings.trajectoryMap || {};
     this.datasetLabelMap = settings.datasetLabelMap || {};
@@ -39,15 +39,21 @@ export let ResultTablePane = Backbone.View.extend({
       return result.id;
     });
 
+    var trendAbbreviationMap = {};
+    _.each(this.trends, function (trend) {
+        trendAbbreviationMap[trend.name] = trend.abbreviation;
+    });
+
     this.$el.html(tablePane({
       resultsByDatasetId: resultsByDatasetId,
-      algorithms: this.algorithms,
+      trends: this.trends,
       datasetMap: this.datasetMap,
       trajectoryMap: this.trajectoryMap,
       datasetLabelMap: this.datasetLabelMap
     })).promise().done(_.bind(function () {
       _.each(this.results, function (result) {
-        var resultDivSelector = '#' + result.id + '-' + result.algorithm;
+        var resultDivSelector = '#' + result.id + '-' +
+            (trendAbbreviationMap[result.trend] || result.trend).toLowerCase();
         // change color of circle
         if (result.current > result.fail) {
           $(resultDivSelector + ' svg.statusDot').find('circle')

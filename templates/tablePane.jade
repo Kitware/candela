@@ -1,9 +1,9 @@
 table.table.table-striped.table-hover.table-responsive.table-compact
   thead.result-labels
     td Data Set
-    each algorithm in algorithms
+    each trend in trends
       td
-        abbr(title="#{algorithm.name}") #{algorithm.abbreviation}
+        abbr(title="#{trend.name}") #{trend.abbreviation}
   tbody
     each resultSet in resultsByDatasetId
       tr
@@ -17,9 +17,9 @@ table.table.table-striped.table-hover.table-responsive.table-compact
           if typeof(datasetLabelMap[resultSet[0].id]) === 'string'
             .dataset-label(id="#{resultSet[0].id}-label")
               | #{datasetLabelMap[resultSet[0].id]}
-        each algorithm in algorithms
-          td.bullet-container(id="#{resultSet[0].id}-#{algorithm.abbreviation.toLowerCase()}")
+        each trend in trends
+          td.bullet-container(id="#{resultSet[0].id}-#{trend.abbreviation.toLowerCase()}")
             svg.statusDot
               circle.none(r="10", cx="10", cy="10")
-            .bullet(id="#{resultSet[0].id}-#{algorithm.abbreviation.toLowerCase()}-bullet")
-              svg(id="#{resultSet[0].id}-#{algorithm.abbreviation.toLowerCase()}-bullet-svg")
+            .bullet(id="#{resultSet[0].id}-#{trend.abbreviation.toLowerCase()}-bullet")
+              svg(id="#{resultSet[0].id}-#{trend.abbreviation.toLowerCase()}-bullet-svg")
