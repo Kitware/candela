@@ -28,7 +28,7 @@
   "scripts": {
     "build": "webpack",
     "build:release": "webpack --progress -p",
-    "start": "webpack-dev-server --progress --colors"
+    "start": "webpack-dev-server --host 0.0.0.0 --progress --colors"
   },
   "devDependencies": {
     "babel-core": "^6.5.1",
