@@ -1,3 +1,4 @@
+import Underscore from 'underscore';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 import candela from '../../../../../src/candela';
@@ -59,6 +60,10 @@ let VisualizationView = Widget.extend({
     this.handleNewToolchain();
   },
   handleNewToolchain: function () {
+    this.$el.html('');
+    this.ok = null;
+    this.vis = null;
+    
     this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations',
       this.render);
     this.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
@@ -93,7 +98,7 @@ Corrupted visualization meta information.`);
       }
     }
   },
-  render: function () {
+  render: Underscore.debounce(function () {
     if (!this.canRender()) {
       return;
     }
@@ -145,8 +150,21 @@ Corrupted visualization meta information.`);
       this.renderIndicators();
       window.mainPage.toolchain.shapeDataForVis().then(data => {
         this.vis.options.data = data;
-        this.vis.component.chart.update(this.vis.options);
-        this.vis.component.render();
+        
+        // TODO: how do we update the data for a component in
+        // general?
+        if (this.vis.component.chart &&
+            this.vis.component.chart.update) {
+          this.vis.component.chart.update(this.vis.options);
+        } else {
+          // Nuke the vis and start fresh
+          this.$el.html(myTemplate);
+          this.vis.component = new candela.components[this.vis.spec.name](
+            '#' + this.spec.hashName + 'Container .visualization', options);
+        }
+        if (this.isTargeted()) {
+          this.vis.component.render();
+        }
         this.ok = true;
         this.statusText.text = this.vis.spec.name;
         this.renderIndicators();
@@ -158,7 +176,7 @@ Corrupted visualization meta information.`);
       this.statusText.text = 'None selected';
       this.renderIndicators();
     }
-  }
+  }, 300)
 });
 
 export default VisualizationView;

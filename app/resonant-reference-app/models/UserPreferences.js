@@ -80,7 +80,9 @@ you move or delete this item, your preferences will be lost.`,
           },
           type: 'PUT'
         })).catch(errorObj => {
-          window.mainPage.trigger('rra:error', errorObj);
+          // For now, ignore failures to adopt toolchains
+          // and datasets
+          // window.mainPage.trigger('rra:error', errorObj);
         });
         
         window.mainPage.currentUser.trigger('rra:updateLibrary');
@@ -91,7 +93,9 @@ you move or delete this item, your preferences will be lost.`,
           window.mainPage.toolchain.updateStatus();
         }
       }).catch(errorObj => {
-        window.mainPage.trigger('rra:error', errorObj);
+        // For now, ignore failures to adopt toolchains
+        // and datasets
+        // window.mainPage.trigger('rra:error', errorObj);
       });
     }
   },

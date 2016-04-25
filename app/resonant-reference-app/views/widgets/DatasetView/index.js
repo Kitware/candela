@@ -1,3 +1,4 @@
+import Underscore from 'underscore';
 import d3 from 'd3';
 import jQuery from 'jquery';
 import ace from 'brace';
@@ -67,10 +68,13 @@ let DatasetView = Widget.extend({
     });
 
     this.listenTo(window.mainPage, 'rra:changeToolchain',
-      this.updateListeners);
-    this.updateListeners();
+      this.handleNewToolchain);
+    this.handleNewToolchain();
   },
-  updateListeners: function () {
+  handleNewToolchain: function () {
+    this.$el.html('');
+    this.status = STATUS.NO_DATA;
+    
     this.listenTo(window.mainPage.toolchain, 'rra:changeDatasets',
       this.render);
     this.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
@@ -145,7 +149,7 @@ you'll probably need to
         dataset.setAttribute(d, newType);
       });
   },
-  render: function () {
+  render: Underscore.debounce(function () {
     if (!this.canRender()) {
       return;
     }
@@ -208,7 +212,7 @@ you'll probably need to
     // to in-browser dataset)... for now, always disable
     // the textarea
     editor.setReadOnly(true);
-  }
+  }, 300)
 });
 
 export default DatasetView;

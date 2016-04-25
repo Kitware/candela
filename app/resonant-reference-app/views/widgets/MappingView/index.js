@@ -1,3 +1,4 @@
+import Underscore from 'underscore';
 import d3 from 'd3';
 import jQuery from 'jquery';
 import myTemplate from './template.html';
@@ -19,6 +20,16 @@ let EDGE_MODES = {
   POTENTIAL: 2,
   PROBABLE: 3
 };
+let STATUS = {
+  OK: 0,
+  NOT_ENOUGH_MAPPINGS: 1,
+  DATASETS_NOT_LOADED: 2,
+  STALE_MAPPINGS: 3,
+  NOTHING_TO_MAP: 4
+};
+
+function OutOfDateMappingError () {};
+OutOfDateMappingError.prototype = new Error();
 
 let MappingView = Widget.extend({
   initialize: function () {
@@ -39,18 +50,24 @@ let MappingView = Widget.extend({
       }
     });
 
-    this.ok = false;
+    this.status = STATUS.NOTHING_TO_MAP;
     this.icons.splice(0, 0, {
       src: () => {
-        if (this.ok === true) {
+        if (this.status === STATUS.OK) {
           return Widget.okayIcon;
+        } else if (this.status === STATUS.DATASETS_NOT_LOADED ||
+                   this.status === STATUS.STALE_MAPPINGS) {
+          return Widget.spinnerIcon;
         } else {
           return Widget.warningIcon;
         }
       },
       title: () => {
-        if (this.ok === true) {
+        if (this.status === STATUS.OK) {
           return 'All the needed mappings have been specified';
+        } else if (this.status === STATUS.DATASETS_NOT_LOADED ||
+                   this.status === STATUS.STALE_MAPPINGS) {
+          return 'Loading...';
         } else {
           return 'Something isn\'t quite right; click for details';
         }
@@ -63,10 +80,13 @@ let MappingView = Widget.extend({
     this.selection = null;
 
     this.listenTo(window.mainPage, 'rra:changeToolchain',
-      this.updateListeners);
-    this.updateListeners();
+      this.handleNewToolchain);
+    this.handleNewToolchain();
   },
-  updateListeners: function () {
+  handleNewToolchain: function () {
+    this.$el.html('');
+    this.status = STATUS.NOTHING_TO_MAP;
+    
     this.listenTo(window.mainPage.toolchain, 'rra:changeMappings', () => {
       this.selection = null;
       this.render();
@@ -79,22 +99,25 @@ let MappingView = Widget.extend({
     window.mainPage.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
-    if (this.ok === true) {
+    let screen;
+    if (this.status === STATUS.OK) {
       window.mainPage.overlay.renderSuccessScreen(`
 You've wired up all the connections that the visualization needs.
 Well done!`);
-    } else {
-      let meta = window.mainPage.toolchain.get('meta');
-      if (!meta || !meta.visualizations || !meta.visualizations[0] ||
-        !meta.datasets || !meta.datasets[0]) {
-        window.mainPage.overlay.renderUserErrorScreen(`
-You need to choose both a Dataset and a Visualization
-in order to connect them together.`);
-      } else {
-        window.mainPage.overlay.renderUserErrorScreen(`
+    } else if (this.status === STATUS.NOT_ENOUGH_MAPPINGS) {
+      window.mainPage.overlay.renderUserErrorScreen(`
 The visualization needs more connections to data in
 order to display anything.`);
-      }
+    } else if (this.status === STATUS.DATASETS_NOT_LOADED) {
+      window.mainPage.overlay.renderLoadingScreen(`
+Still accessing this toolchain's datasets...`);
+    } else if (this.status === STATUS.STALE_MAPPINGS) {
+      window.mainPage.overlay.renderLoadingScreen(`
+Still accessing this toolchain's mapping settings...`);
+    } else if (this.status === STATUS.NOTHING_TO_MAP) {
+      window.mainPage.overlay.renderUserErrorScreen(`
+You need to choose both a Dataset and a Visualization
+in order to connect them together.`);
     }
   },
   createNodeId: function (d) {
@@ -115,11 +138,21 @@ order to display anything.`);
       vis: []
     };
 
-    meta.datasets.forEach(d => {
+    for (let d of meta.datasets) {
       if (window.mainPage.loadedDatasets[d]) {
         specs.data.push(window.mainPage.loadedDatasets[d].getSpec());
+      } else {
+        // A dataset hasn't been added yet...
+        // so don't bother finishing the render
+        this.status = STATUS.DATASETS_NOT_LOADED;
+        return {
+          nodes: [],
+          edges: [],
+          nodeEdgeLookup: {},
+          realEdgeCount: 0
+        };
       }
-    });
+    }
     meta.visualizations.forEach(d => {
       specs.vis.push(d);
     });
@@ -187,6 +220,13 @@ order to display anything.`);
         source: nodeLookup[sourceId],
         target: nodeLookup[targetId]
       };
+      if (newEdge.source === undefined ||
+          newEdge.target === undefined) {
+        // We're constructing a mapping that's out of date!
+        // Render nothing...
+        throw new OutOfDateMappingError();
+      }
+      
       newEdge.id = this.createEdgeId(newEdge);
       if (established) {
         // These edges already exist
@@ -237,49 +277,63 @@ order to display anything.`);
       edges.push(newEdge);
     }
 
-    // Extract all the nodes (from both sides)
-    specs.data.forEach((dataSpec, dataIndex) => {
-      for (let attrName of Object.keys(dataSpec.attributes)) {
-        _createNode('data', dataIndex, attrName, dataSpec.attributes[attrName]);
-      }
-    });
-    specs.vis.forEach((visSpec, visIndex) => {
-      visSpec.options.forEach((option, attrIndex) => {
-        _createNode('vis', visIndex, option.name, option.domain.fieldTypes);
+    try {
+      // Extract all the nodes (from both sides)
+      specs.data.forEach((dataSpec, dataIndex) => {
+        for (let attrName of Object.keys(dataSpec.attributes)) {
+          _createNode('data', dataIndex, attrName, dataSpec.attributes[attrName]);
+        }
       });
-    });
+      specs.vis.forEach((visSpec, visIndex) => {
+        visSpec.options.forEach((option, attrIndex) => {
+          _createNode('vis', visIndex, option.name, option.domain.fieldTypes);
+        });
+      });
 
-    // Get the established edges
-    meta.mappings.forEach(mapping => {
-      _createEdge(true, mapping.visIndex, mapping.visAttribute,
-        mapping.dataIndex, mapping.dataAttribute);
-    });
+      // Get the established edges
+      for (let mapping of meta.mappings) {
+        _createEdge(true, mapping.visIndex, mapping.visAttribute,
+          mapping.dataIndex, mapping.dataAttribute);
+      };
 
-    // Add the potential and probable edges
-    if (this.selection !== null) {
-      if (this.selection.side === 'data') {
-        specs.vis.forEach((visSpec, visIndex) => {
-          visSpec.options.forEach(option => {
-            _createEdge(false, visIndex, option.name,
-              this.selection.index, this.selection.attrName);
+      // Add the potential and probable edges
+      if (this.selection !== null) {
+        if (this.selection.side === 'data') {
+          specs.vis.forEach((visSpec, visIndex) => {
+            visSpec.options.forEach(option => {
+              _createEdge(false, visIndex, option.name,
+                this.selection.index, this.selection.attrName);
+            });
           });
-        });
+        } else {
+          specs.data.forEach((dataSpec, dataIndex) => {
+            for (let attrName of Object.keys(dataSpec.attributes)) {
+              _createEdge(false, this.selection.index, this.selection.attrName,
+                dataIndex, attrName);
+            }
+          });
+        }
+      }
+
+      return {
+        nodes: nodes,
+        edges: edges,
+        nodeEdgeLookup: nodeEdgeLookup,
+        realEdgeCount: meta.mappings.length
+      };
+    } catch (err) {
+      if (err instanceof OutOfDateMappingError) {
+        this.status = STATUS.STALE_MAPPINGS;
+        return {
+          nodes: [],
+          edges: [],
+          nodeEdgeLookup: {},
+          realEdgeCount: 0
+        };
       } else {
-        specs.data.forEach((dataSpec, dataIndex) => {
-          for (let attrName of Object.keys(dataSpec.attributes)) {
-            _createEdge(false, this.selection.index, this.selection.attrName,
-              dataIndex, attrName);
-          }
-        });
+        throw err;
       }
     }
-
-    return {
-      nodes: nodes,
-      edges: edges,
-      nodeEdgeLookup: nodeEdgeLookup,
-      realEdgeCount: meta.mappings.length
-    };
   },
   handleClick: function (d) {
     d3.event.stopPropagation();
@@ -334,7 +388,7 @@ order to display anything.`);
       this.render();
     }
   },
-  render: function () {
+  render: Underscore.debounce(function () {
     if (!this.canRender()) {
       return;
     }
@@ -370,10 +424,15 @@ order to display anything.`);
     this.statusText.text = graph.realEdgeCount + ' / ' + numVis;
     this.statusText.title = graph.realEdgeCount + ' of ' + numVis +
       ' visual channels have been mapped';
-    if (graph.realEdgeCount === 0) {
-      this.ok = false;
-    } else {
-      this.ok = true;
+    if (graph.realEdgeCount > 0) {
+      this.status = STATUS.OK;
+    } else if (this.status !== STATUS.STALE_MAPPINGS &&
+               this.status !== STATUS.DATASETS_NOT_LOADED) {
+      if (numData === 0 || numVis === 0) {
+        this.status = STATUS.NOTHING_TO_MAP;
+      } else {
+        this.status = STATUS.NOT_ENOUGH_MAPPINGS;
+      }
     }
     this.renderIndicators();
 
@@ -557,7 +616,7 @@ order to display anything.`);
         this.handleClick(graph.nodes[d.target]);
       }
     });
-  }
+  }, 300)
 });
 
 export default MappingView;
