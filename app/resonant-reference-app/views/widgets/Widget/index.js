@@ -39,6 +39,7 @@ let Widget = Backbone.View.extend({
     
     this.listenTo(window.mainPage.widgetPanels, 'rra:navigateWidgets',
       this.render);
+    this.listenTo(window.mainPage, 'rra:resizeWindow', this.render);
   },
   toggle: function () {
     window.mainPage.widgetPanels.toggleWidget(this.spec);
@@ -70,11 +71,11 @@ let Widget = Backbone.View.extend({
     });
   },
   canRender: function () {
-    // Don't render if there's no toolchain, or
-    // if our WidgetPanel hasn't given us a legitimate
-    // element in the document yet
-    return !!(window.mainPage.toolchain &&
-      document.getElementById(this.$el.attr('id')) === this.el);
+    // Don't render if there's no toolchain, or if our WidgetPanel
+    // hasn't given us a legitimate element in the
+    // document yet
+    return window.mainPage.toolchain &&
+      document.getElementById(this.$el.attr('id')) === this.el;
   }
 });
 

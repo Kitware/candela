@@ -167,8 +167,9 @@ You encountered an error we didn't anticipate! Please report it
           this.vis.component = new candela.components[this.vis.spec.name](
             '#' + this.spec.hashName + 'Container .visualization', options);
         }
-        
-        this.vis.component.render();
+        if (this.isTargeted()) {
+          this.vis.component.render();
+        }
         this.ok = true;
         this.statusText.text = this.vis.spec.name;
         this.renderIndicators();

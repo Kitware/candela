@@ -36,6 +36,7 @@ let MainPage = Backbone.View.extend({
     // Respond to resize events
     window.onresize = () => {
       this.render();
+      this.trigger('rra:resizeWindow');
     };
   },
   render: function () {

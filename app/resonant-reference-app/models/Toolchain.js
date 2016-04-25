@@ -395,7 +395,7 @@ let Toolchain = MetadataItem.extend({
     meta.datasets.forEach((id, i) => {
       result.push({
         widgetType: 'DatasetView',
-        hashName: 'DatasetView' + id,
+        hashName: 'DatasetView' + i,
         index: i,
         id: id
       });
@@ -407,7 +407,7 @@ let Toolchain = MetadataItem.extend({
     meta.visualizations.forEach((spec, i) => {
       result.push({
         widgetType: 'VisualizationView',
-        hashName: 'VisualizationView' + spec.name + i,
+        hashName: 'VisualizationView' + i,
         index: i,
         spec: spec
       });
