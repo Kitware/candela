@@ -9,7 +9,8 @@
       "x": "petalLength",
       "y": "petalWidth",
       "color": "sepalLength",
-      "shape": "species"
+      "shape": "species",
+      "renderer": "svg"
     }
   },
   {
@@ -20,7 +21,8 @@
     "options": {
       "data": "msft",
       "x": "date",
-      "y": ["price"]
+      "y": ["price"],
+      "renderer": "svg"
     }
   },
   {
@@ -31,7 +33,8 @@
     "options": {
       "data": "iris",
       "fields": ["petalWidth", "petalLength", "sepalLength", "sepalWidth"],
-      "color": "species"
+      "color": "species",
+      "renderer": "svg"
     }
   },
   {
@@ -98,7 +101,8 @@
           "background": "dimgray",
           "foreground": "rgb(228,0,0)"
         }
-      ]
+      ],
+      "renderer": "svg"
     }
   },
   {
@@ -141,7 +145,8 @@
       "fields": ["sepalLength", "sepalWidth"],
       "group": "species",
       "boxSize": 0.5,
-      "capSize": 0.25
+      "capSize": 0.25,
+      "renderer": "svg"
     }
   },
   {
@@ -151,7 +156,8 @@
     "component": "Histogram",
     "options": {
       "data": "iris",
-      "bin": "sepalLength"
+      "bin": "sepalLength",
+      "renderer": "svg"
     }
   },
   {
@@ -178,7 +184,8 @@
         "petalWidth",
         "species"
       ],
-      "sort": "petalLength"
+      "sort": "petalLength",
+      "renderer": "svg"
     }
   },
   {
