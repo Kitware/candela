@@ -32,7 +32,7 @@ let VIEWS = {
   VisualizationLibrary: VisualizationLibrary
 };
 
-import './overlay.css';
+import './style.css';
 
 let Overlay = Backbone.View.extend({
   initialize: function () {

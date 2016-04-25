@@ -9,9 +9,6 @@ import loadingIcon from '../../../images/spinner.gif';
 import infoIcon from '../../../images/info.svg';
 import newInfoIcon from '../../../images/newInfo.svg';
 
-import editableIcon from '../../../images/canEdit.svg';
-import uneditableIcon from '../../../images/cantEdit.svg';
-
 import datasetIcon from '../../../images/dataset.svg';
 import mappingIcon from '../../../images/mapping.svg';
 import visualizationIcon from '../../../images/scatterplot.svg';
@@ -45,10 +42,10 @@ let Header = Backbone.View.extend({
 
     this.listenTo(window.mainPage, 'rra:changeToolchain',
       this.newToolchainResponse);
-    
+
     this.listenTo(window.mainPage.widgetPanels, 'rra:updateWidgetSpecs',
       this.render);
-    
+
     this.listenTo(window.mainPage.helpLayer, 'rra:updateHelp', this.render);
 
     this.listenTo(window.mainPage.userPreferences,
@@ -91,7 +88,7 @@ let Header = Backbone.View.extend({
       });
       this.templateAdded = true;
     }
-    
+
     if (window.mainPage.helpLayer.hasNewTips()) {
       jQuery('#helpButton').attr('src', newInfoIcon);
     } else {
@@ -109,13 +106,6 @@ let Header = Backbone.View.extend({
       } else {
         jQuery('#toolchainLocationButton')
           .attr('src', ICONS[toolchainStatus.location]);
-      }
-      if (toolchainStatus.editable === true) {
-        jQuery('#toolchainEditabilityButton')
-          .attr('src', editableIcon);
-      } else {
-        jQuery('#toolchainEditabilityButton')
-          .attr('src', uneditableIcon);
       }
 
       jQuery('#toolchainName').val(window.mainPage.toolchain.get('name'));
@@ -140,7 +130,9 @@ let Header = Backbone.View.extend({
       let widgetButtons = d3.select(this.el).select('#toolchainIcons')
         .selectAll('img.headerButton').data(widgetIcons);
       widgetButtons.enter().append('img')
-        .attr('class', 'headerButton');
+        .attr('class', (d) => {
+          return d.widgetType + ' headerButton';
+        });
       widgetButtons.exit().remove();
       widgetButtons.attr('src', (d) => {
         return ICONS[d.widgetType];
@@ -158,6 +150,33 @@ let Header = Backbone.View.extend({
       // (an overlay should be showing, so don't sweat the toolbar)
       jQuery('#toolchainHeader, #toolchainIcons').hide();
     }
+
+    // Update any relevant tips on the help screen
+    window.mainPage.helpLayer.update({
+      '#hamburgerButton': 'Main Menu',
+      '#helpButton': `
+Show these tips. This is blue when there are new tips that you 
+haven't seen yet.`,
+      '#achievementsButton': `
+Your achievements. Click this to see what you've accomplished,
+and what you still haven't tried.`,
+      '#toolchainLocationButton': `
+Indicates who can see the toolchain you're working on. Click
+to change its settings.`,
+      '#toolchainName': `
+Click to rename this toolchain`,
+      'img.AddDataset.headerButton': `
+Click to add a dataset to this toolchain`,
+      'img.DatasetView.headerButton': `
+Click to see/change the datasets in this toolchain`,
+      'img.MappingView.headerButton': `
+Click to manage the connections between the datasets and 
+the visualizations in this toolchain`,
+      'img.VisualizationView.headerButton': `
+Click to explore the visualizations in this toolchain`,
+      'img.AddVisualization.headerButton': `
+Click to add a visualization to this toolchain`
+    });
   }, 300),
   notifyLevelUp: function () {
     // TODO

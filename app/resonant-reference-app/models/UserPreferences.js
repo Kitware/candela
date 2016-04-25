@@ -99,6 +99,13 @@ you move or delete this item, your preferences will be lost.`,
       });
     }
   },
+  observeTips: function (tips) {
+    let seenTips = this.getMeta('seenTips');
+    for (let tipId of Object.keys(tips)) {
+      seenTips[tipId] = true;
+    };
+    this.setMeta('seenTips', seenTips);
+  },
   resetToDefaults: function () {
     // The user has logged out, or some other authentication
     // problem is going on. This sets the app to the initial

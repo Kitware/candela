@@ -99,7 +99,6 @@ let MappingView = Widget.extend({
     window.mainPage.overlay.render(infoTemplate);
   },
   renderHelpScreen: function () {
-    let screen;
     if (this.status === STATUS.OK) {
       window.mainPage.overlay.renderSuccessScreen(`
 You've wired up all the connections that the visualization needs.
