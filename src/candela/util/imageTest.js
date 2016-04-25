@@ -21,7 +21,23 @@ function callerDirname () {
 }
 
 function doSaveImage (name) {
-  return process.env.CANDELA_SAVE_IMAGE && process.env.CANDELA_SAVE_IMAGE.split(',').indexOf(name) > -1;
+  // This function returns true if (1) there is an environment variable set
+  // called "CANDELA_SAVE_IMAGE", and either (2a) the name of the test appears
+  // in the value of the variable when treated as a comma separated list of
+  // strings, or (2b) the variable reads "all".
+  const go = process.env.CANDELA_SAVE_IMAGE;
+  const mentionsName = go && process.env.CANDELA_SAVE_IMAGE.split(',').indexOf(name) > -1;
+  const doAll = go && process.env.CANDELA_SAVE_IMAGE === 'all';
+
+  return go && mentionsName || doAll;
+}
+
+function doDumpImage (name) {
+  const go = process.env.CANDELA_DUMP_IMAGE;
+  const mentionsName = go && process.env.CANDELA_DUMP_IMAGE.split(',').indexOf(name) > -1;
+  const doAll = go && process.env.CANDELA_DUMP_IMAGE === 'all';
+
+  return go && mentionsName || doAll;
 }
 
 Promise.onPossiblyUnhandledRejection(err => {
@@ -35,7 +51,12 @@ export default function imageTest ({name, url, selector, delay = 0, threshold}) 
   test(`${name} image test`, t => {
     // TODO: allow options to appear in args.
     let n = Nightmare({
-      show: false
+      show: false,
+      webPreferences: {
+        // This disables session sharing, allowing each test to begin with an
+        // emtpy cache, etc.
+        partition: 'nopersist'
+      }
     });
 
     Promise.resolve()
@@ -61,14 +82,15 @@ export default function imageTest ({name, url, selector, delay = 0, threshold}) 
 
       resemble(image)
         .compareTo(refImage)
+        .ignoreAntialiasing()
         .onComplete(analysis => {
-          const passed = Number(analysis.misMatchPercentage) < threshold;
-          if (!passed) {
+          const passed = Number(analysis.misMatchPercentage) < threshold * 100;
+          if (!passed || doDumpImage(name)) {
             fs.writeFileSync(path.join(dirname, `${name}-test.png`), imageBuf.toString('base64'), 'base64');
             fs.writeFileSync(path.join(dirname, `${name}-diff.png`), rawData(analysis.getImageDataUrl()), 'base64');
           }
 
-          t.ok(passed, `${name} image matches reference image to within ${threshold * 100}%`);
+          t.ok(passed, `${name} image matches reference image to within ${threshold * 100}% (actual diff: ${analysis.misMatchPercentage}%)`);
 
           t.end();
           return n.end().then();
