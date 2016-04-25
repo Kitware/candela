@@ -19,10 +19,6 @@ addons:
         - $(find src/candela/components -name '*.png' | tr "\n" ":")
       debug: true
 
-cache:
-  directories:
-    - node_modules
-
 before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
