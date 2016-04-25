@@ -185,6 +185,9 @@
         "species"
       ],
       "sort": "petalLength",
+      "width": 700,
+      "height": 500,
+      "padding": {"top": 20, "bottom": 80, "left": 80, "right": 20},
       "renderer": "svg"
     }
   },
