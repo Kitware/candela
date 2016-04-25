@@ -65,7 +65,8 @@
       "x": "id",
       "y": "a",
       "color": "b",
-      "hover": ["id", "c"]
+      "hover": ["id", "c"],
+      "renderer": "svg"
     }
   },
   {
