@@ -27,4 +27,4 @@ script:
     - npm install
     - npm run build
     - npm run test:unit
-    - npm run test:image
+    - CANDELA_DUMP_IMAGE=all npm run test:image
