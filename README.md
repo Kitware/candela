@@ -21,4 +21,9 @@ app. This works for midas by running `copy_to_midas.sh`.
 
 ### Usage
 
-For usage instructions see `src/index.js`.
+For example usage see `index.html`. You can run this example app using the
+webpack-dev-server by
+
+```
+npm run start
+```
