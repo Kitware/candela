@@ -17,7 +17,7 @@ addons:
       s3_region: "us-east-1"
       paths:
         - $(find src/candela/components -name '*.png' | tr "\n" ":")
-      debug: true
+      debug: false
 
 before_install:
   - export DISPLAY=:99.0
