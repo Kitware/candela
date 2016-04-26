@@ -7,7 +7,8 @@
     ["orient", "vertical"],
     ["horiz", ["@eq", ["@get", "orient"], "horizontal"]],
     ["valueAxis", ["@if", ["@get", "horiz"], "x", "y"]],
-    ["categoryAxis", ["@if", ["@get", "horiz"], "y", "x"]]
+    ["categoryAxis", ["@if", ["@get", "horiz"], "y", "x"]],
+    ["padding", "strict"]
   ],
   [
     "@merge",
@@ -53,7 +54,7 @@
     {
       "name": "boxplot",
       "height": ["@get", "height", 400],
-      "padding": "strict",
+      "padding": ["@get", "padding"],
       "width": ["@get", "width", 600],
       "data": [
         {
