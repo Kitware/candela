@@ -13,7 +13,7 @@ export let TrendPane = Backbone.View.extend({
     this.metric_name = settings.metric_name || 'RMSE Euclidean Distance';
     this.bins = settings.bins || 10;
     this.trendAbbreviationMap = settings.trendAbbreviationMap;
-    this.hists = this._calculateHistograms(settings.percentErrorByDataset);
+    this.hists = this._calculateHistograms(settings.trendValuesByDataset);
   },
 
   _calculateHistograms: function (trends) {

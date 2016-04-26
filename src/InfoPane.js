@@ -28,7 +28,7 @@ export let InfoPane = Backbone.View.extend({
     this.numBad = 0;
     this.numFail = 0;
     this.allValues = [];
-    _.each(settings.percentErrorByDataset, _.bind(function (dataset) {
+    _.each(settings.trendValuesByDataset, _.bind(function (dataset) {
       this.allValues.push(dataset.current);
       if (dataset.current >= dataset.fail) {
         this.numFail++;
@@ -62,7 +62,7 @@ export let InfoPane = Backbone.View.extend({
    * aggregate trend from the existing trend data.
    */
   _getAggTrends: function (settings) {
-    const byTrend = _.groupBy(settings.percentErrorByDataset, 'trend');
+    const byTrend = _.groupBy(settings.trendValuesByDataset, 'trend');
     const trends = _.keys(byTrend);
     let aggTrends = {};
     for (let i = 0; i < trends.length; ++i) {

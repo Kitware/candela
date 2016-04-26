@@ -10,7 +10,7 @@ export let ResultTablePane = Backbone.View.extend({
   el: '.result-table-pane',
 
   initialize: function (settings) {
-    this.results = settings.percentErrorByDataset;
+    this.results = settings.trendValuesByDataset;
     this.trends = settings.trends || {};
     this.datasetMap = settings.datasetMap || {};
     this.trajectoryMap = settings.trajectoryMap || {};
