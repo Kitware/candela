@@ -7,260 +7,270 @@
     <script type="text/javascript" src="dist/trackerdash.widget.js" charset="utf-8"></script>
     <script type="text/javascript">
     window.onload = function () {
-    var app = new trackerdash.dash({
-    el: '.dash-container',
-    name: 'Beta Ground Truth Pre-Approved',
-    day: '2014-06-03',
-    branch: 'master',
-    warning: 0.4,
-    fail: 0.7,
-    max: 1.0,
-    metric_name: 'RMSE euclids distance',
-    aggregate_metric_name: '51st percentile RMSE',
-    agg_trends: {
-      'ALGA': [0.4, 0.5, 0.6, 0.8, 1.2, 0.55, 0.2],
-      'ALGASBR': [0.4, 0.6, 0.6, 0.8, 1.2, 4, 5],
-      'ALGC': [0.1, 0.1, 0.2, 0.3, 1.5, 1.55, 0.2],
-      'ALGD-ONLINE': [0.4, 0.5, 0.6, 0.8, 2.2, 3.1415, 0.2],
-      'ALGD-OFFLINE': [0.4, 0.45, 0.52, 0.74, 2.4, 2.7, 0.1]
-    },
-    totalDatasets: 15,
-    totalDistance: 1243,
-    percentErrorByDataset: [{
-      dataset: 'dataset0.jpg',
-      trend: 'ALGA RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 5,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset0.jpg',
-      trend: 'ALGC RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 5,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset0.jpg',
-      trend: 'ALGASBR RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 0.3,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset0.jpg',
-      trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 0.25,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset0.jpg',
-      trend: 'ALGD-ONLINE RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 0.15,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset1',
-      trend: 'ALGA RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 5,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset1',
-      trend: 'ALGC RMSE Euclidean Distance',
-      length: 300,
-      mean: 15,
-      current: 14,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset1',
-      trend: 'ALGASBR RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 0.2,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset1',
-      trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 0.10,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset1',
-      trend: 'ALGD-ONLINE RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 0.12,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset2',
-      trend: 'ALGA RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 5,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset2',
-      trend: 'ALGC RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 5,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset2',
-      trend: 'ALGASBR RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 0.3,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset2',
-      trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 0.22,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset2',
-      trend: 'ALGD-ONLINE RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 0.18,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset3',
-      trend: 'ALGA RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 28,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset3',
-      trend: 'ALGC RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 5,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 50
-    }, {
-      dataset: 'dataset3',
-      trend: 'ALGASBR RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 0.3,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 27,
-      callback: function () { console.log('dataset3-algasbr'); }
-    }, {
-      dataset: 'dataset3',
-      trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 25,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 25,
-      callback: function () { console.log('dataset3-algd-offline'); }
-    }, {
-      dataset: 'dataset3',
-      trend: 'ALGD-ONLINE RMSE Euclidean Distance',
-      length: 300,
-      mean: 11,
-      current: 21,
-      target: 7,
-      warning: 10,
-      fail: 25,
-      max: 27,
-      callback: function () { console.log('dataset3--algd-online'); }
-    }],
-    datasetLabelMap: {
-      'dataset2': 'rotation',
-      'dataset1': 'label'
-    },
-    datasetMap: {
-      'dataset3': 'http://www.trackerdash.com',
-      'dataset2': function () { console.log('dataset 2'); }
-    },
-    trajectoryMap: {
-      'dataset0.jpg': function () { console.log('dataset 0 -- trajectory'); },
-      'dataset1': 'https://github.com'
-    },
-    trends: [{
-      name: 'ALGC RMSE Euclidean Distance',
-      abbreviation: 'ALGC'
-    }, {
-      name: 'ALGA RMSE Euclidean Distance',
-      abbreviation: 'ALGA'
-    }, {
-      name: 'ALGASBR RMSE Euclidean Distance',
-      abbreviation: 'ALGASBR'
-    }, {
-      name: 'ALGD-OFFLINE RMSE Euclidean Distance',
-      abbreviation: 'ALGD-OFFLINE'
-    }, {
-      name: 'ALGD-ONLINE RMSE Euclidean Distance',
-      abbreviation: 'ALGD-ONLINE'
-    }]
-  });
-  app.render();
-};
+        // Pass query param 'omitAggTrends' to test without 'agg_trends' key.
+        var appSettings = {
+            el: '.dash-container',
+            name: 'Beta Ground Truth Pre-Approved',
+            day: '2014-06-03',
+            branch: 'master',
+            warning: 0.4,
+            fail: 0.7,
+            max: 1.0,
+            metric_name: 'RMSE euclids distance',
+            aggregate_metric_name: '52nd percentile RMSE',
+            agg_trends: {
+              'ALGA': [0.4, 0.5, 0.6, 0.8, 1.2, 0.55, 0.2],
+              'ALGASBR': [0.4, 0.6, 0.6, 0.8, 1.2, 4, 5],
+              'ALGC': [0.1, 0.1, 0.2, 0.3, 1.5, 1.55, 0.2],
+              'ALGD-ONLINE': [0.4, 0.5, 0.6, 0.8, 2.2, 3.1415, 0.2],
+              'ALGD-OFFLINE': [0.4, 0.45, 0.52, 0.74, 2.4, 2.7, 0.1]
+            },
+            totalDatasets: 15,
+            totalDistance: 1243,
+            percentErrorByDataset: [{
+              dataset: 'dataset0.jpg',
+              trend: 'ALGA RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 5,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset0.jpg',
+              trend: 'ALGC RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 5,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset0.jpg',
+              trend: 'ALGASBR RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 0.3,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset0.jpg',
+              trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 0.25,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset0.jpg',
+              trend: 'ALGD-ONLINE RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 0.15,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset1',
+              trend: 'ALGA RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 5,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset1',
+              trend: 'ALGC RMSE Euclidean Distance',
+              length: 300,
+              mean: 15,
+              current: 14,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset1',
+              trend: 'ALGASBR RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 0.2,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset1',
+              trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 0.10,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset1',
+              trend: 'ALGD-ONLINE RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 0.12,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset2',
+              trend: 'ALGA RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 5,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset2',
+              trend: 'ALGC RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 5,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset2',
+              trend: 'ALGASBR RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 0.3,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset2',
+              trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 0.22,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset2',
+              trend: 'ALGD-ONLINE RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 0.18,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset3',
+              trend: 'ALGA RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 28,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset3',
+              trend: 'ALGC RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 5,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset3',
+              trend: 'ALGASBR RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 0.3,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 27,
+              callback: function () { console.log('dataset3-algasbr'); }
+            }, {
+              dataset: 'dataset3',
+              trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 25,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 25,
+              callback: function () { console.log('dataset3-algd-offline'); }
+            }, {
+              dataset: 'dataset3',
+              trend: 'ALGD-ONLINE RMSE Euclidean Distance',
+              length: 300,
+              mean: 11,
+              current: 21,
+              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 27,
+              callback: function () { console.log('dataset3--algd-online'); }
+            }],
+            datasetLabelMap: {
+              'dataset2': 'rotation',
+              'dataset1': 'label'
+            },
+            datasetMap: {
+              'dataset3': 'http://www.trackerdash.com',
+              'dataset2': function () { console.log('dataset 2'); }
+            },
+            trajectoryMap: {
+              'dataset0.jpg': function () { console.log('dataset 0 -- trajectory'); },
+              'dataset1': 'https://github.com'
+            },
+            trends: [{
+              name: 'ALGC RMSE Euclidean Distance',
+              abbreviation: 'ALGC'
+            }, {
+              name: 'ALGA RMSE Euclidean Distance',
+              abbreviation: 'ALGA'
+            }, {
+              name: 'ALGASBR RMSE Euclidean Distance',
+              abbreviation: 'ALGASBR'
+            }, {
+              name: 'ALGD-OFFLINE RMSE Euclidean Distance',
+              abbreviation: 'ALGD-OFFLINE'
+            }, {
+              name: 'ALGD-ONLINE RMSE Euclidean Distance',
+              abbreviation: 'ALGD-ONLINE'
+            }]
+      };
+      var qParams = location.search;
+      if (qParams) {
+          qParams = qParams.split('?')[1].split('&');
+          for (var i = 0; i < qParams.length; i++) {
+              if (qParams[i] === 'omitAggTrends') {
+                  delete appSettings['agg_trends'];
+              }
+          }
+      }
+      var app = new trackerdash.dash(appSettings);
+    }
     </script>
   </body>
 </html>
