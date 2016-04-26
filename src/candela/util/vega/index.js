@@ -412,7 +412,7 @@ let parseChart = function (spec, element, options) {
   let vegaSpec = transform(spec, curOptions);
 
   // Return a promise for the Vega chart object
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     vg.parse.spec(vegaSpec, chartObj => {
       let chart = chartObj(vegaOptions);
       chart.update();
