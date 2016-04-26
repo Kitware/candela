@@ -1,4 +1,5 @@
 import Backbone from 'backbone';
+import _ from 'underscore';
 
 require('bootstrap-webpack');
 require('nvd3/build/nv.d3.min.css');
@@ -15,6 +16,10 @@ export let dash = Backbone.View.extend({
   el: 'body',
 
   initialize: function (settings) {
+    settings.trendAbbreviationMap = {};
+    _.each(settings.trends, function (trend) {
+      settings.trendAbbreviationMap[trend.name] = trend.abbreviation;
+    });
     this.trackData = settings;
     delete this.trackData.el;
     this.render();

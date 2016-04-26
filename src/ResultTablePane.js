@@ -15,6 +15,7 @@ export let ResultTablePane = Backbone.View.extend({
     this.datasetMap = settings.datasetMap || {};
     this.trajectoryMap = settings.trajectoryMap || {};
     this.datasetLabelMap = settings.datasetLabelMap || {};
+    this.trendAbbreviationMap = settings.trendAbbreviationMap;
     if (this.results === undefined) {
       return;
     }
@@ -39,11 +40,6 @@ export let ResultTablePane = Backbone.View.extend({
       return result.id;
     });
 
-    var trendAbbreviationMap = {};
-    _.each(this.trends, function (trend) {
-        trendAbbreviationMap[trend.name] = trend.abbreviation;
-    });
-
     this.$el.html(tablePane({
       resultsByDatasetId: resultsByDatasetId,
       trends: this.trends,
@@ -53,7 +49,7 @@ export let ResultTablePane = Backbone.View.extend({
     })).promise().done(_.bind(function () {
       _.each(this.results, function (result) {
         var resultDivSelector = '#' + result.id + '-' +
-            (trendAbbreviationMap[result.trend] || result.trend).toLowerCase();
+            (this.trendAbbreviationMap[result.trend] || result.trend).toLowerCase();
         // change color of circle
         if (result.current > result.fail) {
           $(resultDivSelector + ' svg.statusDot').find('circle')
@@ -75,7 +71,7 @@ export let ResultTablePane = Backbone.View.extend({
             .css('cursor', 'pointer')
             .click(result.callback);
         }
-      });
+      }, this);
 
       _.each(this.datasetMap, function (value, key) {
         if (typeof value === 'function') {

@@ -2,8 +2,8 @@ table.table.table-responsive.table-compact
   thead.result-labels
     th(colspan="2")
       .agg-label-header
-        | Aggregate Metric
-    if algorithms.length >= 1 && aggTrends[algorithms[0]].length > 1
+        | #{aggregate_metric_name}
+    if aggTrendNames.length >= 1 && aggTrends[aggTrendNames[0]].length > 1
       th
         .agg-sparkline-header
           | Last 7 Days
@@ -11,21 +11,21 @@ table.table.table-responsive.table-compact
       .agg-bullet-header
         | Submission Value
   tbody
-  each algorithm in algorithms
-    tr.info-section-chart(id="#{algorithm}-aggregate-container")
+  each aggTrendName in aggTrendNames
+    tr.info-section-chart(id="#{aggTrendName}-aggregate-container")
       td.agg-status-dot
         svg.statusDot
-            circle.none(id="#{algorithm}-aggregate-dot" r="10", cx="10", cy="10")
+            circle.none(id="#{aggTrendName}-aggregate-dot" r="10", cx="10", cy="10")
       td
         .agg-label
-          | #{algorithm.toUpperCase()}
-      if algorithms.length >= 1 && aggTrends[algorithms[0]].length > 1
+          | #{aggTrendName.toUpperCase()}
+      if aggTrendNames.length >= 1 && aggTrends[aggTrendNames[0]].length > 1
         td
-          .agg-sparkline(id="#{algorithm}-aggregate-sparkline")
+          .agg-sparkline(id="#{aggTrendName}-aggregate-sparkline")
             svg
       td
         .agg-value
-          | #{Math.round(aggTrends[algorithm][aggTrends[algorithm].length-1] * 10000) / 10000}
+          | #{Math.round(aggTrends[aggTrendName][aggTrends[aggTrendName].length-1] * 10000) / 10000}
       td
-        .agg-bullet(id="#{algorithm}-aggregate-bullet")
-          svg(id="#{algorithm}-aggregate-bullet-svg")
+        .agg-bullet(id="#{aggTrendName}-aggregate-bullet")
+          svg(id="#{aggTrendName}-aggregate-bullet-svg")

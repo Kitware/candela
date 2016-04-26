@@ -12,12 +12,13 @@ export let TrendPane = Backbone.View.extend({
   initialize: function (settings) {
     this.metric_name = settings.metric_name || 'RMSE Euclidean Distance';
     this.bins = settings.bins || 10;
+    this.trendAbbreviationMap = settings.trendAbbreviationMap;
     this.hists = this._calculateHistograms(settings.percentErrorByDataset);
   },
 
   _calculateHistograms: function (trends) {
     const bins = this.bins;
-    const byAlgorithm = _.groupBy(trends, 'algorithm');
+    const byTrend = _.groupBy(trends, 'trend');
 
     const min = _.reduce(trends, (memo, num) => {
       return Math.min(memo, num.current);
@@ -28,8 +29,8 @@ export let TrendPane = Backbone.View.extend({
     }, 0);
 
     const binWidth = (max - min) / bins;
-    let hists = _.map(byAlgorithm, (element, key) => {
-      let el = {algorithm: key};
+    let hists = _.map(byTrend, (element, key) => {
+      let el = {trend: this.trendAbbreviationMap[key] || key};
       el['values'] = _.countBy(_.map(element, (value) => {
         let res = Math.floor(value.current / binWidth);
         if (res > bins - 1) {
@@ -38,9 +39,9 @@ export let TrendPane = Backbone.View.extend({
         return res;
       }), (num) => { return num; });
       return el;
-    });
+    }, this);
 
-    hists = _.indexBy(hists, 'algorithm');
+    hists = _.indexBy(hists, 'trend');
     this.xLabels = [];
     this.xLabels.push(binWidth / 2);
     for (let i = 1; i < bins; ++i) {
@@ -55,13 +56,13 @@ export let TrendPane = Backbone.View.extend({
   getChartData: function () {
     // Prepare the data for plotting
     let plotData = [];
-    const algorithms = _.keys(this.hists);
-    for (let i = 0; i < algorithms.length; ++i) {
-      const algorithm = algorithms[i];
-      let curData = { key: algorithm.toUpperCase() };
+    const trends = _.keys(this.hists);
+    for (let i = 0; i < trends.length; ++i) {
+      const trend = trends[i];
+      let curData = { key: trend.toUpperCase() };
       curData.values = [];
       for (let j = 0; j < this.bins; ++j) {
-        curData.values.push({ x: this.xLabels[j], y: this.hists[algorithm].values[j] || 0 });
+        curData.values.push({ x: this.xLabels[j], y: this.hists[trend].values[j] || 0 });
       }
       plotData.push(curData);
     }

@@ -21,7 +21,8 @@ export let InfoPane = Backbone.View.extend({
     this.warning = settings.warning || 3;
     this.fail = settings.fail || 4;
     this.max = settings.max || 5;
-    this.aggregate_metric_name = settings.aggregate_metric_name || '50th percentile RMSE';
+    this.aggregate_metric_name = settings.aggregate_metric_name || 'Aggregate Metric';
+    this.trendAbbreviationMap = settings.trendAbbreviationMap;
 
     this.numSuccess = 0;
     this.numBad = 0;
@@ -56,19 +57,24 @@ export let InfoPane = Backbone.View.extend({
     return arr[lower] * (1 - weight) + arr[upper] * weight;
   },
 
+  /**
+   * Aggregate metrics were not supplied, so we will create an
+   * aggregate trend from the existing trend data.
+   */
   _getAggTrends: function (settings) {
-    const byAlgorithm = _.groupBy(settings.percentErrorByDataset, 'algorithm');
-    const algorithms = _.keys(byAlgorithm);
+    const byTrend = _.groupBy(settings.percentErrorByDataset, 'trend');
+    const trends = _.keys(byTrend);
     let aggTrends = {};
-    for (let i = 0; i < algorithms.length; ++i) {
-      let algorithm = algorithms[i];
-      aggTrends[algorithm] = _.map(byAlgorithm[algorithm], (value) => {
+    for (let i = 0; i < trends.length; ++i) {
+      let trend = trends[i];
+      let trendDisplayName = this.trendAbbreviationMap[trend] || trend;
+      aggTrends[trendDisplayName] = _.map(byTrend[trend], (value) => {
         return value.current;
       });
-      aggTrends[algorithm] = _.sortBy(aggTrends[algorithm], (num) => {
+      aggTrends[trendDisplayName] = _.sortBy(aggTrends[trendDisplayName], (num) => {
         return num;
       });
-      aggTrends[algorithm] = [this._percentile(aggTrends[algorithm], this.percentile / 100)];
+      aggTrends[trendDisplayName] = [this._percentile(aggTrends[trendDisplayName], this.percentile / 100)];
     }
     return aggTrends;
   },
@@ -100,7 +106,7 @@ export let InfoPane = Backbone.View.extend({
       numBad: this.numBad,
       numFail: this.numFail,
       totalMedian: this.totalMedian,
-      algorithms: Object.keys(this.agg_trends),
+      aggTrendNames: Object.keys(this.agg_trends),
       aggTrends: this.agg_trends,
       aggregate_metric_name: this.aggregate_metric_name
     })).promise().done(_.bind(function () {
