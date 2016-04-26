@@ -4,5 +4,5 @@ imageTest({
   name: 'histogram',
   url: 'http://localhost:38000/examples/#histogram',
   selector: '#vis-element',
-  threshold: 0.01
+  threshold: 0.001
 });

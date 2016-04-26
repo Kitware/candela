@@ -4,5 +4,5 @@ imageTest({
   name: 'scatter',
   url: 'http://localhost:38000/examples/#scatter',
   selector: '#vis-element',
-  threshold: 0.01
+  threshold: 0.001
 });
