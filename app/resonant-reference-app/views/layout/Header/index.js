@@ -42,9 +42,9 @@ let Header = Backbone.View.extend({
       '#helpButton': `
 Show these tips. This is blue when there are new tips that you 
 haven't seen yet.`,
-      '#achievementsButton': `
+/*      '#achievementsButton': `
 Your achievements. Click this to see what you've accomplished,
-and what you still haven't tried.`,
+and what you still haven't tried.`,*/
       '#toolchainLocationButton': `
 Indicates who can see the toolchain you're working on. Click
 to change its settings.`,
@@ -73,9 +73,9 @@ Click to add a visualization to this toolchain`
     this.listenTo(window.mainPage.widgetPanels, 'rra:updateWidgetSpecs',
       this.render);
 
-    this.listenTo(window.mainPage.helpLayer, 'rra:updateHelp', this.render);
-
-    this.listenTo(window.mainPage.userPreferences,
+    this.listenTo(window.mainPage.currentUser.userPreferences,
+      'rra:observeTips', this.render);
+    this.listenTo(window.mainPage.currentUser.userPreferences,
       'rra:levelUp', this.notifyLevelUp);
   },
   newToolchainResponse: function () {
@@ -110,17 +110,25 @@ Click to add a visualization to this toolchain`
         .on('click', () => {
           window.mainPage.overlay.render('ToolchainSettings');
         });
-      jQuery('#toolchainName').on('change', function () {
+      jQuery('#toolchainName').on('focus', function () {
         // this refers to the DOM element
-        window.mainPage.toolchain.rename(this.value);
+        this.value = this.textContent;
+        // We patch on .value to the element to pretend it's
+        // a real input (contenteditable stretches better)
+      });
+      jQuery('#toolchainName').on('blur', function () {
+        if (this.value !== this.textContent) {
+          this.value = this.textContent;
+          window.mainPage.toolchain.rename(this.textContent);
+        }
       });
       this.templateAdded = true;
     }
 
     if (window.mainPage.currentUser.preferences.hasSeenAllTips(this.tips)) {
-      jQuery('#helpButton').attr('src', newInfoIcon);
-    } else {
       jQuery('#helpButton').attr('src', infoIcon);
+    } else {
+      jQuery('#helpButton').attr('src', newInfoIcon);
     }
 
     if (window.mainPage.toolchain) {
@@ -136,7 +144,7 @@ Click to add a visualization to this toolchain`
           .attr('src', ICONS[toolchainStatus.location]);
       }
 
-      jQuery('#toolchainName').val(window.mainPage.toolchain.get('name'));
+      jQuery('#toolchainName').text(window.mainPage.toolchain.get('name'));
 
       // Set up all the widget icons
       let widgetIcons = window.mainPage.toolchain.getAllWidgetSpecs();

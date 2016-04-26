@@ -13,17 +13,15 @@ let User = girder.models.UserModel.extend({
     this.preferences.addListeners();
   },
   authenticate: function (login) {
-    if (login !== false) {
-      login = true;
-    }
-
-    return Promise.resolve(girder.restRequest({
-      path: 'user/authentication',
-      error: () => {
-        this.finishLogout();
-      },
-      type: login ? 'GET' : 'DELETE'
-    })).then(resp => {
+    login = login !== false;
+    
+    return new Promise((resolve, reject) => {
+      girder.restRequest({
+        path: 'user/authentication',
+        type: login ? 'GET' : 'DELETE',
+        error: reject
+      }).done(resolve).fail(resolve);
+    }).then(resp => {
       if (resp === null || login === false) {
         this.finishLogout();
       } else {

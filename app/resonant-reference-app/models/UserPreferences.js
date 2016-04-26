@@ -27,19 +27,25 @@ you move or delete this item, your preferences will be lost.`,
   initialize: function () {
     let seenTips = window.localStorage.getItem('seenTips');
     if (seenTips) {
-      this.setMeta('seenTips', seenTips);
+      this.setMeta('seenTips', JSON.parse(seenTips));
     }
     let achievements = window.localStorage.getItem('achievements');
     if (achievements) {
-      this.setMeta('achievements', achievements);
+      this.setMeta('achievements', JSON.parse(achievements));
     }
   },
   save: function () {
-    MetadataItem.prototype.save.apply(this, arguments)
+    return MetadataItem.prototype.save.apply(this, arguments)
       .catch(() => {
         // Fallback: store the user's preferences in localStorage
-        window.localStorage.setItem('seenTips', this.getMeta('seenTips'));
-        window.localStorage.setItem('achievements', this.getMeta('achievements'));
+        let seenTips = this.getMeta('seenTips');
+        if (seenTips) {
+          window.localStorage.setItem('seenTips', JSON.stringify(seenTips));
+        }
+        let achievements = this.getMeta('achievements');
+        if (achievements) {
+          window.localStorage.setItem('achievements', JSON.stringify(achievements));
+        }
       });
   },
   addListeners: function () {
@@ -55,14 +61,14 @@ you move or delete this item, your preferences will be lost.`,
       // can claim "ownership" when we log in / visit this page again
       // (of course, this is easy to hack, but that's the assumption
       // with public scratch space)
-      let scratchToolchains = window.window.localStorage.getItem('scratchToolchains');
+      let scratchToolchains = window.localStorage.getItem('scratchToolchains');
       if (!scratchToolchains) {
         scratchToolchains = [];
       } else {
         scratchToolchains = JSON.parse(scratchToolchains);
       }
       scratchToolchains.push(window.mainPage.toolchain.getId());
-      window.window.localStorage.setItem('scratchToolchains',
+      window.localStorage.setItem('scratchToolchains',
         JSON.stringify(scratchToolchains));
     }
   },
@@ -74,20 +80,19 @@ you move or delete this item, your preferences will be lost.`,
     // created in the public scratch space into the
     // now-logged-in user's Private folder
 
-    let scratchToolchains = window.window.localStorage.getItem('scratchToolchains');
+    let scratchToolchains = window.localStorage.getItem('scratchToolchains');
 
     if (scratchToolchains) {
-      Promise.resolve(girder.restRequest({
-        path: 'item/adoptScratchItems',
-        data: {
-          'ids': scratchToolchains // already JSON.stringified
-        },
-        error: () => {
-          // For now, ignore failures to adopt toolchains and datasets
-          window.localStorage.clear('scratchToolchains');
-        },
-        type: 'PUT'
-      })).then(successfulAdoptions => {
+      new Promise((resolve, reject) => {
+        girder.restRequest({
+          path: 'item/adoptScratchItems',
+          data: {
+            'ids': scratchToolchains // already JSON.stringified
+          },
+          error: reject,
+          type: 'PUT'
+        }).done(resolve).error(reject);
+      }).then(successfulAdoptions => {
         // Now we need to adopt any datasets that these toolchains refer to
         let datasetIds = new Set();
         successfulAdoptions.forEach(adoptedToolchain => {
@@ -98,45 +103,55 @@ you move or delete this item, your preferences will be lost.`,
           }
         });
 
-        Promise.resolve(girder.restRequest({
-          path: 'item/adoptScratchItems',
-          data: {
-            'ids': JSON.stringify([...datasetIds])
-          },
-          type: 'PUT'
-        })).catch(() => {
-          // For now, ignore failures to adopt toolchains and datasets
+        new Promise((resolve, reject) => {
+          girder.restRequest({
+            path: 'item/adoptScratchItems',
+            data: {
+              'ids': JSON.stringify([...datasetIds])
+            },
+            error: reject,
+            type: 'PUT'
+          });
+        }).catch(() => {
+          // For now, silently ignore failures to adopt datasets
           window.localStorage.clear('scratchToolchains');
+        }).then(() => {
+          window.mainPage.currentUser.trigger('rra:updateLibrary');
+          // In addition to changing the user's library, the current
+          // toolchain will (pretty much always) have just changed
+          // as well
+          if (window.mainPage.toolchain) {
+            window.mainPage.toolchain.updateStatus();
+          }
         });
-
-        window.mainPage.currentUser.trigger('rra:updateLibrary');
-        // In addition to changing the library, the current
-        // toolchain will (pretty much always) have just changed
-        // as well
-        if (window.mainPage.toolchain) {
-          window.mainPage.toolchain.updateStatus();
-        }
-      }).catch(errorObj => {
-        // For now, ignore failures to adopt toolchains and datasets
+      }).catch(() => {
+        // For now, silently ignore failures to adopt toolchains
         window.localStorage.clear('scratchToolchains');
       });
     }
   },
   hasSeenAllTips: function (tips) {
     let seenTips = this.getMeta('seenTips');
-    for (let tipId of Object.keys(tips)) {
+    for (let selector of Object.keys(tips)) {
+      let tipId = selector + tips[selector];
+      // Make the id a valid / nice mongo id
+      tipId = tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
       if (seenTips[tipId] !== true) {
-        return true;
+        return false;
       }
     }
-    return false;
+    return true;
   },
   observeTips: function (tips) {
     let seenTips = this.getMeta('seenTips');
-    for (let tipId of Object.keys(tips)) {
+    for (let selector of Object.keys(tips)) {
+      let tipId = tips[selector].tipId;
+      // Make the id a valid / nice mongo id
+      tipId = tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
       seenTips[tipId] = true;
     };
     this.setMeta('seenTips', seenTips);
+    this.trigger('rra:observeTips');
     this.save();
   },
   resetToDefaults: function () {
@@ -146,10 +161,10 @@ you move or delete this item, your preferences will be lost.`,
     this.clear({
       silent: true
     });
-    this.set(this.defaults);
+    this.set(this.defaults());
     window.localStorage.removeItem('seenTips');
     window.localStorage.removeItem('achievements');
-    this.adoptScratchToolchains();
+    window.localStorage.removeItem('scratchToolchains');
   },
   levelUp: function (achievement) {
     let achievements = this.getMeta('achievements');

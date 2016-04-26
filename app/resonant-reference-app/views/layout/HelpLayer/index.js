@@ -47,8 +47,6 @@ let HelpLayer = Backbone.View.extend({
     this.gravity = 0.05;
     this.theta = 0.8;
     this.alpha = 0.7;
-
-    this.listenTo(this, 'rra:updateHelp', this.render);
   },
   setTips: function (tips) {
     this.relevantTips = {};
@@ -112,7 +110,7 @@ let HelpLayer = Backbone.View.extend({
       }
     });
     if (changedHelp === true) {
-      this.trigger('rra:updateHelp');
+      this.render();
     }
   },
   hide: function () {

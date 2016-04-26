@@ -46,13 +46,16 @@ function toggleCallback() {
     give it a hint if the user is copying a library toolchain
     directly to their public folder)
   */
-  Promise.resolve(girder.restRequest({
-    path: 'item/' + window.mainPage.toolchain.getId() + '/togglePublic',
-    type: 'POST',
-    data: {
-      makePublic: this.value === 'PublicUser'
-    }
-  })).then(() => {
+  new Promise((resolve, reject) => {
+    girder.restRequest({
+      path: 'item/' + window.mainPage.toolchain.getId() + '/togglePublic',
+      type: 'POST',
+      data: {
+        makePublic: this.value === 'PublicUser'
+      },
+      error: reject
+    }).done(resolve).error(reject);
+  }).then(() => {
     window.mainPage.toolchain.updateStatus();
   }).catch((errorObj) => {
     window.mainPage.trigger('rra:error', errorObj);

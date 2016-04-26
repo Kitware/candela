@@ -14,11 +14,11 @@ let VisualizationView = Widget.extend({
       window.mainPage.overlay.render('VisualizationLibrary');
     };
     this.statusText.title = 'Click to select a different visualization.';
-
-    this.newInfo = true;
+        
     this.icons.splice(0, 0, {
       src: () => {
-        return this.newInfo ? Widget.newInfoIcon : Widget.infoIcon;
+        return window.mainPage.currentUser.preferences
+          .hasSeenAllTips(this.getDefaultTips()) ? Widget.infoIcon : Widget.newInfoIcon;
       },
       title: () => {
         return 'About this panel';

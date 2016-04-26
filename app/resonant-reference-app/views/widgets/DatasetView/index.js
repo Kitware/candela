@@ -26,11 +26,11 @@ let DatasetView = Widget.extend({
       window.mainPage.overlay.render('DatasetLibrary');
     };
     this.statusText.title = 'Click to select a different dataset.';
-
-    this.newInfo = true;
+    
     this.icons.splice(0, 0, {
       src: () => {
-        return this.newInfo ? Widget.newInfoIcon : Widget.infoIcon;
+        return window.mainPage.currentUser.preferences
+          .hasSeenAllTips(this.getDefaultTips()) ? Widget.infoIcon : Widget.newInfoIcon;
       },
       title: () => {
         return 'About this panel';
@@ -81,7 +81,6 @@ let DatasetView = Widget.extend({
   renderInfoScreen: function () {
     window.mainPage.helpLayer.setTips(this.getDefaultTips());
     window.mainPage.helpLayer.show();
-    // TODO: add any other special instructions
   },
   renderHelpScreen: function () {
     if (this.status === STATUS.NO_DATA) {
@@ -109,6 +108,10 @@ you'll probably need to
     }
   },
   renderAttributeSettings: function () {
+    if (!this.canRender()) {
+      return;
+    }
+    
     let datasets = window.mainPage.toolchain.getMeta('datasets');
     let dataset;
     let attrs;

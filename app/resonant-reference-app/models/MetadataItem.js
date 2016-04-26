@@ -34,9 +34,12 @@ let girder = window.girder;
      logic)
 */
 
+function MetadataSyncError() {};
+MetadataSyncError.prototype = new Error();
+
 let MetadataItem = girder.models.ItemModel.extend({
   // idAttribute: '_id',
-  wrapInPromise: function (promiseObj, options, beforeSuccess, callbacks) {
+  wrapInPromise: function (executor, options, beforeSuccess, callbacks) {
     /*
       I do some sneaky stuff here. There are three ways
       callbacks and errors are fired / caught across
@@ -50,7 +53,7 @@ let MetadataItem = girder.models.ItemModel.extend({
       them appropriately.
     */
 
-    promiseObj = Promise.resolve(promiseObj);
+    let promiseObj = new Promise(executor);
 
     if (callbacks) {
       /*
@@ -85,10 +88,10 @@ let MetadataItem = girder.models.ItemModel.extend({
     // beforeSuccess is a function that should
     // be called before options.success
     beforeSuccess = beforeSuccess || (() => {});
-    
+
     let self = this;
     promiseObj.then(function () {
-      // Things were successfully; call whatToDo first,
+      // Things were successfully; call beforeSuccess first,
       // and then call options.success if it exists
       beforeSuccess.apply(self, arguments);
       if (options.success) {
@@ -122,16 +125,23 @@ let MetadataItem = girder.models.ItemModel.extend({
     if (method === 'create') {
       // By default, we want to save new items in the user's
       // Private folder or in the public scratch space:
-
-      return this.wrapInPromise(girder.restRequest({
-        path: 'item/scratchItem',
-        data: {
-          name: this.get('name'),
-          description: this.get('description') || '',
-          reuseExisting: false
-        },
-        type: 'GET'
-      }), options, (resp) => {
+      return this.wrapInPromise((resolve, reject) => {
+        // If we've reached this point, we must have
+        // specified a name for the item
+        if (!this.get('name')) {
+          reject(new MetadataSyncError('Item must have a name to be created'));
+        }
+        girder.restRequest({
+          path: 'item/scratchItem',
+          data: {
+            name: this.get('name'),
+            description: this.get('description') || '',
+            reuseExisting: false
+          },
+          error: reject,
+          type: 'GET'
+        }).done(resolve).error(reject);
+      }, options, (resp) => {
         // This *should* assign us our new ID:
         this.set(resp, {
           silent: true
@@ -144,7 +154,6 @@ let MetadataItem = girder.models.ItemModel.extend({
           // the item by saving our current state
           // (this calls sync again, but that's
           // a good thing in case we have metadata
-
           this.sync('update', model, options);
         }
       });
@@ -167,13 +176,16 @@ let MetadataItem = girder.models.ItemModel.extend({
         return this.sync('create', model, options);
       }
 
-      return this.wrapInPromise(girder.restRequest({
-        path: 'item/' + this.getId() + '/updateScratch?' +
-          jQuery.param(args),
-        contentType: 'application/json',
-        data: JSON.stringify(this.get('meta')),
-        type: 'POST'
-      }), options, (resp) => {
+      return this.wrapInPromise((resolve, reject) => {
+        girder.restRequest({
+          path: 'item/' + this.getId() + '/updateScratch?' +
+            jQuery.param(args),
+          contentType: 'application/json',
+          data: JSON.stringify(this.get('meta')),
+          type: 'POST',
+          error: reject
+        }).done(resolve).error(reject);
+      }, options, (resp) => {
         // It's possible that the id changed
         // in the process (e.g. a copy of
         // the toolchain was made
@@ -195,14 +207,17 @@ let MetadataItem = girder.models.ItemModel.extend({
         // If we haven't yet identified the id, look for it
         // in the Private folder by item name / create
         // an item there if it doesn't exist
-        return this.wrapInPromise(girder.restRequest({
-          path: 'item/privateItem',
-          data: {
-            name: this.get('name') || 'Untitled Item',
-            description: this.get('description') || ''
-          },
-          type: 'GET'
-        }), options, (resp) => {
+        return this.wrapInPromise((resolve, reject) => {
+          girder.restRequest({
+            path: 'item/privateItem',
+            data: {
+              name: this.get('name') || 'Untitled Item',
+              description: this.get('description') || ''
+            },
+            type: 'GET',
+            error: reject
+          }).done(resolve).error(reject);
+        }, options, (resp) => {
           // Load up everything we just got
           this.set(resp, {
             silent: true
@@ -210,22 +225,30 @@ let MetadataItem = girder.models.ItemModel.extend({
         });
       } else {
         // Otherwise, just go with the default girder behavior
-        return this.wrapInPromise(
-          girder.models.ItemModel.prototype.fetch.apply(this),
-          options, null, {
-            successEvent: 'g:fetched',
-            errorEvent: 'g:error'
-          });
+        return this.wrapInPromise((resolve, reject) => {
+          try {
+            resolve(girder.models.ItemModel.prototype.fetch.apply(this));
+          } catch (errorObj) {
+            reject(errorObj)
+          }
+        }, options, null, {
+          successEvent: 'g:fetched',
+          errorEvent: 'g:error'
+        });
       }
     } else if (method === 'delete') {
       // We'll already have an id if there's something to delete...
       // so just use the default girder behavior
-      let promise = this.wrapInPromise(
-        girder.models.ItemModel.prototype.destroy.apply(this),
-        options, null, {
-          successEvent: 'g:deleted',
-          errorEvent: 'g:error'
-        });
+      let promise = this.wrapInPromise((resolve, reject) => {
+        try {
+          resolve(girder.models.ItemModel.prototype.destroy.apply(this))
+        } catch (errorObj) {
+          reject(errorObj)
+        }
+      }, options, null, {
+        successEvent: 'g:deleted',
+        errorEvent: 'g:error'
+      });
       // In the mean time let's clear the id so we
       // don't go thinking we're synced anymore
       this.unset(this.idAttribute, {

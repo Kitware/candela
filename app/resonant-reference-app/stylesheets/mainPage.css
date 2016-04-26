@@ -35,7 +35,8 @@ a {
 }
 
 p {
-  font-size: 0.75em;
+  max-width: 30em;
+  line-height: 1.25em;
 }
 
 ::-webkit-scrollbar {

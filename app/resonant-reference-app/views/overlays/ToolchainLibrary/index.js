@@ -21,6 +21,8 @@ let ToolchainLibrary = Backbone.View.extend({
     this.listenTo(window.mainPage, 'rra:changeToolchain',
       this.handleNewToolchain);
     this.handleNewToolchain();
+    
+    this.addedTemplate = false;
   },
   handleNewToolchain: function () {
     if (window.mainPage.toolchain) {
@@ -55,32 +57,38 @@ let ToolchainLibrary = Backbone.View.extend({
     jQuery('.hideable').hide();
 
     // Get the set of toolchains in the public library
-    Promise.resolve(girder.restRequest({
-      path: 'resource/lookup?path=/collection/ReferenceApp/Toolchains',
-      type: 'GET',
-      error: null
-    })).then(folder => {
+    new Promise((resolve, reject) => {
+      girder.restRequest({
+        path: 'resource/lookup?path=/collection/ReferenceApp/Toolchains',
+        type: 'GET',
+        error: reject
+      }).done(resolve).error(reject);
+    }).then(folder => {
       this.getFolderContents(folder, 'toolchainLibrary', libraryFileIcon);
-    }).catch(() => {});
+    }).catch(() => {}); // fail silently
 
     if (window.mainPage.currentUser.isLoggedIn()) {
       // The user is logged in
 
       // Get the set of the user's private toolchains
-      Promise.resolve(girder.restRequest({
-        path: 'folder/privateFolder',
-        type: 'GET',
-        error: null
-      })).then(folder => {
+      new Promise((resolve, reject) => {
+        girder.restRequest({
+          path: 'folder/privateFolder',
+          type: 'GET',
+          error: reject
+        }).done(resolve).error(reject);
+      }).then(folder => {
         this.getFolderContents(folder, 'privateToolchains', privateFileIcon);
       }).catch(() => {}); // fail silently
 
       // Get the set of the user's public toolchains
-      Promise.resolve(girder.restRequest({
-        path: 'folder/publicFolder',
-        type: 'GET',
-        error: null
-      })).then(folder => {
+      new Promise((resolve, reject) => {
+        girder.restRequest({
+          path: 'folder/publicFolder',
+          type: 'GET',
+          error: reject
+        }).done(resolve).error(reject);
+      }).then(folder => {
         this.getFolderContents(folder, 'publicToolchains', publicFileIcon);
       }).catch(() => {}); // fail silently
     } else {

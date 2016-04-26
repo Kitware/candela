@@ -13,8 +13,10 @@
   <button id="okButton">OK</button>
 </div>
 <script type="application/javascript">
-  window.mainPage.switchToolchain(null)
-    .then(() => {
-      window.mainPage.overlay.render('StartingScreen');
-    });
+  jQuery('#okButton').on('click', () => {
+    window.mainPage.switchToolchain(null)
+      .then(() => {
+        window.mainPage.overlay.render('StartingScreen');
+      });
+  });
 </script>

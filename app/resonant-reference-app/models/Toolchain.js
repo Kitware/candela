@@ -67,10 +67,13 @@ let Toolchain = MetadataItem.extend({
     let datasetPromises = [];
 
     this.getMeta('datasets').forEach(datasetId => {
-      datasetPromises.push(Promise.resolve(girder.restRequest({
-        path: 'item/' + datasetId,
-        type: 'GET'
-      })));
+      datasetPromises.push(new Promise((resolve, reject) => {
+        girder.restRequest({
+          path: 'item/' + datasetId,
+          type: 'GET',
+          error: reject
+        }).done(resolve).error(reject);
+      }));
     });
     Promise.all(datasetPromises).catch(errorObj => {
       window.mainPage.trigger('rra:error', errorObj);
@@ -89,10 +92,13 @@ let Toolchain = MetadataItem.extend({
     });
     
     // Get access information about this toolchain
-    let statusPromise = Promise.resolve(girder.restRequest({
-      path: 'item/' + id + '/info',
-      type: 'GET'
-    })).then((resp) => {
+    let statusPromise = new Promise((resolve, reject) => {
+      girder.restRequest({
+        path: 'item/' + id + '/info',
+        type: 'GET',
+        error: reject
+      }).done(resolve).error(reject);
+    }).then((resp) => {
       this.status = resp;
     }).catch(() => {
       this.status = {

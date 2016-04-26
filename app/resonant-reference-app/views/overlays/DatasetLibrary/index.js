@@ -18,29 +18,35 @@ let DatasetLibrary = Backbone.View.extend({
     // errors when you try to fetch() them)
     jQuery('.hideable').hide();
 
-    Promise.resolve(girder.restRequest({
-      path: 'resource/lookup?path=/collection/ReferenceApp/Data',
-      type: 'GET',
-      error: null
-    })).then(folder => {
+    new Promise((resolve, reject) => {
+      girder.restRequest({
+        path: 'resource/lookup?path=/collection/ReferenceApp/Data',
+        type: 'GET',
+        error: reject
+      }).done(resolve).error(reject);
+    }).then(folder => {
       this.renderFolderContents(folder, 'datasetLibrary', libImage);
     }).catch(() => {}); // fail silently
     
     // Only show the per-account datasets if the user is logged in
     if (window.mainPage.currentUser.isLoggedIn()) {
-      Promise.resolve(girder.restRequest({
-        path: 'folder/privateFolder',
-        type: 'GET',
-        error: null
-      })).then(folder => {
+      new Promise((resolve, reject) => {
+        girder.restRequest({
+          path: 'folder/privateFolder',
+          type: 'GET',
+          error: reject
+        }).done(resolve).error(reject);
+      }).then(folder => {
         this.renderFolderContents(folder, 'privateDatasets', privateImage);
       }).catch(() => {}); // fail silently
 
-      Promise.resolve(girder.restRequest({
-        path: 'folder/publicFolder',
-        type: 'GET',
-        error: null
-      })).then(folder => {
+      new Promise((resolve, reject) => {
+        girder.restRequest({
+          path: 'folder/publicFolder',
+          type: 'GET',
+          error: reject
+        }).done(resolve).error(reject);
+      }).then(folder => {
         this.renderFolderContents(folder, 'publicDatasets', publicImage);
       }).catch(() => {}); // fail silently
     }

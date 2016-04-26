@@ -34,11 +34,11 @@ let MappingView = Widget.extend({
     Widget.prototype.initialize.apply(this, arguments);
 
     this.friendlyName = 'Mapping';
-
-    this.newInfo = true;
+    
     this.icons.splice(0, 0, {
       src: () => {
-        return this.newInfo ? Widget.newInfoIcon : Widget.infoIcon;
+        return window.mainPage.currentUser.preferences
+          .hasSeenAllTips(this.getDefaultTips()) ? Widget.infoIcon : Widget.newInfoIcon;
       },
       title: () => {
         return 'About this panel';
@@ -95,7 +95,6 @@ let MappingView = Widget.extend({
   renderInfoScreen: function () {
     window.mainPage.helpLayer.setTips(this.getDefaultTips());
     window.mainPage.helpLayer.show();
-    // TODO: add any other special instructions
   },
   renderHelpScreen: function () {
     if (this.status === STATUS.OK) {
