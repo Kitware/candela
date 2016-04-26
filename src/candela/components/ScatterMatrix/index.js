@@ -36,7 +36,8 @@ export default class ScatterMatrix extends VisComponent {
   }
 
   constructor (el, options) {
-    super(el, options);
+    super(el);
+    this.options = options;
     this.render();
   }
 

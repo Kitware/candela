@@ -1,11 +1,10 @@
 export default class VisComponent {
-  constructor (el, options) {
+  constructor (el) {
     if (!el) {
       throw new Error('"el" is a required argument');
     }
 
     this.el = el;
-    this.options = options;
   }
 
   render () {
