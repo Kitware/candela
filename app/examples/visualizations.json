@@ -25,6 +25,9 @@
       "data": "msft",
       "x": "date",
       "y": ["price"],
+      "width": 735,
+      "height": 535,
+      "padding": {"left": 45, "right": 20, "top": 20, "bottom": 45},
       "renderer": "svg"
     }
   },
