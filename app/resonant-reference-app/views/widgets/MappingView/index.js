@@ -5,8 +5,6 @@ import myTemplate from './template.html';
 import Widget from '../Widget';
 import './style.css';
 
-import infoTemplate from './infoTemplate.html';
-
 let NODE_MODES = {
   INELIGIBLE: 0,
   WILL_SELECT: 1,
@@ -28,13 +26,13 @@ let STATUS = {
   NOTHING_TO_MAP: 4
 };
 
-function OutOfDateMappingError () {};
+function OutOfDateMappingError() {};
 OutOfDateMappingError.prototype = new Error();
 
 let MappingView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
-    
+
     this.friendlyName = 'Mapping';
 
     this.newInfo = true;
@@ -56,7 +54,7 @@ let MappingView = Widget.extend({
         if (this.status === STATUS.OK) {
           return Widget.okayIcon;
         } else if (this.status === STATUS.DATASETS_NOT_LOADED ||
-                   this.status === STATUS.STALE_MAPPINGS) {
+          this.status === STATUS.STALE_MAPPINGS) {
           return Widget.spinnerIcon;
         } else {
           return Widget.warningIcon;
@@ -66,14 +64,16 @@ let MappingView = Widget.extend({
         if (this.status === STATUS.OK) {
           return 'All the needed mappings have been specified';
         } else if (this.status === STATUS.DATASETS_NOT_LOADED ||
-                   this.status === STATUS.STALE_MAPPINGS) {
+          this.status === STATUS.STALE_MAPPINGS) {
           return 'Loading...';
         } else {
           return 'Something isn\'t quite right; click for details';
         }
       },
       onclick: () => {
-        this.renderHelpScreen();
+        window.mainPage.helpLayer.setTips(this.getDefaultTips());
+        window.mainPage.helpLayer.show();
+        // TODO: add any other special instructions
       }
     });
 
@@ -86,17 +86,16 @@ let MappingView = Widget.extend({
   handleNewToolchain: function () {
     this.$el.html('');
     this.status = STATUS.NOTHING_TO_MAP;
-    
+
     this.listenTo(window.mainPage.toolchain, 'rra:changeMappings', () => {
       this.selection = null;
       this.render();
     });
   },
   renderInfoScreen: function () {
-    this.newInfo = false;
-    this.renderIndicators();
-
-    window.mainPage.overlay.render(infoTemplate);
+    window.mainPage.helpLayer.setTips(this.getDefaultTips());
+    window.mainPage.helpLayer.show();
+    // TODO: add any other special instructions
   },
   renderHelpScreen: function () {
     if (this.status === STATUS.OK) {
@@ -204,8 +203,8 @@ in order to connect them together.`);
     }
 
     let _createEdge = (established, visIndex,
-                       visAttrName, dataIndex,
-                       dataAttrName) => {
+      visAttrName, dataIndex,
+      dataAttrName) => {
       // Edges always go from data to vis
       let sourceId = this.createNodeId({
         index: dataIndex,
@@ -220,12 +219,12 @@ in order to connect them together.`);
         target: nodeLookup[targetId]
       };
       if (newEdge.source === undefined ||
-          newEdge.target === undefined) {
+        newEdge.target === undefined) {
         // We're constructing a mapping that's out of date!
         // Render nothing...
         throw new OutOfDateMappingError();
       }
-      
+
       newEdge.id = this.createEdgeId(newEdge);
       if (established) {
         // These edges already exist
@@ -391,7 +390,7 @@ in order to connect them together.`);
     if (!this.canRender()) {
       return;
     }
-    
+
     // Construct a graph from each of the specs
     // (and the currently selected node)
     let graph = this.constructLookups();
@@ -426,7 +425,7 @@ in order to connect them together.`);
     if (graph.realEdgeCount > 0) {
       this.status = STATUS.OK;
     } else if (this.status !== STATUS.STALE_MAPPINGS &&
-               this.status !== STATUS.DATASETS_NOT_LOADED) {
+      this.status !== STATUS.DATASETS_NOT_LOADED) {
       if (numData === 0 || numVis === 0) {
         this.status = STATUS.NOTHING_TO_MAP;
       } else {

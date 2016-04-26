@@ -38,23 +38,30 @@ let HelpLayer = Backbone.View.extend({
   initialize: function () {
     this.relevantTips = {};
 
-    this.padding = 15;
-    this.overlapResistance = 0.1;
-    this.linkStrength = 1;
-    this.friction = 0.9;
-    this.linkDistance = 0;
+    this.padding = 0;
+    this.overlapResistance = 1.0;
+    this.linkStrength = 0.3;
+    this.friction = 0.7;
+    this.linkDistance = 50;
     this.charge = -150;
-    this.gravity = 0.3;
+    this.gravity = 0.05;
     this.theta = 0.8;
-    this.alpha = 0.1;
+    this.alpha = 0.7;
 
     this.listenTo(this, 'rra:updateHelp', this.render);
   },
-  update: function (tips) {
-    let changedHelp = false;
-    for (let tipSelector of Object.keys(tips)) {
-      // We use the tipSelector as the ID for now
-      let tipId = tipSelector;
+  setTips: function (tips) {
+    this.relevantTips = {};
+    this.updateTips(tips, true);
+  },
+  updateTips: function (tips, forceChange) {
+    let changedHelp = !!forceChange;
+    Object.keys(tips).forEach(tipSelector => {
+      // We use the selector and the message
+      // to uniquely identify each tip.
+      let tipId = tipSelector + tips[tipSelector];
+      // Make the id a valid / nice mongo id
+      tipId = tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
 
       let selection = jQuery(tipSelector);
       if (selection.size() === 0) {
@@ -103,26 +110,23 @@ let HelpLayer = Backbone.View.extend({
 
         this.relevantTips[tipId] = newTip;
       }
-    }
+    });
     if (changedHelp === true) {
       this.trigger('rra:updateHelp');
     }
   },
-  hasNewTips: function () {
-    let seenTips = window.mainPage.currentUser
-      .preferences.getMeta('seenTips');
-    for (let tipId of Object.keys(this.relevantTips)) {
-      if (seenTips[tipId] !== true) {
-        return true;
-      }
-    }
-    return false;
-  },
-  toggle: function () {
-    let showHelp = window.mainPage.currentUser
-      .preferences.getMeta('showHelp');
+  hide: function () {
+    this.addedTuner = false;
+    jQuery('#tuner').remove();
     window.mainPage.currentUser
-      .preferences.setMeta('showHelp', !showHelp);
+      .preferences.setMeta('showHelp', false);
+    window.mainPage.currentUser.preferences.save();
+    this.render();
+  },
+  show: function () {
+    window.mainPage.currentUser
+      .preferences.setMeta('showHelp', true);
+    window.mainPage.currentUser.preferences.save();
     this.render();
   },
   render: Underscore.debounce(function () {
@@ -130,23 +134,37 @@ let HelpLayer = Backbone.View.extend({
     let showHelp = meta.showHelp;
     let seenTips = meta.seenTips;
 
-    if (!this.addedTemplate) {
-      this.$el.html(template);
-      this.addedTemplate = true;
-    }
+    this.$el.on('click', () => {
+      this.hide();
+    });
 
     if (showHelp === false) {
-      this.$el.hide();
+      d3.select(this.el)
+        .style('opacity', 1.0)
+        .transition().duration(500)
+        .style('opacity', 0.0)
+        .attr('display', 'none');
     } else {
+      this.$el.html(template);
+
       // Figure out how much space we have
       let bounds = {
         width: window.innerWidth,
         height: window.innerHeight
       };
 
-      // Connect labels to targets
-      let nodes = [];
+      // Default labels that are always there
+      // (not connected to any target)
+      let nodes = [{
+        tipId: 'clearLabel',
+        nodeType: 'label',
+        message: 'Click anywhere to hide these tips',
+        x: bounds.width / 2,
+        y: bounds.height / 2
+      }];
       let edges = [];
+
+      // Connect labels to targets
       for (let tipId of Object.keys(this.relevantTips)) {
         let tip = this.relevantTips[tipId];
         nodes.push({
@@ -191,38 +209,51 @@ let HelpLayer = Backbone.View.extend({
       tips.exit().remove();
 
       tips.attr('class', d => {
-        if (seenTips[d.tipId] === true) {
+        if (d.tipId === 'clearLabel') {
+          return 'clear tip';
+        } else if (seenTips[d.tipId] === true) {
           return 'old tip';
         } else {
           return 'new tip';
-        }
-      }).attr('text-anchor', d => {
-        // Align the text based on where the label
-        // starts on the screen
-        if (d.x < bounds.width / 3) {
-          return 'start';
-        } else if (d.x < 2 * bounds.width / 3) {
-          return 'middle';
-        } else {
-          return 'end';
         }
       });
 
       // Draw the text
       tipsEnter.append('text');
       tips.selectAll('text')
-        .text(d => d.message);
+        .text(d => d.message)
+        .attr('text-anchor', d => {
+          // Align the text based on where the label
+          // starts on the screen
+          if (d.x < bounds.width / 3) {
+            return 'start';
+          } else if (d.x < 2 * bounds.width / 3) {
+            return 'middle';
+          } else {
+            return 'end';
+          }
+        });
 
       // Draw the arrows
       let arrows = d3.select(this.el).select('#linkLayer')
         .selectAll('.arrow').data(edges);
       arrows.enter().append('path')
-        .attr('class', 'arrow');
+        .attr('class', d => {
+          if (!seenTips[nodes[d.source].tipId]) {
+            return 'new arrow';
+          } else {
+            return 'old arrow';
+          }
+        });
       arrows.exit().remove();
 
       // Show the help layer and wrap the text appropriately
       // (wrapping has to be done while the text is visible)
-      this.$el.show();
+      d3.select(this.el)
+        .style('opacity', 0.0)
+        .attr('display', null)
+        .transition().duration(500)
+        .style('opacity', 1.0);
       tips.selectAll('text')
         .each(function () {
           // this refers to the DOM element
@@ -249,17 +280,21 @@ let HelpLayer = Backbone.View.extend({
           // Keep the labels from overlapping with each other
           q.visit(this.collide(d));
           // Keep the labels on the screen
-          if (d.x - d.relative_left < 0) {
-            d.x = d.relative_left;
+          let space = d.x - d.relative_left;
+          if (space < 0) {
+            d.x += this.overlapResistance * (-space);
           }
-          if (d.y - d.relative_top < 0) {
-            d.y = d.relative_top;
+          space = d.y - d.relative_top;
+          if (space < 0) {
+            d.y += this.overlapResistance * (-space);
           }
-          if (d.x + d.relative_right > bounds.width) {
-            d.x = bounds.width - d.relative_right;
+          space = bounds.width - (d.x + d.relative_right);
+          if (space < 0) {
+            d.x -= this.overlapResistance * (-space);
           }
-          if (d.y + d.relative_bottom > bounds.height) {
-            d.y = bounds.height - d.relative_bottom;
+          space = bounds.height - (d.y + d.relative_bottom);
+          if (space < 0) {
+            d.y -= this.overlapResistance * (-space);
           }
         });
 
@@ -271,7 +306,7 @@ let HelpLayer = Backbone.View.extend({
           arrows.attr('d', arrowGenerator);
         }
       });
-      
+
       if (this.addedTuner) {
         // If we're tweaking the layout, let us watch it settle
         force.start();
@@ -282,7 +317,7 @@ let HelpLayer = Backbone.View.extend({
           force.tick();
         }
         force.stop();
-        
+
         // Only render things once
         tips.attr('transform', (d) => {
           return 'translate(' + d.x + ',' + d.y + ')';
@@ -353,7 +388,6 @@ let HelpLayer = Backbone.View.extend({
       }
       // Do we need to keep looking?
       return x1 > nright || x2 < nleft || y1 > nbottom || y2 < ntop;
-      // return false;
     };
   },
   renderTuner: function () {
@@ -364,16 +398,16 @@ let HelpLayer = Backbone.View.extend({
       d3.select('body').append('div').attr('id', 'tuner');
       this.addedTuner = true;
     }
-    
+
     let controls = d3.select('#tuner').selectAll('div').data(forceControls);
     let controlsEnter = controls.enter().append('div');
-    
+
     controlsEnter.append('label')
       .attr('for', d => d.option + 'control');
-    
+
     controls.selectAll('label')
       .text(d => d.option + ': ' + this[d.option]);
-    
+
     let self = this;
     controlsEnter.append('input')
       .attr('type', 'range')

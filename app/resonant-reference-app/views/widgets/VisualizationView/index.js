@@ -4,12 +4,10 @@ import myTemplate from './template.html';
 import candela from '../../../../../src/candela';
 import './style.css';
 
-import infoTemplate from './infoTemplate.html';
-
 let VisualizationView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
-    
+
     this.friendlyName = 'Visualization';
 
     this.statusText.onclick = () => {
@@ -29,7 +27,7 @@ let VisualizationView = Widget.extend({
         this.renderInfoScreen();
       }
     });
-    
+
     this.ok = null;
     this.icons.splice(0, 0, {
       src: () => {
@@ -54,7 +52,7 @@ let VisualizationView = Widget.extend({
         this.renderHelpScreen();
       }
     });
-    
+
     this.listenTo(window.mainPage, 'rra:changeToolchain',
       this.handleNewToolchain);
     this.handleNewToolchain();
@@ -63,17 +61,15 @@ let VisualizationView = Widget.extend({
     this.$el.html('');
     this.ok = null;
     this.vis = null;
-    
+
     this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations',
       this.render);
     this.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
       this.render);
   },
   renderInfoScreen: function () {
-    this.newInfo = false;
-    this.renderIndicators();
-
-    window.mainPage.overlay.render(infoTemplate);
+    window.mainPage.helpLayer.setTips(this.getDefaultTips());
+    window.mainPage.helpLayer.show();
   },
   renderHelpScreen: function () {
     if (this.ok === null) {
@@ -102,26 +98,26 @@ Corrupted visualization meta information.`);
     if (!this.canRender()) {
       return;
     }
-    
+
     // Get the visualization in the toolchain (if there is one)
     let spec = window.mainPage.toolchain.getMeta('visualizations');
     if (spec) {
       // Use the first spec (TODO: support multiple visualizations)
       spec = spec[0];
-      
+
       // Get the options for the vis
       let options = window.mainPage.toolchain.getVisOptions();
-      
+
       // Start with an initial empty dataset (gets populated
       // asynchronously)
       options.data = [];
-      
+
       // How is this render pass different from the last?
       if (!this.vis || this.vis.spec.name !== spec.name) {
         // We've changed visualizations; nuke the DOM element
         // and create a new candela component
         this.$el.html(myTemplate);
-        
+
         this.vis = {
           spec: spec,
           options: options,
@@ -137,10 +133,10 @@ Corrupted visualization meta information.`);
             options[key] = null;
           }
         })
-        
+
         this.vis.options = options;
       }
-      
+
       // Okay, now ask the toolchain if it has any new data for
       // us (changing the mappings, editing the data, or grabbing
       // a new dataset will invalidate the parsed cache).
@@ -150,11 +146,11 @@ Corrupted visualization meta information.`);
       this.renderIndicators();
       window.mainPage.toolchain.shapeDataForVis().then(data => {
         this.vis.options.data = data;
-        
+
         // TODO: how do we update the data for a component in
         // general?
         if (this.vis.component.chart &&
-            this.vis.component.chart.update) {
+          this.vis.component.chart.update) {
           this.vis.component.chart.update(this.vis.options);
         } else {
           // Nuke the vis and start fresh

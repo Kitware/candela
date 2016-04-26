@@ -8,8 +8,6 @@ import Dataset from '../../../models/Dataset';
 import myTemplate from './template.html';
 import './style.css';
 
-import infoTemplate from './infoTemplate.html';
-
 let STATUS = {
   NO_DATA: 0,
   SUCCESS: 1,
@@ -63,7 +61,7 @@ let DatasetView = Widget.extend({
         }
       },
       onclick: () => {
-        this.renderHelpScreen();
+        this.renderInfoScreen();
       }
     });
 
@@ -74,17 +72,16 @@ let DatasetView = Widget.extend({
   handleNewToolchain: function () {
     this.$el.html('');
     this.status = STATUS.NO_DATA;
-    
+
     this.listenTo(window.mainPage.toolchain, 'rra:changeDatasets',
       this.render);
     this.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
       this.renderAttributeSettings);
   },
   renderInfoScreen: function () {
-    this.newInfo = false;
-    this.renderIndicators();
-    
-    window.mainPage.overlay.render(infoTemplate);
+    window.mainPage.helpLayer.setTips(this.getDefaultTips());
+    window.mainPage.helpLayer.show();
+    // TODO: add any other special instructions
   },
   renderHelpScreen: function () {
     if (this.status === STATUS.NO_DATA) {
@@ -153,13 +150,13 @@ you'll probably need to
     if (!this.canRender()) {
       return;
     }
-    
+
     // Get the dataset in the toolchain (if there is one)
     let dataset = window.mainPage.toolchain.getMeta('datasets');
     if (dataset) {
       dataset = window.mainPage.loadedDatasets[dataset[0]];
     }
-    
+
     this.$el.html(myTemplate);
 
     this.renderAttributeSettings();

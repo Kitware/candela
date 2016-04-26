@@ -7,12 +7,12 @@ body {
   -webkit-user-select: none;
   /* awkward font stack that attempts to approximate Girder's...
   (they cheat and just use Helvetica Neue) */
-  font-family: "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
+  font-family: "Josefin Sans", "Helvetica", "Arial", sans-serif;
   font-weight: 400;
 }
 
 h1, button, h2, h3, h4, h5, h6 {
-  font-family: "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
+  font-family: "Josefin Sans", "Helvetica", "Arial", sans-serif;
 }
 h1 {
   font-weight: 900;

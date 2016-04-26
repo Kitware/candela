@@ -1,12 +1,12 @@
 [
   {
     "option": "padding",
-    "range": [0, 30],
+    "range": [-30, 30],
     "step": 1
   },
   {
     "option": "overlapResistance",
-    "range": [0, 2],
+    "range": [0, 1],
     "step": 0.1
   },
   {
@@ -26,13 +26,13 @@
   },
   {
     "option": "charge",
-    "range": [-150, 150],
+    "range": [-300, 300],
     "step": 5
   },
   {
     "option": "gravity",
     "range": [0, 1],
-    "step": 0.1
+    "step": 0.025
   },
   {
     "option": "theta",

@@ -56,6 +56,22 @@ let Widget = Backbone.View.extend({
     // document yet
     return window.mainPage.toolchain &&
       document.getElementById(this.$el.attr('id')) === this.el;
+  },
+  getDefaultTips: function () {
+    let tips = {};
+    let prefix = '#' + this.el.parentNode.getAttribute('id') + ' ';
+    // Get the tips for each indicator icon
+    this.icons.forEach((icon, index) => {
+      let tip = typeof icon.title === 'function' ? icon.title() : icon.title;
+      tips[prefix + '.indicatorIcons img:nth-child(' + (index + 1) + ')'] = tip;
+    });
+    // Get the tip for the indicator text
+    if (this.statusText.title) {
+      tips[prefix + '.indicatorText'] = this.statusText.title;
+    }
+    // Get a tip for the bar
+    tips[prefix + '.sectionHeader'] = 'Click to collapse / expand this panel';
+    return tips;
   }
 });
 

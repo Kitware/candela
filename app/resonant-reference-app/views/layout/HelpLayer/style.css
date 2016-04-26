@@ -5,19 +5,26 @@
   top: 0px;
   width: 100%;
   height: 100%;
-  background-color: rgba(255,255,255,0.5);
-  font-size: 0.75em;
+  background-color: rgba(0,0,0,0.35);
 }
-#HelpLayer #linkLayer path {
+#HelpLayer .arrow {
   fill: none;
-  stroke: rgba(0, 0, 0, 0.25);
-  stroke-width: 3px;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 2px;
+}
+#HelpLayer .new.arrow {
+  stroke: rgba(55, 126, 184, 0.9);
 }
 #HelpLayer .tip text {
+  fill: white;
   filter:url(#dropshadow);
 }
 #HelpLayer .new.tip text {
   fill: #377eb8;
+}
+#HelpLayer .clear.tip text {
+  font-size: 2em;
+  font-weight: 900;
 }
 #tuner {
   position: absolute;

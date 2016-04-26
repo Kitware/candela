@@ -1,5 +1,8 @@
 import MetadataItem from './MetadataItem';
-import {Set} from '../shims/SetOps.js';
+import {
+  Set
+}
+from '../shims/SetOps.js';
 let girder = window.girder;
 
 let UserPreferences = MetadataItem.extend({
@@ -21,6 +24,24 @@ you move or delete this item, your preferences will be lost.`,
       }
     };
   },
+  initialize: function () {
+    let seenTips = window.localStorage.getItem('seenTips');
+    if (seenTips) {
+      this.setMeta('seenTips', seenTips);
+    }
+    let achievements = window.localStorage.getItem('achievements');
+    if (achievements) {
+      this.setMeta('achievements', achievements);
+    }
+  },
+  save: function () {
+    MetadataItem.prototype.save.apply(this, arguments)
+      .catch(() => {
+        // Fallback: store the user's preferences in localStorage
+        window.localStorage.setItem('seenTips', this.getMeta('seenTips'));
+        window.localStorage.setItem('achievements', this.getMeta('achievements'));
+      });
+  },
   addListeners: function () {
     this.listenTo(window.mainPage.currentUser, 'rra:login',
       this.adoptScratchToolchains);
@@ -30,18 +51,18 @@ you move or delete this item, your preferences will be lost.`,
   claimToolchain: function () {
     if (!window.mainPage.currentUser.isLoggedIn()) {
       // Because we created this toolchain while not logged in,
-      // store the toolchain's ID in localStorage so that we
+      // store the toolchain's ID in window.localStorage so that we
       // can claim "ownership" when we log in / visit this page again
       // (of course, this is easy to hack, but that's the assumption
       // with public scratch space)
-      let scratchToolchains = window.localStorage.getItem('scratchToolchains');
+      let scratchToolchains = window.window.localStorage.getItem('scratchToolchains');
       if (!scratchToolchains) {
         scratchToolchains = [];
       } else {
         scratchToolchains = JSON.parse(scratchToolchains);
       }
       scratchToolchains.push(window.mainPage.toolchain.getId());
-      window.localStorage.setItem('scratchToolchains',
+      window.window.localStorage.setItem('scratchToolchains',
         JSON.stringify(scratchToolchains));
     }
   },
@@ -53,13 +74,17 @@ you move or delete this item, your preferences will be lost.`,
     // created in the public scratch space into the
     // now-logged-in user's Private folder
 
-    let scratchToolchains = window.localStorage.getItem('scratchToolchains');
+    let scratchToolchains = window.window.localStorage.getItem('scratchToolchains');
 
     if (scratchToolchains) {
       Promise.resolve(girder.restRequest({
         path: 'item/adoptScratchItems',
         data: {
           'ids': scratchToolchains // already JSON.stringified
+        },
+        error: () => {
+          // For now, ignore failures to adopt toolchains and datasets
+          window.localStorage.clear('scratchToolchains');
         },
         type: 'PUT'
       })).then(successfulAdoptions => {
@@ -72,19 +97,18 @@ you move or delete this item, your preferences will be lost.`,
             });
           }
         });
-        
+
         Promise.resolve(girder.restRequest({
           path: 'item/adoptScratchItems',
           data: {
             'ids': JSON.stringify([...datasetIds])
           },
           type: 'PUT'
-        })).catch(errorObj => {
-          // For now, ignore failures to adopt toolchains
-          // and datasets
-          // window.mainPage.trigger('rra:error', errorObj);
+        })).catch(() => {
+          // For now, ignore failures to adopt toolchains and datasets
+          window.localStorage.clear('scratchToolchains');
         });
-        
+
         window.mainPage.currentUser.trigger('rra:updateLibrary');
         // In addition to changing the library, the current
         // toolchain will (pretty much always) have just changed
@@ -93,11 +117,19 @@ you move or delete this item, your preferences will be lost.`,
           window.mainPage.toolchain.updateStatus();
         }
       }).catch(errorObj => {
-        // For now, ignore failures to adopt toolchains
-        // and datasets
-        // window.mainPage.trigger('rra:error', errorObj);
+        // For now, ignore failures to adopt toolchains and datasets
+        window.localStorage.clear('scratchToolchains');
       });
     }
+  },
+  hasSeenAllTips: function (tips) {
+    let seenTips = this.getMeta('seenTips');
+    for (let tipId of Object.keys(tips)) {
+      if (seenTips[tipId] !== true) {
+        return true;
+      }
+    }
+    return false;
   },
   observeTips: function (tips) {
     let seenTips = this.getMeta('seenTips');
@@ -105,6 +137,7 @@ you move or delete this item, your preferences will be lost.`,
       seenTips[tipId] = true;
     };
     this.setMeta('seenTips', seenTips);
+    this.save();
   },
   resetToDefaults: function () {
     // The user has logged out, or some other authentication
@@ -114,6 +147,8 @@ you move or delete this item, your preferences will be lost.`,
       silent: true
     });
     this.set(this.defaults);
+    window.localStorage.removeItem('seenTips');
+    window.localStorage.removeItem('achievements');
     this.adoptScratchToolchains();
   },
   levelUp: function (achievement) {
@@ -121,7 +156,7 @@ you move or delete this item, your preferences will be lost.`,
     if (achievements[achievement] !== true) {
       achievements[achievement] = true;
       this.setMeta('achievements', achievements);
-      this.save().catch(() => {});  // fail silently
+      this.save().catch(() => {}); // fail silently
       this.trigger('rra:levelUp');
     }
   }

@@ -36,6 +36,33 @@ let ICONS = {
 import './header.css';
 
 let Header = Backbone.View.extend({
+  initialize: function () {
+    this.tips = {
+      '#hamburgerButton': 'Main Menu',
+      '#helpButton': `
+Show these tips. This is blue when there are new tips that you 
+haven't seen yet.`,
+      '#achievementsButton': `
+Your achievements. Click this to see what you've accomplished,
+and what you still haven't tried.`,
+      '#toolchainLocationButton': `
+Indicates who can see the toolchain you're working on. Click
+to change its settings.`,
+      '#toolchainName': `
+Click to rename this toolchain`,
+      'img.AddDataset.headerButton': `
+Click to add a dataset to this toolchain`,
+      'img.DatasetView.headerButton': `
+Click to see/change the datasets in this toolchain`,
+      'img.MappingView.headerButton': `
+Click to manage the connections between the datasets and 
+the visualizations in this toolchain`,
+      'img.VisualizationView.headerButton': `
+Click to explore the visualizations in this toolchain`,
+      'img.AddVisualization.headerButton': `
+Click to add a visualization to this toolchain`
+    };
+  },
   addListeners: function () {
     this.listenTo(window.mainPage.currentUser, 'rra:logout', this.render);
     this.listenTo(window.mainPage.currentUser, 'rra:login', this.render);
@@ -76,7 +103,8 @@ let Header = Backbone.View.extend({
         window.mainPage.overlay.render('AchievementLibrary');
       });
       jQuery('#helpButton').on('click', () => {
-        window.mainPage.helpLayer.toggle();
+        window.mainPage.helpLayer.setTips(this.tips);
+        window.mainPage.helpLayer.show();
       });
       jQuery('#toolchainLocationButton')
         .on('click', () => {
@@ -89,7 +117,7 @@ let Header = Backbone.View.extend({
       this.templateAdded = true;
     }
 
-    if (window.mainPage.helpLayer.hasNewTips()) {
+    if (window.mainPage.currentUser.preferences.hasSeenAllTips(this.tips)) {
       jQuery('#helpButton').attr('src', newInfoIcon);
     } else {
       jQuery('#helpButton').attr('src', infoIcon);
@@ -150,33 +178,6 @@ let Header = Backbone.View.extend({
       // (an overlay should be showing, so don't sweat the toolbar)
       jQuery('#toolchainHeader, #toolchainIcons').hide();
     }
-
-    // Update any relevant tips on the help screen
-    window.mainPage.helpLayer.update({
-      '#hamburgerButton': 'Main Menu',
-      '#helpButton': `
-Show these tips. This is blue when there are new tips that you 
-haven't seen yet.`,
-      '#achievementsButton': `
-Your achievements. Click this to see what you've accomplished,
-and what you still haven't tried.`,
-      '#toolchainLocationButton': `
-Indicates who can see the toolchain you're working on. Click
-to change its settings.`,
-      '#toolchainName': `
-Click to rename this toolchain`,
-      'img.AddDataset.headerButton': `
-Click to add a dataset to this toolchain`,
-      'img.DatasetView.headerButton': `
-Click to see/change the datasets in this toolchain`,
-      'img.MappingView.headerButton': `
-Click to manage the connections between the datasets and 
-the visualizations in this toolchain`,
-      'img.VisualizationView.headerButton': `
-Click to explore the visualizations in this toolchain`,
-      'img.AddVisualization.headerButton': `
-Click to add a visualization to this toolchain`
-    });
   }, 300),
   notifyLevelUp: function () {
     // TODO
