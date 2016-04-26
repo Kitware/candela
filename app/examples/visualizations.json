@@ -113,6 +113,9 @@
           "foreground": "rgb(228,0,0)"
         }
       ],
+      "width": 630,
+      "height": 550,
+      "padding": {"left": 150, "right": 20, "top": 20, "bottom": 30},
       "renderer": "svg"
     }
   },
