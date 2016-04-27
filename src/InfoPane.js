@@ -162,12 +162,21 @@ export let InfoPane = Backbone.View.extend({
         }).render();
         let dotSelector = '#' + key + '-aggregate-dot';
         let current = value[value.length - 1];
-        if (current > this.fail) {
-          $(dotSelector).attr('class', 'fail');
-        } else if (current > this.warning) {
-          $(dotSelector).attr('class', 'bad');
+        if (this.warning > this.fail) {
+          // Lower values are better.
+          if (current < this.fail) {
+            $(dotSelector).attr('class', 'fail');
+          } else if (current < this.warning) {
+            $(dotSelector).attr('class', 'bad');
+          }
+        } else {
+          if (current > this.fail) {
+            $(dotSelector).attr('class', 'fail');
+          } else if (current > this.warning) {
+            $(dotSelector).attr('class', 'bad');
+          }
         }
-      });
+      }, this);
     }, this));
 
     let statusBar = new StatusBarWidget({

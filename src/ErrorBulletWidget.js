@@ -27,12 +27,23 @@ export let ErrorBulletWidget = Backbone.View.extend({
       generate: _.bind(function () {
         let chart = nv.models.bulletChart()
           .margin({top: 5, right: 20, bottom: 20, left: 25});
-        if (this.result.current > this.result.fail) {
-          chart.color(colors.fail);
-        } else if (this.result.current > this.result.warning) {
-          chart.color(colors.bad);
+        if (this.result.warning > this.result.fail) {
+          // Lower values are better.
+          if (this.result.current < this.result.fail) {
+            chart.color(colors.fail);
+          } else if (this.result.current < this.result.warning) {
+            chart.color(colors.bad);
+          } else {
+            chart.color(colors.good);
+          }
         } else {
-          chart.color(colors.good);
+          if (this.result.current > this.result.fail) {
+            chart.color(colors.fail);
+          } else if (this.result.current > this.result.warning) {
+            chart.color(colors.bad);
+          } else {
+            chart.color(colors.good);
+          }
         }
         d3.select('[id=\'' + this.el.id + '-svg\']')
           .datum(this.chartData())

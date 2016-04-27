@@ -49,15 +49,26 @@ export let ResultTablePane = Backbone.View.extend({
     })).promise().done(_.bind(function () {
       _.each(this.results, function (result) {
         var resultDivSelector = '#' + result.id + '-' +
-            (this.trendAbbreviationMap[result.trend] || result.trend)
-            .toLowerCase().replace(' ', '_');
+          (this.trendAbbreviationMap[result.trend] || result.trend)
+          .toLowerCase().replace(' ', '_');
         // change color of circle
-        if (result.current > result.fail) {
-          $(resultDivSelector + ' svg.statusDot').find('circle')
-            .attr('class', 'fail');
-        } else if (result.current > result.warning) {
-          $(resultDivSelector + ' svg.statusDot').find('circle')
-           .attr('class', 'bad');
+        if (result.warning > result.fail) {
+          // Lower values are better.
+          if (result.current < result.fail) {
+            $(resultDivSelector + ' svg.statusDot').find('circle')
+              .attr('class', 'fail');
+          } else if (result.current < result.warning) {
+            $(resultDivSelector + ' svg.statusDot').find('circle')
+              .attr('class', 'bad');
+          }
+        } else {
+          if (result.current > result.fail) {
+            $(resultDivSelector + ' svg.statusDot').find('circle')
+              .attr('class', 'fail');
+          } else if (result.current > result.warning) {
+            $(resultDivSelector + ' svg.statusDot').find('circle')
+              .attr('class', 'bad');
+          }
         }
         // render bullets
         let errorBullet = new ErrorBulletWidget({
