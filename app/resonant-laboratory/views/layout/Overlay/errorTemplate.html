@@ -1,0 +1,31 @@
+<div class="libraryInterface">
+  <img class="headerIcon" src="../../../images/hugeMistake.svg"/>
+  <h1>
+    I've made a huge mistake...
+  </h1>
+  <pre>
+    <%= message %>
+  </pre>
+  <p>
+    If it's not clear how to fix this, or if something else is wrong,
+    let us know <a href="<%= bugReportLink %>">here</a>.
+    We want to get any problems fixed as soon as possible.
+  </p>
+  <p>
+    Or, maybe it's not a bug, but a design problem.
+    Is there something that this should be doing, but it's not?
+    Do you have an idea for how this could be improved?
+    If so, we'd love to work with you to build a
+    <a href="<%= consultingLink %>">custom solution</a>
+    that better fits your needs.
+  </p>
+  <button id="okButton">OK</button>
+</div>
+<script type="application/javascript">
+  jQuery('#okButton').on('click', function () {
+    window.mainPage.switchToolchain(null)
+      .then(() => {
+        window.mainPage.overlay.render('StartingScreen');
+      });
+  });
+</script>
