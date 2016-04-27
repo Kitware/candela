@@ -29,3 +29,18 @@ test('Structure and content of exported Candela library object', t => {
   structureTests(t, candela);
   t.end();
 });
+
+test('Structure and content of unminified Candela library file', t => {
+  try {
+    let candelaBuilt = require('../../../build/candela/candela.js');
+    t.ok(candelaBuilt, 'The built candela.js file exists');
+
+    if (candelaBuilt) {
+      structureTests(t, candelaBuilt);
+    }
+  } catch(e) {
+    t.fail(`Could not import built candela.js: ${e}`);
+  }
+
+  t.end();
+});
