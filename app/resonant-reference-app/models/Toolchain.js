@@ -177,7 +177,7 @@ let Toolchain = MetadataItem.extend({
     } else {
       meta[key] = value;
     }
-    this.setMeta(meta);
+    this.set('meta', meta);
   },
   isEmpty: function () {
     let meta = this.getMeta();
