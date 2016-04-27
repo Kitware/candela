@@ -20,7 +20,7 @@ let User = girder.models.UserModel.extend({
         path: 'user/authentication',
         type: login ? 'GET' : 'DELETE',
         error: reject
-      }).done(resolve).fail(resolve);
+      }).done(resolve).error(reject);
     }).then(resp => {
       if (resp === null || login === false) {
         this.finishLogout();
@@ -53,9 +53,12 @@ let User = girder.models.UserModel.extend({
     this.authToken = undefined;
     this.preferences.resetToDefaults();
     if (wasLoggedIn) {
-      this.trigger('rra:logout');
-      // Girder uses g:login for both log in and log out
-      girder.events.trigger('g:login');
+      window.mainPage.switchToolchain(null)
+        .then(() => {
+          this.trigger('rra:logout');
+          // Girder uses g:login for both log in and log out
+          girder.events.trigger('g:login');
+        });
     }
   },
   handleUpdate: function () {

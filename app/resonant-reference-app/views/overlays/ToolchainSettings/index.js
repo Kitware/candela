@@ -20,7 +20,7 @@ let visibilityIcons = {
   PublicScratch: scratchIcon
 };
 let visibilityLabels = {
-  PublicUser: 'Others can see this toolchain in your Public folder',
+  PublicUser: 'Others can see this toolchain',
   PrivateUser: 'This toolchain is private',
   PublicLibrary: 'This is a toolchain in our library of examples',
   PublicScratch: 'Others can see and edit this toolchain'
