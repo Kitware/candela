@@ -2,6 +2,7 @@ import Underscore from 'underscore';
 import Backbone from 'backbone';
 import jQuery from 'jquery';
 import d3 from 'd3';
+import cola from 'webcola';
 import rewrap from '../../../shims/svgTextWrap.js';
 import forceControls from './forceControls.json';
 import template from './template.html';
@@ -33,20 +34,20 @@ function arrowGenerator(edge) {
     'L' + edge.target.x + ',' + edge.target.y +
     'Z';
 }
-
+window.cola = cola;
 let HelpLayer = Backbone.View.extend({
   initialize: function () {
     this.relevantTips = {};
 
-    this.padding = 0;
-    this.overlapResistance = 1.0;
-    this.linkStrength = 0.3;
-    this.friction = 0.7;
+    // Layout options
+    this.padding = 15;
+    
+    this.avoidOverlaps = true;
     this.linkDistance = 50;
-    this.charge = -150;
-    this.gravity = 0.05;
-    this.theta = 0.8;
     this.alpha = 0.7;
+    this.convergenceThreshold = 0.01;
+    this.defaultNodeSize = 30;
+    this.handleDisconnected = true;
   },
   setTips: function (tips) {
     this.relevantTips = {};
@@ -170,13 +171,17 @@ let HelpLayer = Backbone.View.extend({
           nodeType: 'label',
           message: tip.message,
           x: tip.x,
-          y: tip.y
+          y: tip.y,
+          width: tip.right - tip.left + 2 * this.padding,
+          height: tip.bottom - tip.top + 2 * this.padding
         });
         nodes.push({
           tipId: tip.tipId,
           nodeType: 'arrowhead',
           x: tip.x,
           y: tip.y,
+          width: this.padding,
+          height: this.padding,
           fixed: true
         });
         edges.push({
@@ -187,15 +192,14 @@ let HelpLayer = Backbone.View.extend({
 
       // Subset of just the label nodes
       let labelNodes = nodes.filter(d => d.nodeType === 'label');
-
-      let force = d3.layout.force()
-        .linkStrength(this.linkStrength)
-        .friction(this.friction)
+      
+      let force = cola.d3adaptor()
         .linkDistance(this.linkDistance)
-        .charge(this.charge)
-        .gravity(this.gravity)
-        .theta(this.theta)
+        .avoidOverlaps(this.avoidOverlaps)
         .alpha(this.alpha)
+        .convergenceThreshold(this.convergenceThreshold)
+        .defaultNodeSize(this.defaultNodeSize)
+        .handleDisconnected(this.handleDisconnected)
         .size([bounds.width, bounds.height])
         .nodes(nodes)
         .links(edges);
@@ -273,7 +277,7 @@ let HelpLayer = Backbone.View.extend({
       // Start the simulation to lay out the tips
       // in a fun/non-overlapping way
       force.on('tick', () => {
-        var q = d3.geom.quadtree(labelNodes);
+        /* var q = d3.geom.quadtree(labelNodes);
         labelNodes.forEach(d => {
           // Keep the labels from overlapping with each other
           q.visit(this.collide(d));
@@ -294,7 +298,7 @@ let HelpLayer = Backbone.View.extend({
           if (space < 0) {
             d.y -= this.overlapResistance * (-space);
           }
-        });
+        }); */
 
         // If we're tuning the layout, animate it
         if (this.addedTuner) {

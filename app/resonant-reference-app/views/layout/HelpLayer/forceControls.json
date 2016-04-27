@@ -1,47 +1,22 @@
 [
   {
     "option": "padding",
-    "range": [-30, 30],
+    "range": [0, 30],
     "step": 1
-  },
-  {
-    "option": "overlapResistance",
-    "range": [0, 1],
-    "step": 0.1
-  },
-  {
-    "option": "linkStrength",
-    "range": [0, 1],
-    "step": 0.1
-  },
-  {
-    "option": "friction",
-    "range": [0, 1],
-    "step": 0.1
   },
   {
     "option": "linkDistance",
-    "range": [0, 50],
-    "step": 1
-  },
-  {
-    "option": "charge",
-    "range": [-300, 300],
-    "step": 5
-  },
-  {
-    "option": "gravity",
-    "range": [0, 1],
-    "step": 0.025
-  },
-  {
-    "option": "theta",
-    "range": [0, 1],
-    "step": 0.1
+    "range": [10, 200],
+    "step": 10
   },
   {
     "option": "alpha",
     "range": [0, 1],
     "step": 0.1
+  },
+  {
+    "option": "defaultNodeSize",
+    "range": [0, 100],
+    "step": 1
   }
 ]
