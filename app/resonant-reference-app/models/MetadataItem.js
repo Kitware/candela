@@ -181,7 +181,7 @@ let MetadataItem = girder.models.ItemModel.extend({
           path: 'item/' + this.getId() + '/updateScratch?' +
             jQuery.param(args),
           contentType: 'application/json',
-          data: JSON.stringify(this.getMeta()),
+          data: JSON.stringify(this.getFlatMeta()),
           type: 'POST',
           error: reject
         }).done(resolve).error(reject);
@@ -302,6 +302,10 @@ let MetadataItem = girder.models.ItemModel.extend({
     } else {
       this.unset('meta');
     }
+  },
+  getFlatMeta: function () {
+    // By default, there's no flattening to do
+    return this.getMeta();
   },
   getMeta: function (key) {
     let meta = this.get('meta');

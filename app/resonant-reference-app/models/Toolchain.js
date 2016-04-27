@@ -62,7 +62,7 @@ let Toolchain = MetadataItem.extend({
         return Promise.reject(new Error('Toolchain has no ID'));
       }
     }
-    
+
     // Load up any datasets that the toolchain references
     let datasetPromises = [];
 
@@ -90,7 +90,7 @@ let Toolchain = MetadataItem.extend({
       }
       this.trigger('rra:changeDatasets');
     });
-    
+
     // Get access information about this toolchain
     let statusPromise = new Promise((resolve, reject) => {
       girder.restRequest({
@@ -157,27 +157,24 @@ let Toolchain = MetadataItem.extend({
 
     return meta;
   },
-  setMeta: function (key, value) {
-    let meta = this.getMeta() || {};
-
+  getFlatMeta: function () {
     /*
-      For the same reason as getMeta, we need to override setMeta
-      so that we appropriately handle the flattening process
+      For the same reason as getMeta, MetadataItem needs to be
+      able to get a flattened copy of the metadata for
+      JSON.stringification
     */
 
-    if (typeof key === 'object') {
-      let obj = key;
-      for (key of Object.keys(obj)) {
-        meta[key] = obj[key];
-        if (key === 'preferredWidgets' &&
-          meta[key] instanceof Set) {
-          meta[key] = [...meta[key]];
-        }
+    let meta = this.getMeta() || {};
+    let flatMeta = {};
+
+    for (let key of Object.keys(meta)) {
+      flatMeta[key] = meta[key];
+      if (key === 'preferredWidgets' &&
+        meta[key] instanceof Set) {
+        flatMeta[key] = [...meta[key]];
       }
-    } else {
-      meta[key] = value;
     }
-    this.set('meta', meta);
+    return flatMeta;
   },
   isEmpty: function () {
     let meta = this.getMeta();
