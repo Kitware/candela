@@ -16,6 +16,7 @@ export let ResultTablePane = Backbone.View.extend({
     this.trajectoryMap = settings.trajectoryMap || {};
     this.datasetLabelMap = settings.datasetLabelMap || {};
     this.trendAbbreviationMap = settings.trendAbbreviationMap;
+    this.producerLink = settings.producer_link || null;
     if (this.results === undefined) {
       return;
     }
@@ -45,7 +46,8 @@ export let ResultTablePane = Backbone.View.extend({
       trends: this.trends,
       datasetMap: this.datasetMap,
       trajectoryMap: this.trajectoryMap,
-      datasetLabelMap: this.datasetLabelMap
+      datasetLabelMap: this.datasetLabelMap,
+      producerLink: this.producerLink
     })).promise().done(_.bind(function () {
       _.each(this.results, function (result) {
         var resultDivSelector = '#' + result.id + '-' +
