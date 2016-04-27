@@ -158,7 +158,7 @@ let Toolchain = MetadataItem.extend({
     return meta;
   },
   setMeta: function (key, value) {
-    let meta = this.get('meta') || {};
+    let meta = this.getMeta() || {};
 
     /*
       For the same reason as getMeta, we need to override setMeta
@@ -177,7 +177,7 @@ let Toolchain = MetadataItem.extend({
     } else {
       meta[key] = value;
     }
-    this.set('meta', meta);
+    this.setMeta(meta);
   },
   isEmpty: function () {
     let meta = this.getMeta();
@@ -346,7 +346,7 @@ let Toolchain = MetadataItem.extend({
     });
   },
   addMapping: function (mapping) {
-    let meta = this.get('meta');
+    let meta = this.getMeta();
 
     // Figure out if the vis option allows multiple fields
     let optionSpec = meta.visualizations[mapping.visIndex]

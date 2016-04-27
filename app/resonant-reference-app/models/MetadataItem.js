@@ -181,7 +181,7 @@ let MetadataItem = girder.models.ItemModel.extend({
           path: 'item/' + this.getId() + '/updateScratch?' +
             jQuery.param(args),
           contentType: 'application/json',
-          data: JSON.stringify(this.get('meta')),
+          data: JSON.stringify(this.getMeta()),
           type: 'POST',
           error: reject
         }).done(resolve).error(reject);
@@ -281,7 +281,7 @@ let MetadataItem = girder.models.ItemModel.extend({
     return this.sync('delete', this.toJSON(), options);
   },
   setMeta: function (key, value) {
-    let meta = this.get('meta');
+    let meta = this.getMeta();
     meta = meta || {};
     if (typeof key === 'object') {
       let obj = key;
@@ -294,11 +294,11 @@ let MetadataItem = girder.models.ItemModel.extend({
     this.set('meta', meta);
   },
   unsetMeta: function (key) {
-    let meta = this.get('meta');
+    let meta = this.getMeta();
     meta = meta || {};
     if (key !== undefined) {
       meta[key] = null;
-      this.set('meta', meta);
+      this.setMeta(meta);
     } else {
       this.unset('meta');
     }
