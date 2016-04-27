@@ -2,14 +2,14 @@ table.table.table-responsive.table-compact
   thead.result-labels
     th(colspan="2")
       .agg-label-header
-        | #{aggregate_metric_name}
+        | Aggregate Metric
     if aggTrendNames.length >= 1 && aggTrends[aggTrendNames[0]].length > 1
       th
         .agg-sparkline-header
           | Last 7 Days
     th(colspan="2")
       .agg-bullet-header
-        | Submission Value
+        | Computed Value
   tbody
   each aggTrendName in aggTrendNames
     tr.info-section-chart(id="#{aggTrendIds[aggTrendName]}-aggregate-container")

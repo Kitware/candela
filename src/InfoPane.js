@@ -20,7 +20,6 @@ export let InfoPane = Backbone.View.extend({
     this.warning = settings.warning || 3;
     this.fail = settings.fail || 4;
     this.max = settings.max || 5;
-    this.aggregate_metric_name = settings.aggregate_metric_name || 'Aggregate Metric';
     this.trendAbbreviationMap = settings.trendAbbreviationMap;
 
     this.numSuccess = 0;
@@ -113,7 +112,6 @@ export let InfoPane = Backbone.View.extend({
       aggTrendNames: this.aggTrendNames,
       aggTrendIds: this.aggTrendIds,
       aggTrends: this.agg_trends,
-      aggregate_metric_name: this.aggregate_metric_name
     })).promise().done(_.bind(function () {
       this.aggBullets = {};
       _.each(this.agg_trends, (value, key, list) => {
