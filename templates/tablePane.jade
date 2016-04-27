@@ -18,8 +18,8 @@ table.table.table-striped.table-hover.table-responsive.table-compact
             .dataset-label(id="#{resultSet[0].id}-label")
               | #{datasetLabelMap[resultSet[0].id]}
         each trend in trends
-          td.bullet-container(id="#{resultSet[0].id}-#{trend.abbreviation.toLowerCase()}")
+          td.bullet-container(id="#{resultSet[0].id}-#{trend.abbreviation.toLowerCase().replace(' ', '_')}")
             svg.statusDot
               circle.none(r="10", cx="10", cy="10")
-            .bullet(id="#{resultSet[0].id}-#{trend.abbreviation.toLowerCase()}-bullet")
-              svg(id="#{resultSet[0].id}-#{trend.abbreviation.toLowerCase()}-bullet-svg")
+            .bullet(id="#{resultSet[0].id}-#{trend.abbreviation.toLowerCase().replace(' ', '_')}-bullet")
+              svg(id="#{resultSet[0].id}-#{trend.abbreviation.toLowerCase().replace(' ', '_')}-bullet-svg")

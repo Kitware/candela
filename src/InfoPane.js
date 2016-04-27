@@ -17,7 +17,6 @@ export let InfoPane = Backbone.View.extend({
     this.name = settings.name || 'Ground Truth';
     this.branch = settings.branch || 'master';
     this.day = settings.day || this.getToday();
-    this.totalDatasets = settings.totalDatasets || 0;
     this.warning = settings.warning || 3;
     this.fail = settings.fail || 4;
     this.max = settings.max || 5;
@@ -40,6 +39,11 @@ export let InfoPane = Backbone.View.extend({
     }, this));
     this.ranDatasets = this.numSuccess + this.numBad + this.numFail;
     this.agg_trends = settings.agg_trends || this._getAggTrends(settings);
+    this.aggTrendNames = Object.keys(this.agg_trends);
+    this.aggTrendIds = {};
+    _.each(this.aggTrendNames, function (name) {
+        this.aggTrendIds[name] = name.replace(' ', '_');
+    }, this);
   },
 
   _percentile: function (arr, p) {
@@ -106,12 +110,14 @@ export let InfoPane = Backbone.View.extend({
       numBad: this.numBad,
       numFail: this.numFail,
       totalMedian: this.totalMedian,
-      aggTrendNames: Object.keys(this.agg_trends),
+      aggTrendNames: this.aggTrendNames,
+      aggTrendIds: this.aggTrendIds,
       aggTrends: this.agg_trends,
       aggregate_metric_name: this.aggregate_metric_name
     })).promise().done(_.bind(function () {
       this.aggBullets = {};
       _.each(this.agg_trends, (value, key, list) => {
+        key = this.aggTrendIds[key];
         nv.addGraph({
           generate: _.bind(function () {
             let parent = $('#' + key + '-aggregate-sparkline');

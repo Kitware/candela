@@ -12,20 +12,20 @@ table.table.table-responsive.table-compact
         | Submission Value
   tbody
   each aggTrendName in aggTrendNames
-    tr.info-section-chart(id="#{aggTrendName}-aggregate-container")
+    tr.info-section-chart(id="#{aggTrendIds[aggTrendName]}-aggregate-container")
       td.agg-status-dot
         svg.statusDot
-            circle.none(id="#{aggTrendName}-aggregate-dot" r="10", cx="10", cy="10")
+            circle.none(id="#{aggTrendIds[aggTrendName]}-aggregate-dot" r="10", cx="10", cy="10")
       td
         .agg-label
           | #{aggTrendName.toUpperCase()}
       if aggTrendNames.length >= 1 && aggTrends[aggTrendNames[0]].length > 1
         td
-          .agg-sparkline(id="#{aggTrendName}-aggregate-sparkline")
+          .agg-sparkline(id="#{aggTrendIds[aggTrendName]}-aggregate-sparkline")
             svg
       td
         .agg-value
           | #{Math.round(aggTrends[aggTrendName][aggTrends[aggTrendName].length-1] * 10000) / 10000}
       td
-        .agg-bullet(id="#{aggTrendName}-aggregate-bullet")
-          svg(id="#{aggTrendName}-aggregate-bullet-svg")
+        .agg-bullet(id="#{aggTrendIds[aggTrendName]}-aggregate-bullet")
+          svg(id="#{aggTrendIds[aggTrendName]}-aggregate-bullet-svg")
