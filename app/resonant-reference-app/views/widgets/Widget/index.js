@@ -35,11 +35,7 @@ let Widget = Backbone.View.extend({
     this.listenTo(window.mainPage.widgetPanels, 'rra:navigateWidgets',
       this.render);
     this.listenTo(window.mainPage, 'rra:resizeWindow', this.render);
-    this.listenTo(window.mainPage.currentUser, 'rra:login',
-      this.addListeners);
-  },
-  addListeners: function () {
-    this.listenTo(window.mainPage.currentUser.userPreferences,
+    this.listenTo(window.mainPage.currentUser.preferences,
       'rra:observeTips', this.renderIndicators);
   },
   toggle: function () {
