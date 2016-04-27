@@ -65,17 +65,17 @@ let DatasetView = Widget.extend({
       }
     });
 
-    this.listenTo(window.mainPage, 'rra:changeToolchain',
-      this.handleNewToolchain);
-    this.handleNewToolchain();
+    this.listenTo(window.mainPage, 'rra:changeProject',
+      this.handleNewProject);
+    this.handleNewProject();
   },
-  handleNewToolchain: function () {
+  handleNewProject: function () {
     this.$el.html('');
     this.status = STATUS.NO_DATA;
 
-    this.listenTo(window.mainPage.toolchain, 'rra:changeDatasets',
+    this.listenTo(window.mainPage.project, 'rra:changeDatasets',
       this.render);
-    this.listenTo(window.mainPage.toolchain, 'rra:changeMatchings',
+    this.listenTo(window.mainPage.project, 'rra:changeMatchings',
       this.renderAttributeSettings);
   },
   renderInfoScreen: function () {
@@ -112,7 +112,7 @@ you'll probably need to
       return;
     }
     
-    let datasets = window.mainPage.toolchain.getMeta('datasets');
+    let datasets = window.mainPage.project.getMeta('datasets');
     let dataset;
     let attrs;
     if (datasets && datasets[0] && window.mainPage.loadedDatasets[datasets[0]]) {
@@ -154,8 +154,8 @@ you'll probably need to
       return;
     }
 
-    // Get the dataset in the toolchain (if there is one)
-    let dataset = window.mainPage.toolchain.getMeta('datasets');
+    // Get the dataset in the project (if there is one)
+    let dataset = window.mainPage.project.getMeta('datasets');
     if (dataset) {
       dataset = window.mainPage.loadedDatasets[dataset[0]];
     }

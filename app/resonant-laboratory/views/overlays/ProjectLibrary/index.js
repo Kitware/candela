@@ -9,27 +9,27 @@ import publicFileIcon from '../../../images/light/file_public.svg';
 import scratchFileIcon from '../../../images/light/file_scratch.svg';
 let girder = window.girder;
 
-let ToolchainLibrary = Backbone.View.extend({
+let ProjectLibrary = Backbone.View.extend({
   initialize: function (params) {
     this.keepOpenOnSelect = params.keepOpenOnSelect === true;
 
     this.listenTo(window.mainPage.currentUser, 'rra:updateLibrary', this.render);
     this.listenTo(window.mainPage.currentUser, 'rra:updateLibrary', this.render);
 
-    // The ToolchainLibrary is part of other views that may or
-    // may not expect a toolchain to be open right now...
-    this.listenTo(window.mainPage, 'rra:changeToolchain',
-      this.handleNewToolchain);
-    this.handleNewToolchain();
+    // The ProjectLibrary is part of other views that may or
+    // may not expect a project to be open right now...
+    this.listenTo(window.mainPage, 'rra:changeProject',
+      this.handleNewProject);
+    this.handleNewProject();
 
     this.addedTemplate = false;
   },
-  handleNewToolchain: function () {
-    if (window.mainPage.toolchain) {
-      // Don't bother re-rendering this view until we have the new toolchain's
+  handleNewProject: function () {
+    if (window.mainPage.project) {
+      // Don't bother re-rendering this view until we have the new project's
       // updated status
-      this.listenTo(window.mainPage.toolchain, 'rra:changeStatus', this.render);
-      this.listenTo(window.mainPage.toolchain, 'rra:rename', this.render);
+      this.listenTo(window.mainPage.project, 'rra:changeStatus', this.render);
+      this.listenTo(window.mainPage.project, 'rra:rename', this.render);
     } else {
       this.render();
     }
@@ -56,21 +56,21 @@ let ToolchainLibrary = Backbone.View.extend({
     // Start off with every section hidden
     jQuery('.hideable').hide();
 
-    // Get the set of toolchains in the public library
+    // Get the set of projects in the public library
     new Promise((resolve, reject) => {
       girder.restRequest({
-        path: 'resource/lookup?path=/collection/ResonantLaboratoryApp/Toolchains',
+        path: 'resource/lookup?path=/collection/ResonantLaboratoryApp/Projects',
         type: 'GET',
         error: reject
       }).done(resolve).error(reject);
     }).then(folder => {
-      this.getFolderContents(folder, 'toolchainLibrary', libraryFileIcon);
+      this.getFolderContents(folder, 'projectLibrary', libraryFileIcon);
     }).catch(() => {}); // fail silently
 
     if (window.mainPage.currentUser.isLoggedIn()) {
       // The user is logged in
 
-      // Get the set of the user's private toolchains
+      // Get the set of the user's private projects
       new Promise((resolve, reject) => {
         girder.restRequest({
           path: 'folder/privateFolder',
@@ -78,10 +78,10 @@ let ToolchainLibrary = Backbone.View.extend({
           error: reject
         }).done(resolve).error(reject);
       }).then(folder => {
-        this.getFolderContents(folder, 'privateToolchains', privateFileIcon);
+        this.getFolderContents(folder, 'privateProjects', privateFileIcon);
       }).catch(() => {}); // fail silently
 
-      // Get the set of the user's public toolchains
+      // Get the set of the user's public projects
       new Promise((resolve, reject) => {
         girder.restRequest({
           path: 'folder/publicFolder',
@@ -89,14 +89,14 @@ let ToolchainLibrary = Backbone.View.extend({
           error: reject
         }).done(resolve).error(reject);
       }).then(folder => {
-        this.getFolderContents(folder, 'publicToolchains', publicFileIcon);
+        this.getFolderContents(folder, 'publicProjects', publicFileIcon);
       }).catch(() => {}); // fail silently
     } else {
       // The user is logged out
-      let ids = window.localStorage.getItem('scratchToolchains');
+      let ids = window.localStorage.getItem('scratchProjects');
 
       if (ids !== null) {
-        // Get the set of toolchains in the public scratch space
+        // Get the set of projects in the public scratch space
         // that this browser created
         Promise.resolve(girder.restRequest({
           path: 'item/validateScratchItems',
@@ -106,25 +106,25 @@ let ToolchainLibrary = Backbone.View.extend({
           type: 'GET',
           error: null
         })).then(items => {
-          this.renderToolchains(new girder.collections.ItemCollection(items),
-            'scratchToolchains', scratchFileIcon);
+          this.renderProjects(new girder.collections.ItemCollection(items),
+            'scratchProjects', scratchFileIcon);
         }).catch(() => {}); // fail silently
       }
     }
   }, 300),
   getFolderContents: function (folder, divId, icon) {
-    let toolchains = new girder.collections.ItemCollection();
-    toolchains.altUrl = 'item';
-    toolchains.pageLimit = 100;
-    toolchains.fetch({
+    let projects = new girder.collections.ItemCollection();
+    projects.altUrl = 'item';
+    projects.pageLimit = 100;
+    projects.fetch({
       folderId: folder._id
     });
-    toolchains.on('reset', (items) => {
-      this.renderToolchains(items, divId, icon);
+    projects.on('reset', (items) => {
+      this.renderProjects(items, divId, icon);
     });
   },
-  renderToolchains: function (items, divId, icon) {
-    let toolchainModels = items.models.filter(d => {
+  renderProjects: function (items, divId, icon) {
+    let projectModels = items.models.filter(d => {
       if (!d.attributes || !d.attributes.meta) {
         return false;
       }
@@ -133,7 +133,7 @@ let ToolchainLibrary = Backbone.View.extend({
         d.attributes.meta.visualizations;
     });
 
-    if (toolchainModels.length > 0) {
+    if (projectModels.length > 0) {
       jQuery('#' + divId).show();
       jQuery('#' + divId + 'Divider').show();
       jQuery('#' + divId + 'Header').show();
@@ -142,15 +142,15 @@ let ToolchainLibrary = Backbone.View.extend({
 
     let libraryButtons = d3.select('#' + divId)
       .selectAll('.circleButton')
-      .data(toolchainModels, d => {
+      .data(projectModels, d => {
         return d.id + d.name()
       });
 
     let libraryButtonsEnter = libraryButtons.enter().append('div');
     libraryButtons.exit().remove();
     libraryButtons.attr('class', (d) => {
-      if (window.mainPage.toolchain &&
-        d.id === window.mainPage.toolchain.getId()) {
+      if (window.mainPage.project &&
+        d.id === window.mainPage.project.getId()) {
         return 'current circleButton';
       } else {
         return 'circleButton';
@@ -167,7 +167,7 @@ let ToolchainLibrary = Backbone.View.extend({
 
     d3.select('#' + divId).selectAll('.circleButton')
       .on('click', d => {
-        window.mainPage.switchToolchain(d.id);
+        window.mainPage.switchProject(d.id);
         if (!this.keepOpenOnSelect) {
           window.mainPage.overlay.closeOverlay();
         }
@@ -175,4 +175,4 @@ let ToolchainLibrary = Backbone.View.extend({
   }
 });
 
-export default ToolchainLibrary;
+export default ProjectLibrary;

@@ -61,7 +61,7 @@ let DatasetLibrary = Backbone.View.extend({
     datasets.on('reset', function (items) {
       let datasetModels = items.models.filter(d => {
         // TODO: find a more precise way of differentiating
-        // what items are datasets vs toolchains vs something else
+        // what items are datasets vs projects vs something else
         let ext = d.name();
         if (ext) {
           ext = ext.split('.');
@@ -81,7 +81,7 @@ let DatasetLibrary = Backbone.View.extend({
         .selectAll('.circleButton')
         .data(datasetModels);
 
-      let datasetIds = window.mainPage.toolchain ? window.mainPage.toolchain.getDatasetIds() : [];
+      let datasetIds = window.mainPage.project ? window.mainPage.project.getDatasetIds() : [];
 
       let libraryButtonsEnter = libraryButtons.enter().append('div')
         .attr('class', (d) => {
@@ -103,19 +103,19 @@ let DatasetLibrary = Backbone.View.extend({
 
       d3.select('#' + divId).selectAll('.circleButton')
         .on('click', d => {
-          if (window.mainPage.toolchain) {
-            // We already have a toolchain loaded, so
+          if (window.mainPage.project) {
+            // We already have a project loaded, so
             // swap it in (TODO: load multiple datasets)
-            window.mainPage.toolchain.setDataset(d);
+            window.mainPage.project.setDataset(d);
             window.mainPage.widgetPanels.toggleWidget({
               hashName: 'DatasetView0'
             }, true);
             window.mainPage.overlay.closeOverlay();
           } else {
-            if (d.meta && d.meta.exampleToolchainId) {
-              // Load the example toolchain that this dataset's
+            if (d.meta && d.meta.exampleProjectId) {
+              // Load the example project that this dataset's
               // metadata specifies
-              window.mainPage.switchToolchain(d.meta.exampleToolchainId)
+              window.mainPage.switchProject(d.meta.exampleProjectId)
                 .then(() => {
                   window.mainPage.widgetPanels.toggleWidget({
                     hashName: 'DatasetView0'
@@ -123,11 +123,11 @@ let DatasetLibrary = Backbone.View.extend({
                   window.mainPage.overlay.closeOverlay();
                 });
             } else {
-              // No default example toolchain has been
+              // No default example project has been
               // specified for this dataset; create an empty
-              // toolchain with this dataset
-              window.mainPage.newToolchain().then(() => {
-                window.mainPage.toolchain.setDataset(d);
+              // project with this dataset
+              window.mainPage.newProject().then(() => {
+                window.mainPage.project.setDataset(d);
                 window.mainPage.widgetPanels.toggleWidget({
                   hashName: 'DatasetView0'
                 }, true);

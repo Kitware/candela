@@ -14,7 +14,7 @@
 </div>
 <script type="application/javascript">
   jQuery('#okButton').on('click', () => {
-    window.mainPage.switchToolchain(null)
+    window.mainPage.switchProject(null)
       .then(() => {
         window.mainPage.overlay.render('StartingScreen');
       });

@@ -79,15 +79,15 @@ let MatchingView = Widget.extend({
 
     this.selection = null;
 
-    this.listenTo(window.mainPage, 'rra:changeToolchain',
-      this.handleNewToolchain);
-    this.handleNewToolchain();
+    this.listenTo(window.mainPage, 'rra:changeProject',
+      this.handleNewProject);
+    this.handleNewProject();
   },
-  handleNewToolchain: function () {
+  handleNewProject: function () {
     this.$el.html('');
     this.status = STATUS.NOTHING_TO_MAP;
 
-    this.listenTo(window.mainPage.toolchain, 'rra:changeMatchings', () => {
+    this.listenTo(window.mainPage.project, 'rra:changeMatchings', () => {
       this.selection = null;
       this.render();
     });
@@ -107,10 +107,10 @@ The visualization needs more connections to data in
 order to display anything.`);
     } else if (this.status === STATUS.DATASETS_NOT_LOADED) {
       window.mainPage.overlay.renderLoadingScreen(`
-Still accessing this toolchain's datasets...`);
+Still accessing this project's datasets...`);
     } else if (this.status === STATUS.STALE_MAPPINGS) {
       window.mainPage.overlay.renderLoadingScreen(`
-Still accessing this toolchain's matching settings...`);
+Still accessing this project's matching settings...`);
     } else if (this.status === STATUS.NOTHING_TO_MAP) {
       window.mainPage.overlay.renderUserErrorScreen(`
 You need to choose both a Dataset and a Visualization
@@ -128,7 +128,7 @@ in order to connect them together.`);
       .replace(/([^A-Za-z0-9[\]{}_.:-])\s?/g, '');
   },
   constructLookups: function () {
-    let meta = window.mainPage.toolchain.getMeta();
+    let meta = window.mainPage.project.getMeta();
 
     let specs = {
       data: [],
@@ -358,7 +358,7 @@ in order to connect them together.`);
         visNode = this.selection;
         dataNode = d;
       }
-      window.mainPage.toolchain.addMatching({
+      window.mainPage.project.addMatching({
         visIndex: visNode.index,
         visAttribute: visNode.attrName,
         dataIndex: dataNode.index,
@@ -374,7 +374,7 @@ in order to connect them together.`);
         visNode = this.selection;
         dataNode = d;
       }
-      window.mainPage.toolchain.removeMatching({
+      window.mainPage.project.removeMatching({
         visIndex: visNode.index,
         visAttribute: visNode.attrName,
         dataIndex: dataNode.index,

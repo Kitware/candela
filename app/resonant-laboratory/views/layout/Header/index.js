@@ -40,8 +40,8 @@ let Header = Backbone.View.extend({
     this.listenTo(window.mainPage.currentUser, 'rra:logout', this.render);
     this.listenTo(window.mainPage.currentUser, 'rra:login', this.render);
 
-    this.listenTo(window.mainPage, 'rra:changeToolchain',
-      this.newToolchainResponse);
+    this.listenTo(window.mainPage, 'rra:changeProject',
+      this.newProjectResponse);
 
     this.listenTo(window.mainPage.widgetPanels, 'rra:updateWidgetSpecs',
       this.render);
@@ -51,15 +51,15 @@ let Header = Backbone.View.extend({
     this.listenTo(window.mainPage.currentUser.preferences,
       'rra:levelUp', this.notifyLevelUp);
   },
-  newToolchainResponse: function () {
-    if (window.mainPage.toolchain) {
-      this.listenTo(window.mainPage.toolchain,
+  newProjectResponse: function () {
+    if (window.mainPage.project) {
+      this.listenTo(window.mainPage.project,
         'rra:changeDatasets', this.render);
-      this.listenTo(window.mainPage.toolchain,
+      this.listenTo(window.mainPage.project,
         'rra:changeVisualizations', this.render);
-      this.listenTo(window.mainPage.toolchain,
+      this.listenTo(window.mainPage.project,
         'rra:changeStatus', this.render);
-      this.listenTo(window.mainPage.toolchain,
+      this.listenTo(window.mainPage.project,
         'rra:rename', this.render);
     }
     this.render();
@@ -75,31 +75,31 @@ Your achievements. Click this to see what you've accomplished,
 and what you still haven't tried.`*/
     };
     
-    if (window.mainPage.toolchain) {
-      tips['#toolchainLocationButton'] = `
-Indicates who can see the toolchain you're working on. Click
+    if (window.mainPage.project) {
+      tips['#projectLocationButton'] = `
+Indicates who can see the project you're working on. Click
 to change its settings.`;
       
-      tips['#toolchainName'] = 'Click to rename this toolchain';
+      tips['#projectName'] = 'Click to rename this project';
       
-      if (window.mainPage.toolchain.getMeta('datasets').length === 0) {
+      if (window.mainPage.project.getMeta('datasets').length === 0) {
         tips['img.AddDataset.headerButton'] =
-          'Click to add a dataset to this toolchain';
+          'Click to add a dataset to this project';
       } else {
         tips['img.DatasetView.headerButton'] =
-          'Click to see/change the datasets in this toolchain';
+          'Click to see/change the datasets in this project';
       }
       
       tips['img.MatchingView.headerButton'] = `
 Click to manage the connections between the datasets 
-and the visualizations in this toolchain`;
+and the visualizations in this project`;
       
-      if (window.mainPage.toolchain.getMeta('visualizations').length === 0) {
+      if (window.mainPage.project.getMeta('visualizations').length === 0) {
         tips['img.AddVisualization.headerButton'] =
-          'Step 2: Click to add a visualization to this toolchain';
+          'Step 2: Click to add a visualization to this project';
       } else {
         tips['img.VisualizationView.headerButton'] =
-          'Click to explore the visualizations in this toolchain';
+          'Click to explore the visualizations in this project';
       }
     }
     
@@ -120,20 +120,20 @@ and the visualizations in this toolchain`;
         window.mainPage.helpLayer.setTips(this.getVisibleTips());
         window.mainPage.helpLayer.show();
       });
-      jQuery('#toolchainLocationButton')
+      jQuery('#projectLocationButton')
         .on('click', () => {
-          window.mainPage.overlay.render('ToolchainSettings');
+          window.mainPage.overlay.render('ProjectSettings');
         });
-      jQuery('#toolchainName').on('focus', function () {
+      jQuery('#projectName').on('focus', function () {
         // this refers to the DOM element
         this.value = this.textContent;
         // We patch on .value to the element to pretend it's
         // a real input (contenteditable stretches better)
       });
-      jQuery('#toolchainName').on('blur', function () {
+      jQuery('#projectName').on('blur', function () {
         if (this.value !== this.textContent) {
           this.value = this.textContent;
-          window.mainPage.toolchain.rename(this.textContent);
+          window.mainPage.project.rename(this.textContent);
         }
       });
       this.templateAdded = true;
@@ -148,39 +148,39 @@ and the visualizations in this toolchain`;
       jQuery('#helpButton').attr('src', newInfoIcon);
     }
 
-    if (window.mainPage.toolchain) {
-      // Render information about the toolchain
-      jQuery('#toolchainHeader, #toolchainIcons').show();
+    if (window.mainPage.project) {
+      // Render information about the project
+      jQuery('#projectHeader, #projectIcons').show();
 
-      let toolchainStatus = window.mainPage.toolchain.status;
-      if (toolchainStatus.location === null) {
-        jQuery('#toolchainLocationButton')
+      let projectStatus = window.mainPage.project.status;
+      if (projectStatus.location === null) {
+        jQuery('#projectLocationButton')
           .attr('src', loadingIcon);
       } else {
-        jQuery('#toolchainLocationButton')
-          .attr('src', ICONS[toolchainStatus.location]);
+        jQuery('#projectLocationButton')
+          .attr('src', ICONS[projectStatus.location]);
       }
 
-      jQuery('#toolchainName').text(window.mainPage.toolchain.get('name'));
+      jQuery('#projectName').text(window.mainPage.project.get('name'));
 
       // Set up all the widget icons
-      let widgetIcons = window.mainPage.toolchain.getAllWidgetSpecs();
+      let widgetIcons = window.mainPage.project.getAllWidgetSpecs();
 
       // Prepend and append the buttons for adding stuff
       // (TODO: *always* include these when multiple datasets /
       // multiple visualizations are supported)
-      if (window.mainPage.toolchain.getMeta('datasets').length === 0) {
+      if (window.mainPage.project.getMeta('datasets').length === 0) {
         widgetIcons.unshift({
           widgetType: 'AddDataset'
         });
       }
-      if (window.mainPage.toolchain.getMeta('visualizations').length === 0) {
+      if (window.mainPage.project.getMeta('visualizations').length === 0) {
         widgetIcons.push({
           widgetType: 'AddVisualization'
         })
       }
 
-      let widgetButtons = d3.select(this.el).select('#toolchainIcons')
+      let widgetButtons = d3.select(this.el).select('#projectIcons')
         .selectAll('img.headerButton').data(widgetIcons);
       widgetButtons.enter().append('img')
         .attr('class', (d) => {
@@ -199,9 +199,9 @@ and the visualizations in this toolchain`;
         }
       });
     } else {
-      // We're in an empty state with no toolchain loaded
+      // We're in an empty state with no project loaded
       // (an overlay should be showing, so don't sweat the toolbar)
-      jQuery('#toolchainHeader, #toolchainIcons').hide();
+      jQuery('#projectHeader, #projectIcons').hide();
     }
   }, 300),
   notifyLevelUp: function () {

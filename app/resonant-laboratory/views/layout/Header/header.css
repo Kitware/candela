@@ -50,17 +50,17 @@
   padding-right: 0.25em;
 }
 
-#Header #toolchainHeader {
+#Header #projectHeader {
   display: flex;
   align-items: center;
   padding-left: 0.25em;
 }
 
-#Header #toolchainHeader #toolchainIcons {
+#Header #projectHeader #projectIcons {
   display: inherit;
 }
 
-#Header #toolchainName {
+#Header #projectName {
   background-color: inherit;
   color: inherit;
   border: none;

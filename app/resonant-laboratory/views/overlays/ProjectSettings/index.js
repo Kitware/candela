@@ -1,6 +1,6 @@
 import Underscore from 'underscore';
 import Backbone from 'backbone';
-import ToolchainLibrary from '../ToolchainLibrary';
+import ProjectLibrary from '../ProjectLibrary';
 import myTemplate from './template.html';
 import canEditIcon from '../../../images/canEdit.svg';
 import cantEditIcon from '../../../images/cantEdit.svg';
@@ -20,35 +20,35 @@ let visibilityIcons = {
   PublicScratch: scratchIcon
 };
 let visibilityLabels = {
-  PublicUser: 'Others can see this toolchain',
-  PrivateUser: 'This toolchain is private',
-  PublicLibrary: 'This is a toolchain in our library of examples',
-  PublicScratch: 'Others can see and edit this toolchain'
+  PublicUser: 'Others can see this project',
+  PrivateUser: 'This project is private',
+  PublicLibrary: 'This is a project in our library of examples',
+  PublicScratch: 'Others can see and edit this project'
 };
 
 function toggleCallback() {
-  if (this.value === window.mainPage.toolchain.status.location) {
+  if (this.value === window.mainPage.project.status.location) {
     // Don't do anything if the user isn't actually changing
-    // the toolchain's location
+    // the project's location
     return;
   }
   /*
-    Toggle whether the toolchain is public or private
+    Toggle whether the project is public or private
     
-    If the user doesn't have write access to the toolchain
-    (e.g. it's a library toolchain or the user is logged out),
+    If the user doesn't have write access to the project
+    (e.g. it's a library project or the user is logged out),
     they can still make a copy as long a they have read access
     (there should be some problems even showing this view if
     they don't have read access).
     
     In all of the above scenarios, the togglePublic endpoint
     is smart enough to do the right thing (except we need to
-    give it a hint if the user is copying a library toolchain
+    give it a hint if the user is copying a library project
     directly to their public folder)
   */
   new Promise((resolve, reject) => {
     girder.restRequest({
-      path: 'item/' + window.mainPage.toolchain.getId() + '/togglePublic',
+      path: 'item/' + window.mainPage.project.getId() + '/togglePublic',
       type: 'POST',
       data: {
         makePublic: this.value === 'PublicUser'
@@ -56,36 +56,36 @@ function toggleCallback() {
       error: reject
     }).done(resolve).error(reject);
   }).then(() => {
-    window.mainPage.toolchain.updateStatus();
+    window.mainPage.project.updateStatus();
   }).catch((errorObj) => {
     window.mainPage.trigger('rra:error', errorObj);
   });
 }
 
-let ToolchainSettings = Backbone.View.extend({
+let ProjectSettings = Backbone.View.extend({
   initialize: function () {
-    this.listenTo(window.mainPage.toolchain, 'rra:changeStatus', this.render);
-    this.listenTo(window.mainPage, 'rra:changeToolchain', this.handleNewToolchain);
+    this.listenTo(window.mainPage.project, 'rra:changeStatus', this.render);
+    this.listenTo(window.mainPage, 'rra:changeProject', this.handleNewProject);
   },
-  handleNewToolchain: function () {
-    if (window.mainPage.toolchain) {
-      // Don't bother re-rendering this view until we have the new toolchain's
+  handleNewProject: function () {
+    if (window.mainPage.project) {
+      // Don't bother re-rendering this view until we have the new project's
       // updated status
-      this.listenTo(window.mainPage.toolchain, 'rra:changeStatus', this.render);
-      this.listenTo(window.mainPage.toolchain, 'rra:rename', this.render);
+      this.listenTo(window.mainPage.project, 'rra:changeStatus', this.render);
+      this.listenTo(window.mainPage.project, 'rra:rename', this.render);
     }
   },
   render: function () {
-    if (!window.mainPage.toolchain) {
+    if (!window.mainPage.project) {
       // Ignore spurious render calls (there should always
-      // be a toolchain to see this view)
+      // be a project to see this view)
       return;
     }
 
     if (!this.addedTemplate) {
       this.$el.html(myTemplate);
 
-      this.library = new ToolchainLibrary({
+      this.library = new ProjectLibrary({
         el: '#libraryChunk',
         keepOpenOnSelect: true
       });
@@ -96,11 +96,11 @@ let ToolchainSettings = Backbone.View.extend({
       });
 
       this.$el.find('#girderButton').on('click', () => {
-        window.mainPage.router.openToolchainInGirder();
+        window.mainPage.router.openProjectInGirder();
       });
 
       this.$el.find('#saveAsButton').on('click', () => {
-        window.mainPage.toolchain.makeCopy();
+        window.mainPage.project.makeCopy();
       });
 
       this.$el.find('a#loginLink').on('click', () => {
@@ -111,21 +111,21 @@ let ToolchainSettings = Backbone.View.extend({
         window.mainPage.overlay.render('RegisterView');
       });
 
-      this.$el.find('input[name="toolchainVisibility"]').off('click');
+      this.$el.find('input[name="projectVisibility"]').off('click');
 
       this.$el.find('#deleteButton').on('click', () => {
-        window.mainPage.toolchain.destroy()
+        window.mainPage.project.destroy()
           .then(() => {
-            window.mainPage.switchToolchain(null);
+            window.mainPage.switchProject(null);
           })
           .catch((errorObj) => {
             if (errorObj.statusText === 'Unauthorized') {
               if (window.mainPage.currentUser.isLoggedIn()) {
                 window.mainPage.overlay.renderErrorScreen('You don\'t ' +
-                  'have the necessary permissions to delete that toolchain.');
+                  'have the necessary permissions to delete that project.');
               } else {
                 window.mainPage.overlay.renderErrorScreen('Sorry, you can\'t ' +
-                  'delete toolchains unless you log in.');
+                  'delete projects unless you log in.');
               }
             } else {
               // Something else happened
@@ -135,7 +135,7 @@ let ToolchainSettings = Backbone.View.extend({
       });
 
       this.$el.find('#newButton').on('click', () => {
-        window.mainPage.newToolchain().then(() => {
+        window.mainPage.newProject().then(() => {
           window.mainPage.overlay.closeOverlay();
           window.mainPage.widgetPanels.closeWidgets();
         });
@@ -153,26 +153,26 @@ let ToolchainSettings = Backbone.View.extend({
     this.library.render();
 
     // Set up the settings part of the dialog
-    this.$el.find('#toolchainNameField')
-      .val(window.mainPage.toolchain.get('name'));
-    this.$el.find('#toolchainNameField').on('keyup',
+    this.$el.find('#projectNameField')
+      .val(window.mainPage.project.get('name'));
+    this.$el.find('#projectNameField').on('keyup',
       Underscore.debounce(function () {
         // this refers to the DOM element
-        window.mainPage.toolchain.rename(this.value);
+        window.mainPage.project.rename(this.value);
       }, 300));
 
-    let status = window.mainPage.toolchain.status;
+    let status = window.mainPage.project.status;
 
     if (status.editable) {
       this.$el.find('#editabilityIcon')
         .attr('src', canEditIcon);
       this.$el.find('#editabilityLabel')
-        .text('You can edit this toolchain');
+        .text('You can edit this project');
     } else {
       this.$el.find('#editabilityIcon')
         .attr('src', cantEditIcon);
       this.$el.find('#editabilityLabel')
-        .text('You can\'t edit this toolchain');
+        .text('You can\'t edit this project');
     }
 
     if (status.editable && window.mainPage.currentUser.isLoggedIn()) {
@@ -185,7 +185,7 @@ let ToolchainSettings = Backbone.View.extend({
       .attr('src', visibilityIcons[status.location]);
     this.$el.find('#visibilityLabel')
       .text(visibilityLabels[status.location]);
-    this.$el.find('input[name="toolchainVisibility"][value="' + status.location + '"]')
+    this.$el.find('input[name="projectVisibility"][value="' + status.location + '"]')
       .prop('checked', true);
     if (window.mainPage.currentUser.isLoggedIn()) {
       this.$el.find('#scratchVisibility, #libraryVisibility')
@@ -203,4 +203,4 @@ let ToolchainSettings = Backbone.View.extend({
   }
 });
 
-export default ToolchainSettings;
+export default ProjectSettings;

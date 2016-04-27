@@ -13,10 +13,10 @@ let HamburgerMenu = Backbone.View.extend({
     }
     
     // Main menu items
-    jQuery('#toolchainSettingsMenuItem > p')
-      .text(window.mainPage.toolchain.get('name') + ' settings...');
-    jQuery('#toolchainSettingsMenuItem').on('click', () => {
-      window.mainPage.overlay.render('ToolchainSettings');
+    jQuery('#projectSettingsMenuItem > p')
+      .text(window.mainPage.project.get('name') + ' settings...');
+    jQuery('#projectSettingsMenuItem').on('click', () => {
+      window.mainPage.overlay.render('ProjectSettings');
     });
     
     if (window.mainPage.currentUser.isLoggedIn()) {

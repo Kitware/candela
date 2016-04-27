@@ -50,54 +50,54 @@ you move or delete this item, your preferences will be lost.`,
   },
   addListeners: function () {
     this.listenTo(window.mainPage.currentUser, 'rra:login',
-      this.adoptScratchToolchains);
-    this.listenTo(window.mainPage, 'rra:createToolchain',
-      this.claimToolchain);
+      this.adoptScratchProjects);
+    this.listenTo(window.mainPage, 'rra:createProject',
+      this.claimProject);
   },
-  claimToolchain: function () {
+  claimProject: function () {
     if (!window.mainPage.currentUser.isLoggedIn()) {
-      // Because we created this toolchain while not logged in,
-      // store the toolchain's ID in window.localStorage so that we
+      // Because we created this project while not logged in,
+      // store the project's ID in window.localStorage so that we
       // can claim "ownership" when we log in / visit this page again
       // (of course, this is easy to hack, but that's the assumption
       // with public scratch space)
-      let scratchToolchains = window.localStorage.getItem('scratchToolchains');
-      if (!scratchToolchains) {
-        scratchToolchains = [];
+      let scratchProjects = window.localStorage.getItem('scratchProjects');
+      if (!scratchProjects) {
+        scratchProjects = [];
       } else {
-        scratchToolchains = JSON.parse(scratchToolchains);
+        scratchProjects = JSON.parse(scratchProjects);
       }
-      scratchToolchains.push(window.mainPage.toolchain.getId());
-      window.localStorage.setItem('scratchToolchains',
-        JSON.stringify(scratchToolchains));
+      scratchProjects.push(window.mainPage.project.getId());
+      window.localStorage.setItem('scratchProjects',
+        JSON.stringify(scratchProjects));
     }
   },
-  adoptScratchToolchains: function () {
+  adoptScratchProjects: function () {
     if (!window.mainPage.currentUser.isLoggedIn()) {
       return;
     }
-    // Attempt to adopt any toolchains that this browser
+    // Attempt to adopt any projects that this browser
     // created in the public scratch space into the
     // now-logged-in user's Private folder
 
-    let scratchToolchains = window.localStorage.getItem('scratchToolchains');
+    let scratchProjects = window.localStorage.getItem('scratchProjects');
 
-    if (scratchToolchains) {
+    if (scratchProjects) {
       new Promise((resolve, reject) => {
         girder.restRequest({
           path: 'item/adoptScratchItems',
           data: {
-            'ids': scratchToolchains // already JSON.stringified
+            'ids': scratchProjects // already JSON.stringified
           },
           error: reject,
           type: 'PUT'
         }).done(resolve).error(reject);
       }).then(successfulAdoptions => {
-        // Now we need to adopt any datasets that these toolchains refer to
+        // Now we need to adopt any datasets that these projects refer to
         let datasetIds = new Set();
-        successfulAdoptions.forEach(adoptedToolchain => {
-          if (adoptedToolchain.meta && adoptedToolchain.meta.datasets) {
-            adoptedToolchain.meta.datasets.forEach(datasetId => {
+        successfulAdoptions.forEach(adoptedProject => {
+          if (adoptedProject.meta && adoptedProject.meta.datasets) {
+            adoptedProject.meta.datasets.forEach(datasetId => {
               datasetIds.add(datasetId);
             });
           }
@@ -114,19 +114,19 @@ you move or delete this item, your preferences will be lost.`,
           });
         }).catch(() => {
           // For now, silently ignore failures to adopt datasets
-          window.localStorage.clear('scratchToolchains');
+          window.localStorage.clear('scratchProjects');
         }).then(() => {
           window.mainPage.currentUser.trigger('rra:updateLibrary');
           // In addition to changing the user's library, the current
-          // toolchain will (pretty much always) have just changed
+          // project will (pretty much always) have just changed
           // as well
-          if (window.mainPage.toolchain) {
-            window.mainPage.toolchain.updateStatus();
+          if (window.mainPage.project) {
+            window.mainPage.project.updateStatus();
           }
         });
       }).catch(() => {
-        // For now, silently ignore failures to adopt toolchains
-        window.localStorage.clear('scratchToolchains');
+        // For now, silently ignore failures to adopt projects
+        window.localStorage.clear('scratchProjects');
       });
     }
   },
@@ -164,7 +164,7 @@ you move or delete this item, your preferences will be lost.`,
     this.set(this.defaults());
     window.localStorage.removeItem('seenTips');
     window.localStorage.removeItem('achievements');
-    window.localStorage.removeItem('scratchToolchains');
+    window.localStorage.removeItem('scratchProjects');
   },
   levelUp: function (achievement) {
     let achievements = this.getMeta('achievements');

@@ -53,18 +53,18 @@ let VisualizationView = Widget.extend({
       }
     });
 
-    this.listenTo(window.mainPage, 'rra:changeToolchain',
-      this.handleNewToolchain);
-    this.handleNewToolchain();
+    this.listenTo(window.mainPage, 'rra:changeProject',
+      this.handleNewProject);
+    this.handleNewProject();
   },
-  handleNewToolchain: function () {
+  handleNewProject: function () {
     this.$el.html('');
     this.ok = null;
     this.vis = null;
 
-    this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations',
+    this.listenTo(window.mainPage.project, 'rra:changeVisualizations',
       this.render);
-    this.listenTo(window.mainPage.toolchain, 'rra:changeMatchings',
+    this.listenTo(window.mainPage.project, 'rra:changeMatchings',
       this.render);
   },
   renderInfoScreen: function () {
@@ -81,7 +81,7 @@ here</a> to choose one.`);
       window.mainPage.overlay.renderSuccessScreen(`
 The visualization appears to be functioning correctly.`);
     } else {
-      let meta = window.mainPage.toolchain.get('meta');
+      let meta = window.mainPage.project.get('meta');
 
       if (!meta || !meta.visualizations || !meta.visualizations[0]) {
         window.mainPage.overlay.renderUserErrorScreen(`
@@ -99,14 +99,14 @@ Corrupted visualization meta information.`);
       return;
     }
 
-    // Get the visualization in the toolchain (if there is one)
-    let spec = window.mainPage.toolchain.getMeta('visualizations');
+    // Get the visualization in the project (if there is one)
+    let spec = window.mainPage.project.getMeta('visualizations');
     if (spec) {
       // Use the first spec (TODO: support multiple visualizations)
       spec = spec[0];
 
       // Get the options for the vis
-      let options = window.mainPage.toolchain.getVisOptions();
+      let options = window.mainPage.project.getVisOptions();
 
       // Start with an initial empty dataset (gets populated
       // asynchronously)
@@ -137,14 +137,14 @@ Corrupted visualization meta information.`);
         this.vis.options = options;
       }
 
-      // Okay, now ask the toolchain if it has any new data for
+      // Okay, now ask the project if it has any new data for
       // us (changing the matchings, editing the data, or grabbing
       // a new dataset will invalidate the parsed cache).
       this.vis.component.render();
       this.ok = null;
       this.statusText.text = 'Loading...';
       this.renderIndicators();
-      window.mainPage.toolchain.shapeDataForVis().then(data => {
+      window.mainPage.project.shapeDataForVis().then(data => {
         this.vis.options.data = data;
 
         // TODO: how do we update the data for a component in

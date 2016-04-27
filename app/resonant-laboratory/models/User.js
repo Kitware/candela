@@ -53,7 +53,7 @@ let User = girder.models.UserModel.extend({
     this.authToken = undefined;
     this.preferences.resetToDefaults();
     if (wasLoggedIn) {
-      window.mainPage.switchToolchain(null)
+      window.mainPage.switchProject(null)
         .then(() => {
           this.trigger('rra:logout');
           // Girder uses g:login for both log in and log out

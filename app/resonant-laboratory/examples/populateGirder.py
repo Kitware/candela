@@ -3,7 +3,7 @@ import argparse, getpass
 import girder_client, os, json, sys
 
 parser = argparse.ArgumentParser(description='''Populate a girder
-    installation with example dataset and toolchain collections.
+    installation with example dataset and project collections.
     This script is idempotent, so running it multiple times won't
     result in duplicate files (though it may revert any changes
     that have been made to the elements that it originally added)''')

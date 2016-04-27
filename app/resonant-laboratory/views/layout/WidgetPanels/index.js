@@ -12,23 +12,23 @@ let WidgetPanels = Backbone.View.extend({
     this.widgetSpecs = [];
     this.widgets = {};
     this.expandedWidgets = new Set();
-    this.listenTo(window.mainPage, 'rra:changeToolchain',
-      this.handleNewToolchain);
+    this.listenTo(window.mainPage, 'rra:changeProject',
+      this.handleNewProject);
     this.widgetsChanged = true;
     this.listenTo(this, 'rra:updateWidgetSpecs', this.render);
   },
-  handleNewToolchain: function () {
-    if (window.mainPage.toolchain) {
-      this.listenTo(window.mainPage.toolchain, 'rra:changeDatasets',
+  handleNewProject: function () {
+    if (window.mainPage.project) {
+      this.listenTo(window.mainPage.project, 'rra:changeDatasets',
         this.updateWidgetSpecs);
-      this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations',
+      this.listenTo(window.mainPage.project, 'rra:changeVisualizations',
         this.updateWidgetSpecs);
     }
     this.updateWidgetSpecs();
   },
   updateWidgetSpecs: function () {
-    if (window.mainPage.toolchain) {
-      this.widgetSpecs = window.mainPage.toolchain.getAllWidgetSpecs();
+    if (window.mainPage.project) {
+      this.widgetSpecs = window.mainPage.project.getAllWidgetSpecs();
     } else {
       this.widgetSpecs = [];
     }

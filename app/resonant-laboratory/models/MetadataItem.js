@@ -188,7 +188,7 @@ let MetadataItem = girder.models.ItemModel.extend({
       }, options, (resp) => {
         // It's possible that the id changed
         // in the process (e.g. a copy of
-        // the toolchain was made
+        // the project was made
         // because the user is logged out)
         let swappedId = false;
         if (this.getId() !== resp[this.idAttribute]) {

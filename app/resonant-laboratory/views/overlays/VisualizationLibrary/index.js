@@ -43,19 +43,19 @@ let VisualizationLibrary = Backbone.View.extend({
 
     d3.select('div.libraryInterface').selectAll('.circleButton')
       .on('click', d => {
-        if (window.mainPage.toolchain) {
-          // We already have a toolchain loaded, so
+        if (window.mainPage.project) {
+          // We already have a project loaded, so
           // swap it in (TODO: load multiple visualizations?)
-          window.mainPage.toolchain.setVisualization(d);
+          window.mainPage.project.setVisualization(d);
           window.mainPage.widgetPanels.toggleWidget({
             hashName: 'VisualizationView0'
           }, true);
           window.mainPage.overlay.closeOverlay();
         } else {
-          if (d.meta && d.meta.exampleToolchainId) {
-            // TODO: Load the example toolchain that this
+          if (d.meta && d.meta.exampleProjectId) {
+            // TODO: Load the example project that this
             // visualization specifies
-            // window.mainPage.switchToolchain(d.meta.exampleToolchainId)
+            // window.mainPage.switchProject(d.meta.exampleProjectId)
             //  .then(() => {
             window.mainPage.widgetPanels.toggleWidget({
               hashName: 'VisualizationView0'
@@ -63,11 +63,11 @@ let VisualizationLibrary = Backbone.View.extend({
             window.mainPage.overlay.closeOverlay();
             // });
           } else {
-            // No default example toolchain has been
+            // No default example project has been
             // specified for this visualization; create an empty
-            // toolchain with this visualization
-            window.mainPage.newToolchain().then(() => {
-              window.mainPage.toolchain.setVisualization(d);
+            // project with this visualization
+            window.mainPage.newProject().then(() => {
+              window.mainPage.project.setVisualization(d);
               window.mainPage.widgetPanels.toggleWidget({
                 hashName: 'VisualizationView0'
               }, true);

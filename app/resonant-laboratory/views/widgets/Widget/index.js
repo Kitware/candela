@@ -53,10 +53,10 @@ let Widget = Backbone.View.extend({
     this.panel.renderIndicators();
   },
   canRender: function () {
-    // Don't render if there's no toolchain, or if our WidgetPanel
+    // Don't render if there's no project, or if our WidgetPanel
     // hasn't given us a legitimate element in the
     // document yet
-    return window.mainPage.toolchain &&
+    return window.mainPage.project &&
       document.getElementById(this.$el.attr('id')) === this.el;
   },
   getDefaultTips: function () {

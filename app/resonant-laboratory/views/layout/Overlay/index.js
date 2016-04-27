@@ -12,7 +12,7 @@ import AchievementLibrary from '../../overlays/AchievementLibrary';
 import StartingScreen from '../../overlays/StartingScreen';
 import DatasetLibrary from '../../overlays/DatasetLibrary';
 import VisualizationLibrary from '../../overlays/VisualizationLibrary';
-import ToolchainSettings from '../../overlays/ToolchainSettings';
+import ProjectSettings from '../../overlays/ProjectSettings';
 
 import reallyBadErrorTemplate from './reallyBadErrorTemplate.html';
 import errorTemplate from './errorTemplate.html';
@@ -26,7 +26,7 @@ let VIEWS = {
   ResetPasswordView: ResetPasswordView,
   RegisterView: RegisterView,
   AchievementLibrary: AchievementLibrary,
-  ToolchainSettings: ToolchainSettings,
+  ProjectSettings: ProjectSettings,
   StartingScreen: StartingScreen,
   DatasetLibrary: DatasetLibrary,
   VisualizationLibrary: VisualizationLibrary
@@ -39,14 +39,14 @@ let Overlay = Backbone.View.extend({
     this.template = undefined;
     this.view = null;
 
-    this.listenTo(window.mainPage, 'rra:changeToolchain',
-      this.handleChangeToolchain);
+    this.listenTo(window.mainPage, 'rra:changeProject',
+      this.handleChangeProject);
     this.listenTo(window.mainPage, 'rra:error',
       this.handleError);
   },
-  handleChangeToolchain: function () {
-    if (window.mainPage.toolchain === null) {
-      // No toolchain is loaded; show the StartingScreen
+  handleChangeProject: function () {
+    if (window.mainPage.project === null) {
+      // No project is loaded; show the StartingScreen
       this.render('StartingScreen');
     }
     // Otherwise, we just stay as we are (either no
@@ -103,9 +103,9 @@ let Overlay = Backbone.View.extend({
     this.render(this.getScreen(successTemplate, message));
   },
   closeOverlay: function () {
-    // If we don't have a toolchain, jump straight to the
+    // If we don't have a project, jump straight to the
     // opening overlay (don't actually close)
-    if (window.mainPage.toolchain) {
+    if (window.mainPage.project) {
       window.mainPage.overlay.render(null);
     } else {
       window.mainPage.overlay.render('StartingScreen');
@@ -209,7 +209,7 @@ let Overlay = Backbone.View.extend({
         } else {
           // If it doesn't, that means this is an
           // overlay where the user needs to do
-          // something special (e.g. load a toolchain)
+          // something special (e.g. load a project)
           // in order to dismiss it
           this.removeCloseListeners();
         }

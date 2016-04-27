@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 
 import Router from './Router';
 import User from './models/User';
-import Toolchain from './models/Toolchain';
+import Project from './models/Project';
 
 import Header from './views/layout/Header';
 import WidgetPanels from './views/layout/WidgetPanels';
@@ -27,12 +27,12 @@ let MainPage = Backbone.View.extend({
     this.currentUser = new User();
 
     this.listenTo(this.currentUser, 'rra:logout', () => {
-      this.switchToolchain(null);
+      this.switchProject(null);
     });
 
-    // Start no datasets and no toolchain
+    // Start no datasets and no project
     this.loadedDatasets = {};
-    this.toolchain = null;
+    this.project = null;
 
     // Respond to resize events
     window.onresize = () => {
@@ -70,33 +70,33 @@ let MainPage = Backbone.View.extend({
     this.overlay.render();
     this.helpLayer.render();
   },
-  newToolchain: function () {
-    this.toolchain = new Toolchain();
-    return this.toolchain.save()
+  newProject: function () {
+    this.project = new Project();
+    return this.project.save()
       .then(() => {
-        this.trigger('rra:createToolchain');
-        this.trigger('rra:changeToolchain');
-        this.toolchain.updateStatus();
+        this.trigger('rra:createProject');
+        this.trigger('rra:changeProject');
+        this.project.updateStatus();
       }).catch((err) => {
-        this.switchToolchain(null);
+        this.switchProject(null);
         this.trigger('rra:error', err);
       });
   },
-  switchToolchain: function (id) {
+  switchProject: function (id) {
     if (id === null) {
-      this.toolchain = null;
-      this.trigger('rra:changeToolchain');
+      this.project = null;
+      this.trigger('rra:changeProject');
       return new Promise(() => {});
     } else {
-      this.toolchain = new Toolchain({
+      this.project = new Project({
         _id: id
       });
       
-      return this.toolchain.fetch().then(() => {
-        this.trigger('rra:changeToolchain');
-        this.toolchain.updateStatus();
+      return this.project.fetch().then(() => {
+        this.trigger('rra:changeProject');
+        this.project.updateStatus();
       }).catch((err) => {
-        this.switchToolchain(null);
+        this.switchProject(null);
         this.trigger('rra:error', err);
       });
     }

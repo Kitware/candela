@@ -7,22 +7,22 @@ import {
 from '../shims/SetOps.js';
 let girder = window.girder;
 /*
-    A Toolchain represents a user's saved session;
+    A Project represents a user's saved session;
     it includes specific dataset IDs, with specific
     matchings to specific visualizations (in the future,
     this may also include faceting settings, etc).
 
     Though behind the scenes we're making room for multiple
     datasets and multiple visualizations,
-    for now, toolchains are expected to only contain one
+    for now, projects are expected to only contain one
     dataset and one visualization. Any more are ignored
     by the currently implemented views.
 */
 
-let Toolchain = MetadataItem.extend({
+let Project = MetadataItem.extend({
   defaults: function () {
     return {
-      name: 'Untitled Toolchain',
+      name: 'Untitled Project',
       meta: {
         datasets: [],
         matchings: [],
@@ -47,7 +47,7 @@ let Toolchain = MetadataItem.extend({
   updateStatus: Underscore.debounce(function (copyOnError) {
     let id = this.getId();
 
-    // Look up where the toolchain lives,
+    // Look up where the project lives,
     // and whether the user can edit it
 
     if (id === undefined) {
@@ -59,11 +59,11 @@ let Toolchain = MetadataItem.extend({
           location: null
         };
         this.trigger('rra:changeStatus');
-        return Promise.reject(new Error('Toolchain has no ID'));
+        return Promise.reject(new Error('Project has no ID'));
       }
     }
 
-    // Load up any datasets that the toolchain references
+    // Load up any datasets that the project references
     let datasetPromises = [];
 
     this.getMeta('datasets').forEach(datasetId => {
@@ -80,7 +80,7 @@ let Toolchain = MetadataItem.extend({
     }).then(respObjects => {
       if (!respObjects) {
         window.mainPage.trigger('rra:error',
-          new Error('Could not access this toolchain\'s dataset(s)'));
+          new Error('Could not access this project\'s dataset(s)'));
       } else {
         respObjects.forEach(resp => {
           let newDataset = new Dataset(resp);
@@ -91,7 +91,7 @@ let Toolchain = MetadataItem.extend({
       this.trigger('rra:changeDatasets');
     });
 
-    // Get access information about this toolchain
+    // Get access information about this project
     let statusPromise = new Promise((resolve, reject) => {
       girder.restRequest({
         path: 'item/' + id + '/info',
@@ -117,24 +117,24 @@ let Toolchain = MetadataItem.extend({
   makeCopy: function () {
     /*
     When something weird happens (e.g. the user is
-    trying to edit a toolchain that they don't have write
-    access to, or the toolchain is in an unexpected location),
+    trying to edit a project that they don't have write
+    access to, or the project is in an unexpected location),
     we want to make sure that the user's actions are still
     always saved. This function copies the current state of
-    the toolchain to either the user's Private directory, or
+    the project to either the user's Private directory, or
     to the public scratch space if the user is logged out
     */
     let _fail = function (err) {
       // If we can't even save a copy, something
       // is seriously wrong.
-      window.mainPage.switchToolchain(null);
+      window.mainPage.switchProject(null);
       window.mainPage.trigger('rra:error', err);
     }
 
     this.unset('_id');
     return this.create()
       .then(() => {
-        window.mainPage.trigger('rra:createToolchain');
+        window.mainPage.trigger('rra:createProject');
         this.updateStatus();
       }).catch(_fail);
   },
@@ -296,7 +296,7 @@ let Toolchain = MetadataItem.extend({
 
     // Go through all the matchings and make sure that:
     // 1. The referenced dataset and visualization
-    //    are still in this toolchain
+    //    are still in this project
     // 2. The dataset and visualization still have
     //    the named attribute
     // 3. The data types are still compatible
@@ -391,7 +391,7 @@ let Toolchain = MetadataItem.extend({
   },
   getAllWidgetSpecs: function () {
     // Construct a list of all the widgets that
-    // this toolchain needs
+    // this project needs
     let meta = this.getMeta();
     let result = [];
 
@@ -424,4 +424,4 @@ let Toolchain = MetadataItem.extend({
   }
 });
 
-export default Toolchain;
+export default Project;

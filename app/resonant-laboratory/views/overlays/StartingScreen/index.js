@@ -1,5 +1,5 @@
 import Backbone from 'backbone';
-import ToolchainLibrary from '../ToolchainLibrary';
+import ProjectLibrary from '../ProjectLibrary';
 import myTemplate from './template.html';
 
 let StartingScreen = Backbone.View.extend({
@@ -12,19 +12,19 @@ let StartingScreen = Backbone.View.extend({
       this.$el.html(myTemplate);
 
       this.$el.find('#startWithVisButton').on('click', () => {
-        // TODO: load the stock library toolchain
+        // TODO: load the stock library project
         // from the vis library instead of the vis itthis
         window.mainPage.overlay.render('VisualizationLibrary');
       });
 
       this.$el.find('#startWithDataButton').on('click', () => {
-        // TODO: load the stock library toolchain
+        // TODO: load the stock library project
         // from the dataset library instead of the dataset itthis
         window.mainPage.overlay.render('DatasetLibrary');
       });
 
-      this.$el.find('#emptyToolchainButton').on('click', () => {
-        window.mainPage.newToolchain()
+      this.$el.find('#emptyProjectButton').on('click', () => {
+        window.mainPage.newProject()
           .then(() => {
             window.mainPage.overlay.closeOverlay();
             window.mainPage.widgetPanels.closeWidgets();
@@ -43,7 +43,7 @@ let StartingScreen = Backbone.View.extend({
         window.mainPage.currentUser.authenticate(false);
       });
 
-      this.library = new ToolchainLibrary({
+      this.library = new ProjectLibrary({
         el: '#libraryChunk',
         keepOpenOnSelect: false
       });

@@ -4,8 +4,8 @@ import 'jquery-deparam';
 
 var Router = Backbone.Router.extend({
   routes: {
-    'toolchain/:toolchain/:params': 'handleRoute',
-    'toolchain/:toolchain': 'handleRoute',
+    'project/:project/:params': 'handleRoute',
+    'project/:project': 'handleRoute',
     '': 'emptyRoute',
     '*notFound': 'defaultRoute'
   },
@@ -40,10 +40,10 @@ var Router = Backbone.Router.extend({
     if (!this.initialRoute) {
       // This is the first url we've come to;
       // because we have nothing better to go
-      // on, we'll start with no toolchain and
+      // on, we'll start with no project and
       // no widget
       this.initialRoute = {
-        toolchainId: null,
+        projectId: null,
         params: {
           widgets: new Set()
         }
@@ -67,40 +67,40 @@ var Router = Backbone.Router.extend({
     // like Github's this-is-not-the-page-you-were-
     // looking-for 404 screen
   },
-  handleRoute: function (toolchainId, params) {
+  handleRoute: function (projectId, params) {
     if (!this.initialRoute) {
       // Store the preferred route; our first time through,
-      // there won't be a toolchain or widgetPanels to work with
+      // there won't be a project or widgetPanels to work with
       this.initialRoute = {
-        toolchainId: toolchainId,
+        projectId: projectId,
         params: params
       };
     } else if (window.mainPage) {
       // We've actually navigated
-      let currentId = window.mainPage.toolchain ? window.mainPage.toolchain.getId() : null;
+      let currentId = window.mainPage.project ? window.mainPage.project.getId() : null;
       let currentWidgets = window.mainPage.widgetPanels ? window.mainPage.widgetPanels.expandedWidgets : new Set();
 
-      let changedToolchain = toolchainId !== currentId;
+      let changedProject = projectId !== currentId;
       let changedWidgets = SetOps.symmetric_difference(
         params.widgets, currentWidgets).size > 0;
 
-      if (changedToolchain && changedWidgets) {
-        // We've been given a specific toolchain URL, and we're also
+      if (changedProject && changedWidgets) {
+        // We've been given a specific project URL, and we're also
         // overriding whatever widgets it saved last time it was open
-        window.mainPage.switchToolchain(toolchainId)
+        window.mainPage.switchProject(projectId)
           .then(() => {
             window.mainPage.widgetPanels.setWidgets(params.widgets);
             window.mainPage.overlay.closeOverlay();
           });
-      } else if (changedToolchain) {
+      } else if (changedProject) {
         // The user didn't change the widgets that were
-        // open. As we're switching to a new toolchain,
-        // use whatever widgets that toolchain had open
+        // open. As we're switching to a new project,
+        // use whatever widgets that project had open
         // the last time it was saved
-        window.mainPage.switchToolchain(toolchainId)
+        window.mainPage.switchProject(projectId)
           .then(() => {
             window.mainPage.widgetPanels.setWidgets(
-              window.mainPage.toolchain.getMeta('preferredWidgets'));
+              window.mainPage.project.getMeta('preferredWidgets'));
             window.mainPage.overlay.closeOverlay();
           });
       } else if (changedWidgets) {
@@ -113,12 +113,12 @@ var Router = Backbone.Router.extend({
   applyInitialRoute: function () {
     // We wait to apply the initial route until
     // after the whole DOM has been set up
-    window.mainPage.switchToolchain(this.initialRoute.toolchainId)
+    window.mainPage.switchProject(this.initialRoute.projectId)
       .then(() => {
         window.mainPage.widgetPanels.setWidgets(this.initialRoute
           .params.widgets);
-        if (this.initialRoute.toolchainId) {
-          // The user specified which toolchain they want in
+        if (this.initialRoute.projectId) {
+          // The user specified which project they want in
           // the URL, so don't bother them with a dialog asking
           // them to pick one
           window.mainPage.overlay.closeOverlay();
@@ -127,12 +127,12 @@ var Router = Backbone.Router.extend({
   },
   addListeners: function () {
     // Listen to events that signal that the url needs to be updated
-    this.listenTo(window.mainPage, 'rra:changeToolchain', this.updateUrl);
+    this.listenTo(window.mainPage, 'rra:changeProject', this.updateUrl);
     this.listenTo(window.mainPage.widgetPanels,
       'rra:navigateWidgets', this.updateUrl);
   },
-  constructFragment: function (toolchainId, widgets) {
-    let fragment = 'toolchain/' + toolchainId;
+  constructFragment: function (projectId, widgets) {
+    let fragment = 'project/' + projectId;
     if (widgets.size > 0) {
       fragment += '/' + encodeURIComponent(JSON.stringify({
         widgets: [...widgets]
@@ -142,29 +142,29 @@ var Router = Backbone.Router.extend({
   },
   updateUrl: function () {
     if (!window.mainPage ||
-      window.mainPage.toolchain === undefined ||
+      window.mainPage.project === undefined ||
       !window.mainPage.widgetPanels) {
       // We haven't actually set up our
       // important pieces yet, so don't
       // mess with the URL
       return;
     }
-    if (window.mainPage.toolchain === null) {
-      // There is no toolchain loaded, so clear the URL
+    if (window.mainPage.project === null) {
+      // There is no project loaded, so clear the URL
       this.navigate('', {
         trigger: true
       });
       return;
     } else {
-      let toolchainId = window.mainPage.toolchain.getId();
+      let projectId = window.mainPage.project.getId();
       let widgets = window.mainPage.widgetPanels.expandedWidgets;
-      this.navigate(this.constructFragment(toolchainId, widgets), {
+      this.navigate(this.constructFragment(projectId, widgets), {
         trigger: true
       });
     }
   },
-  openToolchainInGirder: function () {
-    let url = 'girder#folder/' + window.mainPage.toolchain.get('folderId');
+  openProjectInGirder: function () {
+    let url = 'girder#folder/' + window.mainPage.project.get('folderId');
     window.open(url, '_blank');
   },
   openUserDirectoriesInGirder: function () {
