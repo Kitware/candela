@@ -8,202 +8,146 @@
     <script type="text/javascript">
     window.onload = function () {
         // Pass query param 'omitAggTrends' to test without 'agg_trends' key.
-        var appSettings = {
+        var betaGroundTruthSettings = {
             el: '.dash-container',
-            name: 'Beta Ground Truth Pre-Approved',
+            name: 'Beta Ground Truth Pre-Approved With a very long name',
             day: '2014-06-03',
-            branch: 'master',
+            branch: 'feature/incredibly-complex-and-precise-branch-name-master',
             warning: 0.4,
             fail: 0.7,
             max: 1.0,
             metric_name: 'RMSE euclids distance',
             aggregate_metric_name: '52nd percentile RMSE',
             agg_trends: {
-              'ALGA': [0.4, 0.5, 0.6, 0.8, 1.2, 0.55, 0.2],
-              'ALGASBR': [0.4, 0.6, 0.6, 0.8, 1.2, 4, 5],
-              'ALGC': [0.1, 0.1, 0.2, 0.3, 1.5, 1.55, 0.2],
-              'ALGD-ONLINE': [0.4, 0.5, 0.6, 0.8, 2.2, 3.1415, 0.2],
-              'ALGD-OFFLINE': [0.4, 0.45, 0.52, 0.74, 2.4, 2.7, 0.1]
+              'ALGA': [0.4, 0.5, 0.6, 0.8, 1.2, 0.55, 0.5],
+              'ALGASBR': [0.4, 0.6, 0.6, 0.8, 1.2, 4, 0.3],
+              'ALGC': [0.1, 0.1, 0.2, 0.3, 1.5, 1.55, 5],
+              'ALGD-ONLINE': [0.4, 0.5, 0.6, 0.8, 2.2, 3.1415, 0.18],
+              'ALGD-OFFLINE': [0.4, 0.45, 0.52, 0.74, 2.4, 2.7, 0.25]
             },
-            totalDatasets: 15,
-            totalDistance: 1243,
             trendValuesByDataset: [{
               dataset: 'dataset0.jpg',
               trend: 'ALGA RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
-              current: 5,
-              target: 7,
+              current: 0.1,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset0.jpg',
               trend: 'ALGC RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 5,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset0.jpg',
               trend: 'ALGASBR RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 0.3,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset0.jpg',
               trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 0.25,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset0.jpg',
               trend: 'ALGD-ONLINE RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 0.15,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset1',
               trend: 'ALGA RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
-              current: 5,
-              target: 7,
-              warning: 10,
-              fail: 25,
-              max: 50
-            }, {
-              dataset: 'dataset1',
-              trend: 'ALGC RMSE Euclidean Distance',
-              length: 300,
-              mean: 15,
-              current: 14,
-              target: 7,
-              warning: 10,
-              fail: 25,
-              max: 50
-            }, {
-              dataset: 'dataset1',
-              trend: 'ALGASBR RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 0.2,
-              target: 7,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset1',
+              trend: 'ALGC RMSE Euclidean Distance',
+              current: 14,
+              warning: 10,
+              fail: 25,
+              max: 50
+            }, {
+              dataset: 'dataset1',
+              trend: 'ALGASBR RMSE Euclidean Distance',
+              current: 0.2,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset1',
               trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 0.10,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset1',
               trend: 'ALGD-ONLINE RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 0.12,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset2',
               trend: 'ALGA RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
-              current: 5,
-              target: 7,
+              current: 0.5,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset2',
               trend: 'ALGC RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 5,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset2',
               trend: 'ALGASBR RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 0.3,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset2',
               trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 0.22,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset2',
               trend: 'ALGD-ONLINE RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 0.18,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset3',
               trend: 'ALGA RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
-              current: 28,
-              target: 7,
+              current: 0.8,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset3',
               trend: 'ALGC RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 5,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 50
             }, {
               dataset: 'dataset3',
               trend: 'ALGASBR RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 0.3,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 27,
@@ -211,21 +155,15 @@
             }, {
               dataset: 'dataset3',
               trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
-              current: 25,
-              target: 7,
+              current: 27,
               warning: 10,
               fail: 25,
-              max: 25,
+              max: 50,
               callback: function () { console.log('dataset3-algd-offline'); }
             }, {
               dataset: 'dataset3',
               trend: 'ALGD-ONLINE RMSE Euclidean Distance',
-              length: 300,
-              mean: 11,
               current: 21,
-              target: 7,
               warning: 10,
               fail: 25,
               max: 27,
@@ -259,10 +197,106 @@
               name: 'ALGD-ONLINE RMSE Euclidean Distance',
               abbreviation: 'ALGD-ONLINE'
             }]
+        };
+
+        var imageProcessingSettings = {
+            el: '.dash-container',
+            name: 'Image Processing',
+            day: '2014-06-03',
+            branch: 'master',
+            warning: 0.75,
+            fail: 0.5,
+            max: 1.0,
+            metric_name: 'ROC value',
+            agg_trends: {
+              'KEYPOINT-MATCHING Precision': [0.4, 0.5, 0.6, 0.8, 0.6, 0.75, 0.85],
+              'KEYPOINT-MATCHING Recall': [0.8, 0.8, 0.76, 0.89, 0.6, 0.92, 0.85],
+              'RANSAC Precision': [0.8, 0.75, 0.64, 0.28, 0.69, 0.87, 0.5],
+              'RANSAC Recall': [0.7, 0.7, 0.86, 0.92, 0.7, 0.72, 0.35],
+            },
+            trendValuesByDataset: [{
+              dataset: 'dataset0',
+              trend: 'KEYPOINT-MATCHING Precision',
+              current: 0.75,
+              warning: 0.75,
+              fail: 0.5,
+              max: 1,
+            }, {
+              dataset: 'dataset0',
+              trend: 'KEYPOINT-MATCHING Recall',
+              current: 0.5,
+              warning: 0.75,
+              fail: 0.5,
+              max: 1,
+            }, {
+              dataset: 'dataset0',
+              trend: 'RANSAC Precision',
+              current: 0.3,
+              warning: 0.75,
+              fail: 0.5,
+              max: 1,
+            }, {
+              dataset: 'dataset0',
+              trend: 'RANSAC Recall',
+              current: 0.25,
+              warning: 0.75,
+              fail: 0.5,
+              max: 1,
+            }, {
+              dataset: 'dataset1',
+              trend: 'KEYPOINT-MATCHING Precision',
+              current: 0.85,
+              warning: 0.75,
+              fail: 0.5,
+              max: 1,
+            }, {
+              dataset: 'dataset1',
+              trend: 'KEYPOINT-MATCHING Recall',
+              current: 0.85,
+              warning: 0.75,
+              fail: 0.5,
+              max: 1,
+            }, {
+              dataset: 'dataset1',
+              trend: 'RANSAC Precision',
+              current: 0.5,
+              warning: 0.75,
+              fail: 0.5,
+              max: 1,
+            }, {
+              dataset: 'dataset1',
+              trend: 'RANSAC Recall',
+              current: 0.35,
+              warning: 0.75,
+              fail: 0.5,
+              max: 1,
+            }],
+            trends: [{
+              name: 'KEYPOINT-MATCHING Precision',
+              abbreviation: 'Matching Precision'
+            }, {
+              name: 'KEYPOINT-MATCHING Recall',
+              abbreviation: 'Matching Recall'
+            }, {
+              name: 'RANSAC Precision',
+              abbreviation: 'RANSAC Precision'
+            }, {
+              name: 'RANSAC Recall',
+              abbreviation: 'RANSAC Recall'
+            }]
       };
+
+      // Ground truth dataset is default.
+      var appSettings = betaGroundTruthSettings;
       var qParams = location.search;
       if (qParams) {
           qParams = qParams.split('?')[1].split('&');
+          for (var i = 0; i < qParams.length; i++) {
+              if (qParams[i] === 'imageProcessing') {
+                  // Replace with imageProcessing dataset.
+                  var appSettings = imageProcessingSettings;
+              }
+          }
           for (var i = 0; i < qParams.length; i++) {
               if (qParams[i] === 'omitAggTrends') {
                   delete appSettings['agg_trends'];
