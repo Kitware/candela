@@ -129,7 +129,7 @@ let ToolchainLibrary = Backbone.View.extend({
         return false;
       }
       return d.attributes.meta.datasets &&
-        d.attributes.meta.mappings &&
+        d.attributes.meta.matchings &&
         d.attributes.meta.visualizations;
     });
 

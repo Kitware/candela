@@ -6,19 +6,19 @@ import d3 from 'd3';
 // an ideal place for code splitting... only load
 // widgets as they're needed
 import DatasetView from '../../widgets/DatasetView';
-import MappingView from '../../widgets/MappingView';
+import MatchingView from '../../widgets/MatchingView';
 import VisualizationView from '../../widgets/VisualizationView';
 let WIDGETS = {
   DatasetView: DatasetView,
-  MappingView: MappingView,
+  MatchingView: MatchingView,
   VisualizationView: VisualizationView
 };
 import DatasetIcon from '../../../images/dataset.svg';
-import MappingIcon from '../../../images/mapping.svg';
+import MatchingIcon from '../../../images/matching.svg';
 import VisualizationIcon from '../../../images/scatterplot.svg';
 let ICONS = {
   DatasetView: DatasetIcon,
-  MappingView: MappingIcon,
+  MatchingView: MatchingIcon,
   VisualizationView: VisualizationIcon
 };
 

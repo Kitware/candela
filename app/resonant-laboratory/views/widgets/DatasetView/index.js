@@ -75,7 +75,7 @@ let DatasetView = Widget.extend({
 
     this.listenTo(window.mainPage.toolchain, 'rra:changeDatasets',
       this.render);
-    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
+    this.listenTo(window.mainPage.toolchain, 'rra:changeMatchings',
       this.renderAttributeSettings);
   },
   renderInfoScreen: function () {

@@ -26,14 +26,14 @@ let STATUS = {
   NOTHING_TO_MAP: 4
 };
 
-function OutOfDateMappingError() {};
-OutOfDateMappingError.prototype = new Error();
+function OutOfDateMatchingError() {};
+OutOfDateMatchingError.prototype = new Error();
 
-let MappingView = Widget.extend({
+let MatchingView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
 
-    this.friendlyName = 'Mapping';
+    this.friendlyName = 'Matching';
     
     this.icons.splice(0, 0, {
       src: () => {
@@ -62,7 +62,7 @@ let MappingView = Widget.extend({
       },
       title: () => {
         if (this.status === STATUS.OK) {
-          return 'All the needed mappings have been specified';
+          return 'All the needed matchings have been specified';
         } else if (this.status === STATUS.DATASETS_NOT_LOADED ||
           this.status === STATUS.STALE_MAPPINGS) {
           return 'Loading...';
@@ -87,7 +87,7 @@ let MappingView = Widget.extend({
     this.$el.html('');
     this.status = STATUS.NOTHING_TO_MAP;
 
-    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings', () => {
+    this.listenTo(window.mainPage.toolchain, 'rra:changeMatchings', () => {
       this.selection = null;
       this.render();
     });
@@ -110,7 +110,7 @@ order to display anything.`);
 Still accessing this toolchain's datasets...`);
     } else if (this.status === STATUS.STALE_MAPPINGS) {
       window.mainPage.overlay.renderLoadingScreen(`
-Still accessing this toolchain's mapping settings...`);
+Still accessing this toolchain's matching settings...`);
     } else if (this.status === STATUS.NOTHING_TO_MAP) {
       window.mainPage.overlay.renderUserErrorScreen(`
 You need to choose both a Dataset and a Visualization
@@ -219,9 +219,9 @@ in order to connect them together.`);
       };
       if (newEdge.source === undefined ||
         newEdge.target === undefined) {
-        // We're constructing a mapping that's out of date!
+        // We're constructing a matching that's out of date!
         // Render nothing...
-        throw new OutOfDateMappingError();
+        throw new OutOfDateMatchingError();
       }
 
       newEdge.id = this.createEdgeId(newEdge);
@@ -288,9 +288,9 @@ in order to connect them together.`);
       });
 
       // Get the established edges
-      for (let mapping of meta.mappings) {
-        _createEdge(true, mapping.visIndex, mapping.visAttribute,
-          mapping.dataIndex, mapping.dataAttribute);
+      for (let matching of meta.matchings) {
+        _createEdge(true, matching.visIndex, matching.visAttribute,
+          matching.dataIndex, matching.dataAttribute);
       };
 
       // Add the potential and probable edges
@@ -316,10 +316,10 @@ in order to connect them together.`);
         nodes: nodes,
         edges: edges,
         nodeEdgeLookup: nodeEdgeLookup,
-        realEdgeCount: meta.mappings.length
+        realEdgeCount: meta.matchings.length
       };
     } catch (err) {
-      if (err instanceof OutOfDateMappingError) {
+      if (err instanceof OutOfDateMatchingError) {
         this.status = STATUS.STALE_MAPPINGS;
         return {
           nodes: [],
@@ -358,7 +358,7 @@ in order to connect them together.`);
         visNode = this.selection;
         dataNode = d;
       }
-      window.mainPage.toolchain.addMapping({
+      window.mainPage.toolchain.addMatching({
         visIndex: visNode.index,
         visAttribute: visNode.attrName,
         dataIndex: dataNode.index,
@@ -374,7 +374,7 @@ in order to connect them together.`);
         visNode = this.selection;
         dataNode = d;
       }
-      window.mainPage.toolchain.removeMapping({
+      window.mainPage.toolchain.removeMatching({
         visIndex: visNode.index,
         visAttribute: visNode.attrName,
         dataIndex: dataNode.index,
@@ -417,7 +417,7 @@ in order to connect them together.`);
     let numVis = lastVis ? 1 + lastVis - firstVis : 0;
 
     // Update our little indicator
-    // to describe the mapping
+    // to describe the matching
     this.statusText.text = graph.realEdgeCount + ' / ' + numVis;
     this.statusText.title = graph.realEdgeCount + ' of ' + numVis +
       ' visual channels have been mapped';
@@ -616,4 +616,4 @@ in order to connect them together.`);
   }, 300)
 });
 
-export default MappingView;
+export default MatchingView;

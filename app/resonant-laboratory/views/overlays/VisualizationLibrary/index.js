@@ -9,7 +9,7 @@ let VisualizationLibrary = Backbone.View.extend({
     this.$el.html(myTemplate);
 
     // For any candela vis that has a spec defined, extract
-    // field options for our mapping options.
+    // field options for our matching options.
     // TODO: We also need to extract data options - we currently
     // assume that there will be one table option called "data".
     let libraryVisSpecs = [];

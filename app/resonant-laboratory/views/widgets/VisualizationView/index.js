@@ -64,7 +64,7 @@ let VisualizationView = Widget.extend({
 
     this.listenTo(window.mainPage.toolchain, 'rra:changeVisualizations',
       this.render);
-    this.listenTo(window.mainPage.toolchain, 'rra:changeMappings',
+    this.listenTo(window.mainPage.toolchain, 'rra:changeMatchings',
       this.render);
   },
   renderInfoScreen: function () {
@@ -138,7 +138,7 @@ Corrupted visualization meta information.`);
       }
 
       // Okay, now ask the toolchain if it has any new data for
-      // us (changing the mappings, editing the data, or grabbing
+      // us (changing the matchings, editing the data, or grabbing
       // a new dataset will invalidate the parsed cache).
       this.vis.component.render();
       this.ok = null;

@@ -10,7 +10,7 @@ import infoIcon from '../../../images/info.svg';
 import newInfoIcon from '../../../images/newInfo.svg';
 
 import datasetIcon from '../../../images/dataset.svg';
-import mappingIcon from '../../../images/mapping.svg';
+import matchingIcon from '../../../images/matching.svg';
 import visualizationIcon from '../../../images/scatterplot.svg';
 
 import addDatasetIcon from '../../../images/addDataset.svg';
@@ -23,7 +23,7 @@ import scratchSpaceIcon from '../../../images/scratchSpace.svg';
 
 let ICONS = {
   'DatasetView': datasetIcon,
-  'MappingView': mappingIcon,
+  'MatchingView': matchingIcon,
   'VisualizationView': visualizationIcon,
   'AddDataset': addDatasetIcon,
   'AddVisualization': addVisualizationIcon,
@@ -90,7 +90,7 @@ to change its settings.`;
           'Click to see/change the datasets in this toolchain';
       }
       
-      tips['img.MappingView.headerButton'] = `
+      tips['img.MatchingView.headerButton'] = `
 Click to manage the connections between the datasets 
 and the visualizations in this toolchain`;
       
