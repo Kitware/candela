@@ -10,7 +10,6 @@ export let TrendPane = Backbone.View.extend({
   el: '.trend-pane',
 
   initialize: function (settings) {
-    this.metric_name = settings.metric_name || 'RMSE Euclidean Distance';
     this.bins = settings.bins || 10;
     this.trendAbbreviationMap = settings.trendAbbreviationMap;
     this.hists = this._calculateHistograms(settings.trendValuesByDataset);
@@ -79,7 +78,7 @@ export let TrendPane = Backbone.View.extend({
           .width(width)
           .height(height)
           .stacked(false);
-        chart.xAxis.axisLabel(this.metric_name + ' (bin center)');
+        chart.xAxis.axisLabel('Key metric values (bin center)');
         chart.xAxis.tickValues(this.xLabels);
         chart.yAxis.axisLabel('Number of Runs');
         chart.yAxis.tickFormat(d3.format('d'));
