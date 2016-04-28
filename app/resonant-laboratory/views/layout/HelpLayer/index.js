@@ -43,18 +43,18 @@ let HelpLayer = Backbone.View.extend({
     // by invoking the mainPage.helpLayer.renderTuner()
     // easter egg (change these values when you find
     // a good balance)
-    this.padding = 9;
+    this.padding = 5;
 
     this.avoidOverlaps = true;
-    this.linkDistance = 170;
+    // this.linkDistance = 250;
     this.alpha = 0.7;
     this.convergenceThreshold = 0.01;
-    this.defaultNodeSize = 20;
-    this.handleDisconnected = true;
+    // this.defaultNodeSize = 20;
+    this.handleDisconnected = false;
 
-    this.noConstraintIterations = 20;
-    this.structuralIterations = 15;
-    this.allConstraintIterations = 20;
+    this.noConstraintIterations = 50;
+    this.structuralIterations = 50;
+    this.allConstraintIterations = 50;
   },
   setTips: function (tips) {
     this.relevantTips = {};
@@ -65,7 +65,7 @@ let HelpLayer = Backbone.View.extend({
     Object.keys(tips).forEach(tipSelector => {
       // We use the selector and the message
       // to uniquely identify each tip.
-      let tipId = tipSelector + tips[tipSelector];
+      let tipId = tipSelector; // + tips[tipSelector];
       // Make the id a valid / nice mongo id
       tipId = tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
 
@@ -180,6 +180,8 @@ let HelpLayer = Backbone.View.extend({
           nodeType: 'border',
           x: 0,
           y: 0,
+          width: this.padding,
+          height: this.padding,
           fixed: true
         },
         {
@@ -187,6 +189,8 @@ let HelpLayer = Backbone.View.extend({
           nodeType: 'border',
           x: bounds.width,
           y: bounds.height,
+          width: this.padding,
+          height: this.padding,
           fixed: true
         }
       ];
@@ -200,10 +204,10 @@ let HelpLayer = Backbone.View.extend({
           tipId: tipId,
           nodeType: 'label',
           message: tip.message,
-          // Start each label between the center
-          // of the screen and its target
-          x: (tip.x + center.x) / 2,
-          y: (tip.y + center.y) / 2
+          // Start each label slightly toward the center
+          // of the screen relative to its target
+          x: Math.random() * bounds.width, // (3 * tip.x + center.x) / 4,
+          y: Math.random() * bounds.height // (3 * tip.y + center.y) / 4
         });
         // Target (not drawn) for the link
         nodes.push({
@@ -321,6 +325,10 @@ let HelpLayer = Backbone.View.extend({
           .attr('y', -d.height / 2)
           .attr('width', d.width)
           .attr('height', d.height);
+        
+        // Add in extra padding *outside* the rectangle
+        d.width += 2 * self.padding;
+        d.height += 2 * self.padding;
 
         // Now that we know the dimensions, we can add
         // appropriate constraints to keep the nodes on
@@ -330,28 +338,28 @@ let HelpLayer = Backbone.View.extend({
           type: 'separation',
           left: 1, // topLeft
           right: nodes.length - 2,
-          gap: d.width / 2
+          gap: d.width
         });
         constraints.push({
           axis: 'y',
           type: 'separation',
           left: 1, // topLeft
           right: nodes.length - 2,
-          gap: d.height / 2
+          gap: d.height
         });
         constraints.push({
           axis: 'x',
           type: 'separation',
           left: nodes.length - 2,
           right: 2, // bottomRight
-          gap: d.width / 2
+          gap: d.width
         });
         constraints.push({
           axis: 'y',
           type: 'separation',
           left: nodes.length - 2,
           right: 2, // bottomRight
-          gap: d.height / 2
+          gap: d.height
         });
       });
       
@@ -404,7 +412,16 @@ let HelpLayer = Backbone.View.extend({
     // as needed. To see this view, type
     // mainPage.helpLayer.renderTuner() on the console
     if (!this.addedTuner) {
-      d3.select('body').append('div').attr('id', 'tuner');
+      d3.select('body')
+        .append('div')
+        .attr('id', 'tuner')
+        .append('button')
+          .text('Run again')
+          .on('click', () => {
+            self.addedTemplate = false;
+            self.render();
+            self.renderTuner();
+          });
       this.addedTuner = true;
     }
 

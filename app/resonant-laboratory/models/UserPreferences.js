@@ -133,7 +133,7 @@ you move or delete this item, your preferences will be lost.`,
   hasSeenAllTips: function (tips) {
     let seenTips = this.getMeta('seenTips');
     for (let selector of Object.keys(tips)) {
-      let tipId = selector + tips[selector];
+      let tipId = selector; // + tips[selector];
       // Make the id a valid / nice mongo id
       tipId = tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
       if (seenTips[tipId] !== true) {

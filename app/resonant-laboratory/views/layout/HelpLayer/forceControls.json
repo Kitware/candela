@@ -6,7 +6,7 @@
   },
   {
     "option": "linkDistance",
-    "range": [10, 200],
+    "range": [10, 500],
     "step": 10,
     "colaParameter": true
   },

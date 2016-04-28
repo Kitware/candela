@@ -9,22 +9,30 @@
 }
 #HelpLayer .arrow {
   fill: none;
-  stroke-width: 2px;
 }
 #HelpLayer .tip rect {
-  fill: white;
+  opacity: 0.85;
+}
+#HelpLayer .old.tip rect {
+  fill: #ffffcc;
+}
+#HelpLayer .new.tip rect {
+  fill: #b3cde3;
 }
 #HelpLayer .old.arrow,
-#HelpLayer .old .rect {
-  stroke: rgba(255, 255, 255, 0.9);
+#HelpLayer .old.tip rect {
+  stroke-width: 2px;
+  stroke: #ffff33;
 }
 #HelpLayer .new.arrow,
-#HelpLayer .new .rect {
-  stroke: rgba(55, 126, 184, 0.9);
+#HelpLayer .new.tip rect {
+  stroke-width: 2px;
+  stroke: #377eb8;
 }
 #HelpLayer .clear.tip text {
   font-size: 2em;
   font-weight: 900;
+  fill: #ffff33;
 }
 #HelpLayer .clear.tip rect {
   fill: none;
