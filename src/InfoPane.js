@@ -13,14 +13,12 @@ export let InfoPane = Backbone.View.extend({
   el: '.info-pane',
 
   initialize: function (settings) {
-    this.percentile = settings.percentile || 50.0;
     this.name = settings.name || 'Ground Truth';
     this.branch = settings.branch || 'master';
     this.day = settings.day || this.getToday();
     this.warning = settings.warning || 3;
     this.fail = settings.fail || 4;
     this.max = settings.max || 5;
-    this.trendAbbreviationMap = settings.trendAbbreviationMap;
 
     this.numSuccess = 0;
     this.numBad = 0;
@@ -28,6 +26,7 @@ export let InfoPane = Backbone.View.extend({
     this.allValues = [];
     _.each(settings.trendValuesByDataset, _.bind(function (dataset) {
       this.allValues.push(dataset.current);
+      // TODO probably wrong for reveresed case.
       if (dataset.current >= dataset.fail) {
         this.numFail++;
       } else if (dataset.current >= dataset.warning) {
@@ -37,49 +36,7 @@ export let InfoPane = Backbone.View.extend({
       }
     }, this));
     this.ranDatasets = this.numSuccess + this.numBad + this.numFail;
-    this.agg_trends = settings.agg_trends || this._getAggTrends(settings);
-    this.aggTrendNames = Object.keys(this.agg_trends);
-    this.aggTrendIds = {};
-    _.each(this.aggTrendNames, function (name) {
-        this.aggTrendIds[name] = name.replace(' ', '_');
-    }, this);
-  },
-
-  _percentile: function (arr, p) {
-    if (arr.length === 0) return 0;
-    if (typeof p !== 'number') throw new TypeError('p must be a number');
-    if (p <= 0) return arr[0];
-    if (p >= 1) return arr[arr.length - 1];
-
-    let index = arr.length * p;
-    let lower = Math.floor(index);
-    let upper = lower + 1;
-    let weight = index % 1;
-
-    if (upper >= arr.length) return arr[lower];
-    return arr[lower] * (1 - weight) + arr[upper] * weight;
-  },
-
-  /**
-   * Aggregate metrics were not supplied, so we will create an
-   * aggregate trend from the existing trend data.
-   */
-  _getAggTrends: function (settings) {
-    const byTrend = _.groupBy(settings.trendValuesByDataset, 'trend');
-    const trends = _.keys(byTrend);
-    let aggTrends = {};
-    for (let i = 0; i < trends.length; ++i) {
-      let trend = trends[i];
-      let trendDisplayName = this.trendAbbreviationMap[trend] || trend;
-      aggTrends[trendDisplayName] = _.map(byTrend[trend], (value) => {
-        return value.current;
-      });
-      aggTrends[trendDisplayName] = _.sortBy(aggTrends[trendDisplayName], (num) => {
-        return num;
-      });
-      aggTrends[trendDisplayName] = [this._percentile(aggTrends[trendDisplayName], this.percentile / 100)];
-    }
-    return aggTrends;
+    this.aggTrends = settings.aggTrends;
   },
 
   getToday: function () {
@@ -100,6 +57,10 @@ export let InfoPane = Backbone.View.extend({
   },
 
   render: function () {
+      // Test if any of the aggregate trends have spark line historical data.
+      var sparklinesExist = (_.find(this.aggTrends, function (trend) {
+         return trend.history && trend.history.length > 1;
+      }, this)) !== undefined;
     this.$el.html(infoPane({
       name: this.name,
       branch: this.branch,
@@ -109,16 +70,14 @@ export let InfoPane = Backbone.View.extend({
       numBad: this.numBad,
       numFail: this.numFail,
       totalMedian: this.totalMedian,
-      aggTrendNames: this.aggTrendNames,
-      aggTrendIds: this.aggTrendIds,
-      aggTrends: this.agg_trends,
+      aggTrends: this.aggTrends,
+      sparklinesExist: sparklinesExist
     })).promise().done(_.bind(function () {
       this.aggBullets = {};
-      _.each(this.agg_trends, (value, key, list) => {
-        key = this.aggTrendIds[key];
+      _.each(this.aggTrends, (trend, key, list) => {
         nv.addGraph({
           generate: _.bind(function () {
-            let parent = $('#' + key + '-aggregate-sparkline');
+            let parent = $('#' + trend.id_selector + '-aggregate-sparkline');
             let width = parent.width();
             let height = parent.height();
             let chart = nv.models.sparklinePlus()
@@ -127,8 +86,8 @@ export let InfoPane = Backbone.View.extend({
               .width(width)
               .x(function (d, i) { return i; })
               .showLastValue(false);
-            d3.select('#' + key + '-aggregate-sparkline svg')
-              .datum(_.map(value, (curValue, index) => {
+            d3.select('#' + trend.id_selector + '-aggregate-sparkline svg')
+              .datum(_.map(trend.history, (curValue, index) => {
                 return {x: index, y: curValue};
               }))
               .call(chart);
@@ -136,12 +95,12 @@ export let InfoPane = Backbone.View.extend({
           }, this),
           callback: function (graph) {
             nv.utils.windowResize(function () {
-              let parent = $('#' + key + '-aggregate-sparkline');
+              let parent = $('#' + trend.id_selector + '-aggregate-sparkline');
               let width = parent.width();
               let height = parent.height();
               graph.width(width).height(height);
 
-              d3.select('#' + key + '-aggregate-sparkline svg')
+              d3.select('#' + trend.id_selector + '-aggregate-sparkline svg')
                 .attr('width', width)
                 .attr('height', height)
                 .transition().duration(0)
@@ -149,28 +108,26 @@ export let InfoPane = Backbone.View.extend({
             });
           }
         });
-        this.aggBullets[key] = new ErrorBulletWidget({
-          el: '#' + key + '-aggregate-bullet',
+        let current = trend.history[trend.history.length - 1];
+        this.aggBullets[trend.id_selector] = new ErrorBulletWidget({
+          el: '#' + trend.id_selector + '-aggregate-bullet',
           result: {
-            warning: this.warning,
-            fail: this.fail,
-            max: this.max,
-            current: Math.round(value[value.length - 1] * 10000) / 10000
-          }
+            current: Math.round(current * 10000) / 10000
+          },
+          trend: trend
         }).render();
-        let dotSelector = '#' + key + '-aggregate-dot';
-        let current = value[value.length - 1];
-        if (this.warning > this.fail) {
+        let dotSelector = '#' + trend.id_selector + '-aggregate-dot';
+        if (trend.warning > trend.fail) {
           // Lower values are better.
-          if (current < this.fail) {
+          if (current <= trend.fail) {
             $(dotSelector).attr('class', 'fail');
-          } else if (current < this.warning) {
+          } else if (current <= trend.warning) {
             $(dotSelector).attr('class', 'bad');
           }
         } else {
-          if (current > this.fail) {
+          if (current >= trend.fail) {
             $(dotSelector).attr('class', 'fail');
-          } else if (current > this.warning) {
+          } else if (current >= trend.warning) {
             $(dotSelector).attr('class', 'bad');
           }
         }

@@ -10,15 +10,19 @@ export let ErrorBulletWidget = Backbone.View.extend({
 
   initialize: function (settings) {
     this.result = settings.result;
+    this.trend = settings.trend;
     if (this.result === undefined) {
       console.error('No result passed to error bullet.');
+    }
+    if (this.trend === undefined) {
+      console.error('No trend passed to error bullet.');
     }
   },
 
   chartData: function () {
     return {
-      ranges: [this.result.warning, this.result.fail, this.result.max],
-      measures: [Math.round(Math.min(this.result.current, this.result.max) * 10000) / 10000]
+      ranges: [this.trend.warning, this.trend.fail, this.trend.max],
+      measures: [Math.round(Math.min(this.result.current, this.trend.max) * 10000) / 10000]
     };
   },
 
@@ -27,19 +31,19 @@ export let ErrorBulletWidget = Backbone.View.extend({
       generate: _.bind(function () {
         let chart = nv.models.bulletChart()
           .margin({top: 5, right: 20, bottom: 20, left: 25});
-        if (this.result.warning > this.result.fail) {
+        if (this.trend.warning > this.trend.fail) {
           // Lower values are better.
-          if (this.result.current < this.result.fail) {
+          if (this.result.current <= this.trend.fail) {
             chart.color(colors.fail);
-          } else if (this.result.current < this.result.warning) {
+          } else if (this.result.current <= this.trend.warning) {
             chart.color(colors.bad);
           } else {
             chart.color(colors.good);
           }
         } else {
-          if (this.result.current > this.result.fail) {
+          if (this.result.current >= this.trend.fail) {
             chart.color(colors.fail);
-          } else if (this.result.current > this.result.warning) {
+          } else if (this.result.current >= this.trend.warning) {
             chart.color(colors.bad);
           } else {
             chart.color(colors.good);

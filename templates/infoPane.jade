@@ -3,7 +3,7 @@ table.table.table-responsive.table-compact
     th(colspan="2")
       .agg-label-header
         | Aggregate Metric
-    if aggTrendNames.length >= 1 && aggTrends[aggTrendNames[0]].length > 1
+    if sparklinesExist
       th
         .agg-sparkline-header
           | Last 7 Days
@@ -11,21 +11,22 @@ table.table.table-responsive.table-compact
       .agg-bullet-header
         | Computed Value
   tbody
-  each aggTrendName in aggTrendNames
-    tr.info-section-chart(id="#{aggTrendIds[aggTrendName]}-aggregate-container")
+  each aggTrend in aggTrends
+    - var idSelector = aggTrend.id_selector
+    tr.info-section-chart(id="#{idSelector}-aggregate-container")
       td.agg-status-dot
         svg.statusDot
-            circle.none(id="#{aggTrendIds[aggTrendName]}-aggregate-dot" r="10", cx="10", cy="10")
+            circle.none(id="#{idSelector}-aggregate-dot" r="10", cx="10", cy="10")
       td
         .agg-label
-          | #{aggTrendName.toUpperCase()}
-      if aggTrendNames.length >= 1 && aggTrends[aggTrendNames[0]].length > 1
+          | #{aggTrend.display_name}
+      if sparklinesExist && aggTrend.history.length > 1
         td
-          .agg-sparkline(id="#{aggTrendIds[aggTrendName]}-aggregate-sparkline")
+          .agg-sparkline(id="#{idSelector}-aggregate-sparkline")
             svg
       td
         .agg-value
-          | #{Math.round(aggTrends[aggTrendName][aggTrends[aggTrendName].length-1] * 10000) / 10000}
+          | #{Math.round(aggTrend.history[aggTrend.history.length-1] * 10000) / 10000}
       td
-        .agg-bullet(id="#{aggTrendIds[aggTrendName]}-aggregate-bullet")
-          svg(id="#{aggTrendIds[aggTrendName]}-aggregate-bullet-svg")
+        .agg-bullet(id="#{idSelector}-aggregate-bullet")
+          svg(id="#{idSelector}-aggregate-bullet-svg")

@@ -11,7 +11,7 @@ export let TrendPane = Backbone.View.extend({
 
   initialize: function (settings) {
     this.bins = settings.bins || 10;
-    this.trendAbbreviationMap = settings.trendAbbreviationMap;
+    this.trendMap = settings.trendMap;
     this.hists = this._calculateHistograms(settings.trendValuesByDataset);
   },
 
@@ -29,7 +29,7 @@ export let TrendPane = Backbone.View.extend({
 
     const binWidth = (max - min) / bins;
     let hists = _.map(byTrend, (element, key) => {
-      let el = {trend: this.trendAbbreviationMap[key] || key};
+      let el = {trend: this.trendMap[key].display_name};
       el['values'] = _.countBy(_.map(element, (value) => {
         let res = Math.floor(value.current / binWidth);
         if (res > bins - 1) {

@@ -9,7 +9,7 @@ table.table.table-striped.table-hover.table-responsive.table-compact
     td Data Set
     each trend in trends
       td
-        abbr(title="#{trend.name}") #{trend.abbreviation}
+        abbr(title="#{trend.display_name}") #{trend.display_name}
   tbody
     each resultSet in resultsByDatasetId
       tr
@@ -24,8 +24,8 @@ table.table.table-striped.table-hover.table-responsive.table-compact
             .dataset-label(id="#{resultSet[0].id}-label")
               | #{datasetLabelMap[resultSet[0].id]}
         each trend in trends
-          td.bullet-container(id="#{resultSet[0].id}-#{trend.abbreviation.toLowerCase().replace(' ', '_')}")
+          td.bullet-container(id="#{resultSet[0].id}-#{trend.id_selector}")
             svg.statusDot
               circle.none(r="10", cx="10", cy="10")
-            .bullet(id="#{resultSet[0].id}-#{trend.abbreviation.toLowerCase().replace(' ', '_')}-bullet")
-              svg(id="#{resultSet[0].id}-#{trend.abbreviation.toLowerCase().replace(' ', '_')}-bullet-svg")
+            .bullet(id="#{resultSet[0].id}-#{trend.id_selector}-bullet")
+              svg(id="#{resultSet[0].id}-#{trend.id_selector}-bullet-svg")

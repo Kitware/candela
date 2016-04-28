@@ -11,11 +11,11 @@ export let ResultTablePane = Backbone.View.extend({
 
   initialize: function (settings) {
     this.results = settings.trendValuesByDataset;
-    this.trends = settings.trends || {};
+    this.trends = settings.trends;
+    this.trendMap = settings.trendMap;
     this.datasetMap = settings.datasetMap || {};
     this.trajectoryMap = settings.trajectoryMap || {};
     this.datasetLabelMap = settings.datasetLabelMap || {};
-    this.trendAbbreviationMap = settings.trendAbbreviationMap;
     this.producerLink = settings.producer_link || null;
     if (this.results === undefined) {
       return;
@@ -50,24 +50,24 @@ export let ResultTablePane = Backbone.View.extend({
       producerLink: this.producerLink
     })).promise().done(_.bind(function () {
       _.each(this.results, function (result) {
+        var trend = this.trendMap[result.trend];
         var resultDivSelector = '#' + result.id + '-' +
-          (this.trendAbbreviationMap[result.trend] || result.trend)
-          .toLowerCase().replace(' ', '_');
+          trend.id_selector;
         // change color of circle
-        if (result.warning > result.fail) {
+        if (trend.warning > trend.fail) {
           // Lower values are better.
-          if (result.current < result.fail) {
+          if (result.current <= trend.fail) {
             $(resultDivSelector + ' svg.statusDot').find('circle')
               .attr('class', 'fail');
-          } else if (result.current < result.warning) {
+          } else if (result.current <= trend.warning) {
             $(resultDivSelector + ' svg.statusDot').find('circle')
               .attr('class', 'bad');
           }
         } else {
-          if (result.current > result.fail) {
+          if (result.current >= trend.fail) {
             $(resultDivSelector + ' svg.statusDot').find('circle')
               .attr('class', 'fail');
-          } else if (result.current > result.warning) {
+          } else if (result.current >= trend.warning) {
             $(resultDivSelector + ' svg.statusDot').find('circle')
               .attr('class', 'bad');
           }
@@ -75,7 +75,8 @@ export let ResultTablePane = Backbone.View.extend({
         // render bullets
         let errorBullet = new ErrorBulletWidget({
           el: resultDivSelector + '-bullet',
-          result: result
+          result: result,
+          trend: trend
         });
         errorBullet.render();
 
