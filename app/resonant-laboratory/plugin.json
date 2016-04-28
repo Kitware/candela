@@ -1,6 +1,6 @@
 {
-  "name": "Resonant Laboratory App",
-  "description": "Resonant Laboratory App",
+  "name": "Resonant Laboratory",
+  "description": "Resonant Laboratory",
   "version": "0.1.0",
   "grunt": {
     "autobuild": false,

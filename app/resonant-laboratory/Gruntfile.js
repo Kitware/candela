@@ -8,7 +8,7 @@ module.exports = function (grunt) {
   // Fail if grunt is executed here.
   if (path.resolve(__dirname) === path.resolve(process.cwd())) {
     grunt.fail.fatal(
-      "To build Resonant Laboratory App, run grunt from Girder's root directory");
+      "To build Resonant Laboratory, run grunt from Girder's root directory");
   }
 
   var pluginPath = path.resolve(grunt.config.get('pluginDir'), 'resonant-laboratory');
