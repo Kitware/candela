@@ -39,11 +39,11 @@ Choose your own visualization adventure.
 
 2. Register an admin account at ([localhost:8080](http://localhost:8080))
 
-3. Go to Admin console -> Plugins to enable the Resonant Laboratory App plugin
+3. Go to Admin console -> Plugins to enable the Resonant Laboratory plugin
 
 4. Restart Girder
 
-The Resonant Laboratory App will replace the Girder interface at ([localhost:8080](http://localhost:8080))
+Resonant Laboratory will replace the Girder interface at ([localhost:8080](http://localhost:8080))
 (you can still access the girder interface at ([localhost:8080/girder](http://localhost:8080/girder)))
 
 5. Optionally, you can add an example library to the girder instance

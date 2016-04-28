@@ -11,12 +11,13 @@ div.accordion {
 
 div.accordion section {
   position: relative;
+  background-color: white;
   float: left;
   width: 2em;
   height: calc(100% - 1em);
   margin: 0.5em 0 0.5em 0.5em;
   overflow: hidden;
-  border-radius: 3px;
+  border-radius: 5px;
   -webkit-transition: all 1s ease;
   -moz-transition: all 1s ease;
   -ms-transition: all 1s ease;
@@ -39,6 +40,7 @@ div.accordion section .sectionHeader {
   width: calc(100vh - 4.5em);
   padding: 0 0.25em;
   height: 2em;
+  border-radius: 5px;
   top: 100%;
   left: 0;
   z-index: 1;

@@ -149,14 +149,31 @@ Corrupted visualization meta information.`);
 
         // TODO: how do we update the data for a component in
         // general?
+        let successfullyUpdated = false;
         if (this.vis.component.chart &&
           this.vis.component.chart.update) {
-          this.vis.component.chart.update(this.vis.options);
-        } else {
+          try {
+            this.vis.component.chart.update(this.vis.options);
+            successfullyUpdated = true;
+          } catch (errorObj) {
+            // TODO: warn the user that something is up?
+            // window.mainPage.trigger('rlab:error', errorObj);
+            console.warn('Could not update the visualization in place:',
+              errorObj);
+          }
+        }
+        if (!successfullyUpdated) {
           // Nuke the vis and start fresh
           this.$el.html(myTemplate);
-          this.vis.component = new candela.components[this.vis.spec.name](
-            '#' + this.spec.hashName + 'Container .visualization', options);
+          try {
+            this.vis.component = new candela.components[this.vis.spec.name](
+              '#' + this.spec.hashName + 'Container .visualization', options);
+          } catch (errorObj) {
+            // Problem rendering the vis...
+            this.$el.html(myTemplate);
+            this.ok = false;
+            window.mainPage.trigger('rlab:error', errorObj);
+          }
         }
         if (this.isTargeted()) {
           this.vis.component.render();
