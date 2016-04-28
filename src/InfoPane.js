@@ -6,6 +6,7 @@ import nv from 'nvd3';
 
 import { StatusBarWidget } from './StatusBarWidget';
 import { ErrorBulletWidget } from './ErrorBulletWidget';
+import { failValue, warningValue } from './utility.js';
 
 import infoPane from '../templates/infoPane';
 
@@ -24,19 +25,20 @@ export let InfoPane = Backbone.View.extend({
     this.numBad = 0;
     this.numFail = 0;
     this.allValues = [];
+    this.aggTrends = settings.aggTrends;
     _.each(settings.trendValuesByDataset, _.bind(function (dataset) {
       this.allValues.push(dataset.current);
-      // TODO probably wrong for reveresed case.
-      if (dataset.current >= dataset.fail) {
+      var failTrend = settings.trendMap[dataset.trend].fail;
+      var warningTrend = settings.trendMap[dataset.trend].warning;
+      if (failValue(dataset.current, warningTrend, failTrend)) {
         this.numFail++;
-      } else if (dataset.current >= dataset.warning) {
+      } else if (warningValue(dataset.current, warningTrend, failTrend)) {
         this.numBad++;
       } else {
         this.numSuccess++;
       }
     }, this));
     this.ranDatasets = this.numSuccess + this.numBad + this.numFail;
-    this.aggTrends = settings.aggTrends;
   },
 
   getToday: function () {
@@ -117,19 +119,10 @@ export let InfoPane = Backbone.View.extend({
           trend: trend
         }).render();
         let dotSelector = '#' + trend.id_selector + '-aggregate-dot';
-        if (trend.warning > trend.fail) {
-          // Lower values are better.
-          if (current <= trend.fail) {
+        if (failValue(current, trend.warning, trend.fail)) {
             $(dotSelector).attr('class', 'fail');
-          } else if (current <= trend.warning) {
+        } else if (warningValue(current, trend.warning, trend.fail)) {
             $(dotSelector).attr('class', 'bad');
-          }
-        } else {
-          if (current >= trend.fail) {
-            $(dotSelector).attr('class', 'fail');
-          } else if (current >= trend.warning) {
-            $(dotSelector).attr('class', 'bad');
-          }
         }
       }, this);
     }, this));

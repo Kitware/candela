@@ -3,6 +3,7 @@ import _ from 'underscore';
 import $ from 'jquery';
 
 import { ErrorBulletWidget } from './ErrorBulletWidget';
+import { failValue, warningValue } from './utility.js';
 
 import tablePane from '../templates/tablePane';
 
@@ -51,26 +52,14 @@ export let ResultTablePane = Backbone.View.extend({
     })).promise().done(_.bind(function () {
       _.each(this.results, function (result) {
         var trend = this.trendMap[result.trend];
-        var resultDivSelector = '#' + result.id + '-' +
-          trend.id_selector;
+        var resultDivSelector = '#' + result.id + '-' + trend.id_selector;
         // change color of circle
-        if (trend.warning > trend.fail) {
-          // Lower values are better.
-          if (result.current <= trend.fail) {
-            $(resultDivSelector + ' svg.statusDot').find('circle')
-              .attr('class', 'fail');
-          } else if (result.current <= trend.warning) {
-            $(resultDivSelector + ' svg.statusDot').find('circle')
-              .attr('class', 'bad');
-          }
-        } else {
-          if (result.current >= trend.fail) {
-            $(resultDivSelector + ' svg.statusDot').find('circle')
-              .attr('class', 'fail');
-          } else if (result.current >= trend.warning) {
-            $(resultDivSelector + ' svg.statusDot').find('circle')
-              .attr('class', 'bad');
-          }
+        if (failValue(result.current, trend.warning, trend.fail)) {
+          $(resultDivSelector + ' svg.statusDot').find('circle')
+            .attr('class', 'fail');
+        } else if (warningValue(result.current, trend.warning, trend.fail)) {
+          $(resultDivSelector + ' svg.statusDot').find('circle')
+            .attr('class', 'bad');
         }
         // render bullets
         let errorBullet = new ErrorBulletWidget({

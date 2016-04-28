@@ -5,6 +5,7 @@ import nv from 'nvd3';
 import $ from 'jquery';
 
 import colors from './colors.js';
+import { failValue, warningValue } from './utility.js';
 
 export let ErrorBulletWidget = Backbone.View.extend({
 
@@ -31,23 +32,12 @@ export let ErrorBulletWidget = Backbone.View.extend({
       generate: _.bind(function () {
         let chart = nv.models.bulletChart()
           .margin({top: 5, right: 20, bottom: 20, left: 25});
-        if (this.trend.warning > this.trend.fail) {
-          // Lower values are better.
-          if (this.result.current <= this.trend.fail) {
+        if (failValue(this.result.current, this.trend.warning, this.trend.fail)) {
             chart.color(colors.fail);
-          } else if (this.result.current <= this.trend.warning) {
+        } else if (warningValue(this.result.current, this.trend.warning, this.trend.fail)) {
             chart.color(colors.bad);
-          } else {
-            chart.color(colors.good);
-          }
         } else {
-          if (this.result.current >= this.trend.fail) {
-            chart.color(colors.fail);
-          } else if (this.result.current >= this.trend.warning) {
-            chart.color(colors.bad);
-          } else {
             chart.color(colors.good);
-          }
         }
         d3.select('[id=\'' + this.el.id + '-svg\']')
           .datum(this.chartData())
