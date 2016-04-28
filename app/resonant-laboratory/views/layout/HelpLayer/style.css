@@ -42,8 +42,9 @@
 }
 #tuner > div {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 0.5em;
+  align-items: center;
 }
 #tuner > div > * {
   margin-left: 0.25em;

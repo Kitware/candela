@@ -39,17 +39,20 @@ let HelpLayer = Backbone.View.extend({
   initialize: function () {
     this.relevantTips = {};
 
-    // Layout options
-    this.padding = 15;
-    
+    // Layout options. You can tweak these interactively
+    // by invoking the mainPage.helpLayer.renderTuner()
+    // easter egg (change these values when you find
+    // a good balance)
+    this.padding = 9;
+
     this.avoidOverlaps = true;
-    this.linkDistance = 150;
+    this.linkDistance = 170;
     this.alpha = 0.7;
     this.convergenceThreshold = 0.01;
-    this.defaultNodeSize = 30;
+    this.defaultNodeSize = 20;
     this.handleDisconnected = true;
-    
-    this.noConstraintIterations = 10;
+
+    this.noConstraintIterations = 20;
     this.structuralIterations = 15;
     this.allConstraintIterations = 20;
   },
@@ -156,36 +159,61 @@ let HelpLayer = Backbone.View.extend({
         height: window.innerHeight
       };
 
-      // Default labels that are always there
-      // (not connected to any target)
-      let nodes = [{
-        tipId: 'clearLabel',
-        nodeType: 'label',
-        message: 'Click anywhere to hide these tips',
+      let center = {
         x: bounds.width / 2,
         y: bounds.height / 2
-      }];
+      }
+
+      // Default labels that are always there
+      // (not connected to any target)
+      let nodes = [
+        {
+          tipId: 'clearLabel',
+          nodeType: 'label',
+          message: 'Click anywhere to hide these tips',
+          x: center.x,
+          y: center.y,
+          fixed: true
+        },
+        {
+          tipId: 'topLeft',
+          nodeType: 'border',
+          x: 0,
+          y: 0,
+          fixed: true
+        },
+        {
+          tipId: 'bottomRight',
+          nodeType: 'border',
+          x: bounds.width,
+          y: bounds.height,
+          fixed: true
+        }
+      ];
       let edges = [];
 
       // Connect labels to targets
       for (let tipId of Object.keys(this.relevantTips)) {
         let tip = this.relevantTips[tipId];
+        // Node containing the label
         nodes.push({
           tipId: tipId,
           nodeType: 'label',
           message: tip.message,
-          x: tip.x,
-          y: tip.y
+          // Start each label between the center
+          // of the screen and its target
+          x: (tip.x + center.x) / 2,
+          y: (tip.y + center.y) / 2
         });
+        // Target (not drawn) for the link
         nodes.push({
           tipId: tip.tipId,
           nodeType: 'arrowhead',
           x: tip.x,
           y: tip.y,
-          width: this.padding,
-          height: this.padding,
           fixed: true
         });
+        // The link itself
         edges.push({
           source: nodes.length - 2,
           target: nodes.length - 1
@@ -194,24 +222,13 @@ let HelpLayer = Backbone.View.extend({
 
       // Subset of just the label nodes
       let labelNodes = nodes.filter(d => d.nodeType === 'label');
-      
-      let force = cola.d3adaptor()
-        .linkDistance(this.linkDistance)
-        .avoidOverlaps(this.avoidOverlaps)
-        .alpha(this.alpha)
-        .convergenceThreshold(this.convergenceThreshold)
-        .defaultNodeSize(this.defaultNodeSize)
-        .handleDisconnected(this.handleDisconnected)
-        .size([bounds.width, bounds.height])
-        .nodes(nodes)
-        .links(edges);
 
       // Draw the label nodes
       let tips = d3.select(this.el).select('#nodeLayer').selectAll('.tip')
         .data(labelNodes, d => d.tipId);
       let tipsEnter = tips.enter().append('g');
       tips.exit().remove();
-      
+
       // opacity: in the case where we pre-compute the layout,
       // prevent the initial flash where the labels are in their
       // original positions
@@ -225,7 +242,7 @@ let HelpLayer = Backbone.View.extend({
             return 'new tip';
           }
         });
-      
+
       // Background rectangle
       // (we figure out its dimensions later)
       tipsEnter.append('rect');
@@ -275,16 +292,17 @@ let HelpLayer = Backbone.View.extend({
       // Now precompute the sizes of each of the label
       // text blocks, and adjust accordingly
       let self = this;
+      let constraints = [];
       tips.each(function (d) {
         // this refers to the DOM element
         let bounds = this.getBoundingClientRect();
-        
+
         // boundaries relative to the text anchor point
         d.relative_left = bounds.left;
         d.relative_right = bounds.right;
         d.relative_top = bounds.top;
         d.relative_bottom = bounds.bottom;
-        
+
         // cola expects the x and y coordinates to
         // be in the center of the node to handle
         // overlaps - so we need to move the text block
@@ -292,19 +310,66 @@ let HelpLayer = Backbone.View.extend({
           .attr('transform', 'translate(' +
             (-(d.relative_left + d.relative_right) / 2) + ',' +
             (-(d.relative_top + d.relative_bottom) / 2) + ')');
-        
+
         // let cola know our dimensions (add in the padding)
         d.width = d.relative_right - d.relative_left + 2 * self.padding;
         d.height = d.relative_bottom - d.relative_top + 2 * self.padding;
-        
+
         // Set the background rectangle's dimensions
         d3.select(this).select('rect')
           .attr('x', -d.width / 2)
           .attr('y', -d.height / 2)
           .attr('width', d.width)
           .attr('height', d.height);
+
+        // Now that we know the dimensions, we can add
+        // appropriate constraints to keep the nodes on
+        // the screen
+        constraints.push({
+          axis: 'x',
+          type: 'separation',
+          left: 1, // topLeft
+          right: nodes.length - 2,
+          gap: d.width / 2
+        });
+        constraints.push({
+          axis: 'y',
+          type: 'separation',
+          left: 1, // topLeft
+          right: nodes.length - 2,
+          gap: d.height / 2
+        });
+        constraints.push({
+          axis: 'x',
+          type: 'separation',
+          left: nodes.length - 2,
+          right: 2, // bottomRight
+          gap: d.width / 2
+        });
+        constraints.push({
+          axis: 'y',
+          type: 'separation',
+          left: nodes.length - 2,
+          right: 2, // bottomRight
+          gap: d.height / 2
+        });
       });
       
+      // Compute the layout
+      let force = cola.d3adaptor()
+        .size([bounds.width, bounds.height])
+        .nodes(nodes)
+        .links(edges)
+        .constraints(constraints);
+
+      // Apply any cola parameters that we've specified
+      for (let control of forceControls) {
+        if (control.colaParameter &&
+          this[control.option] !== undefined) {
+          force[control.option](this[control.option]);
+        }
+      }
+
       let _renderGraph = () => {
         tips.style('opacity', '1.0')
           .attr('transform', (d) => {
@@ -314,7 +379,6 @@ let HelpLayer = Backbone.View.extend({
           .style('opacity', '1.0');
       };
       
-      // Compute the layout
       if (this.addedTuner) {
         // If we're tweaking the layout, watch it settle
         force.on('tick', _renderGraph);
@@ -322,10 +386,10 @@ let HelpLayer = Backbone.View.extend({
         // Otherwise, just render when it's done
         force.on('end', _renderGraph);
       }
-      
+
       force.start(this.noConstraintIterations,
-                  this.structuralIterations,
-                  this.allConstraintIterations);
+        this.structuralIterations,
+        this.allConstraintIterations);
 
       // Finally, store the set of tips that the user has now seen
       // in the user preferences
@@ -334,6 +398,8 @@ let HelpLayer = Backbone.View.extend({
     }
   }, 300),
   renderTuner: function () {
+    let self = this;
+
     // Easter egg: I added some tuners to tweak the label layout
     // as needed. To see this view, type
     // mainPage.helpLayer.renderTuner() on the console
@@ -344,32 +410,93 @@ let HelpLayer = Backbone.View.extend({
 
     let controls = d3.select('#tuner').selectAll('div').data(forceControls);
     let controlsEnter = controls.enter().append('div');
-
-    controlsEnter.append('label')
-      .attr('for', d => d.option + 'control');
-
-    controls.selectAll('label')
-      .text(d => d.option + ': ' + this[d.option]);
-
-    let self = this;
+    
+    // Control to change this parameter's setting (if enabled)
     controlsEnter.append('input')
-      .attr('type', 'range')
-      .attr('min', d => d.range[0])
-      .attr('max', d => d.range[1])
-      .attr('step', d => d.step)
-      .property('value', d => this[d.option])
-      .on('mousemove', function (d) {
-        if (d3.event.button) {
-          self[d.option] = this.value;
-          self.renderTuner();
-        }
-      }).on('change', function (d) {
+      .attr('id', d => d.option + 'control')
+      .attr('class', 'control')
+      .on('change', function (d) {
         // this refers to the DOM element
-        self[d.option] = this.value;
+        if (d.step) {
+          self[d.option] = this.value;
+        } else {
+          self[d.option] = this.checked;
+        }
+
         self.addedTemplate = false;
         self.render();
         self.renderTuner();
       });
+    controls.selectAll('input.control')
+      .attr('type', (d) => {
+        if (d.step) {
+          return 'range';
+        } else {
+          return 'checkbox';
+        }
+      }).each(function (d) {
+        // this refers to the DOM element
+        let element = d3.select(this);
+        if (d.step) {
+          element.attr('min', d.range[0])
+            .attr('max', d.range[1])
+            .attr('step', d.step);
+          if (self[d.option] !== undefined) {
+            element.property('value', self[d.option]);
+          }
+        } else {
+          if (self[d.option]) {
+            element.property('checked', true);
+          }
+        }
+        element.property('disabled', self[d.option] === undefined);
+      });
+    
+    // Label for the control (with its current value)
+    controlsEnter.append('label')
+      .attr('class', 'control')
+      .attr('for', d => d.option + 'control');
+    controls.selectAll('label.control')
+      .text(d => {
+        let value;
+        if (this[d.option] === undefined) {
+          value = '--';
+        } else if (this[d.option] === true) {
+          value = 'true';
+        } else if (this[d.option] === false) {
+          value = 'false';
+        } else {
+          value = this[d.option];
+        }
+        return d.option + ': ' + value;
+      });
+
+    // Control to enable / disable this parameter
+    controlsEnter.append('input')
+      .attr('id', d => d.option + 'enable')
+      .attr('class', 'enable')
+      .attr('type', 'checkbox')
+      .on('change', function (d) {
+        // this refers to the DOM element
+        if (this.checked) {
+          self[d.option] = d.range[0];
+        } else {
+          self[d.option] = undefined;
+        }
+
+        self.addedTemplate = false;
+        self.render();
+        self.renderTuner();
+      });
+    
+    // Label for the enable switch
+    controls.selectAll('input.enable')
+      .property('checked', d => this[d.option] !== undefined)
+      .property('disabled', d => !d.colaParameter);
+    controlsEnter.append('label')
+      .attr('class', 'enable')
+      .attr('for', d => d.option + 'enable')
+      .text('Enable');
   }
 });
 
