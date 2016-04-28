@@ -43,10 +43,11 @@ let HelpLayer = Backbone.View.extend({
     // by invoking the mainPage.helpLayer.renderTuner()
     // easter egg (change these values when you find
     // a good balance)
-    this.padding = 5;
+    this.padding = 9;
+    this.margin = 18;
 
     this.avoidOverlaps = true;
-    // this.linkDistance = 250;
+    this.linkDistance = 250;
     this.alpha = 0.7;
     this.convergenceThreshold = 0.01;
     // this.defaultNodeSize = 20;
@@ -175,22 +176,43 @@ let HelpLayer = Backbone.View.extend({
           y: center.y,
           fixed: true
         },
+        // As of this writing, Cola's constraints don't seem to be
+        // taking me seriously. So in addition to constraints, I create
+        // four massive bumper nodes to force stuff to stay on the screen
         {
-          tipId: 'topLeft',
+          tipId: 'left',
           nodeType: 'border',
-          x: 0,
-          y: 0,
-          width: this.padding,
-          height: this.padding,
+          x: -center.x,
+          y: center.y,
+          width: bounds.width,
+          height: bounds.height,
           fixed: true
         },
         {
-          tipId: 'bottomRight',
+          tipId: 'right',
           nodeType: 'border',
-          x: bounds.width,
-          y: bounds.height,
-          width: this.padding,
-          height: this.padding,
+          x: 1.5 * bounds.width,
+          y: center.y,
+          width: bounds.width,
+          height: bounds.height,
+          fixed: true
+        },
+        {
+          tipId: 'top',
+          nodeType: 'border',
+          x: center.x,
+          y: -center.y,
+          width: 2 * bounds.width,
+          height: bounds.height,
+          fixed: true
+        },
+        {
+          tipId: 'bottom',
+          nodeType: 'border',
+          x: center.x,
+          y: 1.5 * bounds.height,
+          width: 2 * bounds.width,
+          height: bounds.height,
           fixed: true
         }
       ];
@@ -204,10 +226,9 @@ let HelpLayer = Backbone.View.extend({
           tipId: tipId,
           nodeType: 'label',
           message: tip.message,
-          // Start each label slightly toward the center
-          // of the screen relative to its target
-          x: Math.random() * bounds.width, // (3 * tip.x + center.x) / 4,
-          y: Math.random() * bounds.height // (3 * tip.y + center.y) / 4
+          // Start each label at a random location
+          x: Math.random() * bounds.width,
+          y: Math.random() * bounds.height
         });
         // Target (not drawn) for the link
         nodes.push({
@@ -327,8 +348,8 @@ let HelpLayer = Backbone.View.extend({
           .attr('height', d.height);
         
         // Add in extra padding *outside* the rectangle
-        d.width += 2 * self.padding;
-        d.height += 2 * self.padding;
+        d.width += 2 * self.margin;
+        d.height += 2 * self.margin;
 
         // Now that we know the dimensions, we can add
         // appropriate constraints to keep the nodes on
@@ -336,30 +357,30 @@ let HelpLayer = Backbone.View.extend({
         constraints.push({
           axis: 'x',
           type: 'separation',
-          left: 1, // topLeft
+          left: 1, // left bumper
           right: nodes.length - 2,
-          gap: d.width
-        });
-        constraints.push({
-          axis: 'y',
-          type: 'separation',
-          left: 1, // topLeft
-          right: nodes.length - 2,
-          gap: d.height
+          gap: d.width / 2
         });
         constraints.push({
           axis: 'x',
           type: 'separation',
           left: nodes.length - 2,
-          right: 2, // bottomRight
-          gap: d.width
+          right: 2, // right bumper
+          gap: d.width / 2
+        });
+        constraints.push({
+          axis: 'y',
+          type: 'separation',
+          left: 3, // top bumper
+          right: nodes.length - 2,
+          gap: d.height / 2
         });
         constraints.push({
           axis: 'y',
           type: 'separation',
           left: nodes.length - 2,
-          right: 2, // bottomRight
-          gap: d.height
+          right: 4, // bottom bumper
+          gap: d.height / 2
         });
       });
       

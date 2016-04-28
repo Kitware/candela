@@ -1,7 +1,12 @@
 [
   {
     "option": "padding",
-    "range": [0, 100],
+    "range": [0, 40],
+    "step": 1
+  },
+  {
+    "option": "margin",
+    "range": [0, 40],
     "step": 1
   },
   {
