@@ -248,7 +248,7 @@ let templateFunctions = {
     let dir = transform(args[0], options, scope);
     let obj = transform(args[1], options, scope);
     let transformed = {};
-    let mapping = {
+    let matching = {
       x: 'y',
       x2: 'y2',
       xc: 'yc',
@@ -263,8 +263,8 @@ let templateFunctions = {
     }
     for (let key in obj) {
       if (obj.hasOwnProperty(key)) {
-        if (mapping[key]) {
-          transformed[mapping[key]] = obj[key];
+        if (matching[key]) {
+          transformed[matching[key]] = obj[key];
         } else {
           transformed[key] = obj[key];
         }

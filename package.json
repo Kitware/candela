@@ -5,7 +5,7 @@
   "main": "dist/candela.js",
   "scripts": {
     "build": "webpack --config config/webpack.config.js",
-    "build:reference": "cd app/resonant-reference-app && webpack",
+    "build:laboratory": "cd app/resonant-laboratory && webpack",
     "dist": "webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
     "test": "karma start config/karma-testing.conf.js | grep '^PhantomJS' | sed \"s/^.*LOG: '\\(.*\\)'$/\\1/\" | faucet",
     "test:raw": "karma start config/karma-testing.conf.js",
@@ -78,6 +78,7 @@
     "jquery-deparam": "^0.5.2",
     "underscore": "^1.8.3",
     "UpSet": "git+https://github.com/VCG/upset#6e8b7a172443dd6b4f4324d1a3368287e9e9c089",
-    "vega": "^2.4.2"
+    "vega": "^2.4.2",
+    "webcola": "^3.1.3"
   }
 }
