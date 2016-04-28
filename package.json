@@ -57,8 +57,6 @@
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-quiet-reporter": "^0.1.2",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-tap": "^1.0.4",
-    "karma-tap-reporter": "0.0.6",
     "karma-webpack": "^1.7.0",
     "legacy-loader": "0.0.2",
     "less": "^2.3.1",
