@@ -5,7 +5,7 @@
 candela components.
 * candela.[util](util#readme) - Candela utility functions.
 * [Sizing](#sizing)
-* [Field Mappings](#field-mappings)
+* [Field Matchings](#field-matchings)
 * [Data Types](#data-types)
 
 ## Sizing
@@ -13,7 +13,7 @@ candela components.
 Components often have a **width** and **height** option, which specify the
 width and height of the component in pixels.
 
-## Field Mappings
+## Field Matchings
 
 ### Axis Scales
 

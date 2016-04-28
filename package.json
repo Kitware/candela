@@ -5,7 +5,7 @@
   "main": "dist/candela.js",
   "scripts": {
     "build": "webpack --config config/webpack.config.js",
-    "build:reference": "cd app/resonant-reference-app && webpack",
+    "build:laboratory": "cd app/resonant-laboratory && webpack",
     "dist": "webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
     "test": "karma start config/karma-testing.conf.js | grep '^PhantomJS' | sed \"s/^.*LOG: '\\(.*\\)'$/\\1/\" | faucet",
     "test:raw": "karma start config/karma-testing.conf.js",
