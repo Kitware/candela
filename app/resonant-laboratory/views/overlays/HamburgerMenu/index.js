@@ -19,8 +19,16 @@ let HamburgerMenu = Backbone.View.extend({
       window.mainPage.overlay.render('ProjectSettings');
     });
     
+    jQuery('#closeProjectMenuItem').on('click', () => {
+      window.mainPage.switchProject(null).then(() => {
+        window.mainPage.overlay.render('StartingScreen');
+      });
+    });
+    
     if (window.mainPage.currentUser.isLoggedIn()) {
-      jQuery('#loginMenuItem > p').text('Log Out');
+      jQuery('#loginText').text('Log Out ' +
+        window.mainPage.currentUser.get('firstName') + ' ' +
+        window.mainPage.currentUser.get('lastName'));
       jQuery('#loginMenuItem').on('click', () => {
         window.mainPage.currentUser.authenticate(false)
           .then(() => {
@@ -28,7 +36,7 @@ let HamburgerMenu = Backbone.View.extend({
           });
       });
     } else {
-      jQuery('#loginMenuItem > p').text('Log In');
+      jQuery('#loginText').text('Log In');
       jQuery('#loginMenuItem').on('click', () => {
         window.mainPage.overlay.render('LoginView');
       });

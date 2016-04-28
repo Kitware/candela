@@ -131,18 +131,32 @@ and the visualizations in this project`;
         // a real input (contenteditable stretches better)
       });
       jQuery('#projectName').on('blur', function () {
+        // this refers to the DOM element
         if (this.value !== this.textContent) {
-          this.value = this.textContent;
-          window.mainPage.project.rename(this.textContent);
+          if (this.textContent.length === 0) {
+            this.textContent = this.value;
+          } else {
+            this.value = this.textContent;
+            window.mainPage.project.rename(this.textContent);
+          }
+        }
+      });
+      jQuery('#projectName').on('keydown', function (event) {
+        // this refers to the DOM element
+        let key = event.keyCode || event.charCode;
+        if (key === 13 || key === 27) {
+          jQuery(this).blur();
+          // Workaround for webkit's bug
+          window.getSelection().removeAllRanges();
         }
       });
       this.templateAdded = true;
     }
-    
+
     // TODO: don't check for tips that won't be visible
     // (e.g. add/remove datasets, visualizations)
     if (window.mainPage.currentUser.preferences
-        .hasSeenAllTips(this.getVisibleTips())) {
+      .hasSeenAllTips(this.getVisibleTips())) {
       jQuery('#helpButton').attr('src', infoIcon);
     } else {
       jQuery('#helpButton').attr('src', newInfoIcon);

@@ -119,7 +119,7 @@ in order to connect them together.`);
   },
   createNodeId: function (d) {
     // Generate a valid ID for the node
-    return ('node_' + d.index + d.attrName)
+    return ('node_' + d.side + d.index + d.attrName)
       .replace(/([^A-Za-z0-9[\]{}_.:-])\s?/g, '');
   },
   createEdgeId: function (d) {
@@ -206,10 +206,12 @@ in order to connect them together.`);
       dataAttrName) => {
       // Edges always go from data to vis
       let sourceId = this.createNodeId({
+        side: 'data',
         index: dataIndex,
         attrName: dataAttrName
       });
       let targetId = this.createNodeId({
+        side: 'vis',
         index: visIndex,
         attrName: visAttrName
       });
