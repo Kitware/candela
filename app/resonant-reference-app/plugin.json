@@ -1,9 +1,0 @@
-{
-  "name": "Resonant Reference App",
-  "description": "Resonant Reference App",
-  "version": "0.1.0",
-  "grunt": {
-    "autobuild": false,
-    "file": "Gruntfile.js"
-  }
-}
