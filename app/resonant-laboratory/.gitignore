@@ -1,2 +1,3 @@
-web_client/
+web_client/extra/
+web_client/lib/
 *.pyc
