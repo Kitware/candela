@@ -255,13 +255,13 @@ let Project = MetadataItem.extend({
   shapeDataForVis: function (index = 0) {
     let meta = this.getMeta();
 
-    // TODO: use the matching to transform
-    // the parsed data into the shape that
-    // the visualization expects
     let datasetId = meta.datasets[0];
     if (!window.mainPage.loadedDatasets[datasetId]) {
       return Promise.resolve([]);
     } else {
+      // Use the matching to transform
+      // the parsed data into the shape
+      // that the visualization expects
       return window.mainPage.loadedDatasets[datasetId].parse();
     }
   },
