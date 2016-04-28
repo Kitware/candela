@@ -61,7 +61,7 @@ export let InfoPane = Backbone.View.extend({
   render: function () {
       // Test if any of the aggregate trends have spark line historical data.
       var sparklinesExist = (_.find(this.aggTrends, function (trend) {
-         return trend.history && trend.history.length > 1;
+        return trend.history && trend.history.length > 1;
       }, this)) !== undefined;
     this.$el.html(infoPane({
       name: this.name,

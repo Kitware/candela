@@ -34,8 +34,6 @@ export let dash = Backbone.View.extend({
       if (upper >= arr.length) return arr[lower];
       return arr[lower] * (1 - weight) + arr[upper] * weight;
     }
-    // TODO add mouseover property for aggregate trends
-    // also for the ones coming in
 
     /**
      * Synthesize aggregate metrics from the supplied trend values, which will
