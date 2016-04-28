@@ -1,7 +1,7 @@
 [
   {
     "option": "padding",
-    "range": [0, 30],
+    "range": [0, 100],
     "step": 1
   },
   {
@@ -16,6 +16,21 @@
   },
   {
     "option": "defaultNodeSize",
+    "range": [0, 100],
+    "step": 1
+  },
+  {
+    "option": "noConstraintIterations",
+    "range": [0, 100],
+    "step": 1
+  },
+  {
+    "option": "structuralIterations",
+    "range": [0, 100],
+    "step": 1
+  },
+  {
+    "option": "allConstraintIterations",
     "range": [0, 100],
     "step": 1
   }

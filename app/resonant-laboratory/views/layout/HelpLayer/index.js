@@ -43,11 +43,15 @@ let HelpLayer = Backbone.View.extend({
     this.padding = 15;
     
     this.avoidOverlaps = true;
-    this.linkDistance = 50;
+    this.linkDistance = 150;
     this.alpha = 0.7;
     this.convergenceThreshold = 0.01;
     this.defaultNodeSize = 30;
     this.handleDisconnected = true;
+    
+    this.noConstraintIterations = 10;
+    this.structuralIterations = 15;
+    this.allConstraintIterations = 20;
   },
   setTips: function (tips) {
     this.relevantTips = {};
@@ -171,9 +175,7 @@ let HelpLayer = Backbone.View.extend({
           nodeType: 'label',
           message: tip.message,
           x: tip.x,
-          y: tip.y,
-          width: tip.right - tip.left + 2 * this.padding,
-          height: tip.bottom - tip.top + 2 * this.padding
+          y: tip.y
         });
         nodes.push({
           tipId: tip.tipId,
@@ -209,16 +211,24 @@ let HelpLayer = Backbone.View.extend({
         .data(labelNodes, d => d.tipId);
       let tipsEnter = tips.enter().append('g');
       tips.exit().remove();
-
-      tips.attr('class', d => {
-        if (d.tipId === 'clearLabel') {
-          return 'clear tip';
-        } else if (seenTips[d.tipId] === true) {
-          return 'old tip';
-        } else {
-          return 'new tip';
-        }
-      });
+      
+      // opacity: in the case where we pre-compute the layout,
+      // prevent the initial flash where the labels are in their
+      // original positions
+      tips.style('opacity', '0.0')
+        .attr('class', d => {
+          if (d.tipId === 'clearLabel') {
+            return 'clear tip';
+          } else if (seenTips[d.tipId] === true) {
+            return 'old tip';
+          } else {
+            return 'new tip';
+          }
+        });
+      
+      // Background rectangle
+      // (we figure out its dimensions later)
+      tipsEnter.append('rect');
 
       // Draw the text
       tipsEnter.append('text');
@@ -262,70 +272,60 @@ let HelpLayer = Backbone.View.extend({
           rewrap(this, 150, 1.1);
         });
 
-      // Now precompute the sizes of
-      // each of the label text blocks
+      // Now precompute the sizes of each of the label
+      // text blocks, and adjust accordingly
+      let self = this;
       tips.each(function (d) {
         // this refers to the DOM element
         let bounds = this.getBoundingClientRect();
-        // Store boundaries relative to the anchor point
+        
+        // boundaries relative to the text anchor point
         d.relative_left = bounds.left;
         d.relative_right = bounds.right;
         d.relative_top = bounds.top;
         d.relative_bottom = bounds.bottom;
+        
+        // cola expects the x and y coordinates to
+        // be in the center of the node to handle
+        // overlaps - so we need to move the text block
+        d3.select(this).select('text')
+          .attr('transform', 'translate(' +
+            (-(d.relative_left + d.relative_right) / 2) + ',' +
+            (-(d.relative_top + d.relative_bottom) / 2) + ')');
+        
+        // let cola know our dimensions (add in the padding)
+        d.width = d.relative_right - d.relative_left + 2 * self.padding;
+        d.height = d.relative_bottom - d.relative_top + 2 * self.padding;
+        
+        // Set the background rectangle's dimensions
+        d3.select(this).select('rect')
+          .attr('x', -d.width / 2)
+          .attr('y', -d.height / 2)
+          .attr('width', d.width)
+          .attr('height', d.height);
       });
-
-      // Start the simulation to lay out the tips
-      // in a fun/non-overlapping way
-      force.on('tick', () => {
-        /* var q = d3.geom.quadtree(labelNodes);
-        labelNodes.forEach(d => {
-          // Keep the labels from overlapping with each other
-          q.visit(this.collide(d));
-          // Keep the labels on the screen
-          let space = d.x - d.relative_left;
-          if (space < 0) {
-            d.x += this.overlapResistance * (-space);
-          }
-          space = d.y - d.relative_top;
-          if (space < 0) {
-            d.y += this.overlapResistance * (-space);
-          }
-          space = bounds.width - (d.x + d.relative_right);
-          if (space < 0) {
-            d.x -= this.overlapResistance * (-space);
-          }
-          space = bounds.height - (d.y + d.relative_bottom);
-          if (space < 0) {
-            d.y -= this.overlapResistance * (-space);
-          }
-        }); */
-
-        // If we're tuning the layout, animate it
-        if (this.addedTuner) {
-          tips.attr('transform', (d) => {
+      
+      let _renderGraph = () => {
+        tips.style('opacity', '1.0')
+          .attr('transform', (d) => {
             return 'translate(' + d.x + ',' + d.y + ')';
           });
-          arrows.attr('d', arrowGenerator);
-        }
-      });
-
+        arrows.attr('d', arrowGenerator)
+          .style('opacity', '1.0');
+      };
+      
+      // Compute the layout
       if (this.addedTuner) {
-        // If we're tweaking the layout, let us watch it settle
-        force.start();
+        // If we're tweaking the layout, watch it settle
+        force.on('tick', _renderGraph);
       } else {
-        // Precompute the layout
-        force.start();
-        for (let i = 0; i < nodes.length * nodes.length; i += 1) {
-          force.tick();
-        }
-        force.stop();
-
-        // Only render things once
-        tips.attr('transform', (d) => {
-          return 'translate(' + d.x + ',' + d.y + ')';
-        });
-        arrows.attr('d', arrowGenerator);
+        // Otherwise, just render when it's done
+        force.on('end', _renderGraph);
       }
+      
+      force.start(this.noConstraintIterations,
+                  this.structuralIterations,
+                  this.allConstraintIterations);
 
       // Finally, store the set of tips that the user has now seen
       // in the user preferences
@@ -333,65 +333,6 @@ let HelpLayer = Backbone.View.extend({
         .observeTips(this.relevantTips);
     }
   }, 300),
-  collide: function (node) {
-    let padding = this.padding;
-
-    let nleft = node.x - node.relative_left - padding;
-    let nright = node.x + node.relative_right + padding;
-    let ntop = node.y - node.relative_top - padding;
-    let nbottom = node.y + node.relative_bottom + padding;
-
-    return (quad, x1, y1, x2, y2) => {
-      let other = quad.point;
-
-      if (other && (other !== node)) {
-        // Okay, we're comparing two different nodes. How
-        // much space do they have between them (might be negative)?
-        let xdistance, ydistance;
-
-        if (node.x > other.x) {
-          let nodeBound = node.x - node.relative_left;
-          let otherBound = other.x + other.relative_right;
-          xdistance = nodeBound - otherBound - padding;
-        } else {
-          let nodeBound = node.x + node.relative_right;
-          let otherBound = other.x - other.relative_left;
-          xdistance = otherBound - nodeBound - padding;
-        }
-
-        if (node.y > other.y) {
-          let nodeBound = node.y - node.relative_top;
-          let otherBound = other.y + other.relative_bottom;
-          ydistance = nodeBound - otherBound - padding;
-        } else {
-          let nodeBound = node.y + node.relative_bottom;
-          let otherBound = other.y - other.relative_top;
-          ydistance = otherBound - nodeBound - padding;
-        }
-
-        // Do these two overlap? If so, fix it
-        if (xdistance < 0 && ydistance < 0) {
-          if (node.x > other.x) {
-            node.x -= xdistance * this.overlapResistance / 2; // pushes right
-            other.x += xdistance * this.overlapResistance / 2; // pushes left
-          } else {
-            node.x += xdistance * this.overlapResistance / 2; // pushes left
-            other.x -= xdistance * this.overlapResistance / 2; // pushes right
-          }
-
-          if (node.y > other.y) {
-            node.y -= ydistance * this.overlapResistance / 2; // pushes down
-            other.y += ydistance * this.overlapResistance / 2; // pushes up
-          } else {
-            node.y += ydistance * this.overlapResistance / 2; // pushes up
-            other.y -= ydistance * this.overlapResistance / 2; // pushes down
-          }
-        }
-      }
-      // Do we need to keep looking?
-      return x1 > nright || x2 < nleft || y1 > nbottom || y2 < ntop;
-    };
-  },
   renderTuner: function () {
     // Easter egg: I added some tuners to tweak the label layout
     // as needed. To see this view, type
