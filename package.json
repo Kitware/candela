@@ -21,6 +21,7 @@
     "jquery": "^2.2.0",
     "less": "^2.6.0",
     "less-loader": "^2.2.2",
+    "md5": "^2.1.0",
     "nvd3": "^1.8.2",
     "underscore": "~1.5",
     "url-loader": "^0.5.7"

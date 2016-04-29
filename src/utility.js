@@ -1,3 +1,5 @@
+import md5 from 'md5';
+
 export let failValue = (value, warning, fail) => {
   if (warning > fail) {
     // Lower values are better.
@@ -14,4 +16,9 @@ export let warningValue = (value, warning, fail) => {
   } else {
     return (value >= warning);
   }
+}
+
+export let sanitizeSelector = (input) => {
+    // Prefix with an '_' as selectors can't start with numbers.
+    return '_' + md5(input);
 }

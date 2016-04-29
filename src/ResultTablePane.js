@@ -3,7 +3,7 @@ import _ from 'underscore';
 import $ from 'jquery';
 
 import { ErrorBulletWidget } from './ErrorBulletWidget';
-import { failValue, warningValue } from './utility.js';
+import { failValue, warningValue, sanitizeSelector } from './utility.js';
 
 import tablePane from '../templates/tablePane';
 
@@ -32,7 +32,7 @@ export let ResultTablePane = Backbone.View.extend({
       return a.dataset.localeCompare(b.dataset);
     });
     _.each(this.results, _.bind(function (result) {
-      result.id = result.dataset.replace(/\./g, '_');
+      result.id = sanitizeSelector(result.dataset);
       this.datasetMap[result.id] = this.datasetMap[result.dataset];
       this.trajectoryMap[result.id] = this.trajectoryMap[result.dataset];
       this.datasetLabelMap[result.id] = this.datasetLabelMap[result.dataset];

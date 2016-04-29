@@ -9,6 +9,7 @@ import { InfoPane } from './InfoPane';
 import { TrendPane } from './TrendPane';
 import { ResultTablePane } from './ResultTablePane';
 import { TopInfoBar } from './TopInfoBar';
+import { sanitizeSelector } from './utility.js';
 
 import layout from '../templates/layout';
 
@@ -61,9 +62,7 @@ export let dash = Backbone.View.extend({
      */
     function sanitizeTrend (trend) {
       trend.display_name = trend.abbreviation || trend.name;
-      trend.id_selector = trend.display_name.toLowerCase()
-                                            .replace(/\./g, '_')
-                                            .replace(/ /g, '_');
+      trend.id_selector = sanitizeSelector(trend.display_name);
       return trend;
     }
 
