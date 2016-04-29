@@ -40,6 +40,32 @@ p {
   line-height: 1.25em;
 }
 
+#EmptyState {
+  position: absolute;
+  top: 4.5em;
+  right: 1.5em;
+  height: calc(100vh - 6em);
+  color: #f0f0f0;
+}
+#EmptyState > div {
+  width: 15em;
+}
+#LooseSeal {
+  position: absolute;
+  left: calc(50% - 7.5em);
+  top: 50%;
+  height: 15em;
+  text-align: center;
+  background-image: url('../images/looseSeal.svg');
+}
+#QuestionHint {
+  position: absolute;
+  top: 0em;
+  right: 0em;
+  text-align: right;
+}
+
+
 ::-webkit-scrollbar {
   width: 12px;
   height: 12px;

@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <title>Resonant Laboratory</title>
-    <link href='https://fonts.googleapis.com/css?family=Josefin+Sans:400,900' rel='stylesheet' type='text/css'>
-    <!--link rel="stylesheet" href="static/built/app.min.css"-->
-    <link rel="icon" type="image/png" href="static/img/Girder_Favicon.png">
+  <title>Resonant Laboratory</title>
+  <link href='https://fonts.googleapis.com/css?family=Josefin+Sans:400,900' rel='stylesheet' type='text/css'>
+  <!--link rel="stylesheet" href="static/built/app.min.css"-->
+  <link rel="icon" type="image/png" href="static/img/Girder_Favicon.png">
 </head>
+
 <body>
-    <header id="Header"></header>
-    <div id="WidgetPanels" class="accordion"></div>
-    <div id="Overlay"></div>
-    <svg id="HelpLayer">
-    </svg>
-    <script src="static/built/libs.min.js" charset="utf-8"></script>
-    <script src="static/built/app.min.js" charset="utf-8"></script>
-    <script src="lib/webpack_bundle.js" charset="utf-8"></script>
+  <header id="Header"></header>
+  <div id="EmptyState">
+    <div id="PiecesHint">
+      The pieces of your project are over here; click one of the buttons above me, or one of the panes to the left.
+    </div>
+    <div id="QuestionHint" class="emptyState">For more clues, try the ? button.</div>
+    <div id="LooseSeal" class="emptyState">Nothing to see here.</div>
+  </div>
+  <div id="WidgetPanels" class="accordion"></div>
+  <div id="Overlay"></div>
+  <svg id="HelpLayer">
+  </svg>
+  <script src="static/built/libs.min.js" charset="utf-8"></script>
+  <script src="static/built/app.min.js" charset="utf-8"></script>
+  <script src="lib/webpack_bundle.js" charset="utf-8"></script>
 </body>
