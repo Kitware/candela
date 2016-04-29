@@ -20,6 +20,7 @@ export let InfoPane = Backbone.View.extend({
     this.warning = settings.warning || 3;
     this.fail = settings.fail || 4;
     this.max = settings.max || 5;
+    this.producerLink = settings.producer_link || null;
 
     this.numSuccess = 0;
     this.numBad = 0;
@@ -73,7 +74,8 @@ export let InfoPane = Backbone.View.extend({
       numFail: this.numFail,
       totalMedian: this.totalMedian,
       aggTrends: this.aggTrends,
-      sparklinesExist: sparklinesExist
+      sparklinesExist: sparklinesExist,
+      producerLink: this.producerLink
     })).promise().done(_.bind(function () {
       this.aggBullets = {};
       _.each(this.aggTrends, (trend, key, list) => {

@@ -2,7 +2,10 @@ table.table.table-responsive.table-compact
   thead.result-labels
     th(colspan="2")
       .agg-label-header
-        | Aggregate Metric
+        if producerLink
+          a(href=producerLink) Aggregate Metric
+        else
+          | Aggregate Metric
     if sparklinesExist
       th
         .agg-sparkline-header
