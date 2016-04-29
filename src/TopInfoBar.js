@@ -9,13 +9,15 @@ export let TopInfoBar = Backbone.View.extend({
     this.name = settings.name || 'Ground Truth';
     this.branch = settings.branch || 'master';
     this.day = settings.day || this.getToday();
+    this.helpLink = settings.help_link || 'https://github.com/Trailmix/RedwoodInternal/wiki/Midas-for-Metrics-Based-Testing#performance-dashboards';
   },
 
   render: function () {
     this.$el.html(topInfoBar({
       name: this.name,
       branch: this.branch,
-      day: this.day
+      day: this.day,
+      helpLink: this.helpLink
     }));
   }
 
