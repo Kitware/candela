@@ -20,7 +20,7 @@ let DatasetLibrary = Backbone.View.extend({
 
     new Promise((resolve, reject) => {
       girder.restRequest({
-        path: 'resource/lookup?path=/collection/ResonantLaboratoryApp/Data',
+        path: 'resource/lookup?path=/collection/ResonantLaboratory/Data',
         type: 'GET',
         error: reject
       }).done(resolve).error(reject);
@@ -112,28 +112,15 @@ let DatasetLibrary = Backbone.View.extend({
             }, true);
             window.mainPage.overlay.closeOverlay();
           } else {
-            if (d.meta && d.meta.exampleProjectId) {
-              // Load the example project that this dataset's
-              // metadata specifies
-              window.mainPage.switchProject(d.meta.exampleProjectId)
-                .then(() => {
-                  window.mainPage.widgetPanels.toggleWidget({
-                    hashName: 'DatasetView0'
-                  }, true);
-                  window.mainPage.overlay.closeOverlay();
-                });
-            } else {
-              // No default example project has been
-              // specified for this dataset; create an empty
-              // project with this dataset
-              window.mainPage.newProject().then(() => {
-                window.mainPage.project.setDataset(d);
-                window.mainPage.widgetPanels.toggleWidget({
-                  hashName: 'DatasetView0'
-                }, true);
-                window.mainPage.overlay.closeOverlay();
-              });
-            }
+            // No project is loaded, so create an empty
+            // project with this dataset
+            window.mainPage.newProject().then(() => {
+              window.mainPage.project.setDataset(d);
+              window.mainPage.widgetPanels.toggleWidget({
+                hashName: 'DatasetView0'
+              }, true);
+              window.mainPage.overlay.closeOverlay();
+            });
           }
         });
     });

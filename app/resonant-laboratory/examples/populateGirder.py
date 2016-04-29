@@ -21,11 +21,11 @@ gc.authenticate(args.username, password)
 
 message = ''
 
-# Get or create the ResonantLaboratoryApp collection
-collection = gc.sendRestRequest('GET','collection',{'text':'ResonantLaboratoryApp'})
+# Get or create the ResonantLaboratory collection
+collection = gc.sendRestRequest('GET','collection',{'text':'ResonantLaboratory'})
 if len(collection) == 0:
     collection = gc.sendRestRequest('POST','collection',
-        {'name':'ResonantLaboratoryApp',
+        {'name':'ResonantLaboratory',
          'description':'The public library for the Resonant Laboratory Application',
          'public':True})
     message += 'Created collection '
@@ -39,9 +39,9 @@ print message
 print ''.join(['=' for x in message])   # underline
 
 
-# Walk through this directory, uploading folders into the collection
-folders = os.listdir('.')
-for f in folders:
+# Create the Data and Projects folders
+dataItemIdLookup = {}
+for f in ['Data', 'Projects']:
     if not os.path.isdir(f):
         continue
 
@@ -63,8 +63,17 @@ for f in folders:
 
         spacesNeeded = longestItemName - len(i)
         message = ''.join([' ' for x in xrange(spacesNeeded)])
-
+        
+        # Create (or get) the item
         itemSpec = gc.load_or_create_item(i, folderSpec['_id'])
+        
+        # If it's a dataset, store its ID in case a project
+        # refers to it
+        if f == 'Data':
+            dataItemIdLookup[i] = itemSpec['_id']
+        
+        # Now upload any files that don't already
+        # exist in the item
         files = os.listdir('./' + f + '/' + i)
 
         existingFiles = gc.sendRestRequest('GET',
@@ -78,10 +87,19 @@ for f in folders:
         # Load each of the files into the item
         for x in files:
             if x == 'metadata.json':
-                temp = open('./' + f + '/' + i + '/' + itemMeta, 'rb')
+                # metadata.json is special; attach it as the item's
+                # metadata instead of uploading it as a file
+                temp = open('./' + f + '/' + i + '/metadata.json', 'rb')
                 contents = temp.read()
                 metadata = json.loads(contents)
                 temp.close()
+                
+                # If this is a project, we need to replace the dataset
+                # names with their Girder IDs
+                if f == 'Projects':
+                    for i, d in enumerate(metadata['datasets']):
+                        metadata['datasets'][i] = dataItemIdLookup[d]
+                
                 gc.addMetadataToItem(itemSpec['_id'], metadata)
                 addedMetadata = True
             elif x in existingFiles:

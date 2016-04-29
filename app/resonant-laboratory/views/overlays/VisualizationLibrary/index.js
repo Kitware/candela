@@ -52,28 +52,15 @@ let VisualizationLibrary = Backbone.View.extend({
           }, true);
           window.mainPage.overlay.closeOverlay();
         } else {
-          if (d.meta && d.meta.exampleProjectId) {
-            // TODO: Load the example project that this
-            // visualization specifies
-            // window.mainPage.switchProject(d.meta.exampleProjectId)
-            //  .then(() => {
+          // No project exists yet, so create an empty
+          // project with this visualization
+          window.mainPage.newProject().then(() => {
+            window.mainPage.project.setVisualization(d);
             window.mainPage.widgetPanels.toggleWidget({
               hashName: 'VisualizationView0'
             }, true);
             window.mainPage.overlay.closeOverlay();
-            // });
-          } else {
-            // No default example project has been
-            // specified for this visualization; create an empty
-            // project with this visualization
-            window.mainPage.newProject().then(() => {
-              window.mainPage.project.setVisualization(d);
-              window.mainPage.widgetPanels.toggleWidget({
-                hashName: 'VisualizationView0'
-              }, true);
-              window.mainPage.overlay.closeOverlay();
-            });
-          }
+          });
         }
       });
   }

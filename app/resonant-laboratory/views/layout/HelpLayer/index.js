@@ -34,7 +34,7 @@ function arrowGenerator(edge) {
     'L' + edge.target.x + ',' + edge.target.y +
     'Z';
 }
-window.cola = cola;
+
 let HelpLayer = Backbone.View.extend({
   initialize: function () {
     this.relevantTips = {};
