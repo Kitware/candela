@@ -79,39 +79,41 @@ export let InfoPane = Backbone.View.extend({
     })).promise().done(_.bind(function () {
       this.aggBullets = {};
       _.each(this.aggTrends, (trend, key, list) => {
-        nv.addGraph({
-          generate: _.bind(function () {
-            let parent = $('#' + trend.id_selector + '-aggregate-sparkline');
-            let width = parent.width();
-            let height = parent.height();
-            let chart = nv.models.sparklinePlus()
-              .margin({right: 40})
-              .height(height)
-              .width(width)
-              .x(function (d, i) { return i; })
-              .showLastValue(false);
-            d3.select('#' + trend.id_selector + '-aggregate-sparkline svg')
-              .datum(_.map(trend.history, (curValue, index) => {
-                return {x: index, y: curValue};
-              }))
-              .call(chart);
-            return chart;
-          }, this),
-          callback: function (graph) {
-            nv.utils.windowResize(function () {
+        if (trend.history && trend.history.length > 1) {
+          nv.addGraph({
+            generate: _.bind(function () {
               let parent = $('#' + trend.id_selector + '-aggregate-sparkline');
               let width = parent.width();
               let height = parent.height();
-              graph.width(width).height(height);
-
+              let chart = nv.models.sparklinePlus()
+                .margin({right: 40})
+                .height(height)
+                .width(width)
+                .x(function (d, i) { return i; })
+                .showLastValue(false);
               d3.select('#' + trend.id_selector + '-aggregate-sparkline svg')
-                .attr('width', width)
-                .attr('height', height)
-                .transition().duration(0)
-                .call(graph);
-            });
-          }
-        });
+                .datum(_.map(trend.history, (curValue, index) => {
+                  return {x: index, y: curValue};
+                }))
+                .call(chart);
+              return chart;
+            }, this),
+            callback: function (graph) {
+              nv.utils.windowResize(function () {
+                let parent = $('#' + trend.id_selector + '-aggregate-sparkline');
+                let width = parent.width();
+                let height = parent.height();
+                graph.width(width).height(height);
+
+                d3.select('#' + trend.id_selector + '-aggregate-sparkline svg')
+                  .attr('width', width)
+                  .attr('height', height)
+                  .transition().duration(0)
+                  .call(graph);
+              });
+            }
+          });
+        }
         let current = trend.history[trend.history.length - 1];
         this.aggBullets[trend.id_selector] = new ErrorBulletWidget({
           el: '#' + trend.id_selector + '-aggregate-bullet',
