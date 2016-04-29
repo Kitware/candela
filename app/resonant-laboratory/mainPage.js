@@ -26,8 +26,10 @@ let MainPage = Backbone.View.extend({
     // Initial empty state (assume no logged in user)
     this.currentUser = new User();
 
-    this.listenTo(this.currentUser, 'rra:logout', () => {
-      this.switchProject(null);
+    this.listenTo(this.currentUser, 'rlab:logout', () => {
+      this.switchProject(null).then(() => {
+        this.overlay.render('StartingScreen');
+      });
     });
 
     // Start no datasets and no project
