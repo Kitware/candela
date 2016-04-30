@@ -74,6 +74,14 @@ export let ResultTablePane = Backbone.View.extend({
           $(resultDivSelector)
             .css('cursor', 'pointer')
             .click(result.callback);
+        } else if (result.link) {
+          $(resultDivSelector)
+            .css('cursor', 'pointer')
+            .click(function () {
+              if (result.link) {
+                window.location = result.link;
+              }
+            });
         }
       }, this);
 
