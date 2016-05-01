@@ -9,7 +9,7 @@ table.table.table-striped.table-hover.table-responsive.table-compact
     td Data Set
     each trend in trends
       td
-        abbr(title="#{trend.name}") #{trend.display_name}
+        abbr(title="#{trend.title}") #{trend.display_name}
   tbody
     each resultSet in resultsByDatasetId
       tr

@@ -12,11 +12,12 @@ export let StatusBarWidget = Backbone.View.extend({
     this.numSuccess = settings.numSuccess || 0;
     this.numBad = settings.numBad || 0;
     this.numFail = settings.numFail || 0;
+    this.numIncomplete = settings.numIncomplete || 0;
     $(window).on('resize', _.bind(this.createChart, this));
   },
 
   createChart: function () {
-    var total = this.numSuccess + this.numBad + this.numFail;
+    var total = this.numSuccess + this.numBad + this.numFail + this.numIncomplete;
     if (total <= 0) {
       return;
     }
@@ -27,6 +28,7 @@ export let StatusBarWidget = Backbone.View.extend({
     var unitWidth = curWidth / total;
     var badStart = unitWidth * this.numSuccess;
     var failStart = badStart + unitWidth * this.numBad;
+    var incompleteStart = failStart + unitWidth * this.numFail;
 
     var successGroup = svg.append('g');
     successGroup.append('rect')
@@ -48,6 +50,14 @@ export let StatusBarWidget = Backbone.View.extend({
       .attr('width', unitWidth * this.numFail)
       .attr('height', '100%')
       .attr('class', 'fail');
+
+    var incompleteGroup = svg.append('g');
+    incompleteGroup.append('rect')
+      .attr('x', incompleteStart)
+      .attr('width', unitWidth * this.numIncomplete)
+      .attr('height', '100%')
+      .attr('class', 'incomplete');
+
   },
 
   render: function () {

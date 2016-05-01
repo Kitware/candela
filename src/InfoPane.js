@@ -22,6 +22,7 @@ export let InfoPane = Backbone.View.extend({
     this.max = settings.max || 5;
     this.producerLink = settings.producer_link || null;
 
+    this.numIncomplete = 0;
     this.numSuccess = 0;
     this.numBad = 0;
     this.numFail = 0;
@@ -29,17 +30,21 @@ export let InfoPane = Backbone.View.extend({
     this.aggTrends = settings.aggTrends;
     _.each(settings.trendValuesByDataset, _.bind(function (dataset) {
       this.allValues.push(dataset.current);
-      var failTrend = settings.trendMap[dataset.trend].fail;
-      var warningTrend = settings.trendMap[dataset.trend].warning;
-      if (failValue(dataset.current, warningTrend, failTrend)) {
-        this.numFail++;
-      } else if (warningValue(dataset.current, warningTrend, failTrend)) {
-        this.numBad++;
+
+      if (settings.trendMap[dataset.trend].incompleteThreshold) {
+        this.numIncomplete++;
       } else {
-        this.numSuccess++;
+        var failTrend = settings.trendMap[dataset.trend].fail;
+        var warningTrend = settings.trendMap[dataset.trend].warning;
+        if (failValue(dataset.current, warningTrend, failTrend)) {
+          this.numFail++;
+        } else if (warningValue(dataset.current, warningTrend, failTrend)) {
+          this.numBad++;
+        } else {
+          this.numSuccess++;
+        }
       }
     }, this));
-    this.ranDatasets = this.numSuccess + this.numBad + this.numFail;
   },
 
   getToday: function () {
@@ -68,11 +73,6 @@ export let InfoPane = Backbone.View.extend({
       name: this.name,
       branch: this.branch,
       day: this.day,
-      ranDatasets: this.ranDatasets,
-      numSuccess: this.numSuccess,
-      numBad: this.numBad,
-      numFail: this.numFail,
-      totalMedian: this.totalMedian,
       aggTrends: this.aggTrends,
       sparklinesExist: sparklinesExist,
       producerLink: this.producerLink
@@ -123,10 +123,12 @@ export let InfoPane = Backbone.View.extend({
           trend: trend
         }).render();
         let dotSelector = '#' + trend.id_selector + '-aggregate-dot';
-        if (failValue(current, trend.warning, trend.fail)) {
-            $(dotSelector).attr('class', 'fail');
-        } else if (warningValue(current, trend.warning, trend.fail)) {
-            $(dotSelector).attr('class', 'bad');
+        if (!trend.incompleteThreshold) {
+          if (failValue(current, trend.warning, trend.fail)) {
+              $(dotSelector).attr('class', 'fail');
+          } else if (warningValue(current, trend.warning, trend.fail)) {
+              $(dotSelector).attr('class', 'bad');
+          }
         }
       }, this);
     }, this));
@@ -134,7 +136,8 @@ export let InfoPane = Backbone.View.extend({
     let statusBar = new StatusBarWidget({
       numSuccess: this.numSuccess,
       numBad: this.numBad,
-      numFail: this.numFail
+      numFail: this.numFail,
+      numIncomplete: this.numIncomplete,
     });
     statusBar.render();
   }

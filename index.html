@@ -284,9 +284,14 @@
                     var appSettings = imageProcessingSettings;
                 }
             }
+            // Perform two separate loops since we set appSettings
+            // above, which is modified below.
             for (var i = 0; i < qParams.length; i++) {
                 if (qParams[i] === 'omitAggTrends') {
                     delete appSettings['agg_trends'];
+                }
+                if (qParams[i] === 'omitTrends') {
+                    delete appSettings['trends'];
                 }
             }
         }

@@ -22,7 +22,7 @@ export let ErrorBulletWidget = Backbone.View.extend({
 
   chartData: function () {
     return {
-      ranges: [this.trend.warning, this.trend.fail, this.trend.max],
+      ranges: this.trend.incompleteThreshold ? [0, 0, this.trend.max] : [this.trend.warning, this.trend.fail, this.trend.max],
       measures: [Math.round(Math.min(this.result.current, this.trend.max) * 10000) / 10000]
     };
   },
@@ -32,12 +32,16 @@ export let ErrorBulletWidget = Backbone.View.extend({
       generate: _.bind(function () {
         let chart = nv.models.bulletChart()
           .margin({top: 5, right: 20, bottom: 20, left: 25});
-        if (failValue(this.result.current, this.trend.warning, this.trend.fail)) {
-          chart.color(colors.fail);
-        } else if (warningValue(this.result.current, this.trend.warning, this.trend.fail)) {
-          chart.color(colors.bad);
+        if (this.trend.incompleteThreshold) {
+          chart.color(colors.incomplete);
         } else {
-          chart.color(colors.good);
+          if (failValue(this.result.current, this.trend.warning, this.trend.fail)) {
+            chart.color(colors.fail);
+          } else if (warningValue(this.result.current, this.trend.warning, this.trend.fail)) {
+            chart.color(colors.bad);
+          } else {
+            chart.color(colors.good);
+          }
         }
         d3.select('[id=\'' + this.el.id + '-svg\']')
           .datum(this.chartData())

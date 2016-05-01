@@ -27,3 +27,19 @@ webpack-dev-server by
 ```
 npm run start
 ```
+
+This will run the webpack-dev-server on all IPs to enable serving from a local
+VM, which can be a security vulnerability if served directly from your host machine.
+This server should be used for local development only.
+
+The example app by default displays a TRUTH GT type dashboard with trends
+and aggregate metrics provided.  The following query parameters can be
+added to the URL bar to test alternate input data to the example app, and
+can be used in any combination.
+
+ * `imageProcessing` will change the input data to an Image Processing dashboard
+ * `omitAggTrends` will remove any defined aggregate metrics, displaying the
+default client-side calculate aggregate metrics which are derived from trend values
+ * `omitTrends` will remove the trend thresholds and abbreviations, so the trend
+values will be displayed without thresholds or abbreviations, and max values are
+derived from the trend values

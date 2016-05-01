@@ -54,12 +54,14 @@ export let ResultTablePane = Backbone.View.extend({
         var trend = this.trendMap[result.trend];
         var resultDivSelector = '#' + result.id + '-' + trend.id_selector;
         // change color of circle
-        if (failValue(result.current, trend.warning, trend.fail)) {
-          $(resultDivSelector + ' svg.statusDot').find('circle')
-            .attr('class', 'fail');
-        } else if (warningValue(result.current, trend.warning, trend.fail)) {
-          $(resultDivSelector + ' svg.statusDot').find('circle')
-            .attr('class', 'bad');
+        if (!trend.incomplete) {
+          if (failValue(result.current, trend.warning, trend.fail)) {
+            $(resultDivSelector + ' svg.statusDot').find('circle')
+              .attr('class', 'fail');
+          } else if (warningValue(result.current, trend.warning, trend.fail)) {
+            $(resultDivSelector + ' svg.statusDot').find('circle')
+              .attr('class', 'bad');
+          }
         }
         // render bullets
         let errorBullet = new ErrorBulletWidget({

@@ -22,10 +22,7 @@ table.table.table-responsive.table-compact
             circle.none(id="#{idSelector}-aggregate-dot" r="10", cx="10", cy="10")
       td
         .agg-label
-          if aggTrend.title
-            abbr(title="#{aggTrend.title}") #{aggTrend.display_name}
-          else
-            abbr(title="#{aggTrend.name}") #{aggTrend.display_name}
+          abbr(title="#{aggTrend.title}") #{aggTrend.display_name}
       if sparklinesExist
         td
           .agg-sparkline(id="#{idSelector}-aggregate-sparkline")

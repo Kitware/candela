@@ -61,7 +61,21 @@ export let dash = Backbone.View.extend({
      * Create a valid display_name and id_selector per trend.
      */
     function sanitizeTrend (trend) {
-      trend.display_name = trend.abbreviation || trend.name;
+      if (!trend.abbreviation) {
+        trend.display_name = trend.name;
+        if (!trend.title) {
+          trend.title = 'No abbreviation defined';
+        }
+      } else {
+        trend.display_name = trend.abbreviation;
+        if (!trend.title) {
+          trend.title = trend.name;
+        }
+      }
+      if (!_.has(trend, 'warning') || !_.has(trend, 'fail')) {
+        trend.incompleteThreshold = true;
+        trend.title += ' & Incomplete threshold definition';
+      }
       trend.id_selector = sanitizeSelector(trend.display_name);
       return trend;
     }
@@ -69,11 +83,33 @@ export let dash = Backbone.View.extend({
     // Perform all the data munging at the outset so that it is consistent
     // as it gets passed down throughout the application.
 
+    if (!settings.trends) {
+        settings.trends = [];
+    }
     // trendMap maps full trend name to a sanitized trend object.
     settings.trendMap = {};
     _.each(settings.trends, function (trend) {
       settings.trendMap[trend.name] = sanitizeTrend(trend);
     });
+    // Create trends for any scalars that don't supply them, setting
+    // the max as the max input value for that trend.
+    _.each(settings.trendValuesByDataset, function (trendValue) {
+      if (!_.has(settings.trendMap, trendValue.trend)) {
+        var syntheticTrend = sanitizeTrend({
+          name: trendValue.trend,
+          synth: true,
+          max: trendValue.current
+        });
+        settings.trendMap[syntheticTrend.name] = syntheticTrend;
+        settings.trends.push(syntheticTrend);
+      } else {
+        var trend = settings.trendMap[trendValue.trend];
+        if (trend.synth && trend.max < trendValue.current) {
+          trend.max = trendValue.current;
+        }
+      }
+    });
+
     // Sort trends now that they have display_name property.
     settings.trends = _.sortBy(settings.trends, 'display_name');
     // Order the individual trend dataset values by trend display_name.
