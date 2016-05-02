@@ -50,19 +50,13 @@ p {
 #EmptyState > div {
   width: 15em;
 }
-#LooseSeal {
-  position: absolute;
-  left: calc(50% - 7.5em);
-  top: 50%;
-  height: 15em;
-  text-align: center;
-  background-image: url('../images/looseSeal.svg');
-}
 #QuestionHint {
   position: absolute;
   top: 0em;
   right: 0em;
   text-align: right;
+  background-image: url('../images/looseSeal.svg');
+  height: 15em;
 }
 
 
