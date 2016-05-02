@@ -18,8 +18,9 @@ export let dash = Backbone.View.extend({
 
   initialize: function (settings) {
     /**
-     * Calculate an percentile value from an array of
-     * numbers sorted in numerically increasing order.
+     * Calculate an percentile value from an array of numbers sorted in
+     * numerically increasing order, p should be a ratio percentile,
+     * e.g. 50th percentile is p = 0.5.
      */
     function calcPercentile (arr, p) {
       if (arr.length === 0) return 0;
@@ -27,13 +28,10 @@ export let dash = Backbone.View.extend({
       if (p <= 0) return arr[0];
       if (p >= 1) return arr[arr.length - 1];
 
-      let index = arr.length * p;
-      let lower = Math.floor(index);
-      let upper = lower + 1;
-      let weight = index % 1;
-
-      if (upper >= arr.length) return arr[lower];
-      return arr[lower] * (1 - weight) + arr[upper] * weight;
+      let index = Math.round(p * arr.length) - 1;
+      // Ind may be below 0, in this case the closest value is the 0th index.
+      index = index < 0 ? 0 : index;
+      return arr[index];
     }
 
     /**
@@ -58,7 +56,9 @@ export let dash = Backbone.View.extend({
     }
 
     /**
-     * Create a valid display_name and id_selector per trend.
+     * Creates a valid display_name and id_selector per trend,
+     * create a mouseover title property, and determines if the threshold
+     * is correctly defined.
      */
     function sanitizeTrend (trend) {
       if (!trend.abbreviation) {
@@ -78,6 +78,21 @@ export let dash = Backbone.View.extend({
       }
       trend.id_selector = sanitizeSelector(trend.display_name);
       return trend;
+    }
+
+    /**
+     * Ensures that an aggregate metric has a max value set, as a fallback
+     * it will be set to the last value in the history.
+     */
+    function sanitizeAggregateThreshold (aggTrend) {
+      if (_.isNaN(parseFloat(aggTrend.max))) {
+        aggTrend.max = aggTrend.history[aggTrend.history.length-1];
+        if (!aggTrend.incompleteThreshold) {
+          aggTrend.incompleteThreshold = true;
+          aggTrend.title += ' & Incomplete threshold definition';
+        }
+      }
+      return aggTrend;
     }
 
     // Perform all the data munging at the outset so that it is consistent
@@ -122,6 +137,7 @@ export let dash = Backbone.View.extend({
     var aggTrends = settings.agg_trends || getAggTrends(settings.trendMap, settings.trendValuesByDataset, percentile);
     settings.aggTrends = _.chain(aggTrends)
                           .map(sanitizeTrend)
+                          .map(sanitizeAggregateThreshold)
                           .sortBy('display_name')
                           .value();
 
