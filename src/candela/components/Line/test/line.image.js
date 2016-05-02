@@ -4,5 +4,5 @@ imageTest({
   name: 'line',
   url: 'http://localhost:38000/examples/#line',
   selector: '#vis-element',
-  threshold: 0.01
+  threshold: 0.001
 });

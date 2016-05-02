@@ -1,7 +1,12 @@
+[
+  "@defaults",
+  [
+    ["padding", "strict"]
+  ],
 {
   "width": ["@get", "width", 600],
   "height": ["@get", "height", 600],
-  "padding": "strict",
+  "padding": ["@get", "padding"],
   "data": [
     {
       "name": "data",
@@ -150,3 +155,4 @@
     }
   ]
 }
+]

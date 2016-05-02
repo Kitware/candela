@@ -5,12 +5,13 @@
     ["y", "y"],
     ["xAxis.title", ["@get", "x"]],
     ["yAxis.title", ["@get", "y"]],
-    ["hover", [["@get", "x"], ["@get", "y"]]]
+    ["hover", [["@get", "x"], ["@get", "y"]]],
+    ["padding", "strict"]
   ],
   {
     "width": ["@get", "width", 800],
     "height": ["@get", "height", 500],
-    "padding": "strict",
+    "padding": ["@get", "padding"],
     "predicates": [
       {
         "name": "tooltip",

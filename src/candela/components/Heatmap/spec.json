@@ -3,12 +3,13 @@
   [
     ["id", "_id"],
     ["fields", []],
-    ["sort", ["@get", "id"]]
+    ["sort", ["@get", "id"]],
+    ["padding", "strict"]
   ],
   {
     "width": ["@get", "width"],
     "height": ["@get", "height"],
-    "padding": "strict",
+    "padding": ["@get", "padding"],
 
     "predicates": [
       {

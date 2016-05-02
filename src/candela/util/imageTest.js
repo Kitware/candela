@@ -52,6 +52,8 @@ export default function imageTest ({name, url, selector, delay = 0, threshold}) 
     // TODO: allow options to appear in args.
     let n = Nightmare({
       show: false,
+      useContentSize: true,
+      frame: false,
       webPreferences: {
         // This disables session sharing, allowing each test to begin with an
         // emtpy cache, etc.
@@ -63,7 +65,7 @@ export default function imageTest ({name, url, selector, delay = 0, threshold}) 
     .then(() => {
       return n.goto(url)
         .wait('body')
-        .wait(delay)
+        .wait(1000 + delay)
         // TODO: allow for a custom evaluate function?
         .evaluate((_selector) => {
           const box = document.querySelector(_selector).getBoundingClientRect();

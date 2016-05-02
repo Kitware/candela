@@ -10,7 +10,9 @@
 
     // Default axis titles to x and y field names.
     ["xAxis.title", ["@get", "x"]],
-    ["yAxis.title", ["@get", "y"]]
+    ["yAxis.title", ["@get", "y"]],
+
+    ["padding", "strict"]
 ],
   [
     "@let",
@@ -70,7 +72,7 @@
       {
         "width": ["@get", "width"],
         "height": ["@get", "height"],
-        "padding": "strict",
+        "padding": ["@get", "padding"],
         "predicates": [
           {
             "name": "tooltip",

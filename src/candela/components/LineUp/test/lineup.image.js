@@ -5,5 +5,5 @@ imageTest({
   url: 'http://localhost:38000/examples/#lineup',
   selector: '#vis-element',
   delay: 2000,
-  threshold: 0.03
+  threshold: 0.001
 });

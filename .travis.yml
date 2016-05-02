@@ -17,11 +17,7 @@ addons:
       s3_region: "us-east-1"
       paths:
         - $(find src/candela/components -name '*.png' | tr "\n" ":")
-      debug: true
-
-cache:
-  directories:
-    - node_modules
+      debug: false
 
 before_install:
   - export DISPLAY=:99.0
@@ -31,4 +27,4 @@ script:
     - npm install
     - npm run build
     - npm run test:unit
-    - npm run test:image
+    - CANDELA_DUMP_IMAGE=all npm run test:image

@@ -4,5 +4,5 @@ imageTest({
   name: 'gantt',
   url: 'http://localhost:38000/examples/#gantt',
   selector: '#vis-element',
-  threshold: 0.02
+  threshold: 0.001
 });

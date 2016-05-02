@@ -6,7 +6,8 @@
     ["start", "start"],
     ["end", "end"],
     ["label", "label"],
-    ["level", "level"]
+    ["level", "level"],
+    ["padding", "strict"]
   ],
   [
     "@merge",
@@ -34,7 +35,7 @@
     {
       "width": ["@get", "width"],
       "height": ["@get", "height"],
-      "padding": "strict",
+      "padding": ["@get", "padding"],
       "data": [
         {
           "name": "data",
