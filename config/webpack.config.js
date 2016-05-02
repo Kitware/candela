@@ -31,9 +31,9 @@ module.exports = {
       vg: 'vega'
     }),
 
-    new CleanPlugin([
-      './build/*'
-    ]),
+    new CleanPlugin([path.resolve(__dirname, 'build/*')], {
+      root: __dirname
+    }),
 
     new HtmlPlugin({
       title: 'Candela Examples',
