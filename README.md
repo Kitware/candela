@@ -19,7 +19,7 @@ npm install
 npm run build
 ```
 
-# [Reference application](https://github.com/Kitware/candela/blob/master/app/resonant-reference-app/README.md)
+# [Resonant Laboratory application](https://github.com/Kitware/candela/blob/master/app/resonant-laboratory/README.md)
 
 # Release Process
 
@@ -32,7 +32,7 @@ will be 1.2.0.
 1. Create a new release branch, named `release-1.2.0`:
 
    ```shell
-   git checkout -b release-1.2.0 master 
+   git checkout -b release-1.2.0 master
    ```
 
 2. Bump the version number to 1.2.0 by editing `package.json`. Make a commit
@@ -49,7 +49,7 @@ will be 1.2.0.
    your checkout remains on `release-1.2.0`. You can do this with:
 
    ```shell
-   git branch save-point 
+   git branch save-point
    ```
 
 4. Build the distribution files by using the "production" NPM script:
