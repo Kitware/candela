@@ -9,7 +9,11 @@
       "x": "petalLength",
       "y": "petalWidth",
       "color": "sepalLength",
-      "shape": "species"
+      "shape": "species",
+      "width": 620,
+      "height": 500,
+      "padding": {"top": 20, "bottom": 80, "left": 50, "right": 130},
+      "renderer": "svg"
     }
   },
   {
@@ -20,7 +24,11 @@
     "options": {
       "data": "msft",
       "x": "date",
-      "y": ["price"]
+      "y": ["price"],
+      "width": 735,
+      "height": 535,
+      "padding": {"left": 45, "right": 20, "top": 20, "bottom": 45},
+      "renderer": "svg"
     }
   },
   {
@@ -31,7 +39,11 @@
     "options": {
       "data": "iris",
       "fields": ["petalWidth", "petalLength", "sepalLength", "sepalWidth"],
-      "color": "species"
+      "color": "species",
+      "width": 620,
+      "height": 550,
+      "padding": {"left": 55, "right": 125, "top": 30, "bottom": 20},
+      "renderer": "svg"
     }
   },
   {
@@ -65,7 +77,11 @@
       "x": "id",
       "y": "a",
       "color": "b",
-      "hover": ["id", "c"]
+      "hover": ["id", "c"],
+      "width": 625,
+      "height": 540,
+      "padding": {"left": 45, "right": 130, "top": 20, "bottom": 40},
+      "renderer": "svg"
     }
   },
   {
@@ -97,7 +113,11 @@
           "background": "dimgray",
           "foreground": "rgb(228,0,0)"
         }
-      ]
+      ],
+      "width": 630,
+      "height": 550,
+      "padding": {"left": 150, "right": 20, "top": 20, "bottom": 30},
+      "renderer": "svg"
     }
   },
   {
@@ -126,7 +146,11 @@
       "level": "level",
       "xAxis": {
         "values": [0, 3, 6, 9]
-      }
+      },
+      "width": 620,
+      "height": 555,
+      "padding": {"left": 170, "right": 10, "top": 20, "bottom": 25},
+      "renderer": "svg"
     }
   },
   {
@@ -139,7 +163,11 @@
       "fields": ["sepalLength", "sepalWidth"],
       "group": "species",
       "boxSize": 0.5,
-      "capSize": 0.25
+      "capSize": 0.25,
+      "width": 750,
+      "height": 450,
+      "padding": {"left": 30, "right": 20, "top": 20, "bottom": 130},
+      "renderer": "svg"
     }
   },
   {
@@ -149,7 +177,11 @@
     "component": "Histogram",
     "options": {
       "data": "iris",
-      "bin": "sepalLength"
+      "bin": "sepalLength",
+      "width": 735,
+      "height": 540,
+      "padding": {"left": 45, "right": 20, "top": 20, "bottom": 40},
+      "renderer": "svg"
     }
   },
   {
@@ -176,7 +208,11 @@
         "petalWidth",
         "species"
       ],
-      "sort": "petalLength"
+      "sort": "petalLength",
+      "width": 700,
+      "height": 500,
+      "padding": {"top": 20, "bottom": 80, "left": 80, "right": 20},
+      "renderer": "svg"
     }
   },
   {

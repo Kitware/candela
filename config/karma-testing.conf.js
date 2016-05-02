@@ -4,12 +4,8 @@ var webpackConfig = require('./webpack-testing.config');
 karmaConfig.webpack = webpackConfig;
 
 karmaConfig.reporters = [
-  'tap'
+  'quiet'
 ];
-
-karmaConfig.tapReporter = {
-  disableStdout: true
-};
 
 module.exports = function (config) {
   config.set(karmaConfig);

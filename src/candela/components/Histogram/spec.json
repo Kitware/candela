@@ -12,7 +12,8 @@
         ["@join", "", ["Sum of ", ["@get", "aggregate"]]],
         "Count"
       ]
-    ]
+    ],
+    ["padding", "strict"]
   ],
   [
     "@let",
@@ -95,7 +96,7 @@
       {
         "width": ["@get", "width"],
         "height": ["@get", "height"],
-        "padding": "strict",
+        "padding": ["@get", "padding"],
         "predicates": [
           {
             "name": "tooltip",

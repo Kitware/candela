@@ -383,60 +383,45 @@ let merge = function (defaults, options) {
   return defaults;
 };
 
-let chart = function (template, el, initialOptions, done) {
-  let that = {};
+let parseChart = function (spec, element, options) {
+  // Use element size to set size, unless size explicitly specified or
+  // element size is zero.
+  let el = d3.select(element)[0][0];
+  let sizeOptions = {};
 
-  initialOptions = initialOptions || {};
+  const size = getElementSize(el);
+  const elWidth = size.width;
+  const elHeight = size.height;
 
-  that.el = el;
-  that.options = {};
-  that.template = template;
-
-  that.update = function (newOptions) {
-    that.options = extend(that.options, newOptions);
-
-    // Use element size to set size, unless size explicitly specified or
-    // element size is zero.
-    let el = d3.select(that.el)[0][0];
-    let sizeOptions = {};
-
-    const size = getElementSize(el);
-    const elWidth = size.width;
-    const elHeight = size.height;
-
-    if (elWidth !== 0 && elHeight !== 0) {
-      if (that.options.width === undefined) {
-        sizeOptions.width = elWidth;
-      }
-      if (that.options.height === undefined) {
-        sizeOptions.height = elHeight;
-      }
+  if (elWidth !== 0 && elHeight !== 0) {
+    if (options.width === undefined) {
+      sizeOptions.width = elWidth;
     }
-    let curOptions = extend(that.options, sizeOptions);
+    if (options.height === undefined) {
+      sizeOptions.height = elHeight;
+    }
+  }
+  let curOptions = extend(options, sizeOptions);
 
-    // Options that go directly to Vega runtime
-    let vegaOptions = {
-      el: el,
-      renderer: curOptions.renderer
-    };
-
-    that.spec = transform(that.template, curOptions);
-
-    vg.parse.spec(that.spec, function (chartObj) {
-      let chart = chartObj(vegaOptions);
-      chart.update();
-      if (done) {
-        done(chart);
-      }
-    });
+  // Options that go directly to Vega runtime
+  let vegaOptions = {
+    el: el,
+    renderer: curOptions.renderer
   };
 
-  that.update(initialOptions);
+  let vegaSpec = transform(spec, curOptions);
 
-  return that;
+  // Return a promise for the Vega chart object
+  return new Promise(resolve => {
+    vg.parse.spec(vegaSpec, chartObj => {
+      let chart = chartObj(vegaOptions);
+      chart.update();
+      resolve(chart);
+    });
+  });
 };
 
 export default {
   transform,
-  chart
+  parseChart
 };
