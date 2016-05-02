@@ -1,0 +1,36 @@
+#WidgetPanels {
+  position: absolute;
+  width: 100%;
+  top: 3em;
+  bottom: 0px;
+}
+
+#WidgetPanels .sectionHeader h2 {
+  font-size: 0.75em;
+  letter-spacing: 1px;
+  margin: 0em 0.5em;
+}
+
+#WidgetPanels .sectionHeader img {
+  width: 1em;
+  height: 1em;
+  margin: 0em 0.25em;
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+#WidgetPanels .sectionHeader img:hover {
+  -webkit-filter: opacity(50%);
+  filter: opacity(50%);
+}
+
+#WidgetPanels .targeted .sectionHeader img {
+  -webkit-transform: rotate(0deg);
+  -moz-transform: rotate(0deg);
+  -ms-transform: rotate(0deg);
+  -o-transform: rotate(0deg);
+  transform: rotate(0deg);
+}

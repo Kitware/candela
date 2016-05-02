@@ -8,6 +8,6 @@ export default class VisComponent {
   }
 
   render () {
-    throw new Error('"refresh() is pure abstract"');
+    throw new Error('"render() is pure abstract"');
   }
 }

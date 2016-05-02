@@ -37,7 +37,7 @@ the constructor for specific subclasses of VisComponent.
   visualizations.
 
 * **options** is an object containing the initial options for the visualization.
-  This includes any data, visual mappings, or other settings pertinent to the
+  This includes any data, visual matchings, or other settings pertinent to the
   visualization. Options are specified in the form `{name: value}`.
 
 ## MyComponent.spec

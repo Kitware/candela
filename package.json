@@ -5,12 +5,12 @@
   "main": "dist/candela.js",
   "scripts": {
     "build": "webpack --config config/webpack.config.js",
-    "build:reference": "cd app/resonant-reference-app && webpack",
+    "build:laboratory": "cd app/resonant-laboratory && webpack",
     "dist": "webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
     "test": "echo 'Please use \"npm run test:unit\", \"npm run test:image\", or \"npm run test:all\"' && false",
     "test:all": "result=true; npm run test:unit || result=false; npm run test:image || result=false; ${result}",
     "test:all:raw": "result=true; npm run test:unit:raw || result=false; npm run test:image:raw || result=false; ${result}",
-    "test:unit": "karma start config/karma-testing.conf.js | grep '^PhantomJS' | sed \"s/^.*LOG: '\\(.*\\)'$/\\1/\" | tap-spec",
+    "test:unit": "karma start config/karma-testing.conf.js | grep \"^'.*'$\" | sed \"s/^'\\(.*\\)'$/\\1/\" | tap-spec",
     "test:unit:raw": "karma start config/karma-testing.conf.js",
     "test:image": "npm run test:image:raw | tap-spec",
     "test:image:raw": "result=true; npm run test:image:server:down; npm run test:image:server && find src/ -name '*.image.js' | xargs -n 1 babel-node --presets es2015 || result=false; npm run test:image:server:down; ${result}",
@@ -55,9 +55,8 @@
     "karma": "^0.13.22",
     "karma-coverage": "^0.5.5",
     "karma-phantomjs-launcher": "^1.0.0",
+    "karma-quiet-reporter": "^0.1.2",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-tap": "^1.0.4",
-    "karma-tap-reporter": "0.0.6",
     "karma-webpack": "^1.7.0",
     "legacy-loader": "0.0.2",
     "less": "^2.3.1",
@@ -80,15 +79,17 @@
     "webpack": "^1.12.12"
   },
   "dependencies": {
+    "LineUpJS": "git+https://github.com/Caleydo/lineup.js#51ae6f2bcb55aead3f63357864e90d5799789910",
     "brace": "^0.7.0",
     "d3": "^3.5.14",
     "datalib": "^1.6.3",
     "font-awesome": "^4.4.0",
     "font-awesome-webpack": "^0.0.4",
     "jquery": "^2.2.0",
-    "LineUpJS": "git+https://github.com/Caleydo/lineup.js#51ae6f2bcb55aead3f63357864e90d5799789910",
+    "jquery-deparam": "^0.5.2",
     "underscore": "^1.8.3",
     "UpSet": "git+https://github.com/VCG/upset#6e8b7a172443dd6b4f4324d1a3368287e9e9c089",
-    "vega": "^2.4.2"
+    "vega": "^2.4.2",
+    "webcola": "^3.1.3"
   }
 }
