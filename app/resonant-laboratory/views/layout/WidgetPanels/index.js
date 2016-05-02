@@ -96,14 +96,15 @@ let WidgetPanels = Backbone.View.extend({
     this.$el.find('section.targeted')
       .css('width', style);
     
-    // Are all the widgets closed?
-    if (expandedSections === 0) {
-      // Hide the empty state image
+    // Are all the widgets closed (and no overlay is showing)?
+    if (expandedSections === 0 &&
+        window.mainPage.overlay.template === null) {
+      // Show the empty state image
       jQuery('#EmptyState')
         .css('left', (1.5 + 2.5 * collapsedSections) + 'em')
         .show();
     } else {
-      // Show the empty state image
+      // Hide the empty state image
       jQuery('#EmptyState').hide();
     }
 
