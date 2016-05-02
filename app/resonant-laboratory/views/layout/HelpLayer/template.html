@@ -1,0 +1,15 @@
+<defs>
+  <filter id="dropshadow" height="400%" y="-150%" x="-25%" width="150%">
+    <feMorphology operator="dilate" radius="10" in="SourceAlpha" result="bevel"></feMorphology>
+    <feGaussianBlur in="bevel" stdDeviation="5" result="bevelblur"></feGaussianBlur>
+    <feMerge>
+
+      <feMergeNode in="matrixedblur"></feMergeNode>
+      <!-- this contains the offset blurred image -->
+      <feMergeNode in="SourceGraphic"></feMergeNode>
+      <!-- this contains the element that the filter is applied to -->
+    </feMerge>
+  </filter>
+</defs>
+<g id="linkLayer"></g>
+<g id="nodeLayer"></g>

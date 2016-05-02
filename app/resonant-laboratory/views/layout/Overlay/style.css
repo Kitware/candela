@@ -1,0 +1,88 @@
+#Overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.35);
+  z-index: 8;
+  overflow: auto;
+}
+
+#Overlay .modal-dialog,
+#Overlay div.libraryInterface,
+#Overlay div.hint {
+  background-color: white;
+  border: 1px solid rgba(0,0,0,0.2);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  min-height: 15em;
+}
+
+#Overlay div.libraryInterface {
+  position: relative;
+  margin: 5em;
+  padding: 1em 2em 2em 3em;
+}
+
+#Overlay .libraryInterface hr {
+  position: relative;
+  left: -3em;
+  width: calc(100% + 5em);
+  border: none;
+  height: 1px;
+  background-color: #e5e5e5;
+}
+
+#Overlay div.hint {
+  position: relative;
+  margin: 5em;
+  padding: 3em;
+}
+
+#Overlay img.headerIcon {
+  float: right;
+  height: 16em;
+  margin-right: -1em;
+  margin-left: 1em;
+}
+
+#Overlay div.circleset {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: center;
+  align-items: center;
+}
+
+#Overlay div.circleButton {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-content: center;
+  align-items: center;
+  padding: 1em;
+  cursor: pointer;
+}
+
+#Overlay div.circleButton img {
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  vertical-align: middle;
+  border-radius: 50px;
+  border: 2px solid rgba(0,0,0,0);
+}
+#Overlay div.current.circleButton img {
+  background-color: #ccc;
+}
+
+#Overlay div.circleButton:hover img {
+  border: 2px solid #ccc;
+}
+
+#Overlay #closeOverlay {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  width: 2em;
+  height: 2em;
+  cursor: pointer;
+}

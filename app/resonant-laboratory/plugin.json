@@ -1,0 +1,9 @@
+{
+  "name": "Resonant Laboratory",
+  "description": "Resonant Laboratory",
+  "version": "0.1.0",
+  "grunt": {
+    "autobuild": false,
+    "file": "Gruntfile.js"
+  }
+}
