@@ -22,13 +22,6 @@ Choose your own visualization adventure.
   girder-install plugin -s app/resonant-laboratory
   ```
 
-5. Rebuild Girder:
-
-  ```bash
-  cd girder_repo_dir
-  grunt
-  ```
-
 ## Setup: First Run
 
 1. Start girder:

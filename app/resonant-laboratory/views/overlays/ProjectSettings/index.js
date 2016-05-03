@@ -121,11 +121,11 @@ let ProjectSettings = Backbone.View.extend({
           .catch((errorObj) => {
             if (errorObj.statusText === 'Unauthorized') {
               if (window.mainPage.currentUser.isLoggedIn()) {
-                window.mainPage.overlay.renderErrorScreen('You don\'t ' +
-                  'have the necessary permissions to delete that project.');
+                window.mainPage.overlay.renderErrorScreen(`You don\'t 
+have the necessary permissions to delete that project.`);
               } else {
-                window.mainPage.overlay.renderErrorScreen('Sorry, you can\'t ' +
-                  'delete projects unless you log in.');
+                window.mainPage.overlay.renderErrorScreen(`Sorry, you 
+can\'t delete projects unless you log in.`);
               }
             } else {
               // Something else happened

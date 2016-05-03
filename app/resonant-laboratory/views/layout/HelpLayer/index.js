@@ -11,7 +11,7 @@ import './style.css';
 function arrowGenerator(edge) {
   let arrowAngle = Math.PI / 4;
   let arrowLength = 10;
-
+  
   let shaftAngle = Math.atan2(edge.target.y - edge.source.y,
     edge.target.x - edge.source.x);
 
@@ -44,18 +44,19 @@ let HelpLayer = Backbone.View.extend({
     // easter egg (change these values when you find
     // a good balance)
     this.padding = 9;
-    this.margin = 18;
+    this.margin = 20;
 
     this.avoidOverlaps = true;
-    this.linkDistance = 250;
+    // this.linkDistance = 160;
     this.alpha = 0.7;
-    this.convergenceThreshold = 0.01;
+    this.convergenceThreshold = 0.1;
     // this.defaultNodeSize = 20;
     this.handleDisconnected = false;
+    this.jaccardLinkLengths = 100;
 
-    this.noConstraintIterations = 50;
-    this.structuralIterations = 50;
-    this.allConstraintIterations = 50;
+    this.noConstraintIterations = 3;
+    this.structuralIterations = 3;
+    this.allConstraintIterations = 3;
   },
   setTips: function (tips) {
     this.relevantTips = {};
@@ -227,8 +228,10 @@ let HelpLayer = Backbone.View.extend({
           nodeType: 'label',
           message: tip.message,
           // Start each label at a random location
-          x: Math.random() * bounds.width,
-          y: Math.random() * bounds.height
+          // x: Math.random() * bounds.width,
+          // y: Math.random() * bounds.height
+          x: tip.x,
+          y: tip.y + 250 // generally, tips are anchored toward the top
         });
         // Target (not drawn) for the link
         nodes.push({
@@ -346,7 +349,7 @@ let HelpLayer = Backbone.View.extend({
           .attr('y', -d.height / 2)
           .attr('width', d.width)
           .attr('height', d.height);
-        
+
         // Add in extra padding *outside* the rectangle
         d.width += 2 * self.margin;
         d.height += 2 * self.margin;
@@ -383,7 +386,7 @@ let HelpLayer = Backbone.View.extend({
           gap: d.height / 2
         });
       });
-      
+
       // Compute the layout
       let force = cola.d3adaptor()
         .size([bounds.width, bounds.height])
@@ -400,14 +403,17 @@ let HelpLayer = Backbone.View.extend({
       }
 
       let _renderGraph = () => {
+        // force.prepareEdgeRouting();
         tips.style('opacity', '1.0')
           .attr('transform', (d) => {
             return 'translate(' + d.x + ',' + d.y + ')';
           });
-        arrows.attr('d', arrowGenerator)
-          .style('opacity', '1.0');
+        arrows.attr('d', d => {
+          // return arrowGenerator(force.routeEdge(d));
+          return arrowGenerator(d);
+        }).style('opacity', '1.0');
       };
-      
+
       if (this.addedTuner) {
         // If we're tweaking the layout, watch it settle
         force.on('tick', _renderGraph);
@@ -437,18 +443,18 @@ let HelpLayer = Backbone.View.extend({
         .append('div')
         .attr('id', 'tuner')
         .append('button')
-          .text('Run again')
-          .on('click', () => {
-            self.addedTemplate = false;
-            self.render();
-            self.renderTuner();
-          });
+        .text('Run again')
+        .on('click', () => {
+          self.addedTemplate = false;
+          self.render();
+          self.renderTuner();
+        });
       this.addedTuner = true;
     }
 
     let controls = d3.select('#tuner').selectAll('div').data(forceControls);
     let controlsEnter = controls.enter().append('div');
-    
+
     // Control to change this parameter's setting (if enabled)
     controlsEnter.append('input')
       .attr('id', d => d.option + 'control')
@@ -489,7 +495,7 @@ let HelpLayer = Backbone.View.extend({
         }
         element.property('disabled', self[d.option] === undefined);
       });
-    
+
     // Label for the control (with its current value)
     controlsEnter.append('label')
       .attr('class', 'control')
@@ -526,7 +532,7 @@ let HelpLayer = Backbone.View.extend({
         self.render();
         self.renderTuner();
       });
-    
+
     // Label for the enable switch
     controls.selectAll('input.enable')
       .property('checked', d => this[d.option] !== undefined)

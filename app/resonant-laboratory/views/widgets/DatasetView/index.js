@@ -25,7 +25,7 @@ let DatasetView = Widget.extend({
     this.statusText.onclick = () => {
       window.mainPage.overlay.render('DatasetLibrary');
     };
-    this.statusText.title = 'Click to select a different dataset.';
+    this.statusText.title = 'Select a different dataset.';
     
     this.icons.splice(0, 0, {
       src: () => {

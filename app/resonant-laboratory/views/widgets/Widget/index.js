@@ -72,7 +72,7 @@ let Widget = Backbone.View.extend({
       tips[prefix + '.indicatorText'] = this.statusText.title;
     }
     // Get a tip for the bar
-    tips[prefix + '.sectionHeader'] = 'Click to collapse / expand this panel';
+    tips[prefix + '.sectionHeader'] = 'Collapse / expand this panel';
     return tips;
   }
 });

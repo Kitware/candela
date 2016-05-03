@@ -71,35 +71,34 @@ let Header = Backbone.View.extend({
 when there are new tips that you haven't seen yet.`
         /*,
       '#achievementsButton': `
-Your achievements. Click this to see what you've accomplished,
+Your achievements. See what you've accomplished,
 and what you still haven't tried.`*/
     };
 
     if (window.mainPage.project) {
       tips['#projectLocationButton'] =
-        `Indicates who can see the project you're working on. Click
-to change its settings.`;
+        'See/change who can see the project you\'re working on';
 
-      tips['#projectName'] = 'Click to rename this project';
+      tips['#projectName'] = 'Rename this project';
 
       if (window.mainPage.project.getMeta('datasets').length === 0) {
         tips['img.AddDataset.headerButton'] =
-          'Click to add a dataset to this project';
+          'Add a dataset to this project';
       } else {
         tips['img.DatasetView.headerButton'] =
-          'Click to see/change the datasets in this project';
+          'See/change the datasets in this project';
       }
 
       tips['img.MatchingView.headerButton'] =
-        `Click to manage the connections between the datasets 
+        `Manage the connections between the datasets 
 and the visualizations in this project`;
 
       if (window.mainPage.project.getMeta('visualizations').length === 0) {
         tips['img.AddVisualization.headerButton'] =
-          'Step 2: Click to add a visualization to this project';
+          'Add a visualization to this project';
       } else {
         tips['img.VisualizationView.headerButton'] =
-          'Click to explore the visualizations in this project';
+          'Explore the visualizations in this project';
       }
     }
 
