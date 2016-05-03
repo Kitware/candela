@@ -1,20 +1,8 @@
-import spec from './spec.json';
 import $ from 'jquery';
 import geojs from 'geojs/geo.js';
 import VisComponent from '../../VisComponent';
 
 export default class Geo extends VisComponent {
-  static get spec () {
-    return {
-      options: [
-        {
-          name: 'data',
-          type: 'table',
-          format: 'objectlist'
-        }
-      ]
-    };
-  }
 
   constructor (el, options) {
     super(el);
