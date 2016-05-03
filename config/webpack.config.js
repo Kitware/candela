@@ -26,9 +26,6 @@ module.exports = {
       d3: path.resolve(__dirname, 'node_modules/d3/d3.min.js')
     }
   },
-  externals: {
-    jQuery: 'jQuery',
-  },
   plugins: [
     new webpack.ProvidePlugin({
       vg: 'vega'
