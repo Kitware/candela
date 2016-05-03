@@ -47,18 +47,6 @@ module.exports = {
     }])
   ],
   module: {
-    preLoaders: [
-      {
-        test: /\.js$/,
-        loader: 'semistandard-loader',
-        include: [
-          path.resolve(__dirname, 'src/candela'),
-          path.resolve(__dirname, 'src/vcharts'),
-          path.resolve(__dirname, 'app')
-        ],
-        exclude: path.resolve(__dirname, 'src', 'external')
-      }
-    ],
     loaders: [
       {
         test: /\.js$/,
