@@ -7,6 +7,7 @@
     "build": "webpack --config config/webpack.config.js",
     "build:laboratory": "cd app/resonant-laboratory && webpack",
     "dist": "webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
+    "lint": "semistandard",
     "test": "echo 'Please use \"npm run test:unit\", \"npm run test:image\", or \"npm run test:all\"' && false",
     "test:all": "result=true; npm run test:unit || result=false; npm run test:image || result=false; ${result}",
     "test:all:raw": "result=true; npm run test:unit:raw || result=false; npm run test:image:raw || result=false; ${result}",
@@ -20,6 +21,12 @@
     "cover": "karma start config/karma-coverage.conf.js",
     "cover:report": "http-server coverage -p ${PORT-3000}",
     "demo": "http-server build -p ${PORT-3000}"
+  },
+  "semistandard": {
+    "ignore": [
+      "src/external",
+      "app/resonant-laboratory/web_client/lib"
+    ]
   },
   "repository": {
     "type": "git",
@@ -67,6 +74,7 @@
     "raw-loader": "^0.5.1",
     "sass-loader": "^3.2.0",
     "script-loader": "^0.6.1",
+    "semistandard": "^7.0.5",
     "semistandard-loader": "0.0.3",
     "strip-json-comments": "^2.0.1",
     "strip-json-comments-loader": "0.0.2",
