@@ -8,12 +8,12 @@
 	.st2{fill:none;stroke:#999999;stroke-width:48;stroke-linecap:square;stroke-miterlimit:10;}
 </style>
 <g>
-	<rect x="75.5" y="341.5" class="st0" width="96" height="96"/>
-	<rect x="75.5" y="209" class="st0" width="96" height="96"/>
-	<rect x="75.5" y="75.5" class="st0" width="96" height="96"/>
-	<rect x="339.5" y="123.5" class="st0" width="96" height="96"/>
-	<rect x="339.5" y="293.5" class="st0" width="96" height="96"/>
-	<polyline class="st1" points="123.5,123.5 387.5,341.5 123.5,389.5 	"/>
-	<line class="st2" x1="387.5" y1="171.5" x2="123.5" y2="257"/>
+	<rect x="7.4" y="373.4" class="st0" width="132.6" height="132.6"/>
+	<rect x="7.4" y="190.4" class="st0" width="132.6" height="132.6"/>
+	<rect x="7.4" y="6" class="st0" width="132.6" height="132.6"/>
+	<rect x="372" y="72.3" class="st0" width="132.6" height="132.6"/>
+	<rect x="372" y="307.1" class="st0" width="132.6" height="132.6"/>
+	<polyline class="st1" points="73.7,72.3 438.3,373.4 73.7,439.7 	"/>
+	<line class="st2" x1="438.3" y1="138.6" x2="73.7" y2="256.7"/>
 </g>
 </svg>

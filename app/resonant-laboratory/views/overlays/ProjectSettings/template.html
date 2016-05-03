@@ -4,12 +4,12 @@
   <div id="loginLinks">
     For more control, <a id="registerLink">Register</a> or <a id="loginLink">Log In</a>
   </div>
-  
+
   <h1 id="projectSettingsHeader">
     Project Settings
   </h1>
   <div id="projectSettings">
-    <p>A project connects datasets to visualizations. If your project is public, you can share your work simply by sharing the URL.</p>
+    <p>A project connects datasets to visualizations. If your project is public, you can share your work simply by sharing its URL (only users with access will be able to see it).</p>
 
     <div class="form">
       <div>
@@ -18,27 +18,6 @@
         <button id="saveAsButton">Save A Copy</button>
         <button id="deleteButton">Delete</button>
         <button id="newButton">New Empty Project</button>
-      </div>
-      
-      <div>
-        <img id="visibilityIcon" />
-        <label id="visibilityLabel"></label>
-      </div>
-      
-      <div>
-        <img id="editabilityIcon" />
-        <label id="editabilityLabel"></label>
-      </div>
-      
-      <div class="clickable" id="girderButton">
-        <img src="../../../images/girder.svg" class="button" />
-        <label>Set advanced permissions for this project in Girder</label>
-      </div>
-      
-      <div class="clickable" id="copyLinkButton">
-        <img src="../../../images/copyLink.svg" class="button" />
-        <label>Copy a link to this project (only those with access
-        can use it)</label>
       </div>
       
       <div>
@@ -51,10 +30,32 @@
         <input value="PublicLibrary" id="libraryVisibility" name="projectVisibility" type="radio">
         <label for="libraryVisibility">Library</label>
       </div>
+      
+      <div id="projectDetails">
+        <div class="unclickable circleButton">
+          <img id="visibilityIcon"/>
+          <label id="visibilityLabel"></label>
+        </div>
+
+        <div class="unclickable circleButton">
+          <img id="editabilityIcon"/>
+          <label id="editabilityLabel"></label>
+        </div>
+
+        <div class="circleButton" id="girderButton">
+          <img src="../../../images/girder.svg" />
+          <label>Show in Girder</label>
+        </div>
+
+        <div class="circleButton" id="copyLinkButton">
+          <img src="../../../images/copyLink.svg" />
+          <label>Copy a link</label>
+        </div>
+      </div>
     </div>
   </div>
   <div id="libraryChunk">
-  
+
   </div>
 </div>
 
@@ -64,4 +65,5 @@
     top: 1.5em;
     right: 4em;
   }
+
 </style>

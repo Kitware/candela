@@ -14,9 +14,9 @@
 }
 
 #Header img.headerButton {
-  width: 2.25em;
-  height: 2.25em;
-  margin: 0.25em;
+  width: 1.5em;
+  height: 1.5em;
+  margin: 0.75em;
 }
 
 #Header img.headerButton:hover {
@@ -64,8 +64,7 @@
   background-color: inherit;
   color: inherit;
   border: none;
-  margin: 0.25em;
-  font-size: 1.25em;
+  margin: 0.75em;
   text-align: center;
   box-shadow: none;
 }
