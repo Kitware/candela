@@ -1,5 +1,8 @@
 .info-title.info-name #{name}
-.info-value.info-branch #{branch}
-.info-value.info-date #{day}
+.info-branch #{branch}
+.info-submission
+  .info-date #{day}
+  if uuid
+    .info-uuid #{uuid}
 .info-help
   a(href=helpLink).help Help

@@ -9,6 +9,7 @@ export let TopInfoBar = Backbone.View.extend({
     this.name = settings.name || 'Ground Truth';
     this.branch = settings.branch || 'master';
     this.day = settings.day || this.getToday();
+    this.submissionUuid = settings.submission_uuid;
     this.helpLink = settings.help_link || 'https://github.com/Trailmix/RedwoodInternal/wiki/Midas-for-Metrics-Based-Testing#performance-dashboards';
   },
 
@@ -17,6 +18,7 @@ export let TopInfoBar = Backbone.View.extend({
       name: this.name,
       branch: this.branch,
       day: this.day,
+      uuid: this.submissionUuid,
       helpLink: this.helpLink
     }));
   }
