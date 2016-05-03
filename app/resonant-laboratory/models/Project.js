@@ -135,7 +135,7 @@ let Project = MetadataItem.extend({
     return this.create()
       .then(() => {
         // This copy is now "ours"
-        window.mainPage.currentUser.claimProject();
+        window.mainPage.currentUser.preferences.claimProject();
         // Let everyone know about the new project
         window.mainPage.trigger('rra:createProject');
         this.updateStatus();
