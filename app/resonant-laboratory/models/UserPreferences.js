@@ -149,7 +149,7 @@ you move or delete this item, your preferences will be lost.`,
       // Make the id a valid / nice mongo id
       tipId = tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
       seenTips[tipId] = true;
-    };
+    }
     this.setMeta('seenTips', seenTips);
     this.trigger('rra:observeTips');
     this.save();

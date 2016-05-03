@@ -38,7 +38,7 @@ test('Structure and content of unminified Candela library file', t => {
     if (candelaBuilt) {
       structureTests(t, candelaBuilt);
     }
-  } catch(e) {
+  } catch (e) {
     t.skip('Built candela.js file does not exist');
   }
 

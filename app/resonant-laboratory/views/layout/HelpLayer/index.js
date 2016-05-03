@@ -8,7 +8,7 @@ import forceControls from './forceControls.json';
 import template from './template.html';
 import './style.css';
 
-function arrowGenerator(edge) {
+function arrowGenerator (edge) {
   let arrowAngle = Math.PI / 4;
   let arrowLength = 10;
 
@@ -163,7 +163,7 @@ let HelpLayer = Backbone.View.extend({
       let center = {
         x: bounds.width / 2,
         y: bounds.height / 2
-      }
+      };
 
       // Default labels that are always there
       // (not connected to any target)
@@ -346,7 +346,7 @@ let HelpLayer = Backbone.View.extend({
           .attr('y', -d.height / 2)
           .attr('width', d.width)
           .attr('height', d.height);
-        
+
         // Add in extra padding *outside* the rectangle
         d.width += 2 * self.margin;
         d.height += 2 * self.margin;
@@ -383,7 +383,7 @@ let HelpLayer = Backbone.View.extend({
           gap: d.height / 2
         });
       });
-      
+
       // Compute the layout
       let force = cola.d3adaptor()
         .size([bounds.width, bounds.height])
@@ -407,7 +407,7 @@ let HelpLayer = Backbone.View.extend({
         arrows.attr('d', arrowGenerator)
           .style('opacity', '1.0');
       };
-      
+
       if (this.addedTuner) {
         // If we're tweaking the layout, watch it settle
         force.on('tick', _renderGraph);
@@ -448,7 +448,7 @@ let HelpLayer = Backbone.View.extend({
 
     let controls = d3.select('#tuner').selectAll('div').data(forceControls);
     let controlsEnter = controls.enter().append('div');
-    
+
     // Control to change this parameter's setting (if enabled)
     controlsEnter.append('input')
       .attr('id', d => d.option + 'control')
@@ -489,7 +489,7 @@ let HelpLayer = Backbone.View.extend({
         }
         element.property('disabled', self[d.option] === undefined);
       });
-    
+
     // Label for the control (with its current value)
     controlsEnter.append('label')
       .attr('class', 'control')
@@ -526,7 +526,7 @@ let HelpLayer = Backbone.View.extend({
         self.render();
         self.renderTuner();
       });
-    
+
     // Label for the enable switch
     controls.selectAll('input.enable')
       .property('checked', d => this[d.option] !== undefined)

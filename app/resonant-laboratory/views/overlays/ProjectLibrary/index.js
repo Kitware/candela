@@ -143,7 +143,7 @@ let ProjectLibrary = Backbone.View.extend({
     let libraryButtons = d3.select('#' + divId)
       .selectAll('.circleButton')
       .data(projectModels, d => {
-        return d.id + d.name()
+        return d.id + d.name();
       });
 
     let libraryButtonsEnter = libraryButtons.enter().append('div');

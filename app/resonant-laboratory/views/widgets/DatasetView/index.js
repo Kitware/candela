@@ -26,7 +26,7 @@ let DatasetView = Widget.extend({
       window.mainPage.overlay.render('DatasetLibrary');
     };
     this.statusText.title = 'Click to select a different dataset.';
-    
+
     this.icons.splice(0, 0, {
       src: () => {
         return window.mainPage.currentUser.preferences
@@ -84,34 +84,22 @@ let DatasetView = Widget.extend({
   },
   renderHelpScreen: function () {
     if (this.status === STATUS.NO_DATA) {
-      window.mainPage.overlay.renderUserErrorScreen(`
-You have not chosen a dataset yet. Click 
-<a onclick="window.mainPage.overlay.render('DatasetLibrary')">
-here</a> to choose one.`);
+      window.mainPage.overlay.renderUserErrorScreen(`You have not chosen a dataset yet. Click <a onclick="window.mainPage.overlay.render('DatasetLibrary')"> here</a> to choose one.`);
     } else if (this.status === STATUS.SUCCESS) {
-      window.mainPage.overlay.renderSuccessScreen(`
-The dataset appears to have loaded correctly.`);
+      window.mainPage.overlay.renderSuccessScreen(`The dataset appears to have loaded correctly.`);
     } else if (this.status === STATUS.CANT_LOAD) {
-      window.mainPage.overlay.renderErrorScreen(`
-The dataset could not be loaded; there is a good chance
-that there is a permissions problem.`);
+      window.mainPage.overlay.renderErrorScreen(`The dataset could not be loaded; there is a good chance that there is a permissions problem.`);
     } else if (this.status === STATUS.CANT_PARSE) {
-      window.mainPage.overlay.renderUserErrorScreen(`
-There was a problem parsing the data; you'll probably need to
-<a>edit</a> or <a>reshape</a> the data in order to use it.`);
+      window.mainPage.overlay.renderUserErrorScreen(`There was a problem parsing the data; you'll probably need to <a>edit</a> or <a>reshape</a> the data in order to use it.`);
     } else if (this.status === STATUS.NO_ATTRIBUTES) {
-      window.mainPage.overlay.renderUserErrorScreen(`
-There was a problem parsing the data. Specifically, we're having
-trouble understanding the dataset attributes (usually column headers);
-you'll probably need to
-<a>edit</a> or <a>reshape</a> the data in order to use it.`);
+      window.mainPage.overlay.renderUserErrorScreen(`There was a problem parsing the data. Specifically, we're having trouble understanding the dataset attributes (usually column headers); you'll probably need to <a>edit</a> or <a>reshape</a> the data in order to use it.`);
     }
   },
   renderAttributeSettings: function () {
     if (!this.canRender()) {
       return;
     }
-    
+
     let datasets = window.mainPage.project.getMeta('datasets');
     let dataset;
     let attrs;

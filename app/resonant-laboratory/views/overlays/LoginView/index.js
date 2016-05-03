@@ -13,7 +13,7 @@ let LoginView = girder.views.LoginView.extend({
 
     this.$el.find('button.close, .modal-footer > a')
       .on('click', window.mainPage.overlay.closeOverlay);
-    
+
     this.$el.find('a.g-register-link').on('click', () => {
       window.mainPage.overlay.render('RegisterView');
     });

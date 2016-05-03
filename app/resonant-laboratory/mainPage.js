@@ -91,7 +91,7 @@ let MainPage = Backbone.View.extend({
       this.project = new Project({
         _id: id
       });
-      
+
       return this.project.fetch().then(() => {
         this.trigger('rra:changeProject');
         this.project.updateStatus();

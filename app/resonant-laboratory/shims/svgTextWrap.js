@@ -5,26 +5,26 @@
 
 import d3 from 'd3';
 
-export default function rewrap(textElement, pxWidth, emLeading) {
+export default function rewrap (textElement, pxWidth, emLeading) {
   emLeading = emLeading || 1.1;
-  
+
   let textAnchor = textElement.getAttribute('text-anchor') || 'start';
-  
+
   let text = textElement.textContent;
   let words = text.split(/\s+/);
   if (words.length === 0) {
     return;
   }
   let container = d3.select(textElement).text('');
-  
+
   let lineLengths = [0];
-  
+
   // First pass: figure out which words go on which lines
-  
+
   // Start with the first word
   let currentTspan = container.append('tspan')
     .text(words[0]);
-  
+
   words.forEach((word, index) => {
     // Add the word to the tspan
     let currentText = currentTspan.text();
@@ -33,10 +33,10 @@ export default function rewrap(textElement, pxWidth, emLeading) {
     } else {
       currentTspan.text(currentText + ' ' + word);
     }
-    
+
     // How wide is the line now?
     let length = currentTspan.node().getComputedTextLength();
-    
+
     // Has it exceeded the space that we allow?
     if (length > pxWidth) {
       // Revert to the text we had before, and start it on a new line
@@ -46,10 +46,10 @@ export default function rewrap(textElement, pxWidth, emLeading) {
       lineLengths.push(currentTspan.node().getComputedTextLength());
     } else {
       // Update the length of this line
-      lineLengths[lineLengths.length - 1] = length
+      lineLengths[lineLengths.length - 1] = length;
     }
   });
-  
+
   // Second pass: line up each row appropriately
   container.selectAll('tspan')
     // Apply the leading
