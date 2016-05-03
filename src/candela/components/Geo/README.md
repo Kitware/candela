@@ -1,23 +1,12 @@
-# [candela](../..#readme).[components](..#readme).Bar
+# [candela](../..#readme).[components](..#readme).Geo
 
-A bar chart. The **x** field should contain a distinct value for each bar, while
-the **y** field will correspond to the height of each bar.
+A geospatial chart.
 
 **extends** [VisComponent](../../VisComponent#readme)
 
-### new Bar(el, options)
+### new Geo(el, options)
 
-* **el** is the DOM element that will contain the visualization.
+* **el** is the DOM element that will contain the visualization or a map instance.
 
-* **options** is an object with the following fields:
+* **options** (TODO)
 
-| Option    | Type   | Description  |
-| :-------- | :----- | :----------- |
-| width     | Number | Width of the chart in pixels. See [Sizing](../../#sizing). |
-| height    | Number | Height of the chart in pixels. See [Sizing](../../#sizing). |
-| renderer  | String | Whether to render in "svg" or "canvas" mode (default "canvas"). |
-| data      | [Table](../..#table) | The data table. |
-| x         | String | The x axis field. See [Axis Scales](../../#axis-scales). |
-| y         | String | The y axis field. Must contain numeric data. See [Axis Scales](../../#axis-scales). |
-| color     | String | The color field. See [Color Scales](../../#color-scales). |
-| hover     | Array of String | The fields to display on hovering. |
