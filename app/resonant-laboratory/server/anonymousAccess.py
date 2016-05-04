@@ -13,6 +13,7 @@ FALSE_TESTS = ['false', '0', 'f', 'n', 'no']
 
 
 class AnonymousAccess(Resource):
+
     def _getAnonymousUser(self):
         try:
             return list(self.model('user').textSearch('anonymous'))[0]
@@ -23,7 +24,7 @@ class AnonymousAccess(Resource):
             # logged in can trigger the creation of this account,
             # only the admin should be able to change the anonymous
             # user's settings
-            password = str(random.randint(-sys.maxint-1, sys.maxint))
+            password = str(random.randint(-sys.maxint - 1, sys.maxint))
             password = md5.md5(password).hexdigest()
 
             return self.model('user').createUser(
@@ -36,7 +37,7 @@ class AnonymousAccess(Resource):
 
     @access.user
     @describeRoute(
-        Description('Gets the user's Private folder.' +
+        Description('Gets the user\'s Private folder.' +
                     ' Creates it if it is missing.')
         .errorResponse()
     )
@@ -55,8 +56,8 @@ class AnonymousAccess(Resource):
     @access.user
     @describeRoute(
         Description('Gets or creates an item with the supplied ' +
-                    'name in the current user's Private folder. Also creates' +
-                    ' the Private folder if it is missing.')
+                    'name in the current user\'s Private folder. Also ' +
+                    'creates the Private folder if it is missing.')
         .param('name', 'The name of the item.', required=True)
         .param('description', 'The description of the item.', required=False)
         .param('reuseExisting', 'If false, create a new item, even if an ' +
@@ -84,16 +85,16 @@ class AnonymousAccess(Resource):
                                            creator=user,
                                            folder=privateFolder,
                                            description=params.get(
-                                                'description', ''),
-                                           reuseExisting=reuseExisting)
+            'description', ''),
+            reuseExisting=reuseExisting)
 
         return privateItem
 
     @access.public
     @describeRoute(
-        Description('''Gets the user's Public folder. If the
-        user is not logged in, the anonymous user's Public
-        folder is returned. Creates the folder if it is missing.''')
+        Description('Gets the user\'s Public folder. If the user is not ' +
+                    'logged in, the anonymous user\'s Public folder is ' +
+                    'returned. Creates the folder if it is missing.')
         .errorResponse()
     )
     def getOrMakePublicFolder(self, params):
@@ -111,10 +112,10 @@ class AnonymousAccess(Resource):
 
     @access.public
     @describeRoute(
-        Description('''Create a new item, either in the
-        current user's Private folder (created if non-existent),
-        or in the anonymous user's Public folder if the user
-        is not logged in''')
+        Description('Create a new item, either in the current user\'s ' +
+                    'Private folder (created if non-existent), or in the ' +
+                    'anonymous user\'s Public folder if the user is ' +
+                    'not logged in')
         .param('name', 'The name of the item.', required=True)
         .param('description', 'The description of the item.', required=False)
         .errorResponse()
@@ -141,8 +142,8 @@ class AnonymousAccess(Resource):
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
     @describeRoute(
-        Description('''Get information about where an item is stored,
-        as well as whether the user can write to the item.''')
+        Description('Get information about where an item is stored, as well ' +
+                    'as whether the user can write to the item.')
         .param('id', 'The ID of the item.', paramType='path')
         .errorResponse()
     )
@@ -181,8 +182,8 @@ class AnonymousAccess(Resource):
 
     @access.public
     @describeRoute(
-        Description('''Validate that a specific set of items are
-        in the public scratch space, and return those items''')
+        Description('Validate that a specific set of items are in the public' +
+                    ' scratch space, and return those items')
         .param('ids', 'A JSON list of item IDs', required=True)
         .errorResponse()
     )
@@ -216,10 +217,10 @@ class AnonymousAccess(Resource):
 
     @access.public
     @describeRoute(
-        Description('''Attempt to move a set of items in the
-        anonymous user's Public folder to the current user's
-        Private folder. The list of items that were successfully
-        adopted is returned.''')
+        Description('Attempt to move a set of items in the anonymous user\'s' +
+                    ' Public folder to the current user\'s Private folder. ' +
+                    'The list of items that were successfully adopted ' +
+                    'is returned.')
         .param('ids', 'A JSON list of item IDs', required=True)
         .errorResponse()
     )
@@ -250,10 +251,10 @@ class AnonymousAccess(Resource):
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
     @describeRoute(
-        Description('''Attempt to update an item. If the user does
-        not have write access, a copy is made in the user's Private
-        directory, or the anonymous user's Public folder if the user
-        is not logged in''')
+        Description('Attempt to update an item. If the user does not have ' +
+                    'write access, a copy is made in the user\'s Private ' +
+                    'directory, or the anonymous user\'s Public folder if ' +
+                    'the user is not logged in')
         .param('id', 'The ID of the item.', paramType='path')
         .param('name', 'Name for the item.', required=False)
         .param('description', 'Description for the item.', required=False)
@@ -314,17 +315,17 @@ class AnonymousAccess(Resource):
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
     @describeRoute(
-        Description('''Moves an item is to the user's
-        Public or Private folder. If the user does not have write
-        access to the indicated item, a copy is made instead (of
-        course, read access to the original is necessary). If the
-        user is not logged in, the item is copied to the anonymous
-        user's Public folder''')
+        Description('Moves an item is to the user\'s Public or Private ' +
+                    'folder. If the user does not have write access to the ' +
+                    'indicated item, a copy is made instead (of course, read' +
+                    ' access to the original is necessary). If the user is ' +
+                    'not logged in, the item is copied to the anonymous ' +
+                    'user\'s Public folder')
         .param('id', 'The ID of the item.', paramType='path')
-        .param('makePublic', '''If true, moves the item to the
-        Public folder, regardless of its current location''', required=False)
-        .param('forceCopy', '''If true, copy the item instead
-        of moving it''', required=False)
+        .param('makePublic', 'If true, moves the item to the Public folder, ' +
+               'regardless of its current location', required=False)
+        .param('forceCopy', 'If true, copy the item instead of moving it',
+               required=False)
         .errorResponse()
     )
     def togglePublic(self, item, params):
