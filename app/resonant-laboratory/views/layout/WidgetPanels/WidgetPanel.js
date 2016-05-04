@@ -36,7 +36,7 @@ let WidgetPanel = Backbone.View.extend({
       .on('click', () => {
         this.widget.toggle();
       });
-    
+
     let titleEnter = headerEnter.append('div')
       .attr('class', 'titleSection');
 
@@ -79,7 +79,7 @@ let WidgetPanel = Backbone.View.extend({
 
     this.renderIndicators();
   },
-  renderIndicators() {
+  renderIndicators () {
     let indicators = d3.select(this.el)
       .select('.indicators');
 

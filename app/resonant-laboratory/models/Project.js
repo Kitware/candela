@@ -129,7 +129,7 @@ let Project = MetadataItem.extend({
       // is seriously wrong.
       window.mainPage.switchProject(null);
       window.mainPage.trigger('rra:error', err);
-    }
+    };
 
     this.unset('_id');
     return this.create()

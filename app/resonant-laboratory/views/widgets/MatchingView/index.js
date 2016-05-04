@@ -26,7 +26,7 @@ let STATUS = {
   NOTHING_TO_MAP: 4
 };
 
-function OutOfDateMatchingError() {};
+function OutOfDateMatchingError () {}
 OutOfDateMatchingError.prototype = new Error();
 
 let MatchingView = Widget.extend({
@@ -34,7 +34,7 @@ let MatchingView = Widget.extend({
     Widget.prototype.initialize.apply(this, arguments);
 
     this.friendlyName = 'Matching';
-    
+
     this.icons.splice(0, 0, {
       src: () => {
         return window.mainPage.currentUser.preferences
@@ -199,7 +199,7 @@ in order to connect them together.`);
       }
       nodes.push(newNode);
       nodeEdgeLookup[newNode.id] = [];
-    }
+    };
 
     let _createEdge = (established, visIndex,
       visAttrName, dataIndex,
@@ -274,7 +274,7 @@ in order to connect them together.`);
       nodeEdgeLookup[sourceId].push(edges.length);
       nodeEdgeLookup[targetId].push(edges.length);
       edges.push(newEdge);
-    }
+    };
 
     try {
       // Extract all the nodes (from both sides)
@@ -293,7 +293,7 @@ in order to connect them together.`);
       for (let matching of meta.matchings) {
         _createEdge(true, matching.visIndex, matching.visAttribute,
           matching.dataIndex, matching.dataAttribute);
-      };
+      }
 
       // Add the potential and probable edges
       if (this.selection !== null) {

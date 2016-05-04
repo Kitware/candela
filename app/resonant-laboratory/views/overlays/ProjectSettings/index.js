@@ -26,7 +26,7 @@ let visibilityLabels = {
   PublicScratch: 'Others can see and edit this project'
 };
 
-function toggleCallback() {
+function toggleCallback () {
   if (this.value === window.mainPage.project.status.location) {
     // Don't do anything if the user isn't actually changing
     // the project's location
@@ -34,13 +34,13 @@ function toggleCallback() {
   }
   /*
     Toggle whether the project is public or private
-    
+
     If the user doesn't have write access to the project
     (e.g. it's a library project or the user is logged out),
     they can still make a copy as long a they have read access
     (there should be some problems even showing this view if
     they don't have read access).
-    
+
     In all of the above scenarios, the togglePublic endpoint
     is smart enough to do the right thing (except we need to
     give it a hint if the user is copying a library project

@@ -2,14 +2,14 @@
 // this is an ugly patch to give us basic Set functionality back
 
 /* eslint-disable no-extend-native */
-export function Set(initialMembers) {
+export function Set (initialMembers) {
   this.contents = {};
   if (initialMembers) {
     initialMembers.forEach(m => {
       this.contents[m] = true;
     });
   }
-};
+}
 Set.prototype.add = function (member) {
   this.contents[member] = true;
 };
@@ -40,7 +40,7 @@ Set.prototype[Symbol.iterator] = function () {
   };
 };
 Object.defineProperty(Set.prototype, 'size', {
-  get: function size() {
+  get: function size () {
     return Object.keys(this.contents).length;
   }
 });

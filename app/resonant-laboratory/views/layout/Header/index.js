@@ -67,21 +67,15 @@ let Header = Backbone.View.extend({
   getVisibleTips: function () {
     let tips = {
       '#hamburgerButton': 'Main Menu',
-      '#helpButton': `
-Show these tips. This is blue when there are new tips that you 
-haven't seen yet.` /*,
-      '#achievementsButton': `
-Your achievements. Click this to see what you've accomplished,
-and what you still haven't tried.`*/
+      '#helpButton': `Show these tips. This is blue when there are new tips that you haven't seen yet.`
+			/*, '#achievementsButton': `Your achievements. Click this to see what you've accomplished, and what you still haven't tried.`*/
     };
-    
+
     if (window.mainPage.project) {
-      tips['#projectLocationButton'] = `
-Indicates who can see the project you're working on. Click
-to change its settings.`;
-      
+      tips['#projectLocationButton'] = `Indicates who can see the project you're working on. Click to change its settings.`;
+
       tips['#projectName'] = 'Click to rename this project';
-      
+
       if (window.mainPage.project.getMeta('datasets').length === 0) {
         tips['img.AddDataset.headerButton'] =
           'Click to add a dataset to this project';
@@ -89,11 +83,9 @@ to change its settings.`;
         tips['img.DatasetView.headerButton'] =
           'Click to see/change the datasets in this project';
       }
-      
-      tips['img.MatchingView.headerButton'] = `
-Click to manage the connections between the datasets 
-and the visualizations in this project`;
-      
+
+      tips['img.MatchingView.headerButton'] = `Click to manage the connections between the datasets and the visualizations in this project`;
+
       if (window.mainPage.project.getMeta('visualizations').length === 0) {
         tips['img.AddVisualization.headerButton'] =
           'Step 2: Click to add a visualization to this project';
@@ -102,7 +94,7 @@ and the visualizations in this project`;
           'Click to explore the visualizations in this project';
       }
     }
-    
+
     return tips;
   },
   render: Underscore.debounce(function () {
@@ -191,7 +183,7 @@ and the visualizations in this project`;
       if (window.mainPage.project.getMeta('visualizations').length === 0) {
         widgetIcons.push({
           widgetType: 'AddVisualization'
-        })
+        });
       }
 
       let widgetButtons = d3.select(this.el).select('#projectIcons')

@@ -11,20 +11,20 @@ let HamburgerMenu = Backbone.View.extend({
       this.$el.html(template);
       this.addedTemplate = true;
     }
-    
+
     // Main menu items
     jQuery('#projectSettingsMenuItem > p')
       .text(window.mainPage.project.get('name') + ' settings...');
     jQuery('#projectSettingsMenuItem').on('click', () => {
       window.mainPage.overlay.render('ProjectSettings');
     });
-    
+
     jQuery('#closeProjectMenuItem').on('click', () => {
       window.mainPage.switchProject(null).then(() => {
         window.mainPage.overlay.render('StartingScreen');
       });
     });
-    
+
     if (window.mainPage.currentUser.isLoggedIn()) {
       jQuery('#loginText').text('Log Out ' +
         window.mainPage.currentUser.get('firstName') + ' ' +

@@ -14,7 +14,7 @@ let VisualizationView = Widget.extend({
       window.mainPage.overlay.render('VisualizationLibrary');
     };
     this.statusText.title = 'Click to select a different visualization.';
-        
+
     this.icons.splice(0, 0, {
       src: () => {
         return window.mainPage.currentUser.preferences
@@ -73,24 +73,16 @@ let VisualizationView = Widget.extend({
   },
   renderHelpScreen: function () {
     if (this.ok === null) {
-      window.mainPage.overlay.renderUserErrorScreen(`
-You have not chosen a visualization yet. Click 
-<a onclick="window.mainPage.overlay.render('VisualizationLibrary')">
-here</a> to choose one.`);
+      window.mainPage.overlay.renderUserErrorScreen(`You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render('VisualizationLibrary')"> here</a> to choose one.`);
     } else if (this.ok === true) {
-      window.mainPage.overlay.renderSuccessScreen(`
-The visualization appears to be functioning correctly.`);
+      window.mainPage.overlay.renderSuccessScreen(`The visualization appears to be functioning correctly.`);
     } else {
       let meta = window.mainPage.project.get('meta');
 
       if (!meta || !meta.visualizations || !meta.visualizations[0]) {
-        window.mainPage.overlay.renderUserErrorScreen(`
-You have not chosen a visualization yet. Click 
-<a onclick="window.mainPage.overlay.render('VisualizationLibrary')">
-here</a> to choose one.`);
+        window.mainPage.overlay.renderUserErrorScreen(`You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render('VisualizationLibrary')"> here</a> to choose one.`);
       } else {
-        window.mainPage.overlay.renderReallyBadErrorScreen(`
-Corrupted visualization meta information.`);
+        window.mainPage.overlay.renderReallyBadErrorScreen(`Corrupted visualization meta information.`);
       }
     }
   },
@@ -132,7 +124,7 @@ Corrupted visualization meta information.`);
             // null so that it's removed from the visualization
             options[key] = null;
           }
-        })
+        });
 
         this.vis.options = options;
       }

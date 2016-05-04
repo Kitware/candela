@@ -55,4 +55,4 @@ window.copyTextToClipboard = function (text) {
   }
 
   document.body.removeChild(textArea);
-}
+};
