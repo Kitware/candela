@@ -21,27 +21,27 @@ let VALID_EXTENSIONS = [
 let Dataset = MetadataItem.extend({
   initialize: function () {
     window.mainPage.loadedDatasets[this.getId()] = this;
-    
+
     this.rawCache = null;
     this.parsedCache = null;
     let meta = this.getMeta();
-    
+
     this.listenTo(this, 'rra:swapId', this.swapId);
-    
+
     let fileTypePromise;
     if (meta.fileType) {
       fileTypePromise = Promise.resolve(meta.fileType);
     } else {
       fileTypePromise = this.inferFileType();
     }
-    
+
     let attributePromise;
     if (meta.attributes) {
       attributePromise = Promise.resolve(meta.attributes);
     } else {
       attributePromise = this.inferAttributes();
     }
-    
+
     Promise.all([fileTypePromise, attributePromise]).then(() => {
       this.save().then(() => {
         this.trigger('rra:changeType');
@@ -58,6 +58,7 @@ let Dataset = MetadataItem.extend({
   },
   drop: function () {
     this.dropped = true;
+    this.stopListening();
     delete window.mainPage.loadedDatasets[this.getId()];
   },
   save: function () {
@@ -176,11 +177,11 @@ let Dataset = MetadataItem.extend({
     attributes[attrName] = dataType;
     this.setMeta('attributes', attributes);
     return this.save().then(() => {
-      this.trigger('rra:changeSpec')
+      this.trigger('rra:changeSpec');
     });
   }
 });
 
 Dataset.COMPATIBLE_TYPES = COMPATIBLE_TYPES;
-Dataset.VALID_EXTENSIONS = VALID_EXTENSIONS
+Dataset.VALID_EXTENSIONS = VALID_EXTENSIONS;
 export default Dataset;

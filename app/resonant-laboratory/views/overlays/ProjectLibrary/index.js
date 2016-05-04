@@ -65,7 +65,8 @@ let ProjectLibrary = Backbone.View.extend({
       }).done(resolve).error(reject);
     }).then(folder => {
       this.getFolderContents(folder, 'projectLibrary', libraryFileIcon);
-    }).catch(() => {}); // fail silently
+    }).catch(() => {
+    }); // fail silently
 
     if (window.mainPage.currentUser.isLoggedIn()) {
       // The user is logged in
@@ -79,7 +80,8 @@ let ProjectLibrary = Backbone.View.extend({
         }).done(resolve).error(reject);
       }).then(folder => {
         this.getFolderContents(folder, 'privateProjects', privateFileIcon);
-      }).catch(() => {}); // fail silently
+      }).catch(() => {
+      }); // fail silently
 
       // Get the set of the user's public projects
       new Promise((resolve, reject) => {
@@ -90,7 +92,8 @@ let ProjectLibrary = Backbone.View.extend({
         }).done(resolve).error(reject);
       }).then(folder => {
         this.getFolderContents(folder, 'publicProjects', publicFileIcon);
-      }).catch(() => {}); // fail silently
+      }).catch(() => {
+      }); // fail silently
     } else {
       // The user is logged out
       let ids = window.localStorage.getItem('scratchProjects');
@@ -108,7 +111,8 @@ let ProjectLibrary = Backbone.View.extend({
         })).then(items => {
           this.renderProjects(new girder.collections.ItemCollection(items),
             'scratchProjects', scratchFileIcon);
-        }).catch(() => {}); // fail silently
+        }).catch(() => {
+        }); // fail silently
       }
     }
   }, 300),
@@ -129,8 +133,8 @@ let ProjectLibrary = Backbone.View.extend({
         return false;
       }
       return d.attributes.meta.datasets &&
-        d.attributes.meta.matchings &&
-        d.attributes.meta.visualizations;
+      d.attributes.meta.matchings &&
+      d.attributes.meta.visualizations;
     });
 
     if (projectModels.length > 0) {
@@ -143,7 +147,7 @@ let ProjectLibrary = Backbone.View.extend({
     let libraryButtons = d3.select('#' + divId)
       .selectAll('.circleButton')
       .data(projectModels, d => {
-        return d.id + d.name()
+        return d.id + d.name();
       });
 
     let libraryButtonsEnter = libraryButtons.enter().append('div');

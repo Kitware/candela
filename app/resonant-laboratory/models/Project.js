@@ -41,6 +41,8 @@ let Project = MetadataItem.extend({
       this.updateStatus);
     this.listenTo(window.mainPage.currentUser, 'rra:logout',
       this.updateStatus);
+    this.listenTo(window.mainPage, 'rra:changeProject',
+      this.updateStatus);
     this.listenTo(window.mainPage.widgetPanels, 'rra:navigateWidgets',
       this.storePreferredWidgets);
   },

@@ -14,7 +14,7 @@ let VisualizationView = Widget.extend({
       window.mainPage.overlay.render('VisualizationLibrary');
     };
     this.statusText.title = 'Click to select a different visualization.';
-        
+
     this.icons.splice(0, 0, {
       src: () => {
         return window.mainPage.currentUser.preferences
@@ -41,11 +41,11 @@ let VisualizationView = Widget.extend({
       },
       title: () => {
         if (this.ok === null) {
-          return 'The visualization hasn\'t finished loading yet';
+          return "The visualization hasn't finished loading yet";
         } else if (this.ok === true) {
           return 'The visualization appears to be working';
         } else {
-          return 'Something isn\'t quite right; click for details';
+          return "Something isn't quite right; click for details";
         }
       },
       onclick: () => {
@@ -74,7 +74,7 @@ let VisualizationView = Widget.extend({
   renderHelpScreen: function () {
     if (this.ok === null) {
       window.mainPage.overlay.renderUserErrorScreen(`
-You have not chosen a visualization yet. Click 
+You have not chosen a visualization yet. Click
 <a onclick="window.mainPage.overlay.render('VisualizationLibrary')">
 here</a> to choose one.`);
     } else if (this.ok === true) {
@@ -85,7 +85,7 @@ The visualization appears to be functioning correctly.`);
 
       if (!meta || !meta.visualizations || !meta.visualizations[0]) {
         window.mainPage.overlay.renderUserErrorScreen(`
-You have not chosen a visualization yet. Click 
+You have not chosen a visualization yet. Click
 <a onclick="window.mainPage.overlay.render('VisualizationLibrary')">
 here</a> to choose one.`);
       } else {
@@ -132,7 +132,7 @@ Corrupted visualization meta information.`);
             // null so that it's removed from the visualization
             options[key] = null;
           }
-        })
+        });
 
         this.vis.options = options;
       }

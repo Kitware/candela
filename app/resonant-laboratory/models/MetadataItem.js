@@ -10,31 +10,31 @@ let girder = window.girder;
          error: function () {}
        }
        way of handling the asynchronous calls
-       
+
        This file patches that support back. It also
        converts girder's jQuery deferreds into
        ES6 promises
-       
+
      - Girder relies on its own internal g:event
        events instead of the standard Backbone
        change, create, sync, etc callbacks
-       
+
        This file attempts to restore the default
        events when they're supposed to happen
        (TODO: I still need to work on this)
-       
+
      - Girder ignores+discards 'meta' when syncing!
-     
+
        We use our own custom endpoint to sync metadata
        with the rest of the Item
-       
+
   2. Do smart(ish) things with items in the user's
      private folder and the anonymous user's scratch
      space (the server endpoints handle most of this
      logic)
 */
 
-function MetadataSyncError() {};
+function MetadataSyncError () {}
 MetadataSyncError.prototype = new Error();
 
 let MetadataItem = girder.models.ItemModel.extend({
@@ -44,11 +44,11 @@ let MetadataItem = girder.models.ItemModel.extend({
       I do some sneaky stuff here. There are three ways
       callbacks and errors are fired / caught across
       Backbone and Girder:
-      
+
       - options object ('success' and 'error' functions)
       - jQuery deferreds
       - g:events
-      
+
       This function tries to capture and route all of
       them appropriately.
     */
@@ -87,7 +87,8 @@ let MetadataItem = girder.models.ItemModel.extend({
 
     // beforeSuccess is a function that should
     // be called before options.success
-    beforeSuccess = beforeSuccess || (() => {});
+    beforeSuccess = beforeSuccess || (() => {
+    });
 
     let self = this;
     promiseObj.then(function () {
@@ -167,7 +168,7 @@ let MetadataItem = girder.models.ItemModel.extend({
       };
       let desc = this.get('description');
       if (desc) {
-        args.description = desc
+        args.description = desc;
       }
 
       if (!this.getId()) {
@@ -229,7 +230,7 @@ let MetadataItem = girder.models.ItemModel.extend({
           try {
             resolve(girder.models.ItemModel.prototype.fetch.apply(this));
           } catch (errorObj) {
-            reject(errorObj)
+            reject(errorObj);
           }
         }, options, null, {
           successEvent: 'g:fetched',
@@ -241,9 +242,9 @@ let MetadataItem = girder.models.ItemModel.extend({
       // so just use the default girder behavior
       let promise = this.wrapInPromise((resolve, reject) => {
         try {
-          resolve(girder.models.ItemModel.prototype.destroy.apply(this))
+          resolve(girder.models.ItemModel.prototype.destroy.apply(this));
         } catch (errorObj) {
-          reject(errorObj)
+          reject(errorObj);
         }
       }, options, null, {
         successEvent: 'g:deleted',

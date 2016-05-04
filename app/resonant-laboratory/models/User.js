@@ -14,7 +14,7 @@ let User = girder.models.UserModel.extend({
   },
   authenticate: function (login) {
     login = login !== false;
-    
+
     return new Promise((resolve, reject) => {
       girder.restRequest({
         path: 'user/authentication',

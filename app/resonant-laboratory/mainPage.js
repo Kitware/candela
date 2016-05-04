@@ -78,7 +78,6 @@ let MainPage = Backbone.View.extend({
       .then(() => {
         this.trigger('rra:createProject');
         this.trigger('rra:changeProject');
-        this.project.updateStatus();
       }).catch((err) => {
         this.switchProject(null);
         this.trigger('rra:error', err);
@@ -86,6 +85,9 @@ let MainPage = Backbone.View.extend({
   },
   switchProject: function (id) {
     if (id === null) {
+      if (this.project) {
+        this.project.stopListening();
+      }
       this.project = null;
       this.trigger('rra:changeProject');
       return new Promise(() => {});
@@ -93,10 +95,9 @@ let MainPage = Backbone.View.extend({
       this.project = new Project({
         _id: id
       });
-      
+
       return this.project.fetch().then(() => {
         this.trigger('rra:changeProject');
-        this.project.updateStatus();
       }).catch((err) => {
         this.switchProject(null);
         this.trigger('rra:error', err);

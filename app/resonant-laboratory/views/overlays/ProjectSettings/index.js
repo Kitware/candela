@@ -26,7 +26,7 @@ let visibilityLabels = {
   PublicScratch: 'Others can see and edit this project'
 };
 
-function toggleCallback() {
+function toggleCallback () {
   if (this.value === window.mainPage.project.status.location) {
     // Don't do anything if the user isn't actually changing
     // the project's location
@@ -34,13 +34,13 @@ function toggleCallback() {
   }
   /*
     Toggle whether the project is public or private
-    
+
     If the user doesn't have write access to the project
     (e.g. it's a library project or the user is logged out),
     they can still make a copy as long a they have read access
     (there should be some problems even showing this view if
     they don't have read access).
-    
+
     In all of the above scenarios, the togglePublic endpoint
     is smart enough to do the right thing (except we need to
     give it a hint if the user is copying a library project
@@ -121,10 +121,10 @@ let ProjectSettings = Backbone.View.extend({
           .catch((errorObj) => {
             if (errorObj.statusText === 'Unauthorized') {
               if (window.mainPage.currentUser.isLoggedIn()) {
-                window.mainPage.overlay.renderErrorScreen(`You don\'t 
+                window.mainPage.overlay.renderErrorScreen(`You don\'t
 have the necessary permissions to delete that project.`);
               } else {
-                window.mainPage.overlay.renderErrorScreen(`Sorry, you 
+                window.mainPage.overlay.renderErrorScreen(`Sorry, you
 can\'t delete projects unless you log in.`);
               }
             } else {
@@ -172,7 +172,7 @@ can\'t delete projects unless you log in.`);
       this.$el.find('#editabilityIcon')
         .attr('src', cantEditIcon);
       this.$el.find('#editabilityLabel')
-        .text('You can\'t edit this project');
+        .text("You can't edit this project");
     }
 
     if (status.editable && window.mainPage.currentUser.isLoggedIn()) {

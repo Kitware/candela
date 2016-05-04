@@ -8,10 +8,10 @@ import forceControls from './forceControls.json';
 import template from './template.html';
 import './style.css';
 
-function arrowGenerator(edge) {
+function arrowGenerator (edge) {
   let arrowAngle = Math.PI / 4;
   let arrowLength = 10;
-  
+
   let shaftAngle = Math.atan2(edge.target.y - edge.source.y,
     edge.target.x - edge.source.x);
 
@@ -27,12 +27,12 @@ function arrowGenerator(edge) {
     y: edge.target.y + arrowLength * Math.sin(rightAngle)
   };
   return 'M' + edge.source.x + ',' + edge.source.y +
-    'L' + edge.target.x + ',' + edge.target.y +
-    'L' + leftCoords.x + ',' + leftCoords.y +
-    'L' + edge.target.x + ',' + edge.target.y +
-    'L' + rightCoords.x + ',' + rightCoords.y +
-    'L' + edge.target.x + ',' + edge.target.y +
-    'Z';
+         'L' + edge.target.x + ',' + edge.target.y +
+         'L' + leftCoords.x + ',' + leftCoords.y +
+         'L' + edge.target.x + ',' + edge.target.y +
+         'L' + rightCoords.x + ',' + rightCoords.y +
+         'L' + edge.target.x + ',' + edge.target.y +
+         'Z';
 }
 
 let HelpLayer = Backbone.View.extend({

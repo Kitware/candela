@@ -67,9 +67,9 @@ let Header = Backbone.View.extend({
   getVisibleTips: function () {
     let tips = {
       '#hamburgerButton': 'Main Menu',
-      '#helpButton': `Show these tips. This is blue 
-when there are new tips that you haven't seen yet.`
-        /*,
+      '#helpButton': 'Show these tips. This is blue ' +
+                     'when there are new tips that you haven\'t seen yet.'
+    /*,
       '#achievementsButton': `
 Your achievements. See what you've accomplished,
 and what you still haven't tried.`*/
@@ -77,7 +77,7 @@ and what you still haven't tried.`*/
 
     if (window.mainPage.project) {
       tips['#projectLocationButton'] =
-        'See/change who can see the project you\'re working on';
+        "See/change who can see the project you're working on";
 
       tips['#projectName'] = 'Rename this project';
 
@@ -90,7 +90,7 @@ and what you still haven't tried.`*/
       }
 
       tips['img.MatchingView.headerButton'] =
-        `Manage the connections between the datasets 
+        `Manage the connections between the datasets
 and the visualizations in this project`;
 
       if (window.mainPage.project.getMeta('visualizations').length === 0) {
@@ -126,8 +126,8 @@ and the visualizations in this project`;
       jQuery('#projectName').on('focus', function () {
         // this refers to the DOM element
         this.value = this.textContent;
-        // We patch on .value to the element to pretend it's
-        // a real input (contenteditable stretches better)
+      // We patch on .value to the element to pretend it's
+      // a real input (contenteditable stretches better)
       });
       jQuery('#projectName').on('blur', function () {
         // this refers to the DOM element
@@ -156,7 +156,7 @@ and the visualizations in this project`;
     // (e.g. add/remove datasets, visualizations)
     let tips = this.getVisibleTips();
     if (window.mainPage.currentUser.preferences
-      .hasSeenAllTips(tips)) {
+        .hasSeenAllTips(tips)) {
       jQuery('#helpButton').attr('src', infoIcon);
     } else {
       jQuery('#helpButton').attr('src', newInfoIcon);
@@ -191,7 +191,7 @@ and the visualizations in this project`;
       if (window.mainPage.project.getMeta('visualizations').length === 0) {
         widgetIcons.push({
           widgetType: 'AddVisualization'
-        })
+        });
       }
 
       let widgetButtons = d3.select(this.el).select('#projectIcons')

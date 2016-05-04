@@ -1,8 +1,5 @@
 import MetadataItem from './MetadataItem';
-import {
-  Set
-}
-from '../shims/SetOps.js';
+import { Set } from '../shims/SetOps.js';
 let girder = window.girder;
 
 let UserPreferences = MetadataItem.extend({
@@ -149,7 +146,7 @@ you move or delete this item, your preferences will be lost.`,
       // Make the id a valid / nice mongo id
       tipId = tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
       seenTips[tipId] = true;
-    };
+    }
     this.setMeta('seenTips', seenTips);
     this.trigger('rra:observeTips');
     this.save();
@@ -171,7 +168,8 @@ you move or delete this item, your preferences will be lost.`,
     if (achievements[achievement] !== true) {
       achievements[achievement] = true;
       this.setMeta('achievements', achievements);
-      this.save().catch(() => {}); // fail silently
+      this.save().catch(() => {
+      }); // fail silently
       this.trigger('rra:levelUp');
     }
   }

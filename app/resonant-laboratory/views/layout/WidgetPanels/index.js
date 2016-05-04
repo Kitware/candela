@@ -3,7 +3,7 @@ import Backbone from 'backbone';
 import jQuery from 'jquery';
 import d3 from 'd3';
 import WidgetPanel from './WidgetPanel.js';
-import SetOps, {Set} from '../../../shims/SetOps.js';
+import SetOps, { Set } from '../../../shims/SetOps.js';
 
 import './accordionhorz.css';
 import './style.css';
@@ -62,6 +62,7 @@ let WidgetPanels = Backbone.View.extend({
       .data(this.widgetSpecs, (d) => d.hashName);
     let sectionsEnter = sections.enter().append('section');
     sections.exit().each((d) => {
+      this.widgets[d.hashName].stopListening();
       delete this.widgets[d.hashName];
     }).remove();
 
@@ -95,10 +96,10 @@ let WidgetPanels = Backbone.View.extend({
 
     this.$el.find('section.targeted')
       .css('width', style);
-    
+
     // Are all the widgets closed (and no overlay is showing)?
     if (expandedSections === 0 &&
-        window.mainPage.overlay.template === null) {
+      window.mainPage.overlay.template === null) {
       // Show the empty state image
       jQuery('#EmptyState')
         .css('left', (1.5 + 2.5 * collapsedSections) + 'em')

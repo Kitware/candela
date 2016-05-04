@@ -26,7 +26,7 @@ let STATUS = {
   NOTHING_TO_MAP: 4
 };
 
-function OutOfDateMatchingError() {};
+function OutOfDateMatchingError () {}
 OutOfDateMatchingError.prototype = new Error();
 
 let MatchingView = Widget.extend({
@@ -34,7 +34,7 @@ let MatchingView = Widget.extend({
     Widget.prototype.initialize.apply(this, arguments);
 
     this.friendlyName = 'Matching';
-    
+
     this.icons.splice(0, 0, {
       src: () => {
         return window.mainPage.currentUser.preferences
@@ -67,13 +67,13 @@ let MatchingView = Widget.extend({
           this.status === STATUS.STALE_MAPPINGS) {
           return 'Loading...';
         } else {
-          return 'Something isn\'t quite right; click for details';
+          return "Something isn't quite right; click for details";
         }
       },
       onclick: () => {
         window.mainPage.helpLayer.setTips(this.getDefaultTips());
         window.mainPage.helpLayer.show();
-        // TODO: add any other special instructions
+      // TODO: add any other special instructions
       }
     });
 
@@ -199,7 +199,7 @@ in order to connect them together.`);
       }
       nodes.push(newNode);
       nodeEdgeLookup[newNode.id] = [];
-    }
+    };
 
     let _createEdge = (established, visIndex,
       visAttrName, dataIndex,
@@ -263,18 +263,18 @@ in order to connect them together.`);
             return;
           }
         }
-        // TODO: get the probable nodes:
-        // If the selected node is on the
-        // vis side, this node is 'probable'
-        // if and only if another node in
-        // this group has a link to a node
-        // in the same group as the
-        // selected node...
+      // TODO: get the probable nodes:
+      // If the selected node is on the
+      // vis side, this node is 'probable'
+      // if and only if another node in
+      // this group has a link to a node
+      // in the same group as the
+      // selected node...
       }
       nodeEdgeLookup[sourceId].push(edges.length);
       nodeEdgeLookup[targetId].push(edges.length);
       edges.push(newEdge);
-    }
+    };
 
     try {
       // Extract all the nodes (from both sides)
@@ -293,7 +293,7 @@ in order to connect them together.`);
       for (let matching of meta.matchings) {
         _createEdge(true, matching.visIndex, matching.visAttribute,
           matching.dataIndex, matching.dataAttribute);
-      };
+      }
 
       // Add the potential and probable edges
       if (this.selection !== null) {
@@ -587,9 +587,9 @@ in order to connect them together.`);
       return classString + ' edge';
     }).attr('d', d => {
       let pathString = 'M' + (dataX + nodeWidth / 2) + ',' +
-        dataY(d.source) +
-        'L' + (visX - nodeWidth / 2) + ',' +
-        visY(d.target);
+      dataY(d.source) +
+      'L' + (visX - nodeWidth / 2) + ',' +
+      visY(d.target);
       return pathString;
     }).on('mouseover', d => {
       jQuery(this).addClass('hovered');
