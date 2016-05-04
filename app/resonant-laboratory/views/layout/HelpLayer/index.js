@@ -164,7 +164,7 @@ let HelpLayer = Backbone.View.extend({
       let center = {
         x: bounds.width / 2,
         y: bounds.height / 2
-      }
+      };
 
       // Default labels that are always there
       // (not connected to any target)

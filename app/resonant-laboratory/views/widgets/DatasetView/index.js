@@ -53,11 +53,11 @@ let DatasetView = Widget.extend({
       },
       title: () => {
         if (this.status === STATUS.LOADING) {
-          return "The dataset hasn't finished loading yet";
+          return 'The dataset hasn\'t finished loading yet';
         } else if (this.status === STATUS.SUCCESS) {
           return 'The dataset appears to have loaded correctly';
         } else {
-          return "Something isn't quite right; click for details";
+          return 'Something isn\'t quite right; click for details';
         }
       },
       onclick: () => {

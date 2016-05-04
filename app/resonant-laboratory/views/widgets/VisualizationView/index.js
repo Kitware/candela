@@ -41,11 +41,11 @@ let VisualizationView = Widget.extend({
       },
       title: () => {
         if (this.ok === null) {
-          return "The visualization hasn't finished loading yet";
+          return 'The visualization hasn\'t finished loading yet';
         } else if (this.ok === true) {
           return 'The visualization appears to be working';
         } else {
-          return "Something isn't quite right; click for details";
+          return 'Something isn\'t quite right; click for details';
         }
       },
       onclick: () => {
@@ -73,24 +73,16 @@ let VisualizationView = Widget.extend({
   },
   renderHelpScreen: function () {
     if (this.ok === null) {
-      window.mainPage.overlay.renderUserErrorScreen(`
-You have not chosen a visualization yet. Click
-<a onclick="window.mainPage.overlay.render('VisualizationLibrary')">
-here</a> to choose one.`);
+      window.mainPage.overlay.renderUserErrorScreen('You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render(\'VisualizationLibrary\')"> here</a> to choose one.');
     } else if (this.ok === true) {
-      window.mainPage.overlay.renderSuccessScreen(`
-The visualization appears to be functioning correctly.`);
+      window.mainPage.overlay.renderSuccessScreen('The visualization appears to be functioning correctly.');
     } else {
       let meta = window.mainPage.project.get('meta');
 
       if (!meta || !meta.visualizations || !meta.visualizations[0]) {
-        window.mainPage.overlay.renderUserErrorScreen(`
-You have not chosen a visualization yet. Click
-<a onclick="window.mainPage.overlay.render('VisualizationLibrary')">
-here</a> to choose one.`);
+        window.mainPage.overlay.renderUserErrorScreen('You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render(\'VisualizationLibrary\')"> here</a> to choose one.');
       } else {
-        window.mainPage.overlay.renderReallyBadErrorScreen(`
-Corrupted visualization meta information.`);
+        window.mainPage.overlay.renderReallyBadErrorScreen('Corrupted visualization meta information.');
       }
     }
   },

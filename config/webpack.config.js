@@ -31,9 +31,9 @@ module.exports = {
       vg: 'vega'
     }),
 
-    new CleanPlugin([
-      './build/*'
-    ]),
+    new CleanPlugin([path.resolve(__dirname, 'build/*')], {
+      root: __dirname
+    }),
 
     new HtmlPlugin({
       title: 'Candela Examples',
@@ -47,18 +47,6 @@ module.exports = {
     }])
   ],
   module: {
-    preLoaders: [
-      {
-        test: /\.js$/,
-        loader: 'semistandard-loader',
-        include: [
-          path.resolve(__dirname, 'src/candela'),
-          path.resolve(__dirname, 'src/vcharts'),
-          path.resolve(__dirname, 'app')
-        ],
-        exclude: path.resolve(__dirname, 'src', 'external')
-      }
-    ],
     loaders: [
       {
         test: /\.js$/,

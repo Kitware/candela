@@ -77,7 +77,7 @@ and what you still haven't tried.`*/
 
     if (window.mainPage.project) {
       tips['#projectLocationButton'] =
-        "See/change who can see the project you're working on";
+        'See/change who can see the project you\'re working on';
 
       tips['#projectName'] = 'Rename this project';
 
@@ -89,9 +89,7 @@ and what you still haven't tried.`*/
           'See/change the datasets in this project';
       }
 
-      tips['img.MatchingView.headerButton'] =
-        `Manage the connections between the datasets
-and the visualizations in this project`;
+      tips['img.MatchingView.headerButton'] = 'Manage the connections between the datasets and the visualizations in this project';
 
       if (window.mainPage.project.getMeta('visualizations').length === 0) {
         tips['img.AddVisualization.headerButton'] =
@@ -126,8 +124,8 @@ and the visualizations in this project`;
       jQuery('#projectName').on('focus', function () {
         // this refers to the DOM element
         this.value = this.textContent;
-      // We patch on .value to the element to pretend it's
-      // a real input (contenteditable stretches better)
+        // We patch on .value to the element to pretend it's
+        // a real input (contenteditable stretches better)
       });
       jQuery('#projectName').on('blur', function () {
         // this refers to the DOM element
