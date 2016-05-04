@@ -10,7 +10,7 @@ let UserPreferences = MetadataItem.extend({
   */
   defaults: () => {
     return {
-      name: 'rra_preferences',
+      name: 'rl_preferences',
       description: `
 Contains your preferences for the Resonant Laboratory application. If
 you move or delete this item, your preferences will be lost.`,
