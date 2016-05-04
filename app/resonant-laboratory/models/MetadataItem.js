@@ -200,7 +200,7 @@ let MetadataItem = girder.models.ItemModel.extend({
           silent: true
         });
         if (swappedId) {
-          this.trigger('rra:swapId', resp);
+          this.trigger('rl:swapId', resp);
         }
       });
     } else if (method === 'read') {

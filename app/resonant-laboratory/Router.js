@@ -127,9 +127,9 @@ var Router = Backbone.Router.extend({
   },
   addListeners: function () {
     // Listen to events that signal that the url needs to be updated
-    this.listenTo(window.mainPage, 'rra:changeProject', this.updateUrl);
+    this.listenTo(window.mainPage, 'rl:changeProject', this.updateUrl);
     this.listenTo(window.mainPage.widgetPanels,
-      'rra:navigateWidgets', this.updateUrl);
+      'rl:navigateWidgets', this.updateUrl);
   },
   constructFragment: function (projectId, widgets) {
     let fragment = 'project/' + projectId;

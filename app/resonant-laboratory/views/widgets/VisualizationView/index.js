@@ -53,7 +53,7 @@ let VisualizationView = Widget.extend({
       }
     });
 
-    this.listenTo(window.mainPage, 'rra:changeProject',
+    this.listenTo(window.mainPage, 'rl:changeProject',
       this.handleNewProject);
     this.handleNewProject();
   },
@@ -62,9 +62,9 @@ let VisualizationView = Widget.extend({
     this.ok = null;
     this.vis = null;
 
-    this.listenTo(window.mainPage.project, 'rra:changeVisualizations',
+    this.listenTo(window.mainPage.project, 'rl:changeVisualizations',
       this.render);
-    this.listenTo(window.mainPage.project, 'rra:changeMatchings',
+    this.listenTo(window.mainPage.project, 'rl:changeMatchings',
       this.render);
   },
   renderInfoScreen: function () {

@@ -79,7 +79,7 @@ let MatchingView = Widget.extend({
 
     this.selection = null;
 
-    this.listenTo(window.mainPage, 'rra:changeProject',
+    this.listenTo(window.mainPage, 'rl:changeProject',
       this.handleNewProject);
     this.handleNewProject();
   },
@@ -87,7 +87,7 @@ let MatchingView = Widget.extend({
     this.$el.html('');
     this.status = STATUS.NOTHING_TO_MAP;
 
-    this.listenTo(window.mainPage.project, 'rra:changeMatchings', () => {
+    this.listenTo(window.mainPage.project, 'rl:changeMatchings', () => {
       this.selection = null;
       this.render();
     });

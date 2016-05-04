@@ -37,14 +37,14 @@ let Project = MetadataItem.extend({
       location: null
     };
 
-    this.listenTo(window.mainPage.currentUser, 'rra:login',
+    this.listenTo(window.mainPage.currentUser, 'rl:login',
       this.updateStatus);
-    this.listenTo(window.mainPage.currentUser, 'rra:logout',
+    this.listenTo(window.mainPage.currentUser, 'rl:logout',
       this.updateStatus);
-    this.listenTo(window.mainPage, 'rra:changeProject',
+    this.listenTo(window.mainPage, 'rl:changeProject',
       this.updateStatus);
-    this.listenTo(this, 'rra:swapId', this.updateStatus);
-    this.listenTo(window.mainPage.widgetPanels, 'rra:navigateWidgets',
+    this.listenTo(this, 'rl:swapId', this.updateStatus);
+    this.listenTo(window.mainPage.widgetPanels, 'rl:navigateWidgets',
       this.storePreferredWidgets);
   },
   updateStatus: Underscore.debounce(function (copyOnError) {
@@ -61,7 +61,7 @@ let Project = MetadataItem.extend({
           editable: false,
           location: null
         };
-        this.trigger('rra:changeStatus');
+        this.trigger('rl:changeStatus');
         return Promise.reject(new Error('Project has no ID'));
       }
     }
@@ -79,19 +79,19 @@ let Project = MetadataItem.extend({
       }));
     });
     Promise.all(datasetPromises).catch(errorObj => {
-      window.mainPage.trigger('rra:error', errorObj);
+      window.mainPage.trigger('rl:error', errorObj);
     }).then(respObjects => {
       if (!respObjects) {
-        window.mainPage.trigger('rra:error',
+        window.mainPage.trigger('rl:error',
           new Error('Could not access this project\'s dataset(s)'));
       } else {
         respObjects.forEach(resp => {
           let newDataset = new Dataset(resp);
-          this.listenTo(newDataset, 'rra:changeSpec', this.changeDataSpec);
-          this.listenTo(newDataset, 'rra:swapId', this.swapDatasetId);
+          this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
+          this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
         });
       }
-      this.trigger('rra:changeDatasets');
+      this.trigger('rl:changeDatasets');
     });
 
     // Get access information about this project
@@ -112,7 +112,7 @@ let Project = MetadataItem.extend({
         this.makeCopy();
       }
     }).then(() => {
-      this.trigger('rra:changeStatus');
+      this.trigger('rl:changeStatus');
     });
 
     return statusPromise;
@@ -131,7 +131,7 @@ let Project = MetadataItem.extend({
       // If we can't even save a copy, something
       // is seriously wrong.
       window.mainPage.switchProject(null);
-      window.mainPage.trigger('rra:error', err);
+      window.mainPage.trigger('rl:error', err);
     };
 
     this.unset('_id');
@@ -140,7 +140,7 @@ let Project = MetadataItem.extend({
         // This copy is now "ours"
         window.mainPage.currentUser.preferences.claimProject();
         // Let everyone know about the new project
-        window.mainPage.trigger('rra:createProject');
+        window.mainPage.trigger('rl:createProject');
         this.updateStatus();
       }).catch(_fail);
   },
@@ -191,9 +191,9 @@ let Project = MetadataItem.extend({
   rename: function (newName) {
     this.set('name', newName);
     this.save().then(() => {
-      this.trigger('rra:rename');
+      this.trigger('rl:rename');
     }).catch((errorObj) => {
-      window.mainPage.trigger('rra:error', errorObj);
+      window.mainPage.trigger('rl:error', errorObj);
     });
   },
   getDatasetIds: function () {
@@ -201,7 +201,7 @@ let Project = MetadataItem.extend({
   },
   changeDataSpec: function () {
     this.validateMatchings();
-    this.trigger('rra:changeDatasets');
+    this.trigger('rl:changeDatasets');
   },
   swapDatasetId: function (newData) {
     let datasets = this.getMeta('datasets');
@@ -210,15 +210,15 @@ let Project = MetadataItem.extend({
       datasets[index] = newData._id;
       this.setMeta('datasets', datasets);
     } else {
-      window.mainPage.trigger('rra:error',
+      window.mainPage.trigger('rl:error',
         new Error('Encountered a problem handling swapped dataset id'));
     }
   },
   setDataset: function (newDataset, index = 0) {
     // Need to convert the raw girder.ItemModel
     newDataset = new Dataset(newDataset.toJSON());
-    this.listenTo(newDataset, 'rra:changeSpec', this.changeDataSpec);
-    this.listenTo(newDataset, 'rra:swapId', this.swapDatasetId);
+    this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
+    this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
     let newId = newDataset.getId();
     let datasets = this.getMeta('datasets');
 
@@ -228,18 +228,18 @@ let Project = MetadataItem.extend({
       let oldDataset = window.mainPage.loadedDatasets[datasets[index]];
       if (oldDataset) {
         // If the dataset hasn't already dropped itself...
-        this.stopListening(oldDataset, 'rra:changeSpec', this.changeDataSpec);
-        this.stopListening(oldDataset, 'rra:swapId', this.swapDatasetId);
+        this.stopListening(oldDataset, 'rl:changeSpec', this.changeDataSpec);
+        this.stopListening(oldDataset, 'rl:swapId', this.swapDatasetId);
         oldDataset.drop();
       }
       datasets[index] = newId;
     }
     this.setMeta('datasets', datasets);
     this.save().then(() => {
-      this.trigger('rra:changeDatasets');
+      this.trigger('rl:changeDatasets');
       this.validateMatchings();
     }).catch((errorObj) => {
-      window.mainPage.trigger('rra:error', errorObj);
+      window.mainPage.trigger('rl:error', errorObj);
     });
   },
   setVisualization: function (newVisualization, index = 0) {
@@ -252,10 +252,10 @@ let Project = MetadataItem.extend({
     }
     this.setMeta('visualizations', visualizations);
     this.save().then(() => {
-      this.trigger('rra:changeVisualizations');
+      this.trigger('rl:changeVisualizations');
       this.validateMatchings();
     }).catch((errorObj) => {
-      window.mainPage.trigger('rra:error', errorObj);
+      window.mainPage.trigger('rl:error', errorObj);
     });
   },
   shapeDataForVis: function (index = 0) {
@@ -343,9 +343,9 @@ let Project = MetadataItem.extend({
 
     this.setMeta(meta);
     this.save().then(() => {
-      this.trigger('rra:changeMatchings');
+      this.trigger('rl:changeMatchings');
     }).catch(errorObj => {
-      window.mainPage.trigger('rra:error', errorObj);
+      window.mainPage.trigger('rl:error', errorObj);
     });
   },
   addMatching: function (matching) {
@@ -369,9 +369,9 @@ let Project = MetadataItem.extend({
 
     this.setMeta(meta);
     this.save().then(() => {
-      this.trigger('rra:changeMatchings');
+      this.trigger('rl:changeMatchings');
     }).catch(errorObj => {
-      window.mainPage.trigger('rra:error', errorObj);
+      window.mainPage.trigger('rl:error', errorObj);
     });
   },
   removeMatching: function (matching) {
@@ -390,9 +390,9 @@ let Project = MetadataItem.extend({
     }
     this.setMeta('matchings', matchings);
     this.save().then(() => {
-      this.trigger('rra:changeMatchings');
+      this.trigger('rl:changeMatchings');
     }).catch(errorObj => {
-      window.mainPage.trigger('rra:error', errorObj);
+      window.mainPage.trigger('rl:error', errorObj);
     });
   },
   getAllWidgetSpecs: function () {

@@ -58,21 +58,21 @@ function toggleCallback () {
   }).then(() => {
     window.mainPage.project.updateStatus();
   }).catch((errorObj) => {
-    window.mainPage.trigger('rra:error', errorObj);
+    window.mainPage.trigger('rl:error', errorObj);
   });
 }
 
 let ProjectSettings = Backbone.View.extend({
   initialize: function () {
-    this.listenTo(window.mainPage.project, 'rra:changeStatus', this.render);
-    this.listenTo(window.mainPage, 'rra:changeProject', this.handleNewProject);
+    this.listenTo(window.mainPage.project, 'rl:changeStatus', this.render);
+    this.listenTo(window.mainPage, 'rl:changeProject', this.handleNewProject);
   },
   handleNewProject: function () {
     if (window.mainPage.project) {
       // Don't bother re-rendering this view until we have the new project's
       // updated status
-      this.listenTo(window.mainPage.project, 'rra:changeStatus', this.render);
-      this.listenTo(window.mainPage.project, 'rra:rename', this.render);
+      this.listenTo(window.mainPage.project, 'rl:changeStatus', this.render);
+      this.listenTo(window.mainPage.project, 'rl:rename', this.render);
     }
   },
   render: function () {
@@ -129,7 +129,7 @@ can\'t delete projects unless you log in.`);
               }
             } else {
               // Something else happened
-              window.mainPage.trigger('rra:error', errorObj);
+              window.mainPage.trigger('rl:error', errorObj);
             }
           });
       });

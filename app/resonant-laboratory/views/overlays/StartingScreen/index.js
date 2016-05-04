@@ -4,8 +4,8 @@ import myTemplate from './template.html';
 
 let StartingScreen = Backbone.View.extend({
   initialize: function () {
-    this.listenTo(window.mainPage.currentUser, 'rra:login', this.render);
-    this.listenTo(window.mainPage.currentUser, 'rra:logout', this.render);
+    this.listenTo(window.mainPage.currentUser, 'rl:login', this.render);
+    this.listenTo(window.mainPage.currentUser, 'rl:logout', this.render);
   },
   render: function () {
     if (!this.addedTemplate) {

@@ -32,11 +32,11 @@ let Widget = Backbone.View.extend({
       }
     }];
 
-    this.listenTo(window.mainPage.widgetPanels, 'rra:navigateWidgets',
+    this.listenTo(window.mainPage.widgetPanels, 'rl:navigateWidgets',
       this.render);
-    this.listenTo(window.mainPage, 'rra:resizeWindow', this.render);
+    this.listenTo(window.mainPage, 'rl:resizeWindow', this.render);
     this.listenTo(window.mainPage.currentUser.preferences,
-      'rra:observeTips', this.renderIndicators);
+      'rl:observeTips', this.renderIndicators);
   },
   toggle: function () {
     window.mainPage.widgetPanels.toggleWidget(this.spec);

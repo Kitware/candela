@@ -65,7 +65,7 @@ let DatasetView = Widget.extend({
       }
     });
 
-    this.listenTo(window.mainPage, 'rra:changeProject',
+    this.listenTo(window.mainPage, 'rl:changeProject',
       this.handleNewProject);
     this.handleNewProject();
   },
@@ -73,9 +73,9 @@ let DatasetView = Widget.extend({
     this.$el.html('');
     this.status = STATUS.NO_DATA;
 
-    this.listenTo(window.mainPage.project, 'rra:changeDatasets',
+    this.listenTo(window.mainPage.project, 'rl:changeDatasets',
       this.render);
-    this.listenTo(window.mainPage.project, 'rra:changeMatchings',
+    this.listenTo(window.mainPage.project, 'rl:changeMatchings',
       this.renderAttributeSettings);
   },
   renderInfoScreen: function () {

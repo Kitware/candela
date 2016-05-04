@@ -39,7 +39,7 @@ let MainPage = Backbone.View.extend({
     // Respond to resize events
     window.onresize = () => {
       this.render();
-      this.trigger('rra:resizeWindow');
+      this.trigger('rl:resizeWindow');
     };
   },
   render: function () {
@@ -76,11 +76,11 @@ let MainPage = Backbone.View.extend({
     this.project = new Project();
     return this.project.save()
       .then(() => {
-        this.trigger('rra:createProject');
-        this.trigger('rra:changeProject');
+        this.trigger('rl:createProject');
+        this.trigger('rl:changeProject');
       }).catch((err) => {
         this.switchProject(null);
-        this.trigger('rra:error', err);
+        this.trigger('rl:error', err);
       });
   },
   switchProject: function (id) {
@@ -89,7 +89,7 @@ let MainPage = Backbone.View.extend({
     }
     if (id === null) {
       this.project = null;
-      this.trigger('rra:changeProject');
+      this.trigger('rl:changeProject');
       return new Promise(() => {
       });
     } else {
@@ -98,10 +98,10 @@ let MainPage = Backbone.View.extend({
       });
 
       return this.project.fetch().then(() => {
-        this.trigger('rra:changeProject');
+        this.trigger('rl:changeProject');
       }).catch((err) => {
         this.switchProject(null);
-        this.trigger('rra:error', err);
+        this.trigger('rl:error', err);
       });
     }
   }

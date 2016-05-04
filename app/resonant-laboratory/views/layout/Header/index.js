@@ -37,30 +37,30 @@ import './header.css';
 
 let Header = Backbone.View.extend({
   addListeners: function () {
-    this.listenTo(window.mainPage.currentUser, 'rra:logout', this.render);
-    this.listenTo(window.mainPage.currentUser, 'rra:login', this.render);
+    this.listenTo(window.mainPage.currentUser, 'rl:logout', this.render);
+    this.listenTo(window.mainPage.currentUser, 'rl:login', this.render);
 
-    this.listenTo(window.mainPage, 'rra:changeProject',
+    this.listenTo(window.mainPage, 'rl:changeProject',
       this.newProjectResponse);
 
-    this.listenTo(window.mainPage.widgetPanels, 'rra:updateWidgetSpecs',
+    this.listenTo(window.mainPage.widgetPanels, 'rl:updateWidgetSpecs',
       this.render);
 
     this.listenTo(window.mainPage.currentUser.preferences,
-      'rra:observeTips', this.render);
+      'rl:observeTips', this.render);
     this.listenTo(window.mainPage.currentUser.preferences,
-      'rra:levelUp', this.notifyLevelUp);
+      'rl:levelUp', this.notifyLevelUp);
   },
   newProjectResponse: function () {
     if (window.mainPage.project) {
       this.listenTo(window.mainPage.project,
-        'rra:changeDatasets', this.render);
+        'rl:changeDatasets', this.render);
       this.listenTo(window.mainPage.project,
-        'rra:changeVisualizations', this.render);
+        'rl:changeVisualizations', this.render);
       this.listenTo(window.mainPage.project,
-        'rra:changeStatus', this.render);
+        'rl:changeStatus', this.render);
       this.listenTo(window.mainPage.project,
-        'rra:rename', this.render);
+        'rl:rename', this.render);
     }
     this.render();
   },

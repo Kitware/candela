@@ -13,12 +13,12 @@ let ProjectLibrary = Backbone.View.extend({
   initialize: function (params) {
     this.keepOpenOnSelect = params.keepOpenOnSelect === true;
 
-    this.listenTo(window.mainPage.currentUser, 'rra:updateLibrary', this.render);
-    this.listenTo(window.mainPage.currentUser, 'rra:updateLibrary', this.render);
+    this.listenTo(window.mainPage.currentUser, 'rl:updateLibrary', this.render);
+    this.listenTo(window.mainPage.currentUser, 'rl:updateLibrary', this.render);
 
     // The ProjectLibrary is part of other views that may or
     // may not expect a project to be open right now...
-    this.listenTo(window.mainPage, 'rra:changeProject',
+    this.listenTo(window.mainPage, 'rl:changeProject',
       this.handleNewProject);
     this.handleNewProject();
 
@@ -28,8 +28,8 @@ let ProjectLibrary = Backbone.View.extend({
     if (window.mainPage.project) {
       // Don't bother re-rendering this view until we have the new project's
       // updated status
-      this.listenTo(window.mainPage.project, 'rra:changeStatus', this.render);
-      this.listenTo(window.mainPage.project, 'rra:rename', this.render);
+      this.listenTo(window.mainPage.project, 'rl:changeStatus', this.render);
+      this.listenTo(window.mainPage.project, 'rl:rename', this.render);
     } else {
       this.render();
     }
