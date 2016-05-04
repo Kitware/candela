@@ -67,19 +67,19 @@ let MatchingView = Widget.extend({
           this.status === STATUS.STALE_MAPPINGS) {
           return 'Loading...';
         } else {
-          return 'Something isn\'t quite right; click for details';
+          return "Something isn't quite right; click for details";
         }
       },
       onclick: () => {
         window.mainPage.helpLayer.setTips(this.getDefaultTips());
         window.mainPage.helpLayer.show();
-        // TODO: add any other special instructions
+      // TODO: add any other special instructions
       }
     });
 
     this.selection = null;
 
-    this.listenTo(window.mainPage, 'rra:changeProject',
+    this.listenTo(window.mainPage, 'rl:changeProject',
       this.handleNewProject);
     this.handleNewProject();
   },
@@ -87,7 +87,7 @@ let MatchingView = Widget.extend({
     this.$el.html('');
     this.status = STATUS.NOTHING_TO_MAP;
 
-    this.listenTo(window.mainPage.project, 'rra:changeMatchings', () => {
+    this.listenTo(window.mainPage.project, 'rl:changeMatchings', () => {
       this.selection = null;
       this.render();
     });
@@ -263,13 +263,13 @@ in order to connect them together.`);
             return;
           }
         }
-        // TODO: get the probable nodes:
-        // If the selected node is on the
-        // vis side, this node is 'probable'
-        // if and only if another node in
-        // this group has a link to a node
-        // in the same group as the
-        // selected node...
+      // TODO: get the probable nodes:
+      // If the selected node is on the
+      // vis side, this node is 'probable'
+      // if and only if another node in
+      // this group has a link to a node
+      // in the same group as the
+      // selected node...
       }
       nodeEdgeLookup[sourceId].push(edges.length);
       nodeEdgeLookup[targetId].push(edges.length);
@@ -587,9 +587,9 @@ in order to connect them together.`);
       return classString + ' edge';
     }).attr('d', d => {
       let pathString = 'M' + (dataX + nodeWidth / 2) + ',' +
-        dataY(d.source) +
-        'L' + (visX - nodeWidth / 2) + ',' +
-        visY(d.target);
+      dataY(d.source) +
+      'L' + (visX - nodeWidth / 2) + ',' +
+      visY(d.target);
       return pathString;
     }).on('mouseover', d => {
       jQuery(this).addClass('hovered');

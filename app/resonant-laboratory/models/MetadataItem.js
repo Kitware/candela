@@ -87,7 +87,8 @@ let MetadataItem = girder.models.ItemModel.extend({
 
     // beforeSuccess is a function that should
     // be called before options.success
-    beforeSuccess = beforeSuccess || (() => {});
+    beforeSuccess = beforeSuccess || (() => {
+    });
 
     let self = this;
     promiseObj.then(function () {
@@ -199,7 +200,7 @@ let MetadataItem = girder.models.ItemModel.extend({
           silent: true
         });
         if (swappedId) {
-          this.trigger('rra:swapId', resp);
+          this.trigger('rl:swapId', resp);
         }
       });
     } else if (method === 'read') {

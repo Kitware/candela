@@ -5,9 +5,11 @@
 <style type="text/css">
 	.st0{fill:#999999;}
 </style>
-<rect x="75.5" y="74.5" class="st0" width="64" height="362"/>
-<rect x="75.5" y="372.5" class="st0" width="361" height="64"/>
-<rect x="282.5" y="254.5" class="st0" width="64" height="64"/>
-<rect x="169.5" y="162" class="st0" width="64" height="64"/>
-<rect x="260.5" y="94" class="st0" width="64" height="64"/>
+<g>
+	<rect x="6.7" y="6" class="st0" width="88.4" height="500"/>
+	<rect x="6.7" y="417.6" class="st0" width="498.6" height="88.4"/>
+	<rect x="292.6" y="254.6" class="st0" width="88.4" height="88.4"/>
+	<rect x="136.5" y="126.9" class="st0" width="88.4" height="88.4"/>
+	<rect x="262.2" y="32.9" class="st0" width="88.4" height="88.4"/>
+</g>
 </svg>

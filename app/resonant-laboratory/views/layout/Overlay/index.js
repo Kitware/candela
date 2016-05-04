@@ -39,9 +39,9 @@ let Overlay = Backbone.View.extend({
     this.template = undefined;
     this.view = null;
 
-    this.listenTo(window.mainPage, 'rra:changeProject',
+    this.listenTo(window.mainPage, 'rl:changeProject',
       this.handleChangeProject);
-    this.listenTo(window.mainPage, 'rra:error',
+    this.listenTo(window.mainPage, 'rl:error',
       this.handleError);
   },
   handleChangeProject: function () {

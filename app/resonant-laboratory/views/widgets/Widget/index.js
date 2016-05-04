@@ -32,11 +32,11 @@ let Widget = Backbone.View.extend({
       }
     }];
 
-    this.listenTo(window.mainPage.widgetPanels, 'rra:navigateWidgets',
+    this.listenTo(window.mainPage.widgetPanels, 'rl:navigateWidgets',
       this.render);
-    this.listenTo(window.mainPage, 'rra:resizeWindow', this.render);
+    this.listenTo(window.mainPage, 'rl:resizeWindow', this.render);
     this.listenTo(window.mainPage.currentUser.preferences,
-      'rra:observeTips', this.renderIndicators);
+      'rl:observeTips', this.renderIndicators);
   },
   toggle: function () {
     window.mainPage.widgetPanels.toggleWidget(this.spec);
@@ -53,11 +53,12 @@ let Widget = Backbone.View.extend({
     this.panel.renderIndicators();
   },
   canRender: function () {
-    // Don't render if there's no project, or if our WidgetPanel
+    // Don't render if there's no project, if our WidgetPanel
     // hasn't given us a legitimate element in the
-    // document yet
+    // document yet, or if our WidgetPanel is collapsed
     return window.mainPage.project &&
-      document.getElementById(this.$el.attr('id')) === this.el;
+      document.getElementById(this.$el.attr('id')) === this.el; // &&
+      // window.mainPage.widgetPanels.expandedWidgets.has(this.hashName);
   },
   getDefaultTips: function () {
     let tips = {};
@@ -72,7 +73,7 @@ let Widget = Backbone.View.extend({
       tips[prefix + '.indicatorText'] = this.statusText.title;
     }
     // Get a tip for the bar
-    tips[prefix + '.sectionHeader'] = 'Click to collapse / expand this panel';
+    tips[prefix + '.sectionHeader'] = 'Collapse / expand this panel';
     return tips;
   }
 });

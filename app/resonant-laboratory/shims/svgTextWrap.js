@@ -69,7 +69,7 @@ export default function rewrap (textElement, pxWidth, emLeading) {
         // as well as half the length of
         // the current line
         return -(lineLengths[index - 1] +
-                 lineLengths[index]) / 2;
+        lineLengths[index]) / 2;
       } else { // textAnchor === 'end'
         // scoot the line back the length
         // of the current line

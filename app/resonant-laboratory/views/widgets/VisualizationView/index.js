@@ -53,7 +53,7 @@ let VisualizationView = Widget.extend({
       }
     });
 
-    this.listenTo(window.mainPage, 'rra:changeProject',
+    this.listenTo(window.mainPage, 'rl:changeProject',
       this.handleNewProject);
     this.handleNewProject();
   },
@@ -62,9 +62,9 @@ let VisualizationView = Widget.extend({
     this.ok = null;
     this.vis = null;
 
-    this.listenTo(window.mainPage.project, 'rra:changeVisualizations',
+    this.listenTo(window.mainPage.project, 'rl:changeVisualizations',
       this.render);
-    this.listenTo(window.mainPage.project, 'rra:changeMatchings',
+    this.listenTo(window.mainPage.project, 'rl:changeMatchings',
       this.render);
   },
   renderInfoScreen: function () {
@@ -73,16 +73,16 @@ let VisualizationView = Widget.extend({
   },
   renderHelpScreen: function () {
     if (this.ok === null) {
-      window.mainPage.overlay.renderUserErrorScreen(`You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render('VisualizationLibrary')"> here</a> to choose one.`);
+      window.mainPage.overlay.renderUserErrorScreen('You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render(\'VisualizationLibrary\')"> here</a> to choose one.');
     } else if (this.ok === true) {
-      window.mainPage.overlay.renderSuccessScreen(`The visualization appears to be functioning correctly.`);
+      window.mainPage.overlay.renderSuccessScreen('The visualization appears to be functioning correctly.');
     } else {
       let meta = window.mainPage.project.get('meta');
 
       if (!meta || !meta.visualizations || !meta.visualizations[0]) {
-        window.mainPage.overlay.renderUserErrorScreen(`You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render('VisualizationLibrary')"> here</a> to choose one.`);
+        window.mainPage.overlay.renderUserErrorScreen('You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render(\'VisualizationLibrary\')"> here</a> to choose one.');
       } else {
-        window.mainPage.overlay.renderReallyBadErrorScreen(`Corrupted visualization meta information.`);
+        window.mainPage.overlay.renderReallyBadErrorScreen('Corrupted visualization meta information.');
       }
     }
   },

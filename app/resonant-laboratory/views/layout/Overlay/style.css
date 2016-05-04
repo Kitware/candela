@@ -58,24 +58,24 @@
   text-align: center;
   align-content: center;
   align-items: center;
+  justify-content: space-around;
+  width: 6em;
+  height: 6em;
   padding: 1em;
+  border-radius: 50%;
   cursor: pointer;
+  border: 2px solid rgba(0,0,0,0);
+}
+#Overlay div.current.circleButton {
+  background-color: #ccc;
+}
+#Overlay div.circleButton:hover {
+  border: 2px solid #ccc;
 }
 
 #Overlay div.circleButton img {
-  width: 100px;
-  height: 100px;
-  text-align: center;
-  vertical-align: middle;
-  border-radius: 50px;
-  border: 2px solid rgba(0,0,0,0);
-}
-#Overlay div.current.circleButton img {
-  background-color: #ccc;
-}
-
-#Overlay div.circleButton:hover img {
-  border: 2px solid #ccc;
+  width: 3em;
+  height: 3em;
 }
 
 #Overlay #closeOverlay {

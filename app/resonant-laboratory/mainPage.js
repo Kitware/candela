@@ -26,8 +26,10 @@ let MainPage = Backbone.View.extend({
     // Initial empty state (assume no logged in user)
     this.currentUser = new User();
 
-    this.listenTo(this.currentUser, 'rra:logout', () => {
-      this.switchProject(null);
+    this.listenTo(this.currentUser, 'rlab:logout', () => {
+      this.switchProject(null).then(() => {
+        this.overlay.render('StartingScreen');
+      });
     });
 
     // Start no datasets and no project
@@ -37,7 +39,7 @@ let MainPage = Backbone.View.extend({
     // Respond to resize events
     window.onresize = () => {
       this.render();
-      this.trigger('rra:resizeWindow');
+      this.trigger('rl:resizeWindow');
     };
   },
   render: function () {
@@ -74,30 +76,32 @@ let MainPage = Backbone.View.extend({
     this.project = new Project();
     return this.project.save()
       .then(() => {
-        this.trigger('rra:createProject');
-        this.trigger('rra:changeProject');
-        this.project.updateStatus();
+        this.trigger('rl:createProject');
+        this.trigger('rl:changeProject');
       }).catch((err) => {
         this.switchProject(null);
-        this.trigger('rra:error', err);
+        this.trigger('rl:error', err);
       });
   },
   switchProject: function (id) {
+    if (this.project) {
+      this.project.stopListening();
+    }
     if (id === null) {
       this.project = null;
-      this.trigger('rra:changeProject');
-      return new Promise(() => {});
+      this.trigger('rl:changeProject');
+      return new Promise(() => {
+      });
     } else {
       this.project = new Project({
         _id: id
       });
 
       return this.project.fetch().then(() => {
-        this.trigger('rra:changeProject');
-        this.project.updateStatus();
+        this.trigger('rl:changeProject');
       }).catch((err) => {
         this.switchProject(null);
-        this.trigger('rra:error', err);
+        this.trigger('rl:error', err);
       });
     }
   }

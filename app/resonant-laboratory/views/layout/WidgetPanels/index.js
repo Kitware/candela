@@ -1,8 +1,9 @@
 import Underscore from 'underscore';
 import Backbone from 'backbone';
+import jQuery from 'jquery';
 import d3 from 'd3';
 import WidgetPanel from './WidgetPanel.js';
-import SetOps, {Set} from '../../../shims/SetOps.js';
+import SetOps, { Set } from '../../../shims/SetOps.js';
 
 import './accordionhorz.css';
 import './style.css';
@@ -12,16 +13,16 @@ let WidgetPanels = Backbone.View.extend({
     this.widgetSpecs = [];
     this.widgets = {};
     this.expandedWidgets = new Set();
-    this.listenTo(window.mainPage, 'rra:changeProject',
+    this.listenTo(window.mainPage, 'rl:changeProject',
       this.handleNewProject);
     this.widgetsChanged = true;
-    this.listenTo(this, 'rra:updateWidgetSpecs', this.render);
+    this.listenTo(this, 'rl:updateWidgetSpecs', this.render);
   },
   handleNewProject: function () {
     if (window.mainPage.project) {
-      this.listenTo(window.mainPage.project, 'rra:changeDatasets',
+      this.listenTo(window.mainPage.project, 'rl:changeDatasets',
         this.updateWidgetSpecs);
-      this.listenTo(window.mainPage.project, 'rra:changeVisualizations',
+      this.listenTo(window.mainPage.project, 'rl:changeVisualizations',
         this.updateWidgetSpecs);
     }
     this.updateWidgetSpecs();
@@ -35,7 +36,7 @@ let WidgetPanels = Backbone.View.extend({
     this.expandedWidgets = SetOps.intersection(this.expandedWidgets,
       new Set(this.widgetSpecs.map(spec => spec.hashName)));
     this.widgetsChanged = true;
-    this.trigger('rra:updateWidgetSpecs');
+    this.trigger('rl:updateWidgetSpecs');
   },
   toggleWidget: function (widgetSpec, expand) {
     if (!this.expandedWidgets.has(widgetSpec.hashName) || expand === true) {
@@ -61,6 +62,7 @@ let WidgetPanels = Backbone.View.extend({
       .data(this.widgetSpecs, (d) => d.hashName);
     let sectionsEnter = sections.enter().append('section');
     sections.exit().each((d) => {
+      this.widgets[d.hashName].stopListening();
       delete this.widgets[d.hashName];
     }).remove();
 
@@ -95,13 +97,25 @@ let WidgetPanels = Backbone.View.extend({
     this.$el.find('section.targeted')
       .css('width', style);
 
+    // Are all the widgets closed (and no overlay is showing)?
+    if (expandedSections === 0 &&
+      window.mainPage.overlay.template === null) {
+      // Show the empty state image
+      jQuery('#EmptyState')
+        .css('left', (1.5 + 2.5 * collapsedSections) + 'em')
+        .show();
+    } else {
+      // Hide the empty state image
+      jQuery('#EmptyState').hide();
+    }
+
     // Finally, get all the widgets to render
     // (don't tell them to render themselves
     // until after the animation has finished)
     if (this.widgetsChanged === true) {
       this.widgetsChanged = false;
       window.setTimeout(() => {
-        this.trigger('rra:navigateWidgets');
+        this.trigger('rl:navigateWidgets');
       }, 1000);
     }
   }, 300)

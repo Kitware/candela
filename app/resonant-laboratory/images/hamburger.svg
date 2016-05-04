@@ -6,8 +6,8 @@
 	.st0{fill:#999999;}
 </style>
 <g>
-	<rect x="64.1" y="96" class="st0" width="384" height="64"/>
-	<rect x="64.1" y="224" class="st0" width="384" height="64"/>
-	<rect x="64.1" y="352" class="st0" width="384" height="64"/>
+	<rect x="6" y="47.7" class="st0" width="500" height="83.3"/>
+	<rect x="6" y="214.3" class="st0" width="500" height="83.3"/>
+	<rect x="6" y="381" class="st0" width="500" height="83.3"/>
 </g>
 </svg>

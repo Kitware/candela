@@ -37,61 +37,66 @@ import './header.css';
 
 let Header = Backbone.View.extend({
   addListeners: function () {
-    this.listenTo(window.mainPage.currentUser, 'rra:logout', this.render);
-    this.listenTo(window.mainPage.currentUser, 'rra:login', this.render);
+    this.listenTo(window.mainPage.currentUser, 'rl:logout', this.render);
+    this.listenTo(window.mainPage.currentUser, 'rl:login', this.render);
 
-    this.listenTo(window.mainPage, 'rra:changeProject',
+    this.listenTo(window.mainPage, 'rl:changeProject',
       this.newProjectResponse);
 
-    this.listenTo(window.mainPage.widgetPanels, 'rra:updateWidgetSpecs',
+    this.listenTo(window.mainPage.widgetPanels, 'rl:updateWidgetSpecs',
       this.render);
 
     this.listenTo(window.mainPage.currentUser.preferences,
-      'rra:observeTips', this.render);
+      'rl:observeTips', this.render);
     this.listenTo(window.mainPage.currentUser.preferences,
-      'rra:levelUp', this.notifyLevelUp);
+      'rl:levelUp', this.notifyLevelUp);
   },
   newProjectResponse: function () {
     if (window.mainPage.project) {
       this.listenTo(window.mainPage.project,
-        'rra:changeDatasets', this.render);
+        'rl:changeDatasets', this.render);
       this.listenTo(window.mainPage.project,
-        'rra:changeVisualizations', this.render);
+        'rl:changeVisualizations', this.render);
       this.listenTo(window.mainPage.project,
-        'rra:changeStatus', this.render);
+        'rl:changeStatus', this.render);
       this.listenTo(window.mainPage.project,
-        'rra:rename', this.render);
+        'rl:rename', this.render);
     }
     this.render();
   },
   getVisibleTips: function () {
     let tips = {
       '#hamburgerButton': 'Main Menu',
-      '#helpButton': `Show these tips. This is blue when there are new tips that you haven't seen yet.`
-			/*, '#achievementsButton': `Your achievements. Click this to see what you've accomplished, and what you still haven't tried.`*/
+      '#helpButton': 'Show these tips. This is blue ' +
+                     'when there are new tips that you haven\'t seen yet.'
+    /*,
+      '#achievementsButton': `
+Your achievements. See what you've accomplished,
+and what you still haven't tried.`*/
     };
 
     if (window.mainPage.project) {
-      tips['#projectLocationButton'] = `Indicates who can see the project you're working on. Click to change its settings.`;
+      tips['#projectLocationButton'] =
+        'See/change who can see the project you\'re working on';
 
-      tips['#projectName'] = 'Click to rename this project';
+      tips['#projectName'] = 'Rename this project';
 
       if (window.mainPage.project.getMeta('datasets').length === 0) {
         tips['img.AddDataset.headerButton'] =
-          'Click to add a dataset to this project';
+          'Add a dataset to this project';
       } else {
         tips['img.DatasetView.headerButton'] =
-          'Click to see/change the datasets in this project';
+          'See/change the datasets in this project';
       }
 
-      tips['img.MatchingView.headerButton'] = `Click to manage the connections between the datasets and the visualizations in this project`;
+      tips['img.MatchingView.headerButton'] = 'Manage the connections between the datasets and the visualizations in this project';
 
       if (window.mainPage.project.getMeta('visualizations').length === 0) {
         tips['img.AddVisualization.headerButton'] =
-          'Step 2: Click to add a visualization to this project';
+          'Add a visualization to this project';
       } else {
         tips['img.VisualizationView.headerButton'] =
-          'Click to explore the visualizations in this project';
+          'Explore the visualizations in this project';
       }
     }
 
@@ -147,8 +152,9 @@ let Header = Backbone.View.extend({
 
     // TODO: don't check for tips that won't be visible
     // (e.g. add/remove datasets, visualizations)
+    let tips = this.getVisibleTips();
     if (window.mainPage.currentUser.preferences
-      .hasSeenAllTips(this.getVisibleTips())) {
+        .hasSeenAllTips(tips)) {
       jQuery('#helpButton').attr('src', infoIcon);
     } else {
       jQuery('#helpButton').attr('src', newInfoIcon);
@@ -195,6 +201,8 @@ let Header = Backbone.View.extend({
       widgetButtons.exit().remove();
       widgetButtons.attr('src', (d) => {
         return ICONS[d.widgetType];
+      }).attr('title', d => {
+        return tips['img.' + d.widgetType + '.headerButton'];
       }).on('click', (d) => {
         if (d.widgetType === 'AddDataset') {
           window.mainPage.overlay.render('DatasetLibrary');

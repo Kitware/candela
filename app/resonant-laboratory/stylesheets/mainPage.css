@@ -12,6 +12,12 @@ body {
   background-color: #666;
 }
 
+pre {
+  -ms-user-select: initial;
+  -moz-user-select: initial;
+  -webkit-user-select: initial;
+}
+
 h1, button, h2, h3, h4, h5, h6 {
   font-family: "Josefin Sans", "Helvetica", "Arial", sans-serif;
 }
@@ -39,6 +45,24 @@ p {
   max-width: 30em;
   line-height: 1.25em;
 }
+
+#EmptyState {
+  position: absolute;
+  top: 4.5em;
+  right: 1.5em;
+  height: calc(100vh - 6em);
+  color: #f0f0f0;
+}
+#EmptyState > div {
+  width: 20em;
+}
+#QuestionHint {
+  position: absolute;
+  top: 0em;
+  right: 0em;
+  text-align: right;
+}
+
 
 ::-webkit-scrollbar {
   width: 12px;

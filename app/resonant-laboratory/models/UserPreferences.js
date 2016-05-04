@@ -1,8 +1,5 @@
 import MetadataItem from './MetadataItem';
-import {
-  Set
-}
-from '../shims/SetOps.js';
+import { Set } from '../shims/SetOps.js';
 let girder = window.girder;
 
 let UserPreferences = MetadataItem.extend({
@@ -13,7 +10,7 @@ let UserPreferences = MetadataItem.extend({
   */
   defaults: () => {
     return {
-      name: 'rra_preferences',
+      name: 'rl_preferences',
       description: `
 Contains your preferences for the Resonant Laboratory application. If
 you move or delete this item, your preferences will be lost.`,
@@ -49,9 +46,9 @@ you move or delete this item, your preferences will be lost.`,
       });
   },
   addListeners: function () {
-    this.listenTo(window.mainPage.currentUser, 'rra:login',
+    this.listenTo(window.mainPage.currentUser, 'rl:login',
       this.adoptScratchProjects);
-    this.listenTo(window.mainPage, 'rra:createProject',
+    this.listenTo(window.mainPage, 'rl:createProject',
       this.claimProject);
   },
   claimProject: function () {
@@ -116,7 +113,7 @@ you move or delete this item, your preferences will be lost.`,
           // For now, silently ignore failures to adopt datasets
           window.localStorage.clear('scratchProjects');
         }).then(() => {
-          window.mainPage.currentUser.trigger('rra:updateLibrary');
+          window.mainPage.currentUser.trigger('rl:updateLibrary');
           // In addition to changing the user's library, the current
           // project will (pretty much always) have just changed
           // as well
@@ -151,7 +148,7 @@ you move or delete this item, your preferences will be lost.`,
       seenTips[tipId] = true;
     }
     this.setMeta('seenTips', seenTips);
-    this.trigger('rra:observeTips');
+    this.trigger('rl:observeTips');
     this.save();
   },
   resetToDefaults: function () {
@@ -171,8 +168,9 @@ you move or delete this item, your preferences will be lost.`,
     if (achievements[achievement] !== true) {
       achievements[achievement] = true;
       this.setMeta('achievements', achievements);
-      this.save().catch(() => {}); // fail silently
-      this.trigger('rra:levelUp');
+      this.save().catch(() => {
+      }); // fail silently
+      this.trigger('rl:levelUp');
     }
   }
 });

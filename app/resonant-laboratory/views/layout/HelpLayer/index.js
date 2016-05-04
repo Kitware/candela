@@ -27,14 +27,14 @@ function arrowGenerator (edge) {
     y: edge.target.y + arrowLength * Math.sin(rightAngle)
   };
   return 'M' + edge.source.x + ',' + edge.source.y +
-    'L' + edge.target.x + ',' + edge.target.y +
-    'L' + leftCoords.x + ',' + leftCoords.y +
-    'L' + edge.target.x + ',' + edge.target.y +
-    'L' + rightCoords.x + ',' + rightCoords.y +
-    'L' + edge.target.x + ',' + edge.target.y +
-    'Z';
+         'L' + edge.target.x + ',' + edge.target.y +
+         'L' + leftCoords.x + ',' + leftCoords.y +
+         'L' + edge.target.x + ',' + edge.target.y +
+         'L' + rightCoords.x + ',' + rightCoords.y +
+         'L' + edge.target.x + ',' + edge.target.y +
+         'Z';
 }
-window.cola = cola;
+
 let HelpLayer = Backbone.View.extend({
   initialize: function () {
     this.relevantTips = {};
@@ -44,18 +44,19 @@ let HelpLayer = Backbone.View.extend({
     // easter egg (change these values when you find
     // a good balance)
     this.padding = 9;
-    this.margin = 18;
+    this.margin = 20;
 
     this.avoidOverlaps = true;
-    this.linkDistance = 250;
+    // this.linkDistance = 160;
     this.alpha = 0.7;
-    this.convergenceThreshold = 0.01;
+    this.convergenceThreshold = 0.1;
     // this.defaultNodeSize = 20;
     this.handleDisconnected = false;
+    this.jaccardLinkLengths = 100;
 
-    this.noConstraintIterations = 50;
-    this.structuralIterations = 50;
-    this.allConstraintIterations = 50;
+    this.noConstraintIterations = 3;
+    this.structuralIterations = 3;
+    this.allConstraintIterations = 3;
   },
   setTips: function (tips) {
     this.relevantTips = {};
@@ -227,8 +228,10 @@ let HelpLayer = Backbone.View.extend({
           nodeType: 'label',
           message: tip.message,
           // Start each label at a random location
-          x: Math.random() * bounds.width,
-          y: Math.random() * bounds.height
+          // x: Math.random() * bounds.width,
+          // y: Math.random() * bounds.height
+          x: tip.x,
+          y: tip.y + 250 // generally, tips are anchored toward the top
         });
         // Target (not drawn) for the link
         nodes.push({
@@ -400,12 +403,15 @@ let HelpLayer = Backbone.View.extend({
       }
 
       let _renderGraph = () => {
+        // force.prepareEdgeRouting();
         tips.style('opacity', '1.0')
           .attr('transform', (d) => {
             return 'translate(' + d.x + ',' + d.y + ')';
           });
-        arrows.attr('d', arrowGenerator)
-          .style('opacity', '1.0');
+        arrows.attr('d', d => {
+          // return arrowGenerator(force.routeEdge(d));
+          return arrowGenerator(d);
+        }).style('opacity', '1.0');
       };
 
       if (this.addedTuner) {
@@ -437,12 +443,12 @@ let HelpLayer = Backbone.View.extend({
         .append('div')
         .attr('id', 'tuner')
         .append('button')
-          .text('Run again')
-          .on('click', () => {
-            self.addedTemplate = false;
-            self.render();
-            self.renderTuner();
-          });
+        .text('Run again')
+        .on('click', () => {
+          self.addedTemplate = false;
+          self.render();
+          self.renderTuner();
+        });
       this.addedTuner = true;
     }
 

@@ -18,6 +18,20 @@ let VALID_EXTENSIONS = [
   'json'
 ];
 
+let dictCompare = (a, b) => {
+  let aKeys = Object.keys(a);
+  let bKeys = Object.keys(b);
+  if (aKeys.length !== bKeys.length) {
+    return false;
+  }
+  for (let aKey of aKeys) {
+    if (!b.hasOwnProperty(aKey) || a[aKey] !== b[aKey]) {
+      return false;
+    }
+  }
+  return true;
+};
+
 let Dataset = MetadataItem.extend({
   initialize: function () {
     window.mainPage.loadedDatasets[this.getId()] = this;
@@ -26,7 +40,7 @@ let Dataset = MetadataItem.extend({
     this.parsedCache = null;
     let meta = this.getMeta();
 
-    this.listenTo(this, 'rra:swapId', this.swapId);
+    this.listenTo(this, 'rl:swapId', this.swapId);
 
     let fileTypePromise;
     if (meta.fileType) {
@@ -42,13 +56,20 @@ let Dataset = MetadataItem.extend({
       attributePromise = this.inferAttributes();
     }
 
+    let prevFileType = this.getMeta('fileType');
+    let prevAttributes = this.getMeta('attributes');
+
     Promise.all([fileTypePromise, attributePromise]).then(() => {
-      this.save().then(() => {
-        this.trigger('rra:changeType');
-        this.trigger('rra:changeSpec');
-      }).catch(errorObj => {
-        throw errorObj;
-      });
+      // Don't call save() if nothing changed
+      if (this.getMeta('fileType') !== prevFileType ||
+          !dictCompare(this.getMeta('attributes'), prevAttributes)) {
+        this.save().then(() => {
+          this.trigger('rl:changeType');
+          this.trigger('rl:changeSpec');
+        }).catch(errorObj => {
+          throw errorObj;
+        });
+      }
     });
   },
   swapId: function (newData) {
@@ -58,6 +79,7 @@ let Dataset = MetadataItem.extend({
   },
   drop: function () {
     this.dropped = true;
+    this.stopListening();
     delete window.mainPage.loadedDatasets[this.getId()];
   },
   save: function () {
@@ -72,7 +94,7 @@ let Dataset = MetadataItem.extend({
     }
   },
   saveFailure: function (errorObj) {
-    window.mainPage.trigger('rra:error', errorObj);
+    window.mainPage.trigger('rl:error', errorObj);
   },
   loadData: function (cache = true) {
     // TODO: support more file formats / non-Girder
@@ -156,7 +178,7 @@ let Dataset = MetadataItem.extend({
   setFileType: function (fileType) {
     this.setMeta('fileType', fileType);
     return this.save().then(() => {
-      this.trigger('rra:changeType');
+      this.trigger('rl:changeType');
     });
   },
   inferAttributes: function () {
@@ -176,7 +198,7 @@ let Dataset = MetadataItem.extend({
     attributes[attrName] = dataType;
     this.setMeta('attributes', attributes);
     return this.save().then(() => {
-      this.trigger('rra:changeSpec');
+      this.trigger('rl:changeSpec');
     });
   }
 });

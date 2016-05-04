@@ -5,9 +5,11 @@
 <style type="text/css">
 	.st0{fill:none;stroke:#000000;stroke-miterlimit:10;}
 </style>
-<rect x="198.2" y="191.9" vector-effect="non-scaling-stroke" class="st0" width="26.2" height="26.2"/>
-<rect x="272.8" y="136.2" vector-effect="non-scaling-stroke" class="st0" width="26.2" height="26.2"/>
-<rect x="290.8" y="267.8" vector-effect="non-scaling-stroke" class="st0" width="26.2" height="26.2"/>
-<line vector-effect="non-scaling-stroke" class="st0" x1="160" y1="403.9" x2="160" y2="107.1"/>
-<line vector-effect="non-scaling-stroke" class="st0" x1="107.6" y1="351.5" x2="404.4" y2="351.5"/>
+<g>
+	<rect x="158.6" y="148.9" vector-effect="non-scaling-stroke" class="st0" width="44.1" height="44.1"/>
+	<rect x="284.3" y="55" vector-effect="non-scaling-stroke" class="st0" width="44.1" height="44.1"/>
+	<rect x="314.6" y="276.7" vector-effect="non-scaling-stroke" class="st0" width="44.1" height="44.1"/>
+	<line vector-effect="non-scaling-stroke" class="st0" x1="94.3" y1="506" x2="94.3" y2="6"/>
+	<line vector-effect="non-scaling-stroke" class="st0" x1="6" y1="417.7" x2="506" y2="417.7"/>
+</g>
 </svg>

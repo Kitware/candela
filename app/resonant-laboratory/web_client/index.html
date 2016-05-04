@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <title>Resonant Laboratory</title>
-    <link href='https://fonts.googleapis.com/css?family=Josefin+Sans:400,900' rel='stylesheet' type='text/css'>
-    <!--link rel="stylesheet" href="static/built/app.min.css"-->
-    <link rel="icon" type="image/png" href="static/img/Girder_Favicon.png">
+  <title>Resonant Laboratory</title>
+  <link href='https://fonts.googleapis.com/css?family=Josefin+Sans:400,900' rel='stylesheet' type='text/css'>
+  <!--link rel="stylesheet" href="static/built/app.min.css"-->
+  <link rel="icon" type="image/png" href="static/img/Girder_Favicon.png">
 </head>
+
 <body>
-    <header id="Header"></header>
-    <div id="WidgetPanels" class="accordion"></div>
-    <div id="Overlay"></div>
-    <svg id="HelpLayer">
-    </svg>
-    <script src="static/built/libs.min.js" charset="utf-8"></script>
-    <script src="static/built/app.min.js" charset="utf-8"></script>
-    <script src="lib/webpack_bundle.js" charset="utf-8"></script>
+  <header id="Header"></header>
+  <div id="EmptyState" style="display:none">
+    <div id="PiecesHint">
+      Try one of these buttons or bars to get started.
+    </div>
+    <div id="QuestionHint" class="emptyState">Need a hand? Try the ? button.</div>
+  </div>
+  <div id="WidgetPanels" class="accordion"></div>
+  <div id="Overlay"></div>
+  <svg id="HelpLayer">
+  </svg>
+  <script src="static/built/libs.min.js" charset="utf-8"></script>
+  <script src="static/built/app.min.js" charset="utf-8"></script>
+  <script src="lib/webpack_bundle.js" charset="utf-8"></script>
 </body>

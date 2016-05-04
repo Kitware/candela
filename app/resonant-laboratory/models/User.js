@@ -5,8 +5,8 @@ let User = girder.models.UserModel.extend({
   initialize: function () {
     this.loggedIn = false;
     this.preferences = new UserPreferences();
-    this.listenTo(this, 'rra:logout', this.handleUpdate);
-    this.listenTo(this, 'rra:login', this.handleUpdate);
+    this.listenTo(this, 'rl:logout', this.handleUpdate);
+    this.listenTo(this, 'rl:login', this.handleUpdate);
     this.authenticate();
   },
   addListeners: function () {
@@ -30,7 +30,7 @@ let User = girder.models.UserModel.extend({
           silent: true
         }).set(resp.user);
         this.authToken = resp.authToken;
-        this.trigger('rra:login');
+        this.trigger('rl:login');
         girder.events.trigger('g:login');
       }
     }).catch(errorObj => {
@@ -40,7 +40,7 @@ let User = girder.models.UserModel.extend({
         this.finishLogout();
       } else {
         // Something else happened
-        window.mainPage.trigger('rra:error', errorObj);
+        window.mainPage.trigger('rl:error', errorObj);
       }
     });
   },
@@ -55,7 +55,7 @@ let User = girder.models.UserModel.extend({
     if (wasLoggedIn) {
       window.mainPage.switchProject(null)
         .then(() => {
-          this.trigger('rra:logout');
+          this.trigger('rl:logout');
           // Girder uses g:login for both log in and log out
           girder.events.trigger('g:login');
         });
@@ -70,7 +70,7 @@ let User = girder.models.UserModel.extend({
       // the user already has preferences stored
       this.preferences.fetch()
         .catch((errorObj) => {
-          window.mainPage.trigger('rra:error', errorObj);
+          window.mainPage.trigger('rl:error', errorObj);
         });
     }
   },
