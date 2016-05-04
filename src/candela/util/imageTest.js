@@ -51,6 +51,8 @@ export default function imageTest ({name, url, selector, delay = 0, threshold}) 
   test(`${name} image test`, t => {
     // TODO: allow options to appear in args.
     let n = Nightmare({
+      width: 800,
+      height: 600,
       show: false,
       useContentSize: true,
       frame: false,
