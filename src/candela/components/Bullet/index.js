@@ -36,7 +36,6 @@ export default class Bullet extends VisComponent {
   constructor (el, options) {
     super(el);
     this.options = options;
-    this.render();
   }
 
   render () {

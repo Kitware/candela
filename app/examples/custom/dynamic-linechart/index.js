@@ -10,9 +10,7 @@ class DynamicLine extends Events(Line) {
 
   render () {
     super.render();
-    if (this.emit) {
-      this.emit('render');
-    }
+    this.emit('render');
   }
 
   data (data) {
