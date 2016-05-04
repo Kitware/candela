@@ -84,13 +84,14 @@ let MainPage = Backbone.View.extend({
       });
   },
   switchProject: function (id) {
+    if (this.project) {
+      this.project.stopListening();
+    }
     if (id === null) {
-      if (this.project) {
-        this.project.stopListening();
-      }
       this.project = null;
       this.trigger('rra:changeProject');
-      return new Promise(() => {});
+      return new Promise(() => {
+      });
     } else {
       this.project = new Project({
         _id: id

@@ -18,6 +18,20 @@ let VALID_EXTENSIONS = [
   'json'
 ];
 
+let dictCompare = (a, b) => {
+  let aKeys = Object.keys(a);
+  let bKeys = Object.keys(b);
+  if (aKeys.length !== bKeys.length) {
+    return false;
+  }
+  for (let aKey of aKeys) {
+    if (!b.hasOwnProperty(aKey) || a[aKey] !== b[aKey]) {
+      return false;
+    }
+  }
+  return true;
+};
+
 let Dataset = MetadataItem.extend({
   initialize: function () {
     window.mainPage.loadedDatasets[this.getId()] = this;
@@ -42,13 +56,20 @@ let Dataset = MetadataItem.extend({
       attributePromise = this.inferAttributes();
     }
 
+    let prevFileType = this.getMeta('fileType');
+    let prevAttributes = this.getMeta('attributes');
+
     Promise.all([fileTypePromise, attributePromise]).then(() => {
-      this.save().then(() => {
-        this.trigger('rra:changeType');
-        this.trigger('rra:changeSpec');
-      }).catch(errorObj => {
-        throw errorObj;
-      });
+      // Don't call save() if nothing changed
+      if (this.getMeta('fileType') !== prevFileType ||
+          !dictCompare(this.getMeta('attributes'), prevAttributes)) {
+        this.save().then(() => {
+          this.trigger('rra:changeType');
+          this.trigger('rra:changeSpec');
+        }).catch(errorObj => {
+          throw errorObj;
+        });
+      }
     });
   },
   swapId: function (newData) {
