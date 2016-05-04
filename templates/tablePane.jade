@@ -1,15 +1,17 @@
-#key-metrics-title
-  if producerLink
-    a(href=producerLink) Key Metrics
-  else
-    | Key Metrics
-
 table.table.table-striped.table-hover.table-responsive.table-compact
   thead.result-labels
-    td Data Set
-    each trend in trends
+    tr.key-metrics-row
       td
-        abbr(title="#{trend.title}") #{trend.display_name}
+      td(colspan=trends.length)#key-metrics-title
+        if producerLink
+          a(href=producerLink) Key Metrics
+        else
+          | Key Metrics
+    tr
+      td Data Set
+      each trend in trends
+        td
+          abbr(title="#{trend.title}") #{trend.display_name}
   tbody
     each resultSet in resultsByDatasetId
       tr
