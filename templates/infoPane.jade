@@ -19,10 +19,13 @@ table.table.table-responsive.table-compact
     tr.info-section-chart(id="#{idSelector}-aggregate-container")
       td.agg-status-dot
         svg.statusDot
-            circle.none(id="#{idSelector}-aggregate-dot" r="10", cx="10", cy="10")
+          circle.none(id="#{idSelector}-aggregate-dot" r="10", cx="10", cy="10")
       td
         .agg-label
-          abbr(title="#{aggTrend.title}") #{aggTrend.display_name}
+          if aggTrend.synth
+            abbr(title="#{aggTrend.title}") *#{aggTrend.display_name}
+          else
+            abbr(title="#{aggTrend.title}") #{aggTrend.display_name}
       if sparklinesExist
         td
           .agg-sparkline(id="#{idSelector}-aggregate-sparkline")

@@ -36,21 +36,28 @@ export let dash = Backbone.View.extend({
 
     /**
      * Synthesize aggregate metrics from the supplied trend values, which will
-     * result in a percentile value per trend.
+     * result in a percentile value per trend if an aggregate metric isn't
+     * already supplied for the trend.
      */
-    function getAggTrends (trendMap, trendValuesByDataset, percentile) {
+    function synthesizeMissingAggTrends (aggTrends, trendMap, trendValuesByDataset, percentile) {
       const byTrend = _.groupBy(trendValuesByDataset, 'trend');
       const trends = _.keys(byTrend);
-      let aggTrends = [];
+      if (!aggTrends) {
+          aggTrends = [];
+      }
+      const aggTrendsByTrendName = _.indexBy(aggTrends, 'trend_name');
       for (let i = 0; i < trends.length; ++i) {
-        let aggTrend = _.clone(trendMap[trends[i]]);
-        let trendVals = _.chain(byTrend[aggTrend.name])
-                         .pluck('current')
-                         .sortBy((num) => { return num; })
-                         .value();
-        aggTrend.history = [calcPercentile(trendVals, percentile / 100)];
-        aggTrend.title = 'Default of ' + percentile + ' percentile key metric value (' + aggTrend.name + ')'
-        aggTrends.push(aggTrend);
+        if (!_.has(aggTrendsByTrendName, trends[i])) {
+          let aggTrend = _.clone(trendMap[trends[i]]);
+          let trendVals = _.chain(byTrend[aggTrend.name])
+                           .pluck('current')
+                           .sortBy((num) => { return num; })
+                           .value();
+          aggTrend.history = [calcPercentile(trendVals, percentile / 100)];
+          aggTrend.title = 'Default of ' + percentile + ' percentile key metric value (' + aggTrend.name + '), No aggregate metric defined for trend';
+          aggTrend.synth = true;
+          aggTrends.push(aggTrend);
+        }
       }
       return aggTrends;
     }
@@ -134,7 +141,7 @@ export let dash = Backbone.View.extend({
 
     // Generate aggregate trends if needed.
     var percentile = 50.0;
-    var aggTrends = settings.agg_trends || getAggTrends(settings.trendMap, settings.trendValuesByDataset, percentile);
+    var aggTrends = synthesizeMissingAggTrends(settings.agg_trends, settings.trendMap, settings.trendValuesByDataset, percentile);
     settings.aggTrends = _.chain(aggTrends)
                           .map(sanitizeTrend)
                           .map(sanitizeAggregateThreshold)

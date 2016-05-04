@@ -113,6 +113,7 @@
             },
             agg_trends: [{
               name: 'ALGA 50th percentile RMSE Euclidean Distance',
+              trend_name: 'ALGA RMSE Euclidean Distance',
               // No abbreviation provided.
               warning: 10,
               fail: 25,
@@ -120,18 +121,15 @@
               history: [0.4, 0.5, 0.6, 0.8, 1.2, 0.55, 0.5]
             }, {
               name: 'ALGASBR 50th percentile RMSE Euclidean Distance',
+              trend_name: 'ALGASBR RMSE Euclidean Distance',
               abbreviation: 'ALGASBR',
               // Lacks a valid threshold definition.
               history: [0.4, 0.6, 0.6, 0.8, 1.2, 4, 0.3]
-            }, {
-              name: 'ALGC 50th percentile RMSE Euclidean Distance',
-              abbreviation: 'ALGC',
-              warning: 10,
-              fail: 25,
-              max: 50,
-              history: [0.1, 0.1, 0.2, 0.3, 1.5, 1.55, 5]
-            }, {
+            },
+            // ALGC is left out of agg_trends so it will be synthesized.
+            {
               name: 'ALGD-ONLINE 50th percentile RMSE Euclidean Distance',
+              trend_name: 'ALGD-ONLINE RMSE Euclidean Distance',
               abbreviation: 'ALGD-ONLINE',
               warning: 0.10,
               fail: 0.2,
@@ -139,6 +137,7 @@
               history: [0.4, 0.5, 0.6, 0.8, 2.2, 3.1415, 0.18]
             }, {
               name: 'ALGD-OFFLINE 50th percentile RMSE Euclidean Distance',
+              trend_name: 'ALGD-OFFLINE RMSE Euclidean Distance',
               // A to force first in the sort order.
               abbreviation: 'AALGD-OFFLINE',
               warning: 10,
@@ -148,13 +147,13 @@
             }],
             trends: [{
               name: 'ALGC RMSE Euclidean Distance',
-              // No abbreviation provided.
+              abbreviation: 'ALGC',
               warning: 3,
               fail: 4,
               max: 5
             }, {
               name: 'ALGA RMSE Euclidean Distance',
-              abbreviation: 'ALGA',
+              // No abbreviation provided.
               warning: 0.5,
               fail: 1,
               max: 2
@@ -244,6 +243,7 @@
               max: 1.0,
             }],
             agg_trends: [{
+              trend_name: 'KEYPOINT-MATCHING Precision',
               name: 'KEYPOINT-MATCHING Precision',
               abbreviation: 'Matching Precision',
               warning: 0.75,
@@ -251,6 +251,7 @@
               max: 1.0,
               history: [0.4, 0.5, 0.6, 0.8, 0.6, 0.75, 0.85]
             }, {
+              trend_name: 'KEYPOINT-MATCHING Recall',
               name: 'KEYPOINT-MATCHING Recall',
               abbreviation: 'Matching Recall',
               warning: 0.75,
@@ -259,12 +260,14 @@
               // This trend only has one point.
               history: [0.85]
             }, {
+              trend_name: 'RANSAC Precision',
               name: 'RANSAC Precision',
               warning: 0.5,
               fail: 0.25,
               max: 1.0,
               history: [0.8, 0.75, 0.64, 0.28, 0.69, 0.87, 0.5]
             }, {
+              trend_name: 'RANSAC Recall',
               name: 'RANSAC Recall',
               warning: 0.75,
               fail: 0.5,
