@@ -1,4 +1,4 @@
-import LineChart from './../../../../src/candela/components/Line';
+import LineChart from './../../../../src/candela/components/LineChart';
 import Events from './../../../../src/candela/VisComponent/mixin/Events';
 import $ from 'jquery';
 import './index.styl';
