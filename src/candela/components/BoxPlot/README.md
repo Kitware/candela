@@ -1,4 +1,4 @@
-# [candela](../..#readme).[components](..#readme).Box
+# [candela](../..#readme).[components](..#readme).BoxPlot
 
 A boxplot. The visualization takes a set of measures (**fields**) and produces
 a boxplot of each one. The optional **group** field will partition the data
@@ -7,7 +7,7 @@ for each group.
 
 **extends** [VisComponent](../../VisComponent#readme)
 
-### new Box(el, options)
+### new BoxPlot(el, options)
 
 * **el** is the DOM element that will contain the visualization.
 

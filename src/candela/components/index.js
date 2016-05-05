@@ -1,5 +1,5 @@
 import BarChart from './BarChart';
-import Box from './Box';
+import BoxPlot from './BoxPlot';
 import Bullet from './Bullet';
 import Gantt from './Gantt';
 import Heatmap from './Heatmap';
@@ -13,7 +13,7 @@ import UpSet from './UpSet';
 
 export default {
   BarChart,
-  Box,
+  BoxPlot,
   Bullet,
   Gantt,
   Heatmap,

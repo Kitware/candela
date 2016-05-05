@@ -1,7 +1,7 @@
 # [candela](..#readme).components
 
 * [BarChart](BarChart#readme)
-* [Box](Box#readme)
+* [BoxPlot](BoxPlot#readme)
 * [Bullet](Bullet#readme)
 * [Gantt](Gantt#readme)
 * [Heatmap](Heatmap#readme)

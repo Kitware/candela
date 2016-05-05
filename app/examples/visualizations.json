@@ -157,7 +157,7 @@
     "hash": "box",
     "name": "Box Plot",
     "description": "A simple box plot",
-    "component": "Box",
+    "component": "BoxPlot",
     "options": {
       "data": "iris",
       "fields": ["sepalLength", "sepalWidth"],
