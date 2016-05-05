@@ -2,7 +2,7 @@ import VisComponent from '../../VisComponent';
 import vega from '../../util/vega';
 import spec from './spec.json';
 
-export default class ScatterMatrix extends VisComponent {
+export default class ScatterPlotMatrix extends VisComponent {
   static get spec () {
     return {
       options: [

@@ -33,9 +33,9 @@
   },
   {
     "hash": "scattermatrix",
-    "name": "Scatterplot Matrix",
-    "description": "A simple scatterplot matrix.",
-    "component": "ScatterMatrix",
+    "name": "Scatter Plot Matrix",
+    "description": "A simple scatter plot matrix.",
+    "component": "ScatterPlotMatrix",
     "options": {
       "data": "iris",
       "fields": ["petalWidth", "petalLength", "sepalLength", "sepalWidth"],

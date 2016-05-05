@@ -9,5 +9,5 @@
 * [LineChart](LineChart#readme)
 * [LineUp](LineUp#readme)
 * [ScatterPlot](ScatterPlot#readme)
-* [ScatterMatrix](ScatterMatrix#readme)
+* [ScatterPlotMatrix](ScatterPlotMatrix#readme)
 * [UpSet](UpSet#readme)

@@ -1,4 +1,4 @@
-# [candela](../..#readme).[components](..#readme).ScatterMatrix
+# [candela](../..#readme).[components](..#readme).ScatterPlotMatrix
 
 A scatterplot matrix. This visualization will display a scatterplot for every
 pair of specified **fields**, arranged in a grid. An additional field
@@ -6,7 +6,7 @@ may determine the **color** of the points.
 
 **extends** [VisComponent](../../VisComponent#readme)
 
-### new ScatterMatrix(el, options)
+### new ScatterPlotMatrix(el, options)
 
 * **el** is the DOM element that will contain the visualization.
 

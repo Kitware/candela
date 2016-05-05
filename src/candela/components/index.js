@@ -8,7 +8,7 @@ import LineChart from './LineChart';
 import LineUp from './LineUp';
 import ParallelCoordinates from './ParallelCoordinates';
 import ScatterPlot from './ScatterPlot';
-import ScatterMatrix from './ScatterMatrix';
+import ScatterPlotMatrix from './ScatterPlotMatrix';
 import UpSet from './UpSet';
 
 export default {
@@ -22,6 +22,6 @@ export default {
   LineUp,
   ParallelCoordinates,
   ScatterPlot,
-  ScatterMatrix,
+  ScatterPlotMatrix,
   UpSet
 };
