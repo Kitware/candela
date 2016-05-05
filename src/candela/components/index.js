@@ -1,6 +1,6 @@
 import BarChart from './BarChart';
 import BoxPlot from './BoxPlot';
-import Bullet from './Bullet';
+import BulletChart from './BulletChart';
 import Gantt from './Gantt';
 import Heatmap from './Heatmap';
 import Histogram from './Histogram';
@@ -14,7 +14,7 @@ import UpSet from './UpSet';
 export default {
   BarChart,
   BoxPlot,
-  Bullet,
+  BulletChart,
   Gantt,
   Heatmap,
   Histogram,

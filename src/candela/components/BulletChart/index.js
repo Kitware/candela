@@ -2,7 +2,7 @@ import VisComponent from '../../VisComponent';
 import vega from '../../util/vega';
 import spec from './spec.json';
 
-export default class Bullet extends VisComponent {
+export default class BulletChart extends VisComponent {
   static get options () {
     return [
       {

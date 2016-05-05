@@ -2,7 +2,7 @@
 
 * [BarChart](BarChart#readme)
 * [BoxPlot](BoxPlot#readme)
-* [Bullet](Bullet#readme)
+* [BulletChart](BulletChart#readme)
 * [Gantt](Gantt#readme)
 * [Heatmap](Heatmap#readme)
 * [Histogram](Histogram#readme)

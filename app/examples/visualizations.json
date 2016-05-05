@@ -88,7 +88,7 @@
     "hash": "bullet",
     "name": "Bullet Chart",
     "description": "A simple bullet chart",
-    "component": "Bullet",
+    "component": "BulletChart",
     "options": {
       "value": 0.2,
       "title": "Error",

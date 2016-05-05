@@ -1,4 +1,4 @@
-# [candela](../..#readme).[components](..#readme).Bullet
+# [candela](../..#readme).[components](..#readme).BulletChart
 
 A bullet chart based on the [description by Perceptual Edge](http://www.perceptualedge.com/articles/misc/Bullet_Graph_Design_Spec.pdf).
 The visualization takes a numeric **value** and plots it on a one-dimensional
@@ -6,7 +6,7 @@ plot against comparison **markers** and background color **ranges**.
 
 **extends** [VisComponent](../../VisComponent#readme)
 
-### new Bullet(el, options)
+### new BulletChart(el, options)
 
 * **el** is the DOM element that will contain the visualization.
 
