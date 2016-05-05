@@ -2,7 +2,7 @@ import VisComponent from '../../VisComponent';
 import vega from '../../util/vega';
 import spec from './spec.json';
 
-export default class Gantt extends VisComponent {
+export default class GanttChart extends VisComponent {
   static get spec () {
     return {
       options: [

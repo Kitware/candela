@@ -124,7 +124,7 @@
     "hash": "gantt",
     "name": "Gantt Chart",
     "description": "A simple gantt chart",
-    "component": "Gantt",
+    "component": "GanttChart",
     "options": {
       "data": [
         {"name": "1. Algorithms", "level": 1, "enter": 0, "leave": 6},

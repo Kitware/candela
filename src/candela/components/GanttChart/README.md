@@ -1,4 +1,4 @@
-# [candela](../..#readme).[components](..#readme).Gantt
+# [candela](../..#readme).[components](..#readme).GanttChart
 
 A Gantt chart. The **data** table must contain two numeric fields, **start** and **end**,
 which specify the start and end of horizontal bars. A **label** field can specify
@@ -6,7 +6,7 @@ the name of each item.
 
 **extends** [VisComponent](../../VisComponent#readme)
 
-### new Gantt(el, options)
+### new GanttChart(el, options)
 
 * **el** is the DOM element that will contain the visualization.
 
