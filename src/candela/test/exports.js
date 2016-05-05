@@ -18,11 +18,11 @@ function structureTests (t, cd) {
   t.ok(cd.components.ParallelCoordinates, 'candela.components.ParallelCoordinates exists');
   t.equal(typeof cd.components.ParallelCoordinates, 'function', 'candela.components.ParallelCoordinates is a function');
 
-  t.ok(cd.components.Scatter, 'candela.components.Scatter exists');
-  t.equal(typeof cd.components.Scatter, 'function', 'candela.components.Scatter is a function');
+  t.ok(cd.components.ScatterPlot, 'candela.components.ScatterPlot exists');
+  t.equal(typeof cd.components.ScatterPlot, 'function', 'candela.components.ScatterPlot is a function');
 
-  t.ok(cd.components.ScatterMatrix, 'candela.components.ScatterMatrix exists');
-  t.equal(typeof cd.components.ScatterMatrix, 'function', 'candela.components.ScatterMatrix is a function');
+  t.ok(cd.components.ScatterPlotMatrix, 'candela.components.ScatterPlotMatrix exists');
+  t.equal(typeof cd.components.ScatterPlotMatrix, 'function', 'candela.components.ScatterPlotMatrix is a function');
 }
 
 test('Structure and content of exported Candela library object', t => {
