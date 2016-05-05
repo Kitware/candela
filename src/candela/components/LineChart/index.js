@@ -2,7 +2,7 @@ import VisComponent from '../../VisComponent';
 import vega from '../../util/vega';
 import spec from './spec.json';
 
-export default class Line extends VisComponent {
+export default class LineChart extends VisComponent {
   static get spec () {
     return {
       options: [

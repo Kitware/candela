@@ -1,11 +1,11 @@
-# [candela](../..#readme).[components](..#readme).Line
+# [candela](../..#readme).[components](..#readme).LineChart
 
 A line chart. The chart plots a line for each specified **y** field
 against a single **x** field.
 
 **extends** [VisComponent](../../VisComponent#readme)
 
-### new Line(el, options)
+### new LineChart(el, options)
 
 * **el** is the DOM element that will contain the visualization.
 

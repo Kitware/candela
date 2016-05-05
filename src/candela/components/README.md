@@ -6,7 +6,7 @@
 * [GanttChart](GanttChart#readme)
 * [Heatmap](Heatmap#readme)
 * [Histogram](Histogram#readme)
-* [Line](Line#readme)
+* [LineChart](LineChart#readme)
 * [LineUp](LineUp#readme)
 * [Scatter](Scatter#readme)
 * [ScatterMatrix](ScatterMatrix#readme)

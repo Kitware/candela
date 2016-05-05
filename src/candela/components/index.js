@@ -4,7 +4,7 @@ import BulletChart from './BulletChart';
 import GanttChart from './GanttChart';
 import Heatmap from './Heatmap';
 import Histogram from './Histogram';
-import Line from './Line';
+import LineChart from './LineChart';
 import LineUp from './LineUp';
 import ParallelCoordinates from './ParallelCoordinates';
 import Scatter from './Scatter';
@@ -18,7 +18,7 @@ export default {
   GanttChart,
   Heatmap,
   Histogram,
-  Line,
+  LineChart,
   LineUp,
   ParallelCoordinates,
   Scatter,

@@ -18,9 +18,9 @@
   },
   {
     "hash": "line",
-    "name": "Line Plot",
-    "description": "A simple line plot.",
-    "component": "Line",
+    "name": "Line Chart",
+    "description": "A simple line chart.",
+    "component": "LineChart",
     "options": {
       "data": "msft",
       "x": "date",
