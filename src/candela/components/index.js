@@ -7,7 +7,7 @@ import Histogram from './Histogram';
 import LineChart from './LineChart';
 import LineUp from './LineUp';
 import ParallelCoordinates from './ParallelCoordinates';
-import Scatter from './Scatter';
+import ScatterPlot from './ScatterPlot';
 import ScatterMatrix from './ScatterMatrix';
 import UpSet from './UpSet';
 
@@ -21,7 +21,7 @@ export default {
   LineChart,
   LineUp,
   ParallelCoordinates,
-  Scatter,
+  ScatterPlot,
   ScatterMatrix,
   UpSet
 };

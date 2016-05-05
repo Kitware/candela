@@ -1,9 +1,9 @@
 [
   {
     "hash": "scatter",
-    "name": "Scatterplot",
-    "description": "A simple scatterplot.",
-    "component": "Scatter",
+    "name": "Scatter Plot",
+    "description": "A simple scatter plot.",
+    "component": "ScatterPlot",
     "options": {
       "data": "iris",
       "x": "petalLength",

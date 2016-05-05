@@ -1,4 +1,4 @@
-# [candela](../..#readme).[components](..#readme).Scatter
+# [candela](../..#readme).[components](..#readme).ScatterPlot
 
 A scatterplot. This visualization will plot values at specified **x** and **y**
 positions. Additional fields may determine the **color**, **size**, and **shape**
@@ -6,7 +6,7 @@ of the plotted points.
 
 **extends** [VisComponent](../../VisComponent#readme)
 
-### new Scatter(el, options)
+### new ScatterPlot(el, options)
 
 * **el** is the DOM element that will contain the visualization.
 
