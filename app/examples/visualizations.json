@@ -62,7 +62,7 @@
     "hash": "bar",
     "name": "Bar Chart",
     "description": "A simple bar chart",
-    "component": "Bar",
+    "component": "BarChart",
     "options": {
       "data": [
         {"id": 0, "a": 1, "b": 3, "c": 3},

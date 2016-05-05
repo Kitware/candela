@@ -1,6 +1,6 @@
 # [candela](..#readme).components
 
-* [Bar](Bar#readme)
+* [BarChart](BarChart#readme)
 * [Box](Box#readme)
 * [Bullet](Bullet#readme)
 * [Gantt](Gantt#readme)

@@ -1,4 +1,4 @@
-import Bar from './Bar';
+import BarChart from './BarChart';
 import Box from './Box';
 import Bullet from './Bullet';
 import Gantt from './Gantt';
@@ -12,7 +12,7 @@ import ScatterMatrix from './ScatterMatrix';
 import UpSet from './UpSet';
 
 export default {
-  Bar,
+  BarChart,
   Box,
   Bullet,
   Gantt,

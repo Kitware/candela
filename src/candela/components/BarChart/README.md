@@ -1,11 +1,11 @@
-# [candela](../..#readme).[components](..#readme).Bar
+# [candela](../..#readme).[components](..#readme).BarChart
 
 A bar chart. The **x** field should contain a distinct value for each bar, while
 the **y** field will correspond to the height of each bar.
 
 **extends** [VisComponent](../../VisComponent#readme)
 
-### new Bar(el, options)
+### new BarChart(el, options)
 
 * **el** is the DOM element that will contain the visualization.
 
