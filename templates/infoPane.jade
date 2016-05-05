@@ -3,13 +3,13 @@ table.table.table-responsive.table-compact
     th(colspan="2")
       .agg-label-header
         if producerLink
-          a(href=producerLink) Aggregate Metric
+          a(href=producerLink, title="Aggregate metrics over key metric values") Aggregate Metric
         else
-          | Aggregate Metric
+          abbr(title="Aggregate metrics over key metric values") Aggregate Metric
     if sparklinesExist
       th
         .agg-sparkline-header
-          | Last 7 Days
+          abbr(title="Saved aggregate metric values from recent submissions on the same branch") Last 7 Days
     th(colspan="2")
       .agg-bullet-header
         | Computed Value
