@@ -9,7 +9,7 @@ for (let i = 0; i < 100; i += 1) {
 }
 
 [...document.getElementsByClassName('vis-element')].forEach(el => {
-  let vis = new (AutoResize(InitSize(candela.components.Scatter)))(el, {
+  let vis = new (AutoResize(InitSize(candela.components.ScatterPlot)))(el, {
     data,
     x: 'x',
     y: 'y'
