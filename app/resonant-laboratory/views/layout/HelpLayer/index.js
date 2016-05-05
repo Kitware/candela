@@ -27,36 +27,50 @@ function arrowGenerator (edge) {
     y: edge.target.y + arrowLength * Math.sin(rightAngle)
   };
   return 'M' + edge.source.x + ',' + edge.source.y +
-         'L' + edge.target.x + ',' + edge.target.y +
-         'L' + leftCoords.x + ',' + leftCoords.y +
-         'L' + edge.target.x + ',' + edge.target.y +
-         'L' + rightCoords.x + ',' + rightCoords.y +
-         'L' + edge.target.x + ',' + edge.target.y +
-         'Z';
+  'L' + edge.target.x + ',' + edge.target.y +
+  'L' + leftCoords.x + ',' + leftCoords.y +
+  'L' + edge.target.x + ',' + edge.target.y +
+  'L' + rightCoords.x + ',' + rightCoords.y +
+  'L' + edge.target.x + ',' + edge.target.y +
+  'Z';
 }
-
+window.cola = cola;
 let HelpLayer = Backbone.View.extend({
   initialize: function () {
     this.relevantTips = {};
 
     // Layout options. You can tweak these interactively
-    // by invoking the mainPage.helpLayer.renderTuner()
-    // easter egg (change these values when you find
-    // a good balance)
+    // by holding alt+shift, and clicking on the dialog
+    // containing the 'Restart' and 'Ok, got it' buttons
+    // (don't click the buttons, just the dialog background)
+    // When you arrive at numbers you like, paste them here
     this.padding = 9;
-    this.margin = 20;
+    this.margin = 18;
 
     this.avoidOverlaps = true;
-    // this.linkDistance = 160;
+    this.linkDistance = 250;
     this.alpha = 0.7;
-    this.convergenceThreshold = 0.1;
+    this.convergenceThreshold = 0.01;
     // this.defaultNodeSize = 20;
     this.handleDisconnected = false;
-    this.jaccardLinkLengths = 100;
 
-    this.noConstraintIterations = 3;
-    this.structuralIterations = 3;
-    this.allConstraintIterations = 3;
+    this.noConstraintIterations = 50;
+    this.structuralIterations = 50;
+    this.allConstraintIterations = 50;
+
+    this.force = cola.d3adaptor()
+      .on('tick', () => {
+        d3.select(this.el).select('#nodeLayer').selectAll('.tip')
+          .attr('transform', (d) => {
+            return 'translate(' + d.x + ',' + d.y + ')';
+          });
+        d3.select(this.el).select('#linkLayer').selectAll('.arrow')
+          .attr('d', arrowGenerator);
+      });
+
+    this.visible = false;
+    this.addedTemplate = false;
+    this.showEasterEgg = false;
   },
   setTips: function (tips) {
     this.relevantTips = {};
@@ -126,312 +140,363 @@ let HelpLayer = Backbone.View.extend({
   hide: function () {
     this.addedTuner = false;
     jQuery('#tuner').remove();
-    window.mainPage.currentUser
-      .preferences.setMeta('showHelp', false);
-    window.mainPage.currentUser.preferences.save();
+    this.visible = false;
+    this.addedTemplate = false;
     this.render();
   },
   show: function () {
-    window.mainPage.currentUser
-      .preferences.setMeta('showHelp', true);
-    window.mainPage.currentUser.preferences.save();
+    this.visible = true;
     this.render();
   },
-  render: Underscore.debounce(function () {
-    let meta = window.mainPage.currentUser.preferences.getMeta();
-    let showHelp = meta.showHelp;
-    let seenTips = meta.seenTips;
+  constructGraph: function () {
+    // Figure out how much space we have
+    let bounds = {
+      width: window.innerWidth,
+      height: window.innerHeight
+    };
 
-    this.$el.on('click', () => {
-      this.hide();
+    let center = {
+      x: bounds.width / 2,
+      y: bounds.height / 2
+    };
+
+    // Default labels that are always there
+    // (not connected to any target)
+    let nodes = [
+      // Create four bumper nodes to force stuff to stay on the screen
+      {
+        tipId: 'left',
+        nodeType: 'border',
+        x: -center.x,
+        y: center.y,
+        width: bounds.width,
+        height: bounds.height,
+        fixed: true
+      },
+      {
+        tipId: 'right',
+        nodeType: 'border',
+        x: 1.5 * bounds.width,
+        y: center.y,
+        width: bounds.width,
+        height: bounds.height,
+        fixed: true
+      },
+      {
+        tipId: 'top',
+        nodeType: 'border',
+        x: center.x,
+        y: -center.y,
+        width: 2 * bounds.width,
+        height: bounds.height,
+        fixed: true
+      },
+      {
+        tipId: 'bottom',
+        nodeType: 'border',
+        x: center.x,
+        y: 1.5 * bounds.height,
+        width: 2 * bounds.width,
+        height: bounds.height,
+        fixed: true
+      }
+    ];
+    // Attach nodeIndex to the static nodes
+    nodes.forEach((d, i) => {
+      d.nodeIndex = i;
     });
 
-    if (showHelp === false) {
+    // Create hidden targets, labels, and connect them to each other
+    let tipIds = Object.keys(this.relevantTips);
+    let unseenTips = [];
+    let edges = [];
+    for (let tipId of tipIds) {
+      let tip = this.relevantTips[tipId];
+      let tipNodes = {};
+
+      tipNodes.target = {
+        tipId: tipId,
+        nodeType: 'arrowhead',
+        x: tip.x,
+        y: tip.y,
+        fixed: true
+      };
+
+      tipNodes.label = {
+        tipId: tipId,
+        nodeType: 'label',
+        message: tip.message,
+        // Start each label at a random location
+        x: Math.random() * bounds.width,
+        y: Math.random() * bounds.height
+      };
+
+      // Do we add this to the existing graph,
+      // or the set of nodes that still need to
+      // be added?
+      if (window.mainPage.currentUser.preferences.hasSeenTip(tip)) {
+        nodes.push(tipNodes.target);
+        tipNodes.label.nodeIndex = nodes.length;
+        nodes.push(tipNodes.label);
+        edges.push({
+          source: nodes.length - 1,
+          target: nodes.length - 2
+        });
+      } else {
+        unseenTips.push(tipNodes);
+      }
+    }
+
+    return {
+      bounds: bounds,
+      center: center,
+      nodes: nodes,
+      edges: edges,
+      unseenTips: unseenTips,
+      constraints: []
+    };
+  },
+  render: Underscore.debounce(function () {
+    // Stop the force layout if it's running
+    this.force.stop();
+    if (this.visible === false) {
+      // Fade the whole layer out
       d3.select(this.el)
         .style('opacity', 1.0)
         .transition().duration(500)
         .style('opacity', 0.0)
-        .attr('display', 'none');
+        .attr('display', 'none')
+        .style('opacity', null);
     } else {
-      this.$el.html(template);
-
-      // Figure out how much space we have
-      let bounds = {
-        width: window.innerWidth,
-        height: window.innerHeight
-      };
-
-      let center = {
-        x: bounds.width / 2,
-        y: bounds.height / 2
-      };
-
-      // Default labels that are always there
-      // (not connected to any target)
-      let nodes = [
-        {
-          tipId: 'clearLabel',
-          nodeType: 'label',
-          message: 'Click anywhere to hide these tips',
-          x: center.x,
-          y: center.y,
-          fixed: true
-        },
-        // As of this writing, Cola's constraints don't seem to be
-        // taking me seriously. So in addition to constraints, I create
-        // four massive bumper nodes to force stuff to stay on the screen
-        {
-          tipId: 'left',
-          nodeType: 'border',
-          x: -center.x,
-          y: center.y,
-          width: bounds.width,
-          height: bounds.height,
-          fixed: true
-        },
-        {
-          tipId: 'right',
-          nodeType: 'border',
-          x: 1.5 * bounds.width,
-          y: center.y,
-          width: bounds.width,
-          height: bounds.height,
-          fixed: true
-        },
-        {
-          tipId: 'top',
-          nodeType: 'border',
-          x: center.x,
-          y: -center.y,
-          width: 2 * bounds.width,
-          height: bounds.height,
-          fixed: true
-        },
-        {
-          tipId: 'bottom',
-          nodeType: 'border',
-          x: center.x,
-          y: 1.5 * bounds.height,
-          width: 2 * bounds.width,
-          height: bounds.height,
-          fixed: true
-        }
-      ];
-      let edges = [];
-
-      // Connect labels to targets
-      for (let tipId of Object.keys(this.relevantTips)) {
-        let tip = this.relevantTips[tipId];
-        // Node containing the label
-        nodes.push({
-          tipId: tipId,
-          nodeType: 'label',
-          message: tip.message,
-          // Start each label at a random location
-          // x: Math.random() * bounds.width,
-          // y: Math.random() * bounds.height
-          x: tip.x,
-          y: tip.y + 250 // generally, tips are anchored toward the top
-        });
-        // Target (not drawn) for the link
-        nodes.push({
-          tipId: tip.tipId,
-          nodeType: 'arrowhead',
-          x: tip.x,
-          y: tip.y,
-          fixed: true
-        });
-        // The link itself
-        edges.push({
-          source: nodes.length - 2,
-          target: nodes.length - 1
-        });
+      if (!this.addedTemplate) {
+        this.$el.html(template);
+        this.addedTemplate = true;
       }
-
-      // Subset of just the label nodes
-      let labelNodes = nodes.filter(d => d.nodeType === 'label');
-
-      // Draw the label nodes
-      let tips = d3.select(this.el).select('#nodeLayer').selectAll('.tip')
-        .data(labelNodes, d => d.tipId);
-      let tipsEnter = tips.enter().append('g');
-      tips.exit().remove();
-
-      // opacity: in the case where we pre-compute the layout,
-      // prevent the initial flash where the labels are in their
-      // original positions
-      tips.style('opacity', '0.0')
-        .attr('class', d => {
-          if (d.tipId === 'clearLabel') {
-            return 'clear tip';
-          } else if (seenTips[d.tipId] === true) {
-            return 'old tip';
-          } else {
-            return 'new tip';
-          }
-        });
-
-      // Background rectangle
-      // (we figure out its dimensions later)
-      tipsEnter.append('rect');
-
-      // Draw the text
-      tipsEnter.append('text');
-      tips.selectAll('text')
-        .text(d => d.message)
-        .attr('text-anchor', d => {
-          // Align the text based on where the label
-          // starts on the screen
-          if (d.x < bounds.width / 3) {
-            return 'start';
-          } else if (d.x < 2 * bounds.width / 3) {
-            return 'middle';
-          } else {
-            return 'end';
-          }
-        });
-
-      // Draw the arrows
-      let arrows = d3.select(this.el).select('#linkLayer')
-        .selectAll('.arrow').data(edges);
-      arrows.enter().append('path')
-        .attr('class', d => {
-          if (!seenTips[nodes[d.source].tipId]) {
-            return 'new arrow';
-          } else {
-            return 'old arrow';
-          }
-        });
-      arrows.exit().remove();
-
-      // Show the help layer and wrap the text appropriately
-      // (wrapping has to be done while the text is visible)
       d3.select(this.el)
-        .style('opacity', 0.0)
-        .attr('display', null)
-        .transition().duration(500)
-        .style('opacity', 1.0);
-      tips.selectAll('text')
-        .each(function () {
-          // this refers to the DOM element
-          rewrap(this, 150, 1.1);
-        });
+        .attr('display', null);
 
-      // Now precompute the sizes of each of the label
-      // text blocks, and adjust accordingly
-      let self = this;
-      let constraints = [];
-      tips.each(function (d) {
-        // this refers to the DOM element
-        let bounds = this.getBoundingClientRect();
+      // Render the tuner
+      this.renderTuner();
 
-        // boundaries relative to the text anchor point
-        d.relative_left = bounds.left;
-        d.relative_right = bounds.right;
-        d.relative_top = bounds.top;
-        d.relative_bottom = bounds.bottom;
+      // Get the set of nodes and edges
+      let graph = this.constructGraph();
 
-        // cola expects the x and y coordinates to
-        // be in the center of the node to handle
-        // overlaps - so we need to move the text block
-        d3.select(this).select('text')
-          .attr('transform', 'translate(' +
-            (-(d.relative_left + d.relative_right) / 2) + ',' +
-            (-(d.relative_top + d.relative_bottom) / 2) + ')');
+      // Draw / update the full graph
+      this.drawGraph(graph);
+      this.deriveAllConstraints(graph);
+      this.updateForceLayout(graph);
 
-        // let cola know our dimensions (add in the padding)
-        d.width = d.relative_right - d.relative_left + 2 * self.padding;
-        d.height = d.relative_bottom - d.relative_top + 2 * self.padding;
-
-        // Set the background rectangle's dimensions
-        d3.select(this).select('rect')
-          .attr('x', -d.width / 2)
-          .attr('y', -d.height / 2)
-          .attr('width', d.width)
-          .attr('height', d.height);
-
-        // Add in extra padding *outside* the rectangle
-        d.width += 2 * self.margin;
-        d.height += 2 * self.margin;
-
-        // Now that we know the dimensions, we can add
-        // appropriate constraints to keep the nodes on
-        // the screen
-        constraints.push({
-          axis: 'x',
-          type: 'separation',
-          left: 1, // left bumper
-          right: nodes.length - 2,
-          gap: d.width / 2
-        });
-        constraints.push({
-          axis: 'x',
-          type: 'separation',
-          left: nodes.length - 2,
-          right: 2, // right bumper
-          gap: d.width / 2
-        });
-        constraints.push({
-          axis: 'y',
-          type: 'separation',
-          left: 3, // top bumper
-          right: nodes.length - 2,
-          gap: d.height / 2
-        });
-        constraints.push({
-          axis: 'y',
-          type: 'separation',
-          left: nodes.length - 2,
-          right: 4, // bottom bumper
-          gap: d.height / 2
-        });
-      });
-
-      // Compute the layout
-      let force = cola.d3adaptor()
-        .size([bounds.width, bounds.height])
-        .nodes(nodes)
-        .links(edges)
-        .constraints(constraints);
-
-      // Apply any cola parameters that we've specified
-      for (let control of forceControls) {
-        if (control.colaParameter &&
-          this[control.option] !== undefined) {
-          force[control.option](this[control.option]);
-        }
-      }
-
-      let _renderGraph = () => {
-        // force.prepareEdgeRouting();
-        tips.style('opacity', '1.0')
-          .attr('transform', (d) => {
-            return 'translate(' + d.x + ',' + d.y + ')';
-          });
-        arrows.attr('d', d => {
-          // return arrowGenerator(force.routeEdge(d));
-          return arrowGenerator(d);
-        }).style('opacity', '1.0');
-      };
-
-      if (this.addedTuner) {
-        // If we're tweaking the layout, watch it settle
-        force.on('tick', _renderGraph);
-      } else {
-        // Otherwise, just render when it's done
-        force.on('end', _renderGraph);
-      }
-
-      force.start(this.noConstraintIterations,
-        this.structuralIterations,
-        this.allConstraintIterations);
-
-      // Finally, store the set of tips that the user has now seen
-      // in the user preferences
-      window.mainPage.currentUser.preferences
-        .observeTips(this.relevantTips);
+      // Start drawing the unseenTips one at a time
+      this.drawNextNode(graph);
     }
   }, 300),
+  drawGraph: function (graph, newLabel) {
+    let visibleNodes = graph.nodes.filter(node => {
+      return node.nodeType === 'label';
+    });
+
+    // Update the DOM
+    let tips = d3.select(this.el).select('#nodeLayer').selectAll('.tip')
+      .data(visibleNodes, d => d.tipId);
+
+    let tipsEnter = tips.enter().append('g');
+    tipsEnter
+      .style('opacity', 0.0)
+      .transition().duration(500)
+      .style('opacity', 1.0);
+
+    tips.exit()
+      .style('opacity', 1.0)
+      .transition().duration(500)
+      .style('opacity', 0.0)
+      .remove();
+
+    tips.attr('class', d => {
+      if (d === newLabel) {
+        return 'new tip';
+      } else {
+        return 'old tip';
+      }
+    });
+
+    // Background rectangle
+    // (we figure out its dimensions later)
+    tipsEnter.append('rect');
+
+    // Draw the text
+    tipsEnter.append('text')
+      .text(d => d.message)
+      .attr('text-anchor', d => {
+        // Align the text based on where the label
+        // starts on the screen
+        if (d.x < graph.bounds.width / 3) {
+          return 'start';
+        } else if (d.x < 2 * graph.bounds.width / 3) {
+          return 'middle';
+        } else {
+          return 'end';
+        }
+      });
+
+    // Draw the arrows
+    let arrows = d3.select(this.el).select('#linkLayer')
+      .selectAll('.arrow').data(graph.edges);
+
+    arrows.enter().append('path')
+      .attr('class', 'old arrow')
+      .style('opacity', 0.0)
+      .transition().duration(500)
+      .style('opacity', 1.0);
+
+    arrows.exit()
+      .style('opacity', 1.0)
+      .transition().duration(500)
+      .style('opacity', 0.0)
+      .remove();
+  },
+  deriveConstraint: function (graph, tip, domElement) {
+    let bounds = domElement.getBoundingClientRect();
+
+    // boundaries relative to the text anchor point
+    tip.relative_left = bounds.left;
+    tip.relative_right = bounds.right;
+    tip.relative_top = bounds.top;
+    tip.relative_bottom = bounds.bottom;
+
+    // cola expects the x and y coordinates to
+    // be in the center of the node to handle
+    // overlaps - so we need to move the text block
+    d3.select(domElement).select('text')
+      .attr('transform', 'translate(' +
+        (-(tip.relative_left + tip.relative_right) / 2) + ',' +
+        (-(tip.relative_top + tip.relative_bottom) / 2) + ')');
+
+    // let cola know our dimensions (add in the padding)
+    tip.width = tip.relative_right - tip.relative_left + 2 * this.padding;
+    tip.height = tip.relative_bottom - tip.relative_top + 2 * this.padding;
+
+    // Set the background rectangle's dimensions
+    d3.select(domElement).select('rect')
+      .attr('x', -tip.width / 2)
+      .attr('y', -tip.height / 2)
+      .attr('width', tip.width)
+      .attr('height', tip.height);
+
+    // Add in extra padding *outside* the rectangle
+    tip.width += 2 * this.margin;
+    tip.height += 2 * this.margin;
+
+    // Now that we know the dimensions, we can add
+    // appropriate constraints to keep the nodes on
+    // the screen
+    graph.constraints.push({
+      axis: 'x',
+      type: 'separation',
+      left: 0, // left bumper
+      right: tip.nodeIndex,
+      gap: tip.width / 2
+    });
+    graph.constraints.push({
+      axis: 'x',
+      type: 'separation',
+      left: tip.nodeIndex,
+      right: 1, // right bumper
+      gap: tip.width / 2
+    });
+    graph.constraints.push({
+      axis: 'y',
+      type: 'separation',
+      left: 2, // top bumper
+      right: tip.nodeIndex,
+      gap: tip.height / 2
+    });
+    graph.constraints.push({
+      axis: 'y',
+      type: 'separation',
+      left: tip.nodeIndex,
+      right: 3, // bottom bumper
+      gap: tip.height / 2
+    });
+  },
+  deriveAllConstraints: function (graph) {
+    let tips = d3.select(this.el).select('#nodeLayer').selectAll('.tip');
+    // Wrap all the text appropriately
+    tips.selectAll('text')
+      .each(function () {
+        // this refers to the DOM element
+        rewrap(this, 150, 1.1);
+      });
+
+    // Start with a fresh set of constraints
+    graph.constraints = [];
+    let self = this;
+    tips.each(function (d) {
+      // this refers to the DOM element
+      self.deriveConstraint(graph, d, this);
+    });
+  },
+  updateForceLayout: function (graph) {
+    this.force.stop();
+
+    this.force
+      .size([graph.bounds.width, graph.bounds.height])
+      .nodes(graph.nodes)
+      .links(graph.edges)
+      .constraints(graph.constraints);
+
+    // Apply any cola parameters that we've specified
+    for (let control of forceControls) {
+      if (control.colaParameter &&
+        this[control.option] !== undefined) {
+        this.force[control.option](this[control.option]);
+      }
+    }
+
+    // Start it up
+    this.force.start(this.noConstraintIterations,
+      this.structuralIterations,
+      this.allConstraintIterations);
+  },
+  drawNextNode: function (graph) {
+    if (graph.unseenTips.length === 0 || !this.visible) {
+      return;
+    }
+    // Add the next node to the graph
+    let nextTip = graph.unseenTips.splice(0, 1)[0];
+    graph.nodes.push(nextTip.target);
+    nextTip.label.nodeIndex = graph.nodes.length;
+    graph.nodes.push(nextTip.label);
+    graph.edges.push({
+      source: graph.nodes.length - 1,
+      target: graph.nodes.length - 2
+    });
+
+    // Update the nodes (class attributes
+    // on nodes other than this one will have changed)
+    this.drawGraph(graph, nextTip.label);
+
+    // Add constraints for the new node
+    let domElement = d3.select(this.el).select('#nodeLayer').selectAll('.tip')
+      .filter(d => {
+        return d === nextTip.label;
+      });
+    let domTextElement = domElement.select('text');
+    rewrap(domTextElement.node(), 150, 1.1);
+    this.deriveConstraint(graph, nextTip.label, domElement.node());
+
+    // Store that we've seen the tip
+    // in the user's preferences
+    window.mainPage.currentUser.preferences.observeTip(nextTip.label);
+
+    // Start up the force layout again
+    this.updateForceLayout(graph);
+
+    // Draw the next tip in a couple seconds
+    // TODO: I'm going to transition more elegantly in a bit...
+    window.setTimeout(() => {
+      this.drawNextNode(graph);
+    }, 2000);
+  },
   renderTuner: function () {
     let self = this;
 
@@ -439,108 +504,134 @@ let HelpLayer = Backbone.View.extend({
     // as needed. To see this view, type
     // mainPage.helpLayer.renderTuner() on the console
     if (!this.addedTuner) {
-      d3.select('body')
+      let pane = d3.select('body')
         .append('div')
         .attr('id', 'tuner')
-        .append('button')
-        .text('Run again')
         .on('click', () => {
+          if (d3.event.getModifierState('Shift') &&
+              d3.event.getModifierState('Alt')) {
+            self.showEasterEgg = true;
+            self.render();
+          }
+        });
+      let defaultButtons = pane.append('div');
+      defaultButtons.append('button')
+        .text('Restart')
+        .on('click', () => {
+          window.mainPage.currentUser.preferences
+            .forgetTips(self.relevantTips);
+          self.addedTemplate = false;
+          self.render();
+        });
+      defaultButtons.append('button')
+        .text('Ok, got it')
+        .on('click', () => {
+          self.hide();
+        });
+      defaultButtons.append('input')
+        .attr('type', 'checkbox')
+        .attr('id', 'dontShowHelp');
+      defaultButtons.append('label')
+        .attr('for', 'dontShowHelp')
+        .text('Don\'t show tutorials in the future');
+      this.addedTuner = true;
+    }
+
+    if (this.showEasterEgg) {
+      let controls = d3.select('#tuner')
+        .selectAll('div.easterEggControl')
+        .data(forceControls);
+      let controlsEnter = controls.enter()
+        .append('div')
+        .attr('class', 'easterEggControl');
+
+      // Control to change this parameter's setting (if enabled)
+      controlsEnter.append('input')
+        .attr('id', d => d.option + 'control')
+        .attr('class', 'control')
+        .on('change', function (d) {
+          // this refers to the DOM element
+          if (d.step) {
+            self[d.option] = this.value;
+          } else {
+            self[d.option] = this.checked;
+          }
+
           self.addedTemplate = false;
           self.render();
           self.renderTuner();
         });
-      this.addedTuner = true;
+      controls.selectAll('input.control')
+        .attr('type', (d) => {
+          if (d.step) {
+            return 'range';
+          } else {
+            return 'checkbox';
+          }
+        })
+        .each(function (d) {
+          // this refers to the DOM element
+          let element = d3.select(this);
+          if (d.step) {
+            element.attr('min', d.range[0])
+              .attr('max', d.range[1])
+              .attr('step', d.step);
+            if (self[d.option] !== undefined) {
+              element.property('value', self[d.option]);
+            }
+          } else {
+            if (self[d.option]) {
+              element.property('checked', true);
+            }
+          }
+          element.property('disabled', self[d.option] === undefined);
+        });
+
+      // Label for the control (with its current value)
+      controlsEnter.append('label')
+        .attr('class', 'control')
+        .attr('for', d => d.option + 'control');
+      controls.selectAll('label.control')
+        .text(d => {
+          let value;
+          if (this[d.option] === undefined) {
+            value = '--';
+          } else if (this[d.option] === true) {
+            value = 'true';
+          } else if (this[d.option] === false) {
+            value = 'false';
+          } else {
+            value = this[d.option];
+          }
+          return d.option + ': ' + value;
+        });
+
+      // Control to enable / disable this parameter
+      controlsEnter.append('input')
+        .attr('id', d => d.option + 'enable')
+        .attr('class', 'enable')
+        .attr('type', 'checkbox')
+        .on('change', function (d) {
+          // this refers to the DOM element
+          if (this.checked) {
+            self[d.option] = d.range[0];
+          } else {
+            self[d.option] = undefined;
+          }
+
+          self.addedTemplate = false;
+          self.render();
+        });
+
+      // Label for the enable switch
+      controls.selectAll('input.enable')
+        .property('checked', d => this[d.option] !== undefined)
+        .property('disabled', d => !d.colaParameter);
+      controlsEnter.append('label')
+        .attr('class', 'enable')
+        .attr('for', d => d.option + 'enable')
+        .text('Enable');
     }
-
-    let controls = d3.select('#tuner').selectAll('div').data(forceControls);
-    let controlsEnter = controls.enter().append('div');
-
-    // Control to change this parameter's setting (if enabled)
-    controlsEnter.append('input')
-      .attr('id', d => d.option + 'control')
-      .attr('class', 'control')
-      .on('change', function (d) {
-        // this refers to the DOM element
-        if (d.step) {
-          self[d.option] = this.value;
-        } else {
-          self[d.option] = this.checked;
-        }
-
-        self.addedTemplate = false;
-        self.render();
-        self.renderTuner();
-      });
-    controls.selectAll('input.control')
-      .attr('type', (d) => {
-        if (d.step) {
-          return 'range';
-        } else {
-          return 'checkbox';
-        }
-      }).each(function (d) {
-        // this refers to the DOM element
-        let element = d3.select(this);
-        if (d.step) {
-          element.attr('min', d.range[0])
-            .attr('max', d.range[1])
-            .attr('step', d.step);
-          if (self[d.option] !== undefined) {
-            element.property('value', self[d.option]);
-          }
-        } else {
-          if (self[d.option]) {
-            element.property('checked', true);
-          }
-        }
-        element.property('disabled', self[d.option] === undefined);
-      });
-
-    // Label for the control (with its current value)
-    controlsEnter.append('label')
-      .attr('class', 'control')
-      .attr('for', d => d.option + 'control');
-    controls.selectAll('label.control')
-      .text(d => {
-        let value;
-        if (this[d.option] === undefined) {
-          value = '--';
-        } else if (this[d.option] === true) {
-          value = 'true';
-        } else if (this[d.option] === false) {
-          value = 'false';
-        } else {
-          value = this[d.option];
-        }
-        return d.option + ': ' + value;
-      });
-
-    // Control to enable / disable this parameter
-    controlsEnter.append('input')
-      .attr('id', d => d.option + 'enable')
-      .attr('class', 'enable')
-      .attr('type', 'checkbox')
-      .on('change', function (d) {
-        // this refers to the DOM element
-        if (this.checked) {
-          self[d.option] = d.range[0];
-        } else {
-          self[d.option] = undefined;
-        }
-
-        self.addedTemplate = false;
-        self.render();
-        self.renderTuner();
-      });
-
-    // Label for the enable switch
-    controls.selectAll('input.enable')
-      .property('checked', d => this[d.option] !== undefined)
-      .property('disabled', d => !d.colaParameter);
-    controlsEnter.append('label')
-      .attr('class', 'enable')
-      .attr('for', d => d.option + 'enable')
-      .text('Enable');
   }
 });
 

@@ -19,6 +19,10 @@ let VALID_EXTENSIONS = [
 ];
 
 let dictCompare = (a, b) => {
+  if (!(a instanceof Object) ||
+    !(b instanceof Object)) {
+    return false;
+  }
   let aKeys = Object.keys(a);
   let bKeys = Object.keys(b);
   if (aKeys.length !== bKeys.length) {
@@ -62,7 +66,7 @@ let Dataset = MetadataItem.extend({
     Promise.all([fileTypePromise, attributePromise]).then(() => {
       // Don't call save() if nothing changed
       if (this.getMeta('fileType') !== prevFileType ||
-          !dictCompare(this.getMeta('attributes'), prevAttributes)) {
+        !dictCompare(this.getMeta('attributes'), prevAttributes)) {
         this.save().then(() => {
           this.trigger('rl:changeType');
           this.trigger('rl:changeSpec');

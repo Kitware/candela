@@ -67,8 +67,8 @@ let Header = Backbone.View.extend({
   getVisibleTips: function () {
     let tips = {
       '#hamburgerButton': 'Main Menu',
-      '#helpButton': 'Show these tips. This is blue ' +
-                     'when there are new tips that you haven\'t seen yet.'
+      '#helpButton': 'Show these tips. Tips that you haven\'t seen yet ' +
+        ' are shown in blue.'
     /*,
       '#achievementsButton': `
 Your achievements. See what you've accomplished,
@@ -77,7 +77,7 @@ and what you still haven't tried.`*/
 
     if (window.mainPage.project) {
       tips['#projectLocationButton'] =
-        'See/change who can see the project you\'re working on';
+        'Change who can see the project you\'re working on';
 
       tips['#projectName'] = 'Rename this project';
 
@@ -96,7 +96,7 @@ and what you still haven't tried.`*/
           'Add a visualization to this project';
       } else {
         tips['img.VisualizationView.headerButton'] =
-          'Explore the visualizations in this project';
+          'See/change the visualizations in this project';
       }
     }
 

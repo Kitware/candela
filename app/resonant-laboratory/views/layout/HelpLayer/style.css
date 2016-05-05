@@ -29,15 +29,7 @@
   stroke-width: 2px;
   stroke: #377eb8;
 }
-#HelpLayer .clear.tip text {
-  font-size: 2em;
-  font-weight: 900;
-  fill: #ffff33;
-}
-#HelpLayer .clear.tip rect {
-  fill: none;
-  stroke: none;
-}
+#HelpLayer .button.tip rect,
 #tuner {
   position: absolute;
   bottom: 2em;
