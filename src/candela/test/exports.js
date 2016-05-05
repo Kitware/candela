@@ -2,6 +2,20 @@ import test from 'tape';
 
 import candela from '..';
 
+const componentList = [
+  'Histogram',
+  'ParallelCoordinates',
+  'ScatterPlot',
+  'ScatterPlotMatrix'
+];
+
+function componentExists (t, cd, name) {
+  const component = cd.components[name];
+
+  t.ok(component, `candela.components.${name} exists`);
+  t.equal(typeof component, 'function', `candela.components.${name} is a function`);
+}
+
 function structureTests (t, cd) {
   t.ok(cd, 'candela exists');
 
@@ -12,17 +26,11 @@ function structureTests (t, cd) {
 
   t.ok(cd.components, 'candela.components exists');
 
-  t.ok(cd.components.Histogram, 'candela.components.Histogram exists');
-  t.equal(typeof cd.components.Histogram, 'function', 'candela.components.Histogram is a function');
+  t.equal(Object.keys(cd.components).length, componentList.length, `candela.components contains ${componentList.length} components`);
 
-  t.ok(cd.components.ParallelCoordinates, 'candela.components.ParallelCoordinates exists');
-  t.equal(typeof cd.components.ParallelCoordinates, 'function', 'candela.components.ParallelCoordinates is a function');
-
-  t.ok(cd.components.ScatterPlot, 'candela.components.ScatterPlot exists');
-  t.equal(typeof cd.components.ScatterPlot, 'function', 'candela.components.ScatterPlot is a function');
-
-  t.ok(cd.components.ScatterPlotMatrix, 'candela.components.ScatterPlotMatrix exists');
-  t.equal(typeof cd.components.ScatterPlotMatrix, 'function', 'candela.components.ScatterPlotMatrix is a function');
+  componentList.forEach(name => {
+    componentExists(t, cd, name);
+  });
 }
 
 test('Structure and content of exported Candela library object', t => {
