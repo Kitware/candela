@@ -3,10 +3,18 @@ import test from 'tape';
 import candela from '..';
 
 const componentList = [
+  'BarChart',
+  'BoxPlot',
+  'BulletChart',
+  'GanttChart',
+  'Heatmap',
   'Histogram',
+  'LineChart',
+  'LineUp',
   'ParallelCoordinates',
   'ScatterPlot',
-  'ScatterPlotMatrix'
+  'ScatterPlotMatrix',
+  'UpSet'
 ];
 
 function componentExists (t, cd, name) {
