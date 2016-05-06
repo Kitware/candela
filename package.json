@@ -19,7 +19,7 @@
     "test:image:server:down": "sh script/test-server-down.sh",
     "test:karma": "karma start config/karma-testing.conf.js --no-single-run",
     "cover": "karma start config/karma-coverage.conf.js",
-    "cover:report": "http-server coverage -p ${PORT-3000}",
+    "cover:report": "http-server coverage/html -p ${PORT-3000}",
     "demo": "http-server build -p ${PORT-3000}"
   },
   "semistandard": {
