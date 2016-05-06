@@ -51,10 +51,22 @@ let HelpLayer = Backbone.View.extend({
     this.alphaDecay = 0.02;
     // this.drag = 0.4;
 
-    this.forceCenter = {};
-    this.forceCollide = {};
-    this.forceLink = {};
-    this.forceManyBody = {};
+    // this.forceCenter = {};
+    this.forceCollide = {
+      strength: 1,
+      iterations: 2
+    };
+    this.forceLink = {
+      distance: 160,
+      strength: 0.3,
+      iterations: 2
+    };
+    /* this.forceManyBody = {
+      strength: -10,
+      theta: 0.9,
+      distanceMin: 1,
+      distanceMax: 500
+    };*/
 
     this.forces = {};
 
@@ -160,8 +172,8 @@ let HelpLayer = Backbone.View.extend({
         tipId: tipId,
         nodeType: 'label',
         message: tip.message,
-        x: tip.x,
-        y: tip.y
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight
       };
 
       // Do we add this to the existing graph,
@@ -217,7 +229,6 @@ let HelpLayer = Backbone.View.extend({
       // Draw / update the full graph
       this.drawGraph(graph);
       this.deriveAllSizes(graph);
-      this.updateForceSimulation(graph);
 
       // Start drawing the unseenTips one at a time
       this.drawNextNode(graph);
@@ -325,6 +336,10 @@ let HelpLayer = Backbone.View.extend({
         rewrap(this, 150, 1.1);
       });
 
+    // Reset the background circle
+    tips.selectAll('circle')
+      .attr('r', 1);
+
     // Update each whole node
     let self = this;
     tips.each(function (d) {
@@ -333,10 +348,10 @@ let HelpLayer = Backbone.View.extend({
     });
   },
   updateForceSimulation: function (graph) {
+    this.forceSimulation.nodes(graph.nodes);
     if (this.forces.forceLink) {
       this.forces.forceLink.links(graph.edges);
     }
-    this.forceSimulation.nodes(graph.nodes);
   },
   createForceSimulation: function (graph) {
     if (this.forceSimulation) {
@@ -407,19 +422,19 @@ let HelpLayer = Backbone.View.extend({
         }
         if (d.radius) {
           // bounce off the walls
-          if (d.x + d.vx - d.radius < 0) {
+          if (d.x + d.vx - d.radius <= 0) {
             d.x = d.radius;
-            d.vx = -d.vx;
+            d.vx = Math.max(1, -d.vx);
           } else if (d.x + d.vx + d.radius > window.innerWidth) {
             d.x = window.innerWidth - d.radius;
-            d.vx = -d.vx;
+            d.vx = Math.min(-1, -d.vx);
           }
-          if (d.y + d.vy - d.radius < 0) {
+          if (d.y + d.vy - d.radius <= 0) {
             d.y = d.radius;
-            d.vy = -d.vy;
+            d.vy = Math.max(1, -d.vy);
           } else if (d.y + d.vy + d.radius > window.innerHeight) {
             d.y = window.innerHeight - d.radius;
-            d.vy = -d.vy;
+            d.vy = Math.min(-1, -d.vy);
           }
         }
       });
@@ -433,17 +448,19 @@ let HelpLayer = Backbone.View.extend({
     let nextTip = graph.unseenTips.splice(0, 1)[0];
     graph.nodes.push(nextTip.target);
     nextTip.label.nodeIndex = graph.nodes.length;
+    nextTip.label.x = Math.random() * window.innerWidth;
+    nextTip.label.y = Math.random() * window.innerHeight;
     graph.nodes.push(nextTip.label);
     graph.edges.push({
       source: graph.nodes.length - 1,
       target: graph.nodes.length - 2
     });
 
-    // Update the nodes (class attributes
-    // on nodes other than this one will have changed)
+    // Update the nodes
+    this.updateForceSimulation(graph);
     this.drawGraph(graph, nextTip.label);
 
-    // Add constraints for the new node
+    // We only need to resize the new node's circle
     let domElement = d3.select(this.el).select('#nodeLayer').selectAll('.tip')
       .filter(d => {
         return d === nextTip.label;
@@ -455,9 +472,6 @@ let HelpLayer = Backbone.View.extend({
     // Store that we've seen the tip
     // in the user's preferences
     window.mainPage.currentUser.preferences.observeTip(nextTip.label);
-
-    // Start up the force layout again
-    this.updateForceSimulation(graph);
 
     // Draw the next tip in a couple seconds
     // TODO: I'm going to transition more elegantly in a bit...
@@ -479,6 +493,7 @@ let HelpLayer = Backbone.View.extend({
           if (d3.event.getModifierState('Shift') &&
               d3.event.getModifierState('Alt')) {
             self.showEasterEgg = true;
+            self.addedTemplate = false;
             self.render();
           }
         });
@@ -560,7 +575,7 @@ let HelpLayer = Backbone.View.extend({
               value = value[d.option];
             }
           } else if (d.paramType === 'forceEnable') {
-            value = self[d.forceName] !== undefined;
+            value = !!self[d.option];
           } else {
             value = self[d.option];
           }
@@ -592,8 +607,6 @@ let HelpLayer = Backbone.View.extend({
             if (value) {
               value = value[d.option];
             }
-          } else if (d.paramType === 'forceEnable') {
-            value = self[d.forceName] === undefined ? 'Disabled' : 'Enabled';
           } else {
             value = self[d.option];
           }
@@ -601,6 +614,8 @@ let HelpLayer = Backbone.View.extend({
             value = '--';
           }
           if (d.paramType === 'forceEnable') {
+            return 'Enable ' + d.option;
+          } else if (d.paramType === 'forceParam') {
             return d.forceName + ' ' + d.option + ': ' + value;
           } else {
             return d.option + ': ' + value;
@@ -651,7 +666,7 @@ let HelpLayer = Backbone.View.extend({
           if (d.paramType === 'forceParam' && this[d.forceName] === undefined) {
             return true;
           } else {
-            return null;
+            return false;
           }
         });
       controlsEnter.filter(d => {
