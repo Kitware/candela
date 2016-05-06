@@ -19,7 +19,8 @@
     "test:image:server:down": "sh script/test-server-down.sh",
     "test:karma": "karma start config/karma-testing.conf.js --no-single-run",
     "cover": "karma start config/karma-coverage.conf.js",
-    "cover:report": "http-server coverage -p ${PORT-3000}",
+    "cover:report": "http-server coverage/html -p ${PORT-3000}",
+    "codecov": "cat coverage/lcov/lcov.info | codecov",
     "demo": "http-server build -p ${PORT-3000}"
   },
   "semistandard": {
@@ -45,6 +46,7 @@
     "bluebird": "^3.3.5",
     "callsite": "^1.0.0",
     "clean-webpack-plugin": "^0.1.7",
+    "codecov.io": "^0.1.6",
     "copy-webpack-plugin": "^1.1.1",
     "css-loader": "^0.23.1",
     "eslint": "^1.10.3",
