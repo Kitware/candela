@@ -51,8 +51,8 @@ let User = girder.models.UserModel.extend({
       silent: true
     }).set({});
     this.authToken = undefined;
-    this.preferences.resetToDefaults();
     if (wasLoggedIn) {
+      this.preferences.resetToDefaults();
       window.mainPage.switchProject(null)
         .then(() => {
           this.trigger('rl:logout');
