@@ -42,11 +42,11 @@ let ProjectLibrary = Backbone.View.extend({
         window.mainPage.router.openUserDirectoriesInGirder();
       });
 
-      jQuery('#loginLink').on('click', () => {
+      jQuery('#loginLink2').on('click', () => {
         window.mainPage.overlay.render('LoginView');
       });
 
-      jQuery('#registerLink').on('click', () => {
+      jQuery('#registerLink2').on('click', () => {
         window.mainPage.overlay.render('RegisterView');
       });
 
