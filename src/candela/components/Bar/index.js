@@ -58,7 +58,6 @@ export default class Bar extends VisComponent {
   constructor (el, options) {
     super(el);
     this.options = options;
-    this.render();
   }
 
   render () {
