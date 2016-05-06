@@ -27,19 +27,37 @@ export let ResultTablePane = Backbone.View.extend({
     if (this.results === undefined) {
       return;
     }
-    // dots in names confound css selectors
-    this.results.sort(function (a, b) {
-      return a.dataset.localeCompare(b.dataset);
-    });
+    var resultsByDatasetIdThenTrend = {};
     _.each(this.results, _.bind(function (result) {
-      result.id = sanitizeSelector(result.dataset);
-      this.datasetMap[result.id] = this.datasetMap[result.dataset];
-      this.trajectoryMap[result.id] = this.trajectoryMap[result.dataset];
-      this.datasetLabelMap[result.id] = this.datasetLabelMap[result.dataset];
+      result.dataset_id_selector = sanitizeSelector(result.dataset);
+      this.datasetMap[result.dataset_id_selector] = this.datasetMap[result.dataset];
+      this.trajectoryMap[result.dataset_id_selector] = this.trajectoryMap[result.dataset];
+      this.datasetLabelMap[result.dataset_id_selector] = this.datasetLabelMap[result.dataset];
+      if (!_.has(resultsByDatasetIdThenTrend, result.dataset_id_selector)) {
+        resultsByDatasetIdThenTrend[result.dataset_id_selector] = {};
+      }
+      resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = result.current;
     }, this));
 
+    this.results.sort((_.bind(function () {
+      if (!this.sortOrder) {
+        // Default sort order is alphabetical by dataset name.
+        return function (a, b) {
+          return a.dataset.localeCompare(b.dataset);
+        };
+      } else {
+        return _.bind(function (a, b) {
+          // Sort all datasets by the selected trend column and direction
+          var trendA = resultsByDatasetIdThenTrend[a.dataset_id_selector][this.sortOrder.trend];
+          var trendB = resultsByDatasetIdThenTrend[b.dataset_id_selector][this.sortOrder.trend];
+          return this.sortOrder.order * (trendA - trendB);
+        }, this);
+      }
+    }, this))());
+
+    // The order of the datasets determines the order the rows are printed.
     var resultsByDatasetId = _.groupBy(this.results, function (result) {
-      return result.id;
+      return result.dataset_id_selector;
     });
 
     this.$el.html(tablePane({
@@ -48,11 +66,12 @@ export let ResultTablePane = Backbone.View.extend({
       datasetMap: this.datasetMap,
       trajectoryMap: this.trajectoryMap,
       datasetLabelMap: this.datasetLabelMap,
-      producerLink: this.producerLink
+      producerLink: this.producerLink,
+      sortOrder: this.sortOrder
     })).promise().done(_.bind(function () {
       _.each(this.results, function (result) {
         var trend = this.trendMap[result.trend];
-        var resultDivSelector = '#' + result.id + '-' + trend.id_selector;
+        var resultDivSelector = '#' + result.dataset_id_selector + '-' + trend.id_selector;
         // change color of circle
         if (!trend.incomplete) {
           if (failValue(result.current, trend.warning, trend.fail)) {
@@ -98,6 +117,19 @@ export let ResultTablePane = Backbone.View.extend({
           $('#' + key + '-trajectory-link').click(value);
         }
       });
+
+      _.each(this.trends, function (trend) {
+        // Order by the trend column clicked.
+        $('#' + trend.id_selector + '-trend-col-header').click(_.bind(function () {
+            var sortOrder = this.sortOrder ? this.sortOrder.order * -1 : -1;
+            this.sortOrder = {
+                trend: trend.name,
+                order: sortOrder
+            };
+            this.render();
+        }, this));
+      }, this);
+
     }, this));
   }
 });
