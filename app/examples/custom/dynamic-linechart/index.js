@@ -1,9 +1,9 @@
-import Line from './../../../../src/candela/components/Line';
+import LineChart from './../../../../src/candela/components/LineChart';
 import Events from './../../../../src/candela/VisComponent/mixin/Events';
 import $ from 'jquery';
 import './index.styl';
 
-class DynamicLine extends Events(Line) {
+class DynamicLineChart extends Events(LineChart) {
   constructor (...args) {
     super(...args);
   }
@@ -29,7 +29,7 @@ for (let i = 0; i < 20; i++) {
   });
 }
 
-let vis = new DynamicLine(el, {
+let vis = new DynamicLineChart(el, {
   data,
   x: 'index',
   y: ['value']

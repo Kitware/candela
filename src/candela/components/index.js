@@ -1,27 +1,27 @@
-import Bar from './Bar';
-import Box from './Box';
-import Bullet from './Bullet';
-import Gantt from './Gantt';
+import BarChart from './BarChart';
+import BoxPlot from './BoxPlot';
+import BulletChart from './BulletChart';
+import GanttChart from './GanttChart';
 import Heatmap from './Heatmap';
 import Histogram from './Histogram';
-import Line from './Line';
+import LineChart from './LineChart';
 import LineUp from './LineUp';
 import ParallelCoordinates from './ParallelCoordinates';
-import Scatter from './Scatter';
-import ScatterMatrix from './ScatterMatrix';
+import ScatterPlot from './ScatterPlot';
+import ScatterPlotMatrix from './ScatterPlotMatrix';
 import UpSet from './UpSet';
 
 export default {
-  Bar,
-  Box,
-  Bullet,
-  Gantt,
+  BarChart,
+  BoxPlot,
+  BulletChart,
+  GanttChart,
   Heatmap,
   Histogram,
-  Line,
+  LineChart,
   LineUp,
   ParallelCoordinates,
-  Scatter,
-  ScatterMatrix,
+  ScatterPlot,
+  ScatterPlotMatrix,
   UpSet
 };
