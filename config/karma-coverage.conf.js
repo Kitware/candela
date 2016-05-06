@@ -4,7 +4,6 @@ var webpackConfig = require('./webpack-coverage.config');
 karmaConfig.webpack = webpackConfig;
 
 karmaConfig.reporters = [
-  'tap',
   'coverage'
 ];
 

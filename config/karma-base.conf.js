@@ -7,7 +7,9 @@ module.exports = {
   browsers: [
     'PhantomJS'
   ],
-  frameworks: [],
+  frameworks: [
+    'tap'
+  ],
   files: [
     'tests.bundle.js'
   ],
