@@ -2,7 +2,7 @@ import Underscore from 'underscore';
 import Backbone from 'backbone';
 import jQuery from 'jquery';
 import d3 from 'd3';
-import cola from 'webcola';
+import d3_force from 'd3-force';
 import rewrap from '../../../shims/svgTextWrap.js';
 import forceControls from './forceControls.json';
 import template from './template.html';
@@ -34,7 +34,7 @@ function arrowGenerator (edge) {
   'L' + edge.target.x + ',' + edge.target.y +
   'Z';
 }
-window.cola = cola;
+
 let HelpLayer = Backbone.View.extend({
   initialize: function () {
     this.relevantTips = {};
@@ -47,26 +47,16 @@ let HelpLayer = Backbone.View.extend({
     this.padding = 9;
     this.margin = 18;
 
-    this.avoidOverlaps = true;
-    this.linkDistance = 250;
-    this.alpha = 0.7;
-    this.convergenceThreshold = 0.01;
-    // this.defaultNodeSize = 20;
-    this.handleDisconnected = false;
+    this.alphaMin = 0.001;
+    this.alphaDecay = 0.02;
+    // this.drag = 0.4;
 
-    this.noConstraintIterations = 50;
-    this.structuralIterations = 50;
-    this.allConstraintIterations = 50;
+    this.forceCenter = {};
+    this.forceCollide = {};
+    this.forceLink = {};
+    this.forceManyBody = {};
 
-    this.force = cola.d3adaptor()
-      .on('tick', () => {
-        d3.select(this.el).select('#nodeLayer').selectAll('.tip')
-          .attr('transform', (d) => {
-            return 'translate(' + d.x + ',' + d.y + ')';
-          });
-        d3.select(this.el).select('#linkLayer').selectAll('.arrow')
-          .attr('d', arrowGenerator);
-      });
+    this.forces = {};
 
     this.visible = false;
     this.addedTemplate = false;
@@ -149,62 +139,7 @@ let HelpLayer = Backbone.View.extend({
     this.render();
   },
   constructGraph: function () {
-    // Figure out how much space we have
-    let bounds = {
-      width: window.innerWidth,
-      height: window.innerHeight
-    };
-
-    let center = {
-      x: bounds.width / 2,
-      y: bounds.height / 2
-    };
-
-    // Default labels that are always there
-    // (not connected to any target)
-    let nodes = [
-      // Create four bumper nodes to force stuff to stay on the screen
-      {
-        tipId: 'left',
-        nodeType: 'border',
-        x: -center.x,
-        y: center.y,
-        width: bounds.width,
-        height: bounds.height,
-        fixed: true
-      },
-      {
-        tipId: 'right',
-        nodeType: 'border',
-        x: 1.5 * bounds.width,
-        y: center.y,
-        width: bounds.width,
-        height: bounds.height,
-        fixed: true
-      },
-      {
-        tipId: 'top',
-        nodeType: 'border',
-        x: center.x,
-        y: -center.y,
-        width: 2 * bounds.width,
-        height: bounds.height,
-        fixed: true
-      },
-      {
-        tipId: 'bottom',
-        nodeType: 'border',
-        x: center.x,
-        y: 1.5 * bounds.height,
-        width: 2 * bounds.width,
-        height: bounds.height,
-        fixed: true
-      }
-    ];
-    // Attach nodeIndex to the static nodes
-    nodes.forEach((d, i) => {
-      d.nodeIndex = i;
-    });
+    let nodes = [];
 
     // Create hidden targets, labels, and connect them to each other
     let tipIds = Object.keys(this.relevantTips);
@@ -217,18 +152,16 @@ let HelpLayer = Backbone.View.extend({
       tipNodes.target = {
         tipId: tipId,
         nodeType: 'arrowhead',
-        x: tip.x,
-        y: tip.y,
-        fixed: true
+        fixed_x: tip.x,
+        fixed_y: tip.y
       };
 
       tipNodes.label = {
         tipId: tipId,
         nodeType: 'label',
         message: tip.message,
-        // Start each label at a random location
-        x: Math.random() * bounds.width,
-        y: Math.random() * bounds.height
+        x: tip.x,
+        y: tip.y
       };
 
       // Do we add this to the existing graph,
@@ -248,18 +181,17 @@ let HelpLayer = Backbone.View.extend({
     }
 
     return {
-      bounds: bounds,
-      center: center,
       nodes: nodes,
       edges: edges,
-      unseenTips: unseenTips,
-      constraints: []
+      unseenTips: unseenTips
     };
   },
   render: Underscore.debounce(function () {
-    // Stop the force layout if it's running
-    this.force.stop();
     if (this.visible === false) {
+      // Stop the force layout if it's running
+      if (this.forceSimulation) {
+        this.forceSimulation.stop();
+      }
       // Fade the whole layer out
       d3.select(this.el)
         .style('opacity', 1.0)
@@ -268,8 +200,12 @@ let HelpLayer = Backbone.View.extend({
         .attr('display', 'none')
         .style('opacity', null);
     } else {
+      // Get the set of nodes and edges
+      let graph = this.constructGraph();
+
       if (!this.addedTemplate) {
         this.$el.html(template);
+        this.createForceSimulation(graph);
         this.addedTemplate = true;
       }
       d3.select(this.el)
@@ -278,13 +214,10 @@ let HelpLayer = Backbone.View.extend({
       // Render the tuner
       this.renderTuner();
 
-      // Get the set of nodes and edges
-      let graph = this.constructGraph();
-
       // Draw / update the full graph
       this.drawGraph(graph);
-      this.deriveAllConstraints(graph);
-      this.updateForceLayout(graph);
+      this.deriveAllSizes(graph);
+      this.updateForceSimulation(graph);
 
       // Start drawing the unseenTips one at a time
       this.drawNextNode(graph);
@@ -319,9 +252,9 @@ let HelpLayer = Backbone.View.extend({
       }
     });
 
-    // Background rectangle
-    // (we figure out its dimensions later)
-    tipsEnter.append('rect');
+    // Background circle
+    // (we figure out its radius later)
+    tipsEnter.append('circle');
 
     // Draw the text
     tipsEnter.append('text')
@@ -329,9 +262,9 @@ let HelpLayer = Backbone.View.extend({
       .attr('text-anchor', d => {
         // Align the text based on where the label
         // starts on the screen
-        if (d.x < graph.bounds.width / 3) {
+        if (d.x < window.innerWidth / 3) {
           return 'start';
-        } else if (d.x < 2 * graph.bounds.width / 3) {
+        } else if (d.x < 2 * window.innerWidth / 3) {
           return 'middle';
         } else {
           return 'end';
@@ -354,7 +287,7 @@ let HelpLayer = Backbone.View.extend({
       .style('opacity', 0.0)
       .remove();
   },
-  deriveConstraint: function (graph, tip, domElement) {
+  deriveSize: function (graph, tip, domElement) {
     let bounds = domElement.getBoundingClientRect();
 
     // boundaries relative to the text anchor point
@@ -363,62 +296,27 @@ let HelpLayer = Backbone.View.extend({
     tip.relative_top = bounds.top;
     tip.relative_bottom = bounds.bottom;
 
-    // cola expects the x and y coordinates to
-    // be in the center of the node to handle
-    // overlaps - so we need to move the text block
+    // Move the text block to the center of the node
     d3.select(domElement).select('text')
       .attr('transform', 'translate(' +
         (-(tip.relative_left + tip.relative_right) / 2) + ',' +
         (-(tip.relative_top + tip.relative_bottom) / 2) + ')');
 
-    // let cola know our dimensions (add in the padding)
+    // Store our dimensions (add in the padding)
     tip.width = tip.relative_right - tip.relative_left + 2 * this.padding;
     tip.height = tip.relative_bottom - tip.relative_top + 2 * this.padding;
 
-    // Set the background rectangle's dimensions
-    d3.select(domElement).select('rect')
-      .attr('x', -tip.width / 2)
-      .attr('y', -tip.height / 2)
-      .attr('width', tip.width)
-      .attr('height', tip.height);
+    // Okay, calculate the radius and update the circle
+    tip.radius = Math.sqrt(Math.pow(tip.width, 2) + Math.pow(tip.height, 2)) / 2;
+    d3.select(domElement).select('circle')
+      .attr('r', tip.radius);
 
-    // Add in extra padding *outside* the rectangle
+    // Add in extra padding *outside* the circle
     tip.width += 2 * this.margin;
     tip.height += 2 * this.margin;
-
-    // Now that we know the dimensions, we can add
-    // appropriate constraints to keep the nodes on
-    // the screen
-    graph.constraints.push({
-      axis: 'x',
-      type: 'separation',
-      left: 0, // left bumper
-      right: tip.nodeIndex,
-      gap: tip.width / 2
-    });
-    graph.constraints.push({
-      axis: 'x',
-      type: 'separation',
-      left: tip.nodeIndex,
-      right: 1, // right bumper
-      gap: tip.width / 2
-    });
-    graph.constraints.push({
-      axis: 'y',
-      type: 'separation',
-      left: 2, // top bumper
-      right: tip.nodeIndex,
-      gap: tip.height / 2
-    });
-    graph.constraints.push({
-      axis: 'y',
-      type: 'separation',
-      left: tip.nodeIndex,
-      right: 3, // bottom bumper
-      gap: tip.height / 2
-    });
+    tip.radius += this.margin;
   },
-  deriveAllConstraints: function (graph) {
+  deriveAllSizes: function (graph) {
     let tips = d3.select(this.el).select('#nodeLayer').selectAll('.tip');
     // Wrap all the text appropriately
     tips.selectAll('text')
@@ -427,35 +325,105 @@ let HelpLayer = Backbone.View.extend({
         rewrap(this, 150, 1.1);
       });
 
-    // Start with a fresh set of constraints
-    graph.constraints = [];
+    // Update each whole node
     let self = this;
     tips.each(function (d) {
       // this refers to the DOM element
-      self.deriveConstraint(graph, d, this);
+      self.deriveSize(graph, d, this);
     });
   },
-  updateForceLayout: function (graph) {
-    this.force.stop();
+  updateForceSimulation: function (graph) {
+    if (this.forces.forceLink) {
+      this.forces.forceLink.links(graph.edges);
+    }
+    this.forceSimulation.nodes(graph.nodes);
+  },
+  createForceSimulation: function (graph) {
+    if (this.forceSimulation) {
+      this.forceSimulation.stop();
+    }
 
-    this.force
-      .size([graph.bounds.width, graph.bounds.height])
+    this.forceSimulation = d3_force.forceSimulation()
       .nodes(graph.nodes)
-      .links(graph.edges)
-      .constraints(graph.constraints);
+      .on('tick', () => {
+        d3.select(this.el).select('#nodeLayer').selectAll('.tip')
+          .attr('transform', (d) => {
+            return 'translate(' + d.x + ',' + d.y + ')';
+          });
+        d3.select(this.el).select('#linkLayer').selectAll('.arrow')
+          .attr('d', arrowGenerator);
+      });
 
-    // Apply any cola parameters that we've specified
+    // Apply any parameters and forces that we've specified
+    this.forces = {};
     for (let control of forceControls) {
-      if (control.colaParameter &&
+      if (control.paramType === 'simulation' &&
         this[control.option] !== undefined) {
-        this.force[control.option](this[control.option]);
+        this.forceSimulation[control.option](this[control.option]);
+      } else if (control.paramType === 'forceEnable') {
+        if (this[control.option]) {
+          this.forces[control.option] = d3_force[control.option]();
+          this.forceSimulation.force(control.option, this.forces[control.option]);
+        } else {
+          delete this.forces[control.option];
+        }
       }
     }
 
-    // Start it up
-    this.force.start(this.noConstraintIterations,
-      this.structuralIterations,
-      this.allConstraintIterations);
+    // Apply any force-specific parameters (now that the forces
+    // have been created)
+    for (let control of forceControls) {
+      if (control.paramType === 'forceParam' &&
+        this[control.forceName] &&
+        this[control.forceName][control.option] !== undefined) {
+        this.forces[control.forceName][control.option](
+          this[control.forceName][control.option]);
+      }
+    }
+
+    // Special force options that aren't configured in the easter egg
+    if (this.forces.forceLink) {
+      this.forces.forceLink.links(graph.edges);
+    }
+    if (this.forces.forceCenter) {
+      this.forces.forceCenter.x(window.innerWidth / 2);
+      this.forces.forceCenter.y(window.innerHeight / 2);
+    }
+    if (this.forces.forceCollide) {
+      this.forces.forceCollide.radius(d => d.radius);
+    }
+
+    // Manually create forces for fixed nodes and for keeping
+    // nodes on screen
+    this.forceSimulation.force('constrainNodes', () => {
+      graph.nodes.forEach((d) => {
+        if (d.fixed_x) {
+          d.x = d.fixed_x;
+          d.vx = 0;
+        }
+        if (d.fixed_y) {
+          d.y = d.fixed_y;
+          d.vy = 0;
+        }
+        if (d.radius) {
+          // bounce off the walls
+          if (d.x + d.vx - d.radius < 0) {
+            d.x = d.radius;
+            d.vx = -d.vx;
+          } else if (d.x + d.vx + d.radius > window.innerWidth) {
+            d.x = window.innerWidth - d.radius;
+            d.vx = -d.vx;
+          }
+          if (d.y + d.vy - d.radius < 0) {
+            d.y = d.radius;
+            d.vy = -d.vy;
+          } else if (d.y + d.vy + d.radius > window.innerHeight) {
+            d.y = window.innerHeight - d.radius;
+            d.vy = -d.vy;
+          }
+        }
+      });
+    });
   },
   drawNextNode: function (graph) {
     if (graph.unseenTips.length === 0 || !this.visible) {
@@ -482,14 +450,14 @@ let HelpLayer = Backbone.View.extend({
       });
     let domTextElement = domElement.select('text');
     rewrap(domTextElement.node(), 150, 1.1);
-    this.deriveConstraint(graph, nextTip.label, domElement.node());
+    this.deriveSize(graph, nextTip.label, domElement.node());
 
     // Store that we've seen the tip
     // in the user's preferences
     window.mainPage.currentUser.preferences.observeTip(nextTip.label);
 
     // Start up the force layout again
-    this.updateForceLayout(graph);
+    this.updateForceSimulation(graph);
 
     // Draw the next tip in a couple seconds
     // TODO: I'm going to transition more elegantly in a bit...
@@ -552,14 +520,27 @@ let HelpLayer = Backbone.View.extend({
         .on('change', function (d) {
           // this refers to the DOM element
           if (d.step) {
-            self[d.option] = this.value;
+            if (d.paramType === 'forceParam') {
+              self[d.forceName][d.option] = this.value;
+            } else {
+              self[d.option] = this.value;
+            }
           } else {
-            self[d.option] = this.checked;
+            if (d.paramType === 'forceParam') {
+              self[d.forceName][d.option] = this.checked;
+            } else if (d.paramType === 'forceEnable') {
+              if (this.checked) {
+                self[d.option] = {};
+              } else {
+                delete self[d.option];
+              }
+            } else {
+              self[d.option] = this.checked;
+            }
           }
 
           self.addedTemplate = false;
           self.render();
-          self.renderTuner();
         });
       controls.selectAll('input.control')
         .attr('type', (d) => {
@@ -572,19 +553,31 @@ let HelpLayer = Backbone.View.extend({
         .each(function (d) {
           // this refers to the DOM element
           let element = d3.select(this);
+          let value;
+          if (d.paramType === 'forceParam') {
+            value = self[d.forceName];
+            if (value) {
+              value = value[d.option];
+            }
+          } else if (d.paramType === 'forceEnable') {
+            value = self[d.forceName] !== undefined;
+          } else {
+            value = self[d.option];
+          }
+
           if (d.step) {
             element.attr('min', d.range[0])
               .attr('max', d.range[1])
               .attr('step', d.step);
-            if (self[d.option] !== undefined) {
-              element.property('value', self[d.option]);
+            if (value !== undefined) {
+              element.property('value', value);
             }
           } else {
-            if (self[d.option]) {
+            if (value) {
               element.property('checked', true);
             }
           }
-          element.property('disabled', self[d.option] === undefined);
+          element.property('disabled', value === undefined);
         });
 
       // Label for the control (with its current value)
@@ -594,29 +587,57 @@ let HelpLayer = Backbone.View.extend({
       controls.selectAll('label.control')
         .text(d => {
           let value;
-          if (this[d.option] === undefined) {
-            value = '--';
-          } else if (this[d.option] === true) {
-            value = 'true';
-          } else if (this[d.option] === false) {
-            value = 'false';
+          if (d.paramType === 'forceParam') {
+            value = self[d.forceName];
+            if (value) {
+              value = value[d.option];
+            }
+          } else if (d.paramType === 'forceEnable') {
+            value = self[d.forceName] === undefined ? 'Disabled' : 'Enabled';
           } else {
-            value = this[d.option];
+            value = self[d.option];
           }
-          return d.option + ': ' + value;
+          if (value === undefined) {
+            value = '--';
+          }
+          if (d.paramType === 'forceEnable') {
+            return d.forceName + ' ' + d.option + ': ' + value;
+          } else {
+            return d.option + ': ' + value;
+          }
         });
 
       // Control to enable / disable this parameter
-      controlsEnter.append('input')
-        .attr('id', d => d.option + 'enable')
+      // (don't add these for forceEnable options,
+      // as that's redundant, or for layout options,
+      // as they always apply)
+      controlsEnter.filter(d => {
+        return d.paramType !== 'forceEnable' &&
+          d.paramType !== 'layout';
+      }).append('input')
+        .attr('id', d => {
+          if (d.paramType === 'forceParam') {
+            return d.forceName + d.option + 'enable'
+          } else {
+            return d.option + 'enable';
+          }
+        })
         .attr('class', 'enable')
         .attr('type', 'checkbox')
         .on('change', function (d) {
           // this refers to the DOM element
           if (this.checked) {
-            self[d.option] = d.range[0];
+            if (d.paramType === 'forceParam') {
+              self[d.forceName][d.option] = d.range[0];
+            } else {
+              self[d.option] = d.range[0];
+            }
           } else {
-            self[d.option] = undefined;
+            if (d.paramType === 'forceParam') {
+              delete self[d.forceName][d.option];
+            } else {
+              delete self[d.option];
+            }
           }
 
           self.addedTemplate = false;
@@ -626,8 +647,17 @@ let HelpLayer = Backbone.View.extend({
       // Label for the enable switch
       controls.selectAll('input.enable')
         .property('checked', d => this[d.option] !== undefined)
-        .property('disabled', d => !d.colaParameter);
-      controlsEnter.append('label')
+        .property('disabled', d => {
+          if (d.paramType === 'forceParam' && this[d.forceName] === undefined) {
+            return true;
+          } else {
+            return null;
+          }
+        });
+      controlsEnter.filter(d => {
+        return d.paramType !== 'forceEnable' &&
+          d.paramType !== 'layout';
+      }).append('label')
         .attr('class', 'enable')
         .attr('for', d => d.option + 'enable')
         .text('Enable');

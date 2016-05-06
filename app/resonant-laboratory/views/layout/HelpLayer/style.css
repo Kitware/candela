@@ -10,26 +10,23 @@
 #HelpLayer .arrow {
   fill: none;
 }
-#HelpLayer .tip rect {
-  opacity: 0.85;
-}
-#HelpLayer .old.tip rect {
+#HelpLayer .old.tip circle {
   fill: #ffffcc;
 }
-#HelpLayer .new.tip rect {
+#HelpLayer .new.tip circle {
   fill: #b3cde3;
 }
 #HelpLayer .old.arrow,
-#HelpLayer .old.tip rect {
+#HelpLayer .old.tip circle {
   stroke-width: 2px;
   stroke: #ffff33;
 }
 #HelpLayer .new.arrow,
-#HelpLayer .new.tip rect {
+#HelpLayer .new.tip circle {
   stroke-width: 2px;
   stroke: #377eb8;
 }
-#HelpLayer .button.tip rect,
+#HelpLayer .button.tip circle,
 #tuner {
   position: absolute;
   bottom: 2em;
