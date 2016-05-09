@@ -19,6 +19,9 @@ let VALID_EXTENSIONS = [
 ];
 
 let dictCompare = (a, b) => {
+  if (!(a instanceof Object) || !(b instanceof Object)) {
+    return false;
+  }
   let aKeys = Object.keys(a);
   let bKeys = Object.keys(b);
   if (aKeys.length !== bKeys.length) {
