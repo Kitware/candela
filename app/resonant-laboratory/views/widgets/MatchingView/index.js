@@ -19,7 +19,7 @@ let ICONS = {
   date: dateIcon,
   string: stringIcon,
   string_list: stringListIcon
-}
+};
 
 let NODE_MODES = {
   INELIGIBLE: 0,
@@ -580,7 +580,7 @@ in order to connect them together.`);
           if (d.acceptsMultiple) {
             tooltip += '\nThis option accepts any number of connections';
           } else {
-            tooltip += '\nThis option accepts exactly one connection'
+            tooltip += '\nThis option accepts exactly one connection';
           }
           tooltip += '\nCompatible with ' + d.type.join(', ');
         }
