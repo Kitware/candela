@@ -162,13 +162,16 @@ in order to connect them together.`);
     let nodeEdgeLookup = {};
 
     // Helper functions
-    let _createNode = (side, groupIndex, attrName, attrType) => {
+    let _createNode = (side, groupIndex, attrName, attrType, acceptsMultiple) => {
       let newNode = {
         side: side,
         index: groupIndex,
         attrName: attrName,
         type: attrType
       };
+      if (acceptsMultiple) {
+        newNode.acceptsMultiple = true;
+      }
       newNode.id = this.createNodeId(newNode);
       nodeLookup[newNode.id] = nodes.length;
 
@@ -285,7 +288,8 @@ in order to connect them together.`);
       });
       specs.vis.forEach((visSpec, visIndex) => {
         visSpec.options.forEach((option, attrIndex) => {
-          _createNode('vis', visIndex, option.name, option.domain.fieldTypes);
+          _createNode('vis', visIndex, option.name, option.domain.fieldTypes,
+          option.type === 'string_list');
         });
       });
 
@@ -549,7 +553,11 @@ in order to connect them together.`);
       .attr('class', 'label')
       .attr('y', 0);
     nodes.selectAll('text.label').text(d => {
-      return d.attrName;
+      if (d.acceptsMultiple === true) {
+        return d.attrName + ' (multiple)';
+      } else {
+        return d.attrName;
+      }
     });
 
     enteringNodes.append('text')
