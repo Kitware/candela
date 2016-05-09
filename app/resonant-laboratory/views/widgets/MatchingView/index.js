@@ -495,7 +495,7 @@ in order to connect them together.`);
       });
 
     let dataX = emSize;
-    let nodeWidth = bounds.width / 4;
+    let nodeWidth = bounds.width / 3;
     let visX = bounds.width - emSize - nodeWidth;
     let dataY = d3.scale.linear()
       .domain([firstData - 1, lastData + 1])
@@ -563,6 +563,21 @@ in order to connect them together.`);
       this.handleClick(d);
     });
 
+    enteringNodes.append('title').attr('class', 'nodeTitle');
+    nodes.selectAll('title.nodeTitle')
+      .text(d => {
+        let tooltip = d.attrName;
+        if (d.side === 'data') {
+          tooltip += ' (' + d.type + ')';
+        } else {
+          if (d.acceptsMultiple) {
+            tooltip += '\nYou can connect more than one field to this option.';
+          }
+          tooltip += '\nCompatible with ' + d.type.join(', ');
+        }
+        return tooltip;
+      });
+
     enteringNodes.append('rect');
     nodes.selectAll('rect').attr({
       width: nodeWidth + emSize * 0.5,
@@ -626,9 +641,9 @@ in order to connect them together.`);
       }
       return classString + ' edge';
     }).attr('d', d => {
-      let pathString = 'M' + (dataX + nodeWidth / 2) + ',' +
+      let pathString = 'M' + (dataX + nodeWidth) + ',' +
       dataY(d.source) +
-      'L' + (visX + nodeWidth / 2) + ',' +
+      'L' + visX + ',' +
       visY(d.target);
       return pathString;
     }).on('mouseover', d => {
