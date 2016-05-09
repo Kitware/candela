@@ -500,68 +500,75 @@ in order to connect them together.`);
     let dataY = d3.scale.linear()
       .domain([firstData - 1, lastData + 1])
       .range([0, bounds.height]);
+    let scrollTop = this.$el.scrollTop();
     let visY = d3.scale.linear()
       .domain([firstVis - 1, lastVis + 1])
-      .range([0, this.el.clientHeight]);
-      // TODO: this is a quick, cheap fix to keep the
-      // vis options at the top. We should
-      // reimplement this interface to scroll with
-      // the user
+      .range([scrollTop, scrollTop + this.el.clientHeight]);
 
     let nodes = d3.select(this.el).select('svg')
       .select('.nodeLayer')
       .selectAll('.node').data(graph.nodes, d => {
         return d.id + d.type;
       });
-    let enteringNodes = nodes.enter().append('g');
+    // Animate any existing nodes before we add new ones
+    nodes.transition().duration(300)
+      .attr('transform', (d, i) => {
+        if (d.side === 'vis') {
+          return 'translate(' + visX + ',' + visY(i) + ')';
+        } else {
+          return 'translate(' + dataX + ',' + dataY(i) + ')';
+        }
+      });
+    let enteringNodes = nodes.enter().append('g')
+      .attr('transform', (d, i) => {
+        if (d.side === 'vis') {
+          return 'translate(' + visX + ',' + visY(i) + ')';
+        } else {
+          return 'translate(' + dataX + ',' + dataY(i) + ')';
+        }
+      });
+    nodes.attr('id', d => d.id)
+      .attr('class', d => {
+        let classString = '';
+        // Node mode
+        if (d.mode === NODE_MODES.WILL_SELECT) {
+          classString = 'selectable';
+        } else if (d.mode === NODE_MODES.INELIGIBLE) {
+          classString = 'ineligible';
+        } else if (d.mode === NODE_MODES.WILL_DISCONNECT) {
+          classString = 'linked';
+        } else if (d.mode === NODE_MODES.SELECTED) {
+          classString = 'selected';
+        } else if (d.mode === NODE_MODES.WILL_CONNECT) {
+          classString = 'connectable';
+        }
+        // Node side
+        if (d.side === 'vis') {
+          classString += ' encoding';
+        } else {
+          classString += ' attribute';
+        }
+        return classString + ' node';
+      }).on('mouseover', d => {
+        // Highlight this node
+        jQuery(this).addClass('hovered');
+        // Highlight the edge between this node and the selection
+        if (this.selection !== null && this.selection.id !== d.id) {
+          graph.nodeEdgeLookup[d.id].forEach(edgeIndex => {
+            let edge = graph.edges[edgeIndex];
+            if (graph.nodes[edge.source].id === this.selection.id ||
+              graph.nodes[edge.target].id === this.selection.id) {
+              jQuery('#' + graph.edges[edgeIndex].id).addClass('hovered');
+            }
+          });
+        }
+      }).on('mouseout', d => {
+        // Clear any highlights
+        this.$el.find('.hovered').removeClass('hovered');
+      }).on('click', d => {
+        this.handleClick(d);
+      });
     nodes.exit().remove();
-
-    nodes.attr('id', d => d.id).attr('class', d => {
-      let classString = '';
-      // Node mode
-      if (d.mode === NODE_MODES.WILL_SELECT) {
-        classString = 'selectable';
-      } else if (d.mode === NODE_MODES.INELIGIBLE) {
-        classString = 'ineligible';
-      } else if (d.mode === NODE_MODES.WILL_DISCONNECT) {
-        classString = 'linked';
-      } else if (d.mode === NODE_MODES.SELECTED) {
-        classString = 'selected';
-      } else if (d.mode === NODE_MODES.WILL_CONNECT) {
-        classString = 'connectable';
-      }
-      // Node side
-      if (d.side === 'vis') {
-        classString += ' encoding';
-      } else {
-        classString += ' attribute';
-      }
-      return classString + ' node';
-    }).attr('transform', (d, i) => {
-      if (d.side === 'vis') {
-        return 'translate(' + visX + ',' + visY(i) + ')';
-      } else {
-        return 'translate(' + dataX + ',' + dataY(i) + ')';
-      }
-    }).on('mouseover', d => {
-      // Highlight this node
-      jQuery(this).addClass('hovered');
-      // Highlight the edge between this node and the selection
-      if (this.selection !== null && this.selection.id !== d.id) {
-        graph.nodeEdgeLookup[d.id].forEach(edgeIndex => {
-          let edge = graph.edges[edgeIndex];
-          if (graph.nodes[edge.source].id === this.selection.id ||
-            graph.nodes[edge.target].id === this.selection.id) {
-            jQuery('#' + graph.edges[edgeIndex].id).addClass('hovered');
-          }
-        });
-      }
-    }).on('mouseout', d => {
-      // Clear any highlights
-      this.$el.find('.hovered').removeClass('hovered');
-    }).on('click', d => {
-      this.handleClick(d);
-    });
 
     enteringNodes.append('title').attr('class', 'nodeTitle');
     nodes.selectAll('title.nodeTitle')
@@ -624,9 +631,26 @@ in order to connect them together.`);
     let edges = d3.select(this.el).select('svg')
       .select('.linkLayer')
       .selectAll('.edge').data(graph.edges, d => d.id);
-    edges.enter().append('path');
+    // Animate any existing edges before we add new ones
+    edges.transition().duration(300)
+      .attr('d', d => {
+        let pathString = 'M' + (dataX + nodeWidth) + ',' +
+        dataY(d.source) +
+        'L' + visX + ',' +
+        visY(d.target);
+        return pathString;
+      });
+    edges.enter().append('path')
+      .attr('d', d => {
+        let pathString = 'M' + (dataX + nodeWidth) + ',' +
+        dataY(d.source) +
+        'L' + visX + ',' +
+        visY(d.target);
+        return pathString;
+      }).attr('opacity', 0)
+        .transition().duration(300)
+        .attr('opacity', 1);
     edges.exit().remove();
-
     edges.attr('id', d => d.id).attr('class', d => {
       let classString = '';
       // Edge type
@@ -640,12 +664,6 @@ in order to connect them together.`);
         classString = 'probable';
       }
       return classString + ' edge';
-    }).attr('d', d => {
-      let pathString = 'M' + (dataX + nodeWidth) + ',' +
-      dataY(d.source) +
-      'L' + visX + ',' +
-      visY(d.target);
-      return pathString;
     }).on('mouseover', d => {
       jQuery(this).addClass('hovered');
       // If one end is selected, highlight the other end
