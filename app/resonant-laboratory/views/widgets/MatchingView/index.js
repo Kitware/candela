@@ -578,7 +578,9 @@ in order to connect them together.`);
           tooltip += ' (' + d.type + ')';
         } else {
           if (d.acceptsMultiple) {
-            tooltip += '\nYou can connect more than one field to this option.';
+            tooltip += '\nThis option accepts any number of connections';
+          } else {
+            tooltip += '\nThis option accepts exactly one connection'
           }
           tooltip += '\nCompatible with ' + d.type.join(', ');
         }
@@ -619,11 +621,38 @@ in order to connect them together.`);
       .attr('x', d => {
         return d.side === 'data' ? '1.25em' : (d.type.length + 0.25) + 'em';
       });
-    nodes.selectAll('text.label').text(d => {
-      if (d.acceptsMultiple === true) {
-        return d.attrName + ' (multiple)';
+    nodes.selectAll('text.label').each(function (d) {
+      // this refers to the DOM element
+      let label = d.attrName;
+      if (d.side === 'vis') {
+        if (d.acceptsMultiple === true) {
+          label += ': \u221E';
+        } else {
+          // TODO: options that expect exactly two fields?
+          label += ': 1';
+        }
+      }
+      this.textContent = label;
+
+      // Shrink the label so that it fits. Calculate available space:
+      let maxTextLength = nodeWidth;
+      if (d.side === 'data') {
+        maxTextLength -= emSize;
       } else {
-        return d.attrName;
+        maxTextLength -= d.type.length * emSize;
+      }
+
+      while (this.getComputedTextLength() >= maxTextLength) {
+        if (label.length <= 4) {
+          // Too small to even show a label
+          this.textContent = '';
+          break;
+        }
+        // Swap out the middle four characters
+        // and replace them with three periods
+        let mid = Math.floor(label.length / 2);
+        label = label.slice(0, mid - 2) + '...' + label.slice(mid + 2);
+        this.textContent = label;
       }
     });
 
@@ -651,43 +680,44 @@ in order to connect them together.`);
         .transition().duration(300)
         .attr('opacity', 1);
     edges.exit().remove();
-    edges.attr('id', d => d.id).attr('class', d => {
-      let classString = '';
-      // Edge type
-      if (d.mode === EDGE_MODES.POTENTIAL) {
-        classString = 'potential';
-      } else if (d.mode === EDGE_MODES.ESTABLISHED) {
-        classString = 'established';
-      } else if (d.mode === EDGE_MODES.ESTABLISHED_SELECTED) {
-        classString = 'established selected';
-      } else if (d.mode === EDGE_MODES.PROBABLE) {
-        classString = 'probable';
-      }
-      return classString + ' edge';
-    }).on('mouseover', d => {
-      jQuery(this).addClass('hovered');
-      // If one end is selected, highlight the other end
-      let nodeToHighlight;
-      if (this.selection === null) {
-        return;
-      } else if (this.selection.side === 'vis') {
-        nodeToHighlight = graph.nodes[d.source];
-      } else {
-        nodeToHighlight = graph.nodes[d.target];
-      }
-      this.$el.find('#' + nodeToHighlight.id).addClass('hovered');
-    }).on('mouseout', d => {
-      // Clear any highlights
-      this.$el.find('.hovered').removeClass('hovered');
-    }).on('click', d => {
-      if (this.selection === null) {
-        return;
-      } else if (this.selection.side === 'vis') {
-        this.handleClick(graph.nodes[d.source]);
-      } else {
-        this.handleClick(graph.nodes[d.target]);
-      }
-    });
+    edges.attr('id', d => d.id)
+      .attr('class', d => {
+        let classString = '';
+        // Edge type
+        if (d.mode === EDGE_MODES.POTENTIAL) {
+          classString = 'potential';
+        } else if (d.mode === EDGE_MODES.ESTABLISHED) {
+          classString = 'established';
+        } else if (d.mode === EDGE_MODES.ESTABLISHED_SELECTED) {
+          classString = 'established selected';
+        } else if (d.mode === EDGE_MODES.PROBABLE) {
+          classString = 'probable';
+        }
+        return classString + ' edge';
+      }).on('mouseover', d => {
+        jQuery(this).addClass('hovered');
+        // If one end is selected, highlight the other end
+        let nodeToHighlight;
+        if (this.selection === null) {
+          return;
+        } else if (this.selection.side === 'vis') {
+          nodeToHighlight = graph.nodes[d.source];
+        } else {
+          nodeToHighlight = graph.nodes[d.target];
+        }
+        this.$el.find('#' + nodeToHighlight.id).addClass('hovered');
+      }).on('mouseout', d => {
+        // Clear any highlights
+        this.$el.find('.hovered').removeClass('hovered');
+      }).on('click', d => {
+        if (this.selection === null) {
+          return;
+        } else if (this.selection.side === 'vis') {
+          this.handleClick(graph.nodes[d.source]);
+        } else {
+          this.handleClick(graph.nodes[d.target]);
+        }
+      });
   }, 300)
 });
 
