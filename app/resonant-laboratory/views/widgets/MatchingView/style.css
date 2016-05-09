@@ -32,19 +32,16 @@
   ry: 5px;
 }
 
-.MatchingView.content .node text {
-  text-anchor: middle;
-}
-
 .MatchingView.content .node text.label {
   font-size: 12pt;
   font-weight: bold;
   fill: #ddd;
 }
 
-.MatchingView.content .node text.types {
-  font-size: 9pt;
-  fill: #999;
+.MatchingView.content .node .types image {
+  y: -0.5em;
+  width: 1em;
+  height: 1em;
 }
 
 .MatchingView.content .node.hovered rect {
@@ -77,6 +74,10 @@
   fill: #377eb8;
 }
 
+.MatchingView.content .node.connectable image {
+  filter: url(#blueIcons);
+}
+
 .MatchingView.content path.potential.edge {
   stroke-dasharray: 5, 5;
   stroke-width: 5px;
@@ -103,12 +104,20 @@
   fill: #333;
 }
 
+.MatchingView.content .node.selected image {
+  filter: url(#darkIcons);
+}
+
 .MatchingView.content .node.linked rect {
   fill: #ccebc5;
 }
 
 .MatchingView.content .node.linked text {
   fill: #4daf4a;
+}
+
+.MatchingView.content .node.linked image {
+  filter: url(#greenIcons);
 }
 
 .MatchingView.content .node.selected rect,
@@ -124,6 +133,10 @@
 
 .MatchingView.content .node.linked.hovered text {
   fill: #ff7f00;
+}
+
+.MatchingView.content .node.linked.hovered image {
+  filter: url(#orangeIcons);
 }
 
 .MatchingView.content .node.linked.hovered rect,

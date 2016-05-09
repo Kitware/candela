@@ -5,6 +5,22 @@ import myTemplate from './template.html';
 import Widget from '../Widget';
 import './style.css';
 
+import booleanIcon from '../../../images/boolean.svg';
+import integerIcon from '../../../images/integer.svg';
+import numberIcon from '../../../images/number.svg';
+import dateIcon from '../../../images/date.svg';
+import stringIcon from '../../../images/string.svg';
+import stringListIcon from '../../../images/string_list.svg';
+
+let ICONS = {
+  boolean: booleanIcon,
+  integer: integerIcon,
+  number: numberIcon,
+  date: dateIcon,
+  string: stringIcon,
+  string_list: stringListIcon
+}
+
 let NODE_MODES = {
   INELIGIBLE: 0,
   WILL_SELECT: 1,
@@ -451,9 +467,11 @@ in order to connect them together.`);
         });
     }
 
+    let emSize = parseFloat(this.$el.css('font-size'));
+
     // Figure out how we're going to lay things
     // out based on how much space we have
-    let nodeHeight = 40;
+    let nodeHeight = 1.5 * emSize;
 
     // Temporarily force the scroll bars so we
     // account for their size
@@ -476,15 +494,19 @@ in order to connect them together.`);
         height: bounds.height
       });
 
-    let dataX = bounds.width / 4;
-    let visX = 3 * bounds.width / 4;
+    let dataX = emSize;
     let nodeWidth = bounds.width / 4;
+    let visX = bounds.width - emSize - nodeWidth;
     let dataY = d3.scale.linear()
       .domain([firstData - 1, lastData + 1])
       .range([0, bounds.height]);
     let visY = d3.scale.linear()
       .domain([firstVis - 1, lastVis + 1])
-      .range([0, bounds.height]);
+      .range([0, this.el.clientHeight]);
+      // TODO: this is a quick, cheap fix to keep the
+      // vis options at the top. We should
+      // reimplement this interface to scroll with
+      // the user
 
     let nodes = d3.select(this.el).select('svg')
       .select('.nodeLayer')
@@ -543,15 +565,38 @@ in order to connect them together.`);
 
     enteringNodes.append('rect');
     nodes.selectAll('rect').attr({
-      width: nodeWidth,
+      width: nodeWidth + emSize * 0.5,
       height: nodeHeight,
-      x: -nodeWidth / 2,
+      x: '-0.25em',
       y: -nodeHeight / 2
     });
 
+    enteringNodes.append('g')
+      .attr('class', 'types');
+    let types = nodes.selectAll('g.types').selectAll('image')
+      .data(d => {
+        return d.side === 'data' ? [d.type] : d.type;
+      });
+    types.enter().append('image').append('title');
+    types.attr('xlink:href', d => ICONS[d])
+      .attr('x', (d, i) => i + 'em');
+    types.selectAll('title')
+      .text(function (d) {
+        // this refers to the DOM element
+        let side = d3.select(this.parentNode.parentNode).datum().side;
+        if (side === 'data') {
+          return d + ' field; you can change this in the Dataset widget';
+        } else {
+          return 'Compatible with ' + d + ' fields';
+        }
+      });
+
     enteringNodes.append('text')
       .attr('class', 'label')
-      .attr('y', 0);
+      .attr('y', '0.35em')
+      .attr('x', d => {
+        return d.side === 'data' ? '1.25em' : (d.type.length + 0.25) + 'em';
+      });
     nodes.selectAll('text.label').text(d => {
       if (d.acceptsMultiple === true) {
         return d.attrName + ' (multiple)';
@@ -559,19 +604,6 @@ in order to connect them together.`);
         return d.attrName;
       }
     });
-
-    enteringNodes.append('text')
-      .attr('class', 'types');
-    nodes.selectAll('text.types')
-      .attr('y', nodeHeight / 3)
-      .text(d => {
-        if (d.side === 'data') {
-          return d.type;
-        } else {
-          // TODO: boldface the connected type
-          return d.type.join(',');
-        }
-      });
 
     // Draw the connections
     let edges = d3.select(this.el).select('svg')
@@ -596,7 +628,7 @@ in order to connect them together.`);
     }).attr('d', d => {
       let pathString = 'M' + (dataX + nodeWidth / 2) + ',' +
       dataY(d.source) +
-      'L' + (visX - nodeWidth / 2) + ',' +
+      'L' + (visX + nodeWidth / 2) + ',' +
       visY(d.target);
       return pathString;
     }).on('mouseover', d => {
