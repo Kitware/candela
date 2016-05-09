@@ -2,11 +2,12 @@ import Underscore from 'underscore';
 import Backbone from 'backbone';
 import jQuery from 'jquery';
 import d3 from 'd3';
-import WidgetPanel from './WidgetPanel.js';
-import SetOps, { Set } from '../../../shims/SetOps.js';
 
 import './accordionhorz.css';
 import './style.css';
+
+import WidgetPanel from './WidgetPanel.js';
+import SetOps, { Set } from '../../../shims/SetOps.js';
 
 let WidgetPanels = Backbone.View.extend({
   initialize: function () {
