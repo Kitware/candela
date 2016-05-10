@@ -2,7 +2,7 @@ import Underscore from 'underscore';
 import Backbone from 'backbone';
 import jQuery from 'jquery';
 import d3 from 'd3';
-import d3_force from 'd3-force';
+import d3Force from 'd3-force';
 import rewrap from '../../../shims/svgTextWrap.js';
 import forceControls from './forceControls.json';
 import template from './template.html';
@@ -57,7 +57,7 @@ let HelpLayer = Backbone.View.extend({
       iterations: 2
     };
     this.forceLink = {
-      distance: 160,
+      // distance: 160,
       strength: 0.3,
       iterations: 2
     };
@@ -72,7 +72,7 @@ let HelpLayer = Backbone.View.extend({
 
     this.visible = false;
     this.addedTemplate = false;
-    this.showEasterEgg = false;
+    this.showEasterEgg = true;
   },
   setTips: function (tips) {
     this.relevantTips = {};
@@ -228,7 +228,6 @@ let HelpLayer = Backbone.View.extend({
 
       // Draw / update the full graph
       this.drawGraph(graph);
-      this.deriveAllSizes(graph);
 
       // Start drawing the unseenTips one at a time
       this.drawNextNode(graph);
@@ -263,24 +262,16 @@ let HelpLayer = Backbone.View.extend({
       }
     });
 
-    // Background circle
-    // (we figure out its radius later)
     tipsEnter.append('circle');
-
-    // Draw the text
     tipsEnter.append('text')
-      .text(d => d.message)
-      .attr('text-anchor', d => {
-        // Align the text based on where the label
-        // starts on the screen
-        if (d.x < window.innerWidth / 3) {
-          return 'start';
-        } else if (d.x < 2 * window.innerWidth / 3) {
-          return 'middle';
-        } else {
-          return 'end';
-        }
-      });
+      .text(d => d.message);
+
+    // Reshape the text and set the circle size
+    let self = this;
+    tipsEnter.each(function (d) {
+      // this refers to the DOM element
+      self.deriveSize(graph, d, this);
+    });
 
     // Draw the arrows
     let arrows = d3.select(this.el).select('#linkLayer')
@@ -299,6 +290,27 @@ let HelpLayer = Backbone.View.extend({
       .remove();
   },
   deriveSize: function (graph, tip, domElement) {
+    let el = d3.select(domElement);
+
+    // Reset the background circle
+    el.select('circle')
+      .attr('r', 1);
+
+    let textEl = el.select('text');
+    // Align the text based on where the label
+    // is on the screen
+    if (tip.x < window.innerWidth / 3) {
+      textEl.attr('text-anchor', 'start');
+    } else if (tip.x < 2 * window.innerWidth / 3) {
+      textEl.attr('text-anchor', 'middle');
+    } else {
+      textEl.attr('text-anchor', 'end');
+    }
+
+    // Reflow the text
+    rewrap(textEl.node(), 150, 1.1);
+
+    // Okay, now how big are we?
     let bounds = domElement.getBoundingClientRect();
 
     // boundaries relative to the text anchor point
@@ -327,40 +339,23 @@ let HelpLayer = Backbone.View.extend({
     tip.height += 2 * this.margin;
     tip.radius += this.margin;
   },
-  deriveAllSizes: function (graph) {
-    let tips = d3.select(this.el).select('#nodeLayer').selectAll('.tip');
-    // Wrap all the text appropriately
-    tips.selectAll('text')
-      .each(function () {
-        // this refers to the DOM element
-        rewrap(this, 150, 1.1);
-      });
-
-    // Reset the background circle
-    tips.selectAll('circle')
-      .attr('r', 1);
-
-    // Update each whole node
-    let self = this;
-    tips.each(function (d) {
-      // this refers to the DOM element
-      self.deriveSize(graph, d, this);
-    });
-  },
   updateForceSimulation: function (graph) {
-    this.forceSimulation.nodes(graph.nodes);
+    this.forceSimulation
+      .nodes(graph.nodes);
     if (this.forces.forceLink) {
       this.forces.forceLink.links(graph.edges);
     }
+    this.forceSimulation.restart();
   },
   createForceSimulation: function (graph) {
     if (this.forceSimulation) {
       this.forceSimulation.stop();
     }
 
-    this.forceSimulation = d3_force.forceSimulation()
+    this.forceSimulation = d3Force.forceSimulation()
       .nodes(graph.nodes)
       .on('tick', () => {
+        // Round coordinates to the nearest pixel
         d3.select(this.el).select('#nodeLayer').selectAll('.tip')
           .attr('transform', (d) => {
             return 'translate(' + d.x + ',' + d.y + ')';
@@ -377,7 +372,7 @@ let HelpLayer = Backbone.View.extend({
         this.forceSimulation[control.option](this[control.option]);
       } else if (control.paramType === 'forceEnable') {
         if (this[control.option]) {
-          this.forces[control.option] = d3_force[control.option]();
+          this.forces[control.option] = d3Force[control.option]();
           this.forceSimulation.force(control.option, this.forces[control.option]);
         } else {
           delete this.forces[control.option];
@@ -412,6 +407,7 @@ let HelpLayer = Backbone.View.extend({
     // nodes on screen
     this.forceSimulation.force('constrainNodes', () => {
       graph.nodes.forEach((d) => {
+        // Keep fixed nodes where they belong
         if (d.fixed_x) {
           d.x = d.fixed_x;
           d.vx = 0;
@@ -420,8 +416,8 @@ let HelpLayer = Backbone.View.extend({
           d.y = d.fixed_y;
           d.vy = 0;
         }
+        // Bounce moveable nodes off the walls
         if (d.radius) {
-          // bounce off the walls
           if (d.x + d.vx - d.radius <= 0) {
             d.x = d.radius;
             d.vx = Math.max(1, -d.vx);
@@ -437,6 +433,9 @@ let HelpLayer = Backbone.View.extend({
             d.vy = Math.min(-1, -d.vy);
           }
         }
+        // Finally, round all positions to their nearest pixel
+        d.x = Math.floor(d.x);
+        d.y = Math.floor(d.y);
       });
     });
   },
@@ -459,15 +458,6 @@ let HelpLayer = Backbone.View.extend({
     // Update the nodes
     this.updateForceSimulation(graph);
     this.drawGraph(graph, nextTip.label);
-
-    // We only need to resize the new node's circle
-    let domElement = d3.select(this.el).select('#nodeLayer').selectAll('.tip')
-      .filter(d => {
-        return d === nextTip.label;
-      });
-    let domTextElement = domElement.select('text');
-    rewrap(domTextElement.node(), 150, 1.1);
-    this.deriveSize(graph, nextTip.label, domElement.node());
 
     // Store that we've seen the tip
     // in the user's preferences
@@ -530,7 +520,13 @@ let HelpLayer = Backbone.View.extend({
 
       // Control to change this parameter's setting (if enabled)
       controlsEnter.append('input')
-        .attr('id', d => d.option + 'control')
+        .attr('id', d => {
+          if (d.paramType === 'forceParam') {
+            return d.forceName + d.option + 'control';
+          } else {
+            return d.option + 'control';
+          }
+        })
         .attr('class', 'control')
         .on('change', function (d) {
           // this refers to the DOM element
@@ -546,6 +542,17 @@ let HelpLayer = Backbone.View.extend({
             } else if (d.paramType === 'forceEnable') {
               if (this.checked) {
                 self[d.option] = {};
+                forceControls.forEach((c) => {
+                  if (c.paramType === 'forceParam' &&
+                      c.forceName === d.option) {
+                    let el = jQuery('#' + c.forceName + c.option + 'control');
+                    if (c.step) {
+                      self[d.option][c.option] = el.val();
+                    } else {
+                      self[d.option][c.option] = el.prop('checked');
+                    }
+                  }
+                });
               } else {
                 delete self[d.option];
               }
@@ -632,7 +639,7 @@ let HelpLayer = Backbone.View.extend({
       }).append('input')
         .attr('id', d => {
           if (d.paramType === 'forceParam') {
-            return d.forceName + d.option + 'enable'
+            return d.forceName + d.option + 'enable';
           } else {
             return d.option + 'enable';
           }
@@ -643,9 +650,19 @@ let HelpLayer = Backbone.View.extend({
           // this refers to the DOM element
           if (this.checked) {
             if (d.paramType === 'forceParam') {
-              self[d.forceName][d.option] = d.range[0];
+              let el = jQuery('#' + d.forceName + d.option + 'control');
+              if (d.step) {
+                self[d.forceName][d.option] = el.val();
+              } else {
+                self[d.forceName][d.option] = el.prop('checked');
+              }
             } else {
-              self[d.option] = d.range[0];
+              let el = jQuery('#' + d.option + 'control');
+              if (d.step) {
+                self[d.option] = el.val();
+              } else {
+                self[d.option] = el.prop('checked');
+              }
             }
           } else {
             if (d.paramType === 'forceParam') {
@@ -661,7 +678,14 @@ let HelpLayer = Backbone.View.extend({
 
       // Label for the enable switch
       controls.selectAll('input.enable')
-        .property('checked', d => this[d.option] !== undefined)
+        .property('checked', d => {
+          if (d.paramType === 'forceParam') {
+            return this[d.forceName] &&
+              this[d.forceName][d.option] !== undefined;
+          } else {
+            this[d.option] !== undefined;
+          }
+        })
         .property('disabled', d => {
           if (d.paramType === 'forceParam' && this[d.forceName] === undefined) {
             return true;
