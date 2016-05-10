@@ -5,7 +5,7 @@ export default class Geo extends VisComponent {
 
   constructor (el, options) {
     super(el);
-    console.log(options);
+
     this.plot = geojs.map({
       node: el,
       zoom: 6,
