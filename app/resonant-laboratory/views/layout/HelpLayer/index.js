@@ -89,6 +89,22 @@ let HelpLayer = Backbone.View.extend({
 
     this.padding = 9;
     this.margin = 15;
+
+    // Respond to certain changes in the app in special ways...
+    this.listenTo(window.mainPage.widgetPanels, 'rl:navigateWidgets', () => {
+      // In order for this to have happened, the hole
+      // was probably pointing at one of the headers
+      // that has just changed location / size... we'll
+      // want to re-render
+      this.render();
+    });
+    this.listenTo(window.mainPage.overlay, 'rl:changeOverlay', () => {
+      // TODO: By opening a dialog, we should either jump right into
+      // its ordered series of tips, or if those tips don't
+      // exist (e.g. an error/simple info dialog), we should
+      // just hide the help layer
+      this.hide();
+    });
   },
   showTips: function (tips) {
     let changedHelp = true;
@@ -154,7 +170,8 @@ let HelpLayer = Backbone.View.extend({
       } else {
         // Make a hole in the mask to allow the
         // user to click through to the target
-        this.$el.find('#helpLayerMask')
+        d3.select(this.el).select('#helpLayerMask')
+          .transition().duration(300)
           .attr('d', createMaskWithHole(targetRect));
       }
 
