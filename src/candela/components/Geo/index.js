@@ -2,7 +2,6 @@ import geojs from 'geojs/geo.js';
 import VisComponent from '../../VisComponent';
 
 export default class Geo extends VisComponent {
-
   constructor (el, options) {
     super(el);
 
