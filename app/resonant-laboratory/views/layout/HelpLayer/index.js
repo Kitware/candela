@@ -57,8 +57,28 @@ function getSelectionBounds (selector) {
       result.top = Math.min(bounds.top, result.top);
       result.bottom = Math.max(bounds.bottom, result.bottom);
     });
+    result.width = result.right - result.left;
+    result.height = result.bottom - result.top;
     return result;
   }
+}
+
+function createMaskWithHole (holeBounds) {
+  // First, surround the window
+  let path = 'M0,0L' + window.innerWidth + ',0' +
+    'L' + window.innerWidth + ',' + window.innerHeight +
+    'L0,' + window.innerHeight + 'Z';
+  // Now punch the first half of the hole...
+  path += 'M' + holeBounds.left + ',' + holeBounds.top +
+    'A' + (holeBounds.width / 2) + ',' +
+    (holeBounds.height / 2) + ',0,1,0,' +
+    holeBounds.right + ',' + holeBounds.bottom;
+  // ...and the second half:
+  path += 'M' + holeBounds.right + ',' + holeBounds.bottom +
+    'A' + (holeBounds.width / 2) + ',' +
+    (holeBounds.height / 2) + ',0,1,0,' +
+    holeBounds.left + ',' + holeBounds.top;
+  return path;
 }
 
 let HelpLayer = Backbone.View.extend({
@@ -113,7 +133,10 @@ let HelpLayer = Backbone.View.extend({
         .style('display', 'none');
     } else {
       if (!this.addedTemplate) {
-        this.$el.html(template)
+        this.$el.html(template);
+        this.$el.find('#helpLayerMask')
+          .on('click', () => { this.nextTip(); });
+        this.$el.find('#nextTipButton')
           .on('click', () => { this.nextTip(); });
         this.$el.find('#gotItButton')
           .on('click', () => { this.hide(); });
@@ -128,6 +151,11 @@ let HelpLayer = Backbone.View.extend({
         // isn't visible, so skip it
         this.nextTip();
         return;
+      } else {
+        // Make a hole in the mask to allow the
+        // user to click through to the target
+        this.$el.find('#helpLayerMask')
+          .attr('d', createMaskWithHole(targetRect));
       }
 
       // If it's not already showing, fade the layer in

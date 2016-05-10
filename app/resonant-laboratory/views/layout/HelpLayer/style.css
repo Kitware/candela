@@ -5,24 +5,31 @@
   top: 0px;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.35);
+  pointer-events: none; /* Allow events to pass through the hole */
 }
-#HelpLayer path {
+#HelpLayer svg > * {
+  pointer-events: initial;
+}
+#HelpLayer #helpLayerMask {
+  fill: rgba(0,0,0,0.35);
+  stroke: none;
+}
+#HelpLayer #arrow {
   fill: none;
 }
-#HelpLayer.old circle {
+#HelpLayer.old #bubble circle {
   fill: #ffffcc;
 }
-#HelpLayer.new circle {
+#HelpLayer.new #bubble circle {
   fill: #b3cde3;
 }
-#HelpLayer.old path,
-#HelpLayer.old circle {
+#HelpLayer.old #arrow,
+#HelpLayer.old #bubble circle {
   stroke-width: 2px;
   stroke: #ffff33;
 }
-#HelpLayer.new path,
-#HelpLayer.new circle {
+#HelpLayer.new #arrow,
+#HelpLayer.new #bubble circle {
   stroke-width: 2px;
   stroke: #377eb8;
 }
