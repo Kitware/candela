@@ -1,0 +1,26 @@
+- _ = require('underscore');
+
+mixin item(key, value)
+    tr
+        td.text-right: strong= key
+        td= value
+
+.container.full-width
+    if _.isUndefined(link)
+        em (Selection is empty)
+    else
+        nav
+            ul.pagination
+                li.prev
+                    a(aria-label="Previous").virtual-link.prev
+                        span(aria-hidden="true") &laquo;
+                li.next
+                    a(aria-label="Next").virtual-link.next
+                        span(aria-hidden="true") &raquo;
+        .container.full-width
+            .row
+                .col-md-1
+                    table.table.table-striped.table-bordered.select-ok
+                        +item("key", link.key())
+                        for item in _.pairs(link.getAllData())
+                            +item(item[0], item[1])

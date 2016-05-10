@@ -1,0 +1,45 @@
+- _ = require('underscore');
+
+mixin item(key, value)
+    tr
+        td.text-right: strong= key
+        td= value
+
+mixin button(spec, node)
+    if spec.show(node)
+        if spec.icon
+            button.btn.btn-xs(type="button" class=["btn-" + spec.color, spec.cssClass] style="margin-right: 3px;") #{spec.label(node)} #[span.glyphicon(class="glyphicon-" + spec.icon)]
+        else
+            button.btn.btn-xs(type="button" class=["btn-" + spec.color, spec.cssClass] style="margin-right: 3px;") #{spec.label(node)}
+
+.container.full-width
+    if _.isUndefined(node)
+        em (Selection is empty)
+    else
+        if nav
+            nav
+                ul.pagination
+                    li.prev
+                        a(aria-label="Previous").virtual-link.prev
+                            span(aria-hidden="true") &laquo;
+                    li.next
+                        a(aria-label="Next").virtual-link.next
+                            span(aria-hidden="true") &raquo;
+        .container.full-width
+            if metadata
+                .row
+                    .col-md-1
+                        table.table.table-striped.table-bordered.select-ok
+                            +item("key", node.key())
+                            for item in _.pairs(node.getAllData())
+                                +item(item[0], item[1])
+            .row
+                h5 Node
+                each buttonSpec in nodeButtons
+                    +button(buttonSpec, node)
+
+            if selectionSize > 1
+                .row
+                    h5 Selection
+                    each buttonSpec in selectionButtons
+                        +button(buttonSpec)
