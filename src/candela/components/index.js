@@ -23,5 +23,7 @@ export default {
   LineChart,
   LineUp,
   ParallelCoordinates,
+  ScatterPlot,
+  ScatterPlotMatrix,
   UpSet
 };
