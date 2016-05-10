@@ -21,7 +21,7 @@ data = json.load(open('../examples/data/iris.json'))
 ```
 
 ```python
-pycandela.component('ScatterMatrix', {
+pycandela.component('ScatterPlotMatrix', {
     'data': data,
     'color': 'species',
     'fields': ['sepalLength', 'sepalWidth', 'petalLength', 'petalWidth']

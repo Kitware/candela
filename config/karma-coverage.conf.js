@@ -4,7 +4,6 @@ var webpackConfig = require('./webpack-coverage.config');
 karmaConfig.webpack = webpackConfig;
 
 karmaConfig.reporters = [
-  'tap',
   'coverage'
 ];
 
@@ -16,7 +15,14 @@ karmaConfig.coverageReporter = {
 
     {
       type: 'html',
-      dir: 'coverage/'
+      dir: 'coverage/',
+      subdir: 'html'
+    },
+
+    {
+      type: 'lcovonly',
+      dir: 'coverage',
+      subdir: 'lcov'
     }
   ]
 };

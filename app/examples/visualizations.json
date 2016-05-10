@@ -1,9 +1,9 @@
 [
   {
     "hash": "scatter",
-    "name": "Scatterplot",
-    "description": "A simple scatterplot.",
-    "component": "Scatter",
+    "name": "Scatter Plot",
+    "description": "A simple scatter plot.",
+    "component": "ScatterPlot",
     "options": {
       "data": "iris",
       "x": "petalLength",
@@ -18,9 +18,9 @@
   },
   {
     "hash": "line",
-    "name": "Line Plot",
-    "description": "A simple line plot.",
-    "component": "Line",
+    "name": "Line Chart",
+    "description": "A simple line chart.",
+    "component": "LineChart",
     "options": {
       "data": "msft",
       "x": "date",
@@ -33,9 +33,9 @@
   },
   {
     "hash": "scattermatrix",
-    "name": "Scatterplot Matrix",
-    "description": "A simple scatterplot matrix.",
-    "component": "ScatterMatrix",
+    "name": "Scatter Plot Matrix",
+    "description": "A simple scatter plot matrix.",
+    "component": "ScatterPlotMatrix",
     "options": {
       "data": "iris",
       "fields": ["petalWidth", "petalLength", "sepalLength", "sepalWidth"],
@@ -62,7 +62,7 @@
     "hash": "bar",
     "name": "Bar Chart",
     "description": "A simple bar chart",
-    "component": "Bar",
+    "component": "BarChart",
     "options": {
       "data": [
         {"id": 0, "a": 1, "b": 3, "c": 3},
@@ -88,7 +88,7 @@
     "hash": "bullet",
     "name": "Bullet Chart",
     "description": "A simple bullet chart",
-    "component": "Bullet",
+    "component": "BulletChart",
     "options": {
       "value": 0.2,
       "title": "Error",
@@ -124,7 +124,7 @@
     "hash": "gantt",
     "name": "Gantt Chart",
     "description": "A simple gantt chart",
-    "component": "Gantt",
+    "component": "GanttChart",
     "options": {
       "data": [
         {"name": "1. Algorithms", "level": 1, "enter": 0, "leave": 6},
@@ -157,7 +157,7 @@
     "hash": "box",
     "name": "Box Plot",
     "description": "A simple box plot",
-    "component": "Box",
+    "component": "BoxPlot",
     "options": {
       "data": "iris",
       "fields": ["sepalLength", "sepalWidth"],

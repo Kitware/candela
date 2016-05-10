@@ -1,3 +1,5 @@
+[![codecov.io](https://codecov.io/github/Kitware/candela/coverage.svg?branch=master)](https://codecov.io/github/Kitware/candela?branch=master)
+
 # Candela
 Visualization components for the web
 

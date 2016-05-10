@@ -29,3 +29,5 @@ script:
     - npm run build
     - npm run test:unit
     - CANDELA_DUMP_IMAGE=all npm run test:image
+    - npm run cover
+    - npm run codecov

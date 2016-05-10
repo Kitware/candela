@@ -2,7 +2,7 @@ import VisComponent from '../../VisComponent';
 import vega from '../../util/vega';
 import spec from './spec.json';
 
-export default class Histogram extends VisComponent {
+export default class GanttChart extends VisComponent {
   static get spec () {
     return {
       options: [
@@ -12,7 +12,7 @@ export default class Histogram extends VisComponent {
           format: 'objectlist'
         },
         {
-          name: 'bin',
+          name: 'label',
           type: 'string',
           format: 'text',
           domain: {
@@ -22,7 +22,27 @@ export default class Histogram extends VisComponent {
           }
         },
         {
-          name: 'aggregate',
+          name: 'level',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'start',
+          type: 'string',
+          format: 'text',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['number', 'integer', 'boolean']
+          }
+        },
+        {
+          name: 'end',
           type: 'string',
           format: 'text',
           domain: {
