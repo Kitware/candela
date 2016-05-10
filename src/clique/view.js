@@ -4,7 +4,6 @@ import d3 from 'd3';
 import cola from 'webcola';
 
 import { Selection } from './model';
-import Set from 'es6-set';
 import selectionInfo from './template/selectionInfo.jade';
 import linkInfo from './template/linkInfo.jade';
 

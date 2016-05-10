@@ -1,7 +1,6 @@
 import _ from 'underscore';
 import Backbone from 'backbone';
 import { concat, MultiTable } from './util';
-import Set from 'es6-set';
 
 const Graph = Backbone.Model.extend({
   constructor: function (options) {

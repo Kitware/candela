@@ -1,6 +1,5 @@
 import _ from 'underscore';
 import Backbone from 'backbone';
-// import Set from 'es6-set';
 
 export function deepCopy (o) {
   if (_.isUndefined(o)) {
