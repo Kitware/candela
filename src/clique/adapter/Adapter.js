@@ -1,5 +1,6 @@
 import _ from 'underscore';
-import { concat, Accessor } from './util';
+import { concat } from '../../candela/util';
+import Accessor from './util/Accessor';
 import $ from 'jquery';
 
 export default class Adapter {

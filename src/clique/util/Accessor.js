@@ -1,59 +1,6 @@
 import _ from 'underscore';
 import Backbone from 'backbone';
 
-export function deepCopy (o) {
-  if (_.isUndefined(o)) {
-    return undefined;
-  }
-  return JSON.parse(JSON.stringify(o));
-}
-
-export function concat (...lists) {
-  return [].concat(...lists);
-}
-
-export class MultiTable {
-  constructor () {
-    this.table = {};
-  }
-
-  add (key, item) {
-    let table = this.table;
-
-    if (!table.hasOwnProperty(key)) {
-      table[key] = new Set();
-    }
-
-    table[key].add(item);
-  }
-
-  remove (key, item) {
-    let table = this.table;
-
-    if (table.hasOwnProperty(key)) {
-      table[key].delete(item);
-    }
-  }
-
-  strike (key) {
-    delete this.table[key];
-  }
-
-  has (key, item) {
-    let table = this.table;
-
-    return table.hasOwnProperty(key) && (item === undefined || table[key].has(item));
-  }
-
-  items (key) {
-    let table = this.table;
-
-    if (table.hasOwnProperty(key)) {
-      return [...table[key].values()];
-    }
-  }
-}
-
 export function Accessor (raw) {
   var disallowed = new Set();
 

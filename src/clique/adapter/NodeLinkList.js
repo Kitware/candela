@@ -1,7 +1,7 @@
 import _ from 'underscore';
 
 import Adapter from './Adapter';
-import { deepCopy } from './util';
+import { deepCopy } from '../../candela/util';
 
 export default class NodeLinkList extends Adapter {
   constructor (nodes, links) {
