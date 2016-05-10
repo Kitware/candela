@@ -58,6 +58,7 @@
     "eslint-plugin-standard": "^1.3.2",
     "expose-loader": "^0.7.1",
     "file-loader": "^0.8.5",
+    "geojs": "^0.9.1",
     "grunt": "^1.0.1",
     "html-loader": "^0.4.3",
     "html-webpack-plugin": "^2.9.0",
@@ -105,7 +106,6 @@
     "font-awesome-webpack": "^0.0.4",
     "jquery": "^2.2.0",
     "jquery-deparam": "^0.5.2",
-    "geojs": "git+https://github.com/OpenGeoscience/geojs.git#1ff57c735847818815b37c06ca2cdf075d58577a",
     "underscore": "^1.8.3",
     "vega": "^2.4.2"
   }
