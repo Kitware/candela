@@ -10,19 +10,19 @@
 #HelpLayer path {
   fill: none;
 }
-#HelpLayer .old circle {
+#HelpLayer.old circle {
   fill: #ffffcc;
 }
-#HelpLayer .new circle {
+#HelpLayer.new circle {
   fill: #b3cde3;
 }
-#HelpLayer .old path,
-#HelpLayer .old circle {
+#HelpLayer.old path,
+#HelpLayer.old circle {
   stroke-width: 2px;
   stroke: #ffff33;
 }
-#HelpLayer .new path,
-#HelpLayer .new circle {
+#HelpLayer.new path,
+#HelpLayer.new circle {
   stroke-width: 2px;
   stroke: #377eb8;
 }

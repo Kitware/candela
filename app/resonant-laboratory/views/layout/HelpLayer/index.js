@@ -117,22 +117,8 @@ let HelpLayer = Backbone.View.extend({
           .on('click', () => { this.nextTip(); });
         this.$el.find('#gotItButton')
           .on('click', () => { this.hide(); });
-        // Fade the layer in
-        d3.select(this.el)
-          .style('opacity', 0.0)
-          .transition().duration(300)
-          .style('opacity', 1.0);
         this.addedTemplate = true;
       }
-      // If it's not already showing, fade the layer in
-      if (this.$el.css('display') === 'none') {
-        d3.select(this.el)
-          .style('display', null)
-          .style('opacity', 0.0)
-          .transition().duration(300)
-          .style('opacity', 1.0);
-      }
-
       let tip = this.relevantTips[this.currentIndex];
 
       // Figure out where to point to
@@ -142,6 +128,15 @@ let HelpLayer = Backbone.View.extend({
         // isn't visible, so skip it
         this.nextTip();
         return;
+      }
+
+      // If it's not already showing, fade the layer in
+      if (this.$el.css('display') === 'none') {
+        d3.select(this.el)
+          .style('display', null)
+          .style('opacity', 0.0)
+          .transition().duration(300)
+          .style('opacity', 1.0);
       }
 
       let targetCoords = {};
@@ -270,6 +265,13 @@ let HelpLayer = Backbone.View.extend({
           source: bubbleCoords,
           target: targetCoords
         }));
+
+      // Have we already seen this tip?
+      if (window.mainPage.currentUser.preferences.hasSeenTip(tip)) {
+        this.$el.attr('class', 'old');
+      } else {
+        this.$el.attr('class', 'new');
+      }
 
       // Now that we've successfully drawn it, make a note that
       // the user has already seen this tip
