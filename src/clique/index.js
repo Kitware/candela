@@ -1,5 +1,6 @@
 import Adapter, { NodeLinkList } from './adapter';
-import { Graph, Selection } from './model';
+import Graph from './model/Graph';
+import Selection from './model/Selection';
 import * as util from './util';
 import { Cola, SelectionInfo, LinkInfo } from './view';
 
