@@ -16,13 +16,11 @@ export default class Geo extends VisComponent {
       for (let i = 0; i < options.features.length; ++i) {
         this.plot.createLayer('feature')
           .createFeature(options.features[i].type)
-            .data(options.features[i].data)
-            .position(function (d) {
-              return {
-                x: d[options.features[i].position.x],
-                y: d[options.features[i].position.y]
-              };
-            });
+          .data(options.features[i].data)
+          .position(d => ({
+            x: d[options.features[i].position.x],
+            y: d[options.features[i].position.y]
+          }));
       }
       this.plot.draw();
     }
