@@ -1,4 +1,4 @@
-#HelpLayer {
+#HelpLayer svg {
   position: absolute;
   z-index: 10;
   left: 0px;
@@ -7,27 +7,26 @@
   height: 100%;
   background-color: rgba(0,0,0,0.35);
 }
-#HelpLayer .arrow {
+#HelpLayer path {
   fill: none;
 }
-#HelpLayer .old.tip circle {
+#HelpLayer .old circle {
   fill: #ffffcc;
 }
-#HelpLayer .new.tip circle {
+#HelpLayer .new circle {
   fill: #b3cde3;
 }
-#HelpLayer .old.arrow,
-#HelpLayer .old.tip circle {
+#HelpLayer .old path,
+#HelpLayer .old circle {
   stroke-width: 2px;
   stroke: #ffff33;
 }
-#HelpLayer .new.arrow,
-#HelpLayer .new.tip circle {
+#HelpLayer .new path,
+#HelpLayer .new circle {
   stroke-width: 2px;
   stroke: #377eb8;
 }
-#HelpLayer .button.tip circle,
-#tuner {
+#HelpLayer #gotIt {
   position: absolute;
   bottom: 2em;
   right: 2em;
@@ -37,13 +36,13 @@
   border: 1px solid rgba(0,0,0,0.2);
   box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
-#tuner > div {
+#HelpLayer #gotIt > div {
   display: flex;
   justify-content: space-between;
   padding: 0.5em;
   align-items: center;
 }
-#tuner > div > * {
+#HelpLayer #gotIt > div > * {
   margin-left: 0.25em;
   margin-right: 0.25em;
 }

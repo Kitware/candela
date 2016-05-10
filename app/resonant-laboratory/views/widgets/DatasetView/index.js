@@ -79,8 +79,7 @@ let DatasetView = Widget.extend({
       this.renderAttributeSettings);
   },
   renderInfoScreen: function () {
-    window.mainPage.helpLayer.setTips(this.getDefaultTips());
-    window.mainPage.helpLayer.show();
+    window.mainPage.helpLayer.showTips(this.getDefaultTips());
   },
   renderHelpScreen: function () {
     if (this.status === STATUS.NO_DATA) {

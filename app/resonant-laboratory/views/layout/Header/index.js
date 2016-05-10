@@ -33,6 +33,8 @@ let ICONS = {
   'PublicScratch': scratchSpaceIcon
 };
 
+import tips from './tips.json';
+
 import './header.css';
 
 let Header = Backbone.View.extend({
@@ -64,44 +66,6 @@ let Header = Backbone.View.extend({
     }
     this.render();
   },
-  getVisibleTips: function () {
-    let tips = {
-      '#hamburgerButton': 'Main Menu',
-      '#helpButton': 'Show these tips. Tips that you haven\'t seen yet ' +
-        ' are shown in blue.'
-    /*,
-      '#achievementsButton': `
-Your achievements. See what you've accomplished,
-and what you still haven't tried.`*/
-    };
-
-    if (window.mainPage.project) {
-      tips['#projectLocationButton'] =
-        'Change who can see the project you\'re working on';
-
-      tips['#projectName'] = 'Rename this project';
-
-      if (window.mainPage.project.getMeta('datasets').length === 0) {
-        tips['img.AddDataset.headerButton'] =
-          'Add a dataset to this project';
-      } else {
-        tips['img.DatasetView.headerButton'] =
-          'See/change the datasets in this project';
-      }
-
-      tips['img.MatchingView.headerButton'] = 'Manage the connections between the datasets and the visualizations in this project';
-
-      if (window.mainPage.project.getMeta('visualizations').length === 0) {
-        tips['img.AddVisualization.headerButton'] =
-          'Add a visualization to this project';
-      } else {
-        tips['img.VisualizationView.headerButton'] =
-          'See/change the visualizations in this project';
-      }
-    }
-
-    return tips;
-  },
   render: Underscore.debounce(function () {
     if (!this.templateAdded) {
       // Add the template and wire up all the default
@@ -114,8 +78,7 @@ and what you still haven't tried.`*/
         window.mainPage.overlay.render('AchievementLibrary');
       });
       jQuery('#helpButton').on('click', () => {
-        window.mainPage.helpLayer.setTips(this.getVisibleTips());
-        window.mainPage.helpLayer.show();
+        window.mainPage.helpLayer.showTips(tips);
       });
       jQuery('#projectLocationButton')
         .on('click', () => {
@@ -150,11 +113,14 @@ and what you still haven't tried.`*/
       this.templateAdded = true;
     }
 
-    // TODO: don't check for tips that won't be visible
-    // (e.g. add/remove datasets, visualizations)
-    let tips = this.getVisibleTips();
+    // Only make the icon blue if there's a tip
+    // that the user hasn't seen that is visible
+    // on the screen
+    let visibleTips = tips.filter(tip => {
+      return jQuery(tip.selector).size() > 0;
+    });
     if (window.mainPage.currentUser.preferences
-        .hasSeenAllTips(tips)) {
+        .hasSeenAllTips(visibleTips)) {
       jQuery('#helpButton').attr('src', infoIcon);
     } else {
       jQuery('#helpButton').attr('src', newInfoIcon);
@@ -202,7 +168,9 @@ and what you still haven't tried.`*/
       widgetButtons.attr('src', (d) => {
         return ICONS[d.widgetType];
       }).attr('title', d => {
-        return tips['img.' + d.widgetType + '.headerButton'];
+        return tips.find(tip => {
+          return tip.selector === 'img.' + d.widgetType + '.headerButton';
+        }).message;
       }).on('click', (d) => {
         if (d.widgetType === 'AddDataset') {
           window.mainPage.overlay.render('DatasetLibrary');

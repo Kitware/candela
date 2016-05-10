@@ -128,15 +128,13 @@ you move or delete this item, your preferences will be lost.`,
     }
   },
   hasSeenTip: function (tip) {
-    let tipId = tip.tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
+    let tipId = tip.selector.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
     return this.getMeta('seenTips')[tipId] === true;
   },
   hasSeenAllTips: function (tips) {
     let seenTips = this.getMeta('seenTips');
-    for (let selector of Object.keys(tips)) {
-      let tipId = selector;
-      // Make the id a valid / nice mongo id
-      tipId = tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
+    for (let tip of tips) {
+      let tipId = tip.selector.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
       if (seenTips[tipId] !== true) {
         return false;
       }
@@ -146,7 +144,7 @@ you move or delete this item, your preferences will be lost.`,
   observeTip: function (tip) {
     let seenTips = this.getMeta('seenTips');
     // Make the id a valid / nice mongo id
-    let tipId = tip.tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
+    let tipId = tip.selector.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
     seenTips[tipId] = true;
 
     this.setMeta('seenTips', seenTips);
@@ -155,10 +153,8 @@ you move or delete this item, your preferences will be lost.`,
   },
   forgetTips: function (tips) {
     let seenTips = this.getMeta('seenTips');
-    for (let selector of Object.keys(tips)) {
-      let tipId = selector;
-      // Make the id a valid / nice mongo id
-      tipId = tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
+    for (let tip of tips) {
+      let tipId = tip.selector.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
       delete seenTips[tipId];
     }
     this.setMeta('seenTips', seenTips);

@@ -71,9 +71,7 @@ let MatchingView = Widget.extend({
         }
       },
       onclick: () => {
-        window.mainPage.helpLayer.setTips(this.getDefaultTips());
-        window.mainPage.helpLayer.show();
-      // TODO: add any other special instructions
+        this.renderHelpScreen();
       }
     });
 
@@ -93,8 +91,7 @@ let MatchingView = Widget.extend({
     });
   },
   renderInfoScreen: function () {
-    window.mainPage.helpLayer.setTips(this.getDefaultTips());
-    window.mainPage.helpLayer.show();
+    window.mainPage.helpLayer.showTips(this.getDefaultTips());
   },
   renderHelpScreen: function () {
     if (this.status === STATUS.OK) {

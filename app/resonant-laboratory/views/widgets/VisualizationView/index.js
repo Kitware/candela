@@ -68,8 +68,7 @@ let VisualizationView = Widget.extend({
       this.render);
   },
   renderInfoScreen: function () {
-    window.mainPage.helpLayer.setTips(this.getDefaultTips());
-    window.mainPage.helpLayer.show();
+    window.mainPage.helpLayer.showTips(this.getDefaultTips());
   },
   renderHelpScreen: function () {
     if (this.ok === null) {
