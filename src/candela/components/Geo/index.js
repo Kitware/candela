@@ -12,15 +12,15 @@ export default class Geo extends VisComponent {
     });
     this.plot.createLayer('osm');
     if (options.features) {
-      for (let i = 0; i < options.features.length; ++i) {
+      options.features.forEach(feature => {
         this.plot.createLayer('feature')
-          .createFeature(options.features[i].type)
-          .data(options.features[i].data)
+          .createFeature(feature.type)
+          .data(feature.data)
           .position(d => ({
-            x: d[options.features[i].position.x],
-            y: d[options.features[i].position.y]
+            x: d[feature.position.x],
+            y: d[feature.position.y]
           }));
-      }
+      });
       this.plot.draw();
     }
   }
