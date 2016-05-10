@@ -3,7 +3,9 @@ import NodeLinkList from './adapter/NodeLinkList';
 import Graph from './model/Graph';
 import Selection from './model/Selection';
 import * as util from './util';
-import { Cola, SelectionInfo, LinkInfo } from './view';
+import Cola from './view/Cola';
+import SelectionInfo from './view/SelectionInfo';
+import LinkInfo from './view/LinkInfo';
 
 export default {
   adapter: {
