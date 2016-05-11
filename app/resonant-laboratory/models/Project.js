@@ -43,7 +43,11 @@ let Project = MetadataItem.extend({
       this.updateStatus);
     this.listenTo(window.mainPage, 'rl:changeProject',
       this.updateStatus);
-    this.listenTo(this, 'rl:swapId', this.updateStatus);
+    this.listenTo(this, 'rl:swapId', () => {
+      this.updateStatus().then(() => {
+        window.mainPage.trigger('rl:createProject');
+      });
+    });
     this.listenTo(window.mainPage.widgetPanels, 'rl:navigateWidgets',
       this.storePreferredWidgets);
   },

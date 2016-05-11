@@ -23,7 +23,7 @@
     ],
   "visualizations": [
     {
-      "name": "Bar",
+      "name": "BarChart",
       "options": [
         {
           "domain": {
