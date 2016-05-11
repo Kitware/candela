@@ -7,4 +7,7 @@ let Events = Base => class extends Base {
   }
 };
 
+class Empty {}
+export class EventsBase extends Events(Empty);
+
 export default Events;
