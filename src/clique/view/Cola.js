@@ -3,7 +3,7 @@ import Backbone from 'backbone';
 import d3 from 'd3';
 import cola from 'webcola';
 
-import Selection from './model/Selection';
+import Selection from '../model/Selection';
 
 /* Given an object that contains options, return the value of an option if it is
  * defined or a default value if it is not.  Always return a function.  This

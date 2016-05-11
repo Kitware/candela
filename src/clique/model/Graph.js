@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import Backbone from 'backbone';
 import { concat } from '../../candela/util';
-import MultiTable from './util/MultiTable';
+import MultiTable from '../util/MultiTable';
 
 const Graph = Backbone.Model.extend({
   constructor: function (options) {

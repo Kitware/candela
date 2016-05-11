@@ -13,8 +13,6 @@ test('Check for all parts of ES5-compatible clique object', t => {
   t.ok(clique.model.Graph, 'clique.model.Graph exists');
   t.ok(clique.model.Selection, 'clique.model.Selection exists');
 
-  t.ok(clique.util, 'clique.util exists');
-
   t.ok(clique.view, 'clique.view exists');
   t.ok(clique.view.Cola, 'clique.view.Cola exists');
   t.ok(clique.view.SelectionInfo, 'clique.view.SelectionInfo exists');
