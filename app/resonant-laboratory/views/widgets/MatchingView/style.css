@@ -143,3 +143,6 @@
 .MatchingView.content path.established.selected.edge.hovered {
   stroke: #ff7f00;
 }
+.MatchingView.content path.established.selected.edge.hovered {
+  stroke-dasharray: 5, 5;
+}

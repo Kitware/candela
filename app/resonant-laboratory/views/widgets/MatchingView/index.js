@@ -408,6 +408,8 @@ in order to connect them together.`);
     }
   },
   render: Underscore.debounce(function () {
+    let self = this;
+
     if (!this.canRender()) {
       return;
     }
@@ -549,15 +551,15 @@ in order to connect them together.`);
           classString += ' attribute';
         }
         return classString + ' node';
-      }).on('mouseover', d => {
-        // Highlight this node
+      }).on('mouseover', function (d) {
+        // Highlight this node (this refers to the DOM element)
         jQuery(this).addClass('hovered');
         // Highlight the edge between this node and the selection
-        if (this.selection !== null && this.selection.id !== d.id) {
+        if (self.selection !== null && self.selection.id !== d.id) {
           graph.nodeEdgeLookup[d.id].forEach(edgeIndex => {
             let edge = graph.edges[edgeIndex];
-            if (graph.nodes[edge.source].id === this.selection.id ||
-              graph.nodes[edge.target].id === this.selection.id) {
+            if (graph.nodes[edge.source].id === self.selection.id ||
+              graph.nodes[edge.target].id === self.selection.id) {
               jQuery('#' + graph.edges[edgeIndex].id).addClass('hovered');
             }
           });
@@ -627,9 +629,6 @@ in order to connect them together.`);
       if (d.side === 'vis') {
         if (d.acceptsMultiple === true) {
           label += ': \u221E';
-        } else {
-          // TODO: options that expect exactly two fields?
-          label += ': 1';
         }
       }
       this.textContent = label;
@@ -694,18 +693,19 @@ in order to connect them together.`);
           classString = 'probable';
         }
         return classString + ' edge';
-      }).on('mouseover', d => {
+      }).on('mouseover', function (d) {
+        // this refers to the DOM element
         jQuery(this).addClass('hovered');
         // If one end is selected, highlight the other end
         let nodeToHighlight;
-        if (this.selection === null) {
+        if (self.selection === null) {
           return;
-        } else if (this.selection.side === 'vis') {
+        } else if (self.selection.side === 'vis') {
           nodeToHighlight = graph.nodes[d.source];
         } else {
           nodeToHighlight = graph.nodes[d.target];
         }
-        this.$el.find('#' + nodeToHighlight.id).addClass('hovered');
+        self.$el.find('#' + nodeToHighlight.id).addClass('hovered');
       }).on('mouseout', d => {
         // Clear any highlights
         this.$el.find('.hovered').removeClass('hovered');
