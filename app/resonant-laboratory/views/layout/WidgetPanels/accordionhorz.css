@@ -89,7 +89,6 @@ div.accordion section.targeted div.content {
   position: relative;
   width: 100%;
   height: calc(100% - 3em);
-  overflow: auto;
   -webkit-transition: 0.5s ease;
   -moz-transition: 0.5s ease;
   -ms-transition: 0.5s ease;

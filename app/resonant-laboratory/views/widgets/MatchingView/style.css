@@ -20,6 +20,10 @@
 #fddaec
 */
 
+.MatchingView.content {
+  overflow: auto;
+}
+
 .MatchingView.content .node {
   cursor: pointer;
 }
