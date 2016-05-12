@@ -61,7 +61,7 @@ let DatasetView = Widget.extend({
         }
       },
       onclick: () => {
-        this.renderInfoScreen();
+        this.renderHelpScreen();
       }
     });
 

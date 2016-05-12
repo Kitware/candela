@@ -56,7 +56,7 @@ let WidgetPanel = Backbone.View.extend({
     let indicatorsEnter = headerEnter.append('div')
       .attr('class', 'indicators');
 
-    indicatorsEnter.append('h2')
+    indicatorsEnter.append('button')
       .attr('class', 'indicatorText');
     indicatorsEnter.append('div')
       .attr('class', 'indicatorIcons');
