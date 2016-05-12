@@ -83,12 +83,9 @@
               dataset: 'dataset3',
               trend: 'ALGC RMSE Euclidean Distance',
               current: 5,
-            }, {
-              dataset: 'dataset3',
-              trend: 'ALGASBR RMSE Euclidean Distance',
-              current: 0.3,
-              callback: function () { console.log('dataset3-algasbr'); }
-            }, {
+            },
+            // Omit ALGASBR dataset3
+            {
               dataset: 'dataset3',
               trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
               current: 27,

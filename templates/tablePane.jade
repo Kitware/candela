@@ -8,7 +8,18 @@ table.table.table-striped.table-hover.table-responsive.table-compact
         else
           | Key Metrics
     tr
-      td Data Set
+      td
+        .trend-col-header-sortable(id="dataset-col-header")
+          | Dataset
+          svg.sort-column-icon
+            if !sortOrder || !sortOrder.dataset
+              polygon(points="4,6 12,6 8,14")
+            else
+              if sortOrder.order === 1
+                polygon.active(points="4,14 12,14 8,6")
+              else
+                polygon.active(points="4,6 12,6 8,14")
+
       each trend in trends
         td
           .trend-col-header-sortable(id="#{trend.id_selector}-trend-col-header")

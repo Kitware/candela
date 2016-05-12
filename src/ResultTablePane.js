@@ -21,6 +21,11 @@ export let ResultTablePane = Backbone.View.extend({
     if (this.results === undefined) {
       return;
     }
+    // Default sort order is alphabetical by dataset name.
+    this.sortOrder = {
+      dataset: true,
+      order: 1
+    };
   },
 
   render: function () {
@@ -40,17 +45,26 @@ export let ResultTablePane = Backbone.View.extend({
     }, this));
 
     this.results.sort((_.bind(function () {
-      if (!this.sortOrder) {
-        // Default sort order is alphabetical by dataset name.
-        return function (a, b) {
-          return a.dataset.localeCompare(b.dataset);
-        };
-      } else {
+      if (!this.sortOrder.dataset) {
         return _.bind(function (a, b) {
           // Sort all datasets by the selected trend column and direction
           var trendA = resultsByDatasetIdThenTrend[a.dataset_id_selector][this.sortOrder.trend];
           var trendB = resultsByDatasetIdThenTrend[b.dataset_id_selector][this.sortOrder.trend];
+          if (trendB === undefined) {
+              return -1;
+          }
+          if (trendA === undefined) {
+              return 1;
+          }
           return this.sortOrder.order * (trendA - trendB);
+        }, this);
+      } else {
+        return _.bind(function (a, b) {
+          if (this.sortOrder.order > 0) {
+              return a.dataset.localeCompare(b.dataset);
+          } else {
+              return b.dataset.localeCompare(a.dataset);
+          }
         }, this);
       }
     }, this))());
@@ -121,14 +135,22 @@ export let ResultTablePane = Backbone.View.extend({
       _.each(this.trends, function (trend) {
         // Order by the trend column clicked.
         $('#' + trend.id_selector + '-trend-col-header').click(_.bind(function () {
-            var sortOrder = this.sortOrder ? this.sortOrder.order * -1 : -1;
-            this.sortOrder = {
-                trend: trend.name,
-                order: sortOrder
-            };
-            this.render();
+          this.sortOrder = {
+            trend: trend.name,
+            order: this.sortOrder.order * -1
+          };
+          this.render();
         }, this));
       }, this);
+
+      $('#dataset-col-header').click(_.bind(function () {
+        this.sortOrder = {
+          dataset: true,
+          order: this.sortOrder.order * -1
+        };
+        this.render();
+      }, this));
+
 
     }, this));
   }
