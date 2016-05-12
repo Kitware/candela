@@ -87,6 +87,9 @@ let HelpLayer = Backbone.View.extend({
     this.currentIndex = null;
     this.addedTemplate = false;
 
+    this.showHideSpeed = 100;
+    this.animationSpeed = 100;
+
     this.padding = 9;
     this.margin = 15;
 
@@ -139,12 +142,12 @@ let HelpLayer = Backbone.View.extend({
       this.render();
     }
   },
-  render: Underscore.debounce(function () {
+  render: function () {
     if (this.currentIndex === null) {
       // Fade the whole layer out
       d3.select(this.el)
         .style('opacity', 1.0)
-        .transition().duration(300)
+        .transition().duration(this.showHideSpeed)
         .style('opacity', 0.0)
         .style('display', 'none');
     } else {
@@ -171,7 +174,7 @@ let HelpLayer = Backbone.View.extend({
         // Make a hole in the mask to allow the
         // user to click through to the target
         d3.select(this.el).select('#helpLayerMask')
-          .transition().duration(300)
+          .transition().duration(this.animationSpeed)
           .attr('d', createMaskWithHole(targetRect));
       }
 
@@ -180,7 +183,7 @@ let HelpLayer = Backbone.View.extend({
         d3.select(this.el)
           .style('display', null)
           .style('opacity', 0.0)
-          .transition().duration(300)
+          .transition().duration(this.showHideSpeed)
           .style('opacity', 1.0);
       }
 
@@ -270,7 +273,7 @@ let HelpLayer = Backbone.View.extend({
       bubbleCoords.radius = Math.sqrt(Math.pow(bubbleCoords.width, 2) +
         Math.pow(bubbleCoords.height, 2)) / 2;
       bubbleEl.select('circle')
-        .transition().duration(300)
+        .transition().duration(this.animationSpeed)
         .attr('r', bubbleCoords.radius);
 
       // Add in extra padding *outside* the circle
@@ -299,13 +302,13 @@ let HelpLayer = Backbone.View.extend({
       }
 
       // Move the bubble where it belongs
-      bubbleEl.transition().duration(300)
+      bubbleEl.transition().duration(this.animationSpeed)
         .attr('transform', 'translate(' + bubbleCoords.x + ',' +
           bubbleCoords.y + ')');
 
       // Draw the arrow
       d3.select('#arrow')
-        .transition().duration(300)
+        .transition().duration(this.animationSpeed)
         .attr('d', arrowGenerator({
           source: bubbleCoords,
           target: targetCoords
@@ -322,7 +325,7 @@ let HelpLayer = Backbone.View.extend({
       // the user has already seen this tip
       window.mainPage.currentUser.preferences.observeTip(tip);
     }
-  }, 300)
+  }
 });
 
 export default HelpLayer;
