@@ -1,4 +1,3 @@
-import Underscore from 'underscore';
 import Backbone from 'backbone';
 import jQuery from 'jquery';
 import d3 from 'd3';
