@@ -12,10 +12,10 @@ export let TrendPane = Backbone.View.extend({
   initialize: function (settings) {
     this.bins = settings.bins || 10;
     this.trendMap = settings.trendMap;
-    this.hists = this._calculateHistograms(settings.trendValuesByDataset);
+    this.hists = this._calculateHistograms(settings.trendValuesByDataset, settings.histogram_max_x);
   },
 
-  _calculateHistograms: function (trends) {
+  _calculateHistograms: function (trends, maxX) {
     const bins = this.bins;
     const byTrend = _.groupBy(trends, 'trend');
 
@@ -23,17 +23,33 @@ export let TrendPane = Backbone.View.extend({
       return Math.min(memo, num.current);
     }, 0);  // we want 0 to be the min
 
-    const max = _.reduce(trends, (memo, num) => {
-      return Math.max(memo, num.current);
-    }, 0);
+    const maxXSet = !_.isNaN(parseFloat(maxX));
+    let max;
+    let binWidth;
+    if (maxXSet) {
+      // We have a maximum set, put everything beyond this max
+      // in the same 'Beyond' bin.
+      max = parseFloat(maxX);
+      binWidth = (max - min) / (bins - 1);
+    } else {
+      max = _.reduce(trends, (memo, num) => {
+        return Math.max(memo, num.current);
+      }, 0);
+      binWidth = (max - min) / bins;
+    }
 
-    const binWidth = (max - min) / bins;
     let hists = _.map(byTrend, (element, key) => {
       let el = {trend: this.trendMap[key].display_name};
       el['values'] = _.countBy(_.map(element, (value) => {
         let res = Math.floor(value.current / binWidth);
-        if (res > bins - 1) {
-          res = bins - 1;
+        if (maxXSet) {
+          if (res > bins - 1) {
+            res = bins - 1;
+          }
+        } else {
+          if (res > bins) {
+            res = bins;
+          }
         }
         return res;
       }), (num) => { return num; });
@@ -49,6 +65,9 @@ export let TrendPane = Backbone.View.extend({
     this.xLabels = _.map(this.xLabels, (value) => {
       return value.toFixed(1);
     });
+    if (maxXSet) {
+        this.xLabels[this.xLabels.length - 1] = 'Beyond';
+    }
     return hists;
   },
 
@@ -75,6 +94,7 @@ export let TrendPane = Backbone.View.extend({
         let width = parent.width();
         let height = parent.height();
         let chart = nv.models.multiBarChart()
+          .reduceXTicks(false)
           .width(width)
           .height(height)
           .stacked(false);
