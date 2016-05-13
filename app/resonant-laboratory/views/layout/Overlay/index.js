@@ -225,6 +225,7 @@ let Overlay = Backbone.View.extend({
           d3.select(this.el).style('opacity', 1.0);
         }
       }
+      this.trigger('rl:changeOverlay');
     } else {
       // We're just re-rendering the view
       if (this.view !== null) {

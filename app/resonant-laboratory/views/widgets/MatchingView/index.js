@@ -5,6 +5,22 @@ import myTemplate from './template.html';
 import Widget from '../Widget';
 import './style.css';
 
+import booleanIcon from '../../../images/boolean.svg';
+import integerIcon from '../../../images/integer.svg';
+import numberIcon from '../../../images/number.svg';
+import dateIcon from '../../../images/date.svg';
+import stringIcon from '../../../images/string.svg';
+import stringListIcon from '../../../images/string_list.svg';
+
+let ICONS = {
+  boolean: booleanIcon,
+  integer: integerIcon,
+  number: numberIcon,
+  date: dateIcon,
+  string: stringIcon,
+  string_list: stringListIcon
+};
+
 let NODE_MODES = {
   INELIGIBLE: 0,
   WILL_SELECT: 1,
@@ -38,7 +54,7 @@ let MatchingView = Widget.extend({
     this.icons.splice(0, 0, {
       src: () => {
         return window.mainPage.currentUser.preferences
-          .hasSeenAllTips(this.getDefaultTips()) ? Widget.infoIcon : Widget.newInfoIcon;
+          .hasSeenAllTips(this.getTips()) ? Widget.infoIcon : Widget.newInfoIcon;
       },
       title: () => {
         return 'About this panel';
@@ -71,9 +87,7 @@ let MatchingView = Widget.extend({
         }
       },
       onclick: () => {
-        window.mainPage.helpLayer.setTips(this.getDefaultTips());
-        window.mainPage.helpLayer.show();
-      // TODO: add any other special instructions
+        this.renderHelpScreen();
       }
     });
 
@@ -93,8 +107,7 @@ let MatchingView = Widget.extend({
     });
   },
   renderInfoScreen: function () {
-    window.mainPage.helpLayer.setTips(this.getDefaultTips());
-    window.mainPage.helpLayer.show();
+    window.mainPage.helpLayer.showTips(this.getTips());
   },
   renderHelpScreen: function () {
     if (this.status === STATUS.OK) {
@@ -116,6 +129,19 @@ Still accessing this project's matching settings...`);
 You need to choose both a Dataset and a Visualization
 in order to connect them together.`);
     }
+  },
+  getTips: function () {
+    let tips = [
+      {
+        selector: 'g.attribute.node',
+        message: 'To connect the data to the visualization: 1. Click a data attribute'
+      },
+      {
+        selector: 'g.encoding.node',
+        message: 'To connect the data to the visualization: 2. Click a visual encoding'
+      }
+    ].concat(this.getDefaultTips());
+    return tips;
   },
   createNodeId: function (d) {
     // Generate a valid ID for the node
@@ -162,13 +188,16 @@ in order to connect them together.`);
     let nodeEdgeLookup = {};
 
     // Helper functions
-    let _createNode = (side, groupIndex, attrName, attrType) => {
+    let _createNode = (side, groupIndex, attrName, attrType, acceptsMultiple) => {
       let newNode = {
         side: side,
         index: groupIndex,
         attrName: attrName,
         type: attrType
       };
+      if (acceptsMultiple) {
+        newNode.acceptsMultiple = true;
+      }
       newNode.id = this.createNodeId(newNode);
       nodeLookup[newNode.id] = nodes.length;
 
@@ -285,7 +314,8 @@ in order to connect them together.`);
       });
       specs.vis.forEach((visSpec, visIndex) => {
         visSpec.options.forEach((option, attrIndex) => {
-          _createNode('vis', visIndex, option.name, option.domain.fieldTypes);
+          _createNode('vis', visIndex, option.name, option.domain.fieldTypes,
+          option.type === 'string_list');
         });
       });
 
@@ -388,6 +418,8 @@ in order to connect them together.`);
     }
   },
   render: Underscore.debounce(function () {
+    let self = this;
+
     if (!this.canRender()) {
       return;
     }
@@ -447,9 +479,11 @@ in order to connect them together.`);
         });
     }
 
+    let emSize = parseFloat(this.$el.css('font-size'));
+
     // Figure out how we're going to lay things
     // out based on how much space we have
-    let nodeHeight = 40;
+    let nodeHeight = 1.5 * emSize;
 
     // Temporarily force the scroll bars so we
     // account for their size
@@ -472,149 +506,229 @@ in order to connect them together.`);
         height: bounds.height
       });
 
-    let dataX = bounds.width / 4;
-    let visX = 3 * bounds.width / 4;
-    let nodeWidth = bounds.width / 4;
+    let dataX = emSize;
+    let nodeWidth = bounds.width / 3;
+    let visX = bounds.width - emSize - nodeWidth;
     let dataY = d3.scale.linear()
       .domain([firstData - 1, lastData + 1])
       .range([0, bounds.height]);
+    let scrollTop = this.$el.scrollTop();
     let visY = d3.scale.linear()
       .domain([firstVis - 1, lastVis + 1])
-      .range([0, bounds.height]);
+      .range([scrollTop, scrollTop + this.el.clientHeight]);
 
     let nodes = d3.select(this.el).select('svg')
       .select('.nodeLayer')
       .selectAll('.node').data(graph.nodes, d => {
         return d.id + d.type;
       });
-    let enteringNodes = nodes.enter().append('g');
+    // Animate any existing nodes before we add new ones
+    nodes.transition().duration(300)
+      .attr('transform', (d, i) => {
+        if (d.side === 'vis') {
+          return 'translate(' + visX + ',' + visY(i) + ')';
+        } else {
+          return 'translate(' + dataX + ',' + dataY(i) + ')';
+        }
+      });
+    let enteringNodes = nodes.enter().append('g')
+      .attr('transform', (d, i) => {
+        if (d.side === 'vis') {
+          return 'translate(' + visX + ',' + visY(i) + ')';
+        } else {
+          return 'translate(' + dataX + ',' + dataY(i) + ')';
+        }
+      });
+    nodes.attr('id', d => d.id)
+      .attr('class', d => {
+        let classString = '';
+        // Node mode
+        if (d.mode === NODE_MODES.WILL_SELECT) {
+          classString = 'selectable';
+        } else if (d.mode === NODE_MODES.INELIGIBLE) {
+          classString = 'ineligible';
+        } else if (d.mode === NODE_MODES.WILL_DISCONNECT) {
+          classString = 'linked';
+        } else if (d.mode === NODE_MODES.SELECTED) {
+          classString = 'selected';
+        } else if (d.mode === NODE_MODES.WILL_CONNECT) {
+          classString = 'connectable';
+        }
+        // Node side
+        if (d.side === 'vis') {
+          classString += ' encoding';
+        } else {
+          classString += ' attribute';
+        }
+        return classString + ' node';
+      }).on('mouseover', function (d) {
+        // Highlight this node (this refers to the DOM element)
+        jQuery(this).addClass('hovered');
+        // Highlight the edge between this node and the selection
+        if (self.selection !== null && self.selection.id !== d.id) {
+          graph.nodeEdgeLookup[d.id].forEach(edgeIndex => {
+            let edge = graph.edges[edgeIndex];
+            if (graph.nodes[edge.source].id === self.selection.id ||
+              graph.nodes[edge.target].id === self.selection.id) {
+              jQuery('#' + graph.edges[edgeIndex].id).addClass('hovered');
+            }
+          });
+        }
+      }).on('mouseout', d => {
+        // Clear any highlights
+        this.$el.find('.hovered').removeClass('hovered');
+      }).on('click', d => {
+        this.handleClick(d);
+      });
     nodes.exit().remove();
 
-    nodes.attr('id', d => d.id).attr('class', d => {
-      let classString = '';
-      // Node mode
-      if (d.mode === NODE_MODES.WILL_SELECT) {
-        classString = 'selectable';
-      } else if (d.mode === NODE_MODES.INELIGIBLE) {
-        classString = 'ineligible';
-      } else if (d.mode === NODE_MODES.WILL_DISCONNECT) {
-        classString = 'linked';
-      } else if (d.mode === NODE_MODES.SELECTED) {
-        classString = 'selected';
-      } else if (d.mode === NODE_MODES.WILL_CONNECT) {
-        classString = 'connectable';
-      }
-      // Node side
-      if (d.side === 'vis') {
-        classString += ' encoding';
-      } else {
-        classString += ' attribute';
-      }
-      return classString + ' node';
-    }).attr('transform', (d, i) => {
-      if (d.side === 'vis') {
-        return 'translate(' + visX + ',' + visY(i) + ')';
-      } else {
-        return 'translate(' + dataX + ',' + dataY(i) + ')';
-      }
-    }).on('mouseover', d => {
-      // Highlight this node
-      jQuery(this).addClass('hovered');
-      // Highlight the edge between this node and the selection
-      if (this.selection !== null && this.selection.id !== d.id) {
-        graph.nodeEdgeLookup[d.id].forEach(edgeIndex => {
-          let edge = graph.edges[edgeIndex];
-          if (graph.nodes[edge.source].id === this.selection.id ||
-            graph.nodes[edge.target].id === this.selection.id) {
-            jQuery('#' + graph.edges[edgeIndex].id).addClass('hovered');
+    enteringNodes.append('title').attr('class', 'nodeTitle');
+    nodes.selectAll('title.nodeTitle')
+      .text(d => {
+        let tooltip = d.attrName;
+        if (d.side === 'data') {
+          tooltip += ' (' + d.type + ')';
+        } else {
+          if (d.acceptsMultiple) {
+            tooltip += '\nThis option accepts any number of connections';
+          } else {
+            tooltip += '\nThis option accepts exactly one connection';
           }
-        });
-      }
-    }).on('mouseout', d => {
-      // Clear any highlights
-      this.$el.find('.hovered').removeClass('hovered');
-    }).on('click', d => {
-      this.handleClick(d);
-    });
+          tooltip += '\nCompatible with ' + d.type.join(', ');
+        }
+        return tooltip;
+      });
 
     enteringNodes.append('rect');
     nodes.selectAll('rect').attr({
-      width: nodeWidth,
+      width: nodeWidth + emSize * 0.5,
       height: nodeHeight,
-      x: -nodeWidth / 2,
+      x: '-0.25em',
       y: -nodeHeight / 2
     });
 
-    enteringNodes.append('text')
-      .attr('class', 'label')
-      .attr('y', 0);
-    nodes.selectAll('text.label').text(d => {
-      return d.attrName;
-    });
-
-    enteringNodes.append('text')
+    enteringNodes.append('g')
       .attr('class', 'types');
-    nodes.selectAll('text.types')
-      .attr('y', nodeHeight / 3)
-      .text(d => {
-        if (d.side === 'data') {
-          return d.type;
+    let types = nodes.selectAll('g.types').selectAll('image')
+      .data(d => {
+        return d.side === 'data' ? [d.type] : d.type;
+      });
+    types.enter().append('image').append('title');
+    types.attr('xlink:href', d => ICONS[d])
+      .attr('x', (d, i) => (1.25 * i) + 'em');
+    types.selectAll('title')
+      .text(function (d) {
+        // this refers to the DOM element
+        let side = d3.select(this.parentNode.parentNode).datum().side;
+        if (side === 'data') {
+          return d + ' field; you can change this in the Dataset widget';
         } else {
-          // TODO: boldface the connected type
-          return d.type.join(',');
+          return 'Compatible with ' + d + ' fields';
         }
       });
+
+    enteringNodes.append('text')
+      .attr('class', 'label')
+      .attr('y', '0.35em')
+      .attr('x', d => {
+        return d.side === 'data' ? '1.5em'
+          : (1.25 * d.type.length + 0.25) + 'em';
+      });
+    nodes.selectAll('text.label').each(function (d) {
+      // this refers to the DOM element
+      let label = d.attrName;
+      if (d.side === 'vis') {
+        if (d.acceptsMultiple === true) {
+          label += ': \u221E';
+        }
+      }
+      this.textContent = label;
+
+      // Shrink the label so that it fits. Calculate available space:
+      let maxTextLength = nodeWidth;
+      if (d.side === 'data') {
+        maxTextLength -= emSize;
+      } else {
+        maxTextLength -= d.type.length * emSize;
+      }
+
+      while (this.getComputedTextLength() >= maxTextLength) {
+        if (label.length <= 4) {
+          // Too small to even show a label
+          this.textContent = '';
+          break;
+        }
+        // Swap out the middle four characters
+        // and replace them with three periods
+        let mid = Math.floor(label.length / 2);
+        label = label.slice(0, mid - 2) + '...' + label.slice(mid + 2);
+        this.textContent = label;
+      }
+    });
 
     // Draw the connections
     let edges = d3.select(this.el).select('svg')
       .select('.linkLayer')
       .selectAll('.edge').data(graph.edges, d => d.id);
-    edges.enter().append('path');
+    // Animate any existing edges before we add new ones
+    edges.transition().duration(300)
+      .attr('d', d => {
+        let pathString = 'M' + (dataX + nodeWidth) + ',' +
+        dataY(d.source) +
+        'L' + visX + ',' +
+        visY(d.target);
+        return pathString;
+      });
+    edges.enter().append('path')
+      .attr('d', d => {
+        let pathString = 'M' + (dataX + nodeWidth) + ',' +
+        dataY(d.source) +
+        'L' + visX + ',' +
+        visY(d.target);
+        return pathString;
+      }).attr('opacity', 0)
+        .transition().duration(300)
+        .attr('opacity', 1);
     edges.exit().remove();
-
-    edges.attr('id', d => d.id).attr('class', d => {
-      let classString = '';
-      // Edge type
-      if (d.mode === EDGE_MODES.POTENTIAL) {
-        classString = 'potential';
-      } else if (d.mode === EDGE_MODES.ESTABLISHED) {
-        classString = 'established';
-      } else if (d.mode === EDGE_MODES.ESTABLISHED_SELECTED) {
-        classString = 'established selected';
-      } else if (d.mode === EDGE_MODES.PROBABLE) {
-        classString = 'probable';
-      }
-      return classString + ' edge';
-    }).attr('d', d => {
-      let pathString = 'M' + (dataX + nodeWidth / 2) + ',' +
-      dataY(d.source) +
-      'L' + (visX - nodeWidth / 2) + ',' +
-      visY(d.target);
-      return pathString;
-    }).on('mouseover', d => {
-      jQuery(this).addClass('hovered');
-      // If one end is selected, highlight the other end
-      let nodeToHighlight;
-      if (this.selection === null) {
-        return;
-      } else if (this.selection.side === 'vis') {
-        nodeToHighlight = graph.nodes[d.source];
-      } else {
-        nodeToHighlight = graph.nodes[d.target];
-      }
-      this.$el.find('#' + nodeToHighlight.id).addClass('hovered');
-    }).on('mouseout', d => {
-      // Clear any highlights
-      this.$el.find('.hovered').removeClass('hovered');
-    }).on('click', d => {
-      if (this.selection === null) {
-        return;
-      } else if (this.selection.side === 'vis') {
-        this.handleClick(graph.nodes[d.source]);
-      } else {
-        this.handleClick(graph.nodes[d.target]);
-      }
-    });
+    edges.attr('id', d => d.id)
+      .attr('class', d => {
+        let classString = '';
+        // Edge type
+        if (d.mode === EDGE_MODES.POTENTIAL) {
+          classString = 'potential';
+        } else if (d.mode === EDGE_MODES.ESTABLISHED) {
+          classString = 'established';
+        } else if (d.mode === EDGE_MODES.ESTABLISHED_SELECTED) {
+          classString = 'established selected';
+        } else if (d.mode === EDGE_MODES.PROBABLE) {
+          classString = 'probable';
+        }
+        return classString + ' edge';
+      }).on('mouseover', function (d) {
+        // this refers to the DOM element
+        jQuery(this).addClass('hovered');
+        // If one end is selected, highlight the other end
+        let nodeToHighlight;
+        if (self.selection === null) {
+          return;
+        } else if (self.selection.side === 'vis') {
+          nodeToHighlight = graph.nodes[d.source];
+        } else {
+          nodeToHighlight = graph.nodes[d.target];
+        }
+        self.$el.find('#' + nodeToHighlight.id).addClass('hovered');
+      }).on('mouseout', d => {
+        // Clear any highlights
+        this.$el.find('.hovered').removeClass('hovered');
+      }).on('click', d => {
+        if (this.selection === null) {
+          return;
+        } else if (this.selection.side === 'vis') {
+          this.handleClick(graph.nodes[d.source]);
+        } else {
+          this.handleClick(graph.nodes[d.target]);
+        }
+      });
   }, 300)
 });
 

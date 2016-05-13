@@ -127,25 +127,35 @@ you move or delete this item, your preferences will be lost.`,
       });
     }
   },
+  hasSeenTip: function (tip) {
+    let tipId = tip.selector.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
+    return this.getMeta('seenTips')[tipId] === true;
+  },
   hasSeenAllTips: function (tips) {
     let seenTips = this.getMeta('seenTips');
-    for (let selector of Object.keys(tips)) {
-      let tipId = selector; // + tips[selector];
-      // Make the id a valid / nice mongo id
-      tipId = tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
+    for (let tip of tips) {
+      let tipId = tip.selector.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
       if (seenTips[tipId] !== true) {
         return false;
       }
     }
     return true;
   },
-  observeTips: function (tips) {
+  observeTip: function (tip) {
     let seenTips = this.getMeta('seenTips');
-    for (let selector of Object.keys(tips)) {
-      let tipId = tips[selector].tipId;
-      // Make the id a valid / nice mongo id
-      tipId = tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
-      seenTips[tipId] = true;
+    // Make the id a valid / nice mongo id
+    let tipId = tip.selector.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
+    seenTips[tipId] = true;
+
+    this.setMeta('seenTips', seenTips);
+    this.trigger('rl:observeTips');
+    this.save();
+  },
+  forgetTips: function (tips) {
+    let seenTips = this.getMeta('seenTips');
+    for (let tip of tips) {
+      let tipId = tip.selector.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
+      delete seenTips[tipId];
     }
     this.setMeta('seenTips', seenTips);
     this.trigger('rl:observeTips');
