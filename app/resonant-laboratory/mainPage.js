@@ -8,6 +8,7 @@ import Header from './views/layout/Header';
 import WidgetPanels from './views/layout/WidgetPanels';
 import Overlay from './views/layout/Overlay';
 import HelpLayer from './views/layout/HelpLayer';
+import NotificationLayer from './views/layout/NotificationLayer';
 
 // Page-wide Styles
 import './stylesheets/pure-css-custom-form-elements/style.css';
@@ -61,6 +62,9 @@ let MainPage = Backbone.View.extend({
       this.helpLayer = new HelpLayer({
         el: '#HelpLayer'
       });
+      this.notificationLayer = new NotificationLayer({
+        el: '#NotificationLayer'
+      });
       this.router.addListeners();
       this.currentUser.addListeners();
       this.header.addListeners();
@@ -71,6 +75,7 @@ let MainPage = Backbone.View.extend({
     this.widgetPanels.render();
     this.overlay.render();
     this.helpLayer.render();
+    this.notificationLayer.render();
   },
   newProject: function () {
     this.project = new Project();

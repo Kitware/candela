@@ -37,6 +37,12 @@
   padding: 3em;
 }
 
+#Overlay pre {
+  -ms-user-select: initial;
+  -moz-user-select: initial;
+  -webkit-user-select: initial;
+}
+
 #Overlay img.headerIcon {
   float: right;
   height: 16em;
