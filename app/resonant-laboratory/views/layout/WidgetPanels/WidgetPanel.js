@@ -85,8 +85,6 @@ let WidgetPanel = Backbone.View.extend({
     // that we have its element
     this.widget.setPanel(this, container.node());
 
-    // this.widget.render();
-
     this.renderIndicators();
   },
   renderIndicators () {
