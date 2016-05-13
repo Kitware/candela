@@ -605,7 +605,7 @@ in order to connect them together.`);
       });
     types.enter().append('image').append('title');
     types.attr('xlink:href', d => ICONS[d])
-      .attr('x', (d, i) => i + 'em');
+      .attr('x', (d, i) => (1.25 * i) + 'em');
     types.selectAll('title')
       .text(function (d) {
         // this refers to the DOM element
@@ -621,7 +621,8 @@ in order to connect them together.`);
       .attr('class', 'label')
       .attr('y', '0.35em')
       .attr('x', d => {
-        return d.side === 'data' ? '1.25em' : (d.type.length + 0.25) + 'em';
+        return d.side === 'data' ? '1.5em'
+          : (1.25 * d.type.length + 0.25) + 'em';
       });
     nodes.selectAll('text.label').each(function (d) {
       // this refers to the DOM element
