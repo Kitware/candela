@@ -67,16 +67,53 @@ function createMaskWithHole (holeBounds) {
   let path = 'M0,0L' + window.innerWidth + ',0' +
     'L' + window.innerWidth + ',' + window.innerHeight +
     'L0,' + window.innerHeight + 'Z';
-  // Now punch the first half of the hole...
-  path += 'M' + holeBounds.left + ',' + holeBounds.top +
-    'A' + (holeBounds.width / 2) + ',' +
-    (holeBounds.height / 2) + ',0,1,0,' +
-    holeBounds.right + ',' + holeBounds.bottom;
-  // ...and the second half:
-  path += 'M' + holeBounds.right + ',' + holeBounds.bottom +
-    'A' + (holeBounds.width / 2) + ',' +
-    (holeBounds.height / 2) + ',0,1,0,' +
-    holeBounds.left + ',' + holeBounds.top;
+
+  let aspectRatio = holeBounds.height / holeBounds.width;
+
+  if (Math.abs(aspectRatio - 1) < 0.1) {
+    // We're dealing with roughly a square area; a circle
+    // will work fine. Punch a semicircle for the first
+    // half of the hole...
+    path += 'M' + holeBounds.left + ',' + holeBounds.top +
+      'A' + (holeBounds.width / 2) + ',' +
+      (holeBounds.height / 2) + ',0,1,0,' +
+      holeBounds.right + ',' + holeBounds.bottom;
+    // ...and the second half:
+    path += 'M' + holeBounds.right + ',' + holeBounds.bottom +
+      'A' + (holeBounds.width / 2) + ',' +
+      (holeBounds.height / 2) + ',0,1,0,' +
+      holeBounds.left + ',' + holeBounds.top;
+  } else if (aspectRatio > 1) {
+    // This is a vertical rectangular area; draw a
+    // vertical "pill" shape.
+    let radius = holeBounds.width / 2;
+    let topPillEnd = holeBounds.top + radius;
+    let bottomPillEnd = holeBounds.bottom - radius;
+    // Start by punching a semicircle on the top...
+    path += 'M' + holeBounds.right + ',' + topPillEnd +
+      'A' + radius + ',' + radius + ',0,1,0,' +
+      holeBounds.left + ',' + topPillEnd;
+    // Line down...
+    path += 'L' + holeBounds.left + ',' + bottomPillEnd;
+    // Semicircle on the bottom...
+    path += 'A' + radius + ',' + radius + ',0,1,0,' +
+      holeBounds.right + ',' + bottomPillEnd + 'Z';
+  } else {
+    // This is a horizontal rectangular area; draw a
+    // horizontal "pill" shape
+    let radius = holeBounds.height / 2;
+    let leftPillEnd = holeBounds.left + radius;
+    let rightPillEnd = holeBounds.right - radius;
+    // Start by punching a semicircle on the left...
+    path += 'M' + leftPillEnd + ',' + holeBounds.top +
+      'A' + radius + ',' + radius + ',0,1,0,' +
+      leftPillEnd + ',' + holeBounds.bottom;
+    // Line to the right...
+    path += 'L' + rightPillEnd + ',' + holeBounds.bottom;
+    // Semicircle on the right...
+    path += 'A' + radius + ',' + radius + ',0,1,0,' +
+      rightPillEnd + ',' + holeBounds.top + 'Z';
+  }
   return path;
 }
 
