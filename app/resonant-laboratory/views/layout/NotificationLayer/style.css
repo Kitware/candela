@@ -1,0 +1,36 @@
+#NotificationLayer {
+  z-index:12;
+  position: absolute;
+  right: 1em;
+  bottom: 1em;
+  width: 32em;
+  -ms-user-select: initial;
+  -moz-user-select: initial;
+  -webkit-user-select: initial;
+}
+#NotificationLayer .notification {
+  position: relative;
+  padding: 1em;
+}
+#NotificationLayer .notification img.closeIcon {
+  position: absolute;
+  right: 1.5em;
+  top: 1.5em;
+  width: 1em;
+  height: 1em;
+  cursor: pointer;
+}
+#NotificationLayer .notification .content {
+  padding: 1em 2em 1em 1em;
+  background-color: #ffffcc;
+  border: 1px solid #ffff33;
+  text-align: right;
+  width: auto;
+}
+#NotificationLayer .notification.error .content {
+  background-color: #fed9a6;
+  border: 1px solid #ff7f00;
+}
+#NotificationLayer .notification.error img.closeIcon {
+  -webkit-filter: url(#recolorImageToff7f00);
+}

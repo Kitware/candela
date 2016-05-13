@@ -79,7 +79,7 @@
 }
 
 .MatchingView.content .node.connectable image {
-  filter: url(#blueIcons);
+  filter: url(#recolorImageTo377eb8);
 }
 
 .MatchingView.content path.potential.edge {
@@ -109,7 +109,7 @@
 }
 
 .MatchingView.content .node.selected image {
-  filter: url(#darkIcons);
+  filter: url(#recolorImageTo333333);
 }
 
 .MatchingView.content .node.linked rect {
@@ -121,7 +121,7 @@
 }
 
 .MatchingView.content .node.linked image {
-  filter: url(#greenIcons);
+  filter: url(#recolorImageTo4daf4a);
 }
 
 .MatchingView.content .node.selected rect,
@@ -140,7 +140,7 @@
 }
 
 .MatchingView.content .node.linked.hovered image {
-  filter: url(#orangeIcons);
+  filter: url(#recolorImageToff7f00);
 }
 
 .MatchingView.content .node.linked.hovered rect,

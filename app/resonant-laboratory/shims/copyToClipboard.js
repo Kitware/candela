@@ -2,7 +2,7 @@
 // clipboard, stolen from http://stackoverflow.com/a/30810322/1058935
 
 window.copyTextToClipboard = function (text) {
-  var textArea = document.createElement('textarea');
+  let textArea = document.createElement('textarea');
 
   //
   // *** This styling is an extra step which is likely not required. ***
@@ -46,13 +46,14 @@ window.copyTextToClipboard = function (text) {
 
   textArea.select();
 
+  let successful;
   try {
-    var successful = document.execCommand('copy');
-    var msg = successful ? 'successful' : 'unsuccessful';
-    console.log('Copying text command was ' + msg);
+    successful = !!document.execCommand('copy');
   } catch (err) {
-    console.log('Oops, unable to copy');
+    successful = false;
   }
 
   document.body.removeChild(textArea);
+return false;
+  //return successful;
 };
