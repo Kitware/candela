@@ -1,0 +1,42 @@
+[
+  {
+    "selector": "img.AddDataset.headerButton",
+    "message": "Add a dataset to this project"
+  },
+  {
+    "selector": "img.AddVisualization.headerButton",
+    "message": "Add a visualization to this project"
+  },
+  {
+    "selector": "img.MatchingView.headerButton",
+    "message": "Manage the connections between the datasets and the visualizations in this project"
+  },
+  {
+    "selector": "#projectLocationButton",
+    "message": "Change who can see the project you're working on"
+  },
+  {
+    "selector": "#projectName",
+    "message": "Rename this project"
+  },
+  {
+    "selector": "img.DatasetView.headerButton",
+    "message": "See/change the datasets in this project"
+  },
+  {
+    "selector": "img.VisualizationView.headerButton",
+    "message": "See/change the visualizations in this project"
+  },
+  {
+    "selector": "#hamburgerButton",
+    "message": "Main Menu"
+  },
+  {
+    "selector": "#helpButton",
+    "message": "Show these tips. Tips that you haven't seen yet are shown in blue."
+  },
+  {
+    "selector": "#achievementsButton",
+    "message": "Your achievements. See what you've accomplished, and what you still haven't tried."
+  }
+]

@@ -54,7 +54,7 @@ let MatchingView = Widget.extend({
     this.icons.splice(0, 0, {
       src: () => {
         return window.mainPage.currentUser.preferences
-          .hasSeenAllTips(this.getDefaultTips()) ? Widget.infoIcon : Widget.newInfoIcon;
+          .hasSeenAllTips(this.getTips()) ? Widget.infoIcon : Widget.newInfoIcon;
       },
       title: () => {
         return 'About this panel';
@@ -87,9 +87,7 @@ let MatchingView = Widget.extend({
         }
       },
       onclick: () => {
-        window.mainPage.helpLayer.setTips(this.getDefaultTips());
-        window.mainPage.helpLayer.show();
-      // TODO: add any other special instructions
+        this.renderHelpScreen();
       }
     });
 
@@ -109,8 +107,7 @@ let MatchingView = Widget.extend({
     });
   },
   renderInfoScreen: function () {
-    window.mainPage.helpLayer.setTips(this.getDefaultTips());
-    window.mainPage.helpLayer.show();
+    window.mainPage.helpLayer.showTips(this.getTips());
   },
   renderHelpScreen: function () {
     if (this.status === STATUS.OK) {
@@ -132,6 +129,19 @@ Still accessing this project's matching settings...`);
 You need to choose both a Dataset and a Visualization
 in order to connect them together.`);
     }
+  },
+  getTips: function () {
+    let tips = [
+      {
+        selector: 'g.attribute.node',
+        message: 'To connect the data to the visualization: 1. Click a data attribute'
+      },
+      {
+        selector: 'g.encoding.node',
+        message: 'To connect the data to the visualization: 2. Click a visual encoding'
+      }
+    ].concat(this.getDefaultTips());
+    return tips;
   },
   createNodeId: function (d) {
     // Generate a valid ID for the node

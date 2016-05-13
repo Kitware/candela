@@ -1,5 +1,6 @@
 import MetadataItem from './MetadataItem';
 import datalib from 'datalib';
+import dictCompare from '../shims/dictCompare.js';
 
 let girder = window.girder;
 
@@ -17,23 +18,6 @@ let VALID_EXTENSIONS = [
   'tsv',
   'json'
 ];
-
-let dictCompare = (a, b) => {
-  if (!(a instanceof Object) || !(b instanceof Object)) {
-    return false;
-  }
-  let aKeys = Object.keys(a);
-  let bKeys = Object.keys(b);
-  if (aKeys.length !== bKeys.length) {
-    return false;
-  }
-  for (let aKey of aKeys) {
-    if (!b.hasOwnProperty(aKey) || a[aKey] !== b[aKey]) {
-      return false;
-    }
-  }
-  return true;
-};
 
 let Dataset = MetadataItem.extend({
   initialize: function () {

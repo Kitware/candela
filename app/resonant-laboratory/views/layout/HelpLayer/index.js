@@ -1,10 +1,8 @@
-import Underscore from 'underscore';
 import Backbone from 'backbone';
 import jQuery from 'jquery';
 import d3 from 'd3';
-import cola from 'webcola';
 import rewrap from '../../../shims/svgTextWrap.js';
-import forceControls from './forceControls.json';
+import dictCompare from '../../../shims/dictCompare.js';
 import template from './template.html';
 import './style.css';
 
@@ -27,520 +25,305 @@ function arrowGenerator (edge) {
     y: edge.target.y + arrowLength * Math.sin(rightAngle)
   };
   return 'M' + edge.source.x + ',' + edge.source.y +
-         'L' + edge.target.x + ',' + edge.target.y +
-         'L' + leftCoords.x + ',' + leftCoords.y +
-         'L' + edge.target.x + ',' + edge.target.y +
-         'L' + rightCoords.x + ',' + rightCoords.y +
-         'L' + edge.target.x + ',' + edge.target.y +
-         'Z';
+  'L' + edge.target.x + ',' + edge.target.y +
+  'L' + leftCoords.x + ',' + leftCoords.y +
+  'L' + edge.target.x + ',' + edge.target.y +
+  'L' + rightCoords.x + ',' + rightCoords.y +
+  'L' + edge.target.x + ',' + edge.target.y +
+  'Z';
+}
+
+function getSelectionBounds (selector) {
+  let selection = jQuery(selector);
+  if (selection.size() === 0) {
+    // The selection isn't visible...
+    return null;
+  } else {
+    // Add the tip
+    let result = {
+      left: Infinity,
+      right: -Infinity,
+      top: Infinity,
+      bottom: -Infinity
+    };
+
+    // Figure out the bounding box that contains
+    // all of the matched elements
+    selection.each((index, element) => {
+      let bounds = element.getBoundingClientRect();
+      result.left = Math.min(bounds.left, result.left);
+      result.right = Math.max(bounds.right, result.right);
+      result.top = Math.min(bounds.top, result.top);
+      result.bottom = Math.max(bounds.bottom, result.bottom);
+    });
+    result.width = result.right - result.left;
+    result.height = result.bottom - result.top;
+    return result;
+  }
+}
+
+function createMaskWithHole (holeBounds) {
+  // First, surround the window
+  let path = 'M0,0L' + window.innerWidth + ',0' +
+    'L' + window.innerWidth + ',' + window.innerHeight +
+    'L0,' + window.innerHeight + 'Z';
+  // Now punch the first half of the hole...
+  path += 'M' + holeBounds.left + ',' + holeBounds.top +
+    'A' + (holeBounds.width / 2) + ',' +
+    (holeBounds.height / 2) + ',0,1,0,' +
+    holeBounds.right + ',' + holeBounds.bottom;
+  // ...and the second half:
+  path += 'M' + holeBounds.right + ',' + holeBounds.bottom +
+    'A' + (holeBounds.width / 2) + ',' +
+    (holeBounds.height / 2) + ',0,1,0,' +
+    holeBounds.left + ',' + holeBounds.top;
+  return path;
 }
 
 let HelpLayer = Backbone.View.extend({
   initialize: function () {
-    this.relevantTips = {};
+    this.relevantTips = [];
+    this.currentIndex = null;
+    this.addedTemplate = false;
 
-    // Layout options. You can tweak these interactively
-    // by invoking the mainPage.helpLayer.renderTuner()
-    // easter egg (change these values when you find
-    // a good balance)
+    this.showHideSpeed = 100;
+    this.animationSpeed = 100;
+
     this.padding = 9;
-    this.margin = 20;
+    this.margin = 15;
 
-    this.avoidOverlaps = true;
-    // this.linkDistance = 160;
-    this.alpha = 0.7;
-    this.convergenceThreshold = 0.1;
-    // this.defaultNodeSize = 20;
-    this.handleDisconnected = false;
-    this.jaccardLinkLengths = 100;
-
-    this.noConstraintIterations = 3;
-    this.structuralIterations = 3;
-    this.allConstraintIterations = 3;
-  },
-  setTips: function (tips) {
-    this.relevantTips = {};
-    this.updateTips(tips, true);
-  },
-  updateTips: function (tips, forceChange) {
-    let changedHelp = !!forceChange;
-    Object.keys(tips).forEach(tipSelector => {
-      // We use the selector and the message
-      // to uniquely identify each tip.
-      let tipId = tipSelector; // + tips[tipSelector];
-      // Make the id a valid / nice mongo id
-      tipId = tipId.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
-
-      let selection = jQuery(tipSelector);
-      if (selection.size() === 0) {
-        // In removing a tip, we've changed something
-        if (this.relevantTips[tipId]) {
-          changedHelp = true;
-        }
-
-        // The dom elements no longer exist on the page,
-        // so remove tips pointing to them
-        delete this.relevantTips[tipId];
-      } else {
-        // Add the tip
-        let newTip = {
-          tipId: tipId,
-          message: tips[tipSelector],
-          left: Infinity,
-          right: -Infinity,
-          top: Infinity,
-          bottom: -Infinity
-        };
-
-        // Figure out the bounding box that contains
-        // all of the matched elements
-        selection.each((index, element) => {
-          let bounds = element.getBoundingClientRect();
-          newTip.left = Math.min(bounds.left, newTip.left);
-          newTip.right = Math.max(bounds.right, newTip.right);
-          newTip.top = Math.min(bounds.top, newTip.top);
-          newTip.bottom = Math.max(bounds.bottom, newTip.bottom);
-        });
-
-        // Figure out the center of the bounding box
-        newTip.x = (newTip.left + newTip.right) / 2;
-        newTip.y = (newTip.top + newTip.bottom) / 2;
-
-        // Did anything actually change from what we had before?
-        if (!this.relevantTips[tipId] ||
-          this.relevantTips[tipId].message !== newTip.message ||
-          newTip.left !== this.relevantTips[tipId].left ||
-          newTip.right !== this.relevantTips[tipId].right ||
-          newTip.top !== this.relevantTips[tipId].top ||
-          newTip.bottom !== this.relevantTips[tipId].bottom) {
-          changedHelp = true;
-        }
-
-        this.relevantTips[tipId] = newTip;
-      }
+    // Respond to certain changes in the app in special ways...
+    this.listenTo(window.mainPage.widgetPanels, 'rl:navigateWidgets', () => {
+      // In order for this to have happened, the hole
+      // was probably pointing at one of the headers
+      // that has just changed location / size... we'll
+      // want to re-render
+      this.render();
     });
-    if (changedHelp === true) {
+    this.listenTo(window.mainPage.overlay, 'rl:changeOverlay', () => {
+      // TODO: By opening a dialog, we should either jump right into
+      // its ordered series of tips, or if those tips don't
+      // exist (e.g. an error/simple info dialog), we should
+      // just hide the help layer
+      this.hide();
+    });
+  },
+  showTips: function (tips) {
+    let changedHelp = true;
+    if (!changedHelp) {
+      if (this.relevantTips.length === tips.length) {
+        changedHelp = false;
+        for (let i = 0; i < this.relevantTips.length; i += 1) {
+          if (!dictCompare(this.relevantTips[i], tips[i])) {
+            changedHelp = true;
+            break;
+          }
+        }
+      }
+    }
+    this.relevantTips = tips;
+    if (this.relevantTips.length === 0) {
+      this.currentIndex = null;
+      this.render();
+    } else if (changedHelp) {
+      this.currentIndex = 0;
       this.render();
     }
   },
   hide: function () {
-    this.addedTuner = false;
-    jQuery('#tuner').remove();
-    window.mainPage.currentUser
-      .preferences.setMeta('showHelp', false);
-    window.mainPage.currentUser.preferences.save();
-    this.render();
+    this.showTips([]);
   },
-  show: function () {
-    window.mainPage.currentUser
-      .preferences.setMeta('showHelp', true);
-    window.mainPage.currentUser.preferences.save();
-    this.render();
-  },
-  render: Underscore.debounce(function () {
-    let meta = window.mainPage.currentUser.preferences.getMeta();
-    let showHelp = meta.showHelp;
-    let seenTips = meta.seenTips;
-
-    this.$el.on('click', () => {
+  nextTip: function () {
+    this.currentIndex += 1;
+    if (this.currentIndex >= this.relevantTips.length) {
       this.hide();
-    });
-
-    if (showHelp === false) {
+    } else {
+      this.render();
+    }
+  },
+  render: function () {
+    if (this.currentIndex === null) {
+      // Fade the whole layer out
       d3.select(this.el)
         .style('opacity', 1.0)
-        .transition().duration(500)
+        .transition().duration(this.showHideSpeed)
         .style('opacity', 0.0)
-        .attr('display', 'none');
+        .style('display', 'none');
     } else {
-      this.$el.html(template);
-
-      // Figure out how much space we have
-      let bounds = {
-        width: window.innerWidth,
-        height: window.innerHeight
-      };
-
-      let center = {
-        x: bounds.width / 2,
-        y: bounds.height / 2
-      };
-
-      // Default labels that are always there
-      // (not connected to any target)
-      let nodes = [
-        {
-          tipId: 'clearLabel',
-          nodeType: 'label',
-          message: 'Click anywhere to hide these tips',
-          x: center.x,
-          y: center.y,
-          fixed: true
-        },
-        // As of this writing, Cola's constraints don't seem to be
-        // taking me seriously. So in addition to constraints, I create
-        // four massive bumper nodes to force stuff to stay on the screen
-        {
-          tipId: 'left',
-          nodeType: 'border',
-          x: -center.x,
-          y: center.y,
-          width: bounds.width,
-          height: bounds.height,
-          fixed: true
-        },
-        {
-          tipId: 'right',
-          nodeType: 'border',
-          x: 1.5 * bounds.width,
-          y: center.y,
-          width: bounds.width,
-          height: bounds.height,
-          fixed: true
-        },
-        {
-          tipId: 'top',
-          nodeType: 'border',
-          x: center.x,
-          y: -center.y,
-          width: 2 * bounds.width,
-          height: bounds.height,
-          fixed: true
-        },
-        {
-          tipId: 'bottom',
-          nodeType: 'border',
-          x: center.x,
-          y: 1.5 * bounds.height,
-          width: 2 * bounds.width,
-          height: bounds.height,
-          fixed: true
-        }
-      ];
-      let edges = [];
-
-      // Connect labels to targets
-      for (let tipId of Object.keys(this.relevantTips)) {
-        let tip = this.relevantTips[tipId];
-        // Node containing the label
-        nodes.push({
-          tipId: tipId,
-          nodeType: 'label',
-          message: tip.message,
-          // Start each label at a random location
-          // x: Math.random() * bounds.width,
-          // y: Math.random() * bounds.height
-          x: tip.x,
-          y: tip.y + 250 // generally, tips are anchored toward the top
-        });
-        // Target (not drawn) for the link
-        nodes.push({
-          tipId: tip.tipId,
-          nodeType: 'arrowhead',
-          x: tip.x,
-          y: tip.y,
-          fixed: true
-        });
-        // The link itself
-        edges.push({
-          source: nodes.length - 2,
-          target: nodes.length - 1
-        });
+      if (!this.addedTemplate) {
+        this.$el.html(template);
+        this.$el.find('#helpLayerMask')
+          .on('click', () => { this.nextTip(); });
+        this.$el.find('#nextTipButton')
+          .on('click', () => { this.nextTip(); });
+        this.$el.find('#gotItButton')
+          .on('click', () => { this.hide(); });
+        this.addedTemplate = true;
       }
+      let tip = this.relevantTips[this.currentIndex];
 
-      // Subset of just the label nodes
-      let labelNodes = nodes.filter(d => d.nodeType === 'label');
-
-      // Draw the label nodes
-      let tips = d3.select(this.el).select('#nodeLayer').selectAll('.tip')
-        .data(labelNodes, d => d.tipId);
-      let tipsEnter = tips.enter().append('g');
-      tips.exit().remove();
-
-      // opacity: in the case where we pre-compute the layout,
-      // prevent the initial flash where the labels are in their
-      // original positions
-      tips.style('opacity', '0.0')
-        .attr('class', d => {
-          if (d.tipId === 'clearLabel') {
-            return 'clear tip';
-          } else if (seenTips[d.tipId] === true) {
-            return 'old tip';
-          } else {
-            return 'new tip';
-          }
-        });
-
-      // Background rectangle
-      // (we figure out its dimensions later)
-      tipsEnter.append('rect');
-
-      // Draw the text
-      tipsEnter.append('text');
-      tips.selectAll('text')
-        .text(d => d.message)
-        .attr('text-anchor', d => {
-          // Align the text based on where the label
-          // starts on the screen
-          if (d.x < bounds.width / 3) {
-            return 'start';
-          } else if (d.x < 2 * bounds.width / 3) {
-            return 'middle';
-          } else {
-            return 'end';
-          }
-        });
-
-      // Draw the arrows
-      let arrows = d3.select(this.el).select('#linkLayer')
-        .selectAll('.arrow').data(edges);
-      arrows.enter().append('path')
-        .attr('class', d => {
-          if (!seenTips[nodes[d.source].tipId]) {
-            return 'new arrow';
-          } else {
-            return 'old arrow';
-          }
-        });
-      arrows.exit().remove();
-
-      // Show the help layer and wrap the text appropriately
-      // (wrapping has to be done while the text is visible)
-      d3.select(this.el)
-        .style('opacity', 0.0)
-        .attr('display', null)
-        .transition().duration(500)
-        .style('opacity', 1.0);
-      tips.selectAll('text')
-        .each(function () {
-          // this refers to the DOM element
-          rewrap(this, 150, 1.1);
-        });
-
-      // Now precompute the sizes of each of the label
-      // text blocks, and adjust accordingly
-      let self = this;
-      let constraints = [];
-      tips.each(function (d) {
-        // this refers to the DOM element
-        let bounds = this.getBoundingClientRect();
-
-        // boundaries relative to the text anchor point
-        d.relative_left = bounds.left;
-        d.relative_right = bounds.right;
-        d.relative_top = bounds.top;
-        d.relative_bottom = bounds.bottom;
-
-        // cola expects the x and y coordinates to
-        // be in the center of the node to handle
-        // overlaps - so we need to move the text block
-        d3.select(this).select('text')
-          .attr('transform', 'translate(' +
-            (-(d.relative_left + d.relative_right) / 2) + ',' +
-            (-(d.relative_top + d.relative_bottom) / 2) + ')');
-
-        // let cola know our dimensions (add in the padding)
-        d.width = d.relative_right - d.relative_left + 2 * self.padding;
-        d.height = d.relative_bottom - d.relative_top + 2 * self.padding;
-
-        // Set the background rectangle's dimensions
-        d3.select(this).select('rect')
-          .attr('x', -d.width / 2)
-          .attr('y', -d.height / 2)
-          .attr('width', d.width)
-          .attr('height', d.height);
-
-        // Add in extra padding *outside* the rectangle
-        d.width += 2 * self.margin;
-        d.height += 2 * self.margin;
-
-        // Now that we know the dimensions, we can add
-        // appropriate constraints to keep the nodes on
-        // the screen
-        constraints.push({
-          axis: 'x',
-          type: 'separation',
-          left: 1, // left bumper
-          right: nodes.length - 2,
-          gap: d.width / 2
-        });
-        constraints.push({
-          axis: 'x',
-          type: 'separation',
-          left: nodes.length - 2,
-          right: 2, // right bumper
-          gap: d.width / 2
-        });
-        constraints.push({
-          axis: 'y',
-          type: 'separation',
-          left: 3, // top bumper
-          right: nodes.length - 2,
-          gap: d.height / 2
-        });
-        constraints.push({
-          axis: 'y',
-          type: 'separation',
-          left: nodes.length - 2,
-          right: 4, // bottom bumper
-          gap: d.height / 2
-        });
-      });
-
-      // Compute the layout
-      let force = cola.d3adaptor()
-        .size([bounds.width, bounds.height])
-        .nodes(nodes)
-        .links(edges)
-        .constraints(constraints);
-
-      // Apply any cola parameters that we've specified
-      for (let control of forceControls) {
-        if (control.colaParameter &&
-          this[control.option] !== undefined) {
-          force[control.option](this[control.option]);
-        }
-      }
-
-      let _renderGraph = () => {
-        // force.prepareEdgeRouting();
-        tips.style('opacity', '1.0')
-          .attr('transform', (d) => {
-            return 'translate(' + d.x + ',' + d.y + ')';
-          });
-        arrows.attr('d', d => {
-          // return arrowGenerator(force.routeEdge(d));
-          return arrowGenerator(d);
-        }).style('opacity', '1.0');
-      };
-
-      if (this.addedTuner) {
-        // If we're tweaking the layout, watch it settle
-        force.on('tick', _renderGraph);
+      // Figure out where to point to
+      let targetRect = getSelectionBounds(tip.selector);
+      if (targetRect === null) {
+        // The tip we're supposed to see
+        // isn't visible, so skip it
+        this.nextTip();
+        return;
       } else {
-        // Otherwise, just render when it's done
-        force.on('end', _renderGraph);
+        // Make a hole in the mask to allow the
+        // user to click through to the target
+        d3.select(this.el).select('#helpLayerMask')
+          .transition().duration(this.animationSpeed)
+          .attr('d', createMaskWithHole(targetRect));
       }
 
-      force.start(this.noConstraintIterations,
-        this.structuralIterations,
-        this.allConstraintIterations);
+      // If it's not already showing, fade the layer in
+      if (this.$el.css('display') === 'none') {
+        d3.select(this.el)
+          .style('display', null)
+          .style('opacity', 0.0)
+          .transition().duration(this.showHideSpeed)
+          .style('opacity', 1.0);
+      }
 
-      // Finally, store the set of tips that the user has now seen
-      // in the user preferences
-      window.mainPage.currentUser.preferences
-        .observeTips(this.relevantTips);
+      let targetCoords = {};
+
+      // Where should we put the bubble
+      // (and which corner should it point to)?
+      let bubbleCoords = {};
+      if (window.innerWidth - targetRect.right > targetRect.left) {
+        // More space to the right
+        bubbleCoords.x = window.innerWidth - targetRect.right;
+        targetCoords.x = targetRect.right;
+      } else {
+        // More space to the left
+        bubbleCoords.x = -targetRect.left;
+        targetCoords.x = targetRect.left;
+      }
+      if (window.innerHeight - targetRect.bottom > targetRect.top) {
+        // More space below
+        bubbleCoords.y = window.innerHeight - targetRect.bottom;
+        targetCoords.y = targetRect.bottom;
+      } else {
+        // More space above
+        bubbleCoords.y = -targetRect.top;
+        targetCoords.y = targetRect.top;
+      }
+      bubbleCoords.length = Math.sqrt(Math.pow(bubbleCoords.x, 2) +
+        Math.pow(bubbleCoords.y, 2));
+
+      // Put the bubble 200px in the direction of the corner
+      bubbleCoords.x = targetCoords.x + 200 * bubbleCoords.x /
+        bubbleCoords.length;
+      bubbleCoords.y = targetCoords.y + 200 * bubbleCoords.y /
+        bubbleCoords.length;
+
+      // Now let's see how big the bubble actually will be
+      let bubbleEl = d3.select('#bubble');
+      let textEl = bubbleEl.select('text');
+      textEl.attr('transform', null);
+
+      textEl.text(tip.message);
+
+      // Align the text based on where the label
+      // is on the screen
+      if (bubbleCoords.x < window.innerWidth / 3) {
+        textEl.attr('text-anchor', 'start');
+      } else if (bubbleCoords.x < 2 * window.innerWidth / 3) {
+        textEl.attr('text-anchor', 'middle');
+      } else {
+        textEl.attr('text-anchor', 'end');
+      }
+
+      // Reflow the text
+      rewrap(textEl.node(), 150, 1.1);
+
+      // Temporarily move the bubble to 0,0
+      let oldBubbleTransform = bubbleEl.attr('transform');
+      bubbleEl.attr('transform', null);
+
+      // Okay, now how big is the text?
+      let bounds = textEl.node().getBoundingClientRect();
+
+      if (oldBubbleTransform) {
+        bubbleEl.attr('transform', oldBubbleTransform);
+      }
+
+      // boundaries relative to the text anchor point
+      bubbleCoords.relative_left = bounds.left;
+      bubbleCoords.relative_right = bounds.right;
+      bubbleCoords.relative_top = bounds.top;
+      bubbleCoords.relative_bottom = bounds.bottom;
+
+      // Move the text block to the center of the bubble
+      textEl.attr('transform', 'translate(' +
+          (-(bubbleCoords.relative_left +
+             bubbleCoords.relative_right) / 2) + ',' +
+          (-(bubbleCoords.relative_top +
+             bubbleCoords.relative_bottom) / 2) + ')');
+
+      // How big should the bubble be? (add in the padding)
+      bubbleCoords.width = bubbleCoords.relative_right -
+        bubbleCoords.relative_left + 2 * this.padding;
+      bubbleCoords.height = bubbleCoords.relative_bottom -
+        bubbleCoords.relative_top + 2 * this.padding;
+
+      // Okay, calculate the radius and update the circle
+      bubbleCoords.radius = Math.sqrt(Math.pow(bubbleCoords.width, 2) +
+        Math.pow(bubbleCoords.height, 2)) / 2;
+      bubbleEl.select('circle')
+        .transition().duration(this.animationSpeed)
+        .attr('r', bubbleCoords.radius);
+
+      // Add in extra padding *outside* the circle
+      bubbleCoords.radius += this.margin;
+      bubbleCoords.width = 2 * bubbleCoords.radius;
+      bubbleCoords.height = 2 * bubbleCoords.radius;
+
+      // Make sure that the bubble isn't going off screen.
+      // If it is, it's probably pointing to something really wide/tall,
+      // so we should point to its center, not its corner
+      if (bubbleCoords.x - bubbleCoords.width / 2 < 0) {
+        bubbleCoords.x = bubbleCoords.width / 2;
+        targetCoords.x = (targetRect.left + targetRect.right) / 2;
+      }
+      if (bubbleCoords.x + bubbleCoords.width / 2 > window.innerWidth) {
+        bubbleCoords.x = window.innerWidth - bubbleCoords.width / 2;
+        targetCoords.x = (targetRect.left + targetRect.right) / 2;
+      }
+      if (bubbleCoords.y - bubbleCoords.height / 2 < 0) {
+        bubbleCoords.y = bubbleCoords.height / 2;
+        targetCoords.y = (targetRect.top + targetRect.bottom) / 2;
+      }
+      if (bubbleCoords.y + bubbleCoords.height / 2 > window.innerHeight) {
+        bubbleCoords.y = window.innerHeight - bubbleCoords.height / 2;
+        targetCoords.y = (targetRect.top + targetRect.bottom) / 2;
+      }
+
+      // Move the bubble where it belongs
+      bubbleEl.transition().duration(this.animationSpeed)
+        .attr('transform', 'translate(' + bubbleCoords.x + ',' +
+          bubbleCoords.y + ')');
+
+      // Draw the arrow
+      d3.select('#arrow')
+        .transition().duration(this.animationSpeed)
+        .attr('d', arrowGenerator({
+          source: bubbleCoords,
+          target: targetCoords
+        }));
+
+      // Have we already seen this tip?
+      if (window.mainPage.currentUser.preferences.hasSeenTip(tip)) {
+        this.$el.attr('class', 'old');
+      } else {
+        this.$el.attr('class', 'new');
+      }
+
+      // Now that we've successfully drawn it, make a note that
+      // the user has already seen this tip
+      window.mainPage.currentUser.preferences.observeTip(tip);
     }
-  }, 300),
-  renderTuner: function () {
-    let self = this;
-
-    // Easter egg: I added some tuners to tweak the label layout
-    // as needed. To see this view, type
-    // mainPage.helpLayer.renderTuner() on the console
-    if (!this.addedTuner) {
-      d3.select('body')
-        .append('div')
-        .attr('id', 'tuner')
-        .append('button')
-        .text('Run again')
-        .on('click', () => {
-          self.addedTemplate = false;
-          self.render();
-          self.renderTuner();
-        });
-      this.addedTuner = true;
-    }
-
-    let controls = d3.select('#tuner').selectAll('div').data(forceControls);
-    let controlsEnter = controls.enter().append('div');
-
-    // Control to change this parameter's setting (if enabled)
-    controlsEnter.append('input')
-      .attr('id', d => d.option + 'control')
-      .attr('class', 'control')
-      .on('change', function (d) {
-        // this refers to the DOM element
-        if (d.step) {
-          self[d.option] = this.value;
-        } else {
-          self[d.option] = this.checked;
-        }
-
-        self.addedTemplate = false;
-        self.render();
-        self.renderTuner();
-      });
-    controls.selectAll('input.control')
-      .attr('type', (d) => {
-        if (d.step) {
-          return 'range';
-        } else {
-          return 'checkbox';
-        }
-      }).each(function (d) {
-        // this refers to the DOM element
-        let element = d3.select(this);
-        if (d.step) {
-          element.attr('min', d.range[0])
-            .attr('max', d.range[1])
-            .attr('step', d.step);
-          if (self[d.option] !== undefined) {
-            element.property('value', self[d.option]);
-          }
-        } else {
-          if (self[d.option]) {
-            element.property('checked', true);
-          }
-        }
-        element.property('disabled', self[d.option] === undefined);
-      });
-
-    // Label for the control (with its current value)
-    controlsEnter.append('label')
-      .attr('class', 'control')
-      .attr('for', d => d.option + 'control');
-    controls.selectAll('label.control')
-      .text(d => {
-        let value;
-        if (this[d.option] === undefined) {
-          value = '--';
-        } else if (this[d.option] === true) {
-          value = 'true';
-        } else if (this[d.option] === false) {
-          value = 'false';
-        } else {
-          value = this[d.option];
-        }
-        return d.option + ': ' + value;
-      });
-
-    // Control to enable / disable this parameter
-    controlsEnter.append('input')
-      .attr('id', d => d.option + 'enable')
-      .attr('class', 'enable')
-      .attr('type', 'checkbox')
-      .on('change', function (d) {
-        // this refers to the DOM element
-        if (this.checked) {
-          self[d.option] = d.range[0];
-        } else {
-          self[d.option] = undefined;
-        }
-
-        self.addedTemplate = false;
-        self.render();
-        self.renderTuner();
-      });
-
-    // Label for the enable switch
-    controls.selectAll('input.enable')
-      .property('checked', d => this[d.option] !== undefined)
-      .property('disabled', d => !d.colaParameter);
-    controlsEnter.append('label')
-      .attr('class', 'enable')
-      .attr('for', d => d.option + 'enable')
-      .text('Enable');
   }
 });
 

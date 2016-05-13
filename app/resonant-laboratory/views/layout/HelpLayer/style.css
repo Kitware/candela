@@ -1,44 +1,39 @@
-#HelpLayer {
+#HelpLayer svg {
   position: absolute;
   z-index: 10;
   left: 0px;
   top: 0px;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.35);
+  pointer-events: none; /* Allow events to pass through the hole */
 }
-#HelpLayer .arrow {
+#HelpLayer svg > * {
+  pointer-events: initial;
+}
+#HelpLayer #helpLayerMask {
+  fill: rgba(0,0,0,0.35);
+  stroke: none;
+}
+#HelpLayer #arrow {
   fill: none;
 }
-#HelpLayer .tip rect {
-  opacity: 0.85;
-}
-#HelpLayer .old.tip rect {
+#HelpLayer.old #bubble circle {
   fill: #ffffcc;
 }
-#HelpLayer .new.tip rect {
+#HelpLayer.new #bubble circle {
   fill: #b3cde3;
 }
-#HelpLayer .old.arrow,
-#HelpLayer .old.tip rect {
+#HelpLayer.old #arrow,
+#HelpLayer.old #bubble circle {
   stroke-width: 2px;
   stroke: #ffff33;
 }
-#HelpLayer .new.arrow,
-#HelpLayer .new.tip rect {
+#HelpLayer.new #arrow,
+#HelpLayer.new #bubble circle {
   stroke-width: 2px;
   stroke: #377eb8;
 }
-#HelpLayer .clear.tip text {
-  font-size: 2em;
-  font-weight: 900;
-  fill: #ffff33;
-}
-#HelpLayer .clear.tip rect {
-  fill: none;
-  stroke: none;
-}
-#tuner {
+#HelpLayer #gotIt {
   position: absolute;
   bottom: 2em;
   right: 2em;
@@ -48,13 +43,13 @@
   border: 1px solid rgba(0,0,0,0.2);
   box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
-#tuner > div {
+#HelpLayer #gotIt > div {
   display: flex;
   justify-content: space-between;
   padding: 0.5em;
   align-items: center;
 }
-#tuner > div > * {
+#HelpLayer #gotIt > div > * {
   margin-left: 0.25em;
   margin-right: 0.25em;
 }
