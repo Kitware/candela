@@ -6,16 +6,17 @@
     .info-uuid #{uuid}
 .info-help
   a(href=helpLink).help Help
-  .dropdown
-    button#dLabel.btn.btn-default.dropdown-toggle(data-toggle="dropdown")
-      Dropdown csv
-      span.caret
-    ul.dropdown-menu.dropdown-menu-right
-      li.csv-link
-        a(href="/tracker/submission/csv?submissionUuid=#{uuid}") Current key metrics
-      li.csv-link
-        a(href="/tracker/submission/csv?submissionUuid=#{uuid}&keyMetricsOnly=false") Current all metrics
-      li.csv-link
-        a(href="/tracker/submission/csv?submissionUuid=#{uuid}&daysInterval=7") Last 7 days key metrics
-      li.csv-link
-        a(href="/tracker/submission/csv?submissionUuid=#{uuid}&daysInterval=7&keyMetricsOnly=false") Last 7 days all metrics
+  if uuid
+    .dropdown
+      button#dLabel.btn.btn-default.dropdown-toggle(data-toggle="dropdown")
+        Dropdown csv
+        span.caret
+      ul.dropdown-menu.dropdown-menu-right
+        li.csv-link
+          a(href="/tracker/submission/csv?submissionUuid=#{uuid}") Current key metrics
+        li.csv-link
+          a(href="/tracker/submission/csv?submissionUuid=#{uuid}&keyMetricsOnly=false") Current all metrics
+        li.csv-link
+          a(href="/tracker/submission/csv?submissionUuid=#{uuid}&daysInterval=7") Last 7 days key metrics
+        li.csv-link
+          a(href="/tracker/submission/csv?submissionUuid=#{uuid}&daysInterval=7&keyMetricsOnly=false") Last 7 days all metrics
