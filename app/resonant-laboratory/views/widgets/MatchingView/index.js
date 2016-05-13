@@ -452,9 +452,9 @@ in order to connect them together.`);
 
     // Update our little indicator
     // to describe the matching
-    this.statusText.text = graph.realEdgeCount + ' / ' + numVis;
-    this.statusText.title = graph.realEdgeCount + ' of ' + numVis +
-      ' visual channels have been mapped';
+    this.statusText.text = graph.realEdgeCount + ' | ' + numVis;
+    this.statusText.title = graph.realEdgeCount + ' data attributes' +
+      ' have been mapped to ' + numVis + ' visual encodings';
     if (graph.realEdgeCount > 0) {
       this.status = STATUS.OK;
     } else if (this.status !== STATUS.STALE_MAPPINGS &&
