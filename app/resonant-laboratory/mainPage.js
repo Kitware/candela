@@ -1,4 +1,5 @@
 import Backbone from 'backbone';
+import jQuery from 'jquery';
 
 import Router from './Router';
 import User from './models/User';
@@ -11,6 +12,7 @@ import HelpLayer from './views/layout/HelpLayer';
 import NotificationLayer from './views/layout/NotificationLayer';
 
 // Page-wide Styles
+import iconFilters from './stylesheets/recolorIconFilters.html';
 import './stylesheets/pure-css-custom-form-elements/style.css';
 import './stylesheets/mainPage.css';
 import './stylesheets/girderPatches.css';
@@ -50,6 +52,7 @@ let MainPage = Backbone.View.extend({
       actually add them until we call render()
     */
     if (!this.addedPageChunks) {
+      jQuery('#RecolorIconFilters').html(iconFilters);
       this.header = new Header({
         el: '#Header'
       });

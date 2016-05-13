@@ -18,6 +18,7 @@
   top: 1.5em;
   width: 1em;
   height: 1em;
+  cursor: pointer;
 }
 #NotificationLayer .notification .content {
   padding: 1em 2em 1em 1em;
@@ -29,4 +30,7 @@
 #NotificationLayer .notification.error .content {
   background-color: #fed9a6;
   border: 1px solid #ff7f00;
+}
+#NotificationLayer .notification.error img.closeIcon {
+  -webkit-filter: url(#recolorImageToff7f00);
 }
