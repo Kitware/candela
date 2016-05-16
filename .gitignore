@@ -3,6 +3,7 @@
 node_modules
 build
 coverage
+dist
 .server.pid
 .server.log
 npm-debug.log
