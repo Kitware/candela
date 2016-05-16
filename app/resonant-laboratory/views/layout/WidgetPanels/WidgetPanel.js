@@ -22,6 +22,8 @@ let ICONS = {
   VisualizationView: VisualizationIcon
 };
 
+import swapIcon from '../../../images/swap.svg';
+
 let WidgetPanel = Backbone.View.extend({
   initialize: function (spec) {
     this.spec = spec;
@@ -101,6 +103,15 @@ let WidgetPanel = Backbone.View.extend({
           this.widget.statusText.onclick(d3.event);
         }
       });
+
+    if (this.widget.spec.widgetType !== 'MatchingView') {
+      indicators.select('.indicatorText')
+        .append('img')
+        .attr('src', swapIcon);
+    } else {
+      indicators.select('.indicatorText')
+        .select('img').remove();
+    }
 
     // Update our set of indicator icons
     let indicatorIcons = d3.select(this.el)
