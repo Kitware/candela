@@ -23,6 +23,13 @@ karmaConfig.coverageReporter = {
       type: 'lcovonly',
       dir: 'coverage',
       subdir: 'lcov'
+    },
+
+    {
+      type: 'cobertura',
+      dir: 'coverage/',
+      file: 'coverage.xml',
+      subdir: 'cobertura'
     }
   ]
 };
