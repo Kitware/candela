@@ -3,7 +3,6 @@
   position: absolute;
   right: 1em;
   bottom: 1em;
-  width: 32em;
   -ms-user-select: initial;
   -moz-user-select: initial;
   -webkit-user-select: initial;
@@ -19,18 +18,23 @@
   width: 1em;
   height: 1em;
   cursor: pointer;
+  -webkit-filter: url(#recolorImageToffff33);
+  filter: url(#recolorImageToffff33);
 }
 #NotificationLayer .notification .content {
   padding: 1em 2em 1em 1em;
-  background-color: #ffffcc;
-  border: 1px solid #ffff33;
+  background-color: rgba(255, 255, 204, 0.75);
+  border: 2px solid #ffff33;
+  border-radius: 3px;
   text-align: right;
   width: auto;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
 #NotificationLayer .notification.error .content {
-  background-color: #fed9a6;
-  border: 1px solid #ff7f00;
+  background-color: rgba(254, 217, 166, 0.75);
+  border: 2px solid #ff7f00;
 }
 #NotificationLayer .notification.error img.closeIcon {
   -webkit-filter: url(#recolorImageToff7f00);
+  filter: url(#recolorImageToff7f00);
 }

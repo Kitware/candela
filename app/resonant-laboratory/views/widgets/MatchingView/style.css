@@ -79,6 +79,7 @@
 }
 
 .MatchingView.content .node.connectable image {
+  -webkit-filter: url(#recolorImageTo377eb8);
   filter: url(#recolorImageTo377eb8);
 }
 
@@ -109,6 +110,7 @@
 }
 
 .MatchingView.content .node.selected image {
+  -webkit-filter: url(#recolorImageTo333333);
   filter: url(#recolorImageTo333333);
 }
 
@@ -121,6 +123,7 @@
 }
 
 .MatchingView.content .node.linked image {
+  -webkit-filter: url(#recolorImageTo4daf4a);
   filter: url(#recolorImageTo4daf4a);
 }
 
@@ -140,6 +143,7 @@
 }
 
 .MatchingView.content .node.linked.hovered image {
+  -webkit-filter: url(#recolorImageToff7f00);
   filter: url(#recolorImageToff7f00);
 }
 
