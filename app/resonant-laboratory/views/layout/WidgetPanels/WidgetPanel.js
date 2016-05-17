@@ -56,7 +56,17 @@ let WidgetPanel = Backbone.View.extend({
     let indicatorsEnter = headerEnter.append('div')
       .attr('class', 'indicators');
 
-    indicatorsEnter.append('h2')
+    let elementType;
+    if (this.widget.spec.widgetType === 'MatchingView') {
+      elementType = 'h2';
+    } else {
+      elementType = 'button';
+    }
+    /* TODO: see issue #214... in the future, we can just do:
+    indicatorsEnter.append('button')
+      .attr('class', 'indicatorText');
+    */
+    indicatorsEnter.append(elementType)
       .attr('class', 'indicatorText');
     indicatorsEnter.append('div')
       .attr('class', 'indicatorIcons');

@@ -219,12 +219,26 @@ let Project = MetadataItem.extend({
     }
   },
   setDataset: function (newDataset, index = 0) {
-    // Need to convert the raw girder.ItemModel
-    newDataset = new Dataset(newDataset.toJSON());
-    this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
-    this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
-    let newId = newDataset.getId();
     let datasets = this.getMeta('datasets');
+    let newId;
+
+    // Need to convert the raw girder.ItemModel
+    try {
+      newDataset = new Dataset(newDataset.toJSON());
+      newId = newDataset.getId();
+      this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
+      this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
+    } catch (e) {
+      if (e instanceof Dataset.DuplicateDatasetError) {
+        // We've already loaded the dataset...
+        return;
+        // TODO: when we support multiple datasets, it may
+        // be valid to swap in a dataset we've already loaded
+        // into a different slot...
+      } else {
+        window.mainPage.trigger('rl:error', e);
+      }
+    }
 
     if (index >= datasets.length) {
       datasets.push(newId);

@@ -19,8 +19,18 @@ let VALID_EXTENSIONS = [
   'json'
 ];
 
+function DuplicateDatasetError (message) {
+  this.name = 'DuplicateDatasetError';
+  this.message = message;
+  this.stack = (new Error()).stack;
+}
+DuplicateDatasetError.prototype = Object.create(Error.prototype);
+
 let Dataset = MetadataItem.extend({
   initialize: function () {
+    if (window.mainPage.loadedDatasets[this.getId()]) {
+      throw new DuplicateDatasetError();
+    }
     window.mainPage.loadedDatasets[this.getId()] = this;
 
     this.rawCache = null;
@@ -192,4 +202,5 @@ let Dataset = MetadataItem.extend({
 
 Dataset.COMPATIBLE_TYPES = COMPATIBLE_TYPES;
 Dataset.VALID_EXTENSIONS = VALID_EXTENSIONS;
+Dataset.DuplicateDatasetError = DuplicateDatasetError;
 export default Dataset;
