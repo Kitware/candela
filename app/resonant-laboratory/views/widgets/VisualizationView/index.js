@@ -111,21 +111,21 @@ let VisualizationView = Widget.extend({
           // and create a new candela component
           this.$el.html(myTemplate);
 
-          this.vis = {
-            spec: spec,
-            options: options,
-            component: new candela.components[spec.name](
-              '#' + this.spec.hashName + 'Container .visualization', options)
-          };
-        } else {
-          // The visualization hasn't changed, but the options may have.
-          Object.keys(this.vis.options).forEach(key => {
-            if (!options.hasOwnProperty(key)) {
-              // This option is no longer specified; set it to
-              // null so that it's removed from the visualization
-              options[key] = null;
-            }
-          });
+        this.vis = {
+          spec: spec,
+          options: options,
+          component: new candela.components[spec.name](
+            '#' + this.spec.hashName + 'Container .visualization', options)
+        };
+      } else {
+        // The visualization hasn't changed, but the options may have.
+        Object.keys(this.vis.options).forEach(key => {
+          if (!options.hasOwnProperty(key)) {
+            // This option is no longer specified;
+            // remove it so that it's removed from the visualization
+            delete options[key];
+          }
+        });
 
           this.vis.options = options;
         }

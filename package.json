@@ -27,7 +27,9 @@
     "ignore": [
       "config",
       "src/external",
-      "app/resonant-laboratory/web_client/lib"
+      "app/resonant-laboratory/web_client/lib",
+      "dist",
+      "built"
     ]
   },
   "repository": {
