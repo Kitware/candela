@@ -19,8 +19,8 @@ export default class Geo extends VisComponent {
           .createFeature(feature.type)
           .data(feature.data)
           .position(d => ({
-            x: d[feature.position.x],
-            y: d[feature.position.y]
+            x: d[feature.x],
+            y: d[feature.y]
           }));
       });
       this.plot.draw();
