@@ -99,7 +99,22 @@
 
     "axes": [
       {"type": "x", "scale": "x"},
-      {"type": "y", "scale": "y"}
+      [
+        "@if", ["@eq", ["@get", "id"], "_id"],
+        {
+          "type": "y",
+          "scale": "y",
+          "properties": {
+            "labels": {
+              "text": {"value": ""}
+            }
+          }
+        },
+        {
+          "type": "y",
+          "scale": "y"
+        }
+      ]
     ],
 
     "marks": [
