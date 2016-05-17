@@ -100,7 +100,6 @@ let Dataset = MetadataItem.extend({
       return databaseQuery.then(resp => {
         return JSON.stringify(resp.data);
       }, () => {
-        console.log('hello');
         return girder.restRequest({
           path: 'item/' + this.getId() + '/download',
           type: 'GET',
