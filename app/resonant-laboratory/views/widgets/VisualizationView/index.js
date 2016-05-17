@@ -119,9 +119,9 @@ let VisualizationView = Widget.extend({
         // The visualization hasn't changed, but the options may have.
         Object.keys(this.vis.options).forEach(key => {
           if (!options.hasOwnProperty(key)) {
-            // This option is no longer specified; set it to
-            // null so that it's removed from the visualization
-            options[key] = null;
+            // This option is no longer specified;
+            // remove it so that it's removed from the visualization
+            delete options[key];
           }
         });
 
