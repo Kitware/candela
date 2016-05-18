@@ -16,6 +16,16 @@ export default class LineUp {
           format: 'objectlist'
         },
         {
+          name: 'fields',
+          type: 'string_list',
+          format: 'string_list',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        },
+        {
           name: 'stacked',
           type: 'boolean',
           format: 'boolean'
@@ -247,9 +257,14 @@ export default class LineUp {
       children: []
     };
     let attributes = datalib.type.all(data);
-    for (let attr of Object.keys(attributes)) {
+    /* If fields was specified, use them in order (if they exist as data
+     * attributes).  If fields was not specified, use the data attributes. */
+    for (let attr of (this.options.fields ? this.options.fields : Object.keys(attributes))) {
+      if (!(attr in attributes)) {
+        continue;
+      }
       let type = attributes[attr];
-      if (type === 'integer' || type === 'boolean' || type === 'date') {
+      if (type === 'integer' || type === 'date') {
         type = 'number';
       }
       let col = {
@@ -265,13 +280,15 @@ export default class LineUp {
         column: attr,
         width: 200
       };
-      if (type === 'number') {
+      if (type === 'number' || type === 'boolean') {
         stacked.children.push(layout);
       } else {
         desc.layout.primary.push(layout);
       }
     }
-    desc.layout.primary.push(stacked);
+    if (stacked.children.length) {
+      desc.layout.primary.push(stacked);
+    }
     data.forEach((d, i) => {
       d.__index = i;
     });
