@@ -59,51 +59,74 @@ class DataItemSummary(Resource):
         # Variety: https://github.com/variety/variety
         # mongodb-schema: https://github.com/mongodb-js/mongodb-schema
         collection = self.getMongoCollection(item)
-        result = collection.inline_map_reduce(
+        mr_result = collection.inline_map_reduce(
           """
             function() {
               var keys = this;
               for (var key in keys) {
                 var value = keys[key];
+                var dataType = typeof value;
                 key = key.replace(/\d+/g,'XX');
 
-                occurrences = {};
-                occurrences[typeof value] = 1;
-                emit(key, occurrences);
+                dataTypes = {};
+                dataTypes[dataType] = {
+                  count: 1
+                };
+                if (dataType === 'string' ||
+                  dataType === 'number') {
+                  dataTypes[dataType].min = value;
+                  dataTypes[dataType].max = value;
+                };
+                emit(key, dataTypes);
               }
             }
           """,
           """
             function(key, values) {
-              var occurrences = {};
+              var dataTypes = {};
         	  values.forEach(function(value) {
                 for (dataType in value) {
-                  if (!occurrences.hasOwnProperty(dataType)) {
-                    occurrences[dataType] = 0;
+                  if (!dataTypes.hasOwnProperty(dataType)) {
+                    dataTypes[dataType] = {
+                      count: 0
+                    };
+                    if (dataType === 'string' ||
+                      dataType === 'number') {
+                      dataTypes[dataType].min = value[dataType].min;
+                      dataTypes[dataType].max = value[dataType].max;
+                    }
                   }
-                  occurrences[dataType] += value[dataType]
+                  dataTypes[dataType].count += value[dataType].count;
+                  if (dataType === 'string' || dataType === 'number') {
+                    dataTypes[dataType].min = value[dataType].min < dataTypes[dataType].min ? value[dataType].min : dataTypes[dataType].min;
+                    dataTypes[dataType].max = value[dataType].max > dataTypes[dataType].max ? value[dataType].max : dataTypes[dataType].max;
+                  }
                 }
         	  });
 
-        	  return occurrences;
+        	  return dataTypes;
             }
           """)
-        return list(result)
+        # rearrange into a neater dict before sending it back
+        result = {}
+        for r in mr_result:
+            result[r['_id']] = r['value']
+        return result
 
     def getMongoHistograms(self, item, params):
         """
         Debugging parameters:
-        id: 5739ce44acef4a1d4bc1303e
-        (restaurants)
+        id: 573b110ded27aa29547adeb5
+        (nci)
 
         filterQuery:
-        {"$or":[{"meta.p1a.image.meta.localization":"l arm"},{"meta.p1a.image.meta.localization":"r arm"}]}
+        {"$or":[{"Metal":{"$eq":1}},{"IsCrystalline":{"$eq":1}}]}
 
         categoricalAttrs:
-        meta.p1a.image.meta.gender,meta.p1a.image.meta.localization
+        Agglomerated,Metal,IsCrystalline,Lipid
 
         quantitativeAttrs:
-        {"meta.p1a.image.meta.age":{"min":0,"max":100,"binCount":10}}
+        {"Molecular Weight":{"min":0,"max":1000000,"binCount":10}}
         """
 
         # Establish the connection to the mongodb
@@ -138,6 +161,7 @@ class DataItemSummary(Resource):
                 'totalCount': {'$sum': 1}
             }
         })
+
         try:
             temp = next(collection.aggregate(pipeline))
         except StopIteration:
