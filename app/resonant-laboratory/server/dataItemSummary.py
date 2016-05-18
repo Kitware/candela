@@ -48,6 +48,48 @@ class DataItemSummary(Resource):
         else:
             return self.getFlatFileHistograms(item, params)
 
+    def getMongoCollection(self, item):
+        dbMetadata = item['databaseMetadata']
+        conn = MongoClient(dbMetadata['url'])
+        return conn[dbMetadata['database']][dbMetadata['collection']]
+
+    def inferMongoSchema(self, item, params):
+        # TODO: there's a chance someone has done this more
+        # efficiently. Javascript solutions I found:
+        # Variety: https://github.com/variety/variety
+        # mongodb-schema: https://github.com/mongodb-js/mongodb-schema
+        collection = self.getMongoCollection(item)
+        result = collection.inline_map_reduce(
+          """
+            function() {
+              var keys = this;
+              for (var key in keys) {
+                var value = keys[key];
+                key = key.replace(/\d+/g,'XX');
+
+                occurrences = {};
+                occurrences[typeof value] = 1;
+                emit(key, occurrences);
+              }
+            }
+          """,
+          """
+            function(key, values) {
+              var occurrences = {};
+        	  values.forEach(function(value) {
+                for (dataType in value) {
+                  if (!occurrences.hasOwnProperty(dataType)) {
+                    occurrences[dataType] = 0;
+                  }
+                  occurrences[dataType] += value[dataType]
+                }
+        	  });
+
+        	  return occurrences;
+            }
+          """)
+        return list(result)
+
     def getMongoHistograms(self, item, params):
         """
         Debugging parameters:
@@ -65,9 +107,7 @@ class DataItemSummary(Resource):
         """
 
         # Establish the connection to the mongodb
-        dbMetadata = item['databaseMetadata']
-        conn = MongoClient(dbMetadata['url'])
-        items = conn[dbMetadata['database']][dbMetadata['collection']]
+        collection = self.getMongoCollection(item)
 
         # A dict to store the results of aggregation
         results = {}
@@ -90,7 +130,7 @@ class DataItemSummary(Resource):
                     '$match': query
                 })
 
-        # Count how many items match the filters across the database
+        # Count how many data items match the filters across the database
         pipeline = copy.deepcopy(pipelineBase)
         pipeline.append({
             '$group': {
@@ -99,7 +139,7 @@ class DataItemSummary(Resource):
             }
         })
         try:
-            temp = next(items.aggregate(pipeline))
+            temp = next(collection.aggregate(pipeline))
         except StopIteration:
             return {
                 'Total Size': 0
@@ -121,7 +161,7 @@ class DataItemSummary(Resource):
                         }
                     }
                 })
-                results[attr] = list(items.aggregate(pipeline))
+                results[attr] = list(collection.aggregate(pipeline))
 
         # Create and run pipelines for each quantitative attribute
         if 'quantitativeAttrs' in params:
@@ -163,7 +203,7 @@ class DataItemSummary(Resource):
                         }
                     }
                 })
-                results[attr] = list(items.aggregate(pipeline))
+                results[attr] = list(collection.aggregate(pipeline))
                 for result in results[attr]:
                     result['lowBound'] = (result['_id'] / spec['binCount']) * \
                         histogramRange + spec['min']
