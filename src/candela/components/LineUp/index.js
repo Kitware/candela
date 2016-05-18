@@ -259,7 +259,8 @@ export default class LineUp {
     let attributes = datalib.type.all(data);
     /* If fields was specified, use them in order (if they exist as data
      * attributes).  If fields was not specified, use the data attributes. */
-    for (let attr of (this.options.fields ? this.options.fields : Object.keys(attributes))) {
+    let fields = this.options.fields ? this.options.fields : Object.keys(attributes);
+    for (let attr of fields) {
       if (!(attr in attributes)) {
         continue;
       }
@@ -292,6 +293,7 @@ export default class LineUp {
     data.forEach((d, i) => {
       d.__index = i;
     });
-    this.main = this.createLineup(this.el, 'main', desc, data, this.main, 'Combined');
+    let name = 'main';
+    this.createLineup(this.el, 'main', desc, data, this.lineupInstances[name], 'Combined');
   }
 }
