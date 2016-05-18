@@ -10,6 +10,7 @@
 * [Histogram](Histogram#readme)
 * [LineChart](LineChart#readme)
 * [LineUp](LineUp#readme)
+* [OnSet](OnSet#readme)
 * [ScatterPlot](ScatterPlot#readme)
 * [ScatterPlotMatrix](ScatterPlotMatrix#readme)
 * [UpSet](UpSet#readme)
