@@ -51,3 +51,4 @@ and make them available to UpSet:
 | id         | String | A field containing unique ids for each record. |
 | sets       | Array of String | A list of fields containing 0/1 set membership information which will be populated in the UpSet view. |
 | fields     | Array of String | A list of categorical fields that will be translated into collections of 0/1 sets for every distinct value in each field and populated in the UpSet view. |
+| metadata   | Array of String | A list of additional metadata fields to make available to UpSet. |
