@@ -1,7 +1,6 @@
 import Backbone from 'backbone';
 import jQuery from 'jquery';
 import d3 from 'd3';
-import Dataset from '../../../models/Dataset';
 import myTemplate from './template.html';
 import libImage from '../../../images/light/library.svg';
 import privateImage from '../../../images/light/file_private.svg';
@@ -60,16 +59,18 @@ let DatasetLibrary = Backbone.View.extend({
     });
     datasets.on('reset', function (items) {
       let datasetModels = items.models.filter(d => {
-        // TODO: find a more precise way of differentiating
-        // what items are datasets vs projects vs something else
-        let ext = d.name();
-        if (ext) {
-          ext = ext.split('.');
-          ext = ext[ext.length - 1].toLowerCase();
-        } else {
+        // Assume it's a dataset unless we can identify
+        // it as something else... TODO: do something smarter?
+        if (d.name() === 'rl_preferences') {
+          // this is a preferences item
           return false;
         }
-        return Dataset.VALID_EXTENSIONS.indexOf(ext) !== -1;
+        let meta = d.get('meta');
+        if (meta && meta.datasets) {
+          // this is a project
+          return false;
+        }
+        return true;
       });
 
       if (datasetModels.length > 0) {

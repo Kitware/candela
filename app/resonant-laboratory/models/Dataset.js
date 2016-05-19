@@ -1,23 +1,18 @@
 import MetadataItem from './MetadataItem';
-import datalib from 'datalib';
-import dictCompare from '../shims/dictCompare.js';
 
 let girder = window.girder;
 
-let COMPATIBLE_TYPES = {
-  boolean: ['boolean'],
-  integer: ['integer', 'boolean'],
-  number: ['number', 'integer', 'boolean'],
-  date: ['date'],
-  string: ['string', 'date', 'number', 'integer', 'boolean'],
-  'string_list': ['string_list']
+let DEFAULT_INTERPRETATIONS = {
+  'undefined': 'ignore',
+  boolean: 'categorical',
+  integer: 'quantitative',
+  number: 'quantitative',
+  date: 'categorical',
+  string: 'categorical',
+  object: 'ignore'
 };
 
-let VALID_EXTENSIONS = [
-  'csv',
-  'tsv',
-  'json'
-];
+let BIN_COUNT = 10;
 
 function DuplicateDatasetError (message) {
   this.name = 'DuplicateDatasetError';
@@ -33,41 +28,171 @@ let Dataset = MetadataItem.extend({
     }
     window.mainPage.loadedDatasets[this.getId()] = this;
 
+    // If any of this initialization stuff ends up
+    // saving a copy of this item, we'll get our
+    // id swapped from under us...
+    this.listenTo(this, 'rl:swapId', this.swapId);
+
     this.rawCache = null;
     this.parsedCache = null;
     let meta = this.getMeta();
 
-    this.listenTo(this, 'rl:swapId', this.swapId);
+    let schemaPromise;
 
-    let fileTypePromise;
-    if (meta.fileType) {
-      fileTypePromise = Promise.resolve(meta.fileType);
+    let girderUpdate = this.get('updated');
+    // TODO: do database items update their girder 'updated' flag
+    // when the database is modified? If not, we may need a deeper
+    // check...
+    if (meta.schema && meta.last_updated && girderUpdate &&
+      new Date(meta.last_updated) >= new Date(girderUpdate)) {
+      // We can just use the cached schema
+      schemaPromise = Promise.resolve(meta.schema);
     } else {
-      fileTypePromise = this.inferFileType();
+      // We need to run schema inference...
+      schemaPromise = this.inferSchema();
     }
 
-    let attributePromise;
-    if (meta.attributes) {
-      attributePromise = Promise.resolve(meta.attributes);
+    schemaPromise.then(schema => {
+      // Now that we know the schema, if we have filters,
+      // we should validate and reapply them
+      return this.setFilters(meta.filters);
+    }).then();
+  },
+  getAttributeInterpretation: function (attrSpec) {
+    if (attrSpec.interpretation) {
+      // The user has specified an interpretation
+      return attrSpec.interpretation;
     } else {
-      attributePromise = this.inferAttributes();
+      // Go with the default interpretation for the attribute type
+      return DEFAULT_INTERPRETATIONS[this.getAttributeType(attrSpec)];
     }
-
-    let prevFileType = this.getMeta('fileType');
-    let prevAttributes = this.getMeta('attributes');
-
-    Promise.all([fileTypePromise, attributePromise]).then(() => {
-      // Don't call save() if nothing changed
-      if (this.getMeta('fileType') !== prevFileType ||
-          !dictCompare(this.getMeta('attributes'), prevAttributes)) {
-        this.save().then(() => {
-          this.trigger('rl:changeType');
-          this.trigger('rl:changeSpec');
-        }).catch(errorObj => {
-          throw errorObj;
-        });
+  },
+  getAttributeType: function (attrSpec) {
+    if (attrSpec.coerce_to_type) {
+      // The user has specified a data type
+      return attrSpec.coerce_to_type;
+    } else {
+      // The user hasn't specified a type; go with the
+      // most frequently observed type in the dataset
+      let maxCount = 0;
+      let attrType = 'undefined';
+      for (let dataType of Object.keys(attrSpec.stats)) {
+        if (attrSpec.stats[dataType].count >= maxCount) {
+          maxCount = attrSpec.stats[dataType].count;
+          attrType = dataType;
+        }
       }
+      return attrType;
+    }
+  },
+  getCategoricalAttributes: function (includeExcluded = false) {
+    let schema = this.getMeta('schema');
+    let excludeAttributes = this.getMeta('exclude_attributes') || [];
+    let attrs = [];
+    for (let attrName of Object.keys(schema)) {
+      if (!includeExcluded && excludeAttributes.indexOf(attrName) !== -1) {
+        continue;
+      }
+      let attrSpec = schema[attrName];
+      if (this.getAttributeInterpretation(attrSpec) === 'categorical') {
+        attrs.push(attrName);
+      }
+    }
+    return attrs;
+  },
+  getQuantitativeAttributes: function (includeExcluded = false) {
+    let schema = this.getMeta('schema');
+    let excludeAttributes = this.getMeta('exclude_attributes') || [];
+    let attrs = {};
+    for (let attrName of Object.keys(schema)) {
+      if (!includeExcluded && excludeAttributes.indexOf(attrName) !== -1) {
+        continue;
+      }
+      let attrSpec = schema[attrName];
+      if (this.getAttributeInterpretation(attrSpec) === 'quantitative') {
+        // Our schema should tell us the lowest / highest values
+        // for this attribute as a number or as a string...
+        // TODO: also do coercion on the server?
+        if (!attrSpec.stats.number && !attrSpec.stats.string) {
+          // Even though we want to interpret this value as
+          // quantitative, we can't (yet) figure out how
+          // to ask for min and max values...
+          continue;
+        }
+        let result = {
+          binCount: BIN_COUNT
+        };
+        let desiredType = this.getAttributeType(attrSpec);
+        if (attrSpec.stats.number) {
+          result.min = this.coerceValue(attrSpec.stats.number.min, desiredType);
+          result.max = this.coerceValue(attrSpec.stats.number.max, desiredType);
+        }
+        if (attrSpec.stats.string) {
+          let lowString = this.coerceValue(attrSpec.stats.number.min, desiredType);
+          let highString = this.coerceValue(attrSpec.stats.number.max, desiredType);
+          if (!attrSpec.stats.number) {
+            result.min = lowString;
+            result.max = highString;
+          } else {
+            result.min = lowString < result.min ? lowString : result.min;
+            result.max = highString > result.max ? highString : result.max;
+          }
+        }
+        attrs[attrName] = result;
+      }
+    }
+    return attrs;
+  },
+  getSpec: function (includeExcluded = false) {
+    let schema = this.getMeta('schema') || {};
+    let excludeAttributes = this.getMeta('exclude_attributes') || [];
+    let spec = {
+      name: this.name(),
+      attributes: {}
+    };
+    for (let attrName of Object.keys(schema)) {
+      if (!includeExcluded && excludeAttributes.indexOf(attrName) !== -1) {
+        continue;
+      }
+      spec.attributes[attrName] = this.getAttributeType(schema[attrName]);
+    }
+    return spec;
+  },
+  getHistogram: function (filters) {
+    let parameters = {
+      categoricalAttrs: this.getCategoricalAttributes(true).join(','),
+      quantitativeAttrs: JSON.stringify(this.getQuantitativeAttributes(true)),
+      filters: filters
+    };
+    return new Promise((resolve, reject) => {
+      girder.restRequest({
+        path: 'item/' + this.getId() + '/getHistograms',
+        type: 'GET',
+        data: parameters,
+        error: reject,
+        dataType: 'json'
+      }).done(resolve).error(reject);
     });
+  },
+  setFilters: function (filters) {
+    if (filters) {
+      this.setMeta('filters', filters);
+      // TODO: validate that the filters make sense in terms of the schema
+
+      // With the new filters, update the histogram
+      return this.getHistogram(filters).then((histogram) => {
+        this.set('cached_histogram', histogram);
+        this.trigger('rl:updateFilters');
+        return this.save();
+      });
+    } else {
+      // We want to clear the filters...
+      this.unsetMeta('filters');
+      // The cached_histogram is the same as the summary histogram
+      this.setMeta('cached_histogram', this.getMeta('summary_histogram'));
+      this.trigger('rl:updateFilters');
+      return this.save();
+    }
   },
   swapId: function (newData) {
     window.mainPage.loadedDatasets[newData._id] = window.mainPage.loadedDatasets[newData._oldId];
@@ -87,11 +212,10 @@ let Dataset = MetadataItem.extend({
     if (this.dropped) {
       return Promise.resolve();
     } else {
-      return MetadataItem.prototype.save.apply(this).catch(this.saveFailure);
+      return MetadataItem.prototype.save.apply(this).catch(errorObj => {
+        window.mainPage.trigger('rl:error', errorObj);
+      });
     }
-  },
-  saveFailure: function (errorObj) {
-    window.mainPage.trigger('rl:error', errorObj);
   },
   loadData: function (cache = true) {
     // TODO: support more file formats / non-Girder
@@ -99,39 +223,45 @@ let Dataset = MetadataItem.extend({
     if (cache && this.rawCache !== null) {
       return Promise.resolve(this.rawCache);
     } else {
-      const cacheData = data => this.rawCache = data;
-
-      const databaseQuery = girder.restRequest({
-        path: `item/${this.getId()}/database/select`,
-        type: 'GET',
-        dataType: 'json'
-      });
-
-      return databaseQuery.then(resp => {
-        return JSON.stringify(resp.data);
-      }, () => {
-        return girder.restRequest({
-          path: 'item/' + this.getId() + '/download',
+      let parameters = {
+        format: 'dict',
+        filters: this.getMeta('filters'),
+        fields: Object.keys(this.getSpec().attributes)
+      };
+      return new Promise((resolve, reject) => {
+        girder.restRequest({
+          path: `item/${this.getId()}/filterData`,
           type: 'GET',
-          error: null,
-          dataType: 'text'
-        });
-      })
-      .then(cacheData, () => this.rawCache = null);
+          dataType: 'text',
+          error: reject,
+          data: parameters
+        }).done(resolve).error(reject);
+      }).then(data => {
+        this.rawCache = data;
+      }).catch((e) => {
+        window.mainPage.trigger('rl:error', e);
+      });
     }
   },
-  getSpec: function () {
-    let meta = this.getMeta();
-    let spec = {
-      name: this.name()
-    };
-    if (!meta.attributes) {
-      // We haven't inferred the attributes yet...
-      spec.attributes = {};
+  coerceValue: function (value, dataType) {
+    if (dataType === 'undefined') {
+      return undefined;
+    } else if (dataType === 'boolean') {
+      return !!value;
+    } else if (dataType === 'integer') {
+      return parseInt(String(value).replace(/[^0-9\.]+/g, ''));
+    } else if (dataType === 'number') {
+      return parseFloat(String(value).replace(/[^0-9\.]+/g, ''));
+    } else if (dataType === 'date') {
+      return new Date(value);
+    } else if (dataType === 'string') {
+      return String(value);
+    } else if (dataType === 'object') {
+      // TODO: should I be doing something else?
+      return value;
     } else {
-      spec.attributes = meta.attributes;
+      throw new Error('Unknown data type: ' + dataType);
     }
-    return spec;
   },
   parse: function (cache = true) {
     if (cache && this.parsedCache !== null) {
@@ -142,20 +272,25 @@ let Dataset = MetadataItem.extend({
         if (rawData === null) {
           this.parsedCache = parsedData = null;
         } else {
-          let meta = this.getMeta();
-          let formatPrefs = {
-            type: meta.fileType
-          };
-          if (meta.attributes) {
-            formatPrefs.parse = meta.attributes;
-          } else {
-            formatPrefs.parse = 'auto';
-          }
+          let schema = this.getMeta('schema');
 
           try {
-            parsedData = datalib.read(rawData, formatPrefs);
+            parsedData = JSON.parse(rawData);
+            // If that was successful, we can pretty-print the raw data...
+            this.rawCache = JSON.stringify(parsedData, null, '  ');
+
+            // Okay, now we need to coerce data types...
+            parsedData.forEach(dataItem => {
+              for (let attrName of Object.keys(dataItem)) {
+                let dataType = this.getAttributeType(schema[attrName]);
+                dataItem[attrName] = this.coerceValue(dataItem[attrName], dataType);
+              }
+            });
           } catch (e) {
             parsedData = null;
+            if (!(e instanceof SyntaxError)) {
+              window.mainPage.trigger('rl:error', e);
+            }
           }
 
           if (cache) {
@@ -166,33 +301,49 @@ let Dataset = MetadataItem.extend({
       });
     }
   },
-  inferFileType: function () {
-    let fileType = this.get('name');
-    if (fileType === undefined || fileType.indexOf('.') === -1) {
-      fileType = 'txt';
-    } else {
-      fileType = fileType.split('.');
-      fileType = fileType[fileType.length - 1];
-    }
-    this.setMeta('fileType', fileType);
-    return fileType;
-  },
-  setFileType: function (fileType) {
-    this.setMeta('fileType', fileType);
-    return this.save().then(() => {
-      this.trigger('rl:changeType');
-    });
-  },
-  inferAttributes: function () {
-    return this.parse().then(data => {
-      let attributes;
-      if (data === null) {
-        attributes = {};
-      } else {
-        attributes = datalib.type.all(data);
+  inferSchema: function () {
+    return new Promise((resolve, reject) => {
+      girder.restRequest({
+        path: `item/${this.getId()}/inferSchema`,
+        type: 'GET',
+        dataType: 'json',
+        error: reject
+      }).done(resolve).error(reject);
+    }).then(stats => {
+      // Keep any user preferences for attributes
+      // (e.g. forced types / interpretations / excluded attributes)
+      let existingSchema = this.getMeta('schema') || {};
+      let excludedAttributes = this.getMeta('exclude_attributes') || [];
+      let newSchema = {};
+      let excludeAttributes = [];
+      for (let attrName of Object.keys(stats)) {
+        newSchema[attrName] = {
+          stats: stats[attrName]
+        };
+        if (excludedAttributes.indexOf(attrName) !== -1) {
+          excludeAttributes.push(attrName);
+        }
+        if (existingSchema[attrName]) {
+          if (existingSchema[attrName].coerce_to_type) {
+            newSchema[attrName].coerce_to_type = existingSchema[attrName].coerce_to_type;
+          }
+          if (existingSchema[attrName].interpretation) {
+            newSchema[attrName].interpretation = existingSchema[attrName].interpretation;
+          }
+        }
       }
-      this.setMeta('attributes', attributes);
-      return attributes;
+      // Store the new schema
+      this.setMeta('schema', newSchema);
+      // Store the new exclude_attributes
+      this.setMeta('exclude_attributes', excludeAttributes);
+      // Store the current time
+      this.setMeta('last_updated', new Date().toISOString());
+      // Now that we have the schema, update the summary_histogram
+      return this.getHistogram().then(histogram => {
+        this.setMeta('summary_histogram', histogram);
+      });
+    }).then(() => {
+      return this.save();
     });
   },
   setAttribute: function (attrName, dataType) {
@@ -205,7 +356,5 @@ let Dataset = MetadataItem.extend({
   }
 });
 
-Dataset.COMPATIBLE_TYPES = COMPATIBLE_TYPES;
-Dataset.VALID_EXTENSIONS = VALID_EXTENSIONS;
 Dataset.DuplicateDatasetError = DuplicateDatasetError;
 export default Dataset;

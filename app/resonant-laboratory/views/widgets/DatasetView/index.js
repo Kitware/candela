@@ -124,7 +124,7 @@ let DatasetView = Widget.extend({
 
     cellsEnter.append('select');
     let typeMenuOptions = cells.selectAll('select').selectAll('option')
-      .data(d3.keys(Dataset.COMPATIBLE_TYPES));
+      .data(d3.keys(Dataset.DEFAULT_INTERPRETATIONS));
     typeMenuOptions.enter().append('option');
     typeMenuOptions.attr('value', d => d)
       .text(d => d);

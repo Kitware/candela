@@ -3,6 +3,7 @@ from girder.api.rest import Resource
 from anonymousAccess import AnonymousAccess
 from dataItemSummary import DataItemSummary
 
+
 class ResonantLaboratory(Resource):
     _cp_config = {'tools.staticdir.on': True,
                   'tools.staticdir.index': 'index.html'}
@@ -52,8 +53,10 @@ def load(info):
     info['apiRoot'].item.route('PUT', ('adoptScratchItems', ),
                                anonymousAccess.adoptScratchItems)
     # Expose summarization endpoints
-    dataItemSummary = DataItemSummary()
+    dataItemSummary = DataItemSummary(info)
     info['apiRoot'].item.route('GET', (':id', 'inferSchema'),
                                dataItemSummary.inferSchema)
     info['apiRoot'].item.route('GET', (':id', 'getHistograms'),
                                dataItemSummary.getHistograms)
+    info['apiRoot'].item.route('GET', (':id', 'filterData'),
+                               dataItemSummary.filterData)
