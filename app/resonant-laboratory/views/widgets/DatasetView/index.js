@@ -1,11 +1,11 @@
 import Underscore from 'underscore';
 import d3 from 'd3';
-import jQuery from 'jquery';
 import ace from 'brace';
 import 'brace/theme/textmate';
 import Widget from '../Widget';
 import Dataset from '../../../models/Dataset';
 import myTemplate from './template.html';
+import makeValidId from '../../../shims/makeValidId.js';
 import './style.css';
 
 let STATUS = {
@@ -16,6 +16,9 @@ let STATUS = {
   LOADING: 4,
   NO_ATTRIBUTES: 5
 };
+
+let DATA_TYPES = d3.keys(Dataset.DEFAULT_INTERPRETATIONS);
+let DATA_INTERPRETATIONS = [...new Set(d3.values(Dataset.DEFAULT_INTERPRETATIONS))];
 
 let DatasetView = Widget.extend({
   initialize: function () {
@@ -75,8 +78,6 @@ let DatasetView = Widget.extend({
 
     this.listenTo(window.mainPage.project, 'rl:changeDatasets',
       this.render);
-    this.listenTo(window.mainPage.project, 'rl:changeMatchings',
-      this.renderAttributeSettings);
   },
   renderInfoScreen: function () {
     window.mainPage.helpLayer.showTips(this.getDefaultTips());
@@ -95,50 +96,108 @@ let DatasetView = Widget.extend({
     }
   },
   renderAttributeSettings: function () {
-    if (!this.canRender()) {
-      return;
-    }
-
     let datasets = window.mainPage.project.getMeta('datasets');
     let dataset;
-    let attrs;
+    let schema;
     if (datasets && datasets[0] && window.mainPage.loadedDatasets[datasets[0]]) {
       dataset = window.mainPage.loadedDatasets[datasets[0]];
-      attrs = dataset.getSpec().attributes;
+      schema = dataset.getMeta('schema') || {};
     } else {
-      attrs = {};
+      schema = {};
     }
-    let attrOrder = Object.keys(attrs);
+    let attrOrder = Object.keys(schema);
     // TODO: this is technically cheating; relying on the order
     // of the dict entries to preserve the order on screen
 
-    let cells = d3.select(this.el).select('#attributeSettings')
-      .selectAll('div.cell')
-      .data(attrOrder, d => d + attrs[d]);
-    let cellsEnter = cells.enter().append('div')
-      .attr('class', 'cell');
-    cells.exit().remove();
+    let attributes = d3.select(this.el).select('#attributeSettings')
+      .selectAll('li.attribute')
+      .data(attrOrder, d => d);
+    let attributesEnter = attributes.enter().append('li')
+      .attr('class', 'attribute');
+    attributes.exit().remove();
 
-    cellsEnter.append('span');
-    cells.selectAll('span').text(d => d);
+    let attributeSettingsEnter = attributesEnter.append('div')
+      .attr('class', 'attributeSettings');
+    let attributeSettings = attributes.selectAll('div');
 
-    cellsEnter.append('select');
-    let typeMenuOptions = cells.selectAll('select').selectAll('option')
-      .data(d3.keys(Dataset.DEFAULT_INTERPRETATIONS));
+    // Checkbox to enable the attribute
+    attributeSettingsEnter.append('input')
+      .attr('type', 'checkbox')
+      .attr('class', 'include');
+    attributeSettings.selectAll('input.include')
+      .attr('id', d => makeValidId(d + 'include'));
+
+    attributeSettingsEnter.append('label')
+      .attr('class', 'include');
+    attributeSettings.selectAll('label.include')
+      .attr('for', d => makeValidId(d + 'include'))
+      .text(d => d);
+
+    // Flexbox spacer
+    attributeSettingsEnter.append('div')
+      .attr('class', 'flexspacer');
+
+    // Data type select menu
+    attributeSettingsEnter.append('select')
+      .attr('class', 'dataType');
+    let typeMenuOptions = attributeSettings
+      .selectAll('select.dataType').selectAll('option')
+      .data(DATA_TYPES);
     typeMenuOptions.enter().append('option');
     typeMenuOptions.attr('value', d => d)
       .text(d => d);
+    attributeSettings.selectAll('select.dataType')
+      .property('value', d => dataset.getAttributeType(schema[d]));
 
-    cells.selectAll('select')
-      .property('value', d => attrs[d])
-      .on('change', d => {
-        let newType = jQuery(d3.event.target).val();
-        dataset.setAttribute(d, newType);
-      });
+    // Data interpretation select menu
+    attributeSettingsEnter.append('select')
+      .attr('class', 'interpretation');
+    let interpretationMenuOptions = attributeSettings
+      .selectAll('select.interpretation').selectAll('option')
+      .data(DATA_INTERPRETATIONS);
+    interpretationMenuOptions.enter().append('option');
+    interpretationMenuOptions.attr('value', d => d)
+      .text(d => d);
+    attributeSettings.selectAll('select.interpretation')
+      .property('value', d => dataset.getAttributeInterpretation(schema[d]));
+
+    // Histogram bar container for the whole attribute
+    attributeSettingsEnter.append('div')
+      .attr('class', 'histogramBarContainer');
+
+    // TODO: show attribute size
+
+    // Expander checkbox (for collapsible list)
+    attributesEnter.append('label')
+      .attr('class', 'expand');
+    attributes.selectAll('label.expand')
+      .attr('for', d => makeValidId(d + 'expand'))
+      .text('');
+
+    attributesEnter.append('input')
+      .attr('type', 'checkbox')
+      .attr('class', 'expand');
+    attributes.selectAll('input.expand')
+      .attr('id', d => makeValidId(d + 'expand'));
+
+    attributesEnter.append('ul').append('li').text('test');
   },
   render: Underscore.debounce(function () {
     if (!this.canRender()) {
       return;
+    }
+
+    if (!this.addedTemplate) {
+      this.$el.html(myTemplate);
+      this.editor = ace.edit('editor');
+      this.editor.setOptions({
+        fontFamily: 'Cutive Mono, Courier, Monospace',
+        fontSize: '10pt'
+      });
+      this.editor.setTheme('ace/theme/textmate');
+      this.editor.$blockScrolling = Infinity;
+      this.editor.setReadOnly(true);
+      this.addedTemplate = true;
     }
 
     // Get the dataset in the project (if there is one)
@@ -147,20 +206,9 @@ let DatasetView = Widget.extend({
       dataset = window.mainPage.loadedDatasets[dataset[0]];
     }
 
-    this.$el.html(myTemplate);
-
-    this.renderAttributeSettings();
-
-    let editor = ace.edit('editor');
-    editor.setOptions({
-      fontFamily: 'Cutive Mono, Courier, Monospace',
-      fontSize: '10pt'
-    });
-    editor.setTheme('ace/theme/textmate');
-    editor.$blockScrolling = Infinity;
-
     if (!dataset) {
-      editor.setValue('');
+      this.renderPreview('');
+      this.$el.find('#attributeSettings').html('');
       this.status = STATUS.NO_DATA;
       this.statusText.text = 'No file loaded';
       this.renderIndicators();
@@ -169,37 +217,39 @@ let DatasetView = Widget.extend({
       this.statusText.text = 'Loading...';
       this.renderIndicators();
 
+      this.renderAttributeSettings();
+
       dataset.parse().then(parsedData => {
         let rawData = dataset.rawCache;
-        let spec = dataset.getSpec();
         if (rawData === null) {
-          editor.setValue('');
+          this.renderPreview('');
           this.status = STATUS.CANT_LOAD;
           this.statusText.text = 'ERROR';
           this.renderIndicators();
         } else if (parsedData === null) {
-          editor.setValue(rawData);
+          this.renderPreview(rawData);
           this.status = STATUS.CANT_PARSE;
           this.statusText.text = 'ERROR';
           this.renderIndicators();
-        } else if (Object.keys(spec.attributes).length === 0) {
-          editor.setValue(rawData);
+        } else if (Object.keys(dataset.getMeta('schema') || {}).length === 0) {
+          this.renderPreview(rawData);
           this.status = STATUS.NO_ATTRIBUTES;
           this.statusText.text = 'ERROR';
           this.renderIndicators();
         } else {
-          editor.setValue(rawData);
+          this.renderPreview(rawData);
           this.status = STATUS.SUCCESS;
           this.statusText.text = dataset.get('name');
           this.renderIndicators();
         }
       });
     }
-    // TODO: allow the user to edit the data (convert
-    // to in-browser dataset)... for now, always disable
-    // the textarea
-    editor.setReadOnly(true);
-  }, 300)
+  }, 300),
+  renderPreview: function (previewText) {
+    if (this.editor) {
+      this.editor.setValue(previewText);
+    }
+  }
 });
 
 export default DatasetView;

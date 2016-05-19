@@ -340,5 +340,6 @@ let Dataset = MetadataItem.extend({
   }
 });
 
+Dataset.DEFAULT_INTERPRETATIONS = DEFAULT_INTERPRETATIONS;
 Dataset.DuplicateDatasetError = DuplicateDatasetError;
 export default Dataset;

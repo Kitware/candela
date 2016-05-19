@@ -1,30 +1,79 @@
 .DatasetView.content {
   display: flex;
-  align-items: stretch;
-  justify-content: flex-end;
-  overflow: auto;
-}
-
-.DatasetView.content #editor {
-  flex-grow: 1;
+  flex-direction: column;
+  /* let the editor fill all the way to the bottom */
+  height: calc(100% - 2em) !important;
 }
 
 .DatasetView.content #attributeSettings {
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: auto;
+  height: calc(100% - 10em);
+}
+
+.DatasetView.content #editor {
+  height: 10em;
+}
+
+.DatasetView.content #attributeSettings li div.attributeSettings {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  align-items: center;
+  line-height: 1.5em;
+  flex-wrap: wrap;
+}
+.DatasetView.content #attributeSettings li div.attributeSettings > select {
+  margin-right: 1em;
+}
+.DatasetView.content #attributeSettings div.flexspacer {
+  flex: auto;
+}
+.DatasetView.content #attributeSettings div.histogramBarContainer {
+  /* whatever happens to the other elements, make sure the
+     histogram bars have the same scale! */
+  min-width: 15em;
+  max-width: 15em;
+  height: 1em;
+  border: 1px solid #999999;
+}
+
+/* CSS hack to make expandable list */
+.DatasetView.content #attributeSettings li > input.expand + * {
   display: block;
 }
 
-.DatasetView.content #attributeSettings .cell {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  text-align: center;
-  padding: 0.5em;
-  min-height: 3em;
-  white-space: nowrap;
+.DatasetView.content #attributeSettings li > input.expand:checked + * {
+  display: none;
 }
 
-.DatasetView.content #attributeSettings .cell select {
-  width: auto;
+.DatasetView.content #attributeSettings li > input.expand {
+  position: relative;
+}
+
+.DatasetView.content #attributeSettings li > input.expand::after {
+  display: block;
+  position: relative;
+  top: -1.75em;
+  left: 998em;  /* our CSS hacks hide the normal checkboxes at -999em */
+  content: "-";
+  text-align: center;
+  width: 1em;
+  height: 1em;
+  border: 1px solid #999999;
+  color: #999999;
+}
+.DatasetView.content #attributeSettings li > input.expand:checked::after {
+  content: "+";
+}
+
+.DatasetView.content #attributeSettings li > input.expand:checked {
+
+}
+
+.DatasetView.content #attributeSettings li label {
+  cursor: pointer;
+}
+
+.DatasetView.content #attributeSettings li {
+  list-style: none;
 }
