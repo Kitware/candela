@@ -85,63 +85,64 @@ let Dataset = MetadataItem.extend({
       return attrType;
     }
   },
-  getCategoricalAttributes: function (includeExcluded = false) {
+  getHistogram: function (filters, includeExcluded) {
     let schema = this.getMeta('schema');
     let excludeAttributes = this.getMeta('exclude_attributes') || [];
-    let attrs = [];
+    let parameters = {
+      categoricalAttrs: [],
+      quantitativeAttrs: {}
+    };
     for (let attrName of Object.keys(schema)) {
       if (!includeExcluded && excludeAttributes.indexOf(attrName) !== -1) {
         continue;
       }
       let attrSpec = schema[attrName];
       if (this.getAttributeInterpretation(attrSpec) === 'categorical') {
-        attrs.push(attrName);
-      }
-    }
-    return attrs;
-  },
-  getQuantitativeAttributes: function (includeExcluded = false) {
-    let schema = this.getMeta('schema');
-    let excludeAttributes = this.getMeta('exclude_attributes') || [];
-    let attrs = {};
-    for (let attrName of Object.keys(schema)) {
-      if (!includeExcluded && excludeAttributes.indexOf(attrName) !== -1) {
-        continue;
-      }
-      let attrSpec = schema[attrName];
-      if (this.getAttributeInterpretation(attrSpec) === 'quantitative') {
+        parameters.categoricalAttrs.push(attrName);
+      } else if (this.getAttributeInterpretation(attrSpec) === 'quantitative') {
         // Our schema should tell us the lowest / highest values
-        // for this attribute as a number or as a string...
-        // TODO: also do coercion on the server?
-        if (!attrSpec.stats.number && !attrSpec.stats.string) {
+        // for this attribute as a number...
+        if (!attrSpec.stats.number) {
           // Even though we want to interpret this value as
           // quantitative, we can't (yet) figure out how
           // to ask for min and max values...
+          // We *would* just add this to the categorical query
+          // as a fallback, but that could cause scale/interface
+          // problems, so we'll leave this one out
+          // TODO: what about other potentially quantitative values (like dates?)
           continue;
         }
-        let result = {
-          binCount: BIN_COUNT
-        };
         let desiredType = this.getAttributeType(attrSpec);
-        if (attrSpec.stats.number) {
-          result.min = this.coerceValue(attrSpec.stats.number.min, desiredType);
-          result.max = this.coerceValue(attrSpec.stats.number.max, desiredType);
+        let result = {
+          binCount: BIN_COUNT,
+          min: this.coerceValue(attrSpec.stats.number.min, desiredType),
+          max: this.coerceValue(attrSpec.stats.number.max, desiredType)
+        };
+        if (desiredType === 'boolean') {
+          result.binCount = 2;
         }
-        if (attrSpec.stats.string) {
-          let lowString = this.coerceValue(attrSpec.stats.number.min, desiredType);
-          let highString = this.coerceValue(attrSpec.stats.number.max, desiredType);
-          if (!attrSpec.stats.number) {
-            result.min = lowString;
-            result.max = highString;
-          } else {
-            result.min = lowString < result.min ? lowString : result.min;
-            result.max = highString > result.max ? highString : result.max;
-          }
+        if (result.min === result.max) {
+          // Shoot... there's really only one value for this attribute.
+          // So it's really categorical, even if we want it to be
+          // quantitative (at least for the histogram calculations)
+          parameters.categoricalAttrs.push(attrName);
+        } else {
+          parameters.quantitativeAttrs[attrName] = result;
         }
-        attrs[attrName] = result;
       }
     }
-    return attrs;
+    if (filters && filters.length > 0) {
+      parameters.filters = filters;
+    }
+    return new Promise((resolve, reject) => {
+      girder.restRequest({
+        path: 'item/' + this.getId() + '/getHistograms',
+        type: 'GET',
+        data: parameters,
+        error: reject,
+        dataType: 'json'
+      }).done(resolve).error(reject);
+    });
   },
   getSpec: function (includeExcluded = false) {
     let schema = this.getMeta('schema') || {};
@@ -158,29 +159,13 @@ let Dataset = MetadataItem.extend({
     }
     return spec;
   },
-  getHistogram: function (filters) {
-    let parameters = {
-      categoricalAttrs: this.getCategoricalAttributes(true).join(','),
-      quantitativeAttrs: JSON.stringify(this.getQuantitativeAttributes(true)),
-      filters: filters
-    };
-    return new Promise((resolve, reject) => {
-      girder.restRequest({
-        path: 'item/' + this.getId() + '/getHistograms',
-        type: 'GET',
-        data: parameters,
-        error: reject,
-        dataType: 'json'
-      }).done(resolve).error(reject);
-    });
-  },
   setFilters: function (filters) {
     if (filters) {
       this.setMeta('filters', filters);
       // TODO: validate that the filters make sense in terms of the schema
 
       // With the new filters, update the histogram
-      return this.getHistogram(filters).then((histogram) => {
+      return this.getHistogram(filters, false).then((histogram) => {
         this.set('cached_histogram', histogram);
         this.trigger('rl:updateFilters');
         return this.save();
@@ -269,11 +254,10 @@ let Dataset = MetadataItem.extend({
     } else {
       let parsedData;
       return this.loadData().then(rawData => {
-        if (rawData === null) {
+        let schema = this.getMeta('schema');
+        if (rawData === null || !schema) {
           this.parsedCache = parsedData = null;
         } else {
-          let schema = this.getMeta('schema');
-
           try {
             parsedData = JSON.parse(rawData);
             // If that was successful, we can pretty-print the raw data...
@@ -339,7 +323,7 @@ let Dataset = MetadataItem.extend({
       // Store the current time
       this.setMeta('last_updated', new Date().toISOString());
       // Now that we have the schema, update the summary_histogram
-      return this.getHistogram().then(histogram => {
+      return this.getHistogram([], true).then(histogram => {
         this.setMeta('summary_histogram', histogram);
       });
     }).then(() => {

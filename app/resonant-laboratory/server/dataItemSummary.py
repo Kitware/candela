@@ -167,7 +167,6 @@ function () {
   for (var key in keys) {
     var value = keys[key];
     var dataType = typeof value;
-    key = key.replace(/\d+/g, 'XX');
 
     var dataTypes = {};
     dataTypes[dataType] = {
@@ -301,6 +300,9 @@ function (key, values) {
                     }
                 })
                 histogramRange = spec['max'] - spec['min']
+                if histogramRange == 0:
+                    raise RestException('Min and max are the same for ' + attr +
+                                        '; should this be a categorical attribute?')
                 pipeline.append({
                     '$project': {
                         'binIndex': {
