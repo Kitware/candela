@@ -15,6 +15,7 @@ export default class Heatmap extends VisComponent {
           name: 'id',
           type: 'string',
           format: 'text',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',
@@ -35,6 +36,7 @@ export default class Heatmap extends VisComponent {
           name: 'sort',
           type: 'string',
           format: 'text',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',

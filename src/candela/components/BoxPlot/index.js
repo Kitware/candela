@@ -25,6 +25,7 @@ export default class BoxPlot extends VisComponent {
           name: 'group',
           type: 'string',
           format: 'text',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',

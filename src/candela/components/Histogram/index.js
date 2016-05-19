@@ -25,6 +25,7 @@ export default class Histogram extends VisComponent {
           name: 'aggregate',
           type: 'string',
           format: 'text',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',

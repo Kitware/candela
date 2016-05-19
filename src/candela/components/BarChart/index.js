@@ -35,6 +35,7 @@ export default class BarChart extends VisComponent {
           name: 'color',
           type: 'string',
           format: 'text',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',
@@ -45,6 +46,7 @@ export default class BarChart extends VisComponent {
           name: 'hover',
           type: 'string_list',
           format: 'string_list',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',

@@ -13,22 +13,26 @@ export default class BulletChart extends VisComponent {
       {
         name: 'title',
         type: 'string',
-        format: 'text'
+        format: 'text',
+        optional: true
       },
       {
         name: 'subtitle',
         type: 'string',
-        format: 'text'
+        format: 'text',
+        optional: true
       },
       {
         name: 'markers',
         type: 'number_list',
-        format: 'number_list'
+        format: 'number_list',
+        optional: true
       },
       {
         name: 'ranges',
         type: 'table',
-        format: 'objectlist'
+        format: 'objectlist',
+        optional: true
       }
     ];
   }
