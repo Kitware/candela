@@ -275,9 +275,7 @@ let DatasetView = Widget.extend({
     attributesEnter.append('ul');
     let bins = attributes.selectAll('ul').selectAll('li.binSettings')
       .data(d => lookupTable.attributes[d].binOrder,
-            d => lookupTable.bins[d].humanLabel +
-                 lookupTable.bins[d].summaryCount + ',' +
-                 lookupTable.bins[d].currentCount);
+            d => d);
     let binsEnter = bins.enter().append('li')
       .attr('class', 'binSettings');
     bins.exit().remove();

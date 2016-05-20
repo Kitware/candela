@@ -85,7 +85,7 @@ let Dataset = MetadataItem.extend({
       return attrType;
     }
   },
-  getHistogram: function (includeExcluded) {
+  getHistogramParameters: function (ignoreFilters) {
     let schema = this.getMeta('schema');
     let excludeAttributes = this.getMeta('excludeAttributes') || [];
     let filters = this.getMeta('filters') || [];
@@ -96,7 +96,7 @@ let Dataset = MetadataItem.extend({
     // Assemble the parameters for which attributes we want to see
     // (and provide the bin settings for quantitative attributes)
     for (let attrName of Object.keys(schema)) {
-      if (!includeExcluded && excludeAttributes.indexOf(attrName) !== -1) {
+      if (!ignoreFilters && excludeAttributes.indexOf(attrName) !== -1) {
         continue;
       }
       let attrSpec = schema[attrName];
@@ -141,20 +141,46 @@ let Dataset = MetadataItem.extend({
       }
     }
     // Add the filters if there are any
-    if (filters && filters.length > 0) {
+    if (!ignoreFilters && filters && filters.length > 0) {
       parameters.filters = filters;
     }
     // Format the parameters for the endpoint...
     parameters.categoricalAttrs = parameters.categoricalAttrs.join(',');
     parameters.quantitativeAttrs = JSON.stringify(parameters.quantitativeAttrs);
-    return new Promise((resolve, reject) => {
+    return parameters;
+  },
+  updateHistograms: function (updateSummary) {
+    // Always update the current histogram (with the filters)
+    let promises = [new Promise((resolve, reject) => {
       girder.restRequest({
         path: 'item/' + this.getId() + '/getHistograms',
         type: 'GET',
-        data: parameters,
+        data: this.getHistogramParameters(false),
         error: reject,
         dataType: 'json'
       }).done(resolve).error(reject);
+    })];
+    // Sometimes we need to update the summary histogram (without the filters)
+    // as well...
+    if (updateSummary) {
+      promises.push(new Promise((resolve, reject) => {
+        girder.restRequest({
+          path: 'item/' + this.getId() + '/getHistograms',
+          type: 'GET',
+          data: this.getHistogramParameters(true),
+          error: reject,
+          dataType: 'json'
+        }).done(resolve).error(reject);
+      }));
+    }
+    return Promise.all(promises).then((results) => {
+      this.setMeta('currentHistogram', results[0]);
+      if (updateSummary) {
+        this.setMeta('summaryHistogram', results[1]);
+      }
+      return this.save().then(() => {
+        this.trigger('rl:changeSpec');
+      });
     });
   },
   getSpec: function (includeExcluded = false) {
@@ -322,11 +348,8 @@ let Dataset = MetadataItem.extend({
       // Store the current time
       this.setMeta('lastUpdated', new Date().toISOString());
       // Now that we have the schema, update the summaryHistogram
-      return this.getHistogram(true).then(histogram => {
-        this.setMeta('summaryHistogram', histogram);
-      });
-    }).then(() => {
-      return this.save();
+      // (eventually calls save as well)
+      return this.updateHistograms(true);
     });
   },
   includeAttribute: function (attrName, include) {
@@ -343,12 +366,7 @@ let Dataset = MetadataItem.extend({
     }
     this.setMeta('excludeAttributes', excludeAttributes);
 
-    // With the updated attribute exclusions, update the histogram
-    return this.getHistogram(false).then(histogram => {
-      this.setMeta('currentHistogram', histogram);
-      this.trigger('rl:changeSpec');
-      return this.save();
-    });
+    return this.updateHistograms(false);
   },
   setFilters: function (filters) {
     if (filters) {
@@ -358,28 +376,21 @@ let Dataset = MetadataItem.extend({
     }
     // TODO: validate that the filters make sense in terms of the schema
 
-    // With the new filters (or lack thereof), update the histogram
-    return this.getHistogram(false).then(histogram => {
-      this.setMeta('currentHistogram', histogram);
-      this.trigger('rl:updateFilters');
-      return this.save();
-    });
+    return this.updateHistograms(false);
   },
   setAttributeType: function (attrName, dataType) {
     let schema = this.getMeta('schema');
     schema[attrName].coerceToType = dataType;
     this.setMeta('schema', schema);
-    return this.save().then(() => {
-      this.trigger('rl:changeSpec');
-    });
+
+    return this.updateHistograms(true);
   },
   setAttributeInterpretation: function (attrName, interpretation) {
     let schema = this.getMeta('schema');
     schema[attrName].interpretation = interpretation;
     this.setMeta('schema', schema);
-    return this.save().then(() => {
-      this.trigger('rl:changeSpec');
-    });
+
+    return this.updateHistograms(true);
   }
 });
 
