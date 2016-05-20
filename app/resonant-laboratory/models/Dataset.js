@@ -353,22 +353,17 @@ let Dataset = MetadataItem.extend({
   setFilters: function (filters) {
     if (filters) {
       this.setMeta('filters', filters);
-      // TODO: validate that the filters make sense in terms of the schema
-
-      // With the new filters, update the histogram
-      return this.getHistogram(false).then(histogram => {
-        this.setMeta('currentHistogram', histogram);
-        this.trigger('rl:updateFilters');
-        return this.save();
-      });
     } else {
-      // We want to clear the filters...
       this.unsetMeta('filters');
-      // The currentHistogram is the same as the summary histogram
-      this.setMeta('currentHistogram', this.getMeta('summaryHistogram'));
+    }
+    // TODO: validate that the filters make sense in terms of the schema
+
+    // With the new filters (or lack thereof), update the histogram
+    return this.getHistogram(false).then(histogram => {
+      this.setMeta('currentHistogram', histogram);
       this.trigger('rl:updateFilters');
       return this.save();
-    }
+    });
   },
   setAttribute: function (attrName, dataType) {
     let attributes = this.getMeta('attributes');
