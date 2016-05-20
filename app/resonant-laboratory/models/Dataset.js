@@ -365,10 +365,18 @@ let Dataset = MetadataItem.extend({
       return this.save();
     });
   },
-  setAttribute: function (attrName, dataType) {
-    let attributes = this.getMeta('attributes');
-    attributes[attrName] = dataType;
-    this.setMeta('attributes', attributes);
+  setAttributeType: function (attrName, dataType) {
+    let schema = this.getMeta('schema');
+    schema[attrName].coerceToType = dataType;
+    this.setMeta('schema', schema);
+    return this.save().then(() => {
+      this.trigger('rl:changeSpec');
+    });
+  },
+  setAttributeInterpretation: function (attrName, interpretation) {
+    let schema = this.getMeta('schema');
+    schema[attrName].interpretation = interpretation;
+    this.setMeta('schema', schema);
     return this.save().then(() => {
       this.trigger('rl:changeSpec');
     });

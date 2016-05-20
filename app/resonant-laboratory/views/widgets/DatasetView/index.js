@@ -204,7 +204,11 @@ let DatasetView = Widget.extend({
 
     // Data type select menu
     attributeSettingsEnter.append('select')
-      .attr('class', 'dataType');
+      .attr('class', 'dataType')
+      .on('change', function (d) {
+        // this refers to the DOM element
+        lookupTable.dataset.setAttributeType(d, this.value);
+      });
     let typeMenuOptions = attributeSettings
       .selectAll('select.dataType').selectAll('option')
       .data(DATA_TYPES);
@@ -216,7 +220,11 @@ let DatasetView = Widget.extend({
 
     // Data interpretation select menu
     attributeSettingsEnter.append('select')
-      .attr('class', 'interpretation');
+      .attr('class', 'interpretation')
+      .on('change', function (d) {
+        // this refers to the DOM element
+        lookupTable.dataset.setAttributeInterpretation(d, this.value);
+      });
     let interpretationMenuOptions = attributeSettings
       .selectAll('select.interpretation').selectAll('option')
       .data(DATA_INTERPRETATIONS);
@@ -261,9 +269,13 @@ let DatasetView = Widget.extend({
     // Containers for the bins
     attributesEnter.append('ul');
     let bins = attributes.selectAll('ul').selectAll('li.binSettings')
-      .data(d => lookupTable.attributes[d].binOrder);
+      .data(d => lookupTable.attributes[d].binOrder,
+            d => lookupTable.bins[d].humanLabel +
+                 lookupTable.bins[d].summaryCount + ',' +
+                 lookupTable.bins[d].currentCount);
     let binsEnter = bins.enter().append('li')
       .attr('class', 'binSettings');
+    bins.exit().remove();
 
     // Flexbox spacer
     binsEnter.append('div')
