@@ -153,7 +153,9 @@ let DatasetView = Widget.extend({
           lookupTable.bins[keyIntoAll[d._id]].currentCount = d.count;
         });
         // Make sure the bins are in order for each attribute
-        lookupTable.attributes[attrName].binOrder.sort(key => lookupTable.bins[key].sortKey);
+        lookupTable.attributes[attrName].binOrder.sort((a, b) => {
+          return lookupTable.bins[a].sortKey - lookupTable.bins[b].sortKey;
+        });
         // Keep track of the highest count for the scale
         // to be consistent across all bars
         lookupTable.highestCount = Math.max(attrInfo.summaryCount, lookupTable.highestCount);

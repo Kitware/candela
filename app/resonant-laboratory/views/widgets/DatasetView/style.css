@@ -65,11 +65,11 @@
   display: none;
 }
 
-.DatasetView.content #attributeSettings li > input.expand + * {
+.DatasetView.content #attributeSettings li > input.expand:checked + * {
   display: block;
 }
 
-.DatasetView.content #attributeSettings li > input.expand:checked + * {
+.DatasetView.content #attributeSettings li > input.expand + * {
   display: none;
 }
 
@@ -82,7 +82,7 @@
   position: relative;
   top: -0.1em;
   left: 997em;  /* our CSS hacks hide the normal checkboxes at -999em */
-  content: "-";
+  content: "+";
   text-align: center;
   width: 1em;
   height: 1em;
@@ -91,7 +91,7 @@
   cursor: pointer;
 }
 .DatasetView.content #attributeSettings li > input.expand:checked::after {
-  content: "+";
+  content: "-";
 }
 
 .DatasetView.content #attributeSettings li > input.expand:checked {

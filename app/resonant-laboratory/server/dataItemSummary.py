@@ -333,10 +333,11 @@ function (key, values) {
                     }
                 })
                 results[attr] = list(collection.aggregate(pipeline))
+                divisions = spec['binCount'] - 1
                 for result in results[attr]:
-                    result['lowBound'] = (result['_id'] / spec['binCount']) * \
+                    result['lowBound'] = (result['_id'] / divisions) * \
                         histogramRange + spec['min']
-                    result['highBound'] = ((result['_id'] + 1) / spec['binCount']) * \
+                    result['highBound'] = ((result['_id'] + 1) / divisions) * \
                         histogramRange + spec['min']
 
         return results
