@@ -172,8 +172,7 @@ function () {
     dataTypes[dataType] = {
       count: 1
     };
-    if (dataType === 'string' ||
-      dataType === 'number') {
+    if (dataType === 'number') {
       dataTypes[dataType].min = value;
       dataTypes[dataType].max = value;
     }
@@ -191,13 +190,13 @@ function (key, values) {
         dataTypes[dataType] = {
           count: 0
         };
-        if (dataType === 'string' || dataType === 'number') {
+        if (dataType === 'number') {
           dataTypes[dataType].min = value[dataType].min;
           dataTypes[dataType].max = value[dataType].max;
         }
       }
       dataTypes[dataType].count += value[dataType].count;
-      if (dataType === 'string' || dataType === 'number') {
+      if (dataType === 'number') {
         dataTypes[dataType].min = value[dataType].min < dataTypes[dataType].min ? value[dataType].min : dataTypes[dataType].min;
         dataTypes[dataType].max = value[dataType].max > dataTypes[dataType].max ? value[dataType].max : dataTypes[dataType].max;
       }
@@ -303,6 +302,7 @@ function (key, values) {
                 if histogramRange == 0:
                     raise RestException('Min and max are the same for ' + attr +
                                         '; should this be a categorical attribute?')
+                divisions = spec['binCount'] - 1
                 pipeline.append({
                     '$project': {
                         'binIndex': {
@@ -318,7 +318,7 @@ function (key, values) {
                                             histogramRange
                                         ]
                                     },
-                                    spec['binCount']
+                                    divisions
                                 ]
                             }
                         }
@@ -333,7 +333,6 @@ function (key, values) {
                     }
                 })
                 results[attr] = list(collection.aggregate(pipeline))
-                divisions = spec['binCount'] - 1
                 for result in results[attr]:
                     result['lowBound'] = (result['_id'] / divisions) * \
                         histogramRange + spec['min']

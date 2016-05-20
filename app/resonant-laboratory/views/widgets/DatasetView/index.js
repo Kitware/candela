@@ -134,7 +134,7 @@ let DatasetView = Widget.extend({
           };
           if (d.lowBound && d.highBound) {
             bin.sortKey = d.lowBound;
-            bin.humanLabel = d.lowBound + ' - ' + d.highBound;
+            bin.humanLabel = '[' + d.lowBound + ', ' + d.highBound + ')';
           } else {
             bin.sortKey = d._id;
             bin.humanLabel = d._id;
@@ -279,6 +279,7 @@ let DatasetView = Widget.extend({
     let binsEnter = bins.enter().append('li')
       .attr('class', 'binSettings');
     bins.exit().remove();
+    bins.order();
 
     // Flexbox spacer
     binsEnter.append('div')
