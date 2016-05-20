@@ -1,7 +1,5 @@
 import Underscore from 'underscore';
 import d3 from 'd3';
-import ace from 'brace';
-import 'brace/theme/textmate';
 import Widget from '../Widget';
 import Dataset from '../../../models/Dataset';
 import myTemplate from './template.html';
@@ -97,7 +95,6 @@ let DatasetView = Widget.extend({
   },
   constructAttributeLookupTable: function () {
     let datasets = window.mainPage.project.getMeta('datasets');
-    let dataset;
     let lookupTable = {
       attributes: {},
       bins: {},
@@ -105,10 +102,11 @@ let DatasetView = Widget.extend({
     };
 
     if (datasets && datasets[0] && window.mainPage.loadedDatasets[datasets[0]]) {
-      dataset = window.mainPage.loadedDatasets[datasets[0]];
-      let schema = dataset.getMeta('schema') || {};
-      let summaryHistogram = dataset.getMeta('summary_histogram') || {};
-      let currentHistogram = dataset.getMeta('current_histogram') || {};
+      lookupTable.dataset = window.mainPage.loadedDatasets[datasets[0]];
+      let schema = lookupTable.dataset.getMeta('schema') || {};
+      let summaryHistogram = lookupTable.dataset.getMeta('summaryHistogram') || {};
+      let currentHistogram = lookupTable.dataset.getMeta('currentHistogram') || {};
+      let excludeAttributes = lookupTable.dataset.getMeta('excludeAttributes') || [];
 
       for (let attrName of Object.keys(schema)) {
         let summary = summaryHistogram[attrName] || [];
@@ -116,10 +114,11 @@ let DatasetView = Widget.extend({
 
         // Get all the relevant info for the attribute itself
         let attrInfo = {
+          included: excludeAttributes.indexOf(attrName) === -1,
+          dataType: lookupTable.dataset.getAttributeType(schema[attrName]),
+          interpretation: lookupTable.dataset.getAttributeInterpretation(schema[attrName]),
           summaryCount: 0,
           currentCount: 0,
-          dataType: dataset.getAttributeType(schema[attrName]),
-          interpretation: dataset.getAttributeInterpretation(schema[attrName]),
           binOrder: []
         };
         lookupTable.attributes[attrName] = attrInfo;
@@ -130,7 +129,8 @@ let DatasetView = Widget.extend({
         summary.forEach(d => {
           attrInfo.summaryCount += d.count;
           let bin = {
-            summaryCount: d.count
+            summaryCount: d.count,
+            currentCount: 0
           };
           if (d.lowBound && d.highBound) {
             bin.sortKey = d.lowBound;
@@ -180,12 +180,17 @@ let DatasetView = Widget.extend({
       .attr('class', 'attributeSettings');
     let attributeSettings = attributes.selectAll('div');
 
-    // Checkbox to enable the attribute
+    // Checkbox to include the attribute
     attributeSettingsEnter.append('input')
       .attr('type', 'checkbox')
-      .attr('class', 'include');
+      .attr('class', 'include')
+      .on('change', function (d) {
+        // this refers to the DOM element
+        lookupTable.dataset.includeAttribute(d, this.checked);
+      });
     attributeSettings.selectAll('input.include')
-      .attr('id', d => makeValidId(d + 'include'));
+      .attr('id', d => makeValidId(d + 'include'))
+      .property('checked', d => lookupTable.attributes[d].included);
 
     attributeSettingsEnter.append('label')
       .attr('class', 'include');
@@ -303,14 +308,6 @@ let DatasetView = Widget.extend({
 
     if (!this.addedTemplate) {
       this.$el.html(myTemplate);
-      this.editor = ace.edit('editor');
-      this.editor.setOptions({
-        fontFamily: 'Cutive Mono, Courier, Monospace',
-        fontSize: '10pt'
-      });
-      this.editor.setTheme('ace/theme/textmate');
-      this.editor.$blockScrolling = Infinity;
-      this.editor.setReadOnly(true);
       this.addedTemplate = true;
     }
 
@@ -334,36 +331,26 @@ let DatasetView = Widget.extend({
       this.renderAttributeSettings();
 
       dataset.parse().then(parsedData => {
-        let rawData = dataset.rawCache;
-        if (rawData === null) {
-          this.renderPreview('');
+        if (dataset.rawCache === null) {
           this.status = STATUS.CANT_LOAD;
           this.statusText.text = 'ERROR';
           this.renderIndicators();
         } else if (parsedData === null) {
-          this.renderPreview(rawData);
           this.status = STATUS.CANT_PARSE;
           this.statusText.text = 'ERROR';
           this.renderIndicators();
         } else if (Object.keys(dataset.getMeta('schema') || {}).length === 0) {
-          this.renderPreview(rawData);
           this.status = STATUS.NO_ATTRIBUTES;
           this.statusText.text = 'ERROR';
           this.renderIndicators();
         } else {
-          this.renderPreview(rawData);
           this.status = STATUS.SUCCESS;
           this.statusText.text = dataset.get('name');
           this.renderIndicators();
         }
       });
     }
-  }, 300),
-  renderPreview: function (previewText) {
-    if (this.editor) {
-      this.editor.setValue(previewText);
-    }
-  }
+  }, 300)
 });
 
 export default DatasetView;

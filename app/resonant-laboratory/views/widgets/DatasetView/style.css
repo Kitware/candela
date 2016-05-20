@@ -1,17 +1,11 @@
 .DatasetView.content {
   display: flex;
   flex-direction: column;
-  /* let the editor fill all the way to the bottom */
-  height: calc(100% - 2em) !important;
 }
 
 .DatasetView.content #attributeSettings {
   overflow: auto;
-  height: calc(100% - 10em);
-}
-
-.DatasetView.content #editor {
-  height: 10em;
+  height: 100%;
 }
 
 .DatasetView.content #attributeSettings li div.attributeSettings {
@@ -92,10 +86,6 @@
 }
 .DatasetView.content #attributeSettings li > input.expand:checked::after {
   content: "-";
-}
-
-.DatasetView.content #attributeSettings li > input.expand:checked {
-
 }
 
 .DatasetView.content #attributeSettings li label {

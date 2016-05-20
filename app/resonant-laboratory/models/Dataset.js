@@ -43,8 +43,8 @@ let Dataset = MetadataItem.extend({
     // TODO: do database items update their girder 'updated' flag
     // when the database is modified? If not, we may need a deeper
     // check...
-    if (meta.schema && meta.last_updated && girderUpdate &&
-      new Date(meta.last_updated) >= new Date(girderUpdate)) {
+    if (meta.schema && meta.lastUpdated && girderUpdate &&
+      new Date(meta.lastUpdated) >= new Date(girderUpdate)) {
       // We can just use the cached schema
       schemaPromise = Promise.resolve(meta.schema);
     } else {
@@ -68,9 +68,9 @@ let Dataset = MetadataItem.extend({
     }
   },
   getAttributeType: function (attrSpec) {
-    if (attrSpec.coerce_to_type) {
+    if (attrSpec.coerceToType) {
       // The user has specified a data type
-      return attrSpec.coerce_to_type;
+      return attrSpec.coerceToType;
     } else {
       // The user hasn't specified a type; go with the
       // most frequently observed type in the dataset
@@ -85,9 +85,10 @@ let Dataset = MetadataItem.extend({
       return attrType;
     }
   },
-  getHistogram: function (filters, includeExcluded) {
+  getHistogram: function (includeExcluded) {
     let schema = this.getMeta('schema');
-    let excludeAttributes = this.getMeta('exclude_attributes') || [];
+    let excludeAttributes = this.getMeta('excludeAttributes') || [];
+    let filters = this.getMeta('filters') || [];
     let parameters = {
       categoricalAttrs: [],
       quantitativeAttrs: {}
@@ -158,7 +159,7 @@ let Dataset = MetadataItem.extend({
   },
   getSpec: function (includeExcluded = false) {
     let schema = this.getMeta('schema') || {};
-    let excludeAttributes = this.getMeta('exclude_attributes') || [];
+    let excludeAttributes = this.getMeta('excludeAttributes') || [];
     let spec = {
       name: this.name(),
       attributes: {}
@@ -170,26 +171,6 @@ let Dataset = MetadataItem.extend({
       spec.attributes[attrName] = this.getAttributeType(schema[attrName]);
     }
     return spec;
-  },
-  setFilters: function (filters) {
-    if (filters) {
-      this.setMeta('filters', filters);
-      // TODO: validate that the filters make sense in terms of the schema
-
-      // With the new filters, update the histogram
-      return this.getHistogram(filters, false).then((histogram) => {
-        this.set('current_histogram', histogram);
-        this.trigger('rl:updateFilters');
-        return this.save();
-      });
-    } else {
-      // We want to clear the filters...
-      this.unsetMeta('filters');
-      // The current_histogram is the same as the summary histogram
-      this.setMeta('current_histogram', this.getMeta('summary_histogram'));
-      this.trigger('rl:updateFilters');
-      return this.save();
-    }
   },
   swapId: function (newData) {
     window.mainPage.loadedDatasets[newData._id] = window.mainPage.loadedDatasets[newData._oldId];
@@ -275,11 +256,17 @@ let Dataset = MetadataItem.extend({
             // If that was successful, we can pretty-print the raw data...
             this.rawCache = JSON.stringify(parsedData, null, '  ');
 
-            // Okay, now we need to coerce data types...
+            // Okay, now we need to coerce data types (and deliberately remove
+            // attributes if necessary)
+            let excludeAttributes = this.getMeta('excludeAttributes') || [];
             parsedData.forEach(dataItem => {
               for (let attrName of Object.keys(dataItem)) {
-                let dataType = this.getAttributeType(schema[attrName]);
-                dataItem[attrName] = this.coerceValue(dataItem[attrName], dataType);
+                if (excludeAttributes.indexOf(attrName) !== -1) {
+                  delete dataItem[attrName];
+                } else {
+                  let dataType = this.getAttributeType(schema[attrName]);
+                  dataItem[attrName] = this.coerceValue(dataItem[attrName], dataType);
+                }
               }
             });
           } catch (e) {
@@ -309,7 +296,7 @@ let Dataset = MetadataItem.extend({
       // Keep any user preferences for attributes
       // (e.g. forced types / interpretations / excluded attributes)
       let existingSchema = this.getMeta('schema') || {};
-      let excludedAttributes = this.getMeta('exclude_attributes') || [];
+      let excludedAttributes = this.getMeta('excludeAttributes') || [];
       let newSchema = {};
       let excludeAttributes = [];
       for (let attrName of Object.keys(stats)) {
@@ -320,8 +307,8 @@ let Dataset = MetadataItem.extend({
           excludeAttributes.push(attrName);
         }
         if (existingSchema[attrName]) {
-          if (existingSchema[attrName].coerce_to_type) {
-            newSchema[attrName].coerce_to_type = existingSchema[attrName].coerce_to_type;
+          if (existingSchema[attrName].coerceToType) {
+            newSchema[attrName].coerceToType = existingSchema[attrName].coerceToType;
           }
           if (existingSchema[attrName].interpretation) {
             newSchema[attrName].interpretation = existingSchema[attrName].interpretation;
@@ -330,17 +317,58 @@ let Dataset = MetadataItem.extend({
       }
       // Store the new schema
       this.setMeta('schema', newSchema);
-      // Store the new exclude_attributes
-      this.setMeta('exclude_attributes', excludeAttributes);
+      // Store the new excludeAttributes
+      this.setMeta('excludeAttributes', excludeAttributes);
       // Store the current time
-      this.setMeta('last_updated', new Date().toISOString());
-      // Now that we have the schema, update the summary_histogram
-      return this.getHistogram([], true).then(histogram => {
-        this.setMeta('summary_histogram', histogram);
+      this.setMeta('lastUpdated', new Date().toISOString());
+      // Now that we have the schema, update the summaryHistogram
+      return this.getHistogram(true).then(histogram => {
+        this.setMeta('summaryHistogram', histogram);
       });
     }).then(() => {
       return this.save();
     });
+  },
+  includeAttribute: function (attrName, include) {
+    let excludeAttributes = this.getMeta('excludeAttributes') || [];
+    let attrIndex = excludeAttributes.indexOf(attrName);
+    if (include === true) {
+      if (attrIndex !== -1) {
+        excludeAttributes.splice(attrIndex, 1);
+      }
+    } else {
+      if (attrIndex === -1) {
+        excludeAttributes.push(attrName);
+      }
+    }
+    this.setMeta('excludeAttributes', excludeAttributes);
+
+    // With the updated attribute exclusions, update the histogram
+    return this.getHistogram(false).then(histogram => {
+      this.setMeta('currentHistogram', histogram);
+      this.trigger('rl:changeSpec');
+      return this.save();
+    });
+  },
+  setFilters: function (filters) {
+    if (filters) {
+      this.setMeta('filters', filters);
+      // TODO: validate that the filters make sense in terms of the schema
+
+      // With the new filters, update the histogram
+      return this.getHistogram(false).then(histogram => {
+        this.setMeta('currentHistogram', histogram);
+        this.trigger('rl:updateFilters');
+        return this.save();
+      });
+    } else {
+      // We want to clear the filters...
+      this.unsetMeta('filters');
+      // The currentHistogram is the same as the summary histogram
+      this.setMeta('currentHistogram', this.getMeta('summaryHistogram'));
+      this.trigger('rl:updateFilters');
+      return this.save();
+    }
   },
   setAttribute: function (attrName, dataType) {
     let attributes = this.getMeta('attributes');
