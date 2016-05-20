@@ -92,6 +92,8 @@ let Dataset = MetadataItem.extend({
       categoricalAttrs: [],
       quantitativeAttrs: {}
     };
+    // Assemble the parameters for which attributes we want to see
+    // (and provide the bin settings for quantitative attributes)
     for (let attrName of Object.keys(schema)) {
       if (!includeExcluded && excludeAttributes.indexOf(attrName) !== -1) {
         continue;
@@ -103,13 +105,16 @@ let Dataset = MetadataItem.extend({
         // Our schema should tell us the lowest / highest values
         // for this attribute as a number...
         if (!attrSpec.stats.number) {
-          // Even though we want to interpret this value as
-          // quantitative, we can't (yet) figure out how
-          // to ask for min and max values...
-          // We *would* just add this to the categorical query
-          // as a fallback, but that could cause scale/interface
-          // problems, so we'll leave this one out
-          // TODO: what about other potentially quantitative values (like dates?)
+          // Even though we want to interpret this value as quantitative,
+          // we can't (yet) figure out how to ask for min and max values...
+
+          // TODO: what about other potentially quantitative values (like dates?
+          // the server will probably auto-infer that these are strings...)
+
+          // For now, as a fallback, we'll add this as a categorical query,
+          // but this could be bad for performance (probably lots of "categories"
+          // if it's really quantitative). This may also cause some UI confusion...
+          parameters.categoricalAttrs.push(attrName);
           continue;
         }
         let desiredType = this.getAttributeType(attrSpec);
@@ -118,22 +123,29 @@ let Dataset = MetadataItem.extend({
           min: this.coerceValue(attrSpec.stats.number.min, desiredType),
           max: this.coerceValue(attrSpec.stats.number.max, desiredType)
         };
+        // TODO: there are probably more intelligent things we can
+        // do with binCount based on the data type...
         if (desiredType === 'boolean') {
           result.binCount = 2;
         }
         if (result.min === result.max) {
-          // Shoot... there's really only one value for this attribute.
-          // So it's really categorical, even if we want it to be
-          // quantitative (at least for the histogram calculations)
+          // Shoot... there's really only one value for this attribute
+          // after all. So it's really categorical, even if we want it to be
+          // quantitative (at least as far as the histogram calculations
+          // are concerned)
           parameters.categoricalAttrs.push(attrName);
         } else {
           parameters.quantitativeAttrs[attrName] = result;
         }
       }
     }
+    // Add the filters if there are any
     if (filters && filters.length > 0) {
       parameters.filters = filters;
     }
+    // Format the parameters for the endpoint...
+    parameters.categoricalAttrs = parameters.categoricalAttrs.join(',');
+    parameters.quantitativeAttrs = JSON.stringify(parameters.quantitativeAttrs);
     return new Promise((resolve, reject) => {
       girder.restRequest({
         path: 'item/' + this.getId() + '/getHistograms',
@@ -166,15 +178,15 @@ let Dataset = MetadataItem.extend({
 
       // With the new filters, update the histogram
       return this.getHistogram(filters, false).then((histogram) => {
-        this.set('cached_histogram', histogram);
+        this.set('current_histogram', histogram);
         this.trigger('rl:updateFilters');
         return this.save();
       });
     } else {
       // We want to clear the filters...
       this.unsetMeta('filters');
-      // The cached_histogram is the same as the summary histogram
-      this.setMeta('cached_histogram', this.getMeta('summary_histogram'));
+      // The current_histogram is the same as the summary histogram
+      this.setMeta('current_histogram', this.getMeta('summary_histogram'));
       this.trigger('rl:updateFilters');
       return this.save();
     }
