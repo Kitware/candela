@@ -169,6 +169,11 @@ let DatasetView = Widget.extend({
     // TODO: this is technically cheating; relying on the order
     // of the dict entries to preserve the order on screen
 
+    if (attrOrder.length === 0) {
+      this.$el.find('#attributeSettings').html('');
+      return;
+    }
+
     let attributes = d3.select(this.el).select('#attributeSettings')
       .selectAll('li.attribute')
       .data(attrOrder, d => d);
