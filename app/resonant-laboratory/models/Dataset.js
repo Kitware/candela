@@ -2,6 +2,8 @@ import MetadataItem from './MetadataItem';
 
 let girder = window.girder;
 
+import { Set } from '../shims/SetOps.js';
+
 let DEFAULT_INTERPRETATIONS = {
   'undefined': 'ignore',
   boolean: 'categorical',
@@ -35,6 +37,7 @@ let Dataset = MetadataItem.extend({
 
     this.rawCache = null;
     this.parsedCache = null;
+    this.filterInfo = {};
     let meta = this.getMeta();
 
     let schemaPromise;
@@ -368,9 +371,145 @@ let Dataset = MetadataItem.extend({
 
     return this.updateHistograms(false);
   },
+  isValueIncluded: function (attrName, value) {
+    let info = this.filterInfo[attrName];
+    if (!info) {
+      return true;
+    } else {
+      return !info.has(value);
+    }
+  },
+  includeValue: function (attrName, value, include) {
+    let info = this.filterInfo[attrName];
+    if (include) {
+      if (info) {
+        info.delete(value);
+        if (info.size === 0) {
+          delete this.filterInfo[attrName];
+        }
+      }
+    } else {
+      if (!info) {
+        this.filterInfo[attrName] = info = new Set();
+      }
+      info.add(value);
+    }
+    return this.updateFilters(attrName);
+  },
+  isRangeIncluded: function (attrName, range) {
+    let info = this.filterInfo[attrName];
+    if (!info) {
+      return true;
+    } else {
+      if (range.lowBound < info.lowBound) {
+        if (range.highBound > info.lowBound) {
+          // Straddling...
+          return null;
+        } else {
+          return false;
+        }
+      } else if (range.highBound > info.highBound) {
+        if (range.lowBound < info.highBound) {
+          // Straddling...
+          return null;
+        } else {
+          return false;
+        }
+      } else {
+        return true;
+      }
+    }
+  },
+  includeRange: function (attrName, newRange, include) {
+    let schema = this.getMeta('schema');
+    let fullRange = {
+      lowBound: schema[attrName].stats.number.min,
+      highBound: schema[attrName].stats.number.max
+    };
+    let currentRange = this.filterInfo[attrName];
+    if (!currentRange) {
+      // Make a copy...
+      currentRange = {
+        lowBound: fullRange.lowBound,
+        highBound: fullRange.highBound
+      };
+    }
+    if (include) {
+      // Simpler case; we're adding to the total range
+      currentRange.lowBound = Math.min(currentRange.lowBound, newRange.lowBound);
+      currentRange.highBound = Math.max(currentRange.highBound, newRange.highBound);
+    } else if ((newRange.lowBound < currentRange.lowBound &&
+                newRange.highBound > currentRange.lowBound)) {
+      // The clicked target is straddling the current lowBound;
+      // adjust the lowbound to fit
+      currentRange.lowBound = newRange.lowBound;
+    } else if ((newRange.lowBound < currentRange.highBound &&
+                newRange.highBound > currentRange.highBound)) {
+      // The clicked target is straddling the current lowBound;
+      // adjust the lowbound to fit
+      currentRange.highBound = newRange.highBound;
+    } else {
+      // Okay, this case is a little tricky... there are several different
+      // states / behaviors we want to respond to. If BOTH or NEITHER endpoint
+      // matches the full low or high bound, that means we're free to pick which
+      // end to move (should go with the one that's closest). Otherwise, we
+      // want to move the endpoint that hasn't been assigned
+      if ((currentRange.lowBound === fullRange.lowBound &&
+           currentRange.highBound === fullRange.highBound) ||
+          (currentRange.lowBound > fullRange.lowBound &&
+           currentRange.highBound < fullRange.highBound)) {
+        // Okay, which endpoint is closest? Move that one
+        if (newRange.lowBound - fullRange.lowBound >=
+            fullRange.highBound - newRange.highBound) {
+          // Move the low one
+          currentRange.lowBound = newRange.lowBound;
+        } else {
+          // Move the high one
+          currentRange.highBound = newRange.highBound;
+        }
+      } else if (currentRange.lowBound === fullRange.lowBound) {
+        // The low bound hasn't been customized yet
+        currentRange.lowBound = newRange.lowBound;
+      } else if (currentRange.highBound === fullRange.highBound) {
+        // The high bound hasn't been customized yet
+        currentRange.highBound = newRange.highBound;
+      } else {
+        window.mainPage.trigger('rl:error', new Error('Strange range state encountered.'));
+      }
+    }
+    // Okay, after all that, store the range, or trash it if we don't need it anymore
+    if (currentRange.lowBound === fullRange.lowBound &&
+        currentRange.highBound === fullRange.highBound) {
+      delete this.filterInfo[attrName];
+    } else {
+      this.filterInfo[attrName] = currentRange;
+    }
+    // Finally, update our list of filters in the format that the girder endpoint expects
+    return this.updateFilters(attrName);
+  },
+  updateFilters: function (attrName) {
+    // TODO
+    this.trigger('rl:changeSpec');
+  },
   setFilters: function (filters) {
+    filters = filters || [];
+    this.filterInfo = {};
     if (filters) {
       this.setMeta('filters', filters);
+
+      filters.forEach(d => {
+        if (d.operator === '>=') {
+          this.includeRange({
+            low: d.value
+          });
+        } else if (d.operator === '<') {
+          this.includeRange(d.field, {
+            high: d.value
+          }, true);
+        } else {
+          this.includeValue(d.field, d.value, true);
+        }
+      });
     } else {
       this.unsetMeta('filters');
     }

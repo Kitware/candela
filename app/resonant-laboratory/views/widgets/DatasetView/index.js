@@ -126,14 +126,21 @@ let DatasetView = Widget.extend({
         // Get all the relevant info for the bins (and count up the total
         // for the attribute while we're at it)
         let keyIntoAll = {};
-        summary.forEach(d => {
+        summary.forEach((d, i) => {
           attrInfo.summaryCount += d.count;
           let bin = {
+            index: i,
+            attrName: attrName,
+            interpretation: lookupTable.attributes[attrName].interpretation,
             summaryCount: d.count,
             currentCount: 0
           };
-          if (d.lowBound && d.highBound) {
+          if (d.lowBound || d.highBound) {
             bin.sortKey = d.lowBound;
+            bin.range = {
+              lowBound: d.lowBound,
+              highBound: d.highBound
+            };
             bin.humanLabel = '[' + d.lowBound + ', ' + d.highBound + ')';
           } else {
             bin.sortKey = d._id;
@@ -280,6 +287,13 @@ let DatasetView = Widget.extend({
       .attr('class', 'binSettings');
     bins.exit().remove();
     bins.order();
+    bins.attr('class', d => {
+      if (lookupTable.bins[d].range) {
+        return 'quantitative binSettings';
+      } else {
+        return 'categorical binSettings';
+      }
+    });
 
     // Flexbox spacer
     binsEnter.append('div')
@@ -295,9 +309,35 @@ let DatasetView = Widget.extend({
     // Bin checkbox
     binsEnter.append('input')
       .attr('type', 'checkbox')
-      .attr('class', 'include');
+      .attr('class', 'include')
+      .on('click', function (d) {
+        // this refers to the DOM element
+        let bin = lookupTable.bins[d];
+        if (bin.range === undefined) {
+          // categorical value is the same as the sortKey
+          lookupTable.dataset.includeValue(bin.attrName, bin.sortKey, this.checked);
+        } else {
+          lookupTable.dataset.includeRange(bin.attrName, bin.range, this.checked);
+        }
+      });
     bins.selectAll('input.include')
-      .attr('id', d => makeValidId(d + 'include'));
+      .attr('id', d => makeValidId(d + 'include'))
+      .property('checked', function (d) {
+        // this refers to the DOM element
+        let bin = lookupTable.bins[d];
+        if (bin.range === undefined) {
+          // categorical value is the same as the sortKey
+          return lookupTable.dataset.isValueIncluded(bin.attrName, bin.sortKey);
+        } else {
+          let included = lookupTable.dataset.isRangeIncluded(bin.attrName, bin.range);
+          if (included === null) {
+            this.indeterminate = true;
+            return true;
+          } else {
+            return included;
+          }
+        }
+      });
 
     // Bin histogram bar container
     let binBarsEnter = binsEnter.append('div')

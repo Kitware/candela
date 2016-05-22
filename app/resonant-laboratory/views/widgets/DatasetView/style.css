@@ -9,7 +9,18 @@
 }
 
 .DatasetView.content #attributeSettings li div.attributeSettings {
+  margin-top: 1em;
   margin-bottom: -1.75em;
+}
+
+.DatasetView.content #attributeSettings li.quantitative.binSettings {
+  margin-bottom: -0.5em;
+}
+.DatasetView.content #attributeSettings li.quantitative.binSettings label {
+  position: relative;
+  top: 0.25em;
+  font-size: 0.75em;
+  white-space: nowrap;
 }
 
 .DatasetView.content #attributeSettings li div.attributeSettings,
@@ -23,7 +34,8 @@
 }
 .DatasetView.content #attributeSettings li div.attributeSettings > *,
 .DatasetView.content #attributeSettings li.binSettings > * {
-  margin: 0.5em;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
 }
 .DatasetView.content #attributeSettings li div.attributeSettings > div.flexspacer,
 .DatasetView.content #attributeSettings li.binSettings > div.flexspacer {
@@ -74,7 +86,7 @@
 .DatasetView.content #attributeSettings li > input.expand::after {
   display: block;
   position: relative;
-  top: -0.1em;
+  top: 0.6em;
   left: 997em;  /* our CSS hacks hide the normal checkboxes at -999em */
   content: "+";
   text-align: center;

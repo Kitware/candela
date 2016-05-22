@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 25 75" style="enable-background:new 0 0 25 75;" xml:space="preserve">
+<style type="text/css">
+	.st0{filter:url(#AI_Alpha_4);}
+	.st1{fill:#CCCCCC;}
+	.st2{fill:none;stroke:#999999;stroke-miterlimit:10;}
+</style>
+<filter  filterUnits="objectBoundingBox" height="200%" id="AI_Alpha_4" width="200%" x="-50%" y="-50%">
+	<feTurbulence  baseFrequency="0.01" numOctaves="4" result="turb" stitchTiles="noStitch" type="fractalNoise"></feTurbulence>
+	<feComposite  in="SourceGraphic" in2="turb" operator="in"></feComposite>
+</filter>
+<g class="st0">
+	<path class="st1" d="M4.8,29.3h15c0.6,0,1,0.7,0.8,1.2l-7.5,15c-0.3,0.6-1.2,0.6-1.5,0l-7.5-15C3.8,29.9,4.2,29.3,4.8,29.3z"/>
+	<path class="st2" d="M4.8,29.3h15c0.6,0,1,0.7,0.8,1.2l-7.5,15c-0.3,0.6-1.2,0.6-1.5,0l-7.5-15C3.8,29.9,4.2,29.3,4.8,29.3z"/>
+</g>
+<g class="st0">
+	<path class="st1" d="M19.8,21.3h-15c-0.6,0-1-0.7-0.8-1.2l7.5-15c0.3-0.6,1.2-0.6,1.5,0l7.5,15C20.9,20.6,20.4,21.3,19.8,21.3z"/>
+	<path class="st2" d="M19.8,21.3h-15c-0.6,0-1-0.7-0.8-1.2l7.5-15c0.3-0.6,1.2-0.6,1.5,0l7.5,15C20.9,20.6,20.4,21.3,19.8,21.3z"/>
+</g>
+<g class="st0">
+	<circle class="st1" cx="12.3" cy="62.3" r="8.3"/>
+	<circle class="st2" cx="12.3" cy="62.3" r="8.3"/>
+</g>
+</svg>
