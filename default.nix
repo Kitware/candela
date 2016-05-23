@@ -6,6 +6,7 @@
     [ 
       cairo
       fontconfig
+      freetype
       git
       gnumake
       libpng
@@ -14,6 +15,7 @@
       pkgconfig
       python
       vim
+      zlib
     ]);
   runScript = "zsh";
 }).env
