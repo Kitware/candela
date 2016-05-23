@@ -55,6 +55,9 @@ export default class UpSet {
     if (!this.options.id || (!this.options.sets && !this.options.fields)) {
       return;
     }
+    if (!this.options.data || this.options.data.length === 0) {
+      return;
+    }
 
     d3.select(this.el).html(template);
 
