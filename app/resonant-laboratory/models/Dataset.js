@@ -459,7 +459,7 @@ let Dataset = MetadataItem.extend({
           (currentRange.lowBound > fullRange.lowBound &&
            currentRange.highBound < fullRange.highBound)) {
         // Okay, which endpoint is closest? Move that one
-        if (newRange.lowBound - fullRange.lowBound >=
+        if (newRange.lowBound - fullRange.lowBound <=
             fullRange.highBound - newRange.highBound) {
           // Move the low one
           currentRange.lowBound = newRange.lowBound;

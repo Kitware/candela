@@ -66,6 +66,15 @@
   background-color: #333333;
 }
 
+/* Special stuff for quantitative bin checkboxes */
+.DatasetView.content li.quantitative.binSettings input.include::before {
+  background: url('../../../images/rangeButtons.png') no-repeat center left;
+  background-position: 0 -75px;
+}
+.DatasetView.content li.quantitative.binSettings input.include:checked::before {
+  background-position: 0 -50px;
+}
+
 /* CSS hack to make expandable list */
 .DatasetView.content #attributeSettings li > input.expand::before {
   display: none;

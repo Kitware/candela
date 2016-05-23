@@ -309,7 +309,24 @@ let DatasetView = Widget.extend({
     // Bin checkbox
     binsEnter.append('input')
       .attr('type', 'checkbox')
-      .attr('class', 'include')
+      .attr('class', d => {
+        let bin = lookupTable.bins[d];
+        let included;
+        if (bin.range === undefined) {
+          // categorical value is the same as the sortKey
+          included = lookupTable.dataset.isValueIncluded(bin.attrName, bin.sortKey);
+        } else {
+          included = lookupTable.dataset.isRangeIncluded(bin.attrName, bin.range);
+        }
+        // TODO: flag whether this bin is at the top or the bottom of the range
+        if (included === null) {
+          return 'indeterminate include';
+        } else if (included === true) {
+          return 'included include';
+        } else {
+          return 'excluded include';
+        }
+      })
       .on('click', function (d) {
         // this refers to the DOM element
         let bin = lookupTable.bins[d];
