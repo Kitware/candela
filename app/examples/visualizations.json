@@ -231,7 +231,8 @@
         "Duff Fan",
         "School"
       ],
-      "fields": ["School"]
+      "fields": ["School"],
+      "metadata": ["Age"]
     }
   },
   {

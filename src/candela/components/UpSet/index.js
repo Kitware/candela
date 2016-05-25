@@ -41,6 +41,16 @@ export default class UpSet {
             from: 'data',
             fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
           }
+        },
+        {
+          name: 'metadata',
+          type: 'string_list',
+          format: 'string_list',
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
         }
       ]
     };
@@ -93,23 +103,53 @@ export default class UpSet {
       });
     }
 
+    const setsEnd = header.length - 1;
+
+    let meta = [
+      {
+        type: 'id',
+        index: 0,
+        name: 'Name'
+      }
+    ];
+
+    // Add metadata fields.
+    if (this.options.metadata) {
+      if (!this.options.data.__types__) {
+        dl.read(this.options.data, {parse: 'auto'});
+      }
+      const upsetTypeMap = {
+        string: 'string',
+        date: 'integer',
+        number: 'float',
+        integer: 'integer',
+        boolean: 'integer'
+      };
+      this.options.metadata.forEach(field => {
+        header.push(field);
+        const type = upsetTypeMap[this.options.data.__types__[field]];
+        meta.push({
+          type: type,
+          index: header.length - 1,
+          name: field
+        });
+        this.options.data.forEach((d, i) => {
+          data[i + 1].push('' + d[field]);
+        });
+      });
+    }
+
     let datasets = [
       {
         name: 'data',
         data: data,
         header: 0,
-        meta: [
-          {
-            type: 'id',
-            index: 0,
-            name: 'Name'
-          }
-        ],
+        meta: meta,
         sets: [
           {
             format: 'binary',
             start: 1,
-            end: header.length - 1
+            end: setsEnd
           }
         ],
         author: '',
