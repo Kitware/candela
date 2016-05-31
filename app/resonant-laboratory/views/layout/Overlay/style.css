@@ -3,7 +3,7 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0,0,0,0.35);
-  z-index: 8;
+  z-index: 108;
   overflow: auto;
 }
 

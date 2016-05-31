@@ -1,6 +1,6 @@
 #HelpLayer svg {
   position: absolute;
-  z-index: 10;
+  z-index: 110;
   left: 0px;
   top: 0px;
   width: 100%;
@@ -37,7 +37,7 @@
   position: absolute;
   bottom: 2em;
   right: 2em;
-  z-index: 11;
+  z-index: 111;
   padding: 1em;
   background-color: white;
   border: 1px solid rgba(0,0,0,0.2);
