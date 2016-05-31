@@ -399,49 +399,92 @@ let Dataset = MetadataItem.extend({
   describeRange: function (attrName, range) {
     let info = this.filterInfo[attrName];
     if (!info) {
-      let info = this.getMeta('schema')[attrName].stats.number;
+      // There is no filter on this attribute,
+      // so no matter what, the bin corresponding to
+      // range is included
       let description = {
-        included: true
+        included: true,
+        position: 'inside'
       };
-      if (range.lowBound <= info.min) {
-        description.position = 'low';
-      } else if (range.highBound >= info.max) {
-        description.position = 'high';
-      } else {
-        description.position = 'inside';
+      // Check if range is at the bottom
+      // or top of the span of the data
+      info = this.getMeta('schema')[attrName];
+      if (info && info.stats && info.stats.number) {
+        if (range.lowBound <= info.stats.number.min) {
+          description.position = 'low';
+        } else if (range.highBound >= info.stats.number.max) {
+          description.position = 'high';
+        }
       }
       return description;
     } else {
+      // The filter specifies an eligible range of values (outside of
+      // which all values are filtered). How does the bin range relate to
+      // the eligible range?
       if (range.lowBound < info.lowBound) {
-        if (range.highBound > info.lowBound) {
-          // Straddling...
+        if (range.highBound <= info.lowBound) {
+          // range is entirely below all eligible values
+          return {
+            included: false,
+            position: 'outside'
+          };
+        } else if (range.highBound < info.highBound) {
+          // range straddles the bottom edge of eligible values
           return {
             included: null,
             position: 'low'
           };
         } else {
-          return {
-            included: false,
-            position: 'outside'
-          };
-        }
-      } else if (range.highBound > info.highBound) {
-        if (range.lowBound < info.highBound) {
-          // Straddling...
+          // range covers the entire set of eligible values (and then some)
           return {
             included: null,
-            position: 'high'
-          };
-        } else {
-          return {
-            included: false,
-            position: 'outside'
+            position: 'low high'
           };
         }
-      } else {
+      } else if (range.lowBound === info.lowBound) {
+        if (range.highBound < info.highBound) {
+          // range covers the bottom-most bin
+          return {
+            included: true,
+            position: 'low'
+          };
+        } else if (range.highBound === info.highBound) {
+          // range covers exactly the entire set of eligible values
+          return {
+            included: true,
+            position: 'low high'
+          };
+        } else {
+          // range covers the entire set of eligible values (and then some)
+          return {
+            included: null,
+            position: 'low high'
+          };
+        }
+      } else if (range.highBound < info.highBound) {
+        // very common case; range is strictly somewhere between
+        // the low and high boundaries of the eligible range
         return {
           included: true,
           position: 'inside'
+        };
+      } else if (range.highBound === info.highBound) {
+        // range covers the top-most bin
+        return {
+          included: true,
+          position: 'high'
+        };
+      } else if (range.lowBound < info.highBound) {
+        // range straddles the top edge of eligible values
+        return {
+          included: null,
+          position: 'high'
+        };
+      } else {
+        // range is entirely above all eligible values
+        return {
+          included: false,
+          position: 'outside'
         };
       }
     }
@@ -454,58 +497,66 @@ let Dataset = MetadataItem.extend({
     };
     let currentRange = this.filterInfo[attrName];
     if (!currentRange) {
-      // Make a copy...
+      // Make a copy of fullRange
       currentRange = {
         lowBound: fullRange.lowBound,
         highBound: fullRange.highBound
       };
     }
     if (include) {
-      // Simpler case; we're adding to the total range
+      // Simplest case; we're adding to the total range
       currentRange.lowBound = Math.min(currentRange.lowBound, newRange.lowBound);
       currentRange.highBound = Math.max(currentRange.highBound, newRange.highBound);
-    } else if ((newRange.lowBound < currentRange.lowBound &&
-                newRange.highBound > currentRange.lowBound)) {
-      // The clicked target is straddling the current lowBound;
-      // adjust the lowbound to fit
-      currentRange.lowBound = newRange.lowBound;
-    } else if ((newRange.lowBound < currentRange.highBound &&
-                newRange.highBound > currentRange.highBound)) {
-      // The clicked target is straddling the current lowBound;
-      // adjust the lowbound to fit
-      currentRange.highBound = newRange.highBound;
     } else {
-      // Okay, this case is a little tricky... there are several different
-      // states / behaviors we want to respond to. If BOTH or NEITHER endpoint
-      // matches the full low or high bound, that means we're free to pick which
-      // end to move (should go with the one that's closest). Otherwise, we
-      // want to move the endpoint that hasn't been assigned
-      if ((currentRange.lowBound === fullRange.lowBound &&
-           currentRange.highBound === fullRange.highBound) ||
-          (currentRange.lowBound > fullRange.lowBound &&
-           currentRange.highBound < fullRange.highBound)) {
-        // Okay, which endpoint is closest? Move that one
-        if (newRange.lowBound - fullRange.lowBound <=
-            fullRange.highBound - newRange.highBound) {
-          // Move the low one
-          currentRange.lowBound = newRange.lowBound;
-        } else {
-          // Move the high one
-          currentRange.highBound = newRange.highBound;
-        }
-      } else if (currentRange.lowBound === fullRange.lowBound) {
-        // The low bound hasn't been customized yet
+      let changedRange = false;
+      if ((newRange.lowBound < currentRange.lowBound &&
+           newRange.highBound > currentRange.lowBound)) {
+        // The clicked target is straddling the current lowBound;
+        // adjust the lowbound to fit
         currentRange.lowBound = newRange.lowBound;
-      } else if (currentRange.highBound === fullRange.highBound) {
-        // The high bound hasn't been customized yet
+        changedRange = true;
+      }
+      if ((newRange.lowBound < currentRange.highBound &&
+           newRange.highBound > currentRange.highBound)) {
+        // The clicked target is straddling the current lowBound;
+        // adjust the lowbound to fit
         currentRange.highBound = newRange.highBound;
-      } else {
-        window.mainPage.trigger('rl:error', new Error('Strange range state encountered.'));
+        changedRange = true;
+      }
+
+      if (!changedRange) {
+        // Okay, this case is a little tricky... there are several different
+        // states / behaviors we want to respond to. If BOTH or NEITHER endpoint
+        // matches the full low or high bound, that means we're free to pick which
+        // end to move (should go with the one that's closest). Otherwise, we
+        // want to move the endpoint that hasn't been assigned
+        if ((currentRange.lowBound <= fullRange.lowBound &&
+             currentRange.highBound >= fullRange.highBound) ||
+            (currentRange.lowBound > fullRange.lowBound &&
+             currentRange.highBound < fullRange.highBound)) {
+          // Okay, which endpoint is closest? Move that one
+          if (newRange.lowBound - fullRange.lowBound <=
+              fullRange.highBound - newRange.highBound) {
+            // Move the low one
+            currentRange.lowBound = newRange.lowBound;
+          } else {
+            // Move the high one
+            currentRange.highBound = newRange.highBound;
+          }
+        } else if (currentRange.lowBound <= fullRange.lowBound) {
+          // The low bound hasn't been customized yet
+          currentRange.lowBound = newRange.lowBound;
+        } else if (currentRange.highBound >= fullRange.highBound) {
+          // The high bound hasn't been customized yet
+          currentRange.highBound = newRange.highBound;
+        } else {
+          window.mainPage.trigger('rl:error', new Error('Strange range state encountered.'));
+        }
       }
     }
     // Okay, after all that, store the range, or trash it if we don't need it anymore
-    if (currentRange.lowBound === fullRange.lowBound &&
-        currentRange.highBound === fullRange.highBound) {
+    if (currentRange.lowBound <= fullRange.lowBound &&
+        currentRange.highBound >= fullRange.highBound) {
       delete this.filterInfo[attrName];
     } else {
       this.filterInfo[attrName] = currentRange;

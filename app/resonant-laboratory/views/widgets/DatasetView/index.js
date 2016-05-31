@@ -142,9 +142,13 @@ let DatasetView = Widget.extend({
               highBound: d.highBound
             };
             bin.humanLabel = '[' + d.lowBound + ', ' + d.highBound + ')';
+            let description = lookupTable.dataset.describeRange(attrName, bin.range);
+            bin.included = description.included;
+            bin.position = description.position;
           } else {
             bin.sortKey = d._id;
             bin.humanLabel = d._id;
+            bin.included = lookupTable.dataset.isValueIncluded(attrName, d._id);
           }
           bin.key = attrName + bin.sortKey;
           lookupTable.bins[bin.key] = bin;
@@ -309,17 +313,30 @@ let DatasetView = Widget.extend({
     // Bin checkbox
     binsEnter.append('input')
       .attr('type', 'checkbox')
+      .attr('class', 'include');
+    bins.selectAll('input.include')
+      .attr('id', d => makeValidId(d + 'include'))
       .attr('class', d => {
         let bin = lookupTable.bins[d];
-        if (bin.range === undefined) {
+        if (bin.position === undefined) {
           return 'include';
         } else {
           // flag whether this bin is at the top or the bottom of the range
-          let description = lookupTable.dataset.describeRange(bin.attrName, bin.range);
-          return description.position + ' include';
+          return bin.position + ' include';
         }
       })
-      .on('click', function (d) {
+      .property('checked', function (d) {
+        // this refers to the DOM element
+        let bin = lookupTable.bins[d];
+        if (bin.included === null) {
+          this.indeterminate = true;
+          return true;
+        } else {
+          this.indeterminate = false;
+          return bin.included;
+        }
+      })
+      .on('change', function (d) {
         // this refers to the DOM element
         let bin = lookupTable.bins[d];
         if (bin.range === undefined) {
@@ -327,24 +344,6 @@ let DatasetView = Widget.extend({
           lookupTable.dataset.includeValue(bin.attrName, bin.sortKey, this.checked);
         } else {
           lookupTable.dataset.includeRange(bin.attrName, bin.range, this.checked);
-        }
-      });
-    bins.selectAll('input.include')
-      .attr('id', d => makeValidId(d + 'include'))
-      .property('checked', function (d) {
-        // this refers to the DOM element
-        let bin = lookupTable.bins[d];
-        if (bin.range === undefined) {
-          // categorical value is the same as the sortKey
-          return lookupTable.dataset.isValueIncluded(bin.attrName, bin.sortKey);
-        } else {
-          let description = lookupTable.dataset.describeRange(bin.attrName, bin.range);
-          if (description.included === null) {
-            this.indeterminate = true;
-            return true;
-          } else {
-            return description.included;
-          }
         }
       });
 
