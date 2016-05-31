@@ -230,7 +230,8 @@ let Dataset = MetadataItem.extend({
       let parameters = {
         format: 'dict',
         filters: this.getMeta('filters'),
-        fields: Object.keys(this.getSpec().attributes)
+        fields: Object.keys(this.getSpec().attributes),
+        limit: 0
       };
       return new Promise((resolve, reject) => {
         girder.restRequest({
