@@ -76,13 +76,13 @@ export default class LineUp {
   * @param fixed: minimum width for a column.
   */
   lineupGetColumnWidth (name, col, fixed) {
-    var width = col.width || 0;
-    var colname = col.column || col.type;
+    let width = col.width || 0;
+    let colname = col.column || col.type;
     /* Get the column scaling based on the user settings, if available */
     if (this.lineupColumns && this.lineupColumns[name] && this.lineupColumns[name][colname]) {
       width = this.lineupColumns[name][colname] + fixed;
     }
-    var colWidth = width < fixed ? 0 : (width - fixed);
+    let colWidth = width < fixed ? 0 : (width - fixed);
     if (col === 'rank') {  /* defined in LineUp */
       colWidth = this.lineupRankWidth;
     }
@@ -101,13 +101,13 @@ export default class LineUp {
   * @returns: relative scale of lineup to available space.
   */
   createLineupAdjustWidth (elem, name, spec, fixed) {
-    var rankWidth = 0;
-    var total = 0;
-    var count = 0;
-    var c1, c2;
+    let rankWidth = 0;
+    let total = 0;
+    let count = 0;
+    let c1, c2;
     /* The final width value of 30 is to leave room for a scroll bar. */
-    var width = $(elem)[0].getBoundingClientRect().width - fixed * 2 - 30;
-    var col = spec.dataspec.layout.primary;
+    let width = $(elem)[0].getBoundingClientRect().width - fixed * 2 - 30;
+    let col = spec.dataspec.layout.primary;
     for (c1 = 0; c1 < col.length; c1 += 1) {
       if (col[c1].children) {
         for (c2 = 0; c2 < col[c1].children.length; c2 += 1) {
@@ -123,9 +123,9 @@ export default class LineUp {
         total += this.lineupGetColumnWidth(name, col[c1], fixed);
       }
     }
-    var avail = width - count * fixed - rankWidth;
+    let avail = width - count * fixed - rankWidth;
     avail -= count + (rankWidth ? 1 : 0); // I'm not sure why this is necessary
-    var scale = avail / total;
+    let scale = avail / total;
     for (c1 = 0; c1 < col.length; c1 += 1) {
       if (col[c1].children) {
         for (c2 = 0; c2 < col[c1].children.length; c2 += 1) {
@@ -160,14 +160,14 @@ export default class LineUp {
     delete spec.dataspec.separator;
     spec.dataspec.data = dataset;
     spec.storage = LineUpJS.createLocalStorage(dataset, LineUpJS.deriveColors(desc.columns));
-    var config = ((lineupObj ? lineupObj.config : $.extend({}, this.lineUpConfig)) || {});
+    let config = ((lineupObj ? lineupObj.config : $.extend({}, this.lineUpConfig)) || {});
     if (!config.renderingOptions) {
       config.renderingOptions = {};
     }
-    var oldAnimation = config.renderingOptions.animation;
+    let oldAnimation = config.renderingOptions.animation;
     config.renderingOptions.animation = false;
-    var columnFixed = 5;
-    var scale = this.createLineupAdjustWidth(elem, name, spec, columnFixed);
+    let columnFixed = 5;
+    let scale = this.createLineupAdjustWidth(elem, name, spec, columnFixed);
     /* Always recreate the control */
     $(elem).empty();
     /* Lineup takes a d3 element */
@@ -182,7 +182,7 @@ export default class LineUp {
     lineupObj['lineup-key'] = name;
     $(elem).attr('lineup-key', name);
     if (sort) {
-      var sortColumn;
+      let sortColumn;
       $.each(lineupObj.data.getRankings(), function (ridx, ranking) {
         $.each(ranking.flatColumns, function (cidx, column) {
           if (column.label === sort) {
@@ -193,10 +193,10 @@ export default class LineUp {
       lineupObj.sortBy(sortColumn !== undefined ? sortColumn : sort);
     }
     lineupObj.changeRenderingOption('animation', oldAnimation);
-    var fixTooltips = function () {
+    let fixTooltips = function () {
       for (var i = 0; i < desc.columns.length; i += 1) {
         if (desc.columns[i].description) {
-          var label = (desc.columns[i].label || desc.columns[i].column);
+          let label = (desc.columns[i].label || desc.columns[i].column);
           $('title', $(elem + ' .lu-header text.headerLabel:contains("' + label + '")').parent()).text(label + ': ' + desc.columns[i].description);
         }
       }
@@ -220,14 +220,14 @@ export default class LineUp {
    * @param name: name of the lineup record we have adjusted.
    */
   lineupDragColumnEnd (name) {
-    var c1, c2;
+    let c1, c2;
     if (!this.lineupColumns[name]) {
       this.lineupColumns[name] = {};
     }
-    var record = this.lineupColumns[name];
-    var col = this.lineupInstances[name].dump().rankings[0].columns;
-    var scale = this.lineupInstances[name]['column-scale'];
-    var fixed = this.lineupInstances[name]['column-fixed'];
+    let record = this.lineupColumns[name];
+    let col = this.lineupInstances[name].dump().rankings[0].columns;
+    let scale = this.lineupInstances[name]['column-scale'];
+    let fixed = this.lineupInstances[name]['column-fixed'];
     for (c1 = 0; c1 < col.length; c1 += 1) {
       if (col[c1].children) {
         for (c2 = 0; c2 < col[c1].children.length; c2 += 1) {
