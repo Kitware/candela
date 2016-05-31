@@ -396,27 +396,53 @@ let Dataset = MetadataItem.extend({
     }
     return this.updateFilters(attrName);
   },
-  isRangeIncluded: function (attrName, range) {
+  describeRange: function (attrName, range) {
     let info = this.filterInfo[attrName];
     if (!info) {
-      return true;
+      let info = this.getMeta('schema')[attrName].stats.number;
+      let description = {
+        included: true
+      };
+      if (range.lowBound <= info.min) {
+        description.position = 'low';
+      } else if (range.highBound >= info.max) {
+        description.position = 'high';
+      } else {
+        description.position = 'inside';
+      }
+      return description;
     } else {
       if (range.lowBound < info.lowBound) {
         if (range.highBound > info.lowBound) {
           // Straddling...
-          return null;
+          return {
+            included: null,
+            position: 'low'
+          };
         } else {
-          return false;
+          return {
+            included: false,
+            position: 'outside'
+          };
         }
       } else if (range.highBound > info.highBound) {
         if (range.lowBound < info.highBound) {
           // Straddling...
-          return null;
+          return {
+            included: null,
+            position: 'high'
+          };
         } else {
-          return false;
+          return {
+            included: false,
+            position: 'outside'
+          };
         }
       } else {
-        return true;
+        return {
+          included: true,
+          position: 'inside'
+        };
       }
     }
   },

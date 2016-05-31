@@ -69,10 +69,22 @@
 /* Special stuff for quantitative bin checkboxes */
 .DatasetView.content li.quantitative.binSettings input.include::before {
   background: url('../../../images/rangeButtons.png') no-repeat center left;
-  background-position: 0 -75px;
+  background-position: 0 0px;
 }
 .DatasetView.content li.quantitative.binSettings input.include:checked::before {
+  background-position: 0 -25px;
+}
+.DatasetView.content li.quantitative.binSettings input.include.high::before {
   background-position: 0 -50px;
+}
+.DatasetView.content li.quantitative.binSettings input.include.low::before {
+  background-position: 0 -75px;
+}
+.DatasetView.content li.quantitative.binSettings input.include.high:indeterminate::before {
+  background-position: 0 -100px;
+}
+.DatasetView.content li.quantitative.binSettings input.include.low:indeterminate::before {
+  background-position: 0 -125px;
 }
 
 /* CSS hack to make expandable list */

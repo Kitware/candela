@@ -311,20 +311,12 @@ let DatasetView = Widget.extend({
       .attr('type', 'checkbox')
       .attr('class', d => {
         let bin = lookupTable.bins[d];
-        let included;
         if (bin.range === undefined) {
-          // categorical value is the same as the sortKey
-          included = lookupTable.dataset.isValueIncluded(bin.attrName, bin.sortKey);
+          return 'include';
         } else {
-          included = lookupTable.dataset.isRangeIncluded(bin.attrName, bin.range);
-        }
-        // TODO: flag whether this bin is at the top or the bottom of the range
-        if (included === null) {
-          return 'indeterminate include';
-        } else if (included === true) {
-          return 'included include';
-        } else {
-          return 'excluded include';
+          // flag whether this bin is at the top or the bottom of the range
+          let description = lookupTable.dataset.describeRange(bin.attrName, bin.range);
+          return description.position + ' include';
         }
       })
       .on('click', function (d) {
@@ -346,12 +338,12 @@ let DatasetView = Widget.extend({
           // categorical value is the same as the sortKey
           return lookupTable.dataset.isValueIncluded(bin.attrName, bin.sortKey);
         } else {
-          let included = lookupTable.dataset.isRangeIncluded(bin.attrName, bin.range);
-          if (included === null) {
+          let description = lookupTable.dataset.describeRange(bin.attrName, bin.range);
+          if (description.included === null) {
             this.indeterminate = true;
             return true;
           } else {
-            return included;
+            return description.included;
           }
         }
       });
