@@ -136,9 +136,11 @@ let DatasetView = Widget.extend({
     let widgetIsShowing = Widget.prototype.render.apply(this, arguments);
 
     // Get the dataset in the project (if there is one)
-    let dataset = window.mainPage.project.getMeta('datasets');
-    if (dataset) {
-      dataset = window.mainPage.loadedDatasets[dataset[0]];
+
+    let dataset;
+    if (window.mainPage.project) {
+      let datasets = window.mainPage.project.getMeta('datasets');
+      dataset = window.mainPage.loadedDatasets[datasets[0]];
     }
 
     let editor;
