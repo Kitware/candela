@@ -373,9 +373,7 @@ let DatasetView = Widget.extend({
       .style('width', d => barScale(lookupTable.bins[d].currentCount) + 'px');
   },
   render: Underscore.debounce(function () {
-    if (!this.canRender()) {
-      return;
-    }
+    let widgetIsShowing = Widget.prototype.render.apply(this, arguments);
 
     if (!this.addedTemplate) {
       this.$el.html(myTemplate);
@@ -383,9 +381,11 @@ let DatasetView = Widget.extend({
     }
 
     // Get the dataset in the project (if there is one)
-    let dataset = window.mainPage.project.getMeta('datasets');
-    if (dataset) {
-      dataset = window.mainPage.loadedDatasets[dataset[0]];
+
+    let dataset;
+    if (window.mainPage.project) {
+      let datasets = window.mainPage.project.getMeta('datasets');
+      dataset = window.mainPage.loadedDatasets[datasets[0]];
     }
 
     if (!dataset) {

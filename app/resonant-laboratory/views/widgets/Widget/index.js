@@ -52,13 +52,18 @@ let Widget = Backbone.View.extend({
   renderIndicators: function () {
     this.panel.renderIndicators();
   },
-  canRender: function () {
+  render: function () {
     // Don't render if there's no project, if our WidgetPanel
     // hasn't given us a legitimate element in the
-    // document yet, or if our WidgetPanel is collapsed
-    return window.mainPage.project &&
-      document.getElementById(this.$el.attr('id')) === this.el; // &&
-      // window.mainPage.widgetPanels.expandedWidgets.has(this.hashName);
+    // document yet, or if we are collapsed
+    if (!window.mainPage.project ||
+      document.getElementById(this.$el.attr('id')) !== this.el ||
+      !this.isTargeted()) {
+      this.$el.html('');
+      return false;
+    } else {
+      return true;
+    }
   },
   getDefaultTips: function () {
     let tips = [];

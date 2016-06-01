@@ -92,7 +92,15 @@ let ProjectSettings = Backbone.View.extend({
 
       // Wire up simple events that don't change
       this.$el.find('#copyLinkButton').on('click', () => {
-        window.copyTextToClipboard(window.location.href);
+        if (window.copyTextToClipboard(window.location.href)) {
+          window.mainPage.notificationLayer.displayNotification(
+            'Link successfully copied to clipboard');
+        } else {
+          window.mainPage.notificationLayer.displayNotification(
+            'Sorry, couldn\'t copy the link for some reason.' +
+            ' Try copying this page\'s URL from your browser\'s' +
+            ' address bar instead.', 'error');
+        }
       });
 
       this.$el.find('#girderButton').on('click', () => {

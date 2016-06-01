@@ -1,36 +1,4 @@
-<svg xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
-    <!-- Sneaky way to recolor icons without making separate images:
-    intercept = parseInt(hexvalue, 16) / 255 / 2 -->
-    <filter id="darkIcons">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="0.1" />
-        <feFuncG type="linear" slope="0" intercept="0.1" />
-        <feFuncB type="linear" slope="0" intercept="0.1" />
-      </feComponentTransfer>
-    </filter>
-    <filter id="blueIcons">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="0.10784313725490197" />
-        <feFuncG type="linear" slope="0" intercept="0.24705882352941178" />
-        <feFuncB type="linear" slope="0" intercept="0.3607843137254902" />
-      </feComponentTransfer>
-    </filter>
-    <filter id="greenIcons">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="0.15098039215686274" />
-        <feFuncG type="linear" slope="0" intercept="0.3431372549019608" />
-        <feFuncB type="linear" slope="0" intercept="0.1450980392156863" />
-      </feComponentTransfer>
-    </filter>
-    <filter id="orangeIcons">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="0.5" />
-        <feFuncG type="linear" slope="0" intercept="0.24901960784313726" />
-        <feFuncB type="linear" slope="0" intercept="0" />
-      </feComponentTransfer>
-    </filter>
-  </defs>
+<svg>
   <g class="linkLayer"></g>
   <g class="nodeLayer"></g>
-</svg>;
+</svg>

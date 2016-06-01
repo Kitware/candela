@@ -27,6 +27,11 @@
   filter: opacity(50%);
 }
 
+#WidgetPanels .sectionHeader .indicatorText img:hover {
+  -webkit-filter: opacity(100%);
+  filter: opacity(100%);
+}
+
 #WidgetPanels .targeted .sectionHeader img {
   -webkit-transform: rotate(0deg);
   -moz-transform: rotate(0deg);

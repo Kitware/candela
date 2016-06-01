@@ -53,6 +53,7 @@
     "component": "LineUp",
     "options": {
       "data": "iris",
+      "fields": ["species", "petalLength", "petalWidth", "sepalLength", "sepalWidth"],
       "stacked": true,
       "animation": true,
       "histograms": true
@@ -231,7 +232,8 @@
         "Duff Fan",
         "School"
       ],
-      "fields": ["School"]
+      "fields": ["School"],
+      "metadata": ["Age"]
     }
   },
   {
