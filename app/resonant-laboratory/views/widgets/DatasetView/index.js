@@ -318,7 +318,7 @@ let DatasetView = Widget.extend({
       .text(d => lookupTable.bins[d].humanLabel);
 
     // Bin checkbox
-    binsEnter.append('input')
+    /* binsEnter.append('input')
       .attr('type', 'checkbox')
       .attr('class', 'include');
     bins.selectAll('input.include')
@@ -352,7 +352,7 @@ let DatasetView = Widget.extend({
         } else {
           lookupTable.dataset.includeRange(bin.attrName, bin.range, this.checked);
         }
-      });
+      });*/
 
     // Bin histogram bar container
     let binBarsEnter = binsEnter.append('div')
