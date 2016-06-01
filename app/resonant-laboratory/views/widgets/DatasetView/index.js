@@ -141,7 +141,14 @@ let DatasetView = Widget.extend({
               lowBound: d.lowBound,
               highBound: d.highBound
             };
-            bin.humanLabel = '[' + d.lowBound + ', ' + d.highBound + ')';
+            bin.humanLabel = '[' + d.lowBound + ', ' + d.highBound;
+            // The bins are left-closed, right-open, except
+            // for the last bin (closed on both ends)
+            if (i === summary.length - 1) {
+              bin.humanLabel += ']';
+            } else {
+              bin.humanLabel += ')';
+            }
             let description = lookupTable.dataset.describeRange(attrName, bin.range);
             bin.included = description.included;
             bin.position = description.position;

@@ -518,8 +518,8 @@ let Dataset = MetadataItem.extend({
       }
       if ((newRange.lowBound < currentRange.highBound &&
            newRange.highBound > currentRange.highBound)) {
-        // The clicked target is straddling the current lowBound;
-        // adjust the lowbound to fit
+        // The clicked target is straddling the current highBound;
+        // adjust the highBound to fit
         currentRange.highBound = newRange.highBound;
         changedRange = true;
       }
@@ -538,17 +538,17 @@ let Dataset = MetadataItem.extend({
           if (newRange.lowBound - fullRange.lowBound <=
               fullRange.highBound - newRange.highBound) {
             // Move the low one
-            currentRange.lowBound = newRange.lowBound;
+            currentRange.lowBound = newRange.highBound;
           } else {
             // Move the high one
-            currentRange.highBound = newRange.highBound;
+            currentRange.highBound = newRange.lowBound;
           }
         } else if (currentRange.lowBound <= fullRange.lowBound) {
           // The low bound hasn't been customized yet
-          currentRange.lowBound = newRange.lowBound;
+          currentRange.lowBound = newRange.highBound;
         } else if (currentRange.highBound >= fullRange.highBound) {
           // The high bound hasn't been customized yet
-          currentRange.highBound = newRange.highBound;
+          currentRange.highBound = newRange.lowBound;
         } else {
           window.mainPage.trigger('rl:error', new Error('Strange range state encountered.'));
         }
