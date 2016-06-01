@@ -438,7 +438,7 @@ let Dataset = MetadataItem.extend({
           // range covers the entire set of eligible values (and then some)
           return {
             included: null,
-            position: 'low high'
+            position: 'bothBounds'
           };
         }
       } else if (range.lowBound === info.lowBound) {
@@ -452,13 +452,13 @@ let Dataset = MetadataItem.extend({
           // range covers exactly the entire set of eligible values
           return {
             included: true,
-            position: 'low high'
+            position: 'bothBounds'
           };
         } else {
           // range covers the entire set of eligible values (and then some)
           return {
             included: null,
-            position: 'low high'
+            position: 'bothBounds'
           };
         }
       } else if (range.highBound < info.highBound) {
