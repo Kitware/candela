@@ -99,6 +99,11 @@ you move or delete this item, your preferences will be lost.`,
             });
           }
         });
+        window.mainPage.notificationLayer.displayNotification(
+          'Successfully moved the projects that you ' +
+          'were working on when you were logged out ' +
+          'to your Private folder');
+        window.localStorage.clear('scratchProjects');
 
         new Promise((resolve, reject) => {
           girder.restRequest({
@@ -110,9 +115,13 @@ you move or delete this item, your preferences will be lost.`,
             type: 'PUT'
           });
         }).catch(() => {
-          // For now, silently ignore failures to adopt datasets
-          window.localStorage.clear('scratchProjects');
+          window.mainPage.notificationLayer.displayNotification(
+            'Could not restore datasets from when you were logged out', 'error');
         }).then(() => {
+          window.mainPage.notificationLayer.displayNotification(
+            'Successfully moved the datasets that you ' +
+            'were working on when you were logged out ' +
+            'to your Private folder');
           window.mainPage.currentUser.trigger('rl:updateLibrary');
           // In addition to changing the user's library, the current
           // project will (pretty much always) have just changed
@@ -122,8 +131,9 @@ you move or delete this item, your preferences will be lost.`,
           }
         });
       }).catch(() => {
-        // For now, silently ignore failures to adopt projects
         window.localStorage.clear('scratchProjects');
+        window.mainPage.notificationLayer.displayNotification(
+          'Could not restore projects from when you were logged out', 'error');
       });
     }
   },
