@@ -86,8 +86,9 @@ let VisualizationView = Widget.extend({
     }
   },
   render: Underscore.debounce(function () {
-    if (!this.canRender()) {
-      return;
+    let widgetIsShowing = Widget.prototype.render.apply(this, arguments);
+    if (!widgetIsShowing) {
+      this.vis = undefined;
     }
 
     // Get the visualization in the project (if there is one)
@@ -103,74 +104,80 @@ let VisualizationView = Widget.extend({
       // asynchronously)
       options.data = [];
 
-      // How is this render pass different from the last?
-      if (!this.vis || this.vis.spec.name !== spec.name) {
-        // We've changed visualizations; nuke the DOM element
-        // and create a new candela component
-        this.$el.html(myTemplate);
+      if (widgetIsShowing) {
+        // How is this render pass different from the last?
+        if (!this.vis || this.vis.spec.name !== spec.name) {
+          // We've changed visualizations; nuke the DOM element
+          // and create a new candela component
+          this.$el.html(myTemplate);
 
-        this.vis = {
-          spec: spec,
-          options: options,
-          component: new candela.components[spec.name](
-            '#' + this.spec.hashName + 'Container .visualization', options)
-        };
-      } else {
-        // The visualization hasn't changed, but the options may have.
-        Object.keys(this.vis.options).forEach(key => {
-          if (!options.hasOwnProperty(key)) {
-            // This option is no longer specified;
-            // remove it so that it's removed from the visualization
-            delete options[key];
-          }
-        });
+          this.vis = {
+            spec: spec,
+            options: options,
+            component: new candela.components[spec.name](
+              '#' + this.spec.hashName + 'Container .visualization', options)
+          };
+        } else {
+          // The visualization hasn't changed, but the options may have.
+          Object.keys(this.vis.options).forEach(key => {
+            if (!options.hasOwnProperty(key)) {
+              // This option is no longer specified;
+              // remove it so that it's removed from the visualization
+              delete options[key];
+            }
+          });
 
-        this.vis.options = options;
+          this.vis.options = options;
+        }
       }
 
       // Okay, now ask the project if it has any new data for
       // us (changing the matchings, editing the data, or grabbing
       // a new dataset will invalidate the parsed cache).
-      this.vis.component.render();
+      if (widgetIsShowing) {
+        this.vis.component.render();
+      }
       this.ok = null;
       this.statusText.text = 'Loading...';
       this.renderIndicators();
       window.mainPage.project.shapeDataForVis().then(data => {
-        this.vis.options.data = data;
+        widgetIsShowing = this.isTargeted();
+        if (widgetIsShowing) {
+          this.vis.options.data = data;
 
-        // TODO: how do we update the data for a component in
-        // general?
-        let successfullyUpdated = false;
-        if (this.vis.component.chart &&
-          this.vis.component.chart.update) {
-          try {
-            this.vis.component.chart.update(this.vis.options);
-            successfullyUpdated = true;
-          } catch (errorObj) {
-            // TODO: warn the user that something is up?
-            // window.mainPage.trigger('rlab:error', errorObj);
-            console.warn('Could not update the visualization in place:',
-              errorObj);
+          // TODO: how do we update the data for a component in
+          // general?
+          let successfullyUpdated = false;
+          if (this.vis.component.chart &&
+            this.vis.component.chart.update) {
+            try {
+              this.vis.component.chart.update(this.vis.options);
+              successfullyUpdated = true;
+            } catch (errorObj) {
+              // TODO: warn the user that something is up?
+              // window.mainPage.trigger('rlab:error', errorObj);
+              console.warn('Could not update the visualization in place:',
+                errorObj);
+            }
           }
-        }
-        if (!successfullyUpdated) {
-          // Nuke the vis and start fresh
-          this.$el.html(myTemplate);
-          try {
-            this.vis.component = new candela.components[this.vis.spec.name](
-              '#' + this.spec.hashName + 'Container .visualization', options);
-          } catch (errorObj) {
-            // Problem rendering the vis...
+          if (!successfullyUpdated) {
+            // Nuke the vis and start fresh
             this.$el.html(myTemplate);
-            this.ok = false;
-            window.mainPage.trigger('rlab:error', errorObj);
+            try {
+              this.vis.component = new candela.components[this.vis.spec.name](
+                '#' + this.spec.hashName + 'Container .visualization', options);
+            } catch (errorObj) {
+              // Problem rendering the vis...
+              this.$el.html(myTemplate);
+              this.ok = false;
+              window.mainPage.trigger('rlab:error', errorObj);
+              return;
+            }
           }
-        }
-        if (this.isTargeted()) {
           this.vis.component.render();
         }
         this.ok = true;
-        this.statusText.text = this.vis.spec.name;
+        this.statusText.text = spec.name;
         this.renderIndicators();
       });
     } else {
@@ -180,7 +187,7 @@ let VisualizationView = Widget.extend({
       this.statusText.text = 'None selected';
       this.renderIndicators();
     }
-  }, 300)
+  }, 200)
 });
 
 export default VisualizationView;

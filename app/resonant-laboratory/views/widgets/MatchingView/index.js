@@ -418,11 +418,8 @@ in order to connect them together.`);
     }
   },
   render: Underscore.debounce(function () {
+    let widgetIsShowing = Widget.prototype.render.apply(this, arguments);
     let self = this;
-
-    if (!this.canRender()) {
-      return;
-    }
 
     // Construct a graph from each of the specs
     // (and the currently selected node)
@@ -466,6 +463,12 @@ in order to connect them together.`);
       }
     }
     this.renderIndicators();
+
+    if (!widgetIsShowing) {
+      // Don't need to actually draw the interface;
+      // only the indicators are important
+      return;
+    }
 
     // Add our template if it's not already there
     if (this.$el.find('svg').length === 0) {
@@ -729,7 +732,7 @@ in order to connect them together.`);
           this.handleClick(graph.nodes[d.target]);
         }
       });
-  }, 300)
+  }, 200)
 });
 
 export default MatchingView;

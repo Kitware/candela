@@ -71,14 +71,14 @@ Resonant Laboratory also supports connnecting to mongo databases. For example, a
 
 or to load a `csv` file:
 
-```bash
-mongoimport --db test --collection cars --drop --file cars.csv --type csv --headerline
-```
+  ```bash
+  mongoimport --db test --collection cars --drop --file cars.csv --type csv --headerline
+  ```
 
 Then an item should be created in the user's public or private directory to represent this database (in this case, probably named "gapminder"). To connect the item to the database, issue a `POST` request to `/item/{id}/database`:
 
   ```
-{"url":"localhost:27017","database":"test","collection":"gapminder","type":"mongo"}
+  {"url":"localhost:27017","database":"test","collection":"gapminder","type":"mongo"}
   ```
 
 ## Development

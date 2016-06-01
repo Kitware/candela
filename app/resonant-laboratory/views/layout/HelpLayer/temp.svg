@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <rect x="0" y="0" width="512" height="512" fill="#ff7f00"></rect>
-<path d="M0,0L512,0L512,512L0,512ZM128,128A128,128,0,1,0,384,384A128,128,0,1,0,128,128"></rect>
+<path d="M0,0L512,0L512,512L0,512ZM384,128A128,128,0,1,0,128,128L128,384A128,128,0,0,0,384,384Z" stroke="#bada55" opacity="0.5"></path>
+<path d="M0,0L512,0L512,512L0,512ZM128,128A128,128,0,1,0,128,384L384,384A128,128,0,0,0,384,128Z" stroke="#bada55" opacity="0.5"></path>
 </svg>

@@ -293,6 +293,8 @@ function (key, values) {
             quantitativeAttrs = bson.json_util.loads(params['quantitativeAttrs'])
             for attr, spec in quantitativeAttrs.iteritems():
                 pipeline = copy.deepcopy(pipelineBase)
+                # Make sure this attribute is actually a number
+                # (TODO: what about other quantitative values, like dates?)
                 pipeline.append({
                     '$match': {
                         attr: {'$type': 'number'}
@@ -302,7 +304,12 @@ function (key, values) {
                 if histogramRange == 0:
                     raise RestException('Min and max are the same for ' + attr +
                                         '; should this be a categorical attribute?')
-                divisions = spec['binCount'] - 1
+                # Our bins are left-closed, right-open, with the
+                # exception of the last value (the final bin is closed
+                # on the right). To make the math with the last bin simpler,
+                # we just create one extra bin and add the final bin's
+                # count to the previous one
+                divisions = spec['binCount']
                 pipeline.append({
                     '$project': {
                         'binIndex': {
@@ -332,11 +339,25 @@ function (key, values) {
                         }
                     }
                 })
-                results[attr] = list(collection.aggregate(pipeline))
-                for result in results[attr]:
-                    result['lowBound'] = (result['_id'] / divisions) * \
-                        histogramRange + spec['min']
-                    result['highBound'] = ((result['_id'] + 1) / divisions) * \
-                        histogramRange + spec['min']
+                temp = list(collection.aggregate(pipeline))
+                # quick lookup for which bins already exist
+                createdBins = dict(zip([b['_id'] for b in temp], temp))
 
+                # create every potential bin in the normal range
+                results[attr] = []
+                for binNo in range(divisions):
+                    newBin = {
+                        '_id': binNo,
+                        'lowBound': (float(binNo) / divisions) * histogramRange + spec['min'],
+                        'highBound': (float(binNo + 1) / divisions) * histogramRange + spec['min'],
+                        'count': 0
+                    }
+                    if binNo in createdBins:
+                        newBin['count'] += createdBins[binNo]['count']
+                    results[attr].append(newBin)
+                # the final bin's count will correspond to values that
+                # exactly match the highBound of the previous bin...
+                # so add that value to the previous bin
+                if divisions in createdBins:
+                    results[attr][-1]['count'] += createdBins[divisions]['count']
         return results

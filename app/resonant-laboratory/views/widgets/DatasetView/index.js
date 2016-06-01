@@ -126,18 +126,36 @@ let DatasetView = Widget.extend({
         // Get all the relevant info for the bins (and count up the total
         // for the attribute while we're at it)
         let keyIntoAll = {};
-        summary.forEach(d => {
+        summary.forEach((d, i) => {
           attrInfo.summaryCount += d.count;
           let bin = {
+            index: i,
+            attrName: attrName,
+            interpretation: lookupTable.attributes[attrName].interpretation,
             summaryCount: d.count,
             currentCount: 0
           };
-          if (d.lowBound && d.highBound) {
+          if (d.lowBound || d.highBound) {
             bin.sortKey = d.lowBound;
-            bin.humanLabel = '[' + d.lowBound + ', ' + d.highBound + ')';
+            bin.range = {
+              lowBound: d.lowBound,
+              highBound: d.highBound
+            };
+            bin.humanLabel = '[' + d.lowBound + ', ' + d.highBound;
+            // The bins are left-closed, right-open, except
+            // for the last bin (closed on both ends)
+            if (i === summary.length - 1) {
+              bin.humanLabel += ']';
+            } else {
+              bin.humanLabel += ')';
+            }
+            let description = lookupTable.dataset.describeRange(attrName, bin.range);
+            bin.included = description.included;
+            bin.position = description.position;
           } else {
             bin.sortKey = d._id;
             bin.humanLabel = d._id;
+            bin.included = lookupTable.dataset.isValueIncluded(attrName, d._id);
           }
           bin.key = attrName + bin.sortKey;
           lookupTable.bins[bin.key] = bin;
@@ -280,6 +298,13 @@ let DatasetView = Widget.extend({
       .attr('class', 'binSettings');
     bins.exit().remove();
     bins.order();
+    bins.attr('class', d => {
+      if (lookupTable.bins[d].range) {
+        return 'quantitative binSettings';
+      } else {
+        return 'categorical binSettings';
+      }
+    });
 
     // Flexbox spacer
     binsEnter.append('div')
@@ -293,11 +318,41 @@ let DatasetView = Widget.extend({
       .text(d => lookupTable.bins[d].humanLabel);
 
     // Bin checkbox
-    binsEnter.append('input')
+    /* binsEnter.append('input')
       .attr('type', 'checkbox')
       .attr('class', 'include');
     bins.selectAll('input.include')
-      .attr('id', d => makeValidId(d + 'include'));
+      .attr('id', d => makeValidId(d + 'include'))
+      .attr('class', d => {
+        let bin = lookupTable.bins[d];
+        if (bin.position === undefined) {
+          return 'include';
+        } else {
+          // flag whether this bin is at the top or the bottom of the range
+          return bin.position + ' include';
+        }
+      })
+      .property('checked', function (d) {
+        // this refers to the DOM element
+        let bin = lookupTable.bins[d];
+        if (bin.included === null) {
+          this.indeterminate = true;
+          return true;
+        } else {
+          this.indeterminate = false;
+          return bin.included;
+        }
+      })
+      .on('change', function (d) {
+        // this refers to the DOM element
+        let bin = lookupTable.bins[d];
+        if (bin.range === undefined) {
+          // categorical value is the same as the sortKey
+          lookupTable.dataset.includeValue(bin.attrName, bin.sortKey, this.checked);
+        } else {
+          lookupTable.dataset.includeRange(bin.attrName, bin.range, this.checked);
+        }
+      });*/
 
     // Bin histogram bar container
     let binBarsEnter = binsEnter.append('div')
@@ -318,9 +373,7 @@ let DatasetView = Widget.extend({
       .style('width', d => barScale(lookupTable.bins[d].currentCount) + 'px');
   },
   render: Underscore.debounce(function () {
-    if (!this.canRender()) {
-      return;
-    }
+    let widgetIsShowing = Widget.prototype.render.apply(this, arguments);
 
     if (!this.addedTemplate) {
       this.$el.html(myTemplate);
@@ -328,9 +381,11 @@ let DatasetView = Widget.extend({
     }
 
     // Get the dataset in the project (if there is one)
-    let dataset = window.mainPage.project.getMeta('datasets');
-    if (dataset) {
-      dataset = window.mainPage.loadedDatasets[dataset[0]];
+
+    let dataset;
+    if (window.mainPage.project) {
+      let datasets = window.mainPage.project.getMeta('datasets');
+      dataset = window.mainPage.loadedDatasets[datasets[0]];
     }
 
     if (!dataset) {

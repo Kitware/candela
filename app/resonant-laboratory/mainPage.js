@@ -1,4 +1,5 @@
 import Backbone from 'backbone';
+import jQuery from 'jquery';
 
 import Router from './Router';
 import User from './models/User';
@@ -8,8 +9,10 @@ import Header from './views/layout/Header';
 import WidgetPanels from './views/layout/WidgetPanels';
 import Overlay from './views/layout/Overlay';
 import HelpLayer from './views/layout/HelpLayer';
+import NotificationLayer from './views/layout/NotificationLayer';
 
 // Page-wide Styles
+import iconFilters from './stylesheets/recolorIconFilters.html';
 import './stylesheets/pure-css-custom-form-elements/style.css';
 import './stylesheets/mainPage.css';
 import './stylesheets/girderPatches.css';
@@ -49,6 +52,7 @@ let MainPage = Backbone.View.extend({
       actually add them until we call render()
     */
     if (!this.addedPageChunks) {
+      jQuery('#RecolorIconFilters').html(iconFilters);
       this.header = new Header({
         el: '#Header'
       });
@@ -61,6 +65,9 @@ let MainPage = Backbone.View.extend({
       this.helpLayer = new HelpLayer({
         el: '#HelpLayer'
       });
+      this.notificationLayer = new NotificationLayer({
+        el: '#NotificationLayer'
+      });
       this.router.addListeners();
       this.currentUser.addListeners();
       this.header.addListeners();
@@ -71,6 +78,7 @@ let MainPage = Backbone.View.extend({
     this.widgetPanels.render();
     this.overlay.render();
     this.helpLayer.render();
+    this.notificationLayer.render();
   },
   newProject: function () {
     this.project = new Project();
