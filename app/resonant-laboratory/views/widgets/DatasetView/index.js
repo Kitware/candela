@@ -75,8 +75,8 @@ let DatasetView = Widget.extend({
 
     this.listenTo(window.mainPage.project, 'rl:changeDatasets',
       this.render);
-    this.listenTo(window.mainPage.project, 'rl:changeMatchings',
-      this.renderAttributeSettings);
+    /* this.listenTo(window.mainPage.project, 'rl:changeMatchings',
+      this.render);*/
   },
   renderInfoScreen: function () {
     window.mainPage.helpLayer.showTips(this.getDefaultTips());
@@ -95,10 +95,6 @@ let DatasetView = Widget.extend({
     }
   },
   renderAttributeSettings: function () {
-    if (!this.canRender()) {
-      return;
-    }
-
     let datasets = window.mainPage.project.getMeta('datasets');
     let dataset;
     let attrs;
@@ -137,27 +133,36 @@ let DatasetView = Widget.extend({
       });
   },
   render: Underscore.debounce(function () {
-    if (!this.canRender()) {
-      return;
-    }
+    let widgetIsShowing = Widget.prototype.render.apply(this, arguments);
 
     // Get the dataset in the project (if there is one)
-    let dataset = window.mainPage.project.getMeta('datasets');
-    if (dataset) {
-      dataset = window.mainPage.loadedDatasets[dataset[0]];
+
+    let dataset;
+    if (window.mainPage.project) {
+      let datasets = window.mainPage.project.getMeta('datasets');
+      dataset = window.mainPage.loadedDatasets[datasets[0]];
     }
 
-    this.$el.html(myTemplate);
+    let editor;
+    if (widgetIsShowing) {
+      this.$el.html(myTemplate);
+      this.renderAttributeSettings();
 
-    this.renderAttributeSettings();
-
-    let editor = ace.edit('editor');
-    editor.setOptions({
-      fontFamily: 'Cutive Mono, Courier, Monospace',
-      fontSize: '10pt'
-    });
-    editor.setTheme('ace/theme/textmate');
-    editor.$blockScrolling = Infinity;
+      editor = ace.edit('editor');
+      editor.setOptions({
+        fontFamily: 'Cutive Mono, Courier, Monospace',
+        fontSize: '10pt'
+      });
+      editor.setTheme('ace/theme/textmate');
+      editor.$blockScrolling = Infinity;
+    } else {
+      // dummy "editor" that does nothing
+      // if the widget is collapsed
+      editor = {
+        setValue: () => {},
+        setReadOnly: () => {}
+      };
+    }
 
     if (!dataset) {
       editor.setValue('');
@@ -199,7 +204,7 @@ let DatasetView = Widget.extend({
     // to in-browser dataset)... for now, always disable
     // the textarea
     editor.setReadOnly(true);
-  }, 300)
+  }, 200)
 });
 
 export default DatasetView;
