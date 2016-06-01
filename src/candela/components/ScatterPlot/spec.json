@@ -237,6 +237,8 @@
                     "y": {"scale": "y", "field": "y"},
                     "stroke": {"scale": "color", "field": "color"},
                     "shape": {"scale": "shape", "field": "shape"},
+                    "fill": {"scale": "color", "field": "color"},
+                    "fillOpacity": {"value": 0.01},
                     "strokeWidth": {"value": 2},
                     "size": {"scale": "size", "field": "size"}
                   }

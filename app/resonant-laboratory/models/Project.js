@@ -90,9 +90,21 @@ let Project = MetadataItem.extend({
           new Error('Could not access this project\'s dataset(s)'));
       } else {
         respObjects.forEach(resp => {
-          let newDataset = new Dataset(resp);
-          this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
-          this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
+          try {
+            let newDataset = new Dataset(resp);
+            this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
+            this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
+          } catch (e) {
+            if (e instanceof Dataset.DuplicateDatasetError) {
+              // We've already loaded the dataset...
+              return;
+              // TODO: when we support multiple datasets, it may
+              // be valid to swap in a dataset we've already loaded
+              // into a different slot...
+            } else {
+              window.mainPage.trigger('rl:error', e);
+            }
+          }
         });
       }
       this.trigger('rl:changeDatasets');

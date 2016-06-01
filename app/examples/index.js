@@ -12,9 +12,9 @@ import visualizations from './visualizations.json';
 
 let datasets = {
   iris,
-  stocks: dl.read(stocks, {type: 'csv'}),
-  msft: dl.read(msft, {type: 'csv'}),
-  simpsons: dl.read(simpsons, {type: 'csv'})
+  stocks: dl.read(stocks, {type: 'csv', parse: 'auto'}),
+  msft: dl.read(msft, {type: 'csv', parse: 'auto'}),
+  simpsons: dl.read(simpsons, {type: 'csv', parse: 'auto'})
 };
 let visMap = {};
 visualizations.forEach(v => {

@@ -99,20 +99,25 @@ let Dataset = MetadataItem.extend({
     if (cache && this.rawCache !== null) {
       return Promise.resolve(this.rawCache);
     } else {
-      return Promise.resolve(girder.restRequest({
-        path: 'item/' + this.getId() + '/download',
+      const cacheData = data => this.rawCache = data;
+
+      const databaseQuery = girder.restRequest({
+        path: `item/${this.getId()}/database/select`,
         type: 'GET',
-        error: null,
-        dataType: 'text'
-      })).then((data) => {
-        if (cache) {
-          this.rawCache = data;
-        }
-        return data;
-      }).catch(() => {
-        this.rawCache = null;
-        return null;
+        dataType: 'json'
       });
+
+      return databaseQuery.then(resp => {
+        return JSON.stringify(resp.data);
+      }, () => {
+        return girder.restRequest({
+          path: 'item/' + this.getId() + '/download',
+          type: 'GET',
+          error: null,
+          dataType: 'text'
+        });
+      })
+      .then(cacheData, () => this.rawCache = null);
     }
   },
   getSpec: function () {

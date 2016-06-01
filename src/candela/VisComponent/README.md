@@ -16,7 +16,7 @@ features of all Candela components:
    simply redefine the method to be a no-op.
 
 You can create a concrete visualization component by extending ``VisComponent``.
-The following best practices maximize clarity, reusability, and interopability
+The following best practices maximize clarity, reusability, and interoperability
 of your components (in the rest of this document, imagine that ``MyComponent``
 is declared as an extension of ``VisComponent``):
 
