@@ -237,6 +237,25 @@
     }
   },
   {
+    "hash": "upset-alternate",
+    "name": "UpSet Alternate Sets",
+    "description": "Set visualization with UpSet.",
+    "component": "UpSet",
+    "options": {
+      "data": "simpsons-alternate",
+      "id": "Name",
+      "sets": [
+        "Male",
+        "Power Plant",
+        "Evil",
+        "Blue Hair",
+        "Duff Fan",
+        "School"
+      ],
+      "fields": ["School"]
+    }
+  },
+  {
     "hash": "parallel-coords",
     "name": "Parallel Coordinates",
     "description": "An interactive parallel coordinates view of the NBA dataset",
