@@ -14,7 +14,9 @@ export default class Geo extends VisComponent {
       }
     });
     this.plot.createLayer('osm', {
-      renderer: null
+      renderer: null,
+      url: '/tiles/paisley.png',
+      attribution: 'Tile image &copy; John Rawsterne'
     });
     if (options.features) {
       options.features.forEach(feature => {
