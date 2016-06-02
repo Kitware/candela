@@ -186,7 +186,7 @@ in order to connect them together.`);
     let _createNode = (side, groupIndex, attrName, attrType, optional, possibleConnections) => {
       let newNode = {
         side: side,
-        index: groupIndex,
+        groupIndex: groupIndex,
         attrName: attrName,
         type: attrType,
         optional: optional,
@@ -199,10 +199,7 @@ in order to connect them together.`);
       }
 
       newNode.id = this.createNodeId(newNode);
-      nodeLookup[newNode.id] = {
-        side: side,
-        index: side === 'vis' ? visNodes.length : dataNodes.length
-      };
+      nodeLookup[newNode.id] = side === 'vis' ? visNodes.length : dataNodes.length;
 
       if (this.selection === null) {
         newNode.mode = NODE_MODES.WILL_SELECT;
@@ -235,13 +232,27 @@ in order to connect them together.`);
         dataNodes.push(newNode);
       }
       nodeEdgeLookup[newNode.id] = [];
+      return newNode;
     };
 
-    let _createEdge = (established, visIndex, visAttrName,
-                                    dataIndex, dataAttrName) => {
+    let _createEdge = (established, visGroupIndex, visAttrName,
+                                    dataGroupIndex, dataAttrName) => {
+      // We need to convert visIndex + visAttrName
+      // into an index into the visNodes array
+      // (and likewise for dataIndex + dataAttrName)
+      let visNodeId = this.createNodeId({
+        side: 'vis',
+        groupIndex: visGroupIndex,
+        attrName: visAttrName
+      });
+      let dataNodeId = this.createNodeId({
+        side: 'data',
+        groupIndex: dataGroupIndex,
+        attrName: dataAttrName
+      });
       let newEdge = {
-        dataIndex: dataIndex,
-        visIndex: visIndex
+        visIndex: nodeLookup[visNodeId],
+        dataIndex: nodeLookup[dataNodeId]
       };
       if (newEdge.dataIndex === undefined ||
         newEdge.visIndex === undefined) {
@@ -258,11 +269,11 @@ in order to connect them together.`);
           // Special settings for edges attached
           // to the selected node, as well as
           // the nodes on the other end
-          if (this.selection.side === 'data' && this.selection.groupIndex === dataIndex) {
-            visNodes[visIndex].mode = NODE_MODES.WILL_DISCONNECT;
+          if (this.selection.id === dataNodeId) {
+            visNodes[newEdge.visIndex].mode = NODE_MODES.WILL_DISCONNECT;
             newEdge.mode = EDGE_MODES.ESTABLISHED_SELECTED;
-          } else if (this.selection.side === 'vis' && this.selection.groupIndex === visIndex) {
-            dataNodes[dataIndex].mode = NODE_MODES.WILL_DISCONNECT;
+          } else if (this.selection.id === visNodeId) {
+            dataNodes[newEdge.dataIndex].mode = NODE_MODES.WILL_DISCONNECT;
             newEdge.mode = EDGE_MODES.ESTABLISHED_SELECTED;
           }
         }
@@ -279,11 +290,11 @@ in order to connect them together.`);
         // it's easier to filter based on the node modes
         // that we already set up)
         if (this.selection.side === 'vis') {
-          if (dataNodes[dataIndex].mode !== NODE_MODES.WILL_CONNECT) {
+          if (dataNodes[newEdge.dataIndex].mode !== NODE_MODES.WILL_CONNECT) {
             return;
           }
         } else if (this.selection.side === 'data') {
-          if (visNodes[visIndex].mode !== NODE_MODES.WILL_CONNECT) {
+          if (visNodes[newEdge.visIndex].mode !== NODE_MODES.WILL_CONNECT) {
             return;
           }
         }
@@ -295,9 +306,10 @@ in order to connect them together.`);
       // in the same group as the
       // selected node...
       }
-      nodeEdgeLookup[dataNodes[dataIndex].id].push(edges.length);
-      nodeEdgeLookup[visNodes[visIndex].id].push(edges.length);
+      nodeEdgeLookup[dataNodeId].push(edges.length);
+      nodeEdgeLookup[visNodeId].push(edges.length);
       edges.push(newEdge);
+      return newEdge;
     };
 
     try {
@@ -316,13 +328,13 @@ in order to connect them together.`);
 
       // Get the established edges
       for (let matching of meta.matchings) {
-        _createEdge(true, matching.visIndex, matching.visAttribute,
+        let newEdge = _createEdge(true, matching.visIndex, matching.visAttribute,
           matching.dataIndex, matching.dataAttribute);
         // Count this connection in each node
-        visNodes[matching.visIndex].establishedConnections += 1;
-        dataNodes[matching.dataIndex].establishedConnections += 1;
-        if (!visNodes[matching.visIndex].optional &&
-             visNodes[matching.visIndex].establishedConnections === 1) {
+        visNodes[newEdge.visIndex].establishedConnections += 1;
+        dataNodes[newEdge.dataIndex].establishedConnections += 1;
+        if (!visNodes[newEdge.visIndex].optional &&
+             visNodes[newEdge.visIndex].establishedConnections === 1) {
           // this edge just satisfied a requirement (for now, we're
           // assuming that a non-optional vis encoding only requires
           // one connection to satisfy the requirement)
@@ -333,17 +345,17 @@ in order to connect them together.`);
       // Add the potential and probable edges
       if (this.selection !== null) {
         if (this.selection.side === 'data') {
-          specs.vis.forEach((visSpec, visIndex) => {
+          specs.vis.forEach((visSpec, visGroupIndex) => {
             visSpec.options.forEach(option => {
-              _createEdge(false, visIndex, option.name,
+              _createEdge(false, visGroupIndex, option.name,
                 this.selection.groupIndex, this.selection.attrName);
             });
           });
         } else {
-          specs.data.forEach((dataSpec, dataIndex) => {
+          specs.data.forEach((dataSpec, dataGroupIndex) => {
             for (let attrName of Object.keys(dataSpec.attributes)) {
               _createEdge(false, this.selection.groupIndex, this.selection.attrName,
-                dataIndex, attrName);
+                dataGroupIndex, attrName);
             }
           });
         }
@@ -399,6 +411,7 @@ in order to connect them together.`);
         dataIndex: dataNode.groupIndex,
         dataAttribute: dataNode.attrName
       });
+      // (will trigger a render call on its own)
     } else if (d.mode === NODE_MODES.WILL_DISCONNECT) {
       // Remove the connection between the
       // selected node and the clicked node
@@ -415,6 +428,7 @@ in order to connect them together.`);
         dataIndex: dataNode.groupIndex,
         dataAttribute: dataNode.attrName
       });
+      // (will trigger a render call on its own)
     } else if (d.mode === NODE_MODES.SELECTED) {
       this.selection = null;
       this.render();
@@ -426,9 +440,9 @@ in order to connect them together.`);
       // even if neither side is selected
       return;
     } else if (this.selection.side === 'vis') {
-      this.handleClick(this.graph.nodes[d.dataIndex]);
+      this.clickNode(this.graph.dataNodes[d.dataIndex]);
     } else {
-      this.handleClick(this.graph.nodes[d.visIndex]);
+      this.clickNode(this.graph.visNodes[d.visIndex]);
     }
   },
   hoverNode: function (node, domElement) {
@@ -439,8 +453,8 @@ in order to connect them together.`);
     if (this.selection !== null && this.selection.id !== node.id) {
       this.graph.nodeEdgeLookup[node.id].forEach(edgeIndex => {
         let edge = this.graph.edges[edgeIndex];
-        if (this.graph.nodes[edge.dataIndex].id === this.selection.id ||
-          this.graph.nodes[edge.visIndex].id === this.selection.id) {
+        if (this.graph.dataNodes[edge.dataIndex].id === this.selection.id ||
+            this.graph.visNodes[edge.visIndex].id === this.selection.id) {
           jQuery('#' + this.graph.edges[edgeIndex].id).addClass('hovered');
         }
       });
@@ -472,9 +486,8 @@ in order to connect them together.`);
 
     let nodes = d3.select(this.el).select('svg')
       .select('.nodeLayer')
-      .selectAll('.data').data(this.graph.dataNodes, d => {
-        return d.id + d.type;
-      });
+      .selectAll('.data').data(this.graph.dataNodes, d => d.id + d.type);
+
     // add class labels to distinguish the new nodes from the old ones
     nodes.attr('class', d => 'update data node ' + d.mode);
     let enteringNodes = nodes.enter().append('g')
@@ -508,7 +521,8 @@ in order to connect them together.`);
     nodes.selectAll('image')
       .attr('xlink:href', d => ICONS[d.type]);
     nodes.selectAll('image').selectAll('title')
-      .text(d => 'Interpreted as ' + d + '. You can change this in the Dataset widget');
+      .text(d => d.attrName + ' is being interpreted as a ' + d.type + '.' +
+        '\nYou can change this in the Dataset widget');
 
     // data attribute name
     enteringNodes.append('text')
@@ -622,7 +636,7 @@ in order to connect them together.`);
         let bounds = this.getBoundingClientRect();
         let radius = Math.sqrt(Math.pow(bounds.width, 2), Math.pow(bounds.height, 2)) / 2;
         jQuery(this.parentNode).find('circle.statsBackground')
-          .attr('cy', bounds.height / 2 - 0.8 * self.layout.emSize)
+          .attr('cy', bounds.height / 2 - 0.65 * self.layout.emSize)
           .attr('r', radius + 0.5 * self.layout.emSize);
 
         widthSuggestions.minWidth = Math.max(widthSuggestions.minWidth,
@@ -691,10 +705,10 @@ in order to connect them together.`);
     }).attr('transform', d => {
       if (d.side === 'vis') {
         return 'translate(' + this.layout.visX + ',' +
-          this.layout.yVisScale(this.graph.nodeLookup[d.id].index) + ')';
+          this.layout.yVisScale(this.graph.nodeLookup[d.id]) + ')';
       } else {
         return 'translate(' + this.layout.dataX + ',' +
-          this.layout.yDataScale(this.graph.nodeLookup[d.id].index) + ')';
+          this.layout.yDataScale(this.graph.nodeLookup[d.id]) + ')';
       }
     });
 
@@ -751,10 +765,7 @@ in order to connect them together.`);
     // add class labels to distinguish the new edges from the old ones
     edges.attr('class', d => 'update edge ' + d.mode);
     edges.enter().append('path')
-      .attr('class', d => 'enter edge ' + d.mode)
-      .attr('opacity', 0)
-        .transition().duration(300)
-        .attr('opacity', 1);
+      .attr('class', d => 'enter edge ' + d.mode);
 
     // Animate any existing edges before we add new ones
     edges.transition().duration(function (d) {
@@ -885,18 +896,21 @@ in order to connect them together.`);
 
     // Horizontal layout actually depends largely on the contents
     // of each cell, so we need to render the nodes first
-
-    let suggestions = this.renderDataNodes();
-    this.layout.dataX = suggestions.xPosition;
-    this.layout.dataWidth = suggestions.idealWidth;
-    this.layout.dataWidth = Math.max(suggestions.minWidth, this.layout.dataWidth);
-    this.layout.dataWidth = Math.min(suggestions.maxWidth, this.layout.dataWidth);
-
     suggestions = this.renderVisNodes();
     this.layout.visX = suggestions.xPosition;
     this.layout.visWidth = suggestions.idealWidth;
     this.layout.visWidth = Math.max(suggestions.minWidth, this.layout.visWidth);
     this.layout.visWidth = Math.min(suggestions.maxWidth, this.layout.visWidth);
+
+    let suggestions = this.renderDataNodes();
+    this.layout.dataX = suggestions.xPosition;
+    this.layout.dataWidth = suggestions.idealWidth;
+    this.layout.dataWidth = Math.min(suggestions.maxWidth, this.layout.dataWidth);
+    // Make sure there are at least 8 ems of space between the nodes
+    this.layout.dataWidth = Math.min(this.layout.dataWidth, this.layout.visX -
+      8 * this.layout.emSize);
+    // ... but at least the icon should always show up
+    this.layout.dataWidth = Math.max(suggestions.minWidth, this.layout.dataWidth);
 
     // Now we can update all the nodes with their new positions
     this.positionNodes();
