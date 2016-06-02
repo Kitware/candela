@@ -8,9 +8,11 @@ export default class Geo extends VisComponent {
     this.plot = geojs.map({
       node: el,
       zoom: 6,
-      center: {x: 28.9550, y: 41.0136}
+      center: {x: 0, y: 0}
     });
-    this.plot.createLayer('osm');
+    this.plot.createLayer('osm', {
+      renderer: null
+    });
     if (options.features) {
       options.features.forEach(feature => {
         this.plot.createLayer('feature', {
