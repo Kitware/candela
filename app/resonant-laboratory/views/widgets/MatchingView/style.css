@@ -28,35 +28,67 @@
   cursor: pointer;
 }
 
-.MatchingView.content .node rect {
-  fill: #333;
-  stroke: #333;
+.MatchingView.content .node rect.nodeBackground {
+  fill: #ddd;
+  stroke: #ddd;
   stroke-width: 5px;
   rx: 5px;
   ry: 5px;
 }
 
-.MatchingView.content .node text.label {
+.MatchingView.content .node text {
   font-size: 12pt;
   font-weight: bold;
-  fill: #ddd;
+  fill: #333;
 }
 
-.MatchingView.content .node .types image {
-  y: -0.5em;
+.MatchingView.content .node image {
   width: 1em;
   height: 1em;
 }
+.MatchingView.content .node.data image {
+  y: -0.5em;
+}
+.MatchingView.content .node.vis image {
+  y: 0.25em;
+}
 
-.MatchingView.content .node.hovered rect {
+.MatchingView.content .node.hovered rect.nodeBackground {
+  stroke: #984ea3;
+}
+
+
+.MatchingView.content .node .connectionStats circle {
+  stroke-width: 1px;
+}
+.MatchingView.content .node .connectionStats.optional circle {
+  fill: #999;
+  stroke: black;
+}
+.MatchingView.content .node .connectionStats.optional text {
+  fill: black;
+}
+.MatchingView.content .node .connectionStats.satisfied circle {
+  fill: #ccebc5;
   stroke: #4daf4a;
 }
+.MatchingView.content .node .connectionStats.satisfied text {
+  fill: #4daf4a;
+}
+.MatchingView.content .node .connectionStats.notSatisfied circle {
+  fill: #fed9a6;
+  stroke: #ff7f00;
+}
+.MatchingView.content .node .connectionStats.notSatisfied text {
+  fill: #ff7f00;
+}
+
 
 .MatchingView.content .node.ineligible {
   cursor: not-allowed;
 }
 
-.MatchingView.content .node.ineligible rect {
+.MatchingView.content .node.ineligible rect.nodeBackground {
   fill: #ddd;
   stroke: none;
 }
@@ -69,7 +101,7 @@
   fill: none;
 }
 
-.MatchingView.content .node.connectable rect {
+.MatchingView.content .node.connectable rect.nodeBackground {
   fill: #b3cde3;
   stroke: none;
 }
@@ -89,7 +121,7 @@
   stroke: #b3cde3;
 }
 
-.MatchingView.content .node.connectable.hovered rect,
+.MatchingView.content .node.connectable.hovered rect.nodeBackground,
 .MatchingView.content path.potential.edge.hovered {
   stroke: #377eb8;
   stroke-width: 5px;
@@ -98,11 +130,11 @@
 
 .MatchingView.content path.established.edge {
   stroke-width: 3px;
-  stroke: #ccebc5;
+  stroke: #decbe4;
 }
 
-.MatchingView.content .node.selected rect {
-  fill: #4daf4a;
+.MatchingView.content .node.selected rect.nodeBackground {
+  fill: #984ea3;
 }
 
 .MatchingView.content .node.selected text {
@@ -114,42 +146,42 @@
   filter: url(#recolorImageTo333333);
 }
 
-.MatchingView.content .node.linked rect {
-  fill: #ccebc5;
+.MatchingView.content .node.linked rect.nodeBackground {
+  fill: #decbe4;
 }
 
 .MatchingView.content .node.linked text {
-  fill: #4daf4a;
+  fill: #984ea3;
 }
 
 .MatchingView.content .node.linked image {
-  -webkit-filter: url(#recolorImageTo4daf4a);
-  filter: url(#recolorImageTo4daf4a);
+  -webkit-filter: url(#recolorImageTo984ea3);
+  filter: url(#recolorImageTo984ea3);
 }
 
-.MatchingView.content .node.selected rect,
-.MatchingView.content .node.linked rect,
+.MatchingView.content .node.selected rect.nodeBackground,
+.MatchingView.content .node.linked rect.nodeBackground,
 .MatchingView.content path.established.selected.edge {
   stroke-width: 5px;
-  stroke: #4daf4a;
+  stroke: #984ea3;
 }
 
-.MatchingView.content .node.linked.hovered rect {
-  fill: #fed9a6;
+.MatchingView.content .node.linked.hovered rect.nodeBackground {
+  fill: #fbb4ae;
 }
 
 .MatchingView.content .node.linked.hovered text {
-  fill: #ff7f00;
+  fill: #e41a1c;
 }
 
 .MatchingView.content .node.linked.hovered image {
-  -webkit-filter: url(#recolorImageToff7f00);
-  filter: url(#recolorImageToff7f00);
+  -webkit-filter: url(#recolorImageToe41a1c);
+  filter: url(#recolorImageToe41a1c);
 }
 
-.MatchingView.content .node.linked.hovered rect,
+.MatchingView.content .node.linked.hovered rect.nodeBackground,
 .MatchingView.content path.established.selected.edge.hovered {
-  stroke: #ff7f00;
+  stroke: #e41a1c;
 }
 .MatchingView.content path.established.selected.edge.hovered {
   stroke-dasharray: 5, 5;

@@ -4,12 +4,29 @@
     intercept = Math.pow(parseInt(hexvalue, 16) / 255, 2) -->
     <!-- CSS stylesheets can reference these simply with
     filter: url(#recolorImageTo333333);
+
+    CB Colors:
+    #e41a1c
+    #377eb8
+    #4daf4a
+    #984ea3
+    #ff7f00
+    #ffff33
+    #a65628
+    #f781bf
     -->
     <filter id="recolorImageTo333333">
       <feComponentTransfer in="SourceAlpha" result="color">
         <feFuncR type="linear" slope="0" intercept="0.04000000000000001" />
         <feFuncG type="linear" slope="0" intercept="0.04000000000000001" />
         <feFuncB type="linear" slope="0" intercept="0.04000000000000001" />
+      </feComponentTransfer>
+    </filter>
+    <filter id="recolorImageToe41a1c">
+      <feComponentTransfer in="SourceAlpha" result="color">
+        <feFuncR type="linear" slope="0" intercept="0.799446366782007" />
+        <feFuncG type="linear" slope="0" intercept="0.010396001537870049" />
+        <feFuncB type="linear" slope="0" intercept="0.012056901191849288" />
       </feComponentTransfer>
     </filter>
     <filter id="recolorImageTo377eb8">
@@ -26,6 +43,13 @@
         <feFuncB type="linear" slope="0" intercept="0.08421376393694734" />
       </feComponentTransfer>
     </filter>
+    <filter id="recolorImageTo984ea3">
+      <feComponentTransfer in="SourceAlpha" result="color">
+        <feFuncR type="linear" slope="0" intercept="0.3553094963475586" />
+        <feFuncG type="linear" slope="0" intercept="0.09356401384083046" />
+        <feFuncB type="linear" slope="0" intercept="0.4085966935793925" />
+      </feComponentTransfer>
+    </filter>
     <filter id="recolorImageToff7f00">
       <feComponentTransfer in="SourceAlpha" result="color">
         <feFuncR type="linear" slope="0" intercept="1" />
@@ -40,5 +64,6 @@
         <feFuncB type="linear" slope="0" intercept="0.04000000000000001" />
       </feComponentTransfer>
     </filter>
+    <!-- TODO: brown and pink -->
   </defs>
 </svg>
