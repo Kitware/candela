@@ -18,7 +18,7 @@ export default class Geo extends VisComponent {
     });
     if (options.features) {
       options.features.forEach(feature => {
-        let x = this.plot.createLayer('feature', {
+        this.plot.createLayer('feature', {
           renderer: 'd3'
         })
           .createFeature(feature.type)
