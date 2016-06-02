@@ -7,15 +7,18 @@ export default class Geo extends VisComponent {
 
     this.plot = geojs.map({
       node: el,
-      zoom: 6,
-      center: {x: 0, y: 0}
+      zoom: 10,
+      center: {
+        x: -87.6194,
+        y: 41.867516
+      }
     });
     this.plot.createLayer('osm', {
       renderer: null
     });
     if (options.features) {
       options.features.forEach(feature => {
-        this.plot.createLayer('feature', {
+        let x = this.plot.createLayer('feature', {
           renderer: 'd3'
         })
           .createFeature(feature.type)
@@ -23,7 +26,9 @@ export default class Geo extends VisComponent {
           .position(d => ({
             x: d[feature.x],
             y: d[feature.y]
-          }));
+          }))
+          .style('fillColor', 'red')
+          .style('strokeColor', 'darkred');
       });
       this.plot.draw();
     }
