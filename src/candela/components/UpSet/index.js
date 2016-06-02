@@ -26,6 +26,7 @@ export default class UpSet {
           name: 'sets',
           type: 'string_list',
           format: 'string_list',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',
@@ -36,6 +37,7 @@ export default class UpSet {
           name: 'fields',
           type: 'string_list',
           format: 'string_list',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',
