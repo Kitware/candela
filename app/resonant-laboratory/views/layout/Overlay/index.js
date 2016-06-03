@@ -82,7 +82,7 @@ let Overlay = Backbone.View.extend({
   getScreen: function (template, message) {
     let options = {
       message: message,
-      bugReportLink: 'mailto:alex.bigelow@kitware.com',
+      bugReportLink: 'https://github.com/Kitware/candela/issues',
       consultingLink: 'http://www.kitware.com/company/contact_kitware.php'
     };
     return Underscore.template(template)(options);

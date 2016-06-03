@@ -4,6 +4,14 @@ import myTemplate from './template.html';
 import candela from '../../../../../src/candela';
 import './style.css';
 
+let STATUS = {
+  OK: 0,
+  LOADING: 1,
+  NO_VIS_SELECTED: 2,
+  NOT_ENOUGH_MAPPINGS: 3,
+  FAILED_RENDER: 4
+};
+
 let VisualizationView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
@@ -28,21 +36,21 @@ let VisualizationView = Widget.extend({
       }
     });
 
-    this.ok = null;
+    this.status = STATUS.LOADING;
     this.icons.splice(0, 0, {
       src: () => {
-        if (this.ok === null) {
+        if (this.status === STATUS.LOADING) {
           return Widget.spinnerIcon;
-        } else if (this.ok === true) {
+        } else if (this.status === STATUS.OK) {
           return Widget.okayIcon;
         } else {
           return Widget.warningIcon;
         }
       },
       title: () => {
-        if (this.ok === null) {
+        if (this.status === STATUS.LOADING) {
           return 'The visualization hasn\'t finished loading yet';
-        } else if (this.ok === true) {
+        } else if (this.status === STATUS.OK) {
           return 'The visualization appears to be working';
         } else {
           return 'Something isn\'t quite right; click for details';
@@ -59,7 +67,7 @@ let VisualizationView = Widget.extend({
   },
   handleNewProject: function () {
     this.$el.html('');
-    this.ok = null;
+    this.status = STATUS.LOADING;
     this.vis = null;
 
     this.listenTo(window.mainPage.project, 'rl:changeVisualizations',
@@ -71,18 +79,16 @@ let VisualizationView = Widget.extend({
     window.mainPage.helpLayer.showTips(this.getDefaultTips());
   },
   renderHelpScreen: function () {
-    if (this.ok === null) {
-      window.mainPage.overlay.renderUserErrorScreen('You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render(\'VisualizationLibrary\')"> here</a> to choose one.');
-    } else if (this.ok === true) {
+    if (this.status === STATUS.LOADING) {
+      window.mainPage.overlay.renderLoadingScreen('Still attempting to render the visualization...');
+    } else if (this.status === STATUS.OK) {
       window.mainPage.overlay.renderSuccessScreen('The visualization appears to be functioning correctly.');
-    } else {
-      let meta = window.mainPage.project.get('meta');
-
-      if (!meta || !meta.visualizations || !meta.visualizations[0]) {
-        window.mainPage.overlay.renderUserErrorScreen('You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render(\'VisualizationLibrary\')"> here</a> to choose one.');
-      } else {
-        window.mainPage.overlay.renderReallyBadErrorScreen('Corrupted visualization meta information.');
-      }
+    } else if (this.status === STATUS.NO_VIS_SELECTED) {
+      window.mainPage.overlay.renderUserErrorScreen('You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render(\'VisualizationLibrary\')"> here</a> to choose one.');
+    } else if (this.status === STATUS.NOT_ENOUGH_MAPPINGS) {
+      window.mainPage.overlay.renderUserErrorScreen('This visualization needs more data matchings. Make sure all the circles in the Matching panel are green.');
+    } else if (this.status === STATUS.FAILED_RENDER) {
+      window.mainPage.overlay.renderReallyBadErrorScreen('There was a failure in attempting to render the visualization. There may be some hints in the developer console.');
     }
   },
   render: Underscore.debounce(function () {
@@ -137,7 +143,7 @@ let VisualizationView = Widget.extend({
       if (widgetIsShowing) {
         this.vis.component.render();
       }
-      this.ok = null;
+      this.status = STATUS.LOADING;
       this.statusText.text = 'Loading...';
       this.renderIndicators();
       window.mainPage.project.shapeDataForVis().then(data => {
@@ -145,8 +151,7 @@ let VisualizationView = Widget.extend({
         if (widgetIsShowing) {
           this.vis.options.data = data;
 
-          // TODO: how do we update the data for a component in
-          // general?
+          // TODO: how do we update the data for a component in general?
           let successfullyUpdated = false;
           if (this.vis.component.chart &&
             this.vis.component.chart.update) {
@@ -169,21 +174,29 @@ let VisualizationView = Widget.extend({
             } catch (errorObj) {
               // Problem rendering the vis...
               this.$el.html(myTemplate);
-              this.ok = false;
+              this.status = STATUS.FAILED_RENDER;
+              this.statusText.text = spec.name;
               window.mainPage.trigger('rlab:error', errorObj);
               return;
             }
           }
           this.vis.component.render();
         }
-        this.ok = true;
+        // Okay, finally change the status if there aren't enough mappings
+        // (for now, the empty state is the partially-rendered visualization...
+        // should probably add something in its place in the future)
+        if (!window.mainPage.widgetPanels.widgets.MatchingView.widget.isSatisfied()) {
+          this.status = STATUS.NOT_ENOUGH_MAPPINGS;
+        } else {
+          this.status = STATUS.OK;
+        }
         this.statusText.text = spec.name;
         this.renderIndicators();
       });
     } else {
       this.$el.html(myTemplate);
       this.vis = null;
-      this.ok = false;
+      this.status = STATUS.NO_VIS_SELECTED;
       this.statusText.text = 'None selected';
       this.renderIndicators();
     }

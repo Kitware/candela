@@ -155,6 +155,13 @@ in order to connect them together.`);
     return ('edge_' + d.dataIndex + '_' + d.visIndex)
       .replace(/([^A-Za-z0-9[\]{}_.:-])\s?/g, '');
   },
+  isSatisfied: function () {
+    if (!this.graph) {
+      return false;
+    } else {
+      return this.graph.satisfiedConnections === this.graph.requiredConnections;
+    }
+  },
   updateGraph: function () {
     let meta = window.mainPage.project.getMeta();
 
