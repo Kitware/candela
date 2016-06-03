@@ -482,18 +482,28 @@ in order to connect them together.`);
     // Highlight the edge
     jQuery(domElement).addClass('hovered');
 
-    // Highlight both ends (or just the other end
-    // if one end is selected)
+    // Highlight connected nodes appropriately
     let selector;
     if (this.selection === null) {
       selector = '#' + this.graph.dataNodes[edge.dataIndex].id + ', ' +
                  '#' + this.graph.visNodes[edge.visIndex].id;
-    } else if (this.selection.side === 'vis') {
+    } else if (this.selection.id === this.graph.visNodes[edge.visIndex].id) {
       selector = '#' + this.graph.dataNodes[edge.dataIndex].id;
-    } else {
+    } else if (this.selection.id === this.graph.dataNodes[edge.dataIndex].id) {
       selector = '#' + this.graph.visNodes[edge.visIndex].id;
+    } else {
+      // Something is selected, but the user is mousing an irrelevant
+      // edge; instead of highlighting connected nodes, we want to
+      // remove the hover effect on the edge
+      jQuery(domElement).removeClass('hovered');
     }
-    this.$el.find(selector).addClass('disconnectable');
+    if (selector) {
+      if (edge.mode === EDGE_MODES.POTENTIAL || edge.mode === EDGE_MODES.PROBABLE) {
+        this.$el.find(selector).addClass('hovered');
+      } else {
+        this.$el.find(selector).addClass('disconnectable');
+      }
+    }
   },
   renderDataNodes: function () {
     let self = this;
@@ -785,11 +795,19 @@ in order to connect them together.`);
 
     // add class labels to distinguish the new edges from the old ones
     edges.attr('class', d => 'update edge ' + d.mode);
-    edges.enter().append('path')
+    let edgesEnter = edges.enter().append('g')
       .attr('class', d => 'enter edge ' + d.mode);
 
+    edgesEnter.append('path')
+      .attr('class', 'ghostPath');
+
+    edgesEnter.append('path')
+      .attr('class', 'visiblePath');
+
+    edgesEnter.append('title');
+
     // Animate any existing edges before we add new ones
-    edges.transition().duration(function (d) {
+    edges.selectAll('path').transition().duration(function (d) {
       // Animate any already-existing edges
       // (this refers to the DOM element)
       if (jQuery(this).hasClass('update')) {
@@ -814,6 +832,14 @@ in order to connect them together.`);
         this.$el.find('.disconnectable').removeClass('disconnectable');
       }).on('click', d => {
         this.clickEdge(d);
+      });
+    edges.selectAll('title')
+      .text(d => {
+        if (d.mode === EDGE_MODES.ESTABLISHED || d.mode === EDGE_MODES.ESTABLISHED_SELECTED) {
+          return 'Click to disconnect';
+        } else {
+          return 'Click to connect';
+        }
       });
   },
   render: Underscore.debounce(function () {

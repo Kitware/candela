@@ -55,8 +55,12 @@
   y: 0.25em;
 }
 
-.MatchingView.content path.edge {
+.MatchingView.content .edge path {
   fill: none;
+}
+.MatchingView.content .edge path.ghostPath {
+  stroke: rgba(0,0,0,0.01);
+  stroke-width: 20px;
 }
 
 /* connectionStats (i.e. the the bubble) */
@@ -118,7 +122,7 @@
   -webkit-filter: url(#recolorImageTo377eb8);
   filter: url(#recolorImageTo377eb8);
 }
-.MatchingView.content path.potential.edge {
+.MatchingView.content .potential.edge path.visiblePath {
   stroke-dasharray: 5, 5;
   stroke-width: 5px;
   stroke: #b3cde3;
@@ -126,14 +130,14 @@
 
 /* interaction state: node is about to be connected */
 .MatchingView.content .node.connectable.hovered rect.nodeBackground,
-.MatchingView.content path.potential.edge.hovered {
+.MatchingView.content .potential.edge.hovered path.visiblePath {
   stroke: #377eb8;
   stroke-width: 5px;
   stroke-dasharray: none;
 }
 
 /* interaction state: node is selected */
-.MatchingView.content path.established.edge {
+.MatchingView.content .established.edge path.visiblePath {
   stroke-width: 3px;
   stroke: #decbe4;
 }
@@ -163,7 +167,7 @@
 /* interaction state: link / borders of selected+connected nodes */
 .MatchingView.content .node.selected rect.nodeBackground,
 .MatchingView.content .node.linked rect.nodeBackground,
-.MatchingView.content path.established.selected.edge {
+.MatchingView.content .established.selected.edge path.visiblePath {
   stroke-width: 5px;
   stroke: #984ea3;
 }
@@ -184,9 +188,14 @@
 }
 .MatchingView.content .node.linked.hovered rect.nodeBackground,
 .MatchingView.content .node.disconnectable rect.nodeBackground,
-.MatchingView.content path.established.edge.hovered {
+.MatchingView.content .established.edge.hovered path.visiblePath {
   stroke: #e41a1c;
 }
-.MatchingView.content path.established.edge.hovered {
+.MatchingView.content .established.edge.hovered {
+  /* TODO: create a less dorky cursor */
+  /* cursor: url('../../../images/scissors.png') 12 12, auto; */
+}
+.MatchingView.content .established.edge.hovered path.visiblePath {
+  stroke-dasharray: 5, 5;
   stroke-width: 5px;
 }
