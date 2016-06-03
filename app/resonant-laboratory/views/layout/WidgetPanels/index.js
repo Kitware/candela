@@ -119,7 +119,7 @@ let WidgetPanels = Backbone.View.extend({
         this.trigger('rl:navigateWidgets');
       }, 1000);
     }
-  }, 300)
+  }, 10)
 });
 
 export default WidgetPanels;
