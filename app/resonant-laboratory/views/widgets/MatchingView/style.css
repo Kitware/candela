@@ -24,6 +24,8 @@
   overflow: auto;
 }
 
+/* default node, edge styling */
+
 .MatchingView.content .node {
   cursor: pointer;
 }
@@ -53,9 +55,11 @@
   y: 0.25em;
 }
 
-.MatchingView.content .node.hovered rect.nodeBackground {
-  stroke: #984ea3;
+.MatchingView.content path.edge {
+  fill: none;
 }
+
+/* connectionStats (i.e. the the bubble) */
 
 .MatchingView.content .node .connectionStats circle {
   stroke-width: 5px;
@@ -85,44 +89,42 @@
   fill: #fed9a6;
 }
 
+/* interaction state: node is hovered (will change selection) */
+.MatchingView.content .node.hovered rect.nodeBackground {
+  stroke: #984ea3;
+}
 
+/* interaction state: node can't be connected */
 .MatchingView.content .node.ineligible {
   cursor: not-allowed;
 }
-
 .MatchingView.content .node.ineligible rect.nodeBackground {
   fill: #ddd;
   stroke: none;
 }
-
 .MatchingView.content .node.ineligible > text {
   fill: #999;
 }
 
-.MatchingView.content path.edge {
-  fill: none;
-}
-
+/* interaction state: node can be connected */
 .MatchingView.content .node.connectable rect.nodeBackground {
   fill: #b3cde3;
   stroke: none;
 }
-
 .MatchingView.content .node.connectable > text {
   fill: #377eb8;
 }
-
 .MatchingView.content .node.connectable image {
   -webkit-filter: url(#recolorImageTo377eb8);
   filter: url(#recolorImageTo377eb8);
 }
-
 .MatchingView.content path.potential.edge {
   stroke-dasharray: 5, 5;
   stroke-width: 5px;
   stroke: #b3cde3;
 }
 
+/* interaction state: node is about to be connected */
 .MatchingView.content .node.connectable.hovered rect.nodeBackground,
 .MatchingView.content path.potential.edge.hovered {
   stroke: #377eb8;
@@ -130,37 +132,35 @@
   stroke-dasharray: none;
 }
 
+/* interaction state: node is selected */
 .MatchingView.content path.established.edge {
   stroke-width: 3px;
   stroke: #decbe4;
 }
-
 .MatchingView.content .node.selected rect.nodeBackground {
   fill: #984ea3;
 }
-
 .MatchingView.content .node.selected > text {
   fill: #333;
 }
-
 .MatchingView.content .node.selected image {
   -webkit-filter: url(#recolorImageTo333333);
   filter: url(#recolorImageTo333333);
 }
 
+/* interaction state: node is connected to the selected node */
 .MatchingView.content .node.linked rect.nodeBackground {
   fill: #decbe4;
 }
-
 .MatchingView.content .node.linked > text {
   fill: #984ea3;
 }
-
 .MatchingView.content .node.linked image {
   -webkit-filter: url(#recolorImageTo984ea3);
   filter: url(#recolorImageTo984ea3);
 }
 
+/* interaction state: link / borders of selected+connected nodes */
 .MatchingView.content .node.selected rect.nodeBackground,
 .MatchingView.content .node.linked rect.nodeBackground,
 .MatchingView.content path.established.selected.edge {
@@ -168,23 +168,25 @@
   stroke: #984ea3;
 }
 
-.MatchingView.content .node.linked.hovered rect.nodeBackground {
+/* interaction state: connection is about to be broken */
+.MatchingView.content .node.linked.hovered rect.nodeBackground,
+.MatchingView.content .node.disconnectable rect.nodeBackground {
   fill: #fbb4ae;
 }
-
-.MatchingView.content .node.linked.hovered > text {
+.MatchingView.content .node.linked.hovered > text,
+.MatchingView.content .node.disconnectable > text {
   fill: #e41a1c;
 }
-
-.MatchingView.content .node.linked.hovered image {
+.MatchingView.content .node.linked.hovered image,
+.MatchingView.content .node.disconnectable image {
   -webkit-filter: url(#recolorImageToe41a1c);
   filter: url(#recolorImageToe41a1c);
 }
-
 .MatchingView.content .node.linked.hovered rect.nodeBackground,
-.MatchingView.content path.established.selected.edge.hovered {
+.MatchingView.content .node.disconnectable rect.nodeBackground,
+.MatchingView.content path.established.edge.hovered {
   stroke: #e41a1c;
 }
-.MatchingView.content path.established.selected.edge.hovered {
-  stroke-dasharray: 5, 5;
+.MatchingView.content path.established.edge.hovered {
+  stroke-width: 5px;
 }

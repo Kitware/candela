@@ -436,9 +436,15 @@ in order to connect them together.`);
   },
   clickEdge: function (d) {
     if (this.selection === null) {
-      // TODO: snip established edges
-      // even if neither side is selected
-      return;
+      // Neither side is selected; snip this edge
+      let visNode = this.graph.visNodes[d.visIndex];
+      let dataNode = this.graph.dataNodes[d.dataIndex];
+      window.mainPage.project.removeMatching({
+        visIndex: visNode.groupIndex,
+        visAttribute: visNode.attrName,
+        dataIndex: dataNode.groupIndex,
+        dataAttribute: dataNode.attrName
+      });
     } else if (this.selection.side === 'vis') {
       this.clickNode(this.graph.dataNodes[d.dataIndex]);
     } else {
@@ -464,16 +470,18 @@ in order to connect them together.`);
     // Highlight the edge
     jQuery(domElement).addClass('hovered');
 
-    // If one end is selected, highlight the other end
-    let nodeToHighlight;
+    // Highlight both ends (or just the other end
+    // if one end is selected)
+    let selector;
     if (this.selection === null) {
-      return;
+      selector = '#' + this.graph.dataNodes[edge.dataIndex].id + ', ' +
+                 '#' + this.graph.visNodes[edge.visIndex].id;
     } else if (this.selection.side === 'vis') {
-      nodeToHighlight = this.graph.dataNodes[edge.dataIndex];
+      selector = '#' + this.graph.dataNodes[edge.dataIndex].id;
     } else {
-      nodeToHighlight = this.graph.visNodes[edge.visIndex];
+      selector = '#' + this.graph.visNodes[edge.visIndex].id;
     }
-    this.$el.find('#' + nodeToHighlight.id).addClass('hovered');
+    this.$el.find(selector).addClass('disconnectable');
   },
   renderDataNodes: function () {
     let self = this;
@@ -555,7 +563,7 @@ in order to connect them together.`);
     let nodes = d3.select(this.el).select('svg')
       .select('.nodeLayer')
       .selectAll('.vis').data(this.graph.visNodes, d => {
-        return d.id + d.type;
+        return d.id + d.type + d.establishedConnections;
       });
     // add class labels to distinguish the new nodes from the old ones
     nodes.attr('class', d => 'update vis node ' + d.mode);
@@ -790,6 +798,7 @@ in order to connect them together.`);
       }).on('mouseout', d => {
         // Clear any highlights
         this.$el.find('.hovered').removeClass('hovered');
+        this.$el.find('.disconnectable').removeClass('disconnectable');
       }).on('click', d => {
         this.clickEdge(d);
       });
