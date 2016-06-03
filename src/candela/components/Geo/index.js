@@ -5,17 +5,16 @@ export default class Geo extends VisComponent {
   constructor (el, options) {
     super(el);
 
-    this.plot = geojs.map({
-      node: el,
-      zoom: 10,
-      center: {
-        x: -87.6194,
-        y: 41.867516
-      }
-    });
+    const geojs_opt = options.geojs || {};
+
+    this.plot = geojs.map(Object.assign({
+      node: el
+    }, geojs_opt));
+
     this.plot.createLayer('osm', {
       renderer: null
     });
+
     if (options.features) {
       options.features.forEach(feature => {
         this.plot.createLayer('feature', {

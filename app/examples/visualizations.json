@@ -300,6 +300,13 @@
     "description": "Geospatial plot",
     "component": "Geo",
     "options": {
+      "geojs": {
+        "zoom": 10,
+        "center": {
+          "x": -87.6194,
+          "y": 41.867516
+        }
+      },
       "features": [
         {
           "name": "feature1",
