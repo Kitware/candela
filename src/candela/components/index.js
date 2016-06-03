@@ -3,6 +3,7 @@ import BoxPlot from './BoxPlot';
 import BulletChart from './BulletChart';
 import GanttChart from './GanttChart';
 import Geo from './Geo';
+import GeoDots from './GeoDots';
 import Heatmap from './Heatmap';
 import Histogram from './Histogram';
 import LineChart from './LineChart';
@@ -18,6 +19,7 @@ export default {
   BulletChart,
   GanttChart,
   Geo,
+  GeoDots,
   Heatmap,
   Histogram,
   LineChart,

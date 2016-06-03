@@ -8,6 +8,7 @@ const componentList = [
   'BulletChart',
   'GanttChart',
   'Geo',
+  'GeoDots',
   'Heatmap',
   'Histogram',
   'LineChart',
