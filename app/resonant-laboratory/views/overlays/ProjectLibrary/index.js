@@ -134,7 +134,10 @@ let ProjectLibrary = Backbone.View.extend({
       }
       return d.attributes.meta.datasets &&
       d.attributes.meta.matchings &&
-      d.attributes.meta.visualizations;
+      d.attributes.meta.visualizations &&
+      d.attributes.meta.versionNumber === window.mainPage.versionNumber;
+      // TODO: do intelligent things about different version numbers
+      // (see issue #255)
     });
 
     if (projectModels.length > 0) {

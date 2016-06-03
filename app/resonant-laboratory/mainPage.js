@@ -23,6 +23,17 @@ window.girder.apiRoot = 'api/v1';
 // Our main view that coordinates each big chunk
 let MainPage = Backbone.View.extend({
   initialize: function () {
+    // Get the current app version
+    new Promise((resolve, reject) => {
+      window.girder.restRequest({
+        path: 'system/resonantLaboratoryVersion',
+        type: 'GET',
+        error: reject
+      }).done(resolve).error(reject);
+    }).then(versionNumber => {
+      this.versionNumber = versionNumber;
+    });
+
     // Set up navigation
     this.router = new Router();
 
