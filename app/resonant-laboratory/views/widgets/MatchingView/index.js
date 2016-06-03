@@ -665,7 +665,7 @@ in order to connect them together.`);
         // as calculate how wide and where the whole node should be
         let bounds = this.getBoundingClientRect();
         let radius = Math.sqrt(Math.pow(bounds.width, 2), Math.pow(bounds.height, 2)) / 2;
-        radius = Math.max(radius, 0.75 * self.layout.emSize);
+        radius = Math.max(radius, 0.8 * self.layout.emSize);
         jQuery(this.parentNode).find('circle.statsBackground')
           .attr('cy', bounds.height / 2 - 0.65 * self.layout.emSize)
           .attr('r', radius + 0.5 * self.layout.emSize);
@@ -924,7 +924,7 @@ in order to connect them together.`);
     // We want the vis nodes to move to wherever
     // the user has scrolled
     let scrollTop = this.$el.scrollTop();
-    if (this.layout.visHeight > this.layout.height) {
+    if (this.layout.visHeight >= this.layout.height) {
       // We may want to adjust the top if the vis nodes
       // actually take up more space than can be seen;
       // first try to center the nodes on the screen
@@ -936,6 +936,10 @@ in order to connect them together.`);
       if (scrollTop < 0) {
         scrollTop = 0;
       }
+    } else {
+      // Okay, there's actually more space than we need.
+      // Center the vis nodes in the visible space
+      scrollTop += (this.layout.height - this.layout.visHeight) / 2;
     }
 
     this.layout.yVisScale = d3.scale.linear()
@@ -954,11 +958,20 @@ in order to connect them together.`);
     this.layout.dataX = suggestions.xPosition;
     this.layout.dataWidth = suggestions.idealWidth;
     this.layout.dataWidth = Math.min(suggestions.maxWidth, this.layout.dataWidth);
-    // Make sure there are at least 8 ems of space between the nodes
-    this.layout.dataWidth = Math.min(this.layout.dataWidth, this.layout.visX -
-      8 * this.layout.emSize);
-    // ... but at least the icon should always show up
-    this.layout.dataWidth = Math.max(suggestions.minWidth, this.layout.dataWidth);
+
+    let spaceBetween = this.layout.visX - (this.layout.dataWidth + this.layout.dataX);
+    if (spaceBetween < 7 * this.layout.emSize) {
+      // There's very little space; shrink the data nodes
+      this.layout.dataWidth = Math.min(this.layout.dataWidth, this.layout.visX -
+        this.layout.dataX - 7 * this.layout.emSize);
+      // ... but make sure that at least the icon shows up
+      this.layout.dataWidth = Math.max(suggestions.minWidth, this.layout.dataWidth);
+    } else if (spaceBetween > 20 * this.layout.emSize) {
+      // There's a ton of space between; move everything closer together
+      let delta = (spaceBetween - 20 * this.layout.emSize) / 2;
+      this.layout.dataX += delta;
+      this.layout.visX -= delta;
+    }
 
     // Now we can update all the nodes with their new positions
     this.positionNodes();
