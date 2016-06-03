@@ -655,15 +655,16 @@ in order to connect them together.`);
         // as calculate how wide and where the whole node should be
         let bounds = this.getBoundingClientRect();
         let radius = Math.sqrt(Math.pow(bounds.width, 2), Math.pow(bounds.height, 2)) / 2;
+        radius = Math.max(radius, 0.75 * self.layout.emSize);
         jQuery(this.parentNode).find('circle.statsBackground')
           .attr('cy', bounds.height / 2 - 0.65 * self.layout.emSize)
           .attr('r', radius + 0.5 * self.layout.emSize);
 
         widthSuggestions.minWidth = Math.max(widthSuggestions.minWidth,
-          bounds.width / 2 + 0.25 * self.layout.emSize +
+          bounds.width / 2 + 0.5 * self.layout.emSize +
           (1.25 * d.type.length * self.layout.emSize));
         widthSuggestions.xPosition = Math.min(widthSuggestions.xPosition,
-          self.layout.width - self.layout.emSize - bounds.width / 2 -
+          self.layout.width - self.layout.emSize - radius -
           widthSuggestions.minWidth);
       });
     stats.selectAll('title')

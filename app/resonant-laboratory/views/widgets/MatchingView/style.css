@@ -69,7 +69,7 @@
 }
 .MatchingView.content .node .connectionStats.optional circle {
   fill: #333;
-  stroke: 333;
+  stroke: #333;
 }
 .MatchingView.content .node .connectionStats.optional text {
   fill: white;
