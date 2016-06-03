@@ -4,5 +4,6 @@ imageTest({
   name: 'geo',
   url: 'http://localhost:28000/examples/#geo',
   selector: '#vis-element',
-  threshold: 0.001
+  threshold: 0.001,
+  verbose: true
 });
