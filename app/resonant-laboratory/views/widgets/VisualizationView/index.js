@@ -98,7 +98,7 @@ let VisualizationView = Widget.extend({
     }
 
     // Get the visualization in the project (if there is one)
-    let spec = window.mainPage.project.getMeta('visualizations');
+    let spec = window.mainPage.project ? window.mainPage.project.getMeta('visualizations') : null;
     if (spec) {
       // Use the first spec (TODO: support multiple visualizations)
       spec = spec[0];

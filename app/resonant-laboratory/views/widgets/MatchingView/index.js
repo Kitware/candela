@@ -163,6 +163,11 @@ in order to connect them together.`);
     }
   },
   updateGraph: function () {
+    if (!window.mainPage.project) {
+      this.graph = null;
+      return;
+    }
+
     let meta = window.mainPage.project.getMeta();
 
     let specs = {
