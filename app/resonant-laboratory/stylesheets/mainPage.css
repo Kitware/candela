@@ -33,6 +33,8 @@ hr {
 
 a {
   color: #377eb8;
+  fill: #377eb8;  /* for links in SVG */
+  cursor: pointer;
 }
 
 p {

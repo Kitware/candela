@@ -14,26 +14,36 @@
   fill: rgba(0,0,0,0.35);
   stroke: none;
 }
+#HelpLayer #arrow,
+#HelpLayer #bubble {
+  -webkit-filter: url(#dropShadow);
+  filter: url(#dropShadow);
+}
 #HelpLayer #arrow {
   fill: none;
 }
+#HelpLayer #gotIt rect,
 #HelpLayer.old #bubble circle {
-  fill: #cccccc;
+  fill: white;
 }
 #HelpLayer.new #bubble circle {
   fill: #ffffcc;
 }
-#HelpLayer.old #arrow,
-#HelpLayer.old #bubble circle {
+#HelpLayer.old #arrow {
   stroke-width: 2px;
-  stroke: #999999;
+  stroke: white;
+}
+#HelpLayer #gotIt rect,
+#HelpLayer.old #bubble circle {
+  stroke-width: 1px;
+  stroke: rgba(0,0,0,0.2);
 }
 #HelpLayer.new #arrow,
 #HelpLayer.new #bubble circle {
   stroke-width: 2px;
   stroke: #ffff33;
 }
-#HelpLayer #gotIt {
+/*#HelpLayer #gotIt {
   position: absolute;
   bottom: 2em;
   right: 2em;
@@ -52,4 +62,4 @@
 #HelpLayer #gotIt > div > * {
   margin-left: 0.25em;
   margin-right: 0.25em;
-}
+}*/

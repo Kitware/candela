@@ -5,8 +5,9 @@
 }
 #brandingIcons {
   display: flex;
-  flex-direction: column;
+  align-items: center;
 }
 #brandingIcons img {
-  width: 300px;
+  width: 150px;
+  height: 150px;
 }
