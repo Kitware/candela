@@ -314,7 +314,8 @@
       },
       "layers": [
         {
-          "type": "osm"
+          "type": "osm",
+          "url": "/tile/space.jpg"
         },
         {
           "type": "feature",
@@ -352,6 +353,9 @@
           "x": -87.6194,
           "y": 41.867516
         }
+      },
+      "baseLayer": {
+        "url": "/tile/space.jpg"
       },
       "x": "longitude",
       "y": "latitude",

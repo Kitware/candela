@@ -47,8 +47,8 @@ module.exports = {
     }]),
 
     new CopyPlugin([{
-      from: 'src/candela/components/Geo/test/paisley.png',
-      to: 'tiles/paisley.png'
+      from: 'src/candela/components/Geo/test/space.jpg',
+      to: 'tile/space.jpg'
     }])
   ],
   module: {
