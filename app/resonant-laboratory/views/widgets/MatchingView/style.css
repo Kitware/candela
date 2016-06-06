@@ -41,7 +41,7 @@
 .MatchingView.content .node text {
   font-size: 12pt;
   font-weight: bold;
-  fill: #333;
+  fill: #3f3b3b;
 }
 
 .MatchingView.content .node image {
@@ -65,27 +65,28 @@
 
 /* connectionStats (i.e. the the bubble) */
 
-.MatchingView.content .node .connectionStats circle {
+.MatchingView.content .node .connectionStats path.statsBackground {
   stroke-width: 5px;
 }
 .MatchingView.content .node .connectionStats text {
   font-size: 0.75em;
+  letter-spacing: 1px;
 }
-.MatchingView.content .node .connectionStats.optional circle {
-  fill: #333;
-  stroke: #333;
+.MatchingView.content .node .connectionStats.optional path.statsBackground {
+  fill: #3f3b3b;
+  stroke: #3f3b3b;
 }
 .MatchingView.content .node .connectionStats.optional text {
   fill: white;
 }
-.MatchingView.content .node .connectionStats.satisfied circle {
+.MatchingView.content .node .connectionStats.satisfied path.statsBackground {
   fill: #4daf4a;
   stroke: #4daf4a;
 }
 .MatchingView.content .node .connectionStats.satisfied text {
   fill: #ccebc5;
 }
-.MatchingView.content .node .connectionStats.notSatisfied circle {
+.MatchingView.content .node .connectionStats.notSatisfied path.statsBackground {
   fill: #ff7f00;
   stroke: #ff7f00;
 }
@@ -145,7 +146,7 @@
   fill: #984ea3;
 }
 .MatchingView.content .node.selected > text {
-  fill: #333;
+  fill: #3f3b3b;
 }
 .MatchingView.content .node.selected image {
   -webkit-filter: url(#recolorImageTo333333);

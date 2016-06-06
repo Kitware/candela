@@ -618,7 +618,7 @@ in order to connect them together.`);
     let enteringStats = enteringNodes.append('g')
       .attr('class', 'connectionStats');
     // its background
-    enteringStats.append('circle')
+    enteringStats.append('path')
       .attr('class', 'statsBackground');
     // its tooltip
     enteringStats.append('title');
@@ -640,7 +640,7 @@ in order to connect them together.`);
     stats.selectAll('text')
       .each(function (d) {
         // this refers to the DOM element
-        let stats = d.establishedConnections + ' / ';
+        let stats = d.establishedConnections + '/';
         if (isFinite(d.possibleConnections)) {
           stats += d.possibleConnections;
         } else {
@@ -648,14 +648,26 @@ in order to connect them together.`);
         }
         this.textContent = stats;
         // now that we know the size of the fraction text,
-        // we can scale its background appropriately, as well
+        // we can draw its background appropriately, as well
         // as calculate how wide and where the whole node should be
         let bounds = this.getBoundingClientRect();
         let radius = Math.sqrt(Math.pow(bounds.width, 2), Math.pow(bounds.height, 2)) / 2;
         radius = Math.max(radius, 0.8 * self.layout.emSize);
-        jQuery(this.parentNode).find('circle.statsBackground')
-          .attr('cy', bounds.height / 2 - 0.65 * self.layout.emSize)
-          .attr('r', radius + 0.5 * self.layout.emSize);
+        let cy = bounds.height / 2 - 0.65 * self.layout.emSize;
+        let r = radius + 0.5 * self.layout.emSize;
+        let backgroundPath = 'M0,' + (cy - r);
+        if (!d.optional && d.establishedConnections === 0) {
+          // Draw an equilateral triangle if the requirements are not satisfied
+          backgroundPath += 'L' + 0.866 * r + ',' + (cy + r / 2); // 0.866 = sqrt(3)/2 = cos 30
+          backgroundPath += 'L' + (-0.866 * r) + ',' + (cy + r / 2);
+          backgroundPath += 'Z';
+        } else {
+          // Otherwise draw a circle
+          backgroundPath += 'A' + r + ',' + r + ',0,0,0,0,' + (cy + r);
+          backgroundPath += 'A' + r + ',' + r + ',0,0,0,0,' + (cy - r);
+        }
+        jQuery(this.parentNode).find('path.statsBackground')
+          .attr('d', backgroundPath);
 
         widthSuggestions.minWidth = Math.max(widthSuggestions.minWidth,
           bounds.width / 2 + 0.5 * self.layout.emSize +
