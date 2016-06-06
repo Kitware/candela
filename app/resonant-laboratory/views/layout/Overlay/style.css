@@ -93,3 +93,7 @@
   height: 2em;
   cursor: pointer;
 }
+#Overlay #closeOverlay:hover {
+  -webkit-filter: brightness(150%);
+  filter: brightness(150%);
+}
