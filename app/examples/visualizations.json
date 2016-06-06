@@ -355,7 +355,8 @@
         }
       },
       "baseLayer": {
-        "url": "/tile/space.jpg"
+        "url": "/tile/space.jpg",
+        "attribution": null
       },
       "x": "longitude",
       "y": "latitude",
