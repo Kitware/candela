@@ -13,6 +13,7 @@ import StartingScreen from '../../overlays/StartingScreen';
 import DatasetLibrary from '../../overlays/DatasetLibrary';
 import VisualizationLibrary from '../../overlays/VisualizationLibrary';
 import ProjectSettings from '../../overlays/ProjectSettings';
+import AboutResonantLab from '../../overlays/AboutResonantLab';
 
 import reallyBadErrorTemplate from './reallyBadErrorTemplate.html';
 import errorTemplate from './errorTemplate.html';
@@ -29,7 +30,8 @@ let VIEWS = {
   ProjectSettings: ProjectSettings,
   StartingScreen: StartingScreen,
   DatasetLibrary: DatasetLibrary,
-  VisualizationLibrary: VisualizationLibrary
+  VisualizationLibrary: VisualizationLibrary,
+  AboutResonantLab: AboutResonantLab
 };
 
 import './style.css';

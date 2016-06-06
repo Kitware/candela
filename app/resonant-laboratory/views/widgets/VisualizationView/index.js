@@ -23,19 +23,6 @@ let VisualizationView = Widget.extend({
     };
     this.statusText.title = 'Click to select a different visualization.';
 
-    this.icons.splice(0, 0, {
-      src: () => {
-        return window.mainPage.currentUser.preferences
-          .hasSeenAllTips(this.getDefaultTips()) ? Widget.infoIcon : Widget.newInfoIcon;
-      },
-      title: () => {
-        return 'About this panel';
-      },
-      onclick: () => {
-        this.renderInfoScreen();
-      }
-    });
-
     this.status = STATUS.LOADING;
     this.icons.splice(0, 0, {
       src: () => {

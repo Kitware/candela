@@ -1,0 +1,12 @@
+#aboutResLab {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+}
+#brandingIcons {
+  display: flex;
+  flex-direction: column;
+}
+#brandingIcons img {
+  width: 300px;
+}

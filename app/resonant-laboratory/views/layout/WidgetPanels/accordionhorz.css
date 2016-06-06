@@ -36,11 +36,10 @@ div.accordion section .sectionHeader {
   position: absolute;
   justify-content: space-between;
   cursor: pointer;
-  background-color: #f0f0f0;
+  background-color: #3f3b3b;
   width: calc(100vh - 4.5em);
   padding: 0 0.25em;
   height: 2em;
-  border-radius: 5px;
   top: 100%;
   left: 0;
   z-index: 1;
@@ -57,7 +56,8 @@ div.accordion section .sectionHeader {
 }
 
 div.accordion section .sectionHeader:hover {
-  background-color: #f7f7f7;
+  -webkit-filter: brightness(110%);
+  filter: brightness(110%);
 }
 
 div.accordion section div.content {

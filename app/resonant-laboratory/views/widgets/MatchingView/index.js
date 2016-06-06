@@ -51,19 +51,6 @@ let MatchingView = Widget.extend({
 
     this.friendlyName = 'Matching';
 
-    this.icons.splice(0, 0, {
-      src: () => {
-        return window.mainPage.currentUser.preferences
-          .hasSeenAllTips(this.getTips()) ? Widget.infoIcon : Widget.newInfoIcon;
-      },
-      title: () => {
-        return 'About this panel';
-      },
-      onclick: () => {
-        this.renderInfoScreen();
-      }
-    });
-
     this.status = STATUS.NOTHING_TO_MAP;
     this.icons.splice(0, 0, {
       src: () => {

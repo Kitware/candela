@@ -6,9 +6,6 @@ import myTemplate from './template.html';
 
 import loadingIcon from '../../../images/spinner.gif';
 
-import infoIcon from '../../../images/info.svg';
-import newInfoIcon from '../../../images/newInfo.svg';
-
 import datasetIcon from '../../../images/dataset.svg';
 import matchingIcon from '../../../images/matching.svg';
 import visualizationIcon from '../../../images/scatterplot.svg';
@@ -121,9 +118,9 @@ let Header = Backbone.View.extend({
     });
     if (window.mainPage.currentUser.preferences
         .hasSeenAllTips(visibleTips)) {
-      jQuery('#helpButton').attr('src', infoIcon);
+      jQuery('#helpButton').removeClass('new');
     } else {
-      jQuery('#helpButton').attr('src', newInfoIcon);
+      jQuery('#helpButton').addClass('new');
     }
 
     if (window.mainPage.project) {

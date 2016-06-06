@@ -18,20 +18,20 @@
   fill: none;
 }
 #HelpLayer.old #bubble circle {
-  fill: #ffffcc;
+  fill: #cccccc;
 }
 #HelpLayer.new #bubble circle {
-  fill: #b3cde3;
+  fill: #ffffcc;
 }
 #HelpLayer.old #arrow,
 #HelpLayer.old #bubble circle {
   stroke-width: 2px;
-  stroke: #ffff33;
+  stroke: #999999;
 }
 #HelpLayer.new #arrow,
 #HelpLayer.new #bubble circle {
   stroke-width: 2px;
-  stroke: #377eb8;
+  stroke: #ffff33;
 }
 #HelpLayer #gotIt {
   position: absolute;
