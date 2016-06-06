@@ -5,6 +5,7 @@
 * [BulletChart](BulletChart#readme)
 * [GanttChart](GanttChart#readme)
 * [Geo](Geo#readme)
+* [GeoDots](GeoDots#readme)
 * [Heatmap](Heatmap#readme)
 * [Histogram](Histogram#readme)
 * [LineChart](LineChart#readme)
