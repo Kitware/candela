@@ -47,7 +47,7 @@ module.exports = {
     }]),
 
     new CopyPlugin([{
-      from: 'src/candela/components/Geo/test/space.jpg',
+      from: 'app/examples/data/space.jpg',
       to: 'tile/space.jpg'
     }])
   ],
