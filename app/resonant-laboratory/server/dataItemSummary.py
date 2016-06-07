@@ -1,5 +1,7 @@
 import copy
 import bson.json_util
+import subprocess
+import os
 from pymongo import MongoClient
 from girder.api import access
 from girder.api.describe import Description, describeRoute
@@ -13,6 +15,17 @@ class DataItemSummary(Resource):
     def __init__(self, info):
         super(Resource, self).__init__()
         self.databaseItemResource = DatabaseItemResource(info['apiRoot'])
+
+        # Load up the external foreign code snippets
+        codePath = subprocess.check_output(['girder-install', 'plugin-path']).strip()
+        codePath = os.path.join(codePath, 'resonant-laboratory/server/foreignCode')
+
+        self.foreignCode = {}
+
+        for filename in os.listdir(codePath):
+            infile = open(os.path.join(codePath, filename), 'rb')
+            self.foreignCode[filename] = infile.read()
+            infile.close()
 
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
@@ -161,52 +174,8 @@ class DataItemSummary(Resource):
         # Variety: https://github.com/variety/variety
         # mongodb-schema: https://github.com/mongodb-js/mongodb-schema
         collection = self.getMongoCollection(item)
-        mr_result = collection.inline_map_reduce("""
-function () {
-  var keys = this;
-  for (var key in keys) {
-    var value = keys[key];
-    var dataType = typeof value;
-
-    var dataTypes = {};
-    dataTypes[dataType] = {
-      count: 1
-    };
-    if (dataType === 'number') {
-      dataTypes[dataType].min = value;
-      dataTypes[dataType].max = value;
-    }
-    emit(key, dataTypes);
-  }
-}
-                                                 """,
-                                                 """
-function (key, values) {
-  var dataTypes = {};
-  values.forEach(function (value) {
-    var dataType;
-    for (dataType in value) {
-      if (!dataTypes.hasOwnProperty(dataType)) {
-        dataTypes[dataType] = {
-          count: 0
-        };
-        if (dataType === 'number') {
-          dataTypes[dataType].min = value[dataType].min;
-          dataTypes[dataType].max = value[dataType].max;
-        }
-      }
-      dataTypes[dataType].count += value[dataType].count;
-      if (dataType === 'number') {
-        dataTypes[dataType].min = value[dataType].min < dataTypes[dataType].min ? value[dataType].min : dataTypes[dataType].min;
-        dataTypes[dataType].max = value[dataType].max > dataTypes[dataType].max ? value[dataType].max : dataTypes[dataType].max;
-      }
-    }
-  });
-
-  return dataTypes;
-}
-
-                                                 """)
+        mr_result = collection.inline_map_reduce(self.foreignCode['mongo_schema_map.js'],
+                                                 self.foreignCode['mongo_schema_reduce.js'])
         # rearrange into a neater dict before sending it back
         result = {}
         for r in mr_result:
@@ -215,7 +184,7 @@ function (key, values) {
 
     def getMongoHistograms(self, item, params):
         """
-        Debugging parameters:
+        Debugging parameters for NCI dataset:
         id: 573dd325ed27aa873ea6a63a
         (nci)
 
