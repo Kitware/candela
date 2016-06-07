@@ -28,17 +28,20 @@ export default class LineUp {
         {
           name: 'stacked',
           type: 'boolean',
-          format: 'boolean'
+          format: 'boolean',
+          optional: true
         },
         {
           name: 'histograms',
           type: 'boolean',
-          format: 'boolean'
+          format: 'boolean',
+          optional: true
         },
         {
           name: 'animation',
           type: 'boolean',
-          format: 'boolean'
+          format: 'boolean',
+          optional: true
         }
       ]
     };

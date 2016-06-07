@@ -12,7 +12,7 @@ import HelpLayer from './views/layout/HelpLayer';
 import NotificationLayer from './views/layout/NotificationLayer';
 
 // Page-wide Styles
-import iconFilters from './stylesheets/recolorIconFilters.html';
+import iconFilters from './stylesheets/svgFilters.html';
 import './stylesheets/pure-css-custom-form-elements/style.css';
 import './stylesheets/mainPage.css';
 import './stylesheets/girderPatches.css';
@@ -23,6 +23,17 @@ window.girder.apiRoot = 'api/v1';
 // Our main view that coordinates each big chunk
 let MainPage = Backbone.View.extend({
   initialize: function () {
+    // Get the current app version
+    new Promise((resolve, reject) => {
+      window.girder.restRequest({
+        path: 'system/resonantLaboratoryVersion',
+        type: 'GET',
+        error: reject
+      }).done(resolve).error(reject);
+    }).then(versionNumber => {
+      this.versionNumber = versionNumber;
+    });
+
     // Set up navigation
     this.router = new Router();
 
@@ -52,7 +63,7 @@ let MainPage = Backbone.View.extend({
       actually add them until we call render()
     */
     if (!this.addedPageChunks) {
-      jQuery('#RecolorIconFilters').html(iconFilters);
+      jQuery('#SvgFilters').html(iconFilters);
       this.header = new Header({
         el: '#Header'
       });

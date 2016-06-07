@@ -1,6 +1,7 @@
 import os
 from girder.api.rest import Resource
 from anonymousAccess import AnonymousAccess
+from versioning import Versioning
 from dataItemSummary import DataItemSummary
 
 
@@ -60,3 +61,7 @@ def load(info):
                                dataItemSummary.getHistograms)
     info['apiRoot'].item.route('GET', (':id', 'filterData'),
                                dataItemSummary.filterData)
+    # Expose versioning endpoint
+    versioning = Versioning()
+    info['apiRoot'].system.route('GET', ('resonantLaboratoryVersion', ),
+                                 versioning.versionNumber)

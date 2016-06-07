@@ -24,6 +24,7 @@ let Project = MetadataItem.extend({
     return {
       name: 'Untitled Project',
       meta: {
+        versionNumber: window.mainPage.versionNumber,
         datasets: [],
         matchings: [],
         visualizations: [],

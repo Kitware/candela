@@ -7,6 +7,8 @@ import libraryFileIcon from '../../../images/light/library.svg';
 import privateFileIcon from '../../../images/light/file_private.svg';
 import publicFileIcon from '../../../images/light/file_public.svg';
 import scratchFileIcon from '../../../images/light/file_scratch.svg';
+import warningIcon from '../../../images/warning.svg';
+import './style.css';
 let girder = window.girder;
 
 let ProjectLibrary = Backbone.View.extend({
@@ -161,9 +163,26 @@ let ProjectLibrary = Backbone.View.extend({
       }
     });
 
-    libraryButtonsEnter.append('img');
-    libraryButtons.selectAll('img')
+    libraryButtonsEnter.append('img')
+      .attr('class', 'projectGlyph');
+    libraryButtons.selectAll('img.projectGlyph')
       .attr('src', icon);
+
+    libraryButtonsEnter.append('img')
+      .attr('class', 'badge');
+    libraryButtons.selectAll('img.badge')
+      .attr('src', warningIcon)
+      .style('display', d => {
+        if (d.attributes.meta.versionNumber === window.mainPage.versionNumber) {
+          return 'none';
+        } else {
+          return 'block';
+        }
+      })
+      .attr('title', d => {
+        return 'This project was created with version ' + d.attributes.meta.versionNumber +
+          ' of Resonant Laboratory.\nYou are currently using version ' + window.mainPage.versionNumber;
+      });
 
     libraryButtonsEnter.append('span');
     libraryButtons.selectAll('span')
