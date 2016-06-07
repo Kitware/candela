@@ -1,6 +1,7 @@
 import os
 from girder.api.rest import Resource
 from anonymousAccess import AnonymousAccess
+from versioning import Versioning
 
 
 class ResonantLaboratory(Resource):
@@ -49,3 +50,7 @@ def load(info):
                                anonymousAccess.validateScratchItems)
     info['apiRoot'].item.route('PUT', ('adoptScratchItems', ),
                                anonymousAccess.adoptScratchItems)
+
+    versioning = Versioning()
+    info['apiRoot'].system.route('GET', ('resonantLaboratoryVersion', ),
+                                 versioning.versionNumber)
