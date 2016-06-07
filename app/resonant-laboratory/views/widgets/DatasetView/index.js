@@ -27,19 +27,6 @@ let DatasetView = Widget.extend({
     };
     this.statusText.title = 'Select a different dataset.';
 
-    this.icons.splice(0, 0, {
-      src: () => {
-        return window.mainPage.currentUser.preferences
-          .hasSeenAllTips(this.getDefaultTips()) ? Widget.infoIcon : Widget.newInfoIcon;
-      },
-      title: () => {
-        return 'About this panel';
-      },
-      onclick: () => {
-        this.renderInfoScreen();
-      }
-    });
-
     this.status = STATUS.NO_DATA;
     this.icons.splice(0, 0, {
       src: () => {

@@ -1,0 +1,78 @@
+{
+  "datasets": [
+    "iris.json"
+  ],
+  "matchings": [
+    {
+      "dataAttribute": "petalLength",
+      "dataIndex": 0,
+      "visAttribute": "fields",
+      "visIndex": 0
+    },
+    {
+      "dataAttribute": "sepalLength",
+      "dataIndex": 0,
+      "visAttribute": "fields",
+      "visIndex": 0
+    },
+    {
+      "dataAttribute": "species",
+      "dataIndex": 0,
+      "visAttribute": "color",
+      "visIndex": 0
+    },
+    {
+      "dataAttribute": "sepalWidth",
+      "dataIndex": 0,
+      "visAttribute": "fields",
+      "visIndex": 0
+    },
+    {
+      "dataAttribute": "petalWidth",
+      "dataIndex": 0,
+      "visAttribute": "fields",
+      "visIndex": 0
+    }
+  ],
+  "preferredWidgets": [
+    "VisualizationView0"
+  ],
+  "visualizations": [
+    {
+      "name": "ScatterPlotMatrix",
+      "options": [
+        {
+          "domain": {
+            "fieldTypes": [
+              "number",
+              "integer",
+              "boolean"
+            ],
+            "from": "data",
+            "mode": "field"
+          },
+          "format": "string_list",
+          "name": "fields",
+          "type": "string_list"
+        },
+        {
+          "domain": {
+            "fieldTypes": [
+              "string",
+              "date",
+              "number",
+              "integer",
+              "boolean"
+            ],
+            "from": "data",
+            "mode": "field"
+          },
+          "format": "text",
+          "name": "color",
+          "optional": true,
+          "type": "string"
+        }
+      ]
+    }
+  ]
+}
