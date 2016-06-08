@@ -6,6 +6,7 @@ import { Set } from '../shims/SetOps.js';
 
 let DEFAULT_INTERPRETATIONS = {
   'undefined': 'ignore',
+  'null': 'ignore',
   boolean: 'categorical',
   integer: 'quantitative',
   number: 'quantitative',

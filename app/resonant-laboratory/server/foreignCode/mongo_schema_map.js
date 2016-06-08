@@ -3,7 +3,12 @@ function map () { // eslint-disable-line no-unused-vars
   var keys = this;
   for (var key in keys) {
     var value = keys[key];
-    var dataType = typeof value;
+    var dataType;
+    if (value === null) {
+      dataType = 'null';
+    } else {
+      dataType = typeof value;
+    }
 
     var dataTypes = {};
     dataTypes[dataType] = {
