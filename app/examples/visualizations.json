@@ -347,17 +347,20 @@
     "description": "Geospatial plots with direct plotting of locations",
     "component": "GeoDots",
     "options": {
-      "geojs": {
+      "map": {
         "zoom": 10,
         "center": {
           "x": -87.6194,
           "y": 41.867516
         }
       },
-      "baseLayer": {
-        "url": "/tile/space.jpg",
-        "attribution": null
-      },
+      "layers": [
+        {
+          "type": "osm",
+          "url": "/tile/space.jpg",
+          "attribution": null
+        }
+      ],
       "x": "longitude",
       "y": "latitude",
       "data": [

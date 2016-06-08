@@ -37,7 +37,10 @@ export default class GeoDots extends VisComponent {
   constructor (el, options) {
     super(el);
 
-    this.geojs = new Geo(this.el, Object.assign({}, options, {
+    // TODO(choudhury): don't mutate the options object directly.
+    options.layers = options.layers || [];
+    options.layers.push({
+      type: 'feature',
       features: [
         {
           name: 'feature1',
@@ -47,7 +50,9 @@ export default class GeoDots extends VisComponent {
           data: options.data
         }
       ]
-    }));
+    });
+
+    this.geojs = new Geo(this.el, options);
   }
 
   render () {
