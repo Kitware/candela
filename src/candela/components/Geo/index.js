@@ -5,7 +5,7 @@ export default class Geo extends VisComponent {
   constructor (el, options) {
     super(el);
 
-    const geojs_opt = options.geojs || {};
+    const geojs_opt = options.map || {};
 
     this.plot = geojs.map(Object.assign({
       node: el
