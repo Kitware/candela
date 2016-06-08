@@ -13,12 +13,11 @@ export default class Geo extends VisComponent {
     // Process the requested layers.
     layers.forEach(layer => {
       switch (layer.type) {
-        case "osm": {
-          this.plot.createLayer("osm", layer);
-        }
-        break;
+        case 'osm':
+          this.plot.createLayer('osm', layer);
+          break;
 
-        case "feature": {
+        case 'feature':
           layer.features.forEach(feature => {
             this.plot.createLayer('feature', {
               renderer: 'd3'
@@ -32,8 +31,7 @@ export default class Geo extends VisComponent {
               .style('fillColor', 'red')
               .style('strokeColor', 'darkred');
           });
-        }
-        break;
+          break;
       }
     });
 
