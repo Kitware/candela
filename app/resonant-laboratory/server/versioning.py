@@ -27,5 +27,5 @@ class Versioning(Resource):
                 return 'master'
             else:
                 return branch
-        except:
+        except Exception:
             return 'master'
