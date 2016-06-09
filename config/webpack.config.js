@@ -44,6 +44,11 @@ module.exports = {
     new CopyPlugin([{
       from: 'app/examples/data/nba-heatmaps',
       to: 'examples/nba-heatmaps'
+    }]),
+
+    new CopyPlugin([{
+      from: 'src/candela/components/Geo/test/paisley.png',
+      to: 'tiles/paisley.png'
     }])
   ],
   module: {
