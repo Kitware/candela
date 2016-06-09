@@ -88,13 +88,6 @@ export default function imageTest ({name, url, selector, delay = 0, threshold, v
         .compareTo(refImage)
         .ignoreAntialiasing()
         .onComplete(analysis => {
-          if (verbose) {
-            // For some tests (currently, just 'geo'), if a console.log() does
-            // not occur in this function, the test hangs. This is here as a
-            // workaround until we figure out what is really going on.
-            console.log(analysis);
-          }
-
           const passed = Number(analysis.misMatchPercentage) < threshold * 100;
           if (!passed || doDumpImage(name)) {
             fs.writeFileSync(path.join(dirname, `${name}-test.png`), imageBuf.toString('base64'), 'base64');
