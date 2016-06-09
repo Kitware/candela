@@ -18,7 +18,8 @@
 
 #Overlay div.libraryInterface {
   position: relative;
-  margin: 5em;
+  max-width: 50em;
+  margin: 5em auto 5em auto;
   padding: 1em 2em 2em 3em;
 }
 
@@ -92,4 +93,8 @@
   width: 2em;
   height: 2em;
   cursor: pointer;
+}
+#Overlay #closeOverlay:hover {
+  -webkit-filter: brightness(150%);
+  filter: brightness(150%);
 }

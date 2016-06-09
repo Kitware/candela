@@ -18,7 +18,10 @@
   height: 1.5em;
   margin: 0.75em;
 }
-
+#Header img.headerButton.new {
+  -webkit-filter: url(#recolorImageToffff33);
+  filter: url(#recolorImageToffff33);
+}
 #Header img.headerButton:hover {
   cursor: pointer;
   -webkit-filter: grayscale(100%) brightness(1000%);

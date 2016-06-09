@@ -257,20 +257,11 @@ let HelpLayer = Backbone.View.extend({
 
       // Now let's see how big the bubble actually will be
       let bubbleEl = d3.select('#bubble');
-      let textEl = bubbleEl.select('text');
+      let textEl = bubbleEl.select('#tipText');
       textEl.attr('transform', null);
 
-      textEl.text(tip.message);
-
-      // Align the text based on where the label
-      // is on the screen
-      if (bubbleCoords.x < window.innerWidth / 3) {
-        textEl.attr('text-anchor', 'start');
-      } else if (bubbleCoords.x < 2 * window.innerWidth / 3) {
-        textEl.attr('text-anchor', 'middle');
-      } else {
-        textEl.attr('text-anchor', 'end');
-      }
+      textEl.text(tip.message)
+        .attr('text-anchor', 'middle');
 
       // Reflow the text
       rewrap(textEl.node(), 150, 1.1);
@@ -316,6 +307,10 @@ let HelpLayer = Backbone.View.extend({
       bubbleCoords.radius += this.margin;
       bubbleCoords.width = 2 * bubbleCoords.radius;
       bubbleCoords.height = 2 * bubbleCoords.radius;
+
+      // Move the navigation links to the bottom of the circle
+      bubbleEl.select('g#gotIt')
+        .attr('transform', 'translate(0,' + bubbleCoords.radius + ')');
 
       // Make sure that the bubble isn't going off screen.
       // If it is, it's probably pointing to something really wide/tall,
