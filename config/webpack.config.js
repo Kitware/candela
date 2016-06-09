@@ -44,11 +44,6 @@ module.exports = {
     new CopyPlugin([{
       from: 'app/examples/data/nba-heatmaps',
       to: 'examples/nba-heatmaps'
-    }]),
-
-    new CopyPlugin([{
-      from: 'app/examples/data/space.jpg',
-      to: 'tile/space.jpg'
     }])
   ],
   module: {
