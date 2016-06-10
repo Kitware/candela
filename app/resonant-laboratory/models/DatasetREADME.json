@@ -16,8 +16,11 @@
     ",
 
     "rlab": {
-      "type": "dataset",
       "format": "csv",
+      "type": "table",
+
+      "itemType": "dataset",
+      "versionNumber": "master",
 
       "jsonSelector": "$",
       "dialect": {
@@ -51,9 +54,9 @@
           "interpretation": "ordinal",
 
           "_comment": "
-            coerceToType and interpretation are stored only when the user
-            has explicitly decided one or the other. Otherwise, they're inferred
-            automatically
+            coerceToType and interpretation are only stored in metadata when the user
+            has explicitly made a type coercion or interpretation decision. Otherwise,
+            these properties are inferred automatically on the fly
           ",
 
           "stats": {
@@ -70,10 +73,11 @@
               "highBound": 8
             },
             "_comment": "
-              These stats refer to the *potential* count, min, and max if
+              These stats refer to the *potential* count and low/high values if
               all Fertility values are coerced to 'string' or 'number'.
               The 'native' flag indicates that at least one value in
-              the dataset is stored natively as that type
+              the dataset is stored natively as that type. This is used when
+              automatically attempting to guess an attribute's data type
             "
           }
         }
