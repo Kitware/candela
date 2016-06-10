@@ -1,0 +1,117 @@
+{
+  "_comment": "In Girder, a dataset item's metadata might look something like:",
+
+  "meta": {
+    "flow": {
+      "format": "csv",
+      "type": "table"
+    },
+
+    "_comment": "
+      Assuming the dataset is used in BOTH flow and Resonant Laboratory,
+      it would have both a 'flow' metadata object, and an 'rlab'
+      metadata object. The 'format' field is similar to flow's, but slightly
+      different (will be 'csv', 'json', or 'mongodb.collection'), and Resonant
+      Laboratory has no use for 'type' (would always be 'table')
+    ",
+
+    "rlab": {
+      "type": "dataset",
+      "format": "csv",
+
+      "jsonSelector": "$",
+      "dialect": {
+        "_comment": "
+          Only CSV datasets will have 'dialect' fields, and only JSON
+          datasets will have the 'jsonSelector' field. The jsonSelector
+          field points to which list in the JSON file corresponds to
+          the actual dataset. 'dialect', of course, stores the results
+          of python's csv.Sniffer().
+
+          Both of these fields are cached here not only for convenience /
+          persistence, but also so that an advanced user could tweak
+          them (e.g. if csv.Sniffer() doesn't correctly infer the format
+          of the CSV file)
+        "
+      },
+
+      "lastUpdated": "1986-12-08T04:43:12-07:00",
+      "_comment": "
+        lastUpdated is compared to girder's 'updated' field
+        to determine if the actual data may have changed. If girder indicates
+        a more recent change, all metadata below this comment is invalidated, and
+        automatically refreshed (with the partial exception of 'schema'; any
+        explicit user settings, such as coerceToType or interpretation are
+        preserved, but the stats are updated)
+      ",
+
+      "schema": {
+        "Fertility": {
+          "coerceToType": "integer",
+          "interpretation": "ordinal",
+
+          "_comment": "
+            coerceToType and interpretation are stored only when the user
+            has explicitly decided one or the other. Otherwise, they're inferred
+            automatically
+          ",
+
+          "stats": {
+            "string": {
+              "native": true,
+              "count": 1234,
+              "lowBound": "0",
+              "highBound": "8"
+            },
+            "integer": {
+              "native": false,
+              "count": 1000,
+              "lowBound": 0,
+              "highBound": 8
+            },
+            "_comment": "
+              These stats refer to the *potential* count, min, and max if
+              all Fertility values are coerced to 'string' or 'number'.
+              The 'native' flag indicates that at least one value in
+              the dataset is stored natively as that type
+            "
+          }
+        }
+      },
+      "histogramCaches": {
+        "_comment": "
+          All histograms are computed for all attributes at the same
+          time across an entire dataset (so that only one file pass /
+          db table scan is necessary). The results are cached here,
+          keyed by the MD5 hash of the parameters that were sent to
+          /item/{id}/getHistograms
+
+          (the parameters include filters and paging information,
+           or the lack thereof)
+        ",
+        "69f295908dd7e4929b33938e8f8ad5ff" : {
+          "Fertility": [
+            {
+              "_id": 0,
+              "count": 234,
+              "lowBound": 0,
+              "highBound": 1
+            },
+            {
+              "_id": 1,
+              "count": 345,
+              "lowBound": 1,
+              "highBound": 2
+            },
+            {
+              "_id": 2,
+              "count": 145,
+              "lowBound": 2,
+              "highBound": 3
+            }
+          ]
+        }
+      }
+    }
+  }
+}
