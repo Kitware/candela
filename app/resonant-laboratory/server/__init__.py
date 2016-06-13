@@ -2,7 +2,7 @@ import os
 from girder.api.rest import Resource
 from anonymousAccess import AnonymousAccess
 from versioning import Versioning
-from dataItemSummary import DataItemSummary
+from datasetItem import DatasetItem
 
 
 class ResonantLaboratory(Resource):
@@ -35,32 +35,36 @@ def load(info):
 
     # Expose anonymous access endpoints
     anonymousAccess = AnonymousAccess()
-    info['apiRoot'].item.route('POST', ('privateItem', ),
+    info['apiRoot'].item.route('POST', ('anonymousAccess', 'privateItem'),
                                anonymousAccess.getOrMakePrivateItem)
-    info['apiRoot'].item.route('POST', ('scratchItem', ),
+    info['apiRoot'].item.route('POST', ('anonymousAccess', 'scratchItem'),
                                anonymousAccess.makeScratchItem)
-    info['apiRoot'].folder.route('GET', ('privateFolder', ),
+    info['apiRoot'].folder.route('GET', ('anonymousAccess', 'privateFolder'),
                                  anonymousAccess.getOrMakePrivateFolder)
-    info['apiRoot'].folder.route('GET', ('publicFolder', ),
+    info['apiRoot'].folder.route('GET', ('anonymousAccess', 'publicFolder'),
                                  anonymousAccess.getOrMakePublicFolder)
-    info['apiRoot'].item.route('POST', (':id', 'togglePublic'),
+    info['apiRoot'].item.route('POST', (':id', 'anonymousAccess', 'togglePublic'),
                                anonymousAccess.togglePublic)
-    info['apiRoot'].item.route('POST', (':id', 'updateScratch'),
+    info['apiRoot'].item.route('POST', (':id', 'anonymousAccess', 'updateScratch'),
                                anonymousAccess.updateScratchItem)
-    info['apiRoot'].item.route('GET', (':id', 'info'),
+    info['apiRoot'].item.route('GET', (':id', 'anonymousAccess', 'info'),
                                anonymousAccess.itemInfo)
-    info['apiRoot'].item.route('GET', ('validateScratchItems', ),
+    info['apiRoot'].item.route('GET', ('anonymousAccess', 'validateScratchItems'),
                                anonymousAccess.validateScratchItems)
-    info['apiRoot'].item.route('PUT', ('adoptScratchItems', ),
+    info['apiRoot'].item.route('PUT', ('anonymousAccess', 'adoptScratchItems'),
                                anonymousAccess.adoptScratchItems)
+
     # Expose summarization endpoints
-    dataItemSummary = DataItemSummary(info)
-    info['apiRoot'].item.route('GET', (':id', 'inferSchema'),
-                               dataItemSummary.inferSchema)
-    info['apiRoot'].item.route('GET', (':id', 'getHistograms'),
-                               dataItemSummary.getHistograms)
-    info['apiRoot'].item.route('GET', (':id', 'filterData'),
-                               dataItemSummary.filterData)
+    datasetItem = DatasetItem(info)
+    info['apiRoot'].item.route('POST', (':id', 'dataset'),
+                               datasetItem.setupDataset)
+    info['apiRoot'].item.route('GET', (':id', 'dataset', 'inferSchema'),
+                               datasetItem.inferSchema)
+    info['apiRoot'].item.route('GET', (':id', 'dataset', 'getHistograms'),
+                               datasetItem.getHistograms)
+    info['apiRoot'].item.route('GET', (':id', 'dataset', 'getData'),
+                               datasetItem.getData)
+
     # Expose versioning endpoint
     versioning = Versioning()
     info['apiRoot'].system.route('GET', ('resonantLaboratoryVersion', ),

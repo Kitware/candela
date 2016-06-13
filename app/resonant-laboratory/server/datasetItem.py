@@ -2,19 +2,26 @@ import copy
 import bson.json_util
 import subprocess
 import os
+import functools
+import inspect
+import csv
 from pymongo import MongoClient
+from versioning import Versioning
 from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
 from girder.constants import AccessType
 from girder.plugins.girder_db_items.rest import DatabaseItemResource
 from girder.plugins.girder_db_items.dbs.mongo import MongoConnector
+from girder_worker.format import get_csv_reader
 
 
-class DataItemSummary(Resource):
+class DatasetItem(Resource):
     def __init__(self, info):
         super(Resource, self).__init__()
         self.databaseItemResource = DatabaseItemResource(info['apiRoot'])
+
+        self.versioning = Versioning()
 
         # Load up the external foreign code snippets
         codePath = subprocess.check_output(['girder-install', 'plugin-path']).strip()
@@ -28,9 +35,117 @@ class DataItemSummary(Resource):
             infile.close()
 
     @access.public
+    @loadmodel(model='item', level=AccessType.WRITE)
+    @describeRoute(
+        Description('Set or modify item dataset information')
+        .param('id', 'The ID of the item.', paramType='path')
+        .param('fileId',
+               'The id of the file that contains the data for ' +
+               'this dataset (e.g. may be in a different item). If not supplied, ' +
+               'the default behavior is to 1) use any database link information ' +
+               'stored in the item, or 2) use the first file discovered inside the item',
+               required=False)
+        .param('format',
+               'The format of the file. Must be one of "csv", "json", ' +
+               'or "mongodb.collection". If not supplied, the default behavior ' +
+               'is to infer the format from the file extension or (TODO:) MIME type',
+               required=False)
+        .param('jsonPath',
+               'If the format of the file is "json", this parameter is a JSONPath ' +
+               'expression that indicates where in the JSON file the list of dataset ' +
+               'items be found. By default, this is "$", or the root of the json file ' +
+               '(assumes that the root is a list, not a dictionary).',
+               required=False)
+        .param('dialect',
+               'If the format of the file is "csv", this parameter specifies how the ' +
+               'CSV file should be parsed. This should be a JSON dictionary, containing ' +
+               'parameters to a python CSV reader object. Default behavior is to use ' +
+               'csv.Sniffer() to auto-detect delimiters, etc.',
+               required=False)
+        .errorResponse()
+    )
+    def setupDataset(self, item, params):
+        metadata = item.get('meta', {})
+        metadata['itemType'] = 'dataset'
+        metadata['versionNumber'] = self.versioning.versionNumber()
+
+        # Determine fileId
+        if 'fileId' in params:
+            # We were given the fileId
+            metadata['fileId'] = params['fileId']
+        else:
+            if 'databaseMetadata' in item:
+                # This is a database; there is no fileId
+                metadata['format'] = 'mongodb.collection'
+            else:
+                # Use the first file in this item
+                childFiles = [f for f in self.model('item').childFiles(item=item)]
+                if (len(childFiles) == 0):
+                    raise RestException('Item contains no files')
+                metadata['fileId'] = childFiles[0]['_id']
+
+        # Determine format
+        fileObj = None
+        if 'fileId' in metadata:
+            fileObj = self.model('file').load(metadata['fileId'], user=self.getCurrentUser())
+            exts = fileObj.get('exts', [])
+            if 'csv' in exts:
+                metadata['format'] = 'csv'
+            elif 'json' in exts:
+                metadata['format'] = 'json'
+            elif fileObj.mimeType == 'text/csv':
+                metadata['format'] = 'csv'
+            elif 'json' in fileObj.mimeType:
+                metadata['format'] = 'json'
+            else:
+                raise RestException('Could not determine file format')
+
+        # Format details
+        if metadata['format'] == 'json':
+            if 'jsonPath' in params:
+                metadata['jsonPath'] = params['jsonPath']
+            else:
+                metadata['jsonPath'] = '$'
+        elif metadata['format'] == 'csv':
+            if 'dialect' in params:
+                metadata['dialect'] = json.loads(params['dialect'])
+            else:
+                # use girder_worker's enhancements of csv.Sniffer()
+                # to infer the dialect (use at most 64K of data)
+                sample = functools.partial(self.model('file').download, fileObj, headers=False, endByte=65536)()
+                reader = get_csv_reader(sample)
+                dialect = reader.dialect
+                # Check if it's a standard dialect (we have to do this
+                # to get at details like the delimiter if it IS standard...
+                # otherwise, they're directly accessible)
+                try:
+                    dialect = csv.get_dialect(dialect)
+                except Exception:
+                    pass
+
+                # Okay, now dump all the parameters so that
+                # we can reconstruct the dialect later
+                metadata['dialect'] = {}
+                for key, value in inspect.getmembers(dialect):
+                    if key[0] == '_':
+                        continue
+                    metadata['dialect'][key] = value
+
+        item['meta'] = metadata
+        self.model('item').updateItem(item)
+
+        return metadata
+
+    @access.public
     @loadmodel(model='item', level=AccessType.READ)
     @describeRoute(
-        Description('Infer the schema for the data in an item')
+        Description('Infer the schema of a dataset.')
+        .notes('Calculates the potential frequency of various data types ' +
+               'for each attribute in the dataset (i.e. how many values ' +
+               'can be successfully coerced into a string, number, etc.). ' +
+               'Also notes the min and max value where appropriate, as well ' +
+               'as whether or not a given type was the native format of any value ' +
+               'for that attribute.')
         .param('id', 'The ID of the item.', paramType='path')
         # TODO: add a parameter for selecting the root
         .errorResponse()
@@ -154,7 +269,7 @@ class DataItemSummary(Resource):
         .errorResponse('Cannot use operator on field')
         .errorResponse()
     )
-    def filterData(self, item, params):
+    def getData(self, item, params):
         if 'databaseMetadata' in item:
             params['format'] = 'dict'
             selectResult = self.databaseItemResource.databaseSelect(id=item['_id'], params=params)
