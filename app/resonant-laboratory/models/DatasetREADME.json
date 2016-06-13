@@ -22,7 +22,8 @@
       "itemType": "dataset",
       "versionNumber": "master",
 
-      "jsonSelector": "$",
+      "fileId": "575ab70eed27aa2cacfcc753",
+      "jsonPath": "$",
       "dialect": {
         "_comment": "
           Only CSV datasets will have 'dialect' fields, and only JSON
@@ -31,11 +32,24 @@
           the actual dataset. 'dialect', of course, stores the results
           of python's csv.Sniffer().
 
-          Both of these fields are cached here not only for convenience /
+          These fields are cached here not only for convenience /
           persistence, but also so that an advanced user could tweak
           them (e.g. if csv.Sniffer() doesn't correctly infer the format
           of the CSV file)
-        "
+
+          Only file-based datasets will have the fileId field; usually,
+          the fileId will simply point to the file inside the item. However,
+          this allows an item to refer to the data in another item, without
+          copying the whole dataset (e.g. a different user has a large file
+          that the current user wants to use, but the current user wants to
+          adjust the type coercion settings... an empty item can be created
+          that is simply a view into that other dataset).
+        ",
+        "delimiter": ",",
+        "doublequote": true,
+        "lineterminator": "\r\n",
+        "quotechar": "\"",
+        "skipinitialspace": false
       },
 
       "lastUpdated": "1986-12-08T04:43:12-07:00",
@@ -84,9 +98,9 @@
       },
       "histogramCaches": {
         "_comment": "
-          All histograms are computed for all attributes at the same
+          Histograms are computed for all attributes at the same
           time across an entire dataset (so that only one file pass /
-          db table scan is necessary). The results are cached here,
+          db table scan is necessary). The results can be cached here,
           keyed by the MD5 hash of the parameters that were sent to
           /item/{id}/getHistograms
 
