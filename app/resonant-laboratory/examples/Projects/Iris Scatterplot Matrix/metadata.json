@@ -2,7 +2,7 @@
   "datasets": [
     {
       "dataset": "iris.json",
-      "itemID": "iris"
+      "itemId": "iris"
     }
   ],
   "matchings": [

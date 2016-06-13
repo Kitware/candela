@@ -66,49 +66,47 @@ class DatasetItem(Resource):
     )
     def setupDataset(self, item, params):
         metadata = item.get('meta', {})
-        metadata['itemType'] = 'dataset'
-        metadata['versionNumber'] = self.versioning.versionNumber()
+        rlab = metadata.get('rlab', {})
+        rlab['itemType'] = 'dataset'
+        rlab['versionNumber'] = self.versioning.versionNumber({})
 
         # Determine fileId
         if 'fileId' in params:
             # We were given the fileId
-            metadata['fileId'] = params['fileId']
+            rlab['fileId'] = params['fileId']
         else:
             if 'databaseMetadata' in item:
                 # This is a database; there is no fileId
-                metadata['format'] = 'mongodb.collection'
+                rlab['format'] = 'mongodb.collection'
             else:
                 # Use the first file in this item
                 childFiles = [f for f in self.model('item').childFiles(item=item)]
                 if (len(childFiles) == 0):
                     raise RestException('Item contains no files')
-                metadata['fileId'] = childFiles[0]['_id']
+                rlab['fileId'] = childFiles[0]['_id']
 
         # Determine format
         fileObj = None
-        if 'fileId' in metadata:
-            fileObj = self.model('file').load(metadata['fileId'], user=self.getCurrentUser())
+        if 'fileId' in rlab:
+            fileObj = self.model('file').load(rlab['fileId'], user=self.getCurrentUser())
             exts = fileObj.get('exts', [])
-            if 'csv' in exts:
-                metadata['format'] = 'csv'
-            elif 'json' in exts:
-                metadata['format'] = 'json'
-            elif fileObj.mimeType == 'text/csv':
-                metadata['format'] = 'csv'
-            elif 'json' in fileObj.mimeType:
-                metadata['format'] = 'json'
+            mimeType = fileObj.get('mimeType', '').lower()
+            if 'json' in exts or 'json' in mimeType:
+                rlab['format'] = 'json'
+            elif 'csv' in exts or 'tsv' in exts or 'csv' in mimeType or 'tsv' in mimeType:
+                rlab['format'] = 'csv'
             else:
                 raise RestException('Could not determine file format')
 
         # Format details
-        if metadata['format'] == 'json':
+        if rlab['format'] == 'json':
             if 'jsonPath' in params:
-                metadata['jsonPath'] = params['jsonPath']
+                rlab['jsonPath'] = params['jsonPath']
             else:
-                metadata['jsonPath'] = '$'
-        elif metadata['format'] == 'csv':
+                rlab['jsonPath'] = '$'
+        elif rlab['format'] == 'csv':
             if 'dialect' in params:
-                metadata['dialect'] = json.loads(params['dialect'])
+                rlab['dialect'] = json.loads(params['dialect'])
             else:
                 # use girder_worker's enhancements of csv.Sniffer()
                 # to infer the dialect (use at most 64K of data)
@@ -125,16 +123,17 @@ class DatasetItem(Resource):
 
                 # Okay, now dump all the parameters so that
                 # we can reconstruct the dialect later
-                metadata['dialect'] = {}
+                rlab['dialect'] = {}
                 for key, value in inspect.getmembers(dialect):
                     if key[0] == '_':
                         continue
-                    metadata['dialect'][key] = value
+                    rlab['dialect'][key] = value
 
+        metadata['rlab'] = rlab
         item['meta'] = metadata
         self.model('item').updateItem(item)
 
-        return metadata
+        return rlab
 
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
@@ -165,19 +164,24 @@ class DatasetItem(Resource):
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
     @describeRoute(
-        Description('Get histograms for the data in an item')
-        .param('id', 'The ID of the item.', paramType='path')
+        Description('Get a histogram for a data attribute')
+        .param('id', 'The ID of the dataset item.', paramType='path')
         .param('filterQuery',
-               'Get histograms after the results of these filters. ' +
+               'Get the histogram after the results of these filters. ' +
                'TODO: describe the ' +
                'filter format used in the girder_db_items plugin.',
                required=False)
-        .param('categoricalAttrs',
-               'A comma-separated list of categorical attributes to count',
+        .param('attrName',
+               'The name of the attribute to count',
                required=False)
-        .param('quantitativeAttrs',
-               'A JSON dict of quantitative attribute-dict pairs, where ' +
-               'the dict contains numbers for min, max, and binCount.',
+        .param('coerce',
+               'Attempt to coerce all values to "boolean","int",' +
+               '"number","date", or "string". Incompatible or missing ' +
+               'values will be assigned to appropriate bins such as "NaN" ' +
+               'or "undefined". If no coercion value is supplied, ',
+               required=False)
+        .param('type',
+               'Coerce values to ',
                required=False)
         .errorResponse()
     )
@@ -284,13 +288,9 @@ class DatasetItem(Resource):
         return conn[dbMetadata['database']][dbMetadata['collection']]
 
     def inferMongoSchema(self, item, params):
-        # TODO: there's a chance someone has done this more
-        # efficiently. Javascript solutions I found:
-        # Variety: https://github.com/variety/variety
-        # mongodb-schema: https://github.com/mongodb-js/mongodb-schema
         collection = self.getMongoCollection(item)
-        mr_result = collection.inline_map_reduce(self.foreignCode['mongo_schema_map.js'],
-                                                 self.foreignCode['mongo_schema_reduce.js'])
+        mr_result = collection.inline_map_reduce(self.foreignCode['schema_map.js'],
+                                                 self.foreignCode['schema_reduce.js'])
         # rearrange into a neater dict before sending it back
         result = {}
         for r in mr_result:

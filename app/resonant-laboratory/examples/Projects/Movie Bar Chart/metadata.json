@@ -2,7 +2,7 @@
   "datasets": [
     {
       "dataset": "movies.csv",
-      "itemID": "movies"
+      "itemId": "movies"
     }
   ],
   "matchings": [

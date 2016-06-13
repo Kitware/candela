@@ -133,6 +133,13 @@ for f in ['Data', 'Projects']:
                                               i + '/' + x)
                 addedFiles += 1
 
+        # Hit the endpoint that identifies the item as a dataset or a project
+        if f == 'Data':
+            gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/dataset')
+        elif f == 'Projects':
+            # TODO
+            pass
+
         message += '%i file%s loaded' % (addedFiles,
                                          '' if addedFiles == 1 else 's')
         message += '\t%i file%s ignored' % (ignoredFiles,
@@ -140,7 +147,7 @@ for f in ['Data', 'Projects']:
         if addedMetadata is False:
             message += '\tCOULD NOT FIND METADATA'
         else:
-            message += '\tattached metadata'
+            message += '\tmetadata attached'
         print message
 
 print 'finished'
