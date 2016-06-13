@@ -22,15 +22,14 @@ function map () { // eslint-disable-line no-unused-vars
 
     // store the counts
     counters[nativeType] = {
-      native: {
-        count: 1
-      }
+      native: true,
+      count: 1
     };
     // store the mins and maxes if relevant
     if (nativeType === 'integer' || nativeType === 'number' ||
         nativeType === 'string' || nativeType === 'date') {
-      counters[nativeType].native.lowBound = value;
-      counters[nativeType].native.highBound = value;
+      counters[nativeType].lowBound = value;
+      counters[nativeType].highBound = value;
     }
 
     /** Next determine and count its potential coerced types **/
@@ -39,11 +38,9 @@ function map () { // eslint-disable-line no-unused-vars
       if (strValue !== '[object Object]') {
         // this value can be meaningfully coerced to a string (and isn't already one)
         counters['string'] = {
-          potential: {
-            count: 1,
-            lowBound: strValue,
-            highBound: strValue
-          }
+          count: 1,
+          lowBound: strValue,
+          highBound: strValue
         };
       }
     }
@@ -54,19 +51,15 @@ function map () { // eslint-disable-line no-unused-vars
         // is it an integer?
         if (Math.floor(numValue) === numValue) {
           counters['integer'] = {
-            potential: {
-              count: 1,
-              lowBound: numValue,
-              highBound: numValue
-            }
+            count: 1,
+            lowBound: numValue,
+            highBound: numValue
           };
         } else {
           counters['number'] = {
-            potential: {
-              count: 1,
-              lowBound: numValue,
-              highBound: numValue
-            }
+            count: 1,
+            lowBound: numValue,
+            highBound: numValue
           };
         }
       }
@@ -76,20 +69,16 @@ function map () { // eslint-disable-line no-unused-vars
       if (!isNaN(dateValue)) {
         // this value can be coerced into a date (and isn't already one)
         counters['date'] = {
-          potential: {
-            count: 1,
-            lowBound: dateValue,
-            highBound: dateValue
-          }
+          count: 1,
+          lowBound: dateValue,
+          highBound: dateValue
         };
       }
     }
     if (nativeType !== 'boolean') {
       // anything can be coerced into a boolean
       counters['boolean'] = {
-        potential: {
-          count: 1
-        }
+        count: 1
       };
     }
     emit(key, counters);

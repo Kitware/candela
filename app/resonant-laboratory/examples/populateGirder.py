@@ -89,7 +89,7 @@ def createMongoCollection(args, filePath, fileName):
                '--host', args.mongoHost,
                '--port', args.mongoPort,
                '--db', args.dbName,
-               '--collection', fileName[0],
+               '--collection', parts[0],
                '--drop',
                '--file', os.path.join(filePath, fileName)]
     if parts[1].lower() == '.csv':
