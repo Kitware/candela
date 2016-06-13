@@ -11,6 +11,8 @@ parser = argparse.ArgumentParser(description='''Populate a girder
     This script is idempotent, so running it multiple times won't
     result in duplicate files (though it may revert any changes
     that have been made to the elements that it originally added)''')
+parser.add_argument('-c, --clean', dest='clean', action='store_true',
+                    help='Remove the ResonantLaboratory collection before re-populating')
 parser.add_argument('-u, --username', dest='username', default='admin',
                     help='The administrator username (default: "admin")')
 parser.add_argument('-a, --apiUrl', dest='apiUrl',
@@ -28,6 +30,19 @@ message = ''
 # Get or create the ResonantLaboratory collection
 collection = gc.sendRestRequest('GET', 'collection',
                                 {'text': 'ResonantLaboratory'})
+
+# If specified, trash the existing ResonantLaboratory collection
+if (args.clean):
+    if (len(collection) == 0):
+        print 'No "ResonantLaboratory" collection to clean.'
+        print
+    else:
+        gc.sendRestRequest('DELETE', 'collection/' + collection[0]['_id'])
+        print 'Deleted "ResonantLaboratory" collection.'
+        print
+        collection = []
+
+# Create a new collection if needed
 if len(collection) == 0:
     collection = gc.sendRestRequest('POST', 'collection',
                                     {'name': 'ResonantLaboratory',
@@ -66,6 +81,8 @@ for f in ['Data', 'Projects']:
     longestItemName = max([len(i) for i in items])
 
     for i in items:
+        if not os.path.isdir('./' + f + '/' + i):
+            continue
         print '- Item: ' + i,
 
         spacesNeeded = longestItemName - len(i)
@@ -74,8 +91,8 @@ for f in ['Data', 'Projects']:
         # Create (or get) the item
         itemSpec = gc.load_or_create_item(i, folderSpec['_id'])
 
-        # If it's a dataset, store its ID in case a project
-        # refers to it
+        # If this is a dataset, store its ID for Projects
+        # to look up later
         if f == 'Data':
             dataItemIdLookup[i] = itemSpec['_id']
 
@@ -102,10 +119,10 @@ for f in ['Data', 'Projects']:
                 temp.close()
 
                 # If this is a project, we need to replace the dataset
-                # names with their Girder IDs
+                # folder name with a Girder ID
                 if f == 'Projects':
                     for i, d in enumerate(metadata['datasets']):
-                        metadata['datasets'][i] = dataItemIdLookup[d]
+                        metadata['datasets'][i]['itemId'] = dataItemIdLookup[d['itemId']]
 
                 gc.addMetadataToItem(itemSpec['_id'], metadata)
                 addedMetadata = True

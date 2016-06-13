@@ -1,6 +1,9 @@
 {
   "datasets": [
-    "iris.json"
+    {
+      "dataset": "iris.json",
+      "itemID": "iris"
+    }
   ],
   "matchings": [
     {
