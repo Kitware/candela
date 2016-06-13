@@ -77,6 +77,23 @@ function showPage () {
       }
       let vis = new candela.components[properties.component](el, properties.options);
       vis.render();
+
+      // Create download links for serializable charts
+      let download = document.getElementById('download-link');
+      let serialize = document.getElementById('serialize-links');
+      vis.getSerializationFormats().forEach((format) => {
+        let element = document.createElement('button');
+        element.innerHTML = format;
+        element.addEventListener('click', function () {
+          vis.serialize(format).then((value) => {
+            download.setAttribute('download', 'chart.' + format);
+            download.setAttribute('href', value);
+            download.click();
+          });
+        }, false);
+        serialize.appendChild(element);
+      });
+
       window.addResizeListener(el, () => vis.render());
     }
   }
