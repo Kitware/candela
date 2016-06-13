@@ -35,9 +35,9 @@ def load(info):
 
     # Expose anonymous access endpoints
     anonymousAccess = AnonymousAccess()
-    info['apiRoot'].item.route('GET', ('privateItem', ),
+    info['apiRoot'].item.route('POST', ('privateItem', ),
                                anonymousAccess.getOrMakePrivateItem)
-    info['apiRoot'].item.route('GET', ('scratchItem', ),
+    info['apiRoot'].item.route('POST', ('scratchItem', ),
                                anonymousAccess.makeScratchItem)
     info['apiRoot'].folder.route('GET', ('privateFolder', ),
                                  anonymousAccess.getOrMakePrivateFolder)

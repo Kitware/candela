@@ -55,9 +55,10 @@ class AnonymousAccess(Resource):
 
     @access.user
     @describeRoute(
-        Description('Gets or creates an item with the supplied ' +
-                    'name in the current user\'s Private folder. Also ' +
-                    'creates the Private folder if it is missing.')
+        Description('Get or create a private item')
+        .notes('Gets or creates an item with the supplied ' +
+               'name in the current user\'s Private folder. Also ' +
+               'creates the Private folder if it is missing.')
         .param('name', 'The name of the item.', required=True)
         .param('description', 'The description of the item.', required=False)
         .param('reuseExisting', 'If false, create a new item, even if an ' +
@@ -92,9 +93,10 @@ class AnonymousAccess(Resource):
 
     @access.public
     @describeRoute(
-        Description('Gets the user\'s Public folder. If the user is not ' +
-                    'logged in, the anonymous user\'s Public folder is ' +
-                    'returned. Creates the folder if it is missing.')
+        Description('Gets the user\'s Public folder.')
+        .notes('If the user is not ' +
+               'logged in, the anonymous user\'s Public folder is ' +
+               'returned. Creates the folder if it is missing.')
         .errorResponse()
     )
     def getOrMakePublicFolder(self, params):
@@ -112,10 +114,11 @@ class AnonymousAccess(Resource):
 
     @access.public
     @describeRoute(
-        Description('Create a new item, either in the current user\'s ' +
-                    'Private folder (created if non-existent), or in the ' +
-                    'anonymous user\'s Public folder if the user is ' +
-                    'not logged in')
+        Description('Create a scratch item.')
+        .notes('Create a new item, either in the current user\'s ' +
+               'Private folder (created if non-existent), or in the ' +
+               'anonymous user\'s Public folder if the user is ' +
+               'not logged in')
         .param('name', 'The name of the item.', required=True)
         .param('description', 'The description of the item.', required=False)
         .errorResponse()
@@ -142,8 +145,9 @@ class AnonymousAccess(Resource):
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
     @describeRoute(
-        Description('Get information about where an item is stored, as well ' +
-                    'as whether the user can write to the item.')
+        Description('Get information about an item.')
+        .notes('Get information about where an item is stored, as well ' +
+               'as whether the user can write to the item.')
         .param('id', 'The ID of the item.', paramType='path')
         .errorResponse()
     )
@@ -182,8 +186,9 @@ class AnonymousAccess(Resource):
 
     @access.public
     @describeRoute(
-        Description('Validate that a specific set of items are in the public' +
-                    ' scratch space, and return those items')
+        Description('Check whether items are in the public scratch space.')
+        .notes('Validate that a specific set of items are in the public' +
+               ' scratch space, and return those items')
         .param('ids', 'A JSON list of item IDs', required=True)
         .errorResponse()
     )
@@ -217,10 +222,11 @@ class AnonymousAccess(Resource):
 
     @access.public
     @describeRoute(
-        Description('Attempt to move a set of items in the anonymous user\'s' +
-                    ' Public folder to the current user\'s Private folder. ' +
-                    'The list of items that were successfully adopted ' +
-                    'is returned.')
+        Description('Take ownership of scratch items.')
+        .notes('Attempt to move a set of items in the anonymous user\'s' +
+               ' Public folder to the current user\'s Private folder. ' +
+               'The list of items that were successfully adopted ' +
+               'is returned.')
         .param('ids', 'A JSON list of item IDs', required=True)
         .errorResponse()
     )
@@ -251,10 +257,11 @@ class AnonymousAccess(Resource):
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
     @describeRoute(
-        Description('Attempt to update an item. If the user does not have ' +
-                    'write access, a copy is made in the user\'s Private ' +
-                    'directory, or the anonymous user\'s Public folder if ' +
-                    'the user is not logged in')
+        Description('Update a scratch item.')
+        .notes('Attempt to update an item. If the user does not have ' +
+               'write access, a copy is made in the user\'s Private ' +
+               'directory, or the anonymous user\'s Public folder if ' +
+               'the user is not logged in')
         .param('id', 'The ID of the item.', paramType='path')
         .param('name', 'Name for the item.', required=False)
         .param('description', 'Description for the item.', required=False)
@@ -315,12 +322,13 @@ class AnonymousAccess(Resource):
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
     @describeRoute(
-        Description('Moves an item is to the user\'s Public or Private ' +
-                    'folder. If the user does not have write access to the ' +
-                    'indicated item, a copy is made instead (of course, read' +
-                    ' access to the original is necessary). If the user is ' +
-                    'not logged in, the item is copied to the anonymous ' +
-                    'user\'s Public folder')
+        Description('Toggle the visibility of an item.')
+        .notes('Moves an item is to the user\'s Public or Private ' +
+               'folder. If the user does not have write access to the ' +
+               'indicated item, a copy is made instead (of course, read' +
+               ' access to the original is necessary). If the user is ' +
+               'not logged in, the item is copied to the anonymous ' +
+               'user\'s Public folder')
         .param('id', 'The ID of the item.', paramType='path')
         .param('makePublic', 'If true, moves the item to the Public folder, ' +
                'regardless of its current location', required=False)
