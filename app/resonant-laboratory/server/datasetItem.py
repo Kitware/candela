@@ -51,6 +51,15 @@ class DatasetItem(Resource):
         conn = MongoClient(dbMetadata['url'])
         return conn[dbMetadata['database']][dbMetadata['collection']]
 
+    def mongoMapReduce(self, item, mapScript, reduceScript):
+        collection = self.getMongoCollection(item)
+        mr_result = collection.inline_map_reduce(mapScript, reduceScript)
+        # rearrange into a neater dict before sending it back
+        result = {}
+        for r in mr_result:
+            result[r['_id']] = r['value']
+        return result
+
     def bufferedDownloadLineReader(self, fileId, lineterminator="\r\n"):
         # TODO: @ronichoudhury is implementing something cool
         # that will make this function obsolete
@@ -94,6 +103,47 @@ class DatasetItem(Resource):
             if type(value) is unicode:
                 dialect[key] = str(value)
         return dialect
+
+    def flatFileMapReduce(self, item, mapScript, reduceScript):
+        mapReduceCode = execjs.compile(mapScript + reduceScript +
+                                       self.foreignCode['mapReduceChunk.js'])
+        fileFormat = item['meta']['rlab']['format']
+        reader = None
+        if fileFormat == 'csv':
+            dialect = self.getStringifiedDialect(item)
+            csv.register_dialect(item['name'], **dialect)
+            lineReader = self.bufferedDownloadLineReader(item['meta']['rlab']['fileId'],
+                                                         dialect['lineterminator'])
+            reader = csv.DictReader(lineReader, dialect=item['name'])
+        elif fileFormat == 'json':
+            reader = self.bufferedDownloadItemReader(item['meta']['rlab']['fileId'], '$')
+        else:
+            raise RestException('Unrecognized file type: ' + fileFormat)
+
+        rawData = []
+        reducedResult = {}
+
+        for line in reader:
+            rawData.append(line)
+            if sys.getsizeof(rawData) >= self.bufferSize:
+                reducedResult = mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
+                rawData = []
+        # last chunk
+        return mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
+
+    def mapReduce(self, item, mapCode, reduceCode):
+        if 'meta' not in item or 'rlab' not in item['meta']:
+            item = self.setupDataset(id=item['_id'], params={})
+
+        if 'databaseMetadata' in item:
+            if item['databaseMetadata']['type'] == 'mongo':
+                return self.mongoMapReduce(item, mapCode, reduceCode)
+            else:
+                raise RestException('MapReduce for ' +
+                                    item['databaseMetadata']['type'] +
+                                    ' databases is not yet supported')
+        else:
+            return self.flatFileMapReduce(item, mapCode, reduceCode)
 
     @access.public
     @loadmodel(model='item', level=AccessType.WRITE)
@@ -195,9 +245,7 @@ class DatasetItem(Resource):
 
         metadata['rlab'] = rlab
         item['meta'] = metadata
-        self.model('item').updateItem(item)
-
-        return rlab
+        return self.model('item').updateItem(item)
 
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
@@ -214,56 +262,9 @@ class DatasetItem(Resource):
         .errorResponse()
     )
     def inferSchema(self, item, params):
-        if 'meta' not in item or 'rlab' not in item['meta']:
-            raise RestException('Please POST to item/' + item['_id'] + '/dataset ' +
-                                'before attempting to infer the dataset\'s schema.')
-        if 'databaseMetadata' in item:
-            if item['databaseMetadata']['type'] == 'mongo':
-                return self.inferMongoSchema(item, params)
-            else:
-                raise RestException('Schema inference for ' +
-                                    item['databaseMetadata']['type'] +
-                                    ' databases is not yet supported')
-        else:
-            return self.inferFlatFileSchema(item, params)
-
-    def inferMongoSchema(self, item, params):
-        collection = self.getMongoCollection(item)
-        mr_result = collection.inline_map_reduce(self.foreignCode['schema_map.js'],
-                                                 self.foreignCode['schema_reduce.js'])
-        # rearrange into a neater dict before sending it back
-        result = {}
-        for r in mr_result:
-            result[r['_id']] = r['value']
-        return result
-
-    def inferFlatFileSchema(self, item, params):
-        mapReduceCode = execjs.compile(self.foreignCode['schema_map.js'] +
-                                       self.foreignCode['schema_reduce.js'] +
-                                       self.foreignCode['mapReduceChunk.js'])
-        fileFormat = item['meta']['rlab']['format']
-        reader = None
-        if fileFormat == 'csv':
-            dialect = self.getStringifiedDialect(item)
-            csv.register_dialect(item['name'], **dialect)
-            lineReader = self.bufferedDownloadLineReader(item['meta']['rlab']['fileId'],
-                                                         dialect['lineterminator'])
-            reader = csv.DictReader(lineReader, dialect=item['name'])
-        elif fileFormat == 'json':
-            reader = self.bufferedDownloadItemReader(item['meta']['rlab']['fileId'], '$')
-        else:
-            raise RestException('Unrecognized file type: ' + fileFormat)
-
-        rawData = []
-        reducedResult = {}
-
-        for line in reader:
-            rawData.append(line)
-            if sys.getsizeof(rawData) >= self.bufferSize:
-                reducedResult = mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
-                rawData = []
-        # last chunk
-        return mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
+        return self.mapReduce(item,
+                              self.foreignCode['schema_map.js'],
+                              self.foreignCode['schema_reduce.js'])
 
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
@@ -287,7 +288,9 @@ class DatasetItem(Resource):
         .errorResponse()
     )
     def getHistograms(self, item, params):
-        raise RestException('Not implemented yet')
+        return self.mapReduce(item,
+                              self.foreignCode['histogram_map.js'],
+                              self.foreignCode['histogram_reduce.js'])
 
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
