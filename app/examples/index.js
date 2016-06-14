@@ -62,6 +62,12 @@ function showPage () {
           require('./custom/dynamic-linechart/index.js');
           break;
 
+        case 'serialize':
+          customTemplate = require('./custom/serialize/index.jade');
+          document.getElementsByTagName('body')[0].innerHTML = customTemplate(properties);
+          require('./custom/serialize/index.js');
+          break;
+
         default:
           console.log(`unregistered custom example: ${properties.template}`);
           break;
@@ -76,36 +82,7 @@ function showPage () {
         properties.options.data = datasets[properties.options.data];
       }
       let vis = new candela.components[properties.component](el, properties.options);
-
-      // Attempt serialize() before render().
-      if (vis.serialize) {
-        vis.serialize('png').then(() => {
-          throw new Error('serialize() should not be allowed before render()');
-        }).catch(msg => {
-          console.log('Yay! serialize() was correctly rejected with the message: ' + msg);
-        });
-      }
-
       vis.render();
-
-      /*
-      // Create download links for serializable charts
-      let download = document.getElementById('download-link');
-      let serialize = document.getElementById('serialize-links');
-      vis.serializationFormats.forEach(format => {
-        let element = document.createElement('button');
-        element.innerHTML = format;
-        element.addEventListener('click', () => {
-          vis.serialize(format).then(value => {
-            download.setAttribute('download', 'chart.' + format);
-            download.setAttribute('href', value);
-            download.click();
-          });
-        }, false);
-        serialize.appendChild(element);
-      });
-      */
-
       window.addResizeListener(el, () => vis.render());
     }
   }

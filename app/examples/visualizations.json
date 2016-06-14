@@ -293,5 +293,10 @@
     "hash": "dynamic-linechart",
     "name": "Dynamic Line Chart",
     "template": "dynamic-linechart"
+  },
+  {
+    "hash": "serialize",
+    "name": "Serialization",
+    "template": "serialize"
   }
 ]
