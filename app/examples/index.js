@@ -88,6 +88,7 @@ function showPage () {
 
       vis.render();
 
+      /*
       // Create download links for serializable charts
       let download = document.getElementById('download-link');
       let serialize = document.getElementById('serialize-links');
@@ -103,6 +104,7 @@ function showPage () {
         }, false);
         serialize.appendChild(element);
       });
+      */
 
       window.addResizeListener(el, () => vis.render());
     }
