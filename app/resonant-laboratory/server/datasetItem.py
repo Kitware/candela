@@ -5,6 +5,9 @@ import os
 import functools
 import inspect
 import csv
+import sys
+import re
+import execjs
 from pymongo import MongoClient
 from versioning import Versioning
 from girder.api import access
@@ -33,6 +36,69 @@ class DatasetItem(Resource):
             infile = open(os.path.join(codePath, filename), 'rb')
             self.foreignCode[filename] = infile.read()
             infile.close()
+
+        # For each of our mapreduce operations on flat files, we can reasonably
+        # xpect three buffers to be in use at once:
+        # one for the file's raw data, one for the list of parsed objects,
+        # and one to hold the reduced results. For now, this is small for
+        # testing purposes
+        self.bufferSize = 128   # 131072    128K
+
+        self.sniffSampleSize = 131072    # 128K
+
+    def getMongoCollection(self, item):
+        dbMetadata = item['databaseMetadata']
+        conn = MongoClient(dbMetadata['url'])
+        return conn[dbMetadata['database']][dbMetadata['collection']]
+
+    def bufferedDownloadLineReader(self, fileId, lineterminator="\r\n"):
+        lineterminator = re.compile('[' + lineterminator + ']')
+        fileObj = self.model('file').load(fileId, user=self.getCurrentUser())
+        offset = 0
+        lastLine = ''
+        while True:
+            endByte = None if self.bufferSize is None else offset + self.bufferSize
+            chunk = functools.partial(self.model('file').download,
+                                      fileObj,
+                                      headers=False,
+                                      offset=offset,
+                                      endByte=endByte)()
+            offset = endByte
+
+            chunk = str(chunk().next())
+            chunk = lineterminator.split(chunk)
+            if len(chunk) == 0:
+                break
+            elif len(chunk) == 1:
+                # we happened to split on the last line
+                lastLine = lastLine + chunk[0]
+                break
+
+            # The last and first lines are probably
+            # only partial chunks of lines (if we happen
+            # to break on a newline, then lastLine or firstLine
+            # will just be an empty string)
+            temp = lastLine + chunk.pop(0)
+            # print 'stitched:', temp
+            yield temp
+            lastLine = chunk.pop()
+
+            # yield all the full lines in between
+            for line in chunk:
+                # print 'regular:', line
+                yield line
+
+        # The very last line still needs to be yielded
+        if len(lastLine) > 0:
+            # print 'last:', lastLine
+            yield lastLine
+
+    def getStringifiedDialect(self, item):
+        dialect = item['meta']['rlab']['dialect']
+        for key, value in dialect.iteritems():
+            if type(value) is unicode:
+                dialect[key] = str(value)
+        return dialect
 
     @access.public
     @loadmodel(model='item', level=AccessType.WRITE)
@@ -106,11 +172,14 @@ class DatasetItem(Resource):
                 rlab['jsonPath'] = '$'
         elif rlab['format'] == 'csv':
             if 'dialect' in params:
-                rlab['dialect'] = json.loads(params['dialect'])
+                rlab['dialect'] = bson.json_util.loads(params['dialect'])
             else:
                 # use girder_worker's enhancements of csv.Sniffer()
-                # to infer the dialect (use at most 64K of data)
-                sample = functools.partial(self.model('file').download, fileObj, headers=False, endByte=65536)()
+                # to infer the dialect
+                sample = functools.partial(self.model('file').download,
+                                           fileObj,
+                                           headers=False,
+                                           endByte=self.sniffSampleSize)()
                 reader = get_csv_reader(sample)
                 dialect = reader.dialect
                 # Check if it's a standard dialect (we have to do this
@@ -150,6 +219,9 @@ class DatasetItem(Resource):
         .errorResponse()
     )
     def inferSchema(self, item, params):
+        if 'meta' not in item or 'rlab' not in item['meta']:
+            raise RestException('Please POST to item/' + item['_id'] + '/dataset ' +
+                                'before attempting to infer the dataset\'s schema.')
         if 'databaseMetadata' in item:
             if item['databaseMetadata']['type'] == 'mongo':
                 return self.inferMongoSchema(item, params)
@@ -158,44 +230,68 @@ class DatasetItem(Resource):
                                     item['databaseMetadata']['type'] +
                                     ' databases is not yet supported')
         else:
-            raise RestException('Schema inference for flat file items' +
-                                ' is not yet supported')
+            f = item['meta']['rlab']['format']
+            if f == 'csv':
+                return self.inferCsvFileSchema(item, params)
+            elif f == 'json':
+                return self.inferJsonFileSchema(item, params)
+            else:
+                raise RestException('Unrecognized file type: ' + f)
+
+    def inferMongoSchema(self, item, params):
+        collection = self.getMongoCollection(item)
+        mr_result = collection.inline_map_reduce(self.foreignCode['schema_map.js'],
+                                                 self.foreignCode['schema_reduce.js'])
+        # rearrange into a neater dict before sending it back
+        result = {}
+        for r in mr_result:
+            result[r['_id']] = r['value']
+        return result
+
+    def inferCsvFileSchema(self, item, params):
+        mapReduceCode = execjs.compile(self.foreignCode['schema_map.js'] +
+                                       self.foreignCode['schema_reduce.js'] +
+                                       self.foreignCode['mapReduceChunk.js'])
+        dialect = self.getStringifiedDialect(item)
+        csv.register_dialect(item['name'], **dialect)
+        reader = csv.DictReader(self.bufferedDownloadLineReader(item['meta']['rlab']['fileId'],
+                                                                dialect['lineterminator']),
+                                dialect=item['name'])
+
+        rawData = []
+        reducedResult = {}
+
+        for line in reader:
+            rawData.append(line)
+            if sys.getsizeof(rawData) >= self.bufferSize:
+                reducedResult = mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
+                rawData = []
+        # last chunk
+        return mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
 
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
     @describeRoute(
         Description('Get a histogram for a data attribute')
         .param('id', 'The ID of the dataset item.', paramType='path')
-        .param('filterQuery',
+        .param('filter',
                'Get the histogram after the results of these filters. ' +
-               'TODO: describe the ' +
-               'filter format used in the girder_db_items plugin.',
+               'TODO: describe our filter grammar.',
                required=False)
-        .param('attrName',
-               'The name of the attribute to count',
-               required=False)
+        .param('limit', 'Result set size limit (default=50).',
+               required=False, dataType='int')
+        .param('offset', 'Offset into result set (default=0).',
+               required=False, dataType='int')
         .param('coerce',
                'Attempt to coerce all values to "boolean","int",' +
                '"number","date", or "string". Incompatible or missing ' +
                'values will be assigned to appropriate bins such as "NaN" ' +
-               'or "undefined". If no coercion value is supplied, ',
-               required=False)
-        .param('type',
-               'Coerce values to ',
+               'or "undefined". If no coercion value is supplied, ... TODO',
                required=False)
         .errorResponse()
     )
     def getHistograms(self, item, params):
-        if 'databaseMetadata' in item:
-            if item['databaseMetadata']['type'] == 'mongo':
-                return self.getMongoHistograms(item, params)
-            else:
-                raise RestException('Histogram calculation for ' +
-                                    item['databaseMetadata']['type'] +
-                                    ' databases is not yet supported')
-        else:
-            raise RestException('Histogram calculation for flat file items' +
-                                ' is not yet supported')
+        raise RestException('Not implemented yet')
 
     @access.public
     @loadmodel(model='item', level=AccessType.READ)
@@ -224,53 +320,6 @@ class DatasetItem(Resource):
                '(operator) is optional.  If a dictionary, at least the '
                '"field" and "value" keys must contain values, and "operator" '
                'and "function" keys can also be added.', required=False)
-        .param('clientid', 'A string to use for a client id.  If specified '
-               'and there is an extant query to this end point from the same '
-               'clientid, the extant query will be cancelled.', required=False)
-        .param('wait', 'Maximum duration in seconds to wait for data '
-               '(default=0).  If a positive value is specified and the '
-               'initial query returns no results, the query will be repeated '
-               'every (poll) seconds until this time elapses or there are '
-               'some results.', required=False, dataType='float', default=0)
-        .param('poll', 'Minimum interval in seconds between checking for data '
-               'when waiting (default=10).', required=False, dataType='float',
-               default=10)
-        .param('initwait', 'When waiting, initial delay in seconds before '
-               'starting to poll for more data.  This is not counted as part '
-               'of the wait duration (default=0).', required=False,
-               dataType='float', default=0)
-        .notes('Instead of or in addition to specifying a filters parameter, '
-               'additional query parameters of the form (field)[_(operator)]='
-               '(value) can be used.  '
-               'Operators depend on the data type of the field, and include = '
-               '(no operator or eq), != (<>, ne), >= (min, gte), <= (lte), > '
-               '(gt), < (max, lt), in, notin, ~ (regex), ~* (search -- '
-               'typically a case insensitive regex or word-stem search), !~ '
-               '(notregex), !~* (notsearch).  '
-               'If the backing database connector supports it, any place a '
-               'field can be used can be replaced with a function reference.  '
-               'This is a dictionary with "func" or with the name of the '
-               'database function and "params" which is a list of values, '
-               'fields, or functions to pass to the function.  If the param '
-               'entry is not a dictionary, it is treated as a value.  If a '
-               'dictionary, it can contain "value", "field", or "func" and '
-               '"param".')
-        .errorResponse('ID was invalid.')
-        .errorResponse('Read access was denied for the item.', 403)
-        .errorResponse('Item is not a database link.')
-        .errorResponse('Failed to connect to database.')
-        .errorResponse('The sort parameter must be a JSON list or a known '
-                       'field name.')
-        .errorResponse('Sort must use known fields.')
-        .errorResponse('The fields parameter must be a JSON list or a '
-                       'comma-separated list of known field names.')
-        .errorResponse('Fields must use known fields.')
-        .errorResponse('The filters parameter must be a JSON list.')
-        .errorResponse('Filters in list-format must have two or three '
-                       'components.')
-        .errorResponse('Unknown filter operator')
-        .errorResponse('Filters must be on known fields.')
-        .errorResponse('Cannot use operator on field')
         .errorResponse()
     )
     def getData(self, item, params):
@@ -279,169 +328,5 @@ class DatasetItem(Resource):
             selectResult = self.databaseItemResource.databaseSelect(id=item['_id'], params=params)
             return bson.json_util.loads(list(selectResult())[0])['data']
         else:
-            raise RestException('filterData for flat file items' +
+            raise RestException('getData for flat file items' +
                                 ' is not yet supported')
-
-    def getMongoCollection(self, item):
-        dbMetadata = item['databaseMetadata']
-        conn = MongoClient(dbMetadata['url'])
-        return conn[dbMetadata['database']][dbMetadata['collection']]
-
-    def inferMongoSchema(self, item, params):
-        collection = self.getMongoCollection(item)
-        mr_result = collection.inline_map_reduce(self.foreignCode['schema_map.js'],
-                                                 self.foreignCode['schema_reduce.js'])
-        # rearrange into a neater dict before sending it back
-        result = {}
-        for r in mr_result:
-            result[r['_id']] = r['value']
-        return result
-
-    def getMongoHistograms(self, item, params):
-        """
-        Debugging parameters for NCI dataset:
-        id: 573dd325ed27aa873ea6a63a
-        (nci)
-
-        filterQuery:
-        [{"field":"Metal","operator":"=","value":1},{"field":"Molecular Weight","operator":">=","value":100}]
-        {"$and":[{"Metal":{"$eq":1}},{"Molecular Weight":{"$gte":100}}]}
-
-        categoricalAttrs:
-        CuratedBy,Agglomerated,Metal,IsCrystalline,Lipid
-
-        quantitativeAttrs:
-        {"Molecular Weight":{"min":0,"max":1000000,"binCount":10}}
-        """
-
-        # Establish the connection to the mongodb
-        collection = self.getMongoCollection(item)
-
-        # A dict to store the results of aggregation
-        results = {}
-
-        # Now assemble our aggregation pipeline:
-
-        # TODO: only include results that the user is allowed to access
-        # (how to use girder authentication for a different db?)
-        # dbIds = self.getDatasetIds(params['collection'])
-        # pipelineBase = [{
-        #    '$match': {'folderId': {'$in': dbIds}}
-        # }]
-        pipelineBase = []
-
-        # If filters have been applied, narrow our scope even further
-        if 'filterQuery' in params:
-            query = bson.json_util.loads(params['filterQuery'])
-            if query:
-                pipelineBase.append({
-                    '$match': query
-                })
-
-        # Count how many data items match the filters across the database
-        pipeline = copy.deepcopy(pipelineBase)
-        pipeline.append({
-            '$group': {
-                '_id': None,
-                'totalCount': {'$sum': 1}
-            }
-        })
-
-        try:
-            temp = next(collection.aggregate(pipeline))
-        except StopIteration:
-            return {
-                'Total Size': 0
-            }
-        results['Total Count'] = temp['totalCount']
-
-        # Create and run pipelines for each categorical attribute
-        if 'categoricalAttrs' in params:
-            for attr in params['categoricalAttrs'].split(','):
-                pipeline = copy.deepcopy(pipelineBase)
-                pipeline.append({
-                    '$project': {attr: 1}
-                })
-                pipeline.append({
-                    '$group': {
-                        '_id': '$' + attr,
-                        'count': {
-                            '$sum': 1
-                        }
-                    }
-                })
-                results[attr] = list(collection.aggregate(pipeline))
-
-        # Create and run pipelines for each quantitative attribute
-        if 'quantitativeAttrs' in params:
-            quantitativeAttrs = bson.json_util.loads(params['quantitativeAttrs'])
-            for attr, spec in quantitativeAttrs.iteritems():
-                pipeline = copy.deepcopy(pipelineBase)
-                # Make sure this attribute is actually a number
-                # (TODO: what about other quantitative values, like dates?)
-                pipeline.append({
-                    '$match': {
-                        attr: {'$type': 'number'}
-                    }
-                })
-                histogramRange = spec['max'] - spec['min']
-                if histogramRange == 0:
-                    raise RestException('Min and max are the same for ' + attr +
-                                        '; should this be a categorical attribute?')
-                # Our bins are left-closed, right-open, with the
-                # exception of the last value (the final bin is closed
-                # on the right). To make the math with the last bin simpler,
-                # we just create one extra bin and add the final bin's
-                # count to the previous one
-                divisions = spec['binCount']
-                pipeline.append({
-                    '$project': {
-                        'binIndex': {
-                            '$floor': {
-                                '$multiply': [
-                                    {
-                                        '$divide': [
-                                            {
-                                                '$subtract': [
-                                                    '$' + attr, spec['min']
-                                                ]
-                                            },
-                                            histogramRange
-                                        ]
-                                    },
-                                    divisions
-                                ]
-                            }
-                        }
-                    }
-                })
-                pipeline.append({
-                    '$group': {
-                        '_id': '$binIndex',
-                        'count': {
-                            '$sum': 1
-                        }
-                    }
-                })
-                temp = list(collection.aggregate(pipeline))
-                # quick lookup for which bins already exist
-                createdBins = dict(zip([b['_id'] for b in temp], temp))
-
-                # create every potential bin in the normal range
-                results[attr] = []
-                for binNo in range(divisions):
-                    newBin = {
-                        '_id': binNo,
-                        'lowBound': (float(binNo) / divisions) * histogramRange + spec['min'],
-                        'highBound': (float(binNo + 1) / divisions) * histogramRange + spec['min'],
-                        'count': 0
-                    }
-                    if binNo in createdBins:
-                        newBin['count'] += createdBins[binNo]['count']
-                    results[attr].append(newBin)
-                # the final bin's count will correspond to values that
-                # exactly match the highBound of the previous bin...
-                # so add that value to the previous bin
-                if divisions in createdBins:
-                    results[attr][-1]['count'] += createdBins[divisions]['count']
-        return results

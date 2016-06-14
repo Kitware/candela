@@ -7,15 +7,32 @@
 // The python script can then call reduce directly on the results
 // of multiple mapReduceChunk calls
 
-var chunk = [];
+var chunk;
 
-function emit (obj) { // eslint-disable-line no-unused-vars
-  chunk.push(obj);
+function emit (key, obj) { // eslint-disable-line no-unused-vars
+  if (!chunk.hasOwnProperty(key)) {
+    chunk[key] = [];
+  }
+  chunk[key].push(obj);
 }
 
-function mapReduceChunk (objects) { // eslint-disable-line no-unused-vars
-  objects.forEach(function (obj) {
-    map(obj);
-  });
-  return reduce(chunk);
+function mapReduceChunk (objects, initialChunk) { // eslint-disable-line no-unused-vars
+  chunk = {};
+  var i;
+  if (initialChunk) {
+    for (i in initialChunk) {
+      if (initialChunk.hasOwnProperty(i)) {
+        emit(i, initialChunk[i]);
+      }
+    }
+  }
+  for (i = 0; i < objects.length; i += 1) {
+    map.call(objects[i]);
+  }
+  for (i in chunk) {
+    if (chunk.hasOwnProperty(i)) {
+      chunk[i] = reduce(i, chunk[i]);
+    }
+  }
+  return chunk;
 }
