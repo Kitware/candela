@@ -96,7 +96,7 @@ export default class ScatterPlot extends VisComponent {
     if (!this.chart) {
       this.render();
     }
-    return this.chart.then((vobj) => {
+    return this.chart.then(vobj => {
       return vobj.toImageURL(format);
     });
   }
