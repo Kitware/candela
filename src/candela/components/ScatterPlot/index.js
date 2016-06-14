@@ -94,7 +94,7 @@ export default class ScatterPlot extends VisComponent {
 
   serialize (format) {
     if (!this.chart) {
-      this.render();
+      return Promise.reject('The render() method must be called before serialize().');
     }
     return this.chart.then(vobj => {
       return vobj.toImageURL(format);

@@ -76,6 +76,16 @@ function showPage () {
         properties.options.data = datasets[properties.options.data];
       }
       let vis = new candela.components[properties.component](el, properties.options);
+
+      // Attempt serialize() before render().
+      if (vis.serialize) {
+        vis.serialize('png').then(() => {
+          throw new Error('serialize() should not be allowed before render()');
+        }).catch(msg => {
+          console.log('Yay! serialize() was correctly rejected with the message: ' + msg);
+        });
+      }
+
       vis.render();
 
       // Create download links for serializable charts
