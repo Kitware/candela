@@ -62,6 +62,12 @@ function showPage () {
           require('./custom/dynamic-linechart/index.js');
           break;
 
+        case 'serialize':
+          customTemplate = require('./custom/serialize/index.jade');
+          document.getElementsByTagName('body')[0].innerHTML = customTemplate(properties);
+          require('./custom/serialize/index.js');
+          break;
+
         default:
           console.log(`unregistered custom example: ${properties.template}`);
           break;

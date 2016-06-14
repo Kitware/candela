@@ -1,8 +1,8 @@
 import VisComponent from '../../VisComponent';
-import vega from '../../util/vega';
+import VegaChart from '../../VisComponent/mixin/VegaChart';
 import spec from './spec.json';
 
-export default class Heatmap extends VisComponent {
+export default class Heatmap extends VegaChart(VisComponent, spec) {
   static get spec () {
     return {
       options: [
@@ -45,15 +45,5 @@ export default class Heatmap extends VisComponent {
         }
       ]
     };
-  }
-
-  constructor (el, options) {
-    super(el);
-    this.options = options;
-    this.render();
-  }
-
-  render () {
-    vega.parseChart(spec, this.el, this.options);
   }
 }

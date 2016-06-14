@@ -27,19 +27,6 @@ is declared as an extension of ``VisComponent``):
 2. The component should report its expected inputs in
    [MyComponent.spec](#viscomponentspec).
 
-## new MyComponent(el, options)
-
-**Note**: The constructor for the abstract superclass is empty. You should use
-the constructor for specific subclasses of VisComponent.
-
-* **el** is a valid container for the visualization. The container will often be
-  a DOM element such as `<div>`, but may need to be another type for certain
-  visualizations.
-
-* **options** is an object containing the initial options for the visualization.
-  This includes any data, visual matchings, or other settings pertinent to the
-  visualization. Options are specified in the form `{name: value}`.
-
 ## MyComponent.spec
 
 The `spec` field is a static property on the component's class which describes
@@ -72,3 +59,31 @@ an object with the following properties:
 | mode        | String | The domain mode, one of `'choice'` or `'field'`. The `'choice'` mode will allow a fixed set of options set in the `'from'` field. The `'field'` mode will allow a field or list of fields from another input. If the option type is `'string'`, the option is a single field, and if the option type is `'string_list'`, the option accepts a list of fields. |
 | from        | Array or String | If the mode is `'choice'`, it is the list of strings to use as a dropdown. If the mode is `'field'`, it is the name of the input from which to extract fields.
 | fieldTypes  | Array of String | If mode is `'field'`, this specifies the types of fields to support. This array may contain any combination of [datalib's supported field types](https://github.com/vega/datalib/wiki/Import#dl_type_infer) which include `'string'`, `'date'`, `'number'`, `'integer'`, and `'boolean'`. |
+
+## component = new MyComponent(el, options)
+
+**Note**: The constructor for the abstract superclass is empty. You should use
+the constructor for specific subclasses of VisComponent.
+
+* **el** is a valid container for the visualization. The container will often be
+  a DOM element such as `<div>`, but may need to be another type for certain
+  visualizations.
+
+* **options** is an object containing the initial options for the visualization.
+  This includes any data, visual matchings, or other settings pertinent to the
+  visualization. Options are specified in the form `{name: value}`.
+
+## component.serializationFormats
+
+The `serializationFormats` field is a list of strings of supported formats.
+Formats include:
+
+* `'png'`: A base64-encoded string for a PNG image. This string may be placed in the
+`src` attribute of an `<img>` element to show the image.
+
+* `'svg'`: A base64-encoded string for an SVG scene. This string may be placed in the
+`src` attribute of an `<img>` element to show the image.
+
+## component.serialize(format)
+
+Serializes the component into the specified **format**.

@@ -1,8 +1,8 @@
 import VisComponent from '../../VisComponent';
-import vega from '../../util/vega';
+import VegaChart from '../../VisComponent/mixin/VegaChart';
 import spec from './spec.json';
 
-export default class BulletChart extends VisComponent {
+export default class BulletChart extends VegaChart(VisComponent, spec) {
   static get options () {
     return [
       {
@@ -35,14 +35,5 @@ export default class BulletChart extends VisComponent {
         optional: true
       }
     ];
-  }
-
-  constructor (el, options) {
-    super(el);
-    this.options = options;
-  }
-
-  render () {
-    vega.parseChart(spec, this.el, this.options);
   }
 }

@@ -1,8 +1,8 @@
 import VisComponent from '../../VisComponent';
-import vega from '../../util/vega';
+import VegaChart from '../../VisComponent/mixin/VegaChart';
 import spec from './spec.json';
 
-export default class ScatterPlot extends VisComponent {
+export default class ScatterPlot extends VegaChart(VisComponent, spec) {
   static get spec () {
     return {
       options: [
@@ -77,14 +77,5 @@ export default class ScatterPlot extends VisComponent {
         }
       ]
     };
-  }
-
-  constructor (el, options) {
-    super(el);
-    this.options = options;
-  }
-
-  render () {
-    vega.parseChart(spec, this.el, this.options);
   }
 }
