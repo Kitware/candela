@@ -59,7 +59,7 @@ let Dataset = MetadataItem.extend({
       // Now that we know the schema, if we have filters,
       // we should validate and reapply them
       return this.setFilters(meta.filters);
-    }).then();
+    });
   },
   getAttributeInterpretation: function (attrSpec) {
     if (attrSpec.interpretation) {
@@ -246,8 +246,11 @@ let Dataset = MetadataItem.extend({
         }).done(resolve).error(reject);
       }).then(data => {
         this.rawCache = data;
+        return data;
       }).catch((e) => {
+        this.rawCache = null;
         window.mainPage.trigger('rl:error', e);
+        return null;
       });
     }
   },
@@ -278,7 +281,7 @@ let Dataset = MetadataItem.extend({
       let parsedData;
       return this.loadData().then(rawData => {
         let schema = this.getMeta('schema');
-        if (rawData === null || !schema) {
+        if (!rawData || !schema) {
           this.parsedCache = parsedData = null;
         } else {
           try {

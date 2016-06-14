@@ -386,10 +386,12 @@ let DatasetView = Widget.extend({
       this.statusText.text = 'Loading...';
       this.renderIndicators();
 
-      this.renderAttributeSettings();
+      if (widgetIsShowing) {
+        this.renderAttributeSettings();
+      }
 
       dataset.parse().then(parsedData => {
-        if (dataset.rawCache === null) {
+        if (!dataset.rawCache) {
           this.status = STATUS.CANT_LOAD;
           this.statusText.text = 'ERROR';
           this.renderIndicators();
