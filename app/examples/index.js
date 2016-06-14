@@ -91,7 +91,7 @@ function showPage () {
       // Create download links for serializable charts
       let download = document.getElementById('download-link');
       let serialize = document.getElementById('serialize-links');
-      vis.getSerializationFormats().forEach(format => {
+      vis.serializationFormats.forEach(format => {
         let element = document.createElement('button');
         element.innerHTML = format;
         element.addEventListener('click', () => {

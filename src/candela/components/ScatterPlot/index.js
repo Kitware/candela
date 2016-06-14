@@ -88,7 +88,7 @@ export default class ScatterPlot extends VisComponent {
     this.chart = vega.parseChart(spec, this.el, this.options);
   }
 
-  getSerializationFormats () {
+  get serializationFormats () {
     return ['png', 'svg'];
   }
 

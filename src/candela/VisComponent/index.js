@@ -11,7 +11,7 @@ export default class VisComponent {
     throw new Error('"render() is pure abstract"');
   }
 
-  getSerializationFormats () {
+  get serializationFormats () {
     return [];
   }
 }
