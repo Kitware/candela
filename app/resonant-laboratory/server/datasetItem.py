@@ -54,44 +54,15 @@ class DatasetItem(Resource):
     def bufferedDownloadLineReader(self, fileId, lineterminator="\r\n"):
         lineterminator = re.compile('[' + lineterminator + ']')
         fileObj = self.model('file').load(fileId, user=self.getCurrentUser())
-        offset = 0
-        lastLine = ''
-        while True:
-            endByte = None if self.bufferSize is None else offset + self.bufferSize
-            chunk = functools.partial(self.model('file').download,
-                                      fileObj,
-                                      headers=False,
-                                      offset=offset,
-                                      endByte=endByte)()
-            offset = endByte
-
-            chunk = str(chunk().next())
-            chunk = lineterminator.split(chunk)
-            if len(chunk) == 0:
-                break
-            elif len(chunk) == 1:
-                # we happened to split on the last line
-                lastLine = lastLine + chunk[0]
-                break
-
-            # The last and first lines are probably
-            # only partial chunks of lines (if we happen
-            # to break on a newline, then lastLine or firstLine
-            # will just be an empty string)
-            temp = lastLine + chunk.pop(0)
-            # print 'stitched:', temp
-            yield temp
-            lastLine = chunk.pop()
-
-            # yield all the full lines in between
-            for line in chunk:
-                # print 'regular:', line
-                yield line
-
-        # The very last line still needs to be yielded
-        if len(lastLine) > 0:
-            # print 'last:', lastLine
-            yield lastLine
+        # TODO: only download chunks at a time instead of dumping the whole file at once
+        chunk = functools.partial(self.model('file').download,
+                                  fileObj,
+                                  headers=False,
+                                  endByte=None)()
+        chunk = str(chunk().next())
+        chunk = lineterminator.split(chunk)
+        for line in chunk:
+            yield line
 
     def getStringifiedDialect(self, item):
         dialect = item['meta']['rlab']['dialect']
