@@ -42,7 +42,7 @@ class DatasetItem(Resource):
         # one for the file's raw data, one for the list of parsed objects,
         # and one to hold the reduced results. For now, this is small for
         # testing purposes
-        self.bufferSize = 128   # 131072    128K
+        self.bufferSize = 131072   # 128K
 
         self.sniffSampleSize = 131072    # 128K
 
@@ -52,15 +52,39 @@ class DatasetItem(Resource):
         return conn[dbMetadata['database']][dbMetadata['collection']]
 
     def bufferedDownloadLineReader(self, fileId, lineterminator="\r\n"):
+        # TODO: @ronichoudhury is implementing something cool
+        # that will make this function obsolete
         lineterminator = re.compile('[' + lineterminator + ']')
         fileObj = self.model('file').load(fileId, user=self.getCurrentUser())
-        # TODO: only download chunks at a time instead of dumping the whole file at once
+        # TODO: This is my ignorance of Girder... how exactly do we
+        # call download directly?
+        # TODO: only grab a few lines at a time instead of
+        # dumping the whole thing at once
         chunk = functools.partial(self.model('file').download,
                                   fileObj,
                                   headers=False,
                                   endByte=None)()
         chunk = str(chunk().next())
         chunk = lineterminator.split(chunk)
+        for line in chunk:
+            yield line
+
+    def bufferedDownloadItemReader(self, fileId, jsonPath='$'):
+        # TODO: @ronichoudhury is implementing something cool
+        # that will make this function obsolete
+        fileObj = self.model('file').load(fileId, user=self.getCurrentUser())
+        # TODO: This is my ignorance of Girder... how exactly do we
+        # call download directly?
+        # TODO: only grab a few lines at a time instead of
+        # dumping the whole thing at once
+        chunk = functools.partial(self.model('file').download,
+                                  fileObj,
+                                  headers=False,
+                                  endByte=None)()
+        chunk = str(chunk().next())
+        # TODO: Use the jsonPath argument to
+        # point to the appropriate part of the file
+        chunk = bson.json_util.loads(chunk)
         for line in chunk:
             yield line
 
@@ -201,13 +225,7 @@ class DatasetItem(Resource):
                                     item['databaseMetadata']['type'] +
                                     ' databases is not yet supported')
         else:
-            f = item['meta']['rlab']['format']
-            if f == 'csv':
-                return self.inferCsvFileSchema(item, params)
-            elif f == 'json':
-                return self.inferJsonFileSchema(item, params)
-            else:
-                raise RestException('Unrecognized file type: ' + f)
+            return self.inferFlatFileSchema(item, params)
 
     def inferMongoSchema(self, item, params):
         collection = self.getMongoCollection(item)
@@ -219,15 +237,22 @@ class DatasetItem(Resource):
             result[r['_id']] = r['value']
         return result
 
-    def inferCsvFileSchema(self, item, params):
+    def inferFlatFileSchema(self, item, params):
         mapReduceCode = execjs.compile(self.foreignCode['schema_map.js'] +
                                        self.foreignCode['schema_reduce.js'] +
                                        self.foreignCode['mapReduceChunk.js'])
-        dialect = self.getStringifiedDialect(item)
-        csv.register_dialect(item['name'], **dialect)
-        reader = csv.DictReader(self.bufferedDownloadLineReader(item['meta']['rlab']['fileId'],
-                                                                dialect['lineterminator']),
-                                dialect=item['name'])
+        fileFormat = item['meta']['rlab']['format']
+        reader = None
+        if fileFormat == 'csv':
+            dialect = self.getStringifiedDialect(item)
+            csv.register_dialect(item['name'], **dialect)
+            lineReader = self.bufferedDownloadLineReader(item['meta']['rlab']['fileId'],
+                                                         dialect['lineterminator'])
+            reader = csv.DictReader(lineReader, dialect=item['name'])
+        elif fileFormat == 'json':
+            reader = self.bufferedDownloadItemReader(item['meta']['rlab']['fileId'], '$')
+        else:
+            raise RestException('Unrecognized file type: ' + fileFormat)
 
         rawData = []
         reducedResult = {}
