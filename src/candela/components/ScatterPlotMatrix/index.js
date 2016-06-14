@@ -25,6 +25,7 @@ export default class ScatterPlotMatrix extends VisComponent {
           name: 'color',
           type: 'string',
           format: 'text',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',

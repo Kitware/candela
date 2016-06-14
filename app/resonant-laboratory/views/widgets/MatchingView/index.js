@@ -22,17 +22,17 @@ let ICONS = {
 };
 
 let NODE_MODES = {
-  INELIGIBLE: 0,
-  WILL_SELECT: 1,
-  WILL_CONNECT: 2,
-  WILL_DISCONNECT: 3,
-  SELECTED: 4
+  INELIGIBLE: 'ineligible',
+  WILL_SELECT: 'selectable',
+  WILL_CONNECT: 'connectable',
+  WILL_DISCONNECT: 'linked',
+  SELECTED: 'selected'
 };
 let EDGE_MODES = {
-  ESTABLISHED: 0,
-  ESTABLISHED_SELECTED: 1,
-  POTENTIAL: 2,
-  PROBABLE: 3
+  ESTABLISHED: 'established',
+  ESTABLISHED_SELECTED: 'established selected',
+  POTENTIAL: 'potential',
+  PROBABLE: 'probable'
 };
 let STATUS = {
   OK: 0,
@@ -50,19 +50,6 @@ let MatchingView = Widget.extend({
     Widget.prototype.initialize.apply(this, arguments);
 
     this.friendlyName = 'Matching';
-
-    this.icons.splice(0, 0, {
-      src: () => {
-        return window.mainPage.currentUser.preferences
-          .hasSeenAllTips(this.getTips()) ? Widget.infoIcon : Widget.newInfoIcon;
-      },
-      title: () => {
-        return 'About this panel';
-      },
-      onclick: () => {
-        this.renderInfoScreen();
-      }
-    });
 
     this.status = STATUS.NOTHING_TO_MAP;
     this.icons.splice(0, 0, {
@@ -92,6 +79,8 @@ let MatchingView = Widget.extend({
     });
 
     this.selection = null;
+    this.graph = null;
+    this.layout = null;
 
     this.listenTo(window.mainPage, 'rl:changeProject',
       this.handleNewProject);
@@ -145,15 +134,27 @@ in order to connect them together.`);
   },
   createNodeId: function (d) {
     // Generate a valid ID for the node
-    return ('node_' + d.side + d.index + d.attrName)
+    return ('node_' + d.side + d.groupIndex + d.attrName)
       .replace(/([^A-Za-z0-9[\]{}_.:-])\s?/g, '');
   },
   createEdgeId: function (d) {
     // Generate a valid ID for the edges
-    return ('edge_' + d.source + '_' + d.target)
+    return ('edge_' + d.dataIndex + '_' + d.visIndex)
       .replace(/([^A-Za-z0-9[\]{}_.:-])\s?/g, '');
   },
-  constructLookups: function () {
+  isSatisfied: function () {
+    if (!this.graph) {
+      return false;
+    } else {
+      return this.graph.satisfiedConnections === this.graph.requiredConnections;
+    }
+  },
+  updateGraph: function () {
+    if (!window.mainPage.project) {
+      this.graph = null;
+      return;
+    }
+
     let meta = window.mainPage.project.getMeta();
 
     let specs = {
@@ -164,42 +165,40 @@ in order to connect them together.`);
     for (let d of meta.datasets) {
       if (window.mainPage.loadedDatasets[d]) {
         specs.data.push(window.mainPage.loadedDatasets[d].getSpec());
-      } else {
-        // A dataset hasn't been added yet...
-        // so don't bother finishing the render
-        this.status = STATUS.DATASETS_NOT_LOADED;
-        return {
-          nodes: [],
-          edges: [],
-          nodeEdgeLookup: {},
-          realEdgeCount: 0
-        };
       }
     }
     meta.visualizations.forEach(d => {
       specs.vis.push(d);
     });
 
-    // Reshape the tree into a node/edge tables
+    // Reshape the specs into node/edge tables
     // for easy drawing and interaction
     let nodeLookup = {};
-    let nodes = [];
+    let dataNodes = [];
+    let visNodes = [];
     let edges = [];
     let nodeEdgeLookup = {};
+    let requiredConnections = 0;
+    let satisfiedConnections = 0;
 
     // Helper functions
-    let _createNode = (side, groupIndex, attrName, attrType, acceptsMultiple) => {
+    let _createNode = (side, groupIndex, attrName, attrType, optional, possibleConnections) => {
       let newNode = {
         side: side,
-        index: groupIndex,
+        groupIndex: groupIndex,
         attrName: attrName,
-        type: attrType
+        type: attrType,
+        optional: optional,
+        establishedConnections: 0,
+        possibleConnections: possibleConnections || 1
       };
-      if (acceptsMultiple) {
-        newNode.acceptsMultiple = true;
+
+      if (!newNode.optional) {
+        requiredConnections += 1;
       }
+
       newNode.id = this.createNodeId(newNode);
-      nodeLookup[newNode.id] = nodes.length;
+      nodeLookup[newNode.id] = side === 'vis' ? visNodes.length : dataNodes.length;
 
       if (this.selection === null) {
         newNode.mode = NODE_MODES.WILL_SELECT;
@@ -226,30 +225,36 @@ in order to connect them together.`);
           newNode.mode = NODE_MODES.WILL_CONNECT;
         }
       }
-      nodes.push(newNode);
+      if (side === 'vis') {
+        visNodes.push(newNode);
+      } else {
+        dataNodes.push(newNode);
+      }
       nodeEdgeLookup[newNode.id] = [];
+      return newNode;
     };
 
-    let _createEdge = (established, visIndex,
-      visAttrName, dataIndex,
-      dataAttrName) => {
-      // Edges always go from data to vis
-      let sourceId = this.createNodeId({
-        side: 'data',
-        index: dataIndex,
-        attrName: dataAttrName
-      });
-      let targetId = this.createNodeId({
+    let _createEdge = (established, visGroupIndex, visAttrName,
+                                    dataGroupIndex, dataAttrName) => {
+      // We need to convert visIndex + visAttrName
+      // into an index into the visNodes array
+      // (and likewise for dataIndex + dataAttrName)
+      let visNodeId = this.createNodeId({
         side: 'vis',
-        index: visIndex,
+        groupIndex: visGroupIndex,
         attrName: visAttrName
       });
+      let dataNodeId = this.createNodeId({
+        side: 'data',
+        groupIndex: dataGroupIndex,
+        attrName: dataAttrName
+      });
       let newEdge = {
-        source: nodeLookup[sourceId],
-        target: nodeLookup[targetId]
+        visIndex: nodeLookup[visNodeId],
+        dataIndex: nodeLookup[dataNodeId]
       };
-      if (newEdge.source === undefined ||
-        newEdge.target === undefined) {
+      if (newEdge.dataIndex === undefined ||
+        newEdge.visIndex === undefined) {
         // We're constructing a matching that's out of date!
         // Render nothing...
         throw new OutOfDateMatchingError();
@@ -263,11 +268,11 @@ in order to connect them together.`);
           // Special settings for edges attached
           // to the selected node, as well as
           // the nodes on the other end
-          if (sourceId === this.selection.id) {
-            nodes[nodeLookup[targetId]].mode = NODE_MODES.WILL_DISCONNECT;
+          if (this.selection.id === dataNodeId) {
+            visNodes[newEdge.visIndex].mode = NODE_MODES.WILL_DISCONNECT;
             newEdge.mode = EDGE_MODES.ESTABLISHED_SELECTED;
-          } else if (targetId === this.selection.id) {
-            nodes[nodeLookup[sourceId]].mode = NODE_MODES.WILL_DISCONNECT;
+          } else if (this.selection.id === visNodeId) {
+            dataNodes[newEdge.dataIndex].mode = NODE_MODES.WILL_DISCONNECT;
             newEdge.mode = EDGE_MODES.ESTABLISHED_SELECTED;
           }
         }
@@ -284,11 +289,11 @@ in order to connect them together.`);
         // it's easier to filter based on the node modes
         // that we already set up)
         if (this.selection.side === 'vis') {
-          if (nodes[newEdge.source].mode !== NODE_MODES.WILL_CONNECT) {
+          if (dataNodes[newEdge.dataIndex].mode !== NODE_MODES.WILL_CONNECT) {
             return;
           }
         } else if (this.selection.side === 'data') {
-          if (nodes[newEdge.target].mode !== NODE_MODES.WILL_CONNECT) {
+          if (visNodes[newEdge.visIndex].mode !== NODE_MODES.WILL_CONNECT) {
             return;
           }
         }
@@ -300,71 +305,80 @@ in order to connect them together.`);
       // in the same group as the
       // selected node...
       }
-      nodeEdgeLookup[sourceId].push(edges.length);
-      nodeEdgeLookup[targetId].push(edges.length);
+      nodeEdgeLookup[dataNodeId].push(edges.length);
+      nodeEdgeLookup[visNodeId].push(edges.length);
       edges.push(newEdge);
+      return newEdge;
     };
 
     try {
       // Extract all the nodes (from both sides)
       specs.data.forEach((dataSpec, dataIndex) => {
         for (let attrName of Object.keys(dataSpec.attributes)) {
-          _createNode('data', dataIndex, attrName, dataSpec.attributes[attrName]);
+          _createNode('data', dataIndex, attrName, dataSpec.attributes[attrName], true, 1);
         }
       });
       specs.vis.forEach((visSpec, visIndex) => {
         visSpec.options.forEach((option, attrIndex) => {
-          _createNode('vis', visIndex, option.name, option.domain.fieldTypes,
-          option.type === 'string_list');
+          _createNode('vis', visIndex, option.name, option.domain.fieldTypes, option.optional,
+            option.type === 'string_list' ? Infinity : 1);
         });
       });
 
       // Get the established edges
       for (let matching of meta.matchings) {
-        _createEdge(true, matching.visIndex, matching.visAttribute,
+        let newEdge = _createEdge(true, matching.visIndex, matching.visAttribute,
           matching.dataIndex, matching.dataAttribute);
+        // Count this connection in each node
+        visNodes[newEdge.visIndex].establishedConnections += 1;
+        dataNodes[newEdge.dataIndex].establishedConnections += 1;
+        if (!visNodes[newEdge.visIndex].optional &&
+             visNodes[newEdge.visIndex].establishedConnections === 1) {
+          // this edge just satisfied a requirement (for now, we're
+          // assuming that a non-optional vis encoding only requires
+          // one connection to satisfy the requirement)
+          satisfiedConnections += 1;
+        }
       }
 
       // Add the potential and probable edges
       if (this.selection !== null) {
         if (this.selection.side === 'data') {
-          specs.vis.forEach((visSpec, visIndex) => {
+          specs.vis.forEach((visSpec, visGroupIndex) => {
             visSpec.options.forEach(option => {
-              _createEdge(false, visIndex, option.name,
-                this.selection.index, this.selection.attrName);
+              _createEdge(false, visGroupIndex, option.name,
+                this.selection.groupIndex, this.selection.attrName);
             });
           });
         } else {
-          specs.data.forEach((dataSpec, dataIndex) => {
+          specs.data.forEach((dataSpec, dataGroupIndex) => {
             for (let attrName of Object.keys(dataSpec.attributes)) {
-              _createEdge(false, this.selection.index, this.selection.attrName,
-                dataIndex, attrName);
+              _createEdge(false, this.selection.groupIndex, this.selection.attrName,
+                dataGroupIndex, attrName);
             }
           });
         }
       }
 
-      return {
-        nodes: nodes,
+      this.graph = {
+        nodeLookup: nodeLookup,
+        dataNodes: dataNodes,
+        visNodes: visNodes,
         edges: edges,
         nodeEdgeLookup: nodeEdgeLookup,
-        realEdgeCount: meta.matchings.length
+        requiredConnections: requiredConnections,
+        satisfiedConnections: satisfiedConnections
       };
     } catch (err) {
       if (err instanceof OutOfDateMatchingError) {
         this.status = STATUS.STALE_MAPPINGS;
-        return {
-          nodes: [],
-          edges: [],
-          nodeEdgeLookup: {},
-          realEdgeCount: 0
-        };
+        this.graph = null;
       } else {
         throw err;
       }
     }
   },
-  handleClick: function (d) {
+  clickNode: function (d) {
     d3.event.stopPropagation();
     let visNode;
     let dataNode;
@@ -374,7 +388,7 @@ in order to connect them together.`);
       // Change the selection
       this.selection = {
         side: d.side,
-        index: d.index,
+        groupIndex: d.groupIndex,
         attrName: d.attrName,
         baseType: d.type
       };
@@ -391,11 +405,12 @@ in order to connect them together.`);
         dataNode = d;
       }
       window.mainPage.project.addMatching({
-        visIndex: visNode.index,
+        visIndex: visNode.groupIndex,
         visAttribute: visNode.attrName,
-        dataIndex: dataNode.index,
+        dataIndex: dataNode.groupIndex,
         dataAttribute: dataNode.attrName
       });
+      // (will trigger a render call on its own)
     } else if (d.mode === NODE_MODES.WILL_DISCONNECT) {
       // Remove the connection between the
       // selected node and the clicked node
@@ -407,252 +422,353 @@ in order to connect them together.`);
         dataNode = d;
       }
       window.mainPage.project.removeMatching({
-        visIndex: visNode.index,
+        visIndex: visNode.groupIndex,
         visAttribute: visNode.attrName,
-        dataIndex: dataNode.index,
+        dataIndex: dataNode.groupIndex,
         dataAttribute: dataNode.attrName
       });
+      // (will trigger a render call on its own)
     } else if (d.mode === NODE_MODES.SELECTED) {
       this.selection = null;
       this.render();
     }
   },
-  render: Underscore.debounce(function () {
-    let widgetIsShowing = Widget.prototype.render.apply(this, arguments);
-    let self = this;
-
-    // Construct a graph from each of the specs
-    // (and the currently selected node)
-    let graph = this.constructLookups();
-
-    // The vis and data nodes will be in contiguous
-    // blocks in graph.nodes... rather than split them
-    // into their own lists and render them seperately,
-    // we can just do a little index trickery:
-    let firstData, lastData, firstVis, lastVis;
-    graph.nodes.forEach((d, i) => {
-      if (d.side === 'vis') {
-        if (firstVis === undefined) {
-          firstVis = i;
-        }
-        lastVis = i;
-      } else {
-        if (firstData === undefined) {
-          firstData = i;
-        }
-        lastData = i;
-      }
-    });
-
-    let numData = lastData ? 1 + lastData - firstData : 0;
-    let numVis = lastVis ? 1 + lastVis - firstVis : 0;
-
-    // Update our little indicator
-    // to describe the matching
-    this.statusText.text = graph.realEdgeCount + ' | ' + numVis;
-    this.statusText.title = graph.realEdgeCount + ' data attributes' +
-      ' have been mapped to ' + numVis + ' visual encodings';
-    if (graph.realEdgeCount > 0) {
-      this.status = STATUS.OK;
-    } else if (this.status !== STATUS.STALE_MAPPINGS &&
-      this.status !== STATUS.DATASETS_NOT_LOADED) {
-      if (numData === 0 || numVis === 0) {
-        this.status = STATUS.NOTHING_TO_MAP;
-      } else {
-        this.status = STATUS.NOT_ENOUGH_MAPPINGS;
-      }
-    }
-    this.renderIndicators();
-
-    if (!widgetIsShowing) {
-      // Don't need to actually draw the interface;
-      // only the indicators are important
-      return;
-    }
-
-    // Add our template if it's not already there
-    if (this.$el.find('svg').length === 0) {
-      this.$el.html(myTemplate);
-      // Add the function to deselect everything when
-      // the canvas is clicked
-      d3.select(this.el).select('svg')
-        .on('click', () => {
-          this.selection = null;
-          this.render();
-        });
-    }
-
-    let emSize = parseFloat(this.$el.css('font-size'));
-
-    // Figure out how we're going to lay things
-    // out based on how much space we have
-    let nodeHeight = 1.5 * emSize;
-
-    // Temporarily force the scroll bars so we
-    // account for their size
-    this.$el.css('overflow', 'scroll');
-    let bounds = {
-      width: this.el.clientWidth,
-      height: this.el.clientHeight
-    };
-    this.$el.css('overflow', '');
-
-    // If there isn't enough room for all
-    // the nodes, extend the height
-    bounds.height = Math.max(bounds.height,
-      1.5 * nodeHeight * (numData + 2),
-      1.5 * nodeHeight * (numVis + 2));
-
-    this.$el.find('svg')
-      .attr({
-        width: bounds.width,
-        height: bounds.height
+  clickEdge: function (d) {
+    if (this.selection === null) {
+      // Neither side is selected; snip this edge
+      let visNode = this.graph.visNodes[d.visIndex];
+      let dataNode = this.graph.dataNodes[d.dataIndex];
+      window.mainPage.project.removeMatching({
+        visIndex: visNode.groupIndex,
+        visAttribute: visNode.attrName,
+        dataIndex: dataNode.groupIndex,
+        dataAttribute: dataNode.attrName
       });
+    } else if (this.selection.side === 'vis') {
+      this.clickNode(this.graph.dataNodes[d.dataIndex]);
+    } else {
+      this.clickNode(this.graph.visNodes[d.visIndex]);
+    }
+  },
+  hoverNode: function (node, domElement) {
+    // Highlight the node
+    jQuery(domElement).addClass('hovered');
 
-    let dataX = emSize;
-    let nodeWidth = bounds.width / 3;
-    let visX = bounds.width - emSize - nodeWidth;
-    let dataY = d3.scale.linear()
-      .domain([firstData - 1, lastData + 1])
-      .range([0, bounds.height]);
-    let scrollTop = this.$el.scrollTop();
-    let visY = d3.scale.linear()
-      .domain([firstVis - 1, lastVis + 1])
-      .range([scrollTop, scrollTop + this.el.clientHeight]);
+    // Highlight the edge between this node and the selection
+    if (this.selection !== null && this.selection.id !== node.id) {
+      this.graph.nodeEdgeLookup[node.id].forEach(edgeIndex => {
+        let edge = this.graph.edges[edgeIndex];
+        if (this.graph.dataNodes[edge.dataIndex].id === this.selection.id ||
+            this.graph.visNodes[edge.visIndex].id === this.selection.id) {
+          jQuery('#' + this.graph.edges[edgeIndex].id).addClass('hovered');
+        }
+      });
+    }
+  },
+  hoverEdge: function (edge, domElement) {
+    // Highlight the edge
+    jQuery(domElement).addClass('hovered');
+
+    // Highlight connected nodes appropriately
+    let selector;
+    if (this.selection === null) {
+      selector = '#' + this.graph.dataNodes[edge.dataIndex].id + ', ' +
+                 '#' + this.graph.visNodes[edge.visIndex].id;
+    } else if (this.selection.id === this.graph.visNodes[edge.visIndex].id) {
+      selector = '#' + this.graph.dataNodes[edge.dataIndex].id;
+    } else if (this.selection.id === this.graph.dataNodes[edge.dataIndex].id) {
+      selector = '#' + this.graph.visNodes[edge.visIndex].id;
+    } else {
+      // Something is selected, but the user is mousing an irrelevant
+      // edge; instead of highlighting connected nodes, we want to
+      // remove the hover effect on the edge
+      jQuery(domElement).removeClass('hovered');
+    }
+    if (selector) {
+      if (edge.mode === EDGE_MODES.POTENTIAL || edge.mode === EDGE_MODES.PROBABLE) {
+        this.$el.find(selector).addClass('hovered');
+      } else {
+        this.$el.find(selector).addClass('disconnectable');
+      }
+    }
+  },
+  renderDataNodes: function () {
+    let self = this;
+    let widthSuggestions = {
+      xPosition: this.layout.emSize,
+      minWidth: this.layout.emSize,
+      maxWidth: this.layout.width / 3,
+      idealWidth: 0
+    };
 
     let nodes = d3.select(this.el).select('svg')
       .select('.nodeLayer')
-      .selectAll('.node').data(graph.nodes, d => {
-        return d.id + d.type;
-      });
-    // Animate any existing nodes before we add new ones
-    nodes.transition().duration(300)
-      .attr('transform', (d, i) => {
-        if (d.side === 'vis') {
-          return 'translate(' + visX + ',' + visY(i) + ')';
-        } else {
-          return 'translate(' + dataX + ',' + dataY(i) + ')';
-        }
-      });
+      .selectAll('.data').data(this.graph.dataNodes, d => d.id + d.type);
+
+    // add class labels to distinguish the new nodes from the old ones
+    nodes.attr('class', d => 'update data node ' + d.mode);
     let enteringNodes = nodes.enter().append('g')
-      .attr('transform', (d, i) => {
-        if (d.side === 'vis') {
-          return 'translate(' + visX + ',' + visY(i) + ')';
-        } else {
-          return 'translate(' + dataX + ',' + dataY(i) + ')';
-        }
-      });
+      .attr('class', d => 'enter data node ' + d.mode);
     nodes.attr('id', d => d.id)
-      .attr('class', d => {
-        let classString = '';
-        // Node mode
-        if (d.mode === NODE_MODES.WILL_SELECT) {
-          classString = 'selectable';
-        } else if (d.mode === NODE_MODES.INELIGIBLE) {
-          classString = 'ineligible';
-        } else if (d.mode === NODE_MODES.WILL_DISCONNECT) {
-          classString = 'linked';
-        } else if (d.mode === NODE_MODES.SELECTED) {
-          classString = 'selected';
-        } else if (d.mode === NODE_MODES.WILL_CONNECT) {
-          classString = 'connectable';
-        }
-        // Node side
-        if (d.side === 'vis') {
-          classString += ' encoding';
-        } else {
-          classString += ' attribute';
-        }
-        return classString + ' node';
-      }).on('mouseover', function (d) {
-        // Highlight this node (this refers to the DOM element)
-        jQuery(this).addClass('hovered');
-        // Highlight the edge between this node and the selection
-        if (self.selection !== null && self.selection.id !== d.id) {
-          graph.nodeEdgeLookup[d.id].forEach(edgeIndex => {
-            let edge = graph.edges[edgeIndex];
-            if (graph.nodes[edge.source].id === self.selection.id ||
-              graph.nodes[edge.target].id === self.selection.id) {
-              jQuery('#' + graph.edges[edgeIndex].id).addClass('hovered');
-            }
-          });
-        }
+      .on('mouseover', function (d) {
+        // this refers to the DOM element
+        self.hoverNode(d, this);
       }).on('mouseout', d => {
         // Clear any highlights
         this.$el.find('.hovered').removeClass('hovered');
       }).on('click', d => {
-        this.handleClick(d);
+        this.clickNode(d);
       });
     nodes.exit().remove();
 
+    // main tooltip (for the whole node)
     enteringNodes.append('title').attr('class', 'nodeTitle');
     nodes.selectAll('title.nodeTitle')
-      .text(d => {
-        let tooltip = d.attrName;
-        if (d.side === 'data') {
-          tooltip += ' (' + d.type + ')';
-        } else {
-          if (d.acceptsMultiple) {
-            tooltip += '\nThis option accepts any number of connections';
-          } else {
-            tooltip += '\nThis option accepts exactly one connection';
-          }
-          tooltip += '\nCompatible with ' + d.type.join(', ');
-        }
-        return tooltip;
-      });
+      .text(d => d.attrName + ' (' + d.type + ')');
 
-    enteringNodes.append('rect');
-    nodes.selectAll('rect').attr({
-      width: nodeWidth + emSize * 0.5,
-      height: nodeHeight,
-      x: '-0.25em',
-      y: -nodeHeight / 2
-    });
+    // background rect
+    enteringNodes.append('rect')
+      .attr('class', 'nodeBackground');
+    nodes.selectAll('rect.nodeBackground')
+      .attr('height', this.layout.dataNodeHeight)
+      .attr('y', -this.layout.dataNodeHeight / 2);
 
-    enteringNodes.append('g')
-      .attr('class', 'types');
-    let types = nodes.selectAll('g.types').selectAll('image')
-      .data(d => {
-        return d.side === 'data' ? [d.type] : d.type;
-      });
-    types.enter().append('image').append('title');
-    types.attr('xlink:href', d => ICONS[d])
-      .attr('x', (d, i) => (1.25 * i) + 'em');
-    types.selectAll('title')
-      .text(function (d) {
-        // this refers to the DOM element
-        let side = d3.select(this.parentNode.parentNode).datum().side;
-        if (side === 'data') {
-          return d + ' field; you can change this in the Dataset widget';
-        } else {
-          return 'Compatible with ' + d + ' fields';
-        }
-      });
+    // icon representing the data type (and its tooltip)
+    enteringNodes.append('image').append('title');
+    nodes.selectAll('image')
+      .attr('xlink:href', d => ICONS[d.type]);
+    nodes.selectAll('image').selectAll('title')
+      .text(d => d.attrName + ' is being interpreted as a ' + d.type + '.' +
+        '\nYou can change this in the Dataset widget');
 
+    // data attribute name
     enteringNodes.append('text')
       .attr('class', 'label')
-      .attr('y', '0.35em')
-      .attr('x', d => {
-        return d.side === 'data' ? '1.5em'
-          : (1.25 * d.type.length + 0.25) + 'em';
+      .attr({
+        y: '0.35em',
+        x: '1.25em'
       });
     nodes.selectAll('text.label').each(function (d) {
       // this refers to the DOM element
       let label = d.attrName;
-      if (d.side === 'vis') {
-        if (d.acceptsMultiple === true) {
-          label += ': \u221E';
+      this.textContent = label;
+
+      // Figure out how much space this label would take,
+      // plus the space taken up by the type icon
+      widthSuggestions.idealWidth = Math.max(widthSuggestions.idealWidth,
+        this.getComputedTextLength() + 1.25 * self.layout.emSize);
+    });
+    return widthSuggestions;
+  },
+  renderVisNodes: function () {
+    let self = this;
+    let widthSuggestions = {
+      xPosition: this.layout.width,
+      minWidth: this.layout.emSize,
+      maxWidth: this.layout.width / 2,
+      idealWidth: 0
+    };
+
+    let nodes = d3.select(this.el).select('svg')
+      .select('.nodeLayer')
+      .selectAll('.vis').data(this.graph.visNodes, d => {
+        return d.id + d.type + d.establishedConnections;
+      });
+    // add class labels to distinguish the new nodes from the old ones
+    nodes.attr('class', d => 'update vis node ' + d.mode);
+    let enteringNodes = nodes.enter().append('g')
+      .attr('class', d => 'enter vis node ' + d.mode);
+    nodes.attr('id', d => d.id)
+      .on('mouseover', function (d) {
+        // this refers to the DOM element
+        self.hoverNode(d, this);
+      }).on('mouseout', d => {
+        // Clear any highlights
+        this.$el.find('.hovered').removeClass('hovered');
+      }).on('click', d => {
+        this.clickNode(d);
+      });
+    nodes.exit().remove();
+
+    // main tooltip (for the whole node)
+    enteringNodes.append('title').attr('class', 'nodeTitle');
+    nodes.selectAll('title.nodeTitle')
+      .text(d => {
+        let tooltip = d.attrName + ': ' +
+          d.establishedConnections + ' / ';
+        if (isFinite(d.possibleConnections)) {
+          tooltip += d.possibleConnections;
+        } else {
+          tooltip += '\u221E';
         }
+        if (!d.optional) {
+          tooltip += ' (required)';
+        }
+        return tooltip;
+      });
+
+    // background rect
+    enteringNodes.append('rect')
+      .attr('class', 'nodeBackground');
+    nodes.selectAll('rect.nodeBackground')
+      .attr('height', d => this.layout.visNodeHeight)
+      .attr('y', d => -this.layout.visNodeHeight / 2);
+
+    // fraction indicating how many connections exist:
+    let enteringStats = enteringNodes.append('g')
+      .attr('class', 'connectionStats');
+    // its background
+    enteringStats.append('path')
+      .attr('class', 'statsBackground');
+    // its tooltip
+    enteringStats.append('title');
+    // its text
+    enteringStats.append('text');
+    let stats = nodes.selectAll('g.connectionStats')
+      .attr('text-anchor', 'middle')
+      .attr('class', d => {
+        let classString = 'connectionStats ';
+        if (d.optional) {
+          classString += 'optional';
+        } else if (d.establishedConnections >= 1) {
+          classString += 'satisfied';
+        } else {
+          classString += 'notSatisfied';
+        }
+        return classString;
+      });
+    stats.selectAll('text')
+      .each(function (d) {
+        // this refers to the DOM element
+        let stats = d.establishedConnections + '/';
+        if (isFinite(d.possibleConnections)) {
+          stats += d.possibleConnections;
+        } else {
+          stats += '\u221E';
+        }
+        this.textContent = stats;
+        // now that we know the size of the fraction text,
+        // we can draw its background appropriately, as well
+        // as calculate how wide and where the whole node should be
+        let bounds = this.getBoundingClientRect();
+        let radius = Math.sqrt(Math.pow(bounds.width, 2), Math.pow(bounds.height, 2)) / 2;
+        radius = Math.max(radius, 0.8 * self.layout.emSize);
+        let cy = bounds.height / 2 - 0.65 * self.layout.emSize;
+        let r = radius + 0.5 * self.layout.emSize;
+        let backgroundPath = 'M0,' + (cy - r);
+        if (!d.optional && d.establishedConnections === 0) {
+          // Draw an equilateral triangle if the requirements are not satisfied
+          backgroundPath += 'L' + 0.866 * r + ',' + (cy + r / 2); // 0.866 = sqrt(3)/2 = cos 30
+          backgroundPath += 'L' + (-0.866 * r) + ',' + (cy + r / 2);
+          backgroundPath += 'Z';
+        } else {
+          // Otherwise draw a circle
+          backgroundPath += 'A' + r + ',' + r + ',0,0,0,0,' + (cy + r);
+          backgroundPath += 'A' + r + ',' + r + ',0,0,0,0,' + (cy - r);
+        }
+        jQuery(this.parentNode).find('path.statsBackground')
+          .attr('d', backgroundPath);
+
+        widthSuggestions.minWidth = Math.max(widthSuggestions.minWidth,
+          bounds.width / 2 + 0.5 * self.layout.emSize +
+          (1.25 * d.type.length * self.layout.emSize));
+        widthSuggestions.xPosition = Math.min(widthSuggestions.xPosition,
+          self.layout.width - self.layout.emSize - radius -
+          widthSuggestions.minWidth);
+      });
+    stats.selectAll('title')
+      .text(d => {
+        let tooltip = d.establishedConnections + ' out of ';
+        if (isFinite(d.possibleConnections)) {
+          tooltip += d.possibleConnections;
+        } else {
+          tooltip += '\u221E';
+        }
+        tooltip += ' possible connections have been established.';
+        if (!d.optional) {
+          tooltip += '\nAt least one connection is required';
+        }
+        return tooltip;
+      });
+
+    // group containing icons representing compatible data types
+    // (also create their tooltips)
+    enteringNodes.append('g')
+      .attr('class', 'typeIcons');
+    let typeIcons = nodes.selectAll('g.typeIcons').selectAll('image')
+      .data(d => d.type); // For vis nodes, d.type is an array, not a string
+    typeIcons.enter().append('image').append('title');
+    typeIcons.attr('xlink:href', d => ICONS[d])
+      .attr('x', (d, i) => (1.25 * i) + 'em');
+    typeIcons.selectAll('title')
+      .text(d => 'Compatible with ' + d + ' data attributes');
+
+    // vis encoding name
+    enteringNodes.append('text')
+      .attr('class', 'label')
+      .attr('y', '-0.25em');
+    nodes.selectAll('text.label').each(function (d) {
+      // this refers to the DOM element
+      let label = d.attrName;
+      this.textContent = label;
+
+      widthSuggestions.idealWidth = Math.max(widthSuggestions.idealWidth,
+        this.getComputedTextLength());
+    });
+    return widthSuggestions;
+  },
+  positionNodes: function () {
+    let self = this;
+    let nodes = d3.select(this.el).select('svg')
+      .select('.nodeLayer')
+      .selectAll('.node');
+
+    // Move nodes to their new positions
+    nodes.transition().duration(function (d) {
+      // Animate any already-existing nodes
+      // (this refers to the DOM element)
+      if (jQuery(this).hasClass('update')) {
+        return 300;
+      } else {
+        return 0;
       }
+    }).attr('transform', d => {
+      if (d.side === 'vis') {
+        return 'translate(' + this.layout.visX + ',' +
+          this.layout.yVisScale(this.graph.nodeLookup[d.id]) + ')';
+      } else {
+        return 'translate(' + this.layout.dataX + ',' +
+          this.layout.yDataScale(this.graph.nodeLookup[d.id]) + ')';
+      }
+    });
+
+    // Set the size of each rectangle appropriately
+    nodes.selectAll('rect.nodeBackground')
+      .attr('width', d => {
+        if (d.side === 'vis') {
+          return this.layout.visWidth + 0.5 * this.layout.emSize;
+        } else {
+          return this.layout.dataWidth + 0.5 * this.layout.emSize;
+        }
+      }).attr('x', '-0.25em');
+
+    // Anchor the stats bubble to the right
+    nodes.selectAll('g.connectionStats')
+      .attr('transform', 'translate(' + (this.layout.visWidth + 0.25 * this.layout.emSize) +
+                         ',' + 1.125 * this.layout.emSize + ')');
+
+    // Shrink the text labels so that they fit
+    nodes.selectAll('text.label').each(function (d) {
+      // this refers to the DOM element
+      let label = d.attrName;
       this.textContent = label;
 
       // Shrink the label so that it fits. Calculate available space:
-      let maxTextLength = nodeWidth;
-      if (d.side === 'data') {
-        maxTextLength -= emSize;
+      let maxTextLength;
+      if (d.side === 'vis') {
+        maxTextLength = self.layout.visWidth;
       } else {
-        maxTextLength -= d.type.length * emSize;
+        maxTextLength = self.layout.dataWidth - 1.25 * self.layout.emSize;
       }
 
       while (this.getComputedTextLength() >= maxTextLength) {
@@ -668,70 +784,200 @@ in order to connect them together.`);
         this.textContent = label;
       }
     });
-
+  },
+  renderEdges: function () {
+    let self = this;
     // Draw the connections
     let edges = d3.select(this.el).select('svg')
       .select('.linkLayer')
-      .selectAll('.edge').data(graph.edges, d => d.id);
+      .selectAll('.edge').data(this.graph.edges, d => d.id);
+
+    // add class labels to distinguish the new edges from the old ones
+    edges.attr('class', d => 'update edge ' + d.mode);
+    let edgesEnter = edges.enter().append('g')
+      .attr('class', d => 'enter edge ' + d.mode);
+
+    edgesEnter.append('path')
+      .attr('class', 'ghostPath');
+
+    edgesEnter.append('path')
+      .attr('class', 'visiblePath');
+
+    edgesEnter.append('title');
+
     // Animate any existing edges before we add new ones
-    edges.transition().duration(300)
-      .attr('d', d => {
-        let pathString = 'M' + (dataX + nodeWidth) + ',' +
-        dataY(d.source) +
-        'L' + visX + ',' +
-        visY(d.target);
-        return pathString;
-      });
-    edges.enter().append('path')
-      .attr('d', d => {
-        let pathString = 'M' + (dataX + nodeWidth) + ',' +
-        dataY(d.source) +
-        'L' + visX + ',' +
-        visY(d.target);
-        return pathString;
-      }).attr('opacity', 0)
-        .transition().duration(300)
-        .attr('opacity', 1);
+    edges.selectAll('path').transition().duration(function (d) {
+      // Animate any already-existing edges
+      // (this refers to the DOM element)
+      if (jQuery(this).hasClass('update')) {
+        return 300;
+      } else {
+        return 0;
+      }
+    }).attr('d', d => {
+      let pathString = 'M' + (this.layout.dataX + this.layout.dataWidth) + ',' +
+        this.layout.yDataScale(d.dataIndex) +
+        'L' + this.layout.visX + ',' + this.layout.yVisScale(d.visIndex);
+      return pathString;
+    });
     edges.exit().remove();
     edges.attr('id', d => d.id)
-      .attr('class', d => {
-        let classString = '';
-        // Edge type
-        if (d.mode === EDGE_MODES.POTENTIAL) {
-          classString = 'potential';
-        } else if (d.mode === EDGE_MODES.ESTABLISHED) {
-          classString = 'established';
-        } else if (d.mode === EDGE_MODES.ESTABLISHED_SELECTED) {
-          classString = 'established selected';
-        } else if (d.mode === EDGE_MODES.PROBABLE) {
-          classString = 'probable';
-        }
-        return classString + ' edge';
-      }).on('mouseover', function (d) {
+      .on('mouseover', function (d) {
         // this refers to the DOM element
-        jQuery(this).addClass('hovered');
-        // If one end is selected, highlight the other end
-        let nodeToHighlight;
-        if (self.selection === null) {
-          return;
-        } else if (self.selection.side === 'vis') {
-          nodeToHighlight = graph.nodes[d.source];
-        } else {
-          nodeToHighlight = graph.nodes[d.target];
-        }
-        self.$el.find('#' + nodeToHighlight.id).addClass('hovered');
+        self.hoverEdge(d, this);
       }).on('mouseout', d => {
         // Clear any highlights
         this.$el.find('.hovered').removeClass('hovered');
+        this.$el.find('.disconnectable').removeClass('disconnectable');
       }).on('click', d => {
-        if (this.selection === null) {
-          return;
-        } else if (this.selection.side === 'vis') {
-          this.handleClick(graph.nodes[d.source]);
+        this.clickEdge(d);
+      });
+    edges.selectAll('title')
+      .text(d => {
+        if (d.mode === EDGE_MODES.ESTABLISHED || d.mode === EDGE_MODES.ESTABLISHED_SELECTED) {
+          return 'Click to disconnect';
         } else {
-          this.handleClick(graph.nodes[d.target]);
+          return 'Click to connect';
         }
       });
+  },
+  render: Underscore.debounce(function () {
+    let widgetIsShowing = Widget.prototype.render.apply(this, arguments);
+
+    // Construct a graph from each of the specs
+    // (and the currently selected node)
+    this.updateGraph();
+
+    // Add our template if it's not already there
+    // (or if we simply want to clear the widget)
+    if (this.$el.find('svg').length === 0 || this.graph === null) {
+      this.$el.html(myTemplate);
+      // Add the function to deselect everything when
+      // the canvas is clicked
+      d3.select(this.el).select('svg')
+        .on('click', () => {
+          this.selection = null;
+          this.render();
+        });
+    }
+
+    // Update our little indicator to describe the matching
+    if (this.graph === null || this.graph.requiredConnections === 0) {
+      this.status = STATUS.NOTHING_TO_MAP;
+      this.statusText.text = '--';
+      this.statusText.title = 'There are no required visual encodings';
+    } else {
+      this.statusText.text = this.graph.satisfiedConnections + ' / ' + this.graph.requiredConnections;
+      this.statusText.title = this.graph.satisfiedConnections + ' of the minimum required ' +
+        this.graph.requiredConnections + ' connections have been established';
+      if (this.graph.satisfiedConnections < this.graph.requiredConnections) {
+        this.status = STATUS.NOT_ENOUGH_MAPPINGS;
+      } else {
+        this.status = STATUS.OK;
+      }
+    }
+    this.renderIndicators();
+
+    if (this.graph === null || !widgetIsShowing) {
+      // We don't need to actually draw the interface;
+      // only the indicators are important
+      this.layout = null;
+      return;
+    }
+
+    // Okay, let's figure out the layout
+    this.layout = {
+      emSize: parseFloat(this.$el.css('font-size'))
+    };
+
+    this.layout.dataNodeHeight = 1.5 * this.layout.emSize;
+    this.layout.visNodeHeight = 3.0 * this.layout.emSize;
+
+    // Temporarily force the scroll bars so we
+    // account for their size
+    this.$el.css('overflow', 'scroll');
+    this.layout.width = this.el.clientWidth;
+    this.layout.height = this.el.clientHeight;
+    this.layout.visHeight = 1.5 * this.layout.visNodeHeight * (this.graph.visNodes.length + 2);
+    this.layout.dataHeight = 1.5 * this.layout.dataNodeHeight * (this.graph.dataNodes.length + 2);
+    this.$el.css('overflow', '');
+
+    this.layout.fullHeight = Math.max(this.layout.height,
+                                      this.layout.visHeight,
+                                      this.layout.dataHeight);
+
+    this.$el.find('svg')
+      .attr({
+        width: this.layout.width,
+        height: this.layout.fullHeight
+      });
+
+    // Okay, we've figured out the size of our canvas.
+    // Next up: how to lay things out vertically?
+
+    // Just spread the data nodes out to fill the whole space
+    this.layout.yDataScale = d3.scale.linear()
+      .domain([-1, this.graph.dataNodes.length])
+      .range([0, this.layout.fullHeight]);
+
+    // We want the vis nodes to move to wherever
+    // the user has scrolled
+    let scrollTop = this.$el.scrollTop();
+    if (this.layout.visHeight >= this.layout.height) {
+      // We may want to adjust the top if the vis nodes
+      // actually take up more space than can be seen;
+      // first try to center the nodes on the screen
+      scrollTop -= (this.layout.visHeight - this.layout.height) / 2;
+      // ... and make sure we're not out of scrollable range
+      if (scrollTop + this.layout.visHeight >= this.layout.fullHeight) {
+        scrollTop = this.layout.fullHeight - this.layout.visHeight;
+      }
+      if (scrollTop < 0) {
+        scrollTop = 0;
+      }
+    } else {
+      // Okay, there's actually more space than we need.
+      // Center the vis nodes in the visible space
+      scrollTop += (this.layout.height - this.layout.visHeight) / 2;
+    }
+
+    this.layout.yVisScale = d3.scale.linear()
+      .domain([-1, this.graph.visNodes.length])
+      .range([scrollTop, scrollTop + this.layout.visHeight]);
+
+    // Horizontal layout actually depends largely on the contents
+    // of each cell, so we need to render the nodes first
+    suggestions = this.renderVisNodes();
+    this.layout.visX = suggestions.xPosition;
+    this.layout.visWidth = suggestions.idealWidth;
+    this.layout.visWidth = Math.max(suggestions.minWidth, this.layout.visWidth);
+    this.layout.visWidth = Math.min(suggestions.maxWidth, this.layout.visWidth);
+
+    let suggestions = this.renderDataNodes();
+    this.layout.dataX = suggestions.xPosition;
+    this.layout.dataWidth = suggestions.idealWidth;
+    this.layout.dataWidth = Math.min(suggestions.maxWidth, this.layout.dataWidth);
+
+    let spaceBetween = this.layout.visX - (this.layout.dataWidth + this.layout.dataX);
+    if (spaceBetween < 7 * this.layout.emSize) {
+      // There's very little space; shrink the data nodes
+      this.layout.dataWidth = Math.min(this.layout.dataWidth, this.layout.visX -
+        this.layout.dataX - 7 * this.layout.emSize);
+      // ... but make sure that at least the icon shows up
+      this.layout.dataWidth = Math.max(suggestions.minWidth, this.layout.dataWidth);
+    } else if (spaceBetween > 20 * this.layout.emSize) {
+      // There's a ton of space between; move everything closer together
+      let delta = (spaceBetween - 20 * this.layout.emSize) / 2;
+      this.layout.dataX += delta;
+      this.layout.visX -= delta;
+    }
+
+    // Now we can update all the nodes with their new positions
+    this.positionNodes();
+
+    // Finally, with all the nodes in position, we can draw the
+    // edges between them
+    this.renderEdges();
   }, 200)
 });
 

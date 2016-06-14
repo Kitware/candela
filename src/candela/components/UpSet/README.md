@@ -2,7 +2,8 @@
 
 An [UpSet](http://www.caleydo.org/tools/upset/) set visualization.
 
-UpSet interprets binary columns (i.e. columns with a literal `"0"` or `"1"`
+UpSet interprets binary columns (i.e. columns with a literal `"0"` or `"1"`,
+`"true"` or `"false"`, `"yes"` or `"no"`
 in every row) as sets. Any field in the `sets` option will be interpreted in
 this way. Since most data is not arranged in binary columns, the visualization
 also supports arbitrary categorical fields with the `fields` option.
@@ -49,6 +50,6 @@ and make them available to UpSet:
 | :--------  | :----- | :----------- |
 | data       | [Table](../..#table) | The data table. |
 | id         | String | A field containing unique ids for each record. |
-| sets       | Array of String | A list of fields containing 0/1 set membership information which will be populated in the UpSet view. |
+| sets       | Array of String | A list of fields containing 0/1 set membership information which will be populated in the UpSet view. These may be 0/1 integers, true/false booleans, or strings of the form "0"/"1", "true"/"false", or "yes"/"no". The values are case insensitive. |
 | fields     | Array of String | A list of categorical fields that will be translated into collections of 0/1 sets for every distinct value in each field and populated in the UpSet view. |
 | metadata   | Array of String | A list of additional metadata fields to make available to UpSet. |

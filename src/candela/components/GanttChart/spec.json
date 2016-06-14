@@ -3,10 +3,6 @@
   [
     ["width", 700],
     ["height", 600],
-    ["start", "start"],
-    ["end", "end"],
-    ["label", "label"],
-    ["level", "level"],
     ["padding", "strict"]
   ],
   [

@@ -26,16 +26,18 @@ export default class UpSet {
           name: 'sets',
           type: 'string_list',
           format: 'string_list',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',
-            fieldTypes: ['integer', 'boolean']
+            fieldTypes: ['integer', 'boolean', 'string']
           }
         },
         {
           name: 'fields',
           type: 'string_list',
           format: 'string_list',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',
@@ -81,10 +83,16 @@ export default class UpSet {
 
     // Add 0/1 sets.
     if (this.options.sets) {
+      const membershipVals = ['1', 'yes', 'true'];
       this.options.sets.forEach(s => header.push(s));
       this.options.data.forEach((d, i) => {
         this.options.sets.forEach(s => {
-          data[i + 1].push('' + d[s]);
+          let boolVal = '0';
+          const strVal = ('' + d[s]).toLowerCase();
+          if (membershipVals.indexOf(strVal) !== -1) {
+            boolVal = '1';
+          }
+          data[i + 1].push(boolVal);
         });
       });
     }

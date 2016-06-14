@@ -125,6 +125,9 @@ let WidgetPanel = Backbone.View.extend({
     }).attr('title', (d) => {
       let title = typeof d.title === 'function' ? d.title() : d.title;
       return title || null;
+    }).attr('class', (d) => {
+      let className = typeof d.className === 'function' ? d.className() : d.className;
+      return className || null;
     }).on('click', (d) => {
       d3.event.stopPropagation();
       if (d.onclick) {

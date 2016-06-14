@@ -25,6 +25,10 @@ let HamburgerMenu = Backbone.View.extend({
       });
     });
 
+    jQuery('#aboutResLabMenuItem').on('click', () => {
+      window.mainPage.overlay.render('AboutResonantLab');
+    });
+
     if (window.mainPage.currentUser.isLoggedIn()) {
       jQuery('#loginText').text('Log Out ' +
         window.mainPage.currentUser.get('firstName') + ' ' +
@@ -36,7 +40,7 @@ let HamburgerMenu = Backbone.View.extend({
           });
       });
     } else {
-      jQuery('#loginText').text('Log In');
+      jQuery('#loginMenuItem > p').text('Log In');
       jQuery('#loginMenuItem').on('click', () => {
         window.mainPage.overlay.render('LoginView');
       });

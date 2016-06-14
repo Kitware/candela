@@ -35,6 +35,7 @@ export default class ScatterPlot extends VisComponent {
           name: 'size',
           type: 'string',
           format: 'text',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',
@@ -45,6 +46,7 @@ export default class ScatterPlot extends VisComponent {
           name: 'shape',
           type: 'string',
           format: 'text',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',
@@ -55,6 +57,7 @@ export default class ScatterPlot extends VisComponent {
           name: 'color',
           type: 'string',
           format: 'text',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',
@@ -65,6 +68,7 @@ export default class ScatterPlot extends VisComponent {
           name: 'hover',
           type: 'string_list',
           format: 'string_list',
+          optional: true,
           domain: {
             mode: 'field',
             from: 'data',
