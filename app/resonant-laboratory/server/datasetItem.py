@@ -1,13 +1,14 @@
-import copy
-import bson.json_util
-import subprocess
-import os
-import functools
-import inspect
-import csv
 import sys
-import re
+import os
+import subprocess
 import execjs
+import functools
+import datetime
+import copy
+import inspect
+import re
+import csv
+import bson.json_util
 import md5
 from pymongo import MongoClient
 from versioning import Versioning
@@ -275,6 +276,7 @@ class DatasetItem(Resource):
                 if 'interpretation' in existingSchema['attrName']:
                     schema['attrName']['interpretation'] = existingSchema['attrName']['interpretation']
         item['meta']['rlab']['schema'] = schema
+        item['meta']['rlab']['lastUpdated'] = datetime.datetime.now().isoformat()
         return self.model('item').updateItem(item)
 
     @access.public
@@ -321,7 +323,7 @@ class DatasetItem(Resource):
                'An array of values that will be put into their own bins, regardless of ' +
                'all other settings. This lets you separate bad values/error codes, e.g. ' +
                '[-9999,"N/A"]. These special values will be added to the set of natively ' +
-               'recognized special bins: "undefined", "null", "NaN", "Inf", "-Inf", and ' +
+               'recognized special bins: "undefined", "null", "NaN", "Infinity", "-Infinity", and ' +
                '"" (empty string).',
                required=False)
         .param('cache', 'If true, attempt to retrieve results cached in the item\'s metadata ' +
@@ -338,7 +340,7 @@ class DatasetItem(Resource):
 
         # Populate params with default settings
         # where settings haven't been specified
-        params['filter'] = params.get('filter', {})
+        params['filter'] = bson.json_util.loads(params.get('filter', 'true'))
         params['limit'] = params.get('limit', 50)
         params['offset'] = params.get('offset', 0)
 
@@ -358,11 +360,11 @@ class DatasetItem(Resource):
                 binSettings[attrName]['interpretation'] = interpretation
 
             if interpretation == 'ordinal':
-                lowBound = attrSchema['stats'][coerceToType]['lowBound']
+                lowBound = attrSchema[coerceToType]['lowBound']
                 lowBound = binSettings[attrName].get('lowBound', lowBound)
                 binSettings[attrName]['lowBound'] = lowBound
 
-                highBound = attrSchema['stats'][coerceToType]['highBound']
+                highBound = attrSchema[coerceToType]['highBound']
                 highBound = binSettings[attrName].get('highBound', highBound)
                 binSettings[attrName]['highBound'] = highBound
             else:
