@@ -8,6 +8,7 @@ import csv
 import sys
 import re
 import execjs
+import md5
 from pymongo import MongoClient
 from versioning import Versioning
 from girder.api import access
@@ -17,6 +18,8 @@ from girder.constants import AccessType
 from girder.plugins.girder_db_items.rest import DatabaseItemResource
 from girder.plugins.girder_db_items.dbs.mongo import MongoConnector
 from girder_worker.format import get_csv_reader
+
+TRUE_TESTS = ['true', '1', 't', 'y', 'yes']
 
 
 class DatasetItem(Resource):
@@ -131,19 +134,16 @@ class DatasetItem(Resource):
         # last chunk
         return mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
 
-    def mapReduce(self, item, mapCode, reduceCode):
-        if 'meta' not in item or 'rlab' not in item['meta']:
-            item = self.setupDataset(id=item['_id'], params={})
-
+    def mapReduce(self, item, mapScript, reduceScript):
         if 'databaseMetadata' in item:
             if item['databaseMetadata']['type'] == 'mongo':
-                return self.mongoMapReduce(item, mapCode, reduceCode)
+                return self.mongoMapReduce(item, mapScript, reduceScript)
             else:
                 raise RestException('MapReduce for ' +
                                     item['databaseMetadata']['type'] +
                                     ' databases is not yet supported')
         else:
-            return self.flatFileMapReduce(item, mapCode, reduceCode)
+            return self.flatFileMapReduce(item, mapScript, reduceScript)
 
     @access.public
     @loadmodel(model='item', level=AccessType.WRITE)
@@ -248,7 +248,7 @@ class DatasetItem(Resource):
         return self.model('item').updateItem(item)
 
     @access.public
-    @loadmodel(model='item', level=AccessType.READ)
+    @loadmodel(model='item', level=AccessType.WRITE)
     @describeRoute(
         Description('Infer the schema of a dataset.')
         .notes('Calculates the potential frequency of various data types ' +
@@ -258,39 +258,141 @@ class DatasetItem(Resource):
                'as whether or not a given type was the native format of any value ' +
                'for that attribute.')
         .param('id', 'The ID of the item.', paramType='path')
-        # TODO: add a parameter for selecting the root
         .errorResponse()
     )
     def inferSchema(self, item, params):
-        return self.mapReduce(item,
-                              self.foreignCode['schema_map.js'],
-                              self.foreignCode['schema_reduce.js'])
+        if 'meta' not in item or 'rlab' not in item['meta']:
+            item = self.setupDataset(id=item['_id'], params={})
+
+        schema = self.mapReduce(item,
+                                self.foreignCode['schema_map.js'],
+                                self.foreignCode['schema_reduce.js'])
+
+        # We want to preserve any explicit user coerceToType or interpretation settings
+        existingSchema = item['meta']['rlab'].get('schema', {})
+        for attrName in schema.iterkeys():
+            if attrName in existingSchema:
+                if 'coerceToType' in existingSchema['attrName']:
+                    schema['attrName']['coerceToType'] = existingSchema['attrName']['coerceToType']
+                if 'interpretation' in existingSchema['attrName']:
+                    schema['attrName']['interpretation'] = existingSchema['attrName']['interpretation']
+        item['meta']['rlab']['schema'] = schema
+        return self.model('item').updateItem(item)
 
     @access.public
-    @loadmodel(model='item', level=AccessType.READ)
+    @loadmodel(model='item', level=AccessType.WRITE)
     @describeRoute(
-        Description('Get a histogram for a data attribute')
+        Description('Get a histogram for all data attributes')
         .param('id', 'The ID of the dataset item.', paramType='path')
         .param('filter',
-               'Get the histogram after the results of these filters. ' +
+               'Get the histogram after the results of this filter. ' +
                'TODO: describe our filter grammar.',
                required=False)
         .param('limit', 'Result set size limit (default=50).',
                required=False, dataType='int')
         .param('offset', 'Offset into result set (default=0).',
                required=False, dataType='int')
-        .param('coerce',
+        .param('binSettings',
+               'A JSON dictionary containing settings that control how ' +
+               'each attribute is binned. Each key should correspond to an attribute ' +
+               'name, and the value should be a dictionary containing zero or more of ' +
+               'these settings:' +
+               '<br/><br/>coerceToType<br/>' +
                'Attempt to coerce all values to "boolean","int",' +
                '"number","date", or "string". Incompatible or missing ' +
                'values will be assigned to appropriate bins such as "NaN" ' +
-               'or "undefined". If no coercion value is supplied, ... TODO',
+               'or "undefined". If no coercion value is supplied, values ' +
+               'will be binned into type categories ("interpretation" will be ' +
+               'ignored).'
+               '<br/><br/>interpretation<br/>' +
+               'If "ordinal", values will be summarized in order---either number range ' +
+               'bins (e.g. 0-10, 11-20, ...), or lexicographic bins (e.g. A-D, E-H, ...). ' +
+               'If "categorical" (default), values will be treated as unordered, categorical data.' +
+               '<br/><br/>lowBound<br/>' +
+               'Defines the low bound of the histogram if interpretation=ordinal. Default is ' +
+               'to use the minimum value in the dataset.'
+               '<br/><br/>highBound<br/>' +
+               'Defines the high bound of the histogram if interpretation=ordinal. Default is ' +
+               'to use the maximum value in the dataset.'
+               '<br/><br/>numBins<br/>' +
+               'Defines the maximum number of categorical bins to calculate if ' +
+               'interpreation=categorical (default: 10 bins). Setting this to 0 will ' +
+               'create distinct bins for every value encountered (can be very expensive/useless for ' +
+               'attributes with lots of distinct values, such as URLs!)' +
+               '<br/><br/>specialBins<br/>' +
+               'An array of values that will be put into their own bins, regardless of ' +
+               'all other settings. This lets you separate bad values/error codes, e.g. ' +
+               '[-9999,"N/A"]. These special values will be added to the set of natively ' +
+               'recognized special bins: "undefined", "null", "NaN", "Inf", "-Inf", and ' +
+               '"" (empty string).',
                required=False)
+        .param('cache', 'If true, attempt to retrieve results cached in the item\'s metadata ' +
+                        'if the same query has been run previously. Also, store the results ' +
+                        'of this query in the metadata cache.',
+               required=False, dataType='boolean')
         .errorResponse()
     )
     def getHistograms(self, item, params):
-        return self.mapReduce(item,
-                              self.foreignCode['histogram_map.js'],
-                              self.foreignCode['histogram_reduce.js'])
+        if 'meta' not in item or 'rlab' not in item['meta']:
+            item = self.setupDataset(id=item['_id'], params={})
+        if 'schema' not in item['meta']['rlab']:
+            item = self.inferSchema(id=item['_id'], params={})
+
+        # Populate params with default settings
+        # where settings haven't been specified
+        params['filter'] = params.get('filter', {})
+        params['limit'] = params.get('limit', 50)
+        params['offset'] = params.get('offset', 0)
+
+        binSettings = bson.json_util.loads(params.get('binSettings', '{}'))
+        for attrName, attrSchema in item['meta']['rlab']['schema'].iteritems():
+            binSettings[attrName] = binSettings.get(attrName, {})
+
+            coerceToType = attrSchema.get('coerceToType', None)
+            coerceToType = binSettings[attrName].get('coerceToType', coerceToType)
+            binSettings[attrName]['coerceToType'] = coerceToType
+
+            if binSettings[attrName]['coerceToType'] is None:
+                interpretation = binSettings[attrName]['interpretation'] = 'categorical'
+            else:
+                interpretation = attrSchema.get('interpretation', 'categorical')
+                interpretation = binSettings[attrName].get('interpretation', interpretation)
+                binSettings[attrName]['interpretation'] = interpretation
+
+            if interpretation == 'ordinal':
+                lowBound = attrSchema['stats'][coerceToType]['lowBound']
+                lowBound = binSettings[attrName].get('lowBound', lowBound)
+                binSettings[attrName]['lowBound'] = lowBound
+
+                highBound = attrSchema['stats'][coerceToType]['highBound']
+                highBound = binSettings[attrName].get('highBound', highBound)
+                binSettings[attrName]['highBound'] = highBound
+            else:
+                binSettings[attrName]['numBins'] = binSettings[attrName].get('numBins', 10)
+
+            specialBins = ['undefined', 'null', 'NaN', 'Inf', '-Inf', '']
+            specialBins.extend(binSettings[attrName].get('specialBins', []))
+            binSettings[attrName]['specialBins'] = specialBins
+
+        params['binSettings'] = binSettings
+        params['cache'] = params.get('cache', False)
+
+        # store params as a chunk of code that can be prepended
+        # in a way that the map code can access it
+        paramsCode = 'var params = ' + bson.json_util.dumps(params, sort_keys=True) + ';\n'
+        if params['cache']:
+            paramsMD5 = md5.md5(paramsCode)
+            if 'histogramCaches' in item['meta']['rlab'] and paramsMD5 in item['meta']['rlab']['histogramCaches']:
+                return item['meta']['rlab']['histogramCaches'][paramsMD5]
+        results = self.mapReduce(item,
+                                 paramsCode + self.foreignCode['histogram_map.js'],
+                                 self.foreignCode['histogram_reduce.js'])
+        if params['cache']:
+            if 'histogramCaches' not in item['meta']['rlab']:
+                item['meta']['rlab']['histogramCaches'] = {}
+            item['meta']['rlab']['histogramCaches'][paramsMD5] = results
+            self.model('item').updateItem(item)
+        return results
 
     @access.public
     @loadmodel(model='item', level=AccessType.READ)

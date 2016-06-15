@@ -58,9 +58,9 @@ def load(info):
     datasetItem = DatasetItem(info)
     info['apiRoot'].item.route('POST', (':id', 'dataset'),
                                datasetItem.setupDataset)
-    info['apiRoot'].item.route('GET', (':id', 'dataset', 'inferSchema'),
+    info['apiRoot'].item.route('POST', (':id', 'dataset', 'inferSchema'),
                                datasetItem.inferSchema)
-    info['apiRoot'].item.route('GET', (':id', 'dataset', 'getHistograms'),
+    info['apiRoot'].item.route('POST', (':id', 'dataset', 'getHistograms'),
                                datasetItem.getHistograms)
     info['apiRoot'].item.route('GET', (':id', 'dataset', 'getData'),
                                datasetItem.getData)
