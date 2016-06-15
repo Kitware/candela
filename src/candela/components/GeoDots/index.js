@@ -104,24 +104,28 @@ export default class GeoDots extends VisComponent {
     }
 
     // TODO(choudhury): don't mutate the options object directly.
-    options.layers = options.layers || [];
-    options.layers.push({
-      type: 'feature',
-      features: [
-        {
-          name: 'feature1',
-          type: 'point',
-          x: options.longitude,
-          y: options.latitude,
-          style: {
-            radius: sizeTransform,
-            fillColor: fillTransform,
-            strokeColor: strokeTransform
-          },
-          data: options.data
-        }
-      ]
-    });
+    options.layers = [
+      {
+        type: 'osm',
+      },
+      {
+        type: 'feature',
+        features: [
+          {
+            name: 'feature1',
+            type: 'point',
+            x: options.longitude,
+            y: options.latitude,
+            style: {
+              radius: sizeTransform,
+              fillColor: fillTransform,
+              strokeColor: strokeTransform
+            },
+            data: options.data
+          }
+        ]
+      }
+    ];
 
     this.geojs = new Geo(this.el, options);
   }
