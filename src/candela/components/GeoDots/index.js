@@ -33,6 +33,17 @@ export default class GeoDots extends VisComponent {
           }
         },
         {
+          name: 'color',
+          type: 'string',
+          format: 'text',
+          optional: true,
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          }
+        },
+        {
           name: 'size',
           type: 'string',
           format: 'text',
@@ -60,6 +71,40 @@ export default class GeoDots extends VisComponent {
       sizeTransform = d => scale(d[options.size]);
     }
 
+    let fillTransform = 'red';
+    let strokeTransform = 'darkred';
+    if (options.color && options.data.length > 0) {
+      let fillScale, strokeScale;
+
+      const type = typeof options.data[0][options.color];
+      if (type === undefined || type === 'string') {
+        fillScale = d3.scale.category10();
+        strokeScale = 'black';
+      } else {
+        const range = minmax(options.data.map(d => d[options.color]));
+
+        const red = d3.rgb('#ef6a62');
+        const blue = d3.rgb('#67a9cf');
+        const darkred = red.darker();
+        const darkblue = blue.darker();
+
+        fillScale = d3.scale.linear()
+          .domain([range.min, range.max])
+          .range([red, blue]);
+
+        strokeScale = d3.scale.linear()
+          .domain([range.min, range.max])
+          .range([darkred, darkblue]);
+      }
+
+      fillTransform = d => fillScale(d[options.color]);
+      if (strokeScale === 'black') {
+        strokeTransform = 'black';
+      } else {
+        strokeTransform = d => strokeScale(d[options.color]);
+      }
+    }
+
     // TODO(choudhury): don't mutate the options object directly.
     options.layers = options.layers || [];
     options.layers.push({
@@ -71,7 +116,9 @@ export default class GeoDots extends VisComponent {
           x: options.x,
           y: options.y,
           style: {
-            radius: sizeTransform
+            radius: sizeTransform,
+            fillColor: fillTransform,
+            strokeColor: strokeTransform
           },
           data: options.data
         }
