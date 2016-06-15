@@ -19,8 +19,6 @@ from girder.plugins.girder_db_items.rest import DatabaseItemResource
 from girder.plugins.girder_db_items.dbs.mongo import MongoConnector
 from girder_worker.format import get_csv_reader
 
-TRUE_TESTS = ['true', '1', 't', 'y', 'yes']
-
 
 class DatasetItem(Resource):
     def __init__(self, info):

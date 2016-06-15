@@ -8,9 +8,6 @@ from girder.api.rest import Resource, RestException, loadmodel
 from girder.constants import AccessType
 from girder.models.model_base import AccessException
 
-TRUE_TESTS = ['true', '1', 't', 'y', 'yes']
-FALSE_TESTS = ['false', '0', 'f', 'n', 'no']
-
 
 class AnonymousAccess(Resource):
 
@@ -62,7 +59,8 @@ class AnonymousAccess(Resource):
         .param('name', 'The name of the item.', required=True)
         .param('description', 'The description of the item.', required=False)
         .param('reuseExisting', 'If false, create a new item, even if an ' +
-               'existing item of the same name already exists', required=False)
+               'existing item of the same name already exists',
+               required=False, dataType='boolean')
         .errorResponse()
     )
     def getOrMakePrivateItem(self, params):
@@ -74,12 +72,7 @@ class AnonymousAccess(Resource):
             raise RestException("No assetstore configured")
 
         privateFolder = self.getOrMakePrivateFolder({})
-
-        if 'reuseExisting' in params:
-            temp = str(params['reuseExisting']).lower()
-            reuseExisting = temp not in FALSE_TESTS
-        else:
-            reuseExisting = True
+        reuseExisting = params.get('reuseExisting', True)
 
         itemModel = self.model('item')
         privateItem = itemModel.createItem(name=params['name'],
@@ -331,9 +324,10 @@ class AnonymousAccess(Resource):
                'user\'s Public folder')
         .param('id', 'The ID of the item.', paramType='path')
         .param('makePublic', 'If true, moves the item to the Public folder, ' +
-               'regardless of its current location', required=False)
+               'regardless of its current location',
+               required=False, dataType='boolean')
         .param('forceCopy', 'If true, copy the item instead of moving it',
-               required=False)
+               required=False, dataType='boolean')
         .errorResponse()
     )
     def togglePublic(self, item, params):
@@ -347,15 +341,8 @@ class AnonymousAccess(Resource):
             item['folderId'], user=user,
             level=AccessType.READ, exc=True)
 
-        if 'makePublic' in params:
-            makePublic = str(params['makePublic']).lower() in TRUE_TESTS
-        else:
-            makePublic = currentFolder['name'] == 'Private'
-
-        if 'forceCopy' in params:
-            forceCopy = str(params['forceCopy']).lower() in TRUE_TESTS
-        else:
-            forceCopy = False
+        makePublic = params.get('makePublic', currentFolder['name'] == 'Private')
+        forceCopy = params.get('forceCopy', False)
 
         if anonymous is True:
             makePublic = True
