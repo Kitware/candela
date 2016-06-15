@@ -12,7 +12,7 @@ features of all Candela components:
 
 2. Candela components perform some type of visualization, so they have a
    [`render()`](#componentrender) method. The base class [`render()`](#componentrender)
-   is not implemented and raises an exception.
+   simply raises an exception.
 
 You can create a concrete visualization component by extending `VisComponent`.
 The following best practices maximize clarity, reusability, and interoperability
@@ -98,6 +98,3 @@ Formats include:
 ## component.serialize(format)
 
 Serializes the component into the specified **format**.
-
-**Note**: [`render()`](#componentrender) must be called at least once
-before serialize() is called.
