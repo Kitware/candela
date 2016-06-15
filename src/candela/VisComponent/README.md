@@ -5,37 +5,33 @@ The base class for Candela visualization components.
 This class is intentionally minimal, because there are only a few common
 features of all Candela components:
 
-1. Candela components work on the web, so the constructor looks like ``new
-   VisComponent(el)``, where ``el`` is (usually) a DOM element. The
-   ``VisComponent`` constructor attaches ``el`` to the object, so you can always
-   refer to it using ``this.el``.
+1. Candela components work on the web, so the constructor looks like `new
+   VisComponent(el)`, where `el` is (usually) a DOM element. The
+   `VisComponent` constructor attaches `el` to the object, so you can always
+   refer to it using `this.el`.
 
 2. Candela components perform some type of visualization, so they have a
-   ``render()`` method. The ``VisComponent`` ``render()`` method simply throws
-   an exception; if you truly want your component to do nothing when it renders,
-   simply redefine the method to be a no-op.
+   [`render()`](#componentrender) method. The base class [`render()`](#componentrender)
+   is not implemented and raises an exception.
 
-You can create a concrete visualization component by extending ``VisComponent``.
+You can create a concrete visualization component by extending `VisComponent`.
 The following best practices maximize clarity, reusability, and interoperability
-of your components (in the rest of this document, imagine that ``MyComponent``
-is declared as an extension of ``VisComponent``):
+of your components (in the rest of this document, imagine that `MyComponent`
+is declared as an extension of `VisComponent`, such as `BarChart`):
 
 1. The constructor should take an [additional parameter
-   ``options``](#new-mycomponentel-options) encapsulating all runtime options
-   for the component.
+   `options`](#component-new-mycomponentel-options) encapsulating all
+   runtime options for the component.
 
 2. The component should report its expected inputs in
-   [MyComponent.spec](#viscomponentspec).
+   [MyComponent.options](#mycomponentoptions).
 
-## MyComponent.spec
+## MyComponent.options
 
-The `spec` field is a static property on the component's class which describes
-how to set up the visualization.
-
-| Property    | Type   | Description  |
-| :--------   | :----- | :----------- |
-| container   | Class  | Optional. The type of container this visualization can be added to. Default is DOMElement if unset. |
-| options     | Array of [Option](#option-specification) | A specification of options needed for this visualization. This is used to introspect the component to implement features such as automatic UI building. |
+This static property is an array of [Options](#option-specification), containing
+a specification of options this visualization accepts.
+This may be used to introspect the component to implement features such as
+automatic UI building.
 
 ### Option Specification
 
@@ -60,10 +56,14 @@ an object with the following properties:
 | from        | Array or String | If the mode is `'choice'`, it is the list of strings to use as a dropdown. If the mode is `'field'`, it is the name of the input from which to extract fields.
 | fieldTypes  | Array of String | If mode is `'field'`, this specifies the types of fields to support. This array may contain any combination of [datalib's supported field types](https://github.com/vega/datalib/wiki/Import#dl_type_infer) which include `'string'`, `'date'`, `'number'`, `'integer'`, and `'boolean'`. |
 
+## MyComponent.container
+
+A static field containing the type of container this visualization can be added to.
+The most common is DOMElement.
+
 ## component = new MyComponent(el, options)
 
-**Note**: The constructor for the abstract superclass is empty. You should use
-the constructor for specific subclasses of VisComponent.
+Constructs a new instance of the candela component.
 
 * **el** is a valid container for the visualization. The container will often be
   a DOM element such as `<div>`, but may need to be another type for certain
@@ -73,17 +73,31 @@ the constructor for specific subclasses of VisComponent.
   This includes any data, visual matchings, or other settings pertinent to the
   visualization. Options are specified in the form `{name: value}`.
 
+**Note**: The constructor for the abstract superclass is empty. You should use
+the constructor for specific subclasses of `VisComponent`.
+
+## component.render()
+
+Renders the component to it's container using the current set of options.
+
+**Note**: The `VisComponent` `render()` method simply throws
+an exception; if you truly want your component to do nothing when it renders,
+simply redefine the method to be a no-op.
+
 ## component.serializationFormats
 
 The `serializationFormats` field is a list of strings of supported formats.
 Formats include:
 
-* `'png'`: A base64-encoded string for a PNG image. This string may be placed in the
+* `'png'`: A base64-encoded string for a PNG image. The string may be placed in the
 `src` attribute of an `<img>` element to show the image.
 
-* `'svg'`: A base64-encoded string for an SVG scene. This string may be placed in the
+* `'svg'`: A base64-encoded string for an SVG scene. The string may be placed in the
 `src` attribute of an `<img>` element to show the image.
 
 ## component.serialize(format)
 
 Serializes the component into the specified **format**.
+
+**Note**: [`render()`](#componentrender) must be called at least once
+before serialize() is called.
