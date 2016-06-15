@@ -106,7 +106,7 @@ export default class GeoDots extends VisComponent {
     // TODO(choudhury): don't mutate the options object directly.
     options.layers = [
       {
-        type: 'osm',
+        type: 'osm'
       },
       {
         type: 'feature',
