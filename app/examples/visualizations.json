@@ -343,15 +343,14 @@
     "description": "Geospatial plots with direct plotting of locations (no tile layer)",
     "component": "GeoDots",
     "options": {
-      "map": {
-        "zoom": 10,
-        "center": {
-          "x": -87.6194,
-          "y": 41.867516
-        }
+      "zoom": 10,
+      "center": {
+        "longitude": -87.6194,
+        "latitude": 41.867516
       },
-      "x": "longitude",
-      "y": "latitude",
+      "tileUrl": null,
+      "longitude": "longitude",
+      "latitude": "latitude",
       "data": [
         {"id": 0, "longitude": -87.578, "latitude": 41.838, "c": 3},
         {"id": 1, "longitude": -87.644, "latitude": 41.702, "c": 3},
@@ -411,20 +410,13 @@
     "description": "Geospatial plots with direct plotting of locations",
     "component": "GeoDots",
     "options": {
-      "map": {
-        "zoom": 10,
-        "center": {
-          "x": -87.6194,
-          "y": 41.867516
-        }
+      "zoom": 10,
+      "center": {
+        "longitude": -87.6194,
+        "latitude": 41.867516
       },
-      "layers": [
-        {
-          "type": "osm"
-        }
-      ],
-      "x": "longitude",
-      "y": "latitude",
+      "longitude": "longitude",
+      "latitude": "latitude",
       "data": [
         {"id": 0, "longitude": -87.578, "latitude": 41.838, "c": 3},
         {"id": 1, "longitude": -87.644, "latitude": 41.702, "c": 3},

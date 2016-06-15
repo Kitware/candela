@@ -18,4 +18,5 @@ data.
 | latitude  | String | The latitude field. |
 | zoom      | Integer | The initial zoom level. |
 | center    | Object | An object with `longitude` and `latitude` properties specifying the initial center of the map. |
+| tileUrl   | String | A tile URL template (see [GeoJS OSM layer options](http://opengeoscience.github.io/geojs/apidocs/geo.osmLayer.html)). Set to `null` to disable the OSM layer completely. |
 | data      | [Table](../..#table) | The data table. |

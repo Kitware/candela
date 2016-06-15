@@ -104,37 +104,41 @@ export default class GeoDots extends VisComponent {
     }
 
     // TODO(choudhury): don't mutate the options object directly.
-    options.layers = [
-      {
-        type: 'osm'
-      },
-      {
-        type: 'feature',
-        features: [
-          {
-            name: 'feature1',
-            type: 'point',
-            x: options.longitude,
-            y: options.latitude,
-            style: {
-              radius: sizeTransform,
-              fillColor: fillTransform,
-              strokeColor: strokeTransform
-            },
-            data: options.data
-          }
-        ]
-      }
-    ];
+    options.layers = [];
+    if (options.tileUrl !== null) {
+      options.layers.push({
+        type: 'osm',
+        url: options.tileUrl
+      });
+    }
 
+    options.layers.push({
+      type: 'feature',
+      features: [
+        {
+          name: 'feature1',
+          type: 'point',
+          x: options.longitude,
+          y: options.latitude,
+          style: {
+            radius: sizeTransform,
+            fillColor: fillTransform,
+            strokeColor: strokeTransform
+          },
+          data: options.data
+        }
+      ]
+    });
+
+    options.center = options.center || {};
     const center = {
-      x: options.longitude || 0.0,
-      y: options.latitude || 0.0
+      x: options.center.longitude || 0.0,
+      y: options.center.latitude || 0.0
     };
 
     const map_options = Object.assign({
       map: {
-        zoom: options.zoom || 1,
+        zoom: options.zoom,
         center: center
       }
     }, options);
