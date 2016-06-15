@@ -18,18 +18,23 @@ export default class Geo extends VisComponent {
           break;
 
         case 'feature':
-          layer.features.forEach(feature => {
-            this.plot.createLayer('feature', {
+          layer.features.forEach(spec => {
+            let feature = this.plot.createLayer('feature', {
               renderer: 'd3'
             })
-              .createFeature(feature.type)
-              .data(feature.data)
+              .createFeature(spec.type)
+              .data(spec.data)
               .position(d => ({
-                x: d[feature.x],
-                y: d[feature.y]
-              }))
-              .style('fillColor', 'red')
-              .style('strokeColor', 'darkred');
+                x: d[spec.x],
+                y: d[spec.y]
+              }));
+
+            const style = Object.assign({
+              fillColor: 'red',
+              strokeColor: 'darkred'
+            }, spec.style);
+
+            feature.style(style);
           });
           break;
       }

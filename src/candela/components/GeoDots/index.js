@@ -1,5 +1,7 @@
+import d3 from 'd3';
 import Geo from '../Geo';
 import VisComponent from '../../VisComponent';
+import { minmax } from '../../util';
 
 export default class GeoDots extends VisComponent {
   static get spec () {
@@ -29,6 +31,17 @@ export default class GeoDots extends VisComponent {
             from: 'data',
             fieldTypes: ['number']
           }
+        },
+        {
+          name: 'size',
+          type: 'string',
+          format: 'text',
+          optional: true,
+          domain: {
+            mode: 'field',
+            from: 'data',
+            fieldTypes: ['number', 'integer', 'boolean']
+          }
         }
       ]
     };
@@ -36,6 +49,16 @@ export default class GeoDots extends VisComponent {
 
   constructor (el, options) {
     super(el);
+
+    let sizeTransform = 5;
+    if (options.size) {
+      const range = minmax(options.data.map(d => d[options.size]));
+      const scale = d3.scale.linear()
+        .domain([range.min, range.max])
+        .range([3, 19]);
+
+      sizeTransform = d => scale(d[options.size]);
+    }
 
     // TODO(choudhury): don't mutate the options object directly.
     options.layers = options.layers || [];
@@ -47,6 +70,9 @@ export default class GeoDots extends VisComponent {
           type: 'point',
           x: options.x,
           y: options.y,
+          style: {
+            radius: sizeTransform
+          },
           data: options.data
         }
       ]
