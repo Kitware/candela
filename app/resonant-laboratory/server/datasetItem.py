@@ -323,8 +323,7 @@ class DatasetItem(Resource):
                'An array of values that will be put into their own bins, regardless of ' +
                'all other settings. This lets you separate bad values/error codes, e.g. ' +
                '[-9999,"N/A"]. These special values will be added to the set of natively ' +
-               'recognized special bins: "undefined", "null", "NaN", "Infinity", "-Infinity", and ' +
-               '"" (empty string).',
+               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, ""]',
                required=False)
         .param('cache', 'If true, attempt to retrieve results cached in the item\'s metadata ' +
                         'if the same query has been run previously. Also, store the results ' +
@@ -370,8 +369,7 @@ class DatasetItem(Resource):
             else:
                 binSettings[attrName]['numBins'] = binSettings[attrName].get('numBins', 10)
 
-            specialBins = ['undefined', 'null', 'NaN', 'Inf', '-Inf', '']
-            specialBins.extend(binSettings[attrName].get('specialBins', []))
+            specialBins = bson.json_util.loads(binSettings[attrName].get('specialBins', '[]'))
             binSettings[attrName]['specialBins'] = specialBins
 
         params['binSettings'] = binSettings
