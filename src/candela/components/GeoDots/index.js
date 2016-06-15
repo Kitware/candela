@@ -127,7 +127,19 @@ export default class GeoDots extends VisComponent {
       }
     ];
 
-    this.geojs = new Geo(this.el, options);
+    const center = {
+      x: options.longitude || 0.0,
+      y: options.latitude || 0.0
+    };
+
+    const map_options = Object.assign({
+      map: {
+        zoom: options.zoom || 1,
+        center: center
+      }
+    }, options);
+
+    this.geojs = new Geo(this.el, map_options);
   }
 
   render () {
