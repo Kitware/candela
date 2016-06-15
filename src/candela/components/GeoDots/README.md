@@ -1,7 +1,8 @@
 # [candela](../..#readme).[components](..#readme).GeoDots
 
-A geospatial view with locations marked by dots. The **x** and **y** fields
-should contain longitude and latitude values for each location in the data.
+A geospatial view with locations marked by dots. The **latitude** and
+**longitude** fields should contain lat/long values for each location in the
+data.
 
 **extends** [VisComponent](../../VisComponent#readme)
 
@@ -13,6 +14,8 @@ should contain longitude and latitude values for each location in the data.
 
 | Option    | Type   | Description  |
 | :-------- | :----- | :----------- |
-| x         | Number | The longitude field. |
-| y         | Number | The latitude field. |
+| longitude | String | The longitude field. |
+| latitude  | String | The latitude field. |
+| zoom      | Integer | The initial zoom level. |
+| center    | Object | An object with `longitude` and `latitude` properties specifying the initial center of the map. |
 | data      | [Table](../..#table) | The data table. |
