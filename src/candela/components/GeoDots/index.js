@@ -12,7 +12,7 @@ export default class GeoDots extends VisComponent {
         format: 'objectlist'
       },
       {
-        name: 'x',
+        name: 'latitude',
         type: 'string',
         format: 'text',
         domain: {
@@ -22,7 +22,7 @@ export default class GeoDots extends VisComponent {
         }
       },
       {
-        name: 'y',
+        name: 'longitude',
         type: 'string',
         format: 'text',
         domain: {
@@ -111,8 +111,8 @@ export default class GeoDots extends VisComponent {
         {
           name: 'feature1',
           type: 'point',
-          x: options.x,
-          y: options.y,
+          x: options.longitude,
+          y: options.latitude,
           style: {
             radius: sizeTransform,
             fillColor: fillTransform,
