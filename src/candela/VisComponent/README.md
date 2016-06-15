@@ -20,7 +20,7 @@ of your components (in the rest of this document, imagine that `MyComponent`
 is declared as an extension of `VisComponent`, such as `BarChart`):
 
 1. The constructor should take an [additional parameter
-   `options`](#component-new-mycomponentel-options) encapsulating all
+   `options`](#component--new-mycomponentel-options) encapsulating all
    runtime options for the component.
 
 2. The component should report its expected inputs in
