@@ -7,16 +7,70 @@ var HtmlPlugin = require('html-webpack-plugin');
 
 __dirname = path.resolve(__dirname, '..');
 
+var examples = require('../app/examples2/index.json');
+
+// Compute entry points for the examples.
+var entryPoints = examples.map(function (ex) {
+  return {
+    key: 'examples2/' + ex.link,
+    value: './app/examples2/' + ex.link + '/index.js'
+  };
+});
+
+var entry = {
+  candela: ['./src/candela/index.js'],
+  examples: './app/examples/index.js',
+  examples2: './app/examples2/index.js'
+};
+
+entryPoints.forEach(function (ep) {
+  entry[ep.key] = ep.value;
+});
+
+// Compute HTML file stubs for the examples.
+var htmlPlugins = examples.map(function (ex) {
+  return new HtmlPlugin({
+    title: ex.title,
+    filename: 'examples2/' + ex.link + '/index.html',
+    chunks: ['examples2/' + ex.link]
+  });
+});
+
+var plugins = [
+  new webpack.ProvidePlugin({
+    vg: 'vega'
+  }),
+
+  new CleanPlugin([path.resolve(__dirname, 'build/*')], {
+    root: __dirname
+  }),
+
+  new HtmlPlugin({
+    title: 'Candela Examples',
+    filename: 'examples/index.html',
+    chunks: ['examples']
+  }),
+
+  new HtmlPlugin({
+    title: 'Candela Examples 2',
+    filename: 'examples2/index.html',
+    chunks: ['examples2']
+  }),
+
+  new CopyPlugin([{
+    from: 'app/examples/data/nba-heatmaps',
+    to: 'examples/nba-heatmaps'
+  }])
+];
+
+htmlPlugins.forEach(function (hp) {
+  plugins.push(hp);
+});
+
 module.exports = {
   devtool: 'source-map',
   __dirname: __dirname,
-  entry: {
-    candela: ['./src/candela/index.js'],
-    examples: './app/examples/index.js',
-    examples2: './app/examples2/index.js',
-    'examples2/foobar': './app/examples2/foobar/index.js',
-    'examples2/scatter': './app/examples2/scatter/index.js'
-  },
+  entry: entry,
   output: {
     library: '[name]',
     libraryTarget: 'umd',
@@ -29,44 +83,7 @@ module.exports = {
       d3: path.resolve(__dirname, 'node_modules/d3/d3.min.js')
     }
   },
-  plugins: [
-    new webpack.ProvidePlugin({
-      vg: 'vega'
-    }),
-
-    new CleanPlugin([path.resolve(__dirname, 'build/*')], {
-      root: __dirname
-    }),
-
-    new HtmlPlugin({
-      title: 'Candela Examples',
-      filename: 'examples/index.html',
-      chunks: ['examples']
-    }),
-
-    new HtmlPlugin({
-      title: 'Candela Examples 2',
-      filename: 'examples2/index.html',
-      chunks: ['examples2']
-    }),
-
-    new HtmlPlugin({
-      title: 'Foobar',
-      filename: 'examples2/foobar/index.html',
-      chunks: ['examples2/foobar']
-    }),
-
-    new HtmlPlugin({
-      title: 'Scatter',
-      filename: 'examples2/scatter/index.html',
-      chunks: ['examples2/scatter']
-    }),
-
-    new CopyPlugin([{
-      from: 'app/examples/data/nba-heatmaps',
-      to: 'examples/nba-heatmaps'
-    }])
-  ],
+  plugins: plugins,
   module: {
     loaders: [
       {
