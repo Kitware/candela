@@ -31,9 +31,17 @@ var histogram = [];
 var specialBins = {};
 var binLookup = {};
 
+var binSettings = params.binSettings[attrName];
+if (binSettings === undefined) {
+  binSettings = {
+    humanBins: [],
+    specialBins: ['count'],
+    numBins: 0
+  };
+}
+
 // Initialize all of our human bins to zero,
 // so that there aren't weird gaps in ordinal histograms
-var binSettings = params.binSettings[attrName];
 binSettings.humanBins.forEach(function (label) {
   binLookup[label] = histogram.length;
   histogram.push({

@@ -487,7 +487,7 @@ class DatasetItem(Resource):
         # lowBound / highBound details to each ordinal bin
         for attrName, wrappedHistogram in histogram.iteritems():
             histogram[attrName] = wrappedHistogram['histogram']
-            if 'binBounds' in binSettings[attrName]:
+            if attrName in binSettings and 'binBounds' in binSettings[attrName]:
                 for binIndex, bounds in enumerate(binSettings[attrName]['binBounds']):
                     histogram[attrName][binIndex]['lowBound'] = bounds[0]
                     histogram[attrName][binIndex]['highBound'] = bounds[1]

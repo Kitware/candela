@@ -121,6 +121,12 @@ function findBin (attrName, value) {
 
 var dataRow = this;
 if (filterRow(dataRow)) {
+  emit('__passedFilters__', {
+    histogram: [{
+      count: 1,
+      label: 'count'
+    }]
+  });
   var attrName;
   for (attrName in dataRow) {
     if (dataRow.hasOwnProperty(attrName)) {
