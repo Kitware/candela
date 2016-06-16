@@ -12,7 +12,9 @@ module.exports = {
   __dirname: __dirname,
   entry: {
     candela: ['./src/candela/index.js'],
-    examples: './app/examples/index.js'
+    examples: './app/examples/index.js',
+    examples2: './app/examples2/index.js',
+    foobar: './app/examples2/foobar/index.js'
   },
   output: {
     library: '[name]',
@@ -39,6 +41,18 @@ module.exports = {
       title: 'Candela Examples',
       filename: 'examples/index.html',
       chunks: ['examples']
+    }),
+
+    new HtmlPlugin({
+      title: 'Candela Examples 2',
+      filename: 'examples2/index.html',
+      chunks: ['examples2']
+    }),
+
+    new HtmlPlugin({
+      title: 'Foobar',
+      filename: 'examples2/foobar/index.html',
+      chunks: ['foobar']
     }),
 
     new CopyPlugin([{
