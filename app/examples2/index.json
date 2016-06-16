@@ -4,6 +4,10 @@
     "link": "scatter"
   },
   {
+    "title": "Line Chart",
+    "link": "line"
+  },
+  {
     "title": "Foobar",
     "link": "foobar"
   }
