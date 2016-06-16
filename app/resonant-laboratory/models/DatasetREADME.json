@@ -110,19 +110,19 @@
         "69f295908dd7e4929b33938e8f8ad5ff" : {
           "Fertility": [
             {
-              "_id": 0,
+              "label": "[0, 1)",
               "count": 234,
               "lowBound": 0,
               "highBound": 1
             },
             {
-              "_id": 1,
+              "label": "[1, 2)",
               "count": 345,
               "lowBound": 1,
               "highBound": 2
             },
             {
-              "_id": 2,
+              "label": "[2, 3]",
               "count": 145,
               "lowBound": 2,
               "highBound": 3

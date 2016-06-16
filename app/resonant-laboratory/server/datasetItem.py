@@ -402,6 +402,7 @@ class DatasetItem(Resource):
                     highBound = getSignificantDigit(highBound, 2, roundDown=False)
 
                     binSettings[attrName]['humanBins'] = []
+                    binSettings[attrName]['binBounds'] = []
                     for binNo in xrange(numBins):
                         l = lowBound + (highBound - lowBound) * float(binNo) / numBins
                         h = lowBound + (highBound - lowBound) * float(binNo + 1) / numBins
@@ -416,13 +417,16 @@ class DatasetItem(Resource):
                             label = '[' + str(getSignificantDigit(l, 2, roundDown=True)) + \
                                 ', ' + str(getSignificantDigit(h, 2, roundDown=False)) + ']'
                         binSettings[attrName]['humanBins'].append(label)
+                        binSettings[attrName]['binBounds'].append((l, h))
 
                 elif coerceToType == 'string':
                     # TODO: ordinal binning of strings (lexographic)
                     binSettings[attrName]['humanBins'] = []
+                    binSettings[attrName]['binBounds'] = []
                 elif coerceToType == 'date':
                     # TODO: ordinal binning of dates
                     binSettings[attrName]['humanBins'] = []
+                    binSettings[attrName]['binBounds'] = []
                 else:
                     raise RestException('Can not treat attribute ' + attrName +
                                         ' of type ' + coerceToType + ' as ordinal data.')
@@ -439,11 +443,13 @@ class DatasetItem(Resource):
         params['cache'] = params.get('cache', False)
 
         # Stringify the params, both for cache hashing, as well as stitching
-        # together the map code below
+        # together the map and reduce code below
         paramsCode = bson.json_util.dumps(params,
                                           sort_keys=True,
                                           indent=2,
                                           separators=(',', ': '))
+
+        # Check if this query has already been run - if so, return the cached result
         if params['cache']:
             paramsMD5 = md5.md5(paramsCode).hexdigest()
             if 'histogramCaches' in item['meta']['rlab'] and paramsMD5 in item['meta']['rlab']['histogramCaches']:
@@ -454,7 +460,10 @@ class DatasetItem(Resource):
             'var params = ' + paramsCode + ';\n' + \
             self.foreignCode['histogram_map.js'] + '\n}'
 
-        reduceScript = self.foreignCode['histogram_reduce.js']
+        reduceScript = 'function reduce (attrName, allCounts) {\n' + \
+            'var params = ' + paramsCode + ';\n' + \
+            self.foreignCode['histogram_reduce.js'] + '\n' + \
+            'return counters;\n}'
 
         if 'databaseMetadata' in item:
             if item['databaseMetadata']['type'] == 'mongo':
@@ -469,6 +478,28 @@ class DatasetItem(Resource):
         else:
             histogram = self.flatFileMapReduce(item, mapScript, reduceScript)
 
+        # Add details to each bin, and preserve the order
+        # of the humanBins. Put the special values at the end
+        for attrName, countDict in histogram.iteritems():
+            detailedBins = []
+            for binIndex, humanBin in enumerate(binSettings[attrName]['humanBins']):
+                detailedBin = {
+                    'label': humanBin,
+                    'count': countDict[humanBin]
+                }
+                if binSettings[attrName]['interpretation'] == 'ordinal':
+                    detailedBin['lowBound'] = binSettings[attrName]['binBounds'][binIndex][0]
+                    detailedBin['highBound'] = binSettings[attrName]['binBounds'][binIndex][1]
+                detailedBins.append(detailedBin)
+            for anyBin, count in countDict.iteritems():
+                if anyBin not in binSettings[attrName]['humanBins']:
+                    detailedBins.append({
+                        'label': anyBin,
+                        'count': count
+                    })
+            histogram[attrName] = detailedBins
+
+        # Cache the results before returning them
         if params['cache']:
             if 'histogramCaches' not in item['meta']['rlab']:
                 item['meta']['rlab']['histogramCaches'] = {}

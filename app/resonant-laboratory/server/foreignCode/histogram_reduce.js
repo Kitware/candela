@@ -1,3 +1,5 @@
+/* globals attrName, allCounts, params */
+
 /*
 TODO: For now, we keep the first m categorical values that we encounter,
 and throw the rest into an "other" bin.
@@ -18,19 +20,35 @@ Pass #2:
     exact counts because we know which values to count a priori. We could (should)
     probably do stage 2 in in the map phase, because we already know the bins
 */
-function reduce (attrName, allCounts) {  // eslint-disable-line no-unused-vars
-  var counters = {};
-  // TODO: initialize counters with all the humanBins in params
-  allCounts.forEach(function (binCounts) {
-    var bin;
-    for (bin in binCounts) {
-      if (binCounts.hasOwnProperty(bin)) {
-        if (!counters.hasOwnProperty(bin)) {
-          counters[bin] = 0;
-        }
-        counters[bin] += binCounts[bin];
+
+// This script is kind of sloppy, but to use this code with mongodb's
+// mapreduce, the reduce script must contain exactly one function. Because of
+// this, these two lines are appended in datasetItem.py (as params can vary,
+// and there's no way to pass in parameters to these functions):
+// function reduce (attrName, allCounts) {
+//  var params = {...}
+var counters = {};
+
+// Before we go counting values that we see in the data
+// (including special values that may or may not get a
+// bin in the results, depending on whether they exist),
+// we want to initialize all of our human bins to zero,
+// so that there aren't weird gaps in ordinal histograms
+params.binSettings[attrName].humanBins.forEach(function (bin) {
+  counters[bin] = 0;
+});
+
+// Okay, now count everything
+allCounts.forEach(function (binCounts) {
+  var bin;
+  for (bin in binCounts) {
+    if (binCounts.hasOwnProperty(bin)) {
+      if (!counters.hasOwnProperty(bin)) {
+        counters[bin] = 0;
       }
+      counters[bin] += binCounts[bin];
     }
-  });
-  return counters;
-}
+  }
+});
+//  return counters;
+// }
