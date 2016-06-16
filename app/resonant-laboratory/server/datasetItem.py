@@ -129,6 +129,10 @@ class DatasetItem(Resource):
         return dialect
 
     def flatFileMapReduce(self, item, mapScript, reduceScript):
+        # TODO: This is an incredibly naive, single-threaded implementation.
+        # It shouldn't be hard to rewrite this to use multiple threads...
+        # (though, to be fair, the user shouldn't be using big flat files
+        # in the first place)
         mapReduceCode = execjs.compile(mapScript + reduceScript +
                                        self.foreignCode['mapReduceChunk.js'])
         fileFormat = item['meta']['rlab']['format']
@@ -340,7 +344,7 @@ class DatasetItem(Resource):
                'An array of values that will be put into their own bins, regardless of ' +
                'all other settings. This lets you separate bad values/error codes, e.g. ' +
                '[-9999,"N/A"]. These special values will be added to the set of natively ' +
-               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, ""]'
+               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, "", "other"]'
                '<br/><br/>numBins<br/>' +
                'Defines the maximum number of bins to use, in addition to the specialBins ' +
                '(default: 10 bins). For categorical data, the bins are arbitrarily chosen' +
@@ -434,9 +438,9 @@ class DatasetItem(Resource):
                 binSettings[attrName]['lowBound'] = lowBound
                 binSettings[attrName]['highBound'] = highBound
             else:
-                # TODO: if there are cached bins (from a first,
-                # uncertain pass), populate this list with those
-                # categorical values for the second pass
+                # TODO: if there are cached categorical bins (from a first,
+                # pass with uncertainty in the results), populate this list with those
+                # known categorical values for the second pass
                 binSettings[attrName]['humanBins'] = []
 
         params['binSettings'] = binSettings
@@ -460,10 +464,10 @@ class DatasetItem(Resource):
             'var params = ' + paramsCode + ';\n' + \
             self.foreignCode['histogram_map.js'] + '\n}'
 
-        reduceScript = 'function reduce (attrName, allCounts) {\n' + \
+        reduceScript = 'function reduce (attrName, allHistograms) {\n' + \
             'var params = ' + paramsCode + ';\n' + \
             self.foreignCode['histogram_reduce.js'] + '\n' + \
-            'return counters;\n}'
+            'return {histogram: histogram};\n}'
 
         if 'databaseMetadata' in item:
             if item['databaseMetadata']['type'] == 'mongo':
@@ -478,26 +482,15 @@ class DatasetItem(Resource):
         else:
             histogram = self.flatFileMapReduce(item, mapScript, reduceScript)
 
-        # Add details to each bin, and preserve the order
-        # of the humanBins. Put the special values at the end
-        for attrName, countDict in histogram.iteritems():
-            detailedBins = []
-            for binIndex, humanBin in enumerate(binSettings[attrName]['humanBins']):
-                detailedBin = {
-                    'label': humanBin,
-                    'count': countDict[humanBin]
-                }
-                if binSettings[attrName]['interpretation'] == 'ordinal':
-                    detailedBin['lowBound'] = binSettings[attrName]['binBounds'][binIndex][0]
-                    detailedBin['highBound'] = binSettings[attrName]['binBounds'][binIndex][1]
-                detailedBins.append(detailedBin)
-            for anyBin, count in countDict.iteritems():
-                if anyBin not in binSettings[attrName]['humanBins']:
-                    detailedBins.append({
-                        'label': anyBin,
-                        'count': count
-                    })
-            histogram[attrName] = detailedBins
+        # We have to clean up the histogram wrappers (mongodb can't return
+        # an array from reduce functions). While we're at it, add the
+        # lowBound / highBound details to each ordinal bin
+        for attrName, wrappedHistogram in histogram.iteritems():
+            histogram[attrName] = wrappedHistogram['histogram']
+            if 'binBounds' in binSettings[attrName]:
+                for binIndex, bounds in enumerate(binSettings[attrName]['binBounds']):
+                    histogram[attrName][binIndex]['lowBound'] = bounds[0]
+                    histogram[attrName][binIndex]['highBound'] = bounds[1]
 
         # Cache the results before returning them
         if params['cache']:

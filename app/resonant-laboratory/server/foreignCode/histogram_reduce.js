@@ -1,4 +1,4 @@
-/* globals attrName, allCounts, params */
+/* globals attrName, allHistograms, params */
 
 /*
 TODO: For now, we keep the first m categorical values that we encounter,
@@ -25,30 +25,76 @@ Pass #2:
 // mapreduce, the reduce script must contain exactly one function. Because of
 // this, these two lines are appended in datasetItem.py (as params can vary,
 // and there's no way to pass in parameters to these functions):
-// function reduce (attrName, allCounts) {
+// function reduce (attrName, allHistograms) {
 //  var params = {...}
-var counters = {};
+var histogram = [];
+var specialBins = {};
+var binLookup = {};
 
-// Before we go counting values that we see in the data
-// (including special values that may or may not get a
-// bin in the results, depending on whether they exist),
-// we want to initialize all of our human bins to zero,
+// Initialize all of our human bins to zero,
 // so that there aren't weird gaps in ordinal histograms
-params.binSettings[attrName].humanBins.forEach(function (bin) {
-  counters[bin] = 0;
+var binSettings = params.binSettings[attrName];
+binSettings.humanBins.forEach(function (label) {
+  binLookup[label] = histogram.length;
+  histogram.push({
+    label: label,
+    count: 0
+  });
 });
 
-// Okay, now count everything
-allCounts.forEach(function (binCounts) {
-  var bin;
-  for (bin in binCounts) {
-    if (binCounts.hasOwnProperty(bin)) {
-      if (!counters.hasOwnProperty(bin)) {
-        counters[bin] = 0;
+// Count everything
+allHistograms.forEach(function (wrappedHistogram) {
+  wrappedHistogram.histogram.forEach(function (bin) {
+    if (binLookup.hasOwnProperty(bin.label)) {
+      // We already have a bin for this value
+      histogram[binLookup[bin.label]].count += 1;
+    } else if (binSettings.specialBins.indexOf(bin.label) !== -1) {
+      // This is a special bin; always count these
+      if (!specialBins.hasOwnProperty(bin.label)) {
+        specialBins[bin.label] = {
+          label: bin.label,
+          count: 0
+        };
       }
-      counters[bin] += binCounts[bin];
+      specialBins[bin.label].count += 1;
+    } else {
+      // This is a regular value that we don't have a bin for. Do we have space?
+      if (histogram.length < binSettings.numBins) {
+        // We still have room; create a new bin
+        // TODO: do the fancier stuff outlined at the top of this file
+        binLookup[bin.label] = histogram.length;
+        histogram.push({
+          label: bin.label,
+          count: 1
+        });
+      } else {
+        // Okay, there's no room left. Add a count to the special "other" bin
+        if (!specialBins.hasOwnProperty('other')) {
+          specialBins['other'] = {
+            label: 'other',
+            count: 0
+          };
+        }
+        specialBins.other.count += 1;
+      }
     }
-  }
+  });
 });
-//  return counters;
+
+// Okay, add the special bins on to the end of the regular ones
+// (starting with "other" if it exists)
+if (specialBins.hasOwnProperty('other')) {
+  histogram.push(specialBins.other);
+  delete specialBins.other;
+}
+var bin;
+for (bin in specialBins) {
+  if (specialBins.hasOwnProperty(bin)) {
+    histogram.push(specialBins[bin]);
+  }
+}
+
+// datasetItem.py also stitches this on...
+// mongo can't return an array, so we wrap it in an object
+//  return {histogram: histogram};
 // }

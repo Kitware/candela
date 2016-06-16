@@ -125,9 +125,18 @@ if (filterRow(dataRow)) {
   for (attrName in dataRow) {
     if (dataRow.hasOwnProperty(attrName)) {
       var value = dataRow[attrName];
-      var result = {};
-      result[findBin(attrName, value)] = 1;
-      emit(attrName, result);
+      // This is a funky way to wrap up the histogram...
+      // the outer layer has to do with the fact that mongodb
+      // reduce functions can't output an array. The array, of course,
+      // is an ordered list of bins... in the map case, there's only
+      // one bin to emit. The object inside is the way bins are returned
+      // in the output.
+      emit(attrName, {
+        histogram: [{
+          count: 1,
+          label: findBin(attrName, value)
+        }]
+      });
     }
   }
 }
