@@ -1,7 +1,6 @@
-import candela from '../../../src/candela';
 import dl from 'datalib';
-import html from './index.jade';
 import msft_raw from '../../examples/data/msft.csv';
+import showComponent from '../util/showComponent';
 
 import '../../examples/index.styl';
 
@@ -11,14 +10,7 @@ const msft = dl.read(msft_raw, {
 });
 
 window.onload = () => {
-  document.body.innerHTML = html();
-
-  let el = document.getElementById('vis-container')
-    .appendChild(document.createElement('div'));
-  el.setAttribute('id', 'vis-element');
-  el.className = 'vis-full';
-
-  let vis = new candela.components.LineChart(el, {
+  showComponent('LineChart', 'div', {
     data: msft,
     x: 'date',
     y: ['price'],
@@ -32,5 +24,4 @@ window.onload = () => {
     },
     renderer: 'svg'
   });
-  vis.render();
 };

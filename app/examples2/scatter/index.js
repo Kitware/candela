@@ -1,18 +1,10 @@
-import candela from '../../../src/candela';
-import html from './index.jade';
 import iris from '../../examples/data/iris.json';
+import showComponent from '../util/showComponent';
 
 import '../../examples/index.styl';
 
 window.onload = () => {
-  document.body.innerHTML = html();
-
-  let el = document.getElementById('vis-container')
-    .appendChild(document.createElement('div'));
-  el.setAttribute('id', 'vis-element');
-  el.className = 'vis-full';
-
-  let vis = new candela.components.ScatterPlot(el, {
+  showComponent('ScatterPlot', 'div', {
     data: iris,
     x: 'petalLength',
     y: 'petalWidth',
@@ -28,5 +20,4 @@ window.onload = () => {
     },
     renderer: 'svg'
   });
-  vis.render();
 };
