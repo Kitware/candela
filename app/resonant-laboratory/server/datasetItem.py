@@ -11,6 +11,7 @@ import csv
 import bson.json_util
 import md5
 import math
+import itertools
 from pymongo import MongoClient
 from versioning import Versioning
 from girder.api import access
@@ -509,12 +510,6 @@ class DatasetItem(Resource):
                required=False, dataType='int')
         .param('offset', 'Offset into result set (default=0).',
                required=False, dataType='int')
-        .param('sort', 'Either a field to sort the results by or a JSON list '
-               'of multiple fields and directions for sorting the results '
-               '(e.g., [["field1", 1], ["field2", -1]])', required=False)
-        .param('sortdir', '1 for ascending, -1 for descending (default=1).  '
-               'Ignored if sort is unspecified or is a JSON list.',
-               required=False, dataType='int')
         .param('fields', 'A comma-separated or JSON list of fields (column '
                'names) to return (default is all fields).  If a JSON list is '
                'used, instead of a plain string, a field may be a dictionary '
@@ -530,10 +525,37 @@ class DatasetItem(Resource):
         .errorResponse()
     )
     def getData(self, item, params):
+        # TODO: For now I just dump all the unfiltered results
+        # (need to implement the filtering for flat files AND
+        # convert for the database)
+        if 'filter' in params:
+            del params['filter']
+
+        # TODO: I also ignore the fields parameter for now
+        if 'fields' in params:
+            del params['fields']
+
+        params['limit'] = int(params.get('limit', 50))
+        params['offset'] = int(params.get('offset', 0))
+
         if 'databaseMetadata' in item:
             params['format'] = 'dict'
+
             selectResult = self.databaseItemResource.databaseSelect(id=item['_id'], params=params)
             return bson.json_util.loads(list(selectResult())[0])['data']
         else:
-            raise RestException('getData for flat file items' +
-                                ' is not yet supported')
+            fileFormat = item['meta']['rlab']['format']
+            if fileFormat == 'csv':
+                dialect = self.getStringifiedDialect(item)
+                csv.register_dialect(item['name'], **dialect)
+                lineReader = self.bufferedDownloadLineReader(item['meta']['rlab']['fileId'],
+                                                             dialect['lineterminator'])
+                reader = csv.DictReader(lineReader, dialect=item['name'])
+            elif fileFormat == 'json':
+                reader = self.bufferedDownloadItemReader(item['meta']['rlab']['fileId'], '$')
+            else:
+                raise RestException('Unrecognized file type: ' + fileFormat)
+
+            # Just slice a page... obviously we'll do something fancier in the future
+            resultReader = itertools.islice(reader, params['offset'], params['offset'] + params['limit'])
+            return [line for line in resultReader]
