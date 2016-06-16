@@ -14,7 +14,8 @@ module.exports = {
     candela: ['./src/candela/index.js'],
     examples: './app/examples/index.js',
     examples2: './app/examples2/index.js',
-    'examples2/foobar': './app/examples2/foobar/index.js'
+    'examples2/foobar': './app/examples2/foobar/index.js',
+    'examples2/scatter': './app/examples2/scatter/index.js'
   },
   output: {
     library: '[name]',
@@ -53,6 +54,12 @@ module.exports = {
       title: 'Foobar',
       filename: 'examples2/foobar/index.html',
       chunks: ['examples2/foobar']
+    }),
+
+    new HtmlPlugin({
+      title: 'Scatter',
+      filename: 'examples2/scatter/index.html',
+      chunks: ['examples2/scatter']
     }),
 
     new CopyPlugin([{
