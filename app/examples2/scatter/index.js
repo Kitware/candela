@@ -1,4 +1,4 @@
-import iris from '../../examples/data/iris.json';
+import { iris } from '../util/datasets';
 import showComponent from '../util/showComponent';
 
 import '../../examples/index.styl';

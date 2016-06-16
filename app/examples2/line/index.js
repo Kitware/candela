@@ -1,13 +1,7 @@
-import dl from 'datalib';
-import msft_raw from '../../examples/data/msft.csv';
+import { msft } from '../util/datasets';
 import showComponent from '../util/showComponent';
 
 import '../../examples/index.styl';
-
-const msft = dl.read(msft_raw, {
-  type: 'csv',
-  parse: 'auto'
-});
 
 window.onload = () => {
   showComponent('LineChart', 'div', {
