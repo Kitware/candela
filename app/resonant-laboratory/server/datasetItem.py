@@ -53,9 +53,9 @@ class DatasetItem(Resource):
         conn = MongoClient(dbMetadata['url'])
         return conn[dbMetadata['database']][dbMetadata['collection']]
 
-    def mongoMapReduce(self, item, mapScript, reduceScript):
+    def mongoMapReduce(self, item, mapScript, reduceScript, **kwargs):
         collection = self.getMongoCollection(item)
-        mr_result = collection.inline_map_reduce(mapScript, reduceScript)
+        mr_result = collection.inline_map_reduce(mapScript, reduceScript, **kwargs)
         # rearrange into a neater dict before sending it back
         result = {}
         for r in mr_result:
@@ -132,17 +132,6 @@ class DatasetItem(Resource):
                 rawData = []
         # last chunk
         return mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
-
-    def mapReduce(self, item, mapScript, reduceScript):
-        if 'databaseMetadata' in item:
-            if item['databaseMetadata']['type'] == 'mongo':
-                return self.mongoMapReduce(item, mapScript, reduceScript)
-            else:
-                raise RestException('MapReduce for ' +
-                                    item['databaseMetadata']['type'] +
-                                    ' databases is not yet supported')
-        else:
-            return self.flatFileMapReduce(item, mapScript, reduceScript)
 
     @access.public
     @loadmodel(model='item', level=AccessType.WRITE)
@@ -263,18 +252,29 @@ class DatasetItem(Resource):
         if 'meta' not in item or 'rlab' not in item['meta']:
             item = self.setupDataset(id=item['_id'], params={})
 
-        schema = self.mapReduce(item,
-                                self.foreignCode['schema_map.js'],
-                                self.foreignCode['schema_reduce.js'])
+        # Run the schema MapReduce code
+        mapScript = self.foreignCode['schema_map.js']
+        reduceScript = self.foreignCode['schema_reduce.js']
+
+        if 'databaseMetadata' in item:
+            if item['databaseMetadata']['type'] == 'mongo':
+                schema = self.mongoMapReduce(item, mapScript, reduceScript)
+            else:
+                raise RestException('MapReduce for ' +
+                                    item['databaseMetadata']['type'] +
+                                    ' databases is not yet supported')
+        else:
+            schema = self.flatFileMapReduce(item, mapScript, reduceScript)
 
         # We want to preserve any explicit user coerceToType or interpretation settings
+        # thay may have existed in the previous schema
         existingSchema = item['meta']['rlab'].get('schema', {})
         for attrName in schema.iterkeys():
             if attrName in existingSchema:
-                if 'coerceToType' in existingSchema['attrName']:
-                    schema['attrName']['coerceToType'] = existingSchema['attrName']['coerceToType']
-                if 'interpretation' in existingSchema['attrName']:
-                    schema['attrName']['interpretation'] = existingSchema['attrName']['interpretation']
+                if 'coerceToType' in existingSchema[attrName]:
+                    schema[attrName]['coerceToType'] = existingSchema[attrName]['coerceToType']
+                if 'interpretation' in existingSchema[attrName]:
+                    schema[attrName]['interpretation'] = existingSchema[attrName]['interpretation']
         item['meta']['rlab']['schema'] = schema
         item['meta']['rlab']['lastUpdated'] = datetime.datetime.now().isoformat()
         return self.model('item').updateItem(item)
@@ -375,22 +375,43 @@ class DatasetItem(Resource):
         params['binSettings'] = binSettings
         params['cache'] = params.get('cache', False)
 
-        # store params as a chunk of code that can be prepended
-        # in a way that the map code can access it
-        paramsCode = 'var params = ' + bson.json_util.dumps(params, sort_keys=True) + ';\n'
+        # Stringify the params, both for cache hashing, as well as stitching
+        # together the map code below
+        paramsCode = bson.json_util.dumps(params,
+                                          sort_keys=True,
+                                          indent=2,
+                                          separators=(',', ': '))
         if params['cache']:
-            paramsMD5 = md5.md5(paramsCode)
+            paramsMD5 = md5.md5(paramsCode).hexdigest()
             if 'histogramCaches' in item['meta']['rlab'] and paramsMD5 in item['meta']['rlab']['histogramCaches']:
                 return item['meta']['rlab']['histogramCaches'][paramsMD5]
-        results = self.mapReduce(item,
-                                 paramsCode + self.foreignCode['histogram_map.js'],
-                                 self.foreignCode['histogram_reduce.js'])
+
+        # Construct and run the histogram MapReduce code
+        mapScript = 'function map () {\n' + \
+            'var params = ' + paramsCode + ';\n' + \
+            self.foreignCode['histogram_map.js'] + '\n}'
+
+        reduceScript = self.foreignCode['histogram_reduce.js']
+
+        if 'databaseMetadata' in item:
+            if item['databaseMetadata']['type'] == 'mongo':
+                # TODO: instead of filtering inside the mapReduce code,
+                # convert params['filter'] to a mongo query and do this:
+                # histogram = self.mongoMapReduce(item, mapScript, reduceScript, query=query)
+                histogram = self.mongoMapReduce(item, mapScript, reduceScript)
+            else:
+                raise RestException('MapReduce for ' +
+                                    item['databaseMetadata']['type'] +
+                                    ' databases is not yet supported')
+        else:
+            histogram = self.flatFileMapReduce(item, mapScript, reduceScript)
+
         if params['cache']:
             if 'histogramCaches' not in item['meta']['rlab']:
                 item['meta']['rlab']['histogramCaches'] = {}
-            item['meta']['rlab']['histogramCaches'][paramsMD5] = results
+            item['meta']['rlab']['histogramCaches'][paramsMD5] = histogram
             self.model('item').updateItem(item)
-        return results
+        return histogram
 
     @access.public
     @loadmodel(model='item', level=AccessType.READ)

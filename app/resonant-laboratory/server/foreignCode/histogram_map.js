@@ -1,5 +1,12 @@
 /* globals emit, params */
 
+// This script is kind of sloppy, but to use this code with mongodb's
+// mapreduce, the map script must contain exactly one function. Because of
+// this, these two lines are appended in datasetItem.py (as params can vary,
+// and there's no way to pass in parameters to these functions):
+// function map () {
+//  var params = {...}
+
 function filterRow (dataRow, expression) {
   if (expression === undefined) {
     expression = params['filter'];
@@ -93,11 +100,8 @@ function findBin (attrName, value) {
   }
 }
 
-function map () { // eslint-disable-line no-unused-vars
-  var dataRow = this;
-  if (!filterRow(dataRow)) {
-    return;
-  }
+var dataRow = this;
+if (filterRow(dataRow)) {
   var attrName;
   for (attrName in dataRow) {
     if (dataRow.hasOwnProperty(attrName)) {
@@ -108,3 +112,5 @@ function map () { // eslint-disable-line no-unused-vars
     }
   }
 }
+
+// }

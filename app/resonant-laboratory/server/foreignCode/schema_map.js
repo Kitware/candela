@@ -25,6 +25,7 @@ function map () { // eslint-disable-line no-unused-vars
       native: true,
       count: 1
     };
+    // counters[nativeType][map._dummy] = 1;
     // store the mins and maxes if relevant
     if (nativeType === 'integer' || nativeType === 'number' ||
         nativeType === 'string' || nativeType === 'date') {
