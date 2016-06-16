@@ -10,6 +10,7 @@ import re
 import csv
 import bson.json_util
 import md5
+import math
 from pymongo import MongoClient
 from versioning import Versioning
 from girder.api import access
@@ -19,6 +20,27 @@ from girder.constants import AccessType
 from girder.plugins.girder_db_items.rest import DatabaseItemResource
 from girder.plugins.girder_db_items.dbs.mongo import MongoConnector
 from girder_worker.format import get_csv_reader
+
+
+def getSignificantDigit(value, nDigits, roundDown=True):
+    # "round" a number to its nearest significant digit
+    # As we're looking for low/high boundaries, we control the
+    # rounding direction
+    if math.isinf(value) or math.isnan(value):
+        return value
+    if value == 0.0:
+        return int(value)
+
+    base = 10**(int(math.floor(math.log10(abs(value)))) - (nDigits - 1))
+    if roundDown:
+        result = math.floor(value / base) * base
+    else:
+        result = math.ceil(value / base) * base
+
+    # convert to int if necessary
+    if result == math.floor(result):
+        result = int(result)
+    return result
 
 
 class DatasetItem(Resource):
@@ -314,16 +336,19 @@ class DatasetItem(Resource):
                '<br/><br/>highBound<br/>' +
                'Defines the high bound of the histogram if interpretation=ordinal. Default is ' +
                'to use the maximum value in the dataset.'
-               '<br/><br/>numBins<br/>' +
-               'Defines the maximum number of categorical bins to calculate if ' +
-               'interpreation=categorical (default: 10 bins). Setting this to 0 will ' +
-               'create distinct bins for every value encountered (can be very expensive/useless for ' +
-               'attributes with lots of distinct values, such as URLs!)' +
                '<br/><br/>specialBins<br/>' +
                'An array of values that will be put into their own bins, regardless of ' +
                'all other settings. This lets you separate bad values/error codes, e.g. ' +
                '[-9999,"N/A"]. These special values will be added to the set of natively ' +
-               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, ""]',
+               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, ""]'
+               '<br/><br/>numBins<br/>' +
+               'Defines the maximum number of bins to use, in addition to the specialBins ' +
+               '(default: 10 bins). For categorical data, the bins are arbitrarily chosen' +
+               '(in the future, the n-most frequent values will be chosen), and an "other" ' +
+               'bin will be created for values not in this set. Setting this to 0 will ' +
+               'create distinct bins for every value encountered (can be very expensive/useless for ' +
+               'attributes with lots of distinct values, such as IDs!). For ordinal data, ' +
+               'each bin will span a range of values (defined by lowBound and highBound).',
                required=False)
         .param('cache', 'If true, attempt to retrieve results cached in the item\'s metadata ' +
                         'if the same query has been run previously. Also, store the results ' +
@@ -358,19 +383,57 @@ class DatasetItem(Resource):
                 interpretation = binSettings[attrName].get('interpretation', interpretation)
                 binSettings[attrName]['interpretation'] = interpretation
 
+            specialBins = bson.json_util.loads(binSettings[attrName].get('specialBins', '[]'))
+            binSettings[attrName]['specialBins'] = specialBins
+
+            numBins = binSettings[attrName].get('numBins', 10)
+            binSettings[attrName]['numBins'] = numBins
+
             if interpretation == 'ordinal':
                 lowBound = attrSchema[coerceToType]['lowBound']
                 lowBound = binSettings[attrName].get('lowBound', lowBound)
-                binSettings[attrName]['lowBound'] = lowBound
 
                 highBound = attrSchema[coerceToType]['highBound']
                 highBound = binSettings[attrName].get('highBound', highBound)
+
+                # Pre-populate the bins with human-readable names
+                if coerceToType == 'integer' or coerceToType == 'number':
+                    lowBound = getSignificantDigit(lowBound, 2, roundDown=True)
+                    highBound = getSignificantDigit(highBound, 2, roundDown=False)
+
+                    binSettings[attrName]['humanBins'] = []
+                    for binNo in xrange(numBins):
+                        l = lowBound + (highBound - lowBound) * float(binNo) / numBins
+                        h = lowBound + (highBound - lowBound) * float(binNo + 1) / numBins
+                        if (binNo < numBins - 1):
+                            # Most bins do not include the upper bound
+                            # (and the upper bound is rounded down so that it's
+                            # the same as the next bin's lower bound)
+                            label = '[' + str(getSignificantDigit(l, 2, roundDown=True)) + \
+                                ', ' + str(getSignificantDigit(h, 2, roundDown=True)) + ')'
+                        else:
+                            # The last bin includes the upper bound, and it's rounded up
+                            label = '[' + str(getSignificantDigit(l, 2, roundDown=True)) + \
+                                ', ' + str(getSignificantDigit(h, 2, roundDown=False)) + ']'
+                        binSettings[attrName]['humanBins'].append(label)
+
+                elif coerceToType == 'string':
+                    # TODO: ordinal binning of strings (lexographic)
+                    binSettings[attrName]['humanBins'] = []
+                elif coerceToType == 'date':
+                    # TODO: ordinal binning of dates
+                    binSettings[attrName]['humanBins'] = []
+                else:
+                    raise RestException('Can not treat attribute ' + attrName +
+                                        ' of type ' + coerceToType + ' as ordinal data.')
+
+                binSettings[attrName]['lowBound'] = lowBound
                 binSettings[attrName]['highBound'] = highBound
             else:
-                binSettings[attrName]['numBins'] = binSettings[attrName].get('numBins', 10)
-
-            specialBins = bson.json_util.loads(binSettings[attrName].get('specialBins', '[]'))
-            binSettings[attrName]['specialBins'] = specialBins
+                # TODO: if there are cached bins (from a first,
+                # uncertain pass), populate this list with those
+                # categorical values for the second pass
+                binSettings[attrName]['humanBins'] = []
 
         params['binSettings'] = binSettings
         params['cache'] = params.get('cache', False)

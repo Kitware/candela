@@ -54,6 +54,7 @@ function filterRow (dataRow, expression) {
 
 function findBin (attrName, value) {
   var coerceToType = params.binSettings[attrName].coerceToType;
+  var interpretation = params.binSettings[attrName].interpretation;
   // What type should we coerce this value to?
   if (coerceToType === null) {
     // Bin by native data type
@@ -63,7 +64,6 @@ function findBin (attrName, value) {
       value = typeof value;
     }
   } else if (coerceToType === 'boolean') {
-    // Force the value to this type
     value = !!value;
   } else if (coerceToType === 'integer') {
     value = parseInt(value);
@@ -73,6 +73,11 @@ function findBin (attrName, value) {
     value = String(value);
   } else if (coerceToType === 'date') {
     value = new Date(value);
+  } else {
+    // coerceToType is 'object' or some other kind of passthrough.
+    // for the sake of the histograms, force it to a string (even
+    // though the data will be passed in Resonant Lab unchanged)
+    value = String(value);
   }
 
   // Is the value a special value (always emit the bin)?
@@ -93,9 +98,23 @@ function findBin (attrName, value) {
   }
 
   // Okay, how should we bin things?
-  if (params.binSettings[attrName].interpretation === 'ordinal') {
-    return 'TODO: ordinal bin';
+  if (interpretation === 'ordinal') {
+    if (coerceToType === 'integer' || coerceToType === 'number') {
+      var binIndex = Math.floor(params.binSettings[attrName].numBins *
+                                (value - params.binSettings[attrName].lowBound) /
+                                (params.binSettings[attrName].highBound -
+                                  params.binSettings[attrName].lowBound));
+      return params.binSettings[attrName].humanBins[binIndex];
+    } else if (coerceToType === 'string') {
+      // TODO: ordinal binning of strings (lexographic)
+      return value;
+    } else if (coerceToType === 'date') {
+      // TODO: ordinal binning of dates
+      return value;
+    }
   } else {
+    // Just return all the categorical values... the reduce phase
+    // takes care of binning these
     return value;
   }
 }
