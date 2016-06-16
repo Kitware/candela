@@ -76,16 +76,21 @@ class DatasetItem(Resource):
         conn = MongoClient(dbMetadata['url'])
         return conn[dbMetadata['database']][dbMetadata['collection']]
 
-    def mongoMapReduce(self, item, mapScript, reduceScript, **kwargs):
+    def mongoMapReduce(self, item, mapScript, reduceScript, filters={}, fields={}):
         collection = self.getMongoCollection(item)
-        mr_result = collection.inline_map_reduce(mapScript, reduceScript, **kwargs)
+        # TODO: convert the filters argument to a mongo-style query, and
+        # pass it in as the query parameter
+        mr_result = collection.inline_map_reduce(mapScript, reduceScript)
         # rearrange into a neater dict before sending it back
         result = {}
         for r in mr_result:
+            # TODO: remove fields not specified in the fields parameter
+            # (or is there a more efficient way to keep them out of
+            # the results in the first place?)
             result[r['_id']] = r['value']
         return result
 
-    def bufferedDownloadLineReader(self, fileId, lineterminator="\r\n"):
+    def bufferedDownloadLineReader(self, fileId, lineterminator="\r\n", filters={}, fields={}):
         # TODO: @ronichoudhury is implementing something cool
         # that will make this function obsolete
         lineterminator = re.compile('[' + lineterminator + ']')
@@ -94,6 +99,8 @@ class DatasetItem(Resource):
         # call download directly?
         # TODO: only grab a few lines at a time instead of
         # dumping the whole thing at once
+        # TODO: apply the filters and fields parameters to
+        # limit how much data we actually pull out
         chunk = functools.partial(self.model('file').download,
                                   fileObj,
                                   headers=False,
@@ -103,7 +110,7 @@ class DatasetItem(Resource):
         for line in chunk:
             yield line
 
-    def bufferedDownloadItemReader(self, fileId, jsonPath='$'):
+    def bufferedDownloadItemReader(self, fileId, jsonPath='$', filters={}, fields={}):
         # TODO: @ronichoudhury is implementing something cool
         # that will make this function obsolete
         fileObj = self.model('file').load(fileId, user=self.getCurrentUser())
@@ -111,6 +118,8 @@ class DatasetItem(Resource):
         # call download directly?
         # TODO: only grab a few lines at a time instead of
         # dumping the whole thing at once
+        # TODO: apply the filters and fields parameters to
+        # limit how much data we actually pull out
         chunk = functools.partial(self.model('file').download,
                                   fileObj,
                                   headers=False,

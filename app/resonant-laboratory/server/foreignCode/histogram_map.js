@@ -8,6 +8,9 @@
 //  var params = {...}
 
 function filterRow (dataRow, expression) {
+  // TODO: this is NOT the place to do row filtering!
+  // We *should* let mongo handle the filtering, or
+  // do the filtering in the assetstore...?
   if (expression === undefined) {
     expression = params['filter'];
   }
