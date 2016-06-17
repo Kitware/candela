@@ -16,6 +16,10 @@
     "link": "lineup"
   },
   {
+    "title": "Bar Chart",
+    "link": "bar"
+  },
+  {
     "title": "Bullet Chart",
     "link": "bullet"
   },

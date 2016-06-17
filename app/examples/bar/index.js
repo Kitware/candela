@@ -1,9 +1,7 @@
 import showComponent from '../util/showComponent';
 
-import '../../examples/index.styl';
-
 window.onload = () => {
-  showComponent('scatterplot', 'div', {
+  showComponent('BarChart', 'div', {
     data: [
       {id: 0, a: 1, b: 3, c: 3},
       {id: 1, a: 10, b: 4, c: 3},
