@@ -1,7 +1,5 @@
 import showComponent from '../util/showComponent';
 
-import '../../examples/index.styl';
-
 window.onload = () => {
   showComponent('BulletChart', 'div', {
     value: 0.2,

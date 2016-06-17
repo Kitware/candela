@@ -1,5 +1,6 @@
 import candela from '../../../../src/candela';
 import html from './index.jade';
+import './index.styl';
 
 export default function showComponent (which, elementType, options) {
   document.body.innerHTML = html();

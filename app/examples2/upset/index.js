@@ -1,8 +1,6 @@
 import { simpsons } from '../util/datasets';
 import showComponent from '../util/showComponent';
 
-import '../../examples/index.styl';
-
 window.onload = () => {
   showComponent('UpSet', 'div', {
     data: simpsons,

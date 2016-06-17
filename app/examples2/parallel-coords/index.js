@@ -1,7 +1,5 @@
 import showComponent from '../util/showComponent';
 
-import '../../examples/index.styl';
-
 window.onload = () => {
   showComponent('ParallelCoordinates', 'canvas', {
     dataRoot: 'nba-heatmaps',

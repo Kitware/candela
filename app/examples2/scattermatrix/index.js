@@ -1,8 +1,6 @@
 import { iris } from '../util/datasets';
 import showComponent from '../util/showComponent';
 
-import '../../examples/index.styl';
-
 window.onload = () => {
   showComponent('ScatterPlotMatrix', 'div', {
     data: iris,

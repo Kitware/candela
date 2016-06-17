@@ -1,8 +1,6 @@
 import { iris } from '../util/datasets';
 import showComponent from '../util/showComponent';
 
-import '../../examples/index.styl';
-
 window.onload = () => {
   showComponent('BoxPlot', 'div', {
     data: iris,
