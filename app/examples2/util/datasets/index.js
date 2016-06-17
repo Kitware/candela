@@ -10,7 +10,7 @@ function readCSV (raw) {
     type: 'csv',
     parse: 'auto'
   });
-};
+}
 
 const msft = readCSV(msft_raw);
 const simpsons = readCSV(simpsons_raw);
