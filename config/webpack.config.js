@@ -19,8 +19,7 @@ var entryPoints = examples.map(function (ex) {
 
 var entry = {
   candela: ['./src/candela/index.js'],
-  examples: './app/examples/index.js',
-  examples2: './app/examples2/index.js'
+  examples: './app/examples/index.js'
 };
 
 entryPoints.forEach(function (ep) {
@@ -50,17 +49,6 @@ var plugins = [
     filename: 'examples/index.html',
     chunks: ['examples']
   }),
-
-  new HtmlPlugin({
-    title: 'Candela Examples 2',
-    filename: 'examples2/index.html',
-    chunks: ['examples2']
-  }),
-
-  new CopyPlugin([{
-    from: 'app/examples/data/nba-heatmaps',
-    to: 'examples2/nba-heatmaps'
-  }]),
 
   new CopyPlugin([{
     from: 'app/examples/data/nba-heatmaps',
