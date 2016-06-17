@@ -60,6 +60,11 @@ var plugins = [
   new CopyPlugin([{
     from: 'app/examples/data/nba-heatmaps',
     to: 'examples/nba-heatmaps'
+  }]),
+
+  new CopyPlugin([{
+    from: 'app/examples/data/nba-heatmaps',
+    to: 'examples2/parallel-coords/nba-heatmaps'
   }])
 ];
 

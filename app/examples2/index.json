@@ -8,6 +8,50 @@
     "link": "line"
   },
   {
+    "title": "Scatter Plot Matrix",
+    "link": "scattermatrix"
+  },
+  {
+    "title": "LineUp",
+    "link": "lineup"
+  },
+  {
+    "title": "Bullet Chart",
+    "link": "bullet"
+  },
+  {
+    "title": "Gantt Chart",
+    "link": "gantt"
+  },
+  {
+    "title": "Box Plot",
+    "link": "box"
+  },
+  {
+    "title": "Histogram",
+    "link": "histogram"
+  },
+  {
+    "title": "Date Histogram",
+    "link": "date-histogram"
+  },
+  {
+    "title": "Heatmap",
+    "link": "heatmap"
+  },
+  {
+    "title": "UpSet",
+    "link": "upset"
+  },
+  {
+    "title": "UpSet Alternate Sets",
+    "link": "upset-alternate"
+  },
+  {
+    "title": "Parallel Coordinates",
+    "link": "parallel-coords"
+  },
+  {
     "title": "Foobar",
     "link": "foobar"
   }
