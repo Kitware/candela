@@ -7,13 +7,13 @@ var HtmlPlugin = require('html-webpack-plugin');
 
 __dirname = path.resolve(__dirname, '..');
 
-var examples = require('../app/examples2/index.json');
+var examples = require('../app/examples/index.json');
 
 // Compute entry points for the examples.
 var entryPoints = examples.map(function (ex) {
   return {
-    key: 'examples2/' + ex.link,
-    value: './app/examples2/' + ex.link + '/index.js'
+    key: 'examples/' + ex.link,
+    value: './app/examples/' + ex.link + '/index.js'
   };
 });
 
@@ -31,8 +31,8 @@ entryPoints.forEach(function (ep) {
 var htmlPlugins = examples.map(function (ex) {
   return new HtmlPlugin({
     title: ex.title,
-    filename: 'examples2/' + ex.link + '/index.html',
-    chunks: ['examples2/' + ex.link]
+    filename: 'examples/' + ex.link + '/index.html',
+    chunks: ['examples/' + ex.link]
   });
 });
 
@@ -59,12 +59,12 @@ var plugins = [
 
   new CopyPlugin([{
     from: 'app/examples/data/nba-heatmaps',
-    to: 'examples/nba-heatmaps'
+    to: 'examples2/nba-heatmaps'
   }]),
 
   new CopyPlugin([{
     from: 'app/examples/data/nba-heatmaps',
-    to: 'examples2/parallel-coords/nba-heatmaps'
+    to: 'examples/parallel-coords/nba-heatmaps'
   }])
 ];
 
