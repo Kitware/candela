@@ -50,5 +50,30 @@
   {
     "title": "Parallel Coordinates",
     "link": "parallel-coords"
+  },
+  {
+    "link": "resize-full",
+    "title": "Resize Full",
+    "template": "resize-full"
+  },
+  {
+    "title": "Resize Table",
+    "link": "resize-table",
+    "template": "resize-table"
+  },
+  {
+    "title": "Resize Matrix",
+    "link": "resize-matrix",
+    "template": "resize-matrix"
+  },
+  {
+    "title": "Dynamic Line Chart",
+    "link": "dynamic-linechart",
+    "template": "dynamic-linechart"
+  },
+  {
+    "title": "Serialization",
+    "link": "serialize",
+    "template": "serialize"
   }
 ]
