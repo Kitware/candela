@@ -27,6 +27,7 @@ script:
     - npm install
     - npm run lint
     - npm run build
+    - npm run build:examples
     - npm run test:unit
     - CANDELA_DUMP_IMAGE=all npm run test:image
     - npm run cover
