@@ -4,58 +4,56 @@ import * as upset from 'UpSet';
 import template from './template.html';
 
 export default class UpSet {
-  static get spec () {
-    return {
-      options: [
-        {
-          name: 'data',
-          type: 'table',
-          format: 'objectlist'
-        },
-        {
-          name: 'id',
-          type: 'string',
-          format: 'text',
-          domain: {
-            mode: 'field',
-            from: 'data',
-            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
-          }
-        },
-        {
-          name: 'sets',
-          type: 'string_list',
-          format: 'string_list',
-          optional: true,
-          domain: {
-            mode: 'field',
-            from: 'data',
-            fieldTypes: ['integer', 'boolean', 'string']
-          }
-        },
-        {
-          name: 'fields',
-          type: 'string_list',
-          format: 'string_list',
-          optional: true,
-          domain: {
-            mode: 'field',
-            from: 'data',
-            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
-          }
-        },
-        {
-          name: 'metadata',
-          type: 'string_list',
-          format: 'string_list',
-          domain: {
-            mode: 'field',
-            from: 'data',
-            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
-          }
+  static get options () {
+    return [
+      {
+        name: 'data',
+        type: 'table',
+        format: 'objectlist'
+      },
+      {
+        name: 'id',
+        type: 'string',
+        format: 'text',
+        domain: {
+          mode: 'field',
+          from: 'data',
+          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
         }
-      ]
-    };
+      },
+      {
+        name: 'sets',
+        type: 'string_list',
+        format: 'string_list',
+        optional: true,
+        domain: {
+          mode: 'field',
+          from: 'data',
+          fieldTypes: ['integer', 'boolean', 'string']
+        }
+      },
+      {
+        name: 'fields',
+        type: 'string_list',
+        format: 'string_list',
+        optional: true,
+        domain: {
+          mode: 'field',
+          from: 'data',
+          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+        }
+      },
+      {
+        name: 'metadata',
+        type: 'string_list',
+        format: 'string_list',
+        domain: {
+          mode: 'field',
+          from: 'data',
+          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+        }
+      }
+    ];
   }
 
   constructor (el, options) {

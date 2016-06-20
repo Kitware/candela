@@ -8,16 +8,16 @@ let VisualizationLibrary = Backbone.View.extend({
   render: function () {
     this.$el.html(myTemplate);
 
-    // For any candela vis that has a spec defined, extract
+    // For any candela vis that has options defined, extract
     // field options for our matching options.
     // TODO: We also need to extract data options - we currently
     // assume that there will be one table option called "data".
     let libraryVisSpecs = [];
     for (let visName of Object.keys(candela.components)) {
-      if (candela.components[visName].spec) {
+      if (candela.components[visName].options) {
         let spec = {
           name: visName,
-          options: candela.components[visName].spec.options.filter(option => {
+          options: candela.components[visName].options.filter(option => {
             return option.domain && option.domain.mode === 'field';
           })
         };

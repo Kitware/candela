@@ -7,44 +7,42 @@ import './index.styl';
 import 'font-awesome-webpack';
 
 export default class LineUp {
-  static get spec () {
-    return {
-      options: [
-        {
-          name: 'data',
-          type: 'table',
-          format: 'objectlist'
-        },
-        {
-          name: 'fields',
-          type: 'string_list',
-          format: 'string_list',
-          domain: {
-            mode: 'field',
-            from: 'data',
-            fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
-          }
-        },
-        {
-          name: 'stacked',
-          type: 'boolean',
-          format: 'boolean',
-          optional: true
-        },
-        {
-          name: 'histograms',
-          type: 'boolean',
-          format: 'boolean',
-          optional: true
-        },
-        {
-          name: 'animation',
-          type: 'boolean',
-          format: 'boolean',
-          optional: true
+  static get options () {
+    return [
+      {
+        name: 'data',
+        type: 'table',
+        format: 'objectlist'
+      },
+      {
+        name: 'fields',
+        type: 'string_list',
+        format: 'string_list',
+        domain: {
+          mode: 'field',
+          from: 'data',
+          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
         }
-      ]
-    };
+      },
+      {
+        name: 'stacked',
+        type: 'boolean',
+        format: 'boolean',
+        optional: true
+      },
+      {
+        name: 'histograms',
+        type: 'boolean',
+        format: 'boolean',
+        optional: true
+      },
+      {
+        name: 'animation',
+        type: 'boolean',
+        format: 'boolean',
+        optional: true
+      }
+    ];
   }
 
   constructor (el, options) {

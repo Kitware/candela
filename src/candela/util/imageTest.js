@@ -67,7 +67,7 @@ export default function imageTest ({name, url, selector, delay = 0, threshold}) 
     .then(() => {
       return n.goto(url)
         .wait('body')
-        .wait(1000 + delay)
+        .wait(delay)
         // TODO: allow for a custom evaluate function?
         .evaluate((_selector) => {
           const box = document.querySelector(_selector).getBoundingClientRect();
