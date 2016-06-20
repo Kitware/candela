@@ -76,7 +76,7 @@ let ProjectLibrary = Backbone.View.extend({
       // Get the set of the user's private projects
       new Promise((resolve, reject) => {
         girder.restRequest({
-          path: 'folder/privateFolder',
+          path: 'folder/anonymousAccess/privateFolder',
           type: 'GET',
           error: reject
         }).done(resolve).error(reject);
@@ -88,7 +88,7 @@ let ProjectLibrary = Backbone.View.extend({
       // Get the set of the user's public projects
       new Promise((resolve, reject) => {
         girder.restRequest({
-          path: 'folder/publicFolder',
+          path: 'folder/anonymousAccess/publicFolder',
           type: 'GET',
           error: reject
         }).done(resolve).error(reject);
@@ -104,7 +104,7 @@ let ProjectLibrary = Backbone.View.extend({
         // Get the set of projects in the public scratch space
         // that this browser created
         Promise.resolve(girder.restRequest({
-          path: 'item/validateScratchItems',
+          path: 'item/anonymousAccess/validateScratchItems',
           data: {
             ids: ids
           },

@@ -8,8 +8,8 @@ let DEFAULT_INTERPRETATIONS = {
   'undefined': 'ignore',
   'null': 'ignore',
   boolean: 'categorical',
-  integer: 'quantitative',
-  number: 'quantitative',
+  integer: 'ordinal',
+  number: 'ordinal',
   date: 'categorical',
   string: 'categorical',
   object: 'ignore'
@@ -36,31 +36,20 @@ let Dataset = MetadataItem.extend({
     // id swapped from under us...
     this.listenTo(this, 'rl:swapId', this.swapId);
 
-    this.rawCache = null;
-    this.parsedCache = null;
-    this.filterInfo = {};
-    let meta = this.getMeta();
+    this.cache = null;
+    this.offset = 0;
+    this.limit = 50;
 
-    let schemaPromise;
-
+    let meta = this.getMeta('rlab');
     let girderUpdate = this.get('updated');
     // TODO: do database items update their girder 'updated' flag
     // when the database is modified? If not, we may need a deeper
     // check...
-    if (meta.schema && meta.lastUpdated && girderUpdate &&
-      new Date(meta.lastUpdated) >= new Date(girderUpdate)) {
-      // We can just use the cached schema
-      schemaPromise = Promise.resolve(meta.schema);
-    } else {
+    if (!meta || !meta.lastUpdated || !girderUpdate ||
+      new Date(meta.lastUpdated) < new Date(girderUpdate)) {
       // We need to run schema inference...
-      schemaPromise = this.inferSchema();
+      this.inferSchema();
     }
-
-    schemaPromise.then(schema => {
-      // Now that we know the schema, if we have filters,
-      // we should validate and reapply them
-      return this.setFilters(meta.filters);
-    }).then();
   },
   getAttributeInterpretation: function (attrSpec) {
     if (attrSpec.interpretation) {
@@ -77,11 +66,15 @@ let Dataset = MetadataItem.extend({
       return attrSpec.coerceToType;
     } else {
       // The user hasn't specified a type; go with the
-      // most frequently observed type in the dataset
+      // most frequently observed native type in the dataset
+      // TODO: maybe it would be better to get the most general
+      // native type, e.g. choose number over integer, even
+      // if most values are integers
       let maxCount = 0;
       let attrType = 'undefined';
       for (let dataType of Object.keys(attrSpec.stats)) {
-        if (attrSpec.stats[dataType].count >= maxCount) {
+        if (attrSpec.native === true &&
+            attrSpec.stats[dataType].count >= maxCount) {
           maxCount = attrSpec.stats[dataType].count;
           attrType = dataType;
         }
@@ -95,10 +88,10 @@ let Dataset = MetadataItem.extend({
     let filters = this.getMeta('filters') || [];
     let parameters = {
       categoricalAttrs: [],
-      quantitativeAttrs: {}
+      ordinalAttrs: {}
     };
     // Assemble the parameters for which attributes we want to see
-    // (and provide the bin settings for quantitative attributes)
+    // (and provide the bin settings for ordinal attributes)
     for (let attrName of Object.keys(schema)) {
       if (!ignoreFilters && excludeAttributes.indexOf(attrName) !== -1) {
         continue;
@@ -106,19 +99,19 @@ let Dataset = MetadataItem.extend({
       let attrSpec = schema[attrName];
       if (this.getAttributeInterpretation(attrSpec) === 'categorical') {
         parameters.categoricalAttrs.push(attrName);
-      } else if (this.getAttributeInterpretation(attrSpec) === 'quantitative') {
+      } else if (this.getAttributeInterpretation(attrSpec) === 'ordinal') {
         // Our schema should tell us the lowest / highest values
         // for this attribute as a number...
         if (!attrSpec.stats.number) {
-          // Even though we want to interpret this value as quantitative,
+          // Even though we want to interpret this value as ordinal,
           // we can't (yet) figure out how to ask for min and max values...
 
-          // TODO: what about other potentially quantitative values (like dates?
+          // TODO: what about other potentially ordinal values (like dates?
           // the server will probably auto-infer that these are strings...)
 
           // For now, as a fallback, we'll add this as a categorical query,
           // but this could be bad for performance (probably lots of "categories"
-          // if it's really quantitative). This may also cause some UI confusion...
+          // if it's really ordinal). This may also cause some UI confusion...
           parameters.categoricalAttrs.push(attrName);
           continue;
         }
@@ -136,11 +129,11 @@ let Dataset = MetadataItem.extend({
         if (result.min === result.max) {
           // Shoot... there's really only one value for this attribute
           // after all. So it's really categorical, even if we want it to be
-          // quantitative (at least as far as the histogram calculations
+          // ordinal (at least as far as the histogram calculations
           // are concerned)
           parameters.categoricalAttrs.push(attrName);
         } else {
-          parameters.quantitativeAttrs[attrName] = result;
+          parameters.ordinalAttrs[attrName] = result;
         }
       }
     }
@@ -150,14 +143,14 @@ let Dataset = MetadataItem.extend({
     }
     // Format the parameters for the endpoint...
     parameters.categoricalAttrs = parameters.categoricalAttrs.join(',');
-    parameters.quantitativeAttrs = JSON.stringify(parameters.quantitativeAttrs);
+    parameters.ordinalAttrs = JSON.stringify(parameters.ordinalAttrs);
     return parameters;
   },
   updateHistograms: function (updateSummary) {
     // Always update the current histogram (with the filters)
     let promises = [new Promise((resolve, reject) => {
       girder.restRequest({
-        path: 'item/' + this.getId() + '/getHistograms',
+        path: 'item/' + this.getId() + '/dataset/getHistograms',
         type: 'GET',
         data: this.getHistogramParameters(false),
         error: reject,
@@ -169,7 +162,7 @@ let Dataset = MetadataItem.extend({
     if (updateSummary) {
       promises.push(new Promise((resolve, reject) => {
         girder.restRequest({
-          path: 'item/' + this.getId() + '/getHistograms',
+          path: 'item/' + this.getId() + '/dataset/getHistograms',
           type: 'GET',
           data: this.getHistogramParameters(true),
           error: reject,
@@ -239,7 +232,7 @@ let Dataset = MetadataItem.extend({
       };
       return new Promise((resolve, reject) => {
         girder.restRequest({
-          path: `item/${this.getId()}/filterData`,
+          path: `item/${this.getId()}/dataset/getData`,
           type: 'GET',
           dataType: 'text',
           error: reject,
@@ -318,8 +311,8 @@ let Dataset = MetadataItem.extend({
   inferSchema: function () {
     return new Promise((resolve, reject) => {
       girder.restRequest({
-        path: `item/${this.getId()}/inferSchema`,
-        type: 'GET',
+        path: `item/${this.getId()}/dataset/inferSchema`,
+        type: 'POST',
         dataType: 'json',
         error: reject
       }).done(resolve).error(reject);

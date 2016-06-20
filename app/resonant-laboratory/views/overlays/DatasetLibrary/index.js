@@ -31,7 +31,7 @@ let DatasetLibrary = Backbone.View.extend({
     if (window.mainPage.currentUser.isLoggedIn()) {
       new Promise((resolve, reject) => {
         girder.restRequest({
-          path: 'folder/privateFolder',
+          path: 'folder/anonymousAccess/privateFolder',
           type: 'GET',
           error: reject
         }).done(resolve).error(reject);
@@ -41,7 +41,7 @@ let DatasetLibrary = Backbone.View.extend({
 
       new Promise((resolve, reject) => {
         girder.restRequest({
-          path: 'folder/publicFolder',
+          path: 'folder/anonymousAccess/publicFolder',
           type: 'GET',
           error: reject
         }).done(resolve).error(reject);

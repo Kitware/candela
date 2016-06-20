@@ -24,6 +24,7 @@ let Project = MetadataItem.extend({
     return {
       name: 'Untitled Project',
       meta: {
+        itemType: 'project',
         versionNumber: window.mainPage.versionNumber,
         datasets: [],
         matchings: [],
@@ -114,7 +115,7 @@ let Project = MetadataItem.extend({
     // Get access information about this project
     let statusPromise = new Promise((resolve, reject) => {
       girder.restRequest({
-        path: 'item/' + id + '/info',
+        path: 'item/' + id + '/anonymousAccess/info',
         type: 'GET',
         error: reject
       }).done(resolve).error(reject);

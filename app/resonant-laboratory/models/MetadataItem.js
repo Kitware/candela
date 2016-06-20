@@ -133,14 +133,14 @@ let MetadataItem = girder.models.ItemModel.extend({
           reject(new MetadataSyncError('Item must have a name to be created'));
         }
         girder.restRequest({
-          path: 'item/scratchItem',
+          path: 'item/anonymousAccess/scratchItem',
           data: {
             name: this.get('name'),
             description: this.get('description') || '',
             reuseExisting: false
           },
           error: reject,
-          type: 'GET'
+          type: 'POST'
         }).done(resolve).error(reject);
       }, options, (resp) => {
         // This *should* assign us our new ID:
@@ -179,7 +179,7 @@ let MetadataItem = girder.models.ItemModel.extend({
 
       return this.wrapInPromise((resolve, reject) => {
         girder.restRequest({
-          path: 'item/' + this.getId() + '/updateScratch?' +
+          path: 'item/' + this.getId() + '/anonymousAccess/updateScratch?' +
             jQuery.param(args),
           contentType: 'application/json',
           data: JSON.stringify(this.getFlatMeta()),
@@ -210,12 +210,12 @@ let MetadataItem = girder.models.ItemModel.extend({
         // an item there if it doesn't exist
         return this.wrapInPromise((resolve, reject) => {
           girder.restRequest({
-            path: 'item/privateItem',
+            path: 'item/anonymousAccess/privateItem',
             data: {
               name: this.get('name') || 'Untitled Item',
               description: this.get('description') || ''
             },
-            type: 'GET',
+            type: 'POST',
             error: reject
           }).done(resolve).error(reject);
         }, options, (resp) => {

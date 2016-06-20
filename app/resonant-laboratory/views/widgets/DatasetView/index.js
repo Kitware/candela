@@ -386,7 +386,9 @@ let DatasetView = Widget.extend({
       this.statusText.text = 'Loading...';
       this.renderIndicators();
 
-      this.renderAttributeSettings();
+      if (widgetIsShowing) {
+        this.renderAttributeSettings();
+      }
 
       dataset.parse().then(parsedData => {
         if (dataset.rawCache === null) {

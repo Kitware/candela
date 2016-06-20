@@ -82,7 +82,7 @@ you move or delete this item, your preferences will be lost.`,
     if (scratchProjects) {
       new Promise((resolve, reject) => {
         girder.restRequest({
-          path: 'item/adoptScratchItems',
+          path: 'item/anonymousAccess/adoptScratchItems',
           data: {
             'ids': scratchProjects // already JSON.stringified
           },
@@ -107,7 +107,7 @@ you move or delete this item, your preferences will be lost.`,
 
         new Promise((resolve, reject) => {
           girder.restRequest({
-            path: 'item/adoptScratchItems',
+            path: 'item/anonymousAccess/adoptScratchItems',
             data: {
               'ids': JSON.stringify([...datasetIds])
             },

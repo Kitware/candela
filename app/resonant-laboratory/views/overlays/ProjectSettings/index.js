@@ -48,7 +48,7 @@ function toggleCallback () {
   */
   new Promise((resolve, reject) => {
     girder.restRequest({
-      path: 'item/' + window.mainPage.project.getId() + '/togglePublic',
+      path: 'item/' + window.mainPage.project.getId() + '/anonymousAccess/togglePublic',
       type: 'POST',
       data: {
         makePublic: this.value === 'PublicUser'
