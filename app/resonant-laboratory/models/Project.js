@@ -5,6 +5,7 @@ import {
   Set
 }
 from '../shims/SetOps.js';
+import candela from './../../../../../src/candela';
 let girder = window.girder;
 /*
     A Project represents a user's saved session;
@@ -20,19 +21,6 @@ let girder = window.girder;
 */
 
 let Project = MetadataItem.extend({
-  defaults: function () {
-    return {
-      name: 'Untitled Project',
-      meta: {
-        itemType: 'project',
-        versionNumber: window.mainPage.versionNumber,
-        datasets: [],
-        matchings: [],
-        visualizations: [],
-        preferredWidgets: []
-      }
-    };
-  },
   initialize: function () {
     this.status = {
       editable: false,
@@ -108,8 +96,7 @@ let Project = MetadataItem.extend({
       window.mainPage.trigger('rl:error', errorObj);
     }).then(respObjects => {
       if (!respObjects) {
-        window.mainPage.trigger('rl:error',
-          new Error('Could not access this project\'s dataset(s)'));
+        return Promise.reject(new Error('Could not access this project\'s dataset(s)'));
       } else {
         let loadedDatasets = {};
         respObjects.forEach((resp, index) => {
@@ -267,60 +254,76 @@ let Project = MetadataItem.extend({
       window.mainPage.trigger('rl:error', errorObj);
     });
   },
-  setVisualization: function (newVisualization, index = 0) {
+  setVisualization: function (visName, index = 0) {
     let visualizations = this.getMeta('visualizations');
+    let newVisualizatoinDetails = {
+      'name': visName,
+      'options': {}
+    };
 
     if (index >= visualizations.length) {
-      visualizations.push(newVisualization);
+      visualizations.push(newVisualizatoinDetails);
     } else {
-      visualizations[index] = newVisualization;
+      visualizations[index] = newVisualizatoinDetails;
     }
     this.setMeta('visualizations', visualizations);
-    this.save().then(() => {
+    return this.save().then(() => {
       this.trigger('rl:changeVisualizations');
-      this.validateMatchings();
+      return this.validateMatchings();
     }).catch((errorObj) => {
       window.mainPage.trigger('rl:error', errorObj);
     });
   },
-  shapeDataForVis: function (index = 0) {
+  getAssignedVisFields: function (index = 0) {
     let meta = this.getMeta();
-
-    let datasetId = meta.datasets[0];
-    if (!window.mainPage.loadedDatasets[datasetId]) {
-      return Promise.resolve([]);
-    } else {
-      // Use the matching to transform
-      // the parsed data into the shape
-      // that the visualization expects
-      return window.mainPage.loadedDatasets[datasetId].parse();
-    }
-  },
-  getVisOptions: function (index = 0) {
-    let meta = this.getMeta();
+    let visDetails = meta.visualizations[index];
+    // Copy the non-field options that are stored in the metadata
     let options = {};
 
-    // Figure out which options allow multiple fields
+    // Add field options as defined by the matchings
     meta.matchings.forEach(matching => {
-      for (let optionSpec of meta.visualizations[matching.visIndex].options) {
-        if (optionSpec.name === matching.visAttribute) {
-          if (optionSpec.type === 'string_list') {
+      if (matching.visIndex === index) {
+        let candelaOptionSpec = candela.components[visDetails.name].options.find(spec => {
+          return spec.name === matching.visAttribute;
+        });
+        if (!candelaOptionSpec) {
+          window.mainPage.trigger('rl:error', new Error('Unknown candela option: ' +
+            matching.visAttribute));
+        }
+        if (candelaOptionSpec.type === 'string_list') {
+          if (!(matching.visAttribute in options)) {
             options[matching.visAttribute] = [];
           }
-          break;
+          options[matching.visAttribute].push(matching.dataAttribute);
+        } else {
+          options[matching.visAttribute] = matching.dataAttribute;
         }
       }
     });
-
-    // Construct the options
-    meta.matchings.forEach(matching => {
-      if (Array.isArray(options[matching.visAttribute])) {
-        options[matching.visAttribute].push(matching.dataAttribute);
-      } else {
-        options[matching.visAttribute] = matching.dataAttribute;
-      }
-    });
     return options;
+  },
+  getVisOptions: function (index = 0) {
+    let meta = this.getMeta();
+    let visDetails = meta.visualizations[index];
+    // Copy the non-field options that are stored in the metadata
+    return Object.assign({}, this.getAssignedVisFields(index), visDetails.options || {});
+  },
+  shapeDataForVis: function (index = 0) {
+    let meta = this.getMeta();
+    if (meta.datasets.length < index) {
+      // The indicated dataset isn't loaded yet...
+      // send the visualization a temporary empty dataset instead
+      return Promise.resolve([]);
+    }
+
+    let datasetId = meta.datasets[index];
+    if (!(datasetId in window.mainPage.loadedDatasets)) {
+      window.mainPage.trigger('rl:error', new Error('Could not load the indicated dataset.'));
+    } else {
+      // Use the matching to transform the parsed data into the shape
+      // that the visualization expects
+      return window.mainPage.loadedDatasets[datasetId].loadPage();
+    }
   },
   changeDataSpec: function () {
     return this.validateMatchings().then(() => {

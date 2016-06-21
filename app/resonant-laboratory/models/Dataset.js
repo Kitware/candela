@@ -37,7 +37,7 @@ let Dataset = MetadataItem.extend({
       limit: 50
     };
 
-    let meta = this.getMeta('rlab');
+    let meta = this.getMeta();
     let girderUpdate = this.get('updated');
     // TODO: do database items update their girder 'updated' flag
     // when the database is modified? If not, we may need a deeper
@@ -588,5 +588,4 @@ let Dataset = MetadataItem.extend({
 });
 
 Dataset.DEFAULT_INTERPRETATIONS = DEFAULT_INTERPRETATIONS;
-Dataset.DuplicateDatasetError = DuplicateDatasetError;
 export default Dataset;
