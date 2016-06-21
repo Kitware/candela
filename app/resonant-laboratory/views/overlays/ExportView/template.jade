@@ -1,0 +1,9 @@
+.libraryInterface
+  img(src=closeIcon, id='closeOverlay')
+  h1 Export
+  .circleset.exportOptions
+    each format in vis.component.serializationFormats
+      .circleButton(data-format=format)
+        img(src=libraryIcon)
+        span= 'Download as ' + format.toUpperCase()
+  a.download-anchor

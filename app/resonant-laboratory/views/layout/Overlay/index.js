@@ -178,17 +178,21 @@ let Overlay = Backbone.View.extend({
         }
       } else {
         // Instantiate and add the new view
+        this.$el.html('');
         if (template.prototype &&
           template.prototype instanceof Backbone.View) {
-          // This is a View object already
+          // This is a View class already
           let Template = template;
-          this.$el.html('');
           this.view = new Template();
+          this.el.appendChild(this.view.el);
+          this.view.render();
+        } else if (template instanceof Backbone.View) {
+          // This is a View object already
+          this.view = template;
           this.el.appendChild(this.view.el);
           this.view.render();
         } else if (VIEWS.hasOwnProperty(template)) {
           // This is a named template
-          this.$el.html('');
           this.view = new VIEWS[template]({
             // Some girder views expect a parent, but
             // in this app, we just run them headless

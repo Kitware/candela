@@ -1,7 +1,9 @@
 import Underscore from 'underscore';
+import backbone from 'backbone';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 import candela from '../../../../../src/candela';
+import ExportView from '../../overlays/ExportView';
 import './style.css';
 
 let STATUS = {
@@ -45,6 +47,16 @@ let VisualizationView = Widget.extend({
       },
       onclick: () => {
         this.renderHelpScreen();
+      }
+    });
+
+    this.icons.splice(0, 0, {
+      src: Widget.okayIcon,
+      title: 'Export',
+      onclick: () => {
+        window.mainPage.overlay.render(new ExportView({
+          model: new backbone.Model({vis: this.vis})
+        }));
       }
     });
 
@@ -123,6 +135,27 @@ let VisualizationView = Widget.extend({
           this.vis.options = options;
         }
       }
+
+      // // Re-add export icons
+      // this.icons = this.icons.filter(icon => !('' + icon.title).startsWith('Export'));
+      // if (this.vis) {
+      //   this.vis.component.serializationFormats.forEach(format => {
+      //     let upperFormat = format.toUpperCase();
+      //     this.icons.splice(0, 0, {
+      //       src: Widget.okayIcon,
+      //       title: 'Export to ' + upperFormat,
+      //       onclick: () => {
+      //         let container = document.getElementById(this.spec.hashName + 'Container');
+      //         let download = container.getElementsByClassName('download-anchor')[0];
+      //         this.vis.component.serialize(format).then(value => {
+      //           download.setAttribute('download', 'chart.' + format);
+      //           download.setAttribute('href', value);
+      //           download.click();
+      //         });
+      //       }
+      //     });
+      //   });
+      // }
 
       // Okay, now ask the project if it has any new data for
       // us (changing the matchings, editing the data, or grabbing
