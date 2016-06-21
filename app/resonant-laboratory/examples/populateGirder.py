@@ -124,7 +124,7 @@ if __name__ == '__main__':
         longestItemName = max([len(item) for item in items])
 
         print 'Item' + ''.join([' ' for x in xrange(longestItemName - 4)]),
-        print '\tIgnored files\tFlat files added\tCollections added\tMetadata attached'
+        print '\tIgnored files\tFlat files added\tMongo Collections added\tMetadata attached'
 
         for item in items:
             if not os.path.isdir('./' + folder + '/' + item):

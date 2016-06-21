@@ -32,6 +32,10 @@ let girder = window.girder;
      private folder and the anonymous user's scratch
      space (the server endpoints handle most of this
      logic)
+
+  3. Namespace Resonant Laboratory's specific metadata
+     under an 'rlab' key so that it plays nicely with other
+     girder-based projects
 */
 
 function MetadataSyncError () {}
@@ -284,37 +288,40 @@ let MetadataItem = girder.models.ItemModel.extend({
   setMeta: function (key, value) {
     let meta = this.getMeta();
     meta = meta || {};
+    meta.rlab = meta.rlab || {};
     if (typeof key === 'object') {
       let obj = key;
       for (key of Object.keys(obj)) {
-        meta[key] = obj[key];
+        meta.rlab[key] = obj[key];
       }
     } else {
-      meta[key] = value;
+      meta.rlab[key] = value;
     }
     this.set('meta', meta);
   },
   unsetMeta: function (key) {
     let meta = this.getMeta();
     meta = meta || {};
+    meta.rlab = meta.rlab || {};
     if (key !== undefined) {
-      meta[key] = null;
+      meta.rlab[key] = null;
       this.setMeta(meta);
     } else {
       this.unset('meta');
     }
   },
-  getFlatMeta: function () {
+  getFlatMeta: function (key) {
     // By default, there's no flattening to do
-    return this.getMeta();
+    return this.getMeta(key);
   },
   getMeta: function (key) {
     let meta = this.get('meta');
     meta = meta || {};
+    meta.rlab = meta.rlab || {};
     if (key !== undefined) {
-      return meta[key];
+      return meta.rlab[key];
     } else {
-      return meta;
+      return meta.rlab;
     }
   },
   getId: function () {
@@ -323,10 +330,11 @@ let MetadataItem = girder.models.ItemModel.extend({
   previousMeta: function (key) {
     let prevMeta = this.previous('meta');
     prevMeta = prevMeta || {};
+    prevMeta.rlab = prevMeta.rlab || {};
     if (key !== undefined) {
-      return prevMeta[key];
+      return prevMeta.rlab[key];
     } else {
-      return prevMeta;
+      return prevMeta.rlab;
     }
   },
   hasMetaChanged: function (key, eqFunc) {
