@@ -56,7 +56,6 @@ htmlPlugins.forEach(function (hp) {
 });
 
 module.exports = {
-  devtool: 'source-map',
   __dirname: __dirname,
   entry: entry,
   output: {

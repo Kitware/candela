@@ -79,5 +79,21 @@
     "title": "Serialization",
     "link": "serialize",
     "template": "serialize"
+  },
+  {
+    "title": "GeoJS (No Tiles)",
+    "link": "geoblank"
+  },
+  {
+    "title": "GeoJS Dots (No Tiles)",
+    "link": "geodotsblank"
+  },
+  {
+    "title": "GeoJS",
+    "link": "geo"
+  },
+  {
+    "title": "GeoJS Dots",
+    "link": "geodots"
   }
 ]

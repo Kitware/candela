@@ -7,6 +7,8 @@ const componentList = [
   'BoxPlot',
   'BulletChart',
   'GanttChart',
+  'Geo',
+  'GeoDots',
   'Heatmap',
   'Histogram',
   'LineChart',
