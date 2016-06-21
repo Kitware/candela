@@ -22,3 +22,7 @@ export let sanitizeSelector = (input) => {
     // Prefix with an '_' as selectors can't start with numbers.
     return '_' + md5(input);
 }
+
+export let standardRound = (input) => {
+    return Math.round(input * 10000) / 10000
+}

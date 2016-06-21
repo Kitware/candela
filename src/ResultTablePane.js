@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 import _ from 'underscore';
 import $ from 'jquery';
 
-import { ErrorBulletWidget } from './ErrorBulletWidget';
+import { ValueWidget } from './ValueWidget';
 import { failValue, warningValue, sanitizeSelector } from './utility.js';
 
 import tablePane from '../templates/tablePane';
@@ -41,7 +41,11 @@ export let ResultTablePane = Backbone.View.extend({
       if (!_.has(resultsByDatasetIdThenTrend, result.dataset_id_selector)) {
         resultsByDatasetIdThenTrend[result.dataset_id_selector] = {};
       }
-      resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = result.current;
+      if (Array.isArray(result.current)) {
+         resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = d3.median(result.current);
+      } else {
+          resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = result.current;
+      }
     }, this));
 
     this.results.sort((_.bind(function () {
@@ -97,7 +101,7 @@ export let ResultTablePane = Backbone.View.extend({
           }
         }
         // render bullets
-        let errorBullet = new ErrorBulletWidget({
+        let errorBullet = new ValueWidget({
           el: resultDivSelector + '-bullet',
           result: result,
           trend: trend
