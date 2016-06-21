@@ -22,7 +22,7 @@
     "cover": "karma start config/karma-coverage.conf.js",
     "cover:report": "http-server coverage/html -p ${PORT-3000}",
     "codecov": "cat coverage/lcov/lcov.info | codecov",
-    "demo": "http-server build -p ${PORT-3000}"
+    "examples": "http-server build -p ${PORT-3000}"
   },
   "semistandard": {
     "ignore": [
