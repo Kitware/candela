@@ -45,7 +45,7 @@ Promise.onPossiblyUnhandledRejection(err => {
   throw err;
 });
 
-export default function imageTest ({name, url, selector, delay = 0, threshold}) {
+export default function imageTest ({name, url, selector, delay = 0, threshold, verbose = false}) {
   const dirname = callerDirname();
 
   test(`${name} image test`, t => {
