@@ -91,7 +91,7 @@ let VisualizationView = Widget.extend({
       spec = spec[0];
 
       // Get the options for the vis
-      let options = window.mainPage.project.getVisOptions();
+      let options = window.mainPage.project.getVisOptions(0);
 
       // Start with an initial empty dataset (gets populated
       // asynchronously)

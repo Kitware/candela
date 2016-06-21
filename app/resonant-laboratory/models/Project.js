@@ -71,48 +71,6 @@ let Project = MetadataItem.extend({
         return Promise.reject(new Error('Project has no ID'));
       }
     }
-
-    // Load up any datasets that the project references
-    let datasetPromises = [];
-
-    this.getMeta('datasets').forEach(datasetId => {
-      datasetPromises.push(new Promise((resolve, reject) => {
-        girder.restRequest({
-          path: 'item/' + datasetId,
-          type: 'GET',
-          error: reject
-        }).done(resolve).error(reject);
-      }));
-    });
-    Promise.all(datasetPromises).catch(errorObj => {
-      window.mainPage.trigger('rl:error', errorObj);
-    }).then(respObjects => {
-      if (!respObjects) {
-        window.mainPage.trigger('rl:error',
-          new Error('Could not access this project\'s dataset(s)'));
-      } else {
-        respObjects.forEach(resp => {
-          try {
-            let newDataset = new Dataset(resp);
-            this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
-            this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
-          } catch (e) {
-            if (e instanceof Dataset.DuplicateDatasetError) {
-              // We've already loaded the dataset...
-              return;
-              // TODO: when we support multiple datasets, it may
-              // be valid to swap in a dataset we've already loaded
-              // into a different slot...
-            } else {
-              window.mainPage.trigger('rl:error', e);
-            }
-          }
-        });
-      }
-      this.trigger('rl:changeDatasets');
-    });
-
-    // Get access information about this project
     let statusPromise = new Promise((resolve, reject) => {
       girder.restRequest({
         path: 'item/' + id + '/anonymousAccess/info',
@@ -133,7 +91,57 @@ let Project = MetadataItem.extend({
       this.trigger('rl:changeStatus');
     });
 
-    return statusPromise;
+    // Load up any datasets that the project references
+    let datasetSpecs = this.getMeta('datasets');
+    let datasetPromises = [];
+
+    datasetSpecs.forEach(datasetSpec => {
+      datasetPromises.push(new Promise((resolve, reject) => {
+        girder.restRequest({
+          path: 'item/' + datasetSpec.dataset,
+          type: 'GET',
+          error: reject
+        }).done(resolve).error(reject);
+      }));
+    });
+    let allDatasetPromises = Promise.all(datasetPromises).catch(errorObj => {
+      window.mainPage.trigger('rl:error', errorObj);
+    }).then(respObjects => {
+      if (!respObjects) {
+        window.mainPage.trigger('rl:error',
+          new Error('Could not access this project\'s dataset(s)'));
+      } else {
+        let loadedDatasets = {};
+        respObjects.forEach((resp, index) => {
+          if (resp._id in window.mainPage.loadedDatasets) {
+            // We've already loaded this dataset; update its filter and
+            // paging parameters
+            let dataset = window.mainPage.loadedDatasets[resp._id];
+            dataset.setFilter(datasetSpecs[index].filter);
+            dataset.setPage(datasetSpecs[index].page);
+            loadedDatasets[resp._id] = dataset;
+          } else {
+            // We haven't seen this dataset before; load it up
+            let newDataset = new Dataset(resp, datasetSpecs[index].filter, datasetSpecs[index].page);
+            this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
+            this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
+            loadedDatasets[resp._id] = newDataset;
+          }
+        });
+        // Okay, now that we know the datasets that should be open. Clear out
+        // any listeners that are attached to old ones so they can be garbage
+        // collected
+        for (let datasetId in Object.keys(window.mainPage.loadedDatasets)) {
+          if (!(datasetId in loadedDatasets)) {
+            window.mainPage.loadedDatasets[datasetId].stopListening();
+          }
+        }
+        window.mainPage.loadedDatasets = loadedDatasets;
+      }
+      this.trigger('rl:changeDatasets');
+    });
+
+    return Promise.all([statusPromise, allDatasetPromises]);
   }, 300),
   makeCopy: function () {
     /*
@@ -159,7 +167,7 @@ let Project = MetadataItem.extend({
         window.mainPage.currentUser.preferences.claimProject();
         // Let everyone know about the new project
         window.mainPage.trigger('rl:createProject');
-        this.updateStatus();
+        return this.updateStatus();
       }).catch(_fail);
   },
   getMeta: function (key) {
@@ -200,76 +208,61 @@ let Project = MetadataItem.extend({
     }
     return flatMeta;
   },
-  isEmpty: function () {
-    let meta = this.getMeta();
-    return meta.datasets.length === 0 &&
-      meta.visualizations.length === 0 &&
-      meta.matchings.length === 0;
-  },
   rename: function (newName) {
     this.set('name', newName);
-    this.save().then(() => {
+    return this.save().then(() => {
       this.trigger('rl:rename');
     }).catch((errorObj) => {
       window.mainPage.trigger('rl:error', errorObj);
     });
   },
   getDatasetIds: function () {
-    return this.getMeta('datasets');
-  },
-  changeDataSpec: function () {
-    this.validateMatchings();
-    this.trigger('rl:changeDatasets');
+    return this.getMeta('datasets').map(d => d.dataset);
   },
   swapDatasetId: function (newData) {
     let datasets = this.getMeta('datasets');
-    let index = datasets.indexOf(newData._oldId);
-    if (index !== -1) {
+    let index = datasets.findIndex(d => d.dataset === newData._oldId);
+    if (index !== -1 || !(newData._oldId in window.mainPage.loadedDatasets)) {
+      // Update the project metadata to point to the new dataset
       datasets[index] = newData._id;
       this.setMeta('datasets', datasets);
+
+      // Update the cached dataset key
+      window.mainPage.loadedDatasets[newData._id] = window.mainPage.loadedDatasets[newData._oldId];
+      delete window.mainPage.loadedDatasets[newData._oldId];
     } else {
       window.mainPage.trigger('rl:error',
-        new Error('Encountered a problem handling swapped dataset id'));
+        new Error('Encountered a problem handling a swapped dataset id'));
     }
   },
-  setDataset: function (newDataset, index = 0) {
+  setDataset: function (newDatasetId, index = 0) {
     let datasets = this.getMeta('datasets');
-    let newId;
+    let newDataset;
 
-    // Need to convert the raw girder.ItemModel
-    try {
-      newDataset = new Dataset(newDataset.toJSON());
-      newId = newDataset.getId();
+    if (newDatasetId in window.mainPage.loadedDatasets) {
+      newDataset = window.mainPage.loadedDatasets[newDatasetId];
+    } else {
+      newDataset = new Dataset(newDatasetId);
       this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
       this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
-    } catch (e) {
-      if (e instanceof Dataset.DuplicateDatasetError) {
-        // We've already loaded the dataset...
-        return;
-        // TODO: when we support multiple datasets, it may
-        // be valid to swap in a dataset we've already loaded
-        // into a different slot...
-      } else {
-        window.mainPage.trigger('rl:error', e);
-      }
+      window.mainPage.loadedDatasets[newDatasetId] = newDataset;
     }
 
+    let newDatasetDetails = {
+      dataset: newDatasetId,
+      filter: newDataset.filter,
+      page: newDataset.page
+    };
+
     if (index >= datasets.length) {
-      datasets.push(newId);
+      datasets.push(newDatasetDetails);
     } else {
-      let oldDataset = window.mainPage.loadedDatasets[datasets[index]];
-      if (oldDataset) {
-        // If the dataset hasn't already dropped itself...
-        this.stopListening(oldDataset, 'rl:changeSpec', this.changeDataSpec);
-        this.stopListening(oldDataset, 'rl:swapId', this.swapDatasetId);
-        oldDataset.drop();
-      }
-      datasets[index] = newId;
+      datasets[index] = newDatasetDetails;
     }
     this.setMeta('datasets', datasets);
-    this.save().then(() => {
+    return this.save().then(() => {
       this.trigger('rl:changeDatasets');
-      this.validateMatchings();
+      return this.validateMatchings();
     }).catch((errorObj) => {
       window.mainPage.trigger('rl:error', errorObj);
     });
@@ -329,6 +322,11 @@ let Project = MetadataItem.extend({
     });
     return options;
   },
+  changeDataSpec: function () {
+    return this.validateMatchings().then(() => {
+      this.trigger('rl:changeDatasets');
+    });
+  },
   validateMatchings: function () {
     let meta = this.getMeta();
 
@@ -374,7 +372,7 @@ let Project = MetadataItem.extend({
     }
 
     this.setMeta(meta);
-    this.save().then(() => {
+    return this.save().then(() => {
       this.trigger('rl:changeMatchings');
     }).catch(errorObj => {
       window.mainPage.trigger('rl:error', errorObj);

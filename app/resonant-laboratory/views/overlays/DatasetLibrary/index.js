@@ -107,7 +107,7 @@ let DatasetLibrary = Backbone.View.extend({
           if (window.mainPage.project) {
             // We already have a project loaded, so
             // swap it in (TODO: load multiple datasets)
-            window.mainPage.project.setDataset(d);
+            window.mainPage.project.setDataset(d._id);
             window.mainPage.widgetPanels.toggleWidget({
               hashName: 'DatasetView0'
             }, true);
@@ -116,7 +116,7 @@ let DatasetLibrary = Backbone.View.extend({
             // No project is loaded, so create an empty
             // project with this dataset
             window.mainPage.newProject().then(() => {
-              window.mainPage.project.setDataset(d);
+              window.mainPage.project.setDataset(d._id);
               window.mainPage.widgetPanels.toggleWidget({
                 hashName: 'DatasetView0'
               }, true);

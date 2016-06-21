@@ -15,30 +15,27 @@ let DEFAULT_INTERPRETATIONS = {
   object: 'ignore'
 };
 
+let ATTRIBUTE_GENERALITY = {
+  'undefined': 0,
+  'null': 1,
+  'boolean': 2,
+  'date': 2,
+  'integer': 3,
+  'number': 4,
+  'string': 5,
+  'object': 6
+};
+
 let BIN_COUNT = 10;
 
-function DuplicateDatasetError (message) {
-  this.name = 'DuplicateDatasetError';
-  this.message = message;
-  this.stack = (new Error()).stack;
-}
-DuplicateDatasetError.prototype = Object.create(Error.prototype);
-
 let Dataset = MetadataItem.extend({
-  initialize: function () {
-    if (window.mainPage.loadedDatasets[this.getId()]) {
-      throw new DuplicateDatasetError();
-    }
-    window.mainPage.loadedDatasets[this.getId()] = this;
-
-    // If any of this initialization stuff ends up
-    // saving a copy of this item, we'll get our
-    // id swapped from under us...
-    this.listenTo(this, 'rl:swapId', this.swapId);
-
+  initialize: function (filter, page) {
     this.cache = null;
-    this.offset = 0;
-    this.limit = 50;
+    this.filter = filter || {};
+    this.page = page || {
+      offset: 0,
+      limit: 50
+    };
 
     let meta = this.getMeta('rlab');
     let girderUpdate = this.get('updated');
@@ -67,15 +64,10 @@ let Dataset = MetadataItem.extend({
     } else {
       // The user hasn't specified a type; go with the
       // most frequently observed native type in the dataset
-      // TODO: maybe it would be better to get the most general
-      // native type, e.g. choose number over integer, even
-      // if most values are integers
-      let maxCount = 0;
       let attrType = 'undefined';
       for (let dataType of Object.keys(attrSpec.stats)) {
         if (attrSpec.native === true &&
-            attrSpec.stats[dataType].count >= maxCount) {
-          maxCount = attrSpec.stats[dataType].count;
+            ATTRIBUTE_GENERALITY[dataType] > ATTRIBUTE_GENERALITY[attrType]) {
           attrType = dataType;
         }
       }
@@ -151,7 +143,7 @@ let Dataset = MetadataItem.extend({
     let promises = [new Promise((resolve, reject) => {
       girder.restRequest({
         path: 'item/' + this.getId() + '/dataset/getHistograms',
-        type: 'GET',
+        type: 'POST',
         data: this.getHistogramParameters(false),
         error: reject,
         dataType: 'json'
@@ -163,7 +155,7 @@ let Dataset = MetadataItem.extend({
       promises.push(new Promise((resolve, reject) => {
         girder.restRequest({
           path: 'item/' + this.getId() + '/dataset/getHistograms',
-          type: 'GET',
+          type: 'POST',
           data: this.getHistogramParameters(true),
           error: reject,
           dataType: 'json'
@@ -194,16 +186,6 @@ let Dataset = MetadataItem.extend({
       spec.attributes[attrName] = this.getAttributeType(schema[attrName]);
     }
     return spec;
-  },
-  swapId: function (newData) {
-    window.mainPage.loadedDatasets[newData._id] = window.mainPage.loadedDatasets[newData._oldId];
-    delete window.mainPage.loadedDatasets[newData._oldId];
-    window.mainPage.loadedDatasets[newData._id].set(newData);
-  },
-  drop: function () {
-    this.dropped = true;
-    this.stopListening();
-    delete window.mainPage.loadedDatasets[this.getId()];
   },
   save: function () {
     // It's possible for a dataset to be dropped from a collection
