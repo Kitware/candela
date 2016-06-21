@@ -55,7 +55,7 @@ allHistograms.forEach(function (wrappedHistogram) {
   wrappedHistogram.histogram.forEach(function (bin) {
     if (binLookup.hasOwnProperty(bin.label)) {
       // We already have a bin for this value
-      histogram[binLookup[bin.label]].count += 1;
+      histogram[binLookup[bin.label]].count += bin.count;
     } else if (binSettings.specialBins.indexOf(bin.label) !== -1) {
       // This is a special bin; always count these
       if (!specialBins.hasOwnProperty(bin.label)) {
@@ -64,7 +64,7 @@ allHistograms.forEach(function (wrappedHistogram) {
           count: 0
         };
       }
-      specialBins[bin.label].count += 1;
+      specialBins[bin.label].count += bin.count;
     } else {
       // This is a regular value that we don't have a bin for. Do we have space?
       if (histogram.length < binSettings.numBins) {
@@ -73,17 +73,17 @@ allHistograms.forEach(function (wrappedHistogram) {
         binLookup[bin.label] = histogram.length;
         histogram.push({
           label: bin.label,
-          count: 1
+          count: bin.count
         });
       } else {
         // Okay, there's no room left. Add a count to the special "other" bin
-        if (!specialBins.hasOwnProperty('other')) {
+        if (!(specialBins.hasOwnProperty('other'))) {
           specialBins['other'] = {
             label: 'other',
             count: 0
           };
         }
-        specialBins.other.count += 1;
+        specialBins.other.count += bin.count;
       }
     }
   });
