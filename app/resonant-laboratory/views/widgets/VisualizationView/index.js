@@ -3,6 +3,7 @@ import backbone from 'backbone';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 import candela from '../../../../../src/candela';
+import shareIcon from '../../../images/share.svg';
 import ExportView from '../../overlays/ExportView';
 import './style.css';
 
@@ -51,7 +52,7 @@ let VisualizationView = Widget.extend({
     });
 
     this.icons.splice(0, 0, {
-      src: Widget.okayIcon,
+      src: shareIcon,
       title: 'Export',
       onclick: () => {
         window.mainPage.overlay.render(new ExportView({

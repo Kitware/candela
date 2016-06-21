@@ -1,6 +1,6 @@
 import Backbone from 'backbone';
 import closeIcon from '../../../images/close.svg';
-import libraryIcon from '../../../images/library.svg';
+import downloadIcon from '../../../images/download.svg';
 import myTemplate from './template.jade';
 
 let ExportView = Backbone.View.extend({
@@ -20,7 +20,7 @@ let ExportView = Backbone.View.extend({
   render: function () {
     this.$el.html(myTemplate({
       closeIcon,
-      libraryIcon,
+      downloadIcon,
       vis: this.model.get('vis')
     }));
   }
