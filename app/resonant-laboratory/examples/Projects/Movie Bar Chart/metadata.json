@@ -1,5 +1,4 @@
 {
-  "versionNumber": "master",
   "datasets": [
     {
       "dataset": "movies.csv",
@@ -51,72 +50,7 @@
   "visualizations": [
     {
       "name": "BarChart",
-      "options": [
-        {
-          "domain": {
-            "fieldTypes": [
-              "string",
-              "date",
-              "number",
-              "integer",
-              "boolean"
-            ],
-            "from": "data",
-            "mode": "field"
-          },
-          "format": "text",
-          "name": "x",
-          "type": "string"
-        },
-        {
-          "domain": {
-            "fieldTypes": [
-              "number",
-              "integer",
-              "boolean"
-            ],
-            "from": "data",
-            "mode": "field"
-          },
-          "format": "text",
-          "name": "y",
-          "type": "string"
-        },
-        {
-          "domain": {
-            "fieldTypes": [
-              "string",
-              "date",
-              "number",
-              "integer",
-              "boolean"
-            ],
-            "from": "data",
-            "mode": "field"
-          },
-          "format": "text",
-          "name": "color",
-          "optional": true,
-          "type": "string"
-        },
-        {
-          "domain": {
-            "fieldTypes": [
-              "string",
-              "date",
-              "number",
-              "integer",
-              "boolean"
-            ],
-            "from": "data",
-            "mode": "field"
-          },
-          "format": "string_list",
-          "name": "hover",
-          "optional": true,
-          "type": "string_list"
-        }
-      ]
+      "options": {}
     }
   ]
 }

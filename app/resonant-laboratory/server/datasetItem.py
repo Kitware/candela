@@ -13,7 +13,7 @@ import md5
 import math
 import itertools
 from pymongo import MongoClient
-from versioning import Versioning
+from anonymousAccess import loadAnonymousItem
 from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
@@ -45,11 +45,11 @@ def getSignificantDigit(value, nDigits, roundDown=True):
 
 
 class DatasetItem(Resource):
-    def __init__(self, info):
+    def __init__(self, app):
         super(Resource, self).__init__()
-        self.databaseItemResource = DatabaseItemResource(info['apiRoot'])
+        self.app = app
 
-        self.versioning = Versioning()
+        self.databaseItemResource = DatabaseItemResource(self.app.info['apiRoot'])
 
         # Load up the external foreign code snippets
         codePath = subprocess.check_output(['girder-install', 'plugin-path']).strip()
@@ -90,11 +90,11 @@ class DatasetItem(Resource):
             result[r['_id']] = r['value']
         return result
 
-    def bufferedDownloadLineReader(self, fileId, lineterminator="\r\n", filters={}, fields={}):
+    def bufferedDownloadLineReader(self, fileId, user, lineterminator="\r\n", filters={}, fields={}):
         # TODO: @ronichoudhury is implementing something cool
         # that will make this function obsolete
         lineterminator = re.compile('[' + lineterminator + ']')
-        fileObj = self.model('file').load(fileId, user=self.getCurrentUser())
+        fileObj = self.model('file').load(fileId, user=user)
         # TODO: This is my ignorance of Girder... how exactly do we
         # call download directly?
         # TODO: only grab a few lines at a time instead of
@@ -110,10 +110,10 @@ class DatasetItem(Resource):
         for line in chunk:
             yield line
 
-    def bufferedDownloadItemReader(self, fileId, jsonPath='$', filters={}, fields={}):
+    def bufferedDownloadItemReader(self, fileId, user, jsonPath='$', filters={}, fields={}):
         # TODO: @ronichoudhury is implementing something cool
         # that will make this function obsolete
-        fileObj = self.model('file').load(fileId, user=self.getCurrentUser())
+        fileObj = self.model('file').load(fileId, user=user)
         # TODO: This is my ignorance of Girder... how exactly do we
         # call download directly?
         # TODO: only grab a few lines at a time instead of
@@ -138,7 +138,7 @@ class DatasetItem(Resource):
                 dialect[key] = str(value)
         return dialect
 
-    def flatFileMapReduce(self, item, mapScript, reduceScript):
+    def flatFileMapReduce(self, item, user, mapScript, reduceScript):
         # TODO: This is an incredibly naive, single-threaded implementation.
         # It shouldn't be hard to rewrite this to use multiple threads...
         # (though, to be fair, the user shouldn't be using big flat files
@@ -150,11 +150,11 @@ class DatasetItem(Resource):
         if fileFormat == 'csv':
             dialect = self.getStringifiedDialect(item)
             csv.register_dialect(item['name'], **dialect)
-            lineReader = self.bufferedDownloadLineReader(item['meta']['rlab']['fileId'],
+            lineReader = self.bufferedDownloadLineReader(item['meta']['rlab']['fileId'], user,
                                                          dialect['lineterminator'])
             reader = csv.DictReader(lineReader, dialect=item['name'])
         elif fileFormat == 'json':
-            reader = self.bufferedDownloadItemReader(item['meta']['rlab']['fileId'], '$')
+            reader = self.bufferedDownloadItemReader(item['meta']['rlab']['fileId'], user, '$')
         else:
             raise RestException('Unrecognized file type: ' + fileFormat)
 
@@ -170,7 +170,7 @@ class DatasetItem(Resource):
         return mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
 
     @access.public
-    @loadmodel(model='item', level=AccessType.WRITE)
+    @loadAnonymousItem()
     @describeRoute(
         Description('Set or modify item dataset information')
         .param('id', 'The ID of the item.', paramType='path')
@@ -199,11 +199,11 @@ class DatasetItem(Resource):
                required=False)
         .errorResponse()
     )
-    def setupDataset(self, item, params):
+    def setupDataset(self, item, params, user):
         metadata = item.get('meta', {})
         rlab = metadata.get('rlab', {})
         rlab['itemType'] = 'dataset'
-        rlab['versionNumber'] = self.versioning.versionNumber({})
+        rlab['versionNumber'] = self.app.versioning.versionNumber({})
 
         # Determine fileId
         if 'fileId' in params:
@@ -223,7 +223,7 @@ class DatasetItem(Resource):
         # Determine format
         fileObj = None
         if 'fileId' in rlab:
-            fileObj = self.model('file').load(rlab['fileId'], user=self.getCurrentUser())
+            fileObj = self.model('file').load(rlab['fileId'], user=user)
             exts = fileObj.get('exts', [])
             mimeType = fileObj.get('mimeType', '').lower()
             if 'json' in exts or 'json' in mimeType:
@@ -269,10 +269,11 @@ class DatasetItem(Resource):
 
         metadata['rlab'] = rlab
         item['meta'] = metadata
+
         return self.model('item').updateItem(item)
 
     @access.public
-    @loadmodel(model='item', level=AccessType.WRITE)
+    @loadAnonymousItem()
     @describeRoute(
         Description('Infer the schema of a dataset.')
         .notes('Calculates the potential frequency of various data types ' +
@@ -284,9 +285,9 @@ class DatasetItem(Resource):
         .param('id', 'The ID of the item.', paramType='path')
         .errorResponse()
     )
-    def inferSchema(self, item, params):
+    def inferSchema(self, item, params, user):
         if 'meta' not in item or 'rlab' not in item['meta']:
-            item = self.setupDataset(id=item['_id'], params={})
+            item = self.setupDataset(id=item['_id'], params={}, user=user)
 
         # Run the schema MapReduce code
         mapScript = self.foreignCode['schema_map.js']
@@ -300,7 +301,7 @@ class DatasetItem(Resource):
                                     item['databaseMetadata']['type'] +
                                     ' databases is not yet supported')
         else:
-            schema = self.flatFileMapReduce(item, mapScript, reduceScript)
+            schema = self.flatFileMapReduce(item, user, mapScript, reduceScript)
 
         # We want to preserve any explicit user coerceToType or interpretation settings
         # thay may have existed in the previous schema
@@ -311,12 +312,14 @@ class DatasetItem(Resource):
                     schema[attrName]['coerceToType'] = existingSchema[attrName]['coerceToType']
                 if 'interpretation' in existingSchema[attrName]:
                     schema[attrName]['interpretation'] = existingSchema[attrName]['interpretation']
+
         item['meta']['rlab']['schema'] = schema
         item['meta']['rlab']['lastUpdated'] = datetime.datetime.now().isoformat()
+
         return self.model('item').updateItem(item)
 
     @access.public
-    @loadmodel(model='item', level=AccessType.WRITE)
+    @loadAnonymousItem()
     @describeRoute(
         Description('Get a histogram for all data attributes')
         .param('id', 'The ID of the dataset item.', paramType='path')
@@ -370,11 +373,11 @@ class DatasetItem(Resource):
                required=False, dataType='boolean')
         .errorResponse()
     )
-    def getHistograms(self, item, params):
+    def getHistograms(self, item, params, user):
         if 'meta' not in item or 'rlab' not in item['meta']:
-            item = self.setupDataset(id=item['_id'], params={})
+            item = self.setupDataset(id=item['_id'], params={}, user=user)
         if 'schema' not in item['meta']['rlab']:
-            item = self.inferSchema(id=item['_id'], params={})
+            item = self.inferSchema(id=item['_id'], params={}, user=user)
 
         # Populate params with default settings
         # where settings haven't been specified
@@ -490,7 +493,7 @@ class DatasetItem(Resource):
                                     item['databaseMetadata']['type'] +
                                     ' databases is not yet supported')
         else:
-            histogram = self.flatFileMapReduce(item, mapScript, reduceScript)
+            histogram = self.flatFileMapReduce(item, user, mapScript, reduceScript)
 
         # We have to clean up the histogram wrappers (mongodb can't return
         # an array from reduce functions). While we're at it, add the

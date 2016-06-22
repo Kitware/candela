@@ -1,4 +1,4 @@
-from versioning import Versioning
+from anonymousAccess import loadAnonymousItem
 from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
@@ -9,22 +9,23 @@ from girder_worker.format import get_csv_reader
 
 
 class ProjectItem(Resource):
-    def __init__(self, info):
-        self.versioning = Versioning()
+    def __init__(self, app):
+        super(Resource, self).__init__()
+        self.app = app
 
     @access.public
-    @loadmodel(model='item', level=AccessType.WRITE)
+    @loadAnonymousItem()
     @describeRoute(
-        Description('Set or modify project dataset information')
+        Description('Set or modify item project information')
         .param('id', 'The ID of the item.', paramType='path')
         .errorResponse()
     )
-    def setupProject(self, item, params):
+    def setupProject(self, item, params, user):
         metadata = item.get('meta', {})
         rlab = metadata.get('rlab', {})
 
         rlab['itemType'] = 'project'
-        rlab['versionNumber'] = self.versioning.versionNumber({})
+        rlab['versionNumber'] = self.app.versioning.versionNumber({})
 
         rlab['datasets'] = []
         rlab['matchings'] = []
