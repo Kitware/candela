@@ -1,6 +1,6 @@
 import Backbone from 'backbone';
 import closeIcon from '../../../images/close.svg';
-import downloadIcon from '../../../images/download.svg';
+import downloadIcon from '../../../images/light/download.svg';
 import myTemplate from './template.jade';
 
 let ExportView = Backbone.View.extend({
