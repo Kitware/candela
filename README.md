@@ -114,3 +114,12 @@ This concludes the release process. You will have a new, tagged release
 published, with a corresponding commit on the `release` branch, while
 `master` will have the package version number updated, ready for further
 development.
+
+# Testing Images
+
+One of Candela's testing phases is *image testing*, in which images of
+visualization components are created programmatically and compared to
+established baseline images. These images are automatically uploaded to
+[Kitware's Girder
+instance](https://data.kitware.com/#folder/576845848d777f30a28d705a) where they
+are catalogued by Travis build number and can be viewed by anyone.
