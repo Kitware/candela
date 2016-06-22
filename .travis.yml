@@ -18,6 +18,8 @@ before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 
+install: pip install --user girder-client 'requests[security]'
+
 script:
     - npm install
     - npm run lint
@@ -25,7 +27,6 @@ script:
     - npm run build:examples
     - npm run test:unit
     - CANDELA_DUMP_IMAGE=all npm run test:image
-    - pip install --user girder-client
     - find src/candela/components -name '*.png' | xargs python script/upload-test-images.py
     - npm run cover
     - npm run codecov
