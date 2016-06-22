@@ -1,5 +1,4 @@
 {
-  "versionNumber": "master",
   "datasets": [
     {
       "dataset": "iris.json",
@@ -44,39 +43,7 @@
   "visualizations": [
     {
       "name": "ScatterPlotMatrix",
-      "options": [
-        {
-          "domain": {
-            "fieldTypes": [
-              "number",
-              "integer",
-              "boolean"
-            ],
-            "from": "data",
-            "mode": "field"
-          },
-          "format": "string_list",
-          "name": "fields",
-          "type": "string_list"
-        },
-        {
-          "domain": {
-            "fieldTypes": [
-              "string",
-              "date",
-              "number",
-              "integer",
-              "boolean"
-            ],
-            "from": "data",
-            "mode": "field"
-          },
-          "format": "text",
-          "name": "color",
-          "optional": true,
-          "type": "string"
-        }
-      ]
+      "options": {}
     }
   ]
 }

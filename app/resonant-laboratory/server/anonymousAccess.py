@@ -2,6 +2,7 @@ import md5
 import random
 import sys
 import json
+import six
 from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
@@ -10,7 +11,6 @@ from girder.models.model_base import AccessException
 
 
 class AnonymousAccess(Resource):
-
     def _getAnonymousUser(self):
         try:
             return list(self.model('user').textSearch('anonymous'))[0]
@@ -362,3 +362,45 @@ class AnonymousAccess(Resource):
                 self.model('item').move(item, targetFolder)
 
         return item
+
+
+class loadAnonymousItem(object):
+    """
+    This is a decorator that can be used to create a fallback scratch copy of an
+    item if the user needs to WRITE when they only have READ access to the original.
+    """
+    def __call__(self, fun):
+        @six.wraps(fun)
+        def wrapped(self, *args, **kwargs):
+            user = self.getCurrentUser()
+            anonymous = False
+            if user is None:
+                anonymous = True
+                user = self.app.anonymousAccess._getAnonymousUser()
+
+            try:
+                targetItem = self.app.anonymousAccess \
+                    .model('item').load(kwargs['id'],
+                                        level=AccessType.WRITE,
+                                        user=user,
+                                        exc=True)
+            except AccessException as err:
+                srcItem = self.app.anonymousAccess \
+                    .model('item').load(kwargs['id'],
+                                        level=AccessType.READ,
+                                        user=user,
+                                        exc=True)
+                if anonymous:
+                    targetFolder = self.app.anonymousAccess.getOrMakePublicFolder({})
+                else:
+                    targetFolder = self.app.anonymousAccess.getOrMakePrivateFolder({})
+
+                targetItem = self.app.anonymousAccess \
+                    .model('item').copyItem(srcItem=srcItem,
+                                            creator=user,
+                                            folder=targetFolder)
+            kwargs['item'] = targetItem
+            kwargs['user'] = user
+            del kwargs['id']
+            return fun(self, *args, **kwargs)
+        return wrapped

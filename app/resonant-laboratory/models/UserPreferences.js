@@ -10,12 +10,11 @@ let UserPreferences = MetadataItem.extend({
   */
   defaults: () => {
     return {
-      name: 'rl_preferences',
+      name: 'Resonant Laboratory Preferences',
       description: `
 Contains your preferences for the Resonant Laboratory application. If
 you move or delete this item, your preferences will be lost.`,
       meta: {
-        showHelp: false,
         seenTips: {},
         achievements: {}
       }
@@ -188,8 +187,7 @@ you move or delete this item, your preferences will be lost.`,
     if (achievements[achievement] !== true) {
       achievements[achievement] = true;
       this.setMeta('achievements', achievements);
-      this.save().catch(() => {
-      }); // fail silently
+      this.save().catch(() => {}); // fail silently
       this.trigger('rl:levelUp');
     }
   }

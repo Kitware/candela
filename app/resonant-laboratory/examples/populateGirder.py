@@ -124,7 +124,7 @@ if __name__ == '__main__':
         longestItemName = max([len(item) for item in items])
 
         print 'Item' + ''.join([' ' for x in xrange(longestItemName - 4)]),
-        print '\tIgnored files\tFlat files added\tCollections added\tMetadata attached'
+        print '\tIgnored files\tFlat files added\tMongo Collections added\tMetadata attached'
 
         for item in items:
             if not os.path.isdir('./' + folder + '/' + item):
@@ -136,6 +136,11 @@ if __name__ == '__main__':
 
             # Create (or get) the item
             itemSpec = gc.load_or_create_item(item, folderSpec['_id'])
+
+            # Hit the endpoint that identifies the item as a project,
+            # and populates the metadata appropriately
+            if folder == 'Projects':
+                gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/project')
 
             # If this is a dataset, store its ID for Projects
             # to look up later
@@ -161,14 +166,16 @@ if __name__ == '__main__':
                     # metadata instead of uploading it as a file
                     temp = open('./' + folder + '/' + item + '/metadata.json', 'rb')
                     contents = temp.read()
-                    metadata = json.loads(contents)
+                    metadata = {
+                        'rlab': json.loads(contents)
+                    }
                     temp.close()
 
                     # If this is a project, we need to replace the dataset
                     # folder name with a Girder ID
                     if folder == 'Projects':
-                        for i, d in enumerate(metadata['datasets']):
-                            metadata['datasets'][i]['itemId'] = dataItemIdLookup[d['itemId']]
+                        for i, d in enumerate(metadata['rlab']['datasets']):
+                            metadata['rlab']['datasets'][i]['itemId'] = dataItemIdLookup[d['itemId']]
 
                     gc.addMetadataToItem(itemSpec['_id'], metadata)
                     addedMetadata = True
@@ -189,13 +196,10 @@ if __name__ == '__main__':
                         gc.uploadFileToItem(itemSpec['_id'], './' + folder + '/' + item + '/' + fileName)
                         addedFiles += 1
 
-            # Hit the endpoint that identifies the item as a dataset or a project,
+            # Hit the endpoint that identifies the item as a dataset,
             # and populates the metadata appropriately
             if folder == 'Data':
                 gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/dataset')
-            elif folder == 'Projects':
-                # TODO
-                pass
 
             message += '\t%i            \t%i               \t%i                \t' % (
                 ignoredFiles, addedFiles, addedCollections)
