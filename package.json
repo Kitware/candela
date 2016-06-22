@@ -5,6 +5,7 @@
   "main": "dist/candela.js",
   "scripts": {
     "build": "script/prepare_lineup.sh && webpack --config config/webpack.config.js",
+    "build:examples": "webpack --config config/webpack-examples.config.js",
     "build:laboratory": "cd app/resonant-laboratory && webpack",
     "dist": "script/prepare_lineup.sh && webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
     "lint": "semistandard | snazzy",
@@ -21,7 +22,7 @@
     "cover": "karma start config/karma-coverage.conf.js",
     "cover:report": "http-server coverage/html -p ${PORT-3000}",
     "codecov": "cat coverage/lcov/lcov.info | codecov",
-    "demo": "http-server build -p ${PORT-3000}"
+    "examples": "http-server build -p ${PORT-3000}"
   },
   "semistandard": {
     "ignore": [
