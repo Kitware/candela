@@ -137,27 +137,6 @@ let VisualizationView = Widget.extend({
         }
       }
 
-      // // Re-add export icons
-      // this.icons = this.icons.filter(icon => !('' + icon.title).startsWith('Export'));
-      // if (this.vis) {
-      //   this.vis.component.serializationFormats.forEach(format => {
-      //     let upperFormat = format.toUpperCase();
-      //     this.icons.splice(0, 0, {
-      //       src: Widget.okayIcon,
-      //       title: 'Export to ' + upperFormat,
-      //       onclick: () => {
-      //         let container = document.getElementById(this.spec.hashName + 'Container');
-      //         let download = container.getElementsByClassName('download-anchor')[0];
-      //         this.vis.component.serialize(format).then(value => {
-      //           download.setAttribute('download', 'chart.' + format);
-      //           download.setAttribute('href', value);
-      //           download.click();
-      //         });
-      //       }
-      //     });
-      //   });
-      // }
-
       // Okay, now ask the project if it has any new data for
       // us (changing the matchings, editing the data, or grabbing
       // a new dataset will invalidate the parsed cache).
