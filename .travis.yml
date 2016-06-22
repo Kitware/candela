@@ -13,11 +13,6 @@ addons:
         packages:
             - g++-4.8
             - libgif-dev
-    artifacts:
-      s3_region: "us-east-1"
-      paths:
-        - $(find src/candela/components -name '*.png' | tr "\n" ":")
-      debug: false
 
 before_install:
   - export DISPLAY=:99.0
@@ -30,5 +25,7 @@ script:
     - npm run build:examples
     - npm run test:unit
     - CANDELA_DUMP_IMAGE=all npm run test:image
+    - pip install --user girder-client
+    - find src/candela/components -name '*.png' | xargs python script/upload-test-images.py
     - npm run cover
     - npm run codecov
