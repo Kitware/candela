@@ -1,5 +1,4 @@
 import Backbone from 'backbone';
-import _ from 'underscore';
 
 import { ErrorBulletWidget } from './ErrorBulletWidget';
 import { BoxAndWhiskerWidget } from './BoxAndWhiskerWidget';

@@ -132,6 +132,10 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
                         "25th %ile: " + standardRound(quantiles[1]) + "<br/>" +
                         "75th %ile: " + standardRound(quantiles[3]) + "<br/>" +
                         "95th %ile: " + standardRound(quantiles[4]) + "<br/>" +
+                        "Min: " + this.testArray[0] + "<br/>" +
+                        "Max: " +
+                        this.testArray[this.testArray.length-1] + "<br/>" +
+                        "# of samples: " + this.testArray.length + "<br/>" +
                         "<br/>" +
                         "Outliers: " +
                         _.map(outliers, standardRound).join(", "))

@@ -297,7 +297,10 @@
                 if (qParams[i] === 'multipleValues') {
                     appSettings['trendValuesByDataset'][0]['current'] =
                                 [0.1, 0.2, 0.3, 0.5, 0.9, 0.1, 0.5, 0.3, 5.0];
-                    appSettings['trendValuesByDataset'][0]['max'] = 1.0;
+                    appSettings['trendValuesByDataset'][1]['current'] =
+                                [0.1, 0.2, 0.3, 0.5, 0.9, 0.1, 0.5, 0.3, 2.0];
+                    appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length-1]['current'] =
+                                [20, 20, 20, 30, 20, 21, 22, 23, 25];
                 }
             }
         }
