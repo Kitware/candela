@@ -94,13 +94,14 @@ export default function imageTest ({name, extraBaselines = [], url, selector, de
           }
         });
 
-        const passed = Number(best.analysis.misMatchPercentage) < threshold * 100;
+        const {filename, analysis} = best;
+        const passed = Number(analysis.misMatchPercentage) < threshold * 100;
         if (!passed || doDumpImage(name)) {
-          fs.writeFileSync(path.join(dirname, `${best.filename}-test.png`), imageBuf.toString('base64'), 'base64');
-          fs.writeFileSync(path.join(dirname, `${best.filename}-diff.png`), rawData(best.getImageDataUrl()), 'base64');
+          fs.writeFileSync(path.join(dirname, `${filename}-test.png`), imageBuf.toString('base64'), 'base64');
+          fs.writeFileSync(path.join(dirname, `${filename}-diff.png`), rawData(analysis.getImageDataUrl()), 'base64');
         }
 
-        t.ok(passed, `${name} image matches baseline image ${best.filename}.png to within ${threshold * 100}% (actual diff: ${best.analysis.misMatchPercentage}%)`);
+        t.ok(passed, `${name} image matches baseline image ${filename}.png to within ${threshold * 100}% (actual diff: ${analysis.misMatchPercentage}%)`);
 
         t.end();
         return n.end().then();
