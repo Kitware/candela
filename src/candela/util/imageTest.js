@@ -101,7 +101,7 @@ export default function imageTest ({name, extraBaselines = [], url, selector, de
           fs.writeFileSync(path.join(dirname, `${filename}-diff.png`), rawData(analysis.getImageDataUrl()), 'base64');
         }
 
-        t.ok(passed, `${name} image matches baseline image ${filename}.png to within ${threshold * 100}% (actual diff: ${analysis.misMatchPercentage}%)`);
+        t.ok(passed, `${name} image matches to within ${threshold * 100}% (actual diff: ${analysis.misMatchPercentage}%, baseline: ${filename}.png)`);
 
         t.end();
         return n.end().then();
