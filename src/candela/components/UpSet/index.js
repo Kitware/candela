@@ -1,9 +1,10 @@
 import d3 from 'd3';
 import dl from 'datalib';
+import VisComponent from '../../VisComponent';
 import * as upset from 'UpSet';
 import template from './template.html';
 
-export default class UpSet {
+export default class UpSet extends VisComponent {
   static get options () {
     return [
       {
@@ -57,7 +58,7 @@ export default class UpSet {
   }
 
   constructor (el, options) {
-    this.el = el;
+    super(el);
     this.options = options;
   }
 

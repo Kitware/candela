@@ -1,12 +1,13 @@
 import $ from 'jquery';
 import datalib from 'datalib';
 import d3 from 'd3';
+import VisComponent from '../../VisComponent';
 import LineUpJS from 'LineUpJS/src/main.js';
 import 'LineUpJS/dist/style.css';
 import './index.styl';
 import 'font-awesome-webpack';
 
-export default class LineUp {
+export default class LineUp extends VisComponent {
   static get options () {
     return [
       {
@@ -46,7 +47,7 @@ export default class LineUp {
   }
 
   constructor (el, options) {
-    this.el = el;
+    super(el);
     this.options = options;
     this.lineUpConfig = {
       interaction: {
