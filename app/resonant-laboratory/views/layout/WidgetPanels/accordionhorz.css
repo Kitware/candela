@@ -61,7 +61,8 @@ div.accordion section .sectionHeader:hover {
 }
 
 div.accordion section div.content {
-  opacity: 0.0;
+  position: absolute;
+  bottom: 200%;
   -webkit-transition: 0s ease;
   -moz-transition: 0s ease;
   -ms-transition: 0s ease;
@@ -87,6 +88,7 @@ div.accordion section.targeted .sectionHeader {
 div.accordion section.targeted div.content {
   opacity: 1.0;
   position: relative;
+  bottom: auto;
   width: 100%;
   height: calc(100% - 3em);
   -webkit-transition: 0.25s ease;
