@@ -22,18 +22,129 @@ let ATTRIBUTE_GENERALITY = {
   'object': 6
 };
 
+class DatasetCache {
+  constructor (model) {
+    this.model = model;
+  }
+  get cachedPromises () {
+    if (!this._cachedPromises) {
+      this._cachedPromises = {};
+    }
+    return this._cachedPromises;
+  }
+  set cachedPromises (value) {
+    this._cachedPromises = value;
+  }
+  get filter () {
+    if (!this._filter) {
+      this._filter = {};
+    }
+    return this._filter;
+  }
+  set filter (value) {
+    this._filter = value;
+    // Invalidate filteredHistogram, pageHistogram, and currentDataPage
+    delete this.cachedPromises.filteredHistogram;
+    delete this.cachedPromises.pageHistogram;
+    delete this.cachedPromises.currentDataPage;
+  }
+  get page () {
+    if (!this._page) {
+      this._page = {
+        offset: 0,
+        limit: 50
+      };
+    }
+    return this._page;
+  }
+  set page (value) {
+    this._page = value;
+    // Invalidate pageHistogram and currentDataPage
+    delete this.cachedPromises.pageHistogram;
+    delete this.cachedPromises.currentDataPage;
+  }
+  get overviewHistogram () {
+    if (!this.cachedPromises.overviewHistogram) {
+      this.cachedPromises.overviewHistogram = this.restRequest({
+        path: 'dataset/getHistograms',
+        type: 'POST',
+        data: {
+          binSettings: this.model.getBinSettings(),
+          cache: true
+        }
+      });
+      this.cachedPromises.overviewHistogram.then(() => {
+        this.model.trigger('rl:loadedHistogram');
+      });
+    }
+    return this.cachedPromises.overviewHistogram;
+  }
+  get filteredHistogram () {
+    if (!this.cachedPromises.filteredHistogram) {
+      this.cachedPromises.filteredHistogram = this.restRequest({
+        path: 'dataset/getHistograms',
+        type: 'POST',
+        data: {
+          binSettings: this.model.getBinSettings(),
+          filter: this.filter,
+          cache: true
+        }
+      });
+      this.cachedPromises.filteredHistogram.then(() => {
+        this.model.trigger('rl:loadedHistogram');
+      });
+    }
+    return this.cachedPromises.filteredHistogram;
+  }
+  get pageHistogram () {
+    if (!this.cachedPromises.pageHistogram) {
+      this.cachedPromises.pageHistogram = this.restRequest({
+        path: 'dataset/getHistograms',
+        type: 'POST',
+        data: {
+          binSettings: this.model.getBinSettings(),
+          filter: this.filter,
+          limit: this.page.limit,
+          offset: this.page.offset
+          // Don't cache the page histograms on the server
+        }
+      });
+      this.cachedPromises.pageHistogram.then(() => {
+        this.model.trigger('rl:loadedHistogram');
+      });
+    }
+    return this.cachedPromises.pageHistogram;
+  }
+  get currentDataPage () {
+    if (!this.cachedPromises.currentDataPage) {
+      this.cachedPromises.currentDataPage = this.restRequest({
+        path: 'dataset/getData',
+        type: 'GET',
+        data: {
+          binSettings: this.model.getBinSettings(),
+          filter: this.filter,
+          limit: this.page.limit,
+          offset: this.page.offset
+          // TODO: supply the fields option based on which
+          // fields are actually in use in the visualization
+        }
+      });
+      this.cachedPromises.currentDataPage.then(() => {
+        this.model.trigger('rl:loadedData');
+      });
+    }
+    return this.cachedPromises.currentDataPage;
+  }
+}
+
 let Dataset = MetadataItem.extend({
-  initialize: function (filter, page) {
-    this.cache = null;
-    this.overviewHistogram = null;
-    this.filteredHistogram = null;
-    this.pageHistogram = null;
+  initialize: function () {
+    // Backbone.extend doesn't respect
+    // getters and setters, so we split
+    // all the cached information out into
+    // its own non-Backbone cache class
+    this.cache = new DatasetCache(this);
     this.dropped = false;
-    this.filter = filter || {};
-    this.page = page || {
-      offset: 0,
-      limit: 50
-    };
   },
   fetch: function () {
     // Calling fetch() on a dataset may necessitate more than a
@@ -59,64 +170,19 @@ let Dataset = MetadataItem.extend({
       });
     }
 
-    // Issue calls to get (or retrieve the cached) overview
-    // histogram, filtered histogram, and page histogram
-    this.overviewHistogram = null;
-    this.filteredHistogram = null;
-    this.pageHistogram = null;
-    // Finally, cache the current page
-    this.cache = null;
-
-    let binSettings = this.getBinSettings();
+    // Refresh the histograms and current page of data;
+    // it's not a big deal if the parameters haven't changed,
+    // as the most expensive bits (the overview and filtered
+    // histograms) will be cached on the server
+    this.cache.cachedPromises = {};
 
     promiseChain.then(() => {
       return Promise.all([
-        this.restRequest({
-          path: 'dataset/getHistograms',
-          type: 'POST',
-          data: {
-            binSettings: binSettings,
-            cache: true
-          }
-        }),
-        this.restRequest({
-          path: 'dataset/getHistograms',
-          type: 'POST',
-          data: {
-            binSettings: binSettings,
-            filter: this.filter,
-            cache: true
-          }
-        }),
-        this.restRequest({
-          path: 'dataset/getHistograms',
-          type: 'POST',
-          data: {
-            binSettings: binSettings,
-            filter: this.filter,
-            limit: this.page.limit,
-            offset: this.page.offset
-          }
-        }),
-        this.restRequest({
-          path: 'dataset/getData',
-          type: 'GET',
-          data: {
-            binSettings: binSettings,
-            filter: this.filter,
-            limit: this.page.limit,
-            offset: this.page.offset
-            // TODO: supply the fields option based on which
-            // fields are actually in use in the visualization
-          }
-        })
-      ]).then(results => {
-        this.overviewHistogram = results[0];
-        this.filteredHistogram = results[1];
-        this.pageHistogram = results[2];
-        this.cache = results[3];
-        this.trigger('rl:loadedData');
-      });
+        this.cache.overviewHistogram,
+        this.cache.filteredHistogram,
+        this.cache.pageHistogram,
+        this.cache.currentDataPage
+      ]);
     });
 
     return fetchPromise;

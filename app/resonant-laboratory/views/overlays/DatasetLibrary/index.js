@@ -59,18 +59,8 @@ let DatasetLibrary = Backbone.View.extend({
     });
     datasets.on('reset', function (items) {
       let datasetModels = items.models.filter(d => {
-        // Assume it's a dataset unless we can identify
-        // it as something else... TODO: do something smarter?
-        if (d.name() === 'Resonant Laboratory Preferences') {
-          // this is a preferences item
-          return false;
-        }
         let meta = d.get('meta');
-        if (meta && meta.datasets) {
-          // this is a project
-          return false;
-        }
-        return true;
+        return !(!meta || !meta.rlab || !meta.rlab.itemType || meta.rlab.itemType !== 'dataset');
       });
 
       if (datasetModels.length > 0) {
@@ -104,25 +94,21 @@ let DatasetLibrary = Backbone.View.extend({
 
       d3.select('#' + divId).selectAll('.circleButton')
         .on('click', d => {
+          let projectPromise;
           if (window.mainPage.project) {
-            // We already have a project loaded, so
-            // swap it in (TODO: load multiple datasets)
-            window.mainPage.project.setDataset(d._id);
+            projectPromise = Promise.resolve(window.mainPage.project);
+          } else {
+            // No project is loaded, so create an empty
+            // project with this dataset
+            projectPromise = window.mainPage.newProject();
+          }
+          projectPromise.then(() => {
+            window.mainPage.project.setDataset(d.get('_id'));
             window.mainPage.widgetPanels.toggleWidget({
               hashName: 'DatasetView0'
             }, true);
             window.mainPage.overlay.closeOverlay();
-          } else {
-            // No project is loaded, so create an empty
-            // project with this dataset
-            window.mainPage.newProject().then(() => {
-              window.mainPage.project.setDataset(d._id);
-              window.mainPage.widgetPanels.toggleWidget({
-                hashName: 'DatasetView0'
-              }, true);
-              window.mainPage.overlay.closeOverlay();
-            });
-          }
+          });
         });
     });
   }

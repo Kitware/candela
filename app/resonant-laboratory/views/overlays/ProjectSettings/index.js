@@ -11,8 +11,6 @@ import scratchIcon from '../../../images/scratchSpace.svg';
 import '../../../shims/copyToClipboard.js';
 import './style.css';
 
-let girder = window.girder;
-
 let visibilityIcons = {
   PublicUser: publicIcon,
   PrivateUser: privateIcon,

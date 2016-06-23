@@ -89,20 +89,19 @@ let Project = MetadataItem.extend({
           // We've already loaded this dataset; update its filter and
           // paging parameters
           dataset = window.mainPage.loadedDatasets[datasetSpec.dataset];
-          dataset.setFilter(datasetSpecs[index].filter);
-          dataset.setPage(datasetSpecs[index].page);
         } else {
           // We haven't loaded this dataset yet; load it and
           // attach some listeners
           dataset = new Dataset({
             id: datasetSpec.dataset
-          }, datasetSpecs[index].filter,
-             datasetSpecs[index].page);
+          });
           this.listenTo(dataset, 'rl:changeSpec', this.changeDataSpec);
           this.listenTo(dataset, 'rl:swapId', this.swapDatasetId);
         }
+        dataset.cache.filter = datasetSpec.filter;
+        dataset.cache.page = datasetSpec.page;
         newLoadedDatasets[datasetSpec.dataset] = dataset;
-        datasetPromises.push(newLoadedDatasets[datasetSpec.dataset]).fetch();
+        datasetPromises.push(newLoadedDatasets[datasetSpec.dataset].fetch());
       });
       // Now go through and discard any references to
       // old datasets that we don't need anymore
@@ -189,7 +188,9 @@ let Project = MetadataItem.extend({
     if (newDatasetId in window.mainPage.loadedDatasets) {
       newDataset = window.mainPage.loadedDatasets[newDatasetId];
     } else {
-      newDataset = new Dataset(newDatasetId);
+      newDataset = new Dataset({
+        id: newDatasetId
+      });
       this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
       this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
       window.mainPage.loadedDatasets[newDatasetId] = newDataset;
@@ -197,8 +198,8 @@ let Project = MetadataItem.extend({
 
     let newDatasetDetails = {
       dataset: newDatasetId,
-      filter: newDataset.filter,
-      page: newDataset.page
+      filter: newDataset.cache.filter,
+      page: newDataset.cache.page
     };
 
     if (index >= datasets.length) {
@@ -266,19 +267,19 @@ let Project = MetadataItem.extend({
   },
   shapeDataForVis: function (index = 0) {
     let meta = this.getMeta();
-    if (meta.datasets.length < index) {
+    if (meta.datasets.length <= index) {
       // The indicated dataset isn't loaded yet...
       // send the visualization a temporary empty dataset instead
       return Promise.resolve([]);
     }
 
-    let datasetId = meta.datasets[0];
+    let datasetId = meta.datasets[0].dataset;
     // TODO: when candela supports multiple datasets, include
     // all the datasets that the visualization connects to
     // TODO: potential optimization: use the set of relevant fields
     // to retrieve less data in the call to dataset/getData in
     // Dataset.fetch()
-    return window.mainPage.loadedDatasets[datasetId].loadPage();
+    return window.mainPage.loadedDatasets[datasetId].cache.currentDataPage;
   },
   changeDataSpec: function () {
     return this.validateMatchings().then(() => {

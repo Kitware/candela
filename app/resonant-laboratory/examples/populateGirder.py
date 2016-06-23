@@ -137,11 +137,6 @@ if __name__ == '__main__':
             # Create (or get) the item
             itemSpec = gc.load_or_create_item(item, folderSpec['_id'])
 
-            # Hit the endpoint that identifies the item as a project,
-            # and populates the metadata appropriately
-            if folder == 'Projects':
-                gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/project')
-
             # If this is a dataset, store its ID for Projects
             # to look up later
             if folder == 'Data':
@@ -196,10 +191,12 @@ if __name__ == '__main__':
                         gc.uploadFileToItem(itemSpec['_id'], './' + folder + '/' + item + '/' + fileName)
                         addedFiles += 1
 
-            # Hit the endpoint that identifies the item as a dataset,
+            # Hit the endpoint that identifies the item as a dataset or a project,
             # and populates the metadata appropriately
             if folder == 'Data':
                 gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/dataset')
+            elif folder == 'Projects':
+                gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/project')
 
             message += '\t%i            \t%i               \t%i                \t' % (
                 ignoredFiles, addedFiles, addedCollections)

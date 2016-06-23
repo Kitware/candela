@@ -27,10 +27,10 @@ class ProjectItem(Resource):
         rlab['itemType'] = 'project'
         rlab['versionNumber'] = self.app.versioning.versionNumber({})
 
-        rlab['datasets'] = []
-        rlab['matchings'] = []
-        rlab['visualizations'] = []
-        rlab['preferredWidgets'] = []
+        rlab['datasets'] = rlab.get('datasets', [])
+        rlab['matchings'] = rlab.get('matchings', [])
+        rlab['visualizations'] = rlab.get('visualizations', [])
+        rlab['preferredWidgets'] = rlab.get('preferredWidgets', [])
 
         metadata['rlab'] = rlab
         item['meta'] = metadata
