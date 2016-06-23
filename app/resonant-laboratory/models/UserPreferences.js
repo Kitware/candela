@@ -14,9 +14,11 @@ let UserPreferences = MetadataItem.extend({
       description: `
 Contains your preferences for the Resonant Laboratory application. If
 you move or delete this item, your preferences will be lost.`,
-      meta: {
-        seenTips: {},
-        achievements: {}
+      rlab: {
+        meta: {
+          seenTips: {},
+          achievements: {}
+        }
       }
     };
   },
@@ -30,18 +32,22 @@ you move or delete this item, your preferences will be lost.`,
       this.setMeta('achievements', JSON.parse(achievements));
     }
   },
+  fetch: function () {
+    return MetadataItem.prototype.fetch.apply(this, arguments)
+      .catch(() => {
+        // Fallback: attempt to retrieve the user's preferences from localStorage
+        this.setMeta('seenTips', window.localStorage.getItem('seenTips') || {});
+        this.setMeta('achievements', window.localStorage.getItem('achievements') || {});
+      });
+  },
   save: function () {
     return MetadataItem.prototype.save.apply(this, arguments)
       .catch(() => {
         // Fallback: store the user's preferences in localStorage
-        let seenTips = this.getMeta('seenTips');
-        if (seenTips) {
-          window.localStorage.setItem('seenTips', JSON.stringify(seenTips));
-        }
-        let achievements = this.getMeta('achievements');
-        if (achievements) {
-          window.localStorage.setItem('achievements', JSON.stringify(achievements));
-        }
+        let seenTips = this.getMeta('seenTips') || {};
+        window.localStorage.setItem('seenTips', JSON.stringify(seenTips));
+        let achievements = this.getMeta('achievements') || {};
+        window.localStorage.setItem('achievements', JSON.stringify(achievements));
       });
   },
   addListeners: function () {
@@ -126,7 +132,7 @@ you move or delete this item, your preferences will be lost.`,
           // project will (pretty much always) have just changed
           // as well
           if (window.mainPage.project) {
-            window.mainPage.project.updateStatus();
+            window.mainPage.project.fetch();
           }
         });
       }).catch(() => {
@@ -141,7 +147,7 @@ you move or delete this item, your preferences will be lost.`,
     return this.getMeta('seenTips')[tipId] === true;
   },
   hasSeenAllTips: function (tips) {
-    let seenTips = this.getMeta('seenTips');
+    let seenTips = this.getMeta('seenTips') || {};
     for (let tip of tips) {
       let tipId = tip.selector.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
       if (seenTips[tipId] !== true) {
@@ -151,7 +157,7 @@ you move or delete this item, your preferences will be lost.`,
     return true;
   },
   observeTip: function (tip) {
-    let seenTips = this.getMeta('seenTips');
+    let seenTips = this.getMeta('seenTips') || {};
     // Make the id a valid / nice mongo id
     let tipId = tip.selector.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
     seenTips[tipId] = true;
@@ -161,7 +167,7 @@ you move or delete this item, your preferences will be lost.`,
     this.save();
   },
   forgetTips: function (tips) {
-    let seenTips = this.getMeta('seenTips');
+    let seenTips = this.getMeta('seenTips') || {};
     for (let tip of tips) {
       let tipId = tip.selector.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
       delete seenTips[tipId];
@@ -183,11 +189,11 @@ you move or delete this item, your preferences will be lost.`,
     window.localStorage.removeItem('scratchProjects');
   },
   levelUp: function (achievement) {
-    let achievements = this.getMeta('achievements');
+    let achievements = this.getMeta('achievements') || {};
     if (achievements[achievement] !== true) {
       achievements[achievement] = true;
       this.setMeta('achievements', achievements);
-      this.save().catch(() => {}); // fail silently
+      this.save(); // fail silently
       this.trigger('rl:levelUp');
     }
   }

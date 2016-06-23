@@ -1,10 +1,8 @@
 import MetadataItem from './MetadataItem';
 import Dataset from './Dataset';
-import {
-  Set
-}
-from '../shims/SetOps.js';
-import candela from './../../../../../src/candela';
+import promiseDebounce from '../shims/promiseDebounce.js';
+import { Set } from '../shims/SetOps.js';
+import candela from '../../../src/candela';
 /*
     A Project represents a user's saved session;
     it includes specific dataset IDs, with specific
@@ -20,19 +18,23 @@ import candela from './../../../../../src/candela';
 
 let Project = MetadataItem.extend({
   initialize: function () {
+    if (!this.get('name')) {
+      this.set('name', 'Untitled Project');
+    }
+
     this.status = {
       editable: false,
       location: null
     };
 
     this.listenTo(window.mainPage.currentUser, 'rl:login',
-      this.updateStatus);
+      this.fetch);
     this.listenTo(window.mainPage.currentUser, 'rl:logout',
-      this.updateStatus);
+      this.fetch);
     this.listenTo(window.mainPage, 'rl:changeProject',
-      this.updateStatus);
+      this.fetch);
     this.listenTo(this, 'rl:swapId', () => {
-      this.updateStatus().then(() => {
+      this.fetch().then(() => {
         window.mainPage.trigger('rl:createProject');
       });
     });
@@ -51,7 +53,7 @@ let Project = MetadataItem.extend({
     });
     return createPromise;
   },
-  fetch: function () {
+  fetch: promiseDebounce(function () {
     let fetchPromise = MetadataItem.prototype.fetch.apply(this, arguments);
 
     // Whenever we update the project metadata, we also want
@@ -73,7 +75,7 @@ let Project = MetadataItem.extend({
     fetchPromise.then(() => {
       let datasetPromises = [];
       let newLoadedDatasets = {};
-      let datasetSpecs = this.getMeta('datasets');
+      let datasetSpecs = this.getMeta('datasets') || [];
       datasetSpecs.forEach((datasetSpec, index) => {
         let dataset;
         if (datasetSpec.dataset in window.mainPage.loadedDatasets) {
@@ -114,7 +116,7 @@ let Project = MetadataItem.extend({
     });
 
     return fetchPromise;
-  },
+  }, 100),
   getMeta: function (key) {
     let meta = MetadataItem.prototype.getMeta.apply(this, [key]);
 
@@ -154,10 +156,10 @@ let Project = MetadataItem.extend({
     return flatMeta;
   },
   getDatasetIds: function () {
-    return this.getMeta('datasets').map(d => d.dataset);
+    return (this.getMeta('datasets') || []).map(d => d.dataset);
   },
   swapDatasetId: function (newData) {
-    let datasets = this.getMeta('datasets');
+    let datasets = this.getMeta('datasets') || [];
     let index = datasets.findIndex(d => d.dataset === newData._oldId);
     if (index !== -1 || !(newData._oldId in window.mainPage.loadedDatasets)) {
       // Update the project metadata to point to the new dataset
@@ -174,7 +176,7 @@ let Project = MetadataItem.extend({
     return this.save();
   },
   setDataset: function (newDatasetId, index = 0) {
-    let datasets = this.getMeta('datasets');
+    let datasets = this.getMeta('datasets') || [];
     let newDataset;
 
     if (newDatasetId in window.mainPage.loadedDatasets) {
@@ -204,7 +206,7 @@ let Project = MetadataItem.extend({
     });
   },
   setVisualization: function (visName, index = 0) {
-    let visualizations = this.getMeta('visualizations');
+    let visualizations = this.getMeta('visualizations') || [];
     let newVisualizatoinDetails = {
       'name': visName,
       'options': {}
@@ -384,26 +386,52 @@ let Project = MetadataItem.extend({
     let meta = this.getMeta();
     let result = [];
 
-    meta.datasets.forEach((id, i) => {
+    if (!meta.datasets || meta.datasets.length === 0) {
+      // If there aren't any datasets yet,
+      // include a dummy, empty dataset widget
       result.push({
         widgetType: 'DatasetView',
-        hashName: 'DatasetView' + i,
-        index: i,
-        id: id
+        hashName: 'DatasetViewDummy',
+        index: null,
+        id: null
       });
-    });
+    } else {
+      // Add a widget for every dataset
+      meta.datasets.forEach((id, i) => {
+        result.push({
+          widgetType: 'DatasetView',
+          hashName: 'DatasetView' + i,
+          index: i,
+          id: id
+        });
+      });
+    }
+    // Add the matching widget
     result.push({
       widgetType: 'MatchingView',
       hashName: 'MatchingView'
     });
-    meta.visualizations.forEach((spec, i) => {
+
+    if (!meta.visualizations || meta.visualizations.length === 0) {
+      // If there aren't any visualizations yet,
+      // include a dummy, empty visualization widget
       result.push({
         widgetType: 'VisualizationView',
-        hashName: 'VisualizationView' + i,
-        index: i,
-        spec: spec
+        hashName: 'VisualizationViewDummy',
+        index: null,
+        id: null
       });
-    });
+    } else {
+      // Add a widget for every visualization
+      meta.visualizations.forEach((spec, i) => {
+        result.push({
+          widgetType: 'VisualizationView',
+          hashName: 'VisualizationView' + i,
+          index: i,
+          spec: spec
+        });
+      });
+    }
 
     return result;
   },

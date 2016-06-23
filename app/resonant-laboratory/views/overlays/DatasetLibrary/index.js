@@ -61,7 +61,7 @@ let DatasetLibrary = Backbone.View.extend({
       let datasetModels = items.models.filter(d => {
         // Assume it's a dataset unless we can identify
         // it as something else... TODO: do something smarter?
-        if (d.name() === 'rl_preferences') {
+        if (d.name() === 'Resonant Laboratory Preferences') {
           // this is a preferences item
           return false;
         }

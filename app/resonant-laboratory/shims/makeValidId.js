@@ -1,4 +1,5 @@
 /* tool to make any string a valid DOM id (resolves regex collisions) */
+import { Set } from './SetOps.js';
 let ID_LOOKUP = {};
 let USED_IDS = new Set();
 function makeValidId (str) {

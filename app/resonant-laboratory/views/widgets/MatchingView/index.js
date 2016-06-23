@@ -162,14 +162,18 @@ in order to connect them together.`);
       vis: []
     };
 
-    for (let d of meta.datasets) {
-      if (window.mainPage.loadedDatasets[d]) {
-        specs.data.push(window.mainPage.loadedDatasets[d].getSpec());
+    if (meta.datasets) {
+      for (let d of meta.datasets) {
+        if (window.mainPage.loadedDatasets[d]) {
+          specs.data.push(window.mainPage.loadedDatasets[d].getSpec());
+        }
       }
     }
-    meta.visualizations.forEach(d => {
-      specs.vis.push(d);
-    });
+    if (meta.visualizations) {
+      meta.visualizations.forEach(d => {
+        specs.vis.push(d);
+      });
+    }
 
     // Reshape the specs into node/edge tables
     // for easy drawing and interaction
@@ -326,18 +330,20 @@ in order to connect them together.`);
       });
 
       // Get the established edges
-      for (let matching of meta.matchings) {
-        let newEdge = _createEdge(true, matching.visIndex, matching.visAttribute,
-          matching.dataIndex, matching.dataAttribute);
-        // Count this connection in each node
-        visNodes[newEdge.visIndex].establishedConnections += 1;
-        dataNodes[newEdge.dataIndex].establishedConnections += 1;
-        if (!visNodes[newEdge.visIndex].optional &&
-             visNodes[newEdge.visIndex].establishedConnections === 1) {
-          // this edge just satisfied a requirement (for now, we're
-          // assuming that a non-optional vis encoding only requires
-          // one connection to satisfy the requirement)
-          satisfiedConnections += 1;
+      if (meta.matchings) {
+        for (let matching of meta.matchings) {
+          let newEdge = _createEdge(true, matching.visIndex, matching.visAttribute,
+            matching.dataIndex, matching.dataAttribute);
+          // Count this connection in each node
+          visNodes[newEdge.visIndex].establishedConnections += 1;
+          dataNodes[newEdge.dataIndex].establishedConnections += 1;
+          if (!visNodes[newEdge.visIndex].optional &&
+               visNodes[newEdge.visIndex].establishedConnections === 1) {
+            // this edge just satisfied a requirement (for now, we're
+            // assuming that a non-optional vis encoding only requires
+            // one connection to satisfy the requirement)
+            satisfiedConnections += 1;
+          }
         }
       }
 

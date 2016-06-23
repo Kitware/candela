@@ -110,7 +110,7 @@ let Header = Backbone.View.extend({
       this.templateAdded = true;
     }
 
-    // Only make the icon blue if there's a tip
+    // Only make the icon yellow if there's a tip
     // that the user hasn't seen that is visible
     // on the screen
     let visibleTips = tips.filter(tip => {
@@ -141,19 +141,16 @@ let Header = Backbone.View.extend({
       // Set up all the widget icons
       let widgetIcons = window.mainPage.project.getAllWidgetSpecs();
 
-      // Prepend and append the buttons for adding stuff
-      // (TODO: *always* include these when multiple datasets /
-      // multiple visualizations are supported)
-      if (window.mainPage.project.getMeta('datasets').length === 0) {
-        widgetIcons.unshift({
-          widgetType: 'AddDataset'
-        });
-      }
-      if (window.mainPage.project.getMeta('visualizations').length === 0) {
-        widgetIcons.push({
-          widgetType: 'AddVisualization'
-        });
-      }
+      // TODO: Uncomment to prepend and append the buttons for adding
+      // additional datasets and/or visualizations
+      /*
+      widgetIcons.unshift({
+        widgetType: 'AddDataset'
+      });
+      widgetIcons.push({
+        widgetType: 'AddVisualization'
+      });
+      */
 
       let widgetButtons = d3.select(this.el).select('#projectIcons')
         .selectAll('img.headerButton').data(widgetIcons);

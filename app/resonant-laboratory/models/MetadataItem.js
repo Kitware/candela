@@ -116,6 +116,7 @@ let MetadataItem = girder.models.ItemModel.extend({
     return promiseObj;
   },
   restRequest: function (requestParameters, options) {
+    options = options || {};
     return this.wrapInPromise((resolve, reject) => {
       requestParameters.path = 'item/' + this.getId() + '/' + requestParameters.path;
       requestParameters.error = reject;

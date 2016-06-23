@@ -46,19 +46,14 @@ function toggleCallback () {
     give it a hint if the user is copying a library project
     directly to their public folder)
   */
-  new Promise((resolve, reject) => {
-    girder.restRequest({
-      path: 'item/' + window.mainPage.project.getId() + '/anonymousAccess/togglePublic',
-      type: 'POST',
-      data: {
-        makePublic: this.value === 'PublicUser'
-      },
-      error: reject
-    }).done(resolve).error(reject);
+  window.mainPage.project.restRequest({
+    path: '/anonymousAccess/togglePublic',
+    type: 'POST',
+    data: {
+      makePublic: this.value === 'PublicUser'
+    }
   }).then(() => {
-    window.mainPage.project.updateStatus();
-  }).catch((errorObj) => {
-    window.mainPage.trigger('rl:error', errorObj);
+    window.mainPage.project.fetch();
   });
 }
 
@@ -108,7 +103,7 @@ let ProjectSettings = Backbone.View.extend({
       });
 
       this.$el.find('#saveAsButton').on('click', () => {
-        window.mainPage.project.makeCopy();
+        window.mainPage.project.create();
       });
 
       this.$el.find('a#loginLink').on('click', () => {

@@ -4,6 +4,7 @@ import Widget from '../Widget';
 import Dataset from '../../../models/Dataset';
 import myTemplate from './template.html';
 import makeValidId from '../../../shims/makeValidId.js';
+import { Set } from '../../../shims/SetOps.js';
 import './style.css';
 
 let STATUS = {
@@ -368,15 +369,16 @@ let DatasetView = Widget.extend({
     }
 
     // Get the dataset in the project (if there is one)
-
+    // TODO: get the dataset assigned to this widget
     let dataset;
     if (window.mainPage.project) {
       let datasets = window.mainPage.project.getMeta('datasets');
-      dataset = window.mainPage.loadedDatasets[datasets[0]];
+      if (datasets) {
+        dataset = window.mainPage.loadedDatasets[datasets[0]];
+      }
     }
 
     if (!dataset) {
-      this.renderPreview('');
       this.$el.find('#attributeSettings').html('');
       this.status = STATUS.NO_DATA;
       this.statusText.text = 'No file loaded';
