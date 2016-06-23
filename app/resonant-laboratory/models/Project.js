@@ -17,11 +17,18 @@ import candela from '../../../src/candela';
 */
 
 let Project = MetadataItem.extend({
-  initialize: function () {
-    if (!this.get('name')) {
-      this.set('name', 'Untitled Project');
+  defaults: {
+    'name': 'Untitled Project',
+    'meta': {
+      'rlab': {
+        datasets: [],
+        matchings: [],
+        visualizations: [],
+        preferredWidgets: []
+      }
     }
-
+  },
+  initialize: function () {
     this.status = {
       editable: false,
       location: null
@@ -75,7 +82,7 @@ let Project = MetadataItem.extend({
     fetchPromise.then(() => {
       let datasetPromises = [];
       let newLoadedDatasets = {};
-      let datasetSpecs = this.getMeta('datasets') || [];
+      let datasetSpecs = this.getMeta('datasets');
       datasetSpecs.forEach((datasetSpec, index) => {
         let dataset;
         if (datasetSpec.dataset in window.mainPage.loadedDatasets) {
@@ -156,10 +163,10 @@ let Project = MetadataItem.extend({
     return flatMeta;
   },
   getDatasetIds: function () {
-    return (this.getMeta('datasets') || []).map(d => d.dataset);
+    return this.getMeta('datasets').map(d => d.dataset);
   },
   swapDatasetId: function (newData) {
-    let datasets = this.getMeta('datasets') || [];
+    let datasets = this.getMeta('datasets');
     let index = datasets.findIndex(d => d.dataset === newData._oldId);
     if (index !== -1 || !(newData._oldId in window.mainPage.loadedDatasets)) {
       // Update the project metadata to point to the new dataset
@@ -176,7 +183,7 @@ let Project = MetadataItem.extend({
     return this.save();
   },
   setDataset: function (newDatasetId, index = 0) {
-    let datasets = this.getMeta('datasets') || [];
+    let datasets = this.getMeta('datasets');
     let newDataset;
 
     if (newDatasetId in window.mainPage.loadedDatasets) {
@@ -206,7 +213,7 @@ let Project = MetadataItem.extend({
     });
   },
   setVisualization: function (visName, index = 0) {
-    let visualizations = this.getMeta('visualizations') || [];
+    let visualizations = this.getMeta('visualizations');
     let newVisualizatoinDetails = {
       'name': visName,
       'options': {}

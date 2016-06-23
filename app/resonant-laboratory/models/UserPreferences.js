@@ -14,8 +14,8 @@ let UserPreferences = MetadataItem.extend({
       description: `
 Contains your preferences for the Resonant Laboratory application. If
 you move or delete this item, your preferences will be lost.`,
-      rlab: {
-        meta: {
+      meta: {
+        rlab: {
           seenTips: {},
           achievements: {}
         }

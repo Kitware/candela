@@ -131,12 +131,12 @@ let ProjectLibrary = Backbone.View.extend({
   },
   renderProjects: function (items, divId, icon) {
     let projectModels = items.models.filter(d => {
-      if (!d.attributes || !d.attributes.meta) {
+      if (!d.attributes || !d.attributes.meta || !d.attributes.meta.rlab) {
         return false;
       }
-      return d.attributes.meta.datasets &&
-      d.attributes.meta.matchings &&
-      d.attributes.meta.visualizations;
+      return d.attributes.meta.rlab.datasets &&
+      d.attributes.meta.rlab.matchings &&
+      d.attributes.meta.rlab.visualizations;
     });
 
     if (projectModels.length > 0) {

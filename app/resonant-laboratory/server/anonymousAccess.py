@@ -268,14 +268,15 @@ class AnonymousAccess(Resource):
                                            item['description']).strip()
 
         metadata = item.get('meta', {})
+        rlabMetadata = metadata.get('rlab', {})
         metaOverrides = self.getBodyJson()
         if metaOverrides is not None:
             for k, v in metaOverrides.iteritems():
                 if v is None:
-                    if k in metadata:
-                        del metadata[k]
+                    if k in rlabMetadata:
+                        del rlabMetadata[k]
                 else:
-                    metadata[k] = v
+                    rlabMetadata[k] = v
 
         user = self.getCurrentUser()
         anonymous = False
@@ -306,6 +307,7 @@ class AnonymousAccess(Resource):
         targetItem['name'] = params['name']
         targetItem['description'] = params['description']
 
+        metadata['rlab'] = rlabMetadata
         targetItem['meta'] = metadata
 
         self.model('item').updateItem(targetItem)
