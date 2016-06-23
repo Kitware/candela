@@ -115,6 +115,29 @@ let MetadataItem = girder.models.ItemModel.extend({
 
     return promiseObj;
   },
+  restRequest: function (requestParameters, options) {
+    return this.wrapInPromise((resolve, reject) => {
+      requestParameters.path = 'item/' + this.getId() + '/' + requestParameters.path;
+      requestParameters.error = reject;
+      girder.restRequest(requestParameters).done(resolve).error(reject);
+    }, options, resp => {
+      // It's possible that the id changed in the process (e.g. a copy of
+      // the item was made because the user is logged out)
+      let swappedId = false;
+      if (this.getId() !== resp[this.idAttribute]) {
+        resp['_oldId'] = this.getId();
+        swappedId = true;
+      }
+      this.set(resp, {
+        silent: true
+      });
+      if (swappedId) {
+        this.trigger('rl:swapId', resp);
+      }
+    }).catch(errorObj => {
+      window.mainPage.trigger('rl:error', new Error('Error communicating with the server.'));
+    });
+  },
   sync: function (method, model, options) {
     options = options || {};
 
@@ -146,7 +169,7 @@ let MetadataItem = girder.models.ItemModel.extend({
           error: reject,
           type: 'POST'
         }).done(resolve).error(reject);
-      }, options, (resp) => {
+      }, options, resp => {
         // This *should* assign us our new ID:
         this.set(resp, {
           silent: true
@@ -181,32 +204,13 @@ let MetadataItem = girder.models.ItemModel.extend({
         return this.sync('create', model, options);
       }
 
-      return this.wrapInPromise((resolve, reject) => {
-        girder.restRequest({
-          path: 'item/' + this.getId() + '/anonymousAccess/updateScratch?' +
-            jQuery.param(args),
-          contentType: 'application/json',
-          data: JSON.stringify(this.getFlatMeta()),
-          type: 'POST',
-          error: reject
-        }).done(resolve).error(reject);
-      }, options, (resp) => {
-        // It's possible that the id changed
-        // in the process (e.g. a copy of
-        // the project was made
-        // because the user is logged out)
-        let swappedId = false;
-        if (this.getId() !== resp[this.idAttribute]) {
-          resp['_oldId'] = this.getId();
-          swappedId = true;
-        }
-        this.set(resp, {
-          silent: true
-        });
-        if (swappedId) {
-          this.trigger('rl:swapId', resp);
-        }
-      });
+      return this.restRequest({
+        path: '/anonymousAccess/updateScratch?' +
+          jQuery.param(args),
+        contentType: 'application/json',
+        data: JSON.stringify(this.getFlatMeta()),
+        type: 'POST'
+      }, options);
     } else if (method === 'read') {
       if (this.getId() === undefined) {
         // If we haven't yet identified the id, look for it
@@ -263,7 +267,10 @@ let MetadataItem = girder.models.ItemModel.extend({
     }
   },
   fetch: function (options) {
-    return this.sync('read', this.toJSON(), options);
+    return this.sync('read', this.toJSON(), options)
+      .catch(errorObj => {
+        window.mainPage.trigger('rl:error', new Error('Error communicating with the server.'));
+      });
   },
   create: function (attributes, options) {
     if (attributes) {
@@ -274,16 +281,25 @@ let MetadataItem = girder.models.ItemModel.extend({
     this.unset(this.idAttribute, {
       silent: true
     });
-    return this.sync('create', this.toJSON(), options);
+    return this.sync('create', this.toJSON(), options)
+      .catch(errorObj => {
+        window.mainPage.trigger('rl:error', new Error('Error communicating with the server.'));
+      });
   },
   save: function (attributes, options) {
     if (attributes) {
       this.set(attributes, options);
     }
-    return this.sync('update', this.toJSON(), options);
+    return this.sync('update', this.toJSON(), options)
+      .catch(errorObj => {
+        window.mainPage.trigger('rl:error', new Error('Error communicating with the server.'));
+      });
   },
   destroy: function (options) {
-    return this.sync('delete', this.toJSON(), options);
+    return this.sync('delete', this.toJSON(), options)
+      .catch(errorObj => {
+        window.mainPage.trigger('rl:error', new Error('Error communicating with the server.'));
+      });
   },
   setMeta: function (key, value) {
     let meta = this.getMeta();
@@ -346,6 +362,12 @@ let MetadataItem = girder.models.ItemModel.extend({
     } else {
       return !eqFunc(this.previousMeta(key), this.getMeta(key));
     }
+  },
+  rename: function (newName) {
+    this.set('name', newName);
+    return this.save().then(() => {
+      this.trigger('rl:rename');
+    });
   }
 });
 

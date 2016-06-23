@@ -270,6 +270,14 @@ class DatasetItem(Resource):
         metadata['rlab'] = rlab
         item['meta'] = metadata
 
+        # Calling setupDataset invalidates the schema and any cached histograms
+        if 'schema' in item['meta']['rlab']:
+            del item['meta']['rlab']['schema']
+        if 'lastUpdated' in item['meta']['rlab']:
+            del item['meta']['rlab']['lastUpdated']
+        if 'histogramCaches' in item['meta']['rlab']:
+            del item['meta']['rlab']['histogramCaches']
+
         return self.model('item').updateItem(item)
 
     @access.public
@@ -315,6 +323,10 @@ class DatasetItem(Resource):
 
         item['meta']['rlab']['schema'] = schema
         item['meta']['rlab']['lastUpdated'] = datetime.datetime.now().isoformat()
+
+        # A fresh schema inference invalidates any cached histograms
+        if 'histogramCaches' in item['meta']['rlab']:
+            del item['meta']['rlab']['histogramCaches']
 
         return self.model('item').updateItem(item)
 
