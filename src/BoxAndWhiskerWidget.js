@@ -126,19 +126,26 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
       .on("mouseover", (d) => {
         toolTipDiv.transition()
           .duration(200)
-          .style("opacity", .9);
-        toolTipDiv.html("Median: " + standardRound(this.median) + "<br/>" +
-                        "5th %ile: " + standardRound(quantiles[0]) + "<br/>" +
-                        "25th %ile: " + standardRound(quantiles[1]) + "<br/>" +
-                        "75th %ile: " + standardRound(quantiles[3]) + "<br/>" +
-                        "95th %ile: " + standardRound(quantiles[4]) + "<br/>" +
-                        "Min: " + this.testArray[0] + "<br/>" +
-                        "Max: " +
-                        this.testArray[this.testArray.length-1] + "<br/>" +
-                        "# of samples: " + this.testArray.length + "<br/>" +
-                        "<br/>" +
-                        "Outliers: " +
-                        _.map(outliers, standardRound).join(", "))
+          .style("opacity", 1.0);
+        let cells = [
+          ['Min', standardRound(this.testArray[0])],
+          ['5th %ile', standardRound(quantiles[0])],
+          ['25th %ile', standardRound(quantiles[1])],
+          ['Median', standardRound(this.median)],
+          ['75th %ile', standardRound(quantiles[3])],
+          ['95th %ile', standardRound(quantiles[4])],
+          ['Max', standardRound(this.testArray[this.testArray.length-1])],
+          ['# of Samples', this.testArray.length],
+          // Add in a blank row to separate Outliers.
+          ['&nbsp', '&nbsp'],
+          ['Outliers', _.map(outliers, standardRound).join(", ")]
+        ];
+        let toolTipHtml = '<table style="border-collapse: separate; border-spacing: 10px 2px;">';
+        _.each(cells, function (cell) {
+          toolTipHtml += '<tr><td>'+cell[0]+'</td><td>'+cell[1]+'</td></tr>';
+        });
+        toolTipHtml += '</table>';
+        toolTipDiv.html(toolTipHtml)
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY - 28) + "px");
       })
