@@ -5,7 +5,7 @@ import nv from 'nvd3';
 import $ from 'jquery';
 
 import colors from './colors.js';
-import { failValue, warningValue } from './utility.js';
+import { failValue, warningValue, computeColor } from './utility.js';
 
 export let ErrorBulletWidget = Backbone.View.extend({
 
@@ -31,18 +31,8 @@ export let ErrorBulletWidget = Backbone.View.extend({
     nv.addGraph({
       generate: _.bind(function () {
         let chart = nv.models.bulletChart()
-          .margin({top: 5, right: 20, bottom: 20, left: 25});
-        if (this.trend.incompleteThreshold) {
-          chart.color(colors.incomplete);
-        } else {
-          if (failValue(this.result.current, this.trend.warning, this.trend.fail)) {
-            chart.color(colors.fail);
-          } else if (warningValue(this.result.current, this.trend.warning, this.trend.fail)) {
-            chart.color(colors.bad);
-          } else {
-            chart.color(colors.good);
-          }
-        }
+          .margin({top: 5, right: 20, bottom: 20, left: 10});
+        chart.color(computeColor(this.trend, this.result.current));
         d3.select('[id=\'' + this.el.id + '-svg\']')
           .datum(this.chartData())
           .call(chart);

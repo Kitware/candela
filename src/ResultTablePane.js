@@ -90,16 +90,6 @@ export let ResultTablePane = Backbone.View.extend({
       _.each(this.results, function (result) {
         var trend = this.trendMap[result.trend];
         var resultDivSelector = '#' + result.dataset_id_selector + '-' + trend.id_selector;
-        // change color of circle
-        if (!trend.incomplete) {
-          if (failValue(result.current, trend.warning, trend.fail)) {
-            $(resultDivSelector + ' svg.statusDot').find('circle')
-              .attr('class', 'fail');
-          } else if (warningValue(result.current, trend.warning, trend.fail)) {
-            $(resultDivSelector + ' svg.statusDot').find('circle')
-              .attr('class', 'bad');
-          }
-        }
         // render bullets
         let errorBullet = new ValueWidget({
           el: resultDivSelector + '-bullet',

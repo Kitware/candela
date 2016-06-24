@@ -43,3 +43,5 @@ default client-side calculate aggregate metrics which are derived from trend val
  * `omitTrends` will remove the trend thresholds and abbreviations, so the trend
 values will be displayed without thresholds or abbreviations, and max values are
 derived from the trend values
+ * `multipleValues` will render box and whisker plots for some cells in the
+   result table by setting their "current" value to an array.

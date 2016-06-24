@@ -5,7 +5,8 @@ import nv from 'nvd3';
 import $ from 'jquery';
 
 import colors from './colors.js';
-import { failValue, warningValue, standardRound } from './utility.js';
+import { failValue, warningValue,
+         standardRound, computeColor } from './utility.js';
 
 export let BoxAndWhiskerWidget = Backbone.View.extend({
 
@@ -13,27 +14,9 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
     this.showScales = settings.showScales !== false;
     this.current = settings.result.current;
     this.trend = settings.trend;
-    this.testArray = this.current.sort(d3.ascending),
-    this.median = d3.median(this.testArray);
+    this.currentValues = this.current.sort(d3.ascending),
+    this.median = d3.median(this.currentValues);
     $(window).resize(_.bind(this.render, this));
-  },
-
-  computeColor: function () {
-    if (this.trend.incompleteThreshold) {
-      return colors.incomplete;
-    } else {
-      if (failValue(this.median,
-                    this.trend.warning,
-                    this.trend.fail)) {
-        return colors.fail;
-      } else if (warningValue(this.median,
-                              this.trend.warning,
-                              this.trend.fail)) {
-        return colors.bad;
-      } else {
-        return colors.good;
-      }
-    }
   },
 
   chartData: function () {},
@@ -44,21 +27,25 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
       .attr("class", "tdash-tooltip")
       .style("opacity", 0);
 
-
     let svg = d3.select('[id=\'' + this.el.id + '-svg\']')
      .html("")
      .attr("width", "100%")
      .attr("height", "100%");
 
+    // An IQR factor for determining outliers is a good rule of thumb. See
+    // https://en.wikipedia.org/wiki/Box_plot for further explanation.
     const iqrFactor = 1.5,
       min = 0,
       max = this.trend.max,
-      margin = {top: 10, right: 10, bottom: 10, left: 10},
+      margin = {top: 10, right: 20, bottom: 10, left: 10},
       w = svg[0][0].clientWidth - margin.left - margin.right,
       h = svg[0][0].clientHeight - margin.top - margin.bottom;
 
-    const q1 = d3.quantile(this.testArray, 0.25);
-    const q3 = d3.quantile(this.testArray, 0.75);
+    svg.attr("style", "padding-left: " + margin.left + "; padding-right: " +
+             margin.right);
+
+    const q1 = d3.quantile(this.currentValues, 0.25);
+    const q3 = d3.quantile(this.currentValues, 0.75);
     const iqr = q3 - q1;
     const outlierRange = iqr*iqrFactor;
 
@@ -80,14 +67,14 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
     svg = svg.append("g");
 
     const quantiles = [
-      d3.quantile(this.testArray, 0.05),
-      d3.quantile(this.testArray, 0.25),
-      d3.quantile(this.testArray, 0.50),
-      d3.quantile(this.testArray, 0.75),
-      d3.quantile(this.testArray, 0.95)
+      d3.quantile(this.currentValues, 0.05),
+      d3.quantile(this.currentValues, 0.25),
+      d3.quantile(this.currentValues, 0.50),
+      d3.quantile(this.currentValues, 0.75),
+      d3.quantile(this.currentValues, 0.95)
     ];
 
-    const outliers = _.filter(this.testArray, (val) => {
+    const outliers = _.filter(this.currentValues, (val) => {
         return val < q1 - outlierRange || val > q3 + outlierRange;
     });
 
@@ -128,14 +115,14 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
           .duration(200)
           .style("opacity", 1.0);
         let cells = [
-          ['Min', standardRound(this.testArray[0])],
+          ['Min', standardRound(this.currentValues[0])],
           ['5th %ile', standardRound(quantiles[0])],
           ['25th %ile', standardRound(quantiles[1])],
           ['Median', standardRound(this.median)],
           ['75th %ile', standardRound(quantiles[3])],
           ['95th %ile', standardRound(quantiles[4])],
-          ['Max', standardRound(this.testArray[this.testArray.length-1])],
-          ['# of Samples', this.testArray.length],
+          ['Max', standardRound(this.currentValues[this.currentValues.length-1])],
+          ['# of Samples', this.currentValues.length],
           // Add in a blank row to separate Outliers.
           ['&nbsp', '&nbsp'],
           ['Outliers', _.map(outliers, standardRound).join(", ")]
@@ -163,20 +150,19 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
         return ((d.q3-d.q1)/max)*w;
       })
      .attr("height", h/2)
-     .attr("fill", this.computeColor())
+     .attr("fill", computeColor(this.trend, this.median))
      .attr("stroke", "black")
      .attr("stroke-width", 1)
      .attr("class", "qtr");
 
+    // Draw the whisker marks
     const markGroup = svg.append("g");
-
     const marks = markGroup.selectAll("rect")
       .data([quantiles[0],
              quantiles[2],
              quantiles[4]])
       .enter()
       .append("rect");
-
     marks.attr("x", (d, i) => {
       return (d/max)*w;
     })
@@ -184,6 +170,7 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
      .attr("width", 2)
      .attr("height", h/2);
 
+    // Draw the horizontal lines that extend the whiskers
     const horGroup = svg.append("g");
     const hor = horGroup.selectAll("rect")
       .data([
@@ -192,7 +179,6 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
       ])
       .enter()
       .append("rect");
-
     hor.attr("x", (d, i) => {
       return (d.start/max)*w;
     })

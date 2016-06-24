@@ -48,7 +48,5 @@ table.table.table-striped.table-hover.table-responsive.table-compact
               | #{datasetLabelMap[resultSet[0].dataset_id_selector]}
         each trend in trends
           td.bullet-container(id="#{resultSet[0].dataset_id_selector}-#{trend.id_selector}")
-            svg.statusDot
-              circle.none(r="10", cx="10", cy="10")
             .bullet(id="#{resultSet[0].dataset_id_selector}-#{trend.id_selector}-bullet")
               svg(id="#{resultSet[0].dataset_id_selector}-#{trend.id_selector}-bullet-svg")
