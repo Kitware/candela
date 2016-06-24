@@ -240,6 +240,12 @@ let Dataset = MetadataItem.extend({
     });
     return binSettings;
   },
+  getSpec: function () {
+    return {
+      name: this.get('name'),
+      attributes: this.getMeta('schema') || {}
+    };
+  },
   setAttributeType: function (attrName, dataType) {
     let schema = this.getMeta('schema');
     schema[attrName].coerceToType = dataType;

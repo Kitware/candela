@@ -11,9 +11,8 @@ let STATUS = {
   NO_DATA: 0,
   SUCCESS: 1,
   CANT_LOAD: 2,
-  CANT_PARSE: 3,
-  LOADING: 4,
-  NO_ATTRIBUTES: 5
+  LOADING: 3,
+  NO_ATTRIBUTES: 4
 };
 
 let DATA_TYPES = d3.keys(Dataset.DEFAULT_INTERPRETATIONS);
@@ -173,7 +172,7 @@ let DatasetView = Widget.extend({
     }
     return lookupTable;
   },
-  renderAttributeSettings: function () {
+  renderAttributeSettings: function (datasetDetails) {
     let lookupTable = this.constructAttributeLookupTable();
     let attrOrder = Object.keys(lookupTable.attributes);
     // TODO: this is technically cheating; relying on the order
@@ -374,15 +373,15 @@ let DatasetView = Widget.extend({
 
     // Get the dataset in the project (if there is one)
     // TODO: get the dataset assigned to this widget
-    let dataset;
+    let datasetObj;
     if (window.mainPage.project) {
       let datasets = window.mainPage.project.getMeta('datasets');
       if (datasets) {
-        dataset = window.mainPage.loadedDatasets[datasets[0]];
+        datasetObj = window.mainPage.loadedDatasets[datasets[0].dataset];
       }
     }
 
-    if (!dataset) {
+    if (!datasetObj) {
       this.$el.find('#attributeSettings').html('');
       this.status = STATUS.NO_DATA;
       this.statusText.text = 'No file loaded';
@@ -392,29 +391,28 @@ let DatasetView = Widget.extend({
       this.statusText.text = 'Loading...';
       this.renderIndicators();
 
-      if (widgetIsShowing) {
-        this.renderAttributeSettings();
-      }
-
-      dataset.parse().then(parsedData => {
-        if (dataset.rawCache === null) {
-          this.status = STATUS.CANT_LOAD;
-          this.statusText.text = 'ERROR';
-          this.renderIndicators();
-        } else if (parsedData === null) {
-          this.status = STATUS.CANT_PARSE;
-          this.statusText.text = 'ERROR';
-          this.renderIndicators();
-        } else if (Object.keys(dataset.getMeta('schema') || {}).length === 0) {
-          this.status = STATUS.NO_ATTRIBUTES;
-          this.statusText.text = 'ERROR';
-          this.renderIndicators();
-        } else {
-          this.status = STATUS.SUCCESS;
-          this.statusText.text = dataset.get('name');
-          this.renderIndicators();
-        }
-      });
+      Promise.all([datasetObj.cache.overviewHistogram,
+                   datasetObj.cache.filterHistogram,
+                   datasetObj.cache.pageHistogram,
+                   datasetObj.cache.currentDataPage])
+        .then(datasetDetails => {
+          if (datasetDetails.indexOf(null) !== -1) {
+            this.status = STATUS.CANT_LOAD;
+            this.statusText.text = 'ERROR';
+            this.renderIndicators();
+          } else if (Object.keys(datasetObj.getMeta('schema') || {}).length === 0) {
+            this.status = STATUS.NO_ATTRIBUTES;
+            this.statusText.text = 'ERROR';
+            this.renderIndicators();
+          } else {
+            this.status = STATUS.SUCCESS;
+            this.statusText.text = datasetObj.get('name');
+            this.renderIndicators();
+            if (widgetIsShowing) {
+              this.renderAttributeSettings(datasetDetails);
+            }
+          }
+        });
     }
   }, 300)
 });

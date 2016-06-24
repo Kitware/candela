@@ -162,11 +162,12 @@ in order to connect them together.`);
     };
 
     if (meta.datasets) {
-      for (let d of meta.datasets) {
-        if (window.mainPage.loadedDatasets[d]) {
-          specs.data.push(window.mainPage.loadedDatasets[d].getSpec());
+      meta.datasets.forEach(d => {
+        let datasetObj = window.mainPage.loadedDatasets[d.dataset];
+        if (datasetObj) {
+          specs.data.push(datasetObj.getSpec());
         }
-      }
+      });
     }
     if (meta.visualizations) {
       meta.visualizations.forEach(d => {
