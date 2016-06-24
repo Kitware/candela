@@ -10,7 +10,63 @@ from girder.constants import AccessType
 from girder.models.model_base import AccessException
 
 
+class loadAnonymousItem(object):
+    """
+    This is a decorator that can be used to create a fallback scratch copy of an
+    item if the user needs to WRITE when they only have READ access to the original.
+    The response of the wrapped function must be a dictionary; in the event that
+    a scratch copy IS made, extra __copiedItemId__ and __originalItemId__ keys
+    will be added to maintain provenance and/or indicate to the client that the
+    results are derived from a copy, not the original
+    """
+    def __call__(self, fun):
+        @six.wraps(fun)
+        def wrapped(self, *args, **kwargs):
+            user = self.getCurrentUser()
+            anonymous = False
+            if user is None:
+                anonymous = True
+                user = self.app.anonymousAccess._getAnonymousUser()
+
+            copiedItem = False
+            try:
+                targetItem = self.app.anonymousAccess \
+                    .model('item').load(kwargs['id'],
+                                        level=AccessType.WRITE,
+                                        user=user,
+                                        exc=True)
+            except AccessException as err:
+                srcItem = self.app.anonymousAccess \
+                    .model('item').load(kwargs['id'],
+                                        level=AccessType.READ,
+                                        user=user,
+                                        exc=True)
+                if anonymous:
+                    targetFolder = self.app.anonymousAccess.getOrMakePublicFolder({})
+                else:
+                    targetFolder = self.app.anonymousAccess.getOrMakePrivateFolder({})
+
+                targetItem = self.app.anonymousAccess \
+                    .model('item').copyItem(srcItem=srcItem,
+                                            creator=user,
+                                            folder=targetFolder)
+                copiedItem = True
+            kwargs['item'] = targetItem
+            kwargs['user'] = user
+            del kwargs['id']
+            result = fun(self, *args, **kwargs)
+            if copiedItem is True:
+                result['__originalItemId__'] = kwargs['id']
+                result['__copiedItemId__'] = targetItem['_id']
+            return result
+        return wrapped
+
+
 class AnonymousAccess(Resource):
+    def __init__(self, app):
+        super(Resource, self).__init__()
+        self.app = app
+
     def _getAnonymousUser(self):
         try:
             return list(self.model('user').textSearch('anonymous'))[0]
@@ -248,7 +304,7 @@ class AnonymousAccess(Resource):
         return result
 
     @access.public
-    @loadmodel(model='item', level=AccessType.READ)
+    @loadAnonymousItem()
     @describeRoute(
         Description('Update a scratch item.')
         .notes('Attempt to update an item. If the user does not have ' +
@@ -262,60 +318,32 @@ class AnonymousAccess(Resource):
                paramType='body')
         .errorResponse()
     )
-    def updateScratchItem(self, item, params):
+    def updateScratchItem(self, item, params, user):
         params['name'] = params.get('name', item['name']).strip()
         params['description'] = params.get('description',
                                            item['description']).strip()
 
         metadata = item.get('meta', {})
-        rlabMetadata = metadata.get('rlab', {})
         metaOverrides = self.getBodyJson()
         if metaOverrides is not None:
             for k, v in metaOverrides.iteritems():
                 if v is None:
-                    if k in rlabMetadata:
-                        del rlabMetadata[k]
+                    if k in metadata:
+                        del metadata[k]
                 else:
-                    rlabMetadata[k] = v
+                    metadata[k] = v
 
-        user = self.getCurrentUser()
-        anonymous = False
-        if user is None:
-            anonymous = True
-            user = self._getAnonymousUser()
+        item['name'] = params['name']
+        item['description'] = params['description']
 
-        try:
-            targetItem = self.model('item').load(item['_id'],
-                                                 level=AccessType.WRITE,
-                                                 user=user,
-                                                 exc=True)
-        except AccessException as err:
-            srcItem = self.model('item').load(item['_id'],
-                                              level=AccessType.READ,
-                                              user=user,
-                                              exc=True)
+        item['meta'] = metadata
 
-            if anonymous:
-                targetFolder = self.getOrMakePublicFolder({})
-            else:
-                targetFolder = self.getOrMakePrivateFolder({})
+        self.model('item').updateItem(item)
 
-            targetItem = self.model('item').copyItem(srcItem=srcItem,
-                                                     creator=user,
-                                                     folder=targetFolder)
-
-        targetItem['name'] = params['name']
-        targetItem['description'] = params['description']
-
-        metadata['rlab'] = rlabMetadata
-        targetItem['meta'] = metadata
-
-        self.model('item').updateItem(targetItem)
-
-        return targetItem
+        return item
 
     @access.public
-    @loadmodel(model='item', level=AccessType.READ)
+    @loadAnonymousItem()
     @describeRoute(
         Description('Toggle the visibility of an item.')
         .notes('Moves an item is to the user\'s Public or Private ' +
@@ -332,13 +360,7 @@ class AnonymousAccess(Resource):
                required=False, dataType='boolean')
         .errorResponse()
     )
-    def togglePublic(self, item, params):
-        user = self.getCurrentUser()
-        anonymous = False
-        if user is None:
-            anonymous = True
-            user = self._getAnonymousUser()
-
+    def togglePublic(self, item, params, user):
         currentFolder = self.model('folder').load(
             item['folderId'], user=user,
             level=AccessType.READ, exc=True)
@@ -346,7 +368,7 @@ class AnonymousAccess(Resource):
         makePublic = params.get('makePublic', currentFolder['name'] == 'Private')
         forceCopy = params.get('forceCopy', False)
 
-        if anonymous is True:
+        if user is self._getAnonymousUser():
             makePublic = True
             forceCopy = True
 
@@ -364,45 +386,3 @@ class AnonymousAccess(Resource):
                 self.model('item').move(item, targetFolder)
 
         return item
-
-
-class loadAnonymousItem(object):
-    """
-    This is a decorator that can be used to create a fallback scratch copy of an
-    item if the user needs to WRITE when they only have READ access to the original.
-    """
-    def __call__(self, fun):
-        @six.wraps(fun)
-        def wrapped(self, *args, **kwargs):
-            user = self.getCurrentUser()
-            anonymous = False
-            if user is None:
-                anonymous = True
-                user = self.app.anonymousAccess._getAnonymousUser()
-
-            try:
-                targetItem = self.app.anonymousAccess \
-                    .model('item').load(kwargs['id'],
-                                        level=AccessType.WRITE,
-                                        user=user,
-                                        exc=True)
-            except AccessException as err:
-                srcItem = self.app.anonymousAccess \
-                    .model('item').load(kwargs['id'],
-                                        level=AccessType.READ,
-                                        user=user,
-                                        exc=True)
-                if anonymous:
-                    targetFolder = self.app.anonymousAccess.getOrMakePublicFolder({})
-                else:
-                    targetFolder = self.app.anonymousAccess.getOrMakePrivateFolder({})
-
-                targetItem = self.app.anonymousAccess \
-                    .model('item').copyItem(srcItem=srcItem,
-                                            creator=user,
-                                            folder=targetFolder)
-            kwargs['item'] = targetItem
-            kwargs['user'] = user
-            del kwargs['id']
-            return fun(self, *args, **kwargs)
-        return wrapped

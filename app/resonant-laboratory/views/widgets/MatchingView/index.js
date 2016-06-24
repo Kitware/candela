@@ -3,6 +3,7 @@ import d3 from 'd3';
 import jQuery from 'jquery';
 import myTemplate from './template.html';
 import Widget from '../Widget';
+import candela from '../../../../../src/candela';
 import './style.css';
 
 import booleanIcon from '../../../images/boolean.svg';
@@ -323,9 +324,12 @@ in order to connect them together.`);
         }
       });
       specs.vis.forEach((visSpec, visIndex) => {
-        visSpec.options.forEach((option, attrIndex) => {
-          _createNode('vis', visIndex, option.name, option.domain.fieldTypes, option.optional,
-            option.type === 'string_list' ? Infinity : 1);
+        let candelaSpec = candela.components[visSpec.name];
+        candelaSpec.options.forEach((option, attrIndex) => {
+          if (option.domain && option.domain.mode === 'field') {
+            _createNode('vis', visIndex, option.name, option.domain.fieldTypes, option.optional,
+              option.type === 'string_list' ? Infinity : 1);
+          }
         });
       });
 
@@ -351,9 +355,12 @@ in order to connect them together.`);
       if (this.selection !== null) {
         if (this.selection.side === 'data') {
           specs.vis.forEach((visSpec, visGroupIndex) => {
-            visSpec.options.forEach(option => {
-              _createEdge(false, visGroupIndex, option.name,
-                this.selection.groupIndex, this.selection.attrName);
+            let candelaSpec = candela.components[visSpec.name];
+            candelaSpec.options.forEach(option => {
+              if (option.domain && option.domain.mode === 'field') {
+                _createEdge(false, visGroupIndex, option.name,
+                  this.selection.groupIndex, this.selection.attrName);
+              }
             });
           });
         } else {

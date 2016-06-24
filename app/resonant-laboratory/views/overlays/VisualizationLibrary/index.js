@@ -52,7 +52,7 @@ let VisualizationLibrary = Backbone.View.extend({
           projectPromise = window.mainPage.newProject();
         }
         projectPromise.then(() => {
-          window.mainPage.project.setVisualization(d);
+          window.mainPage.project.setVisualization(d.name);
           window.mainPage.widgetPanels.toggleWidget({
             hashName: 'VisualizationView0'
           }, true);

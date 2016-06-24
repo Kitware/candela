@@ -122,18 +122,12 @@ let MetadataItem = girder.models.ItemModel.extend({
       requestParameters.error = reject;
       girder.restRequest(requestParameters).done(resolve).error(reject);
     }, options, resp => {
-      // It's possible that the id changed in the process (e.g. a copy of
-      // the item was made because the user is logged out)
-      let swappedId = false;
-      if (this.getId() !== resp[this.idAttribute]) {
-        resp['_oldId'] = this.getId();
-        swappedId = true;
-      }
-      this.set(resp, {
-        silent: true
-      });
-      if (swappedId) {
-        this.trigger('rl:swapId', resp);
+      if (resp.hasOwnProperty('__copiedItemId__')) {
+        // The id of the item changed in the process (e.g. a copy of
+        // the item was made because the user had read, but not write access)
+        let oldId = this.getId();
+        this.set(this.idAttribute, resp['__copiedItemId__']);
+        this.trigger('rl:swappedId', oldId);
       }
     }).catch(errorObj => {
       window.mainPage.trigger('rl:error', new Error('Error communicating with the server.'));
@@ -206,10 +200,12 @@ let MetadataItem = girder.models.ItemModel.extend({
       }
 
       return this.restRequest({
-        path: '/anonymousAccess/updateScratch?' +
+        path: 'anonymousAccess/updateScratch?' +
           jQuery.param(args),
         contentType: 'application/json',
-        data: JSON.stringify(this.getFlatMeta()),
+        data: JSON.stringify({
+          rlab: this.getFlatMeta()
+        }),
         type: 'POST'
       }, options);
     } else if (method === 'read') {
@@ -303,7 +299,7 @@ let MetadataItem = girder.models.ItemModel.extend({
       });
   },
   setMeta: function (key, value) {
-    let meta = this.getMeta();
+    let meta = this.get('meta');
     meta = meta || {};
     meta.rlab = meta.rlab || {};
     if (typeof key === 'object') {
@@ -317,7 +313,7 @@ let MetadataItem = girder.models.ItemModel.extend({
     this.set('meta', meta);
   },
   unsetMeta: function (key) {
-    let meta = this.getMeta();
+    let meta = this.get('meta');
     meta = meta || {};
     meta.rlab = meta.rlab || {};
     if (key !== undefined) {
@@ -327,9 +323,9 @@ let MetadataItem = girder.models.ItemModel.extend({
       this.unset('meta');
     }
   },
-  getFlatMeta: function (key) {
+  getFlatMeta: function () {
     // By default, there's no flattening to do
-    return this.getMeta(key);
+    return this.getMeta();
   },
   getMeta: function (key) {
     let meta = this.get('meta');

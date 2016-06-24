@@ -16,7 +16,7 @@ class ResonantLaboratory(Resource):
 
         self.info = info
         self.versioning = Versioning()
-        self.anonymousAccess = AnonymousAccess()
+        self.anonymousAccess = AnonymousAccess(self)
         self.datasetItem = DatasetItem(self)
         self.projectItem = ProjectItem(self)
 

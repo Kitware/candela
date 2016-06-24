@@ -72,10 +72,7 @@ class DatasetCache {
           binSettings: this.model.getBinSettings(),
           cache: true
         }
-      });
-      this.cachedPromises.overviewHistogram.then(() => {
-        this.model.trigger('rl:loadedHistogram');
-      });
+      }, 'rl:loadedHistogram');
     }
     return this.cachedPromises.overviewHistogram;
   }
@@ -89,10 +86,7 @@ class DatasetCache {
           filter: this.filter,
           cache: true
         }
-      });
-      this.cachedPromises.filteredHistogram.then(() => {
-        this.model.trigger('rl:loadedHistogram');
-      });
+      }, 'rl:loadedHistogram');
     }
     return this.cachedPromises.filteredHistogram;
   }
@@ -108,10 +102,7 @@ class DatasetCache {
           offset: this.page.offset
           // Don't cache the page histograms on the server
         }
-      });
-      this.cachedPromises.pageHistogram.then(() => {
-        this.model.trigger('rl:loadedHistogram');
-      });
+      }, 'rl:loadedHistogram');
     }
     return this.cachedPromises.pageHistogram;
   }
@@ -121,19 +112,27 @@ class DatasetCache {
         path: 'dataset/getData',
         type: 'GET',
         data: {
-          binSettings: this.model.getBinSettings(),
           filter: this.filter,
           limit: this.page.limit,
           offset: this.page.offset
-          // TODO: supply the fields option based on which
+          // TODO: optimization: supply the fields option based on which
           // fields are actually in use in the visualization
         }
-      });
-      this.cachedPromises.currentDataPage.then(() => {
-        this.model.trigger('rl:loadedData');
-      });
+      }, 'rl:loadedData');
     }
     return this.cachedPromises.currentDataPage;
+  }
+  restRequest (parameters, successEvent) {
+    if (!this.model.getId()) {
+      // We still haven't synced our basic info with the
+      // server yet... so leave the value as null
+      return null;
+    } else {
+      let promise = this.model.restRequest(parameters);
+      promise.then(() => {
+        this.model.trigger(successEvent);
+      });
+    }
   }
 }
 
@@ -170,13 +169,13 @@ let Dataset = MetadataItem.extend({
       });
     }
 
-    // Refresh the histograms and current page of data;
-    // it's not a big deal if the parameters haven't changed,
-    // as the most expensive bits (the overview and filtered
-    // histograms) will be cached on the server
-    this.cache.cachedPromises = {};
-
     promiseChain.then(() => {
+      // Refresh the histograms and current page of data;
+      // it's not a big deal if the parameters haven't changed,
+      // as the most expensive bits (the overview and filtered
+      // histograms) will be cached on the server
+      this.cache.cachedPromises = {};
+
       return Promise.all([
         this.cache.overviewHistogram,
         this.cache.filteredHistogram,
@@ -205,7 +204,7 @@ let Dataset = MetadataItem.extend({
       return attrSpec.interpretation;
     } else {
       // Go with the default interpretation for the attribute type
-      return DEFAULT_INTERPRETATIONS[this.inferAttributeType(attrSpec)];
+      return DEFAULT_INTERPRETATIONS[this.inferAttributeType(attrName)];
     }
   },
   inferAttributeType: function (attrName) {
@@ -217,27 +216,27 @@ let Dataset = MetadataItem.extend({
       // The user hasn't specified a type; go with the
       // most frequently observed native type in the dataset
       let attrType = 'undefined';
-      for (let dataType of Object.keys(attrSpec.stats)) {
+      Object.keys(attrSpec).forEach(dataType => {
         if (attrSpec.native === true &&
             ATTRIBUTE_GENERALITY[dataType] > ATTRIBUTE_GENERALITY[attrType]) {
           attrType = dataType;
         }
-      }
+      });
       return attrType;
     }
   },
   getBinSettings: function (ignoreFilters) {
     let binSettings = {};
-    let schema = this.getMeta('schema');
+    let schema = this.getMeta('schema') || {};
     // Assemble the parameters for how we want to see each attribute.
     // For now, other than attempting to auto-infer type and interpretation,
     // we rely on the default behavior
-    for (let attrName of Object.keys(schema)) {
+    Object.keys(schema).forEach(attrName => {
       binSettings[attrName] = {
         coerceToType: this.inferAttributeType(attrName),
         interpretation: this.inferAttributeInterpretation(attrName)
       };
-    }
+    });
     return binSettings;
   },
   setAttributeType: function (attrName, dataType) {

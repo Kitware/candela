@@ -540,12 +540,8 @@ class DatasetItem(Resource):
                'with a function definition and an optional "reference" entry '
                'which is used to identify the resultant column.',
                required=False)
-        .param('filters', 'A JSON list of filters to apply to the data.  Each '
-               'entry in the list can be either a list or a dictionary.  If a '
-               'list, it contains [(field), (operator), (value)], where '
-               '(operator) is optional.  If a dictionary, at least the '
-               '"field" and "value" keys must contain values, and "operator" '
-               'and "function" keys can also be added.', required=False)
+        .param('filter', 'Get the pages of data after the results of this filter. ' +
+               'TODO: describe our filter grammar.', required=False)
         .errorResponse()
     )
     def getData(self, item, params):
@@ -573,10 +569,13 @@ class DatasetItem(Resource):
                 dialect = self.getStringifiedDialect(item)
                 csv.register_dialect(item['name'], **dialect)
                 lineReader = self.bufferedDownloadLineReader(item['meta']['rlab']['fileId'],
+                                                             self.getCurrentUser(),
                                                              dialect['lineterminator'])
                 reader = csv.DictReader(lineReader, dialect=item['name'])
             elif fileFormat == 'json':
-                reader = self.bufferedDownloadItemReader(item['meta']['rlab']['fileId'], '$')
+                reader = self.bufferedDownloadItemReader(item['meta']['rlab']['fileId'],
+                                                         self.getCurrentUser(),
+                                                         '$')
             else:
                 raise RestException('Unrecognized file type: ' + fileFormat)
 

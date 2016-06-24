@@ -17,16 +17,18 @@ import candela from '../../../src/candela';
 */
 
 let Project = MetadataItem.extend({
-  defaults: {
-    'name': 'Untitled Project',
-    'meta': {
-      'rlab': {
-        datasets: [],
-        matchings: [],
-        visualizations: [],
-        preferredWidgets: []
+  defaults: () => {
+    return {
+      'name': 'Untitled Project',
+      'meta': {
+        'rlab': {
+          datasets: [],
+          matchings: [],
+          visualizations: [],
+          preferredWidgets: []
+        }
       }
-    }
+    };
   },
   initialize: function () {
     this.status = {
@@ -40,8 +42,23 @@ let Project = MetadataItem.extend({
       this.fetch);
     this.listenTo(window.mainPage, 'rl:changeProject',
       this.fetch);
-    this.listenTo(this, 'rl:swapId', () => {
+    this.listenTo(this, 'rl:swappedId', () => {
+      // If the server makes a copy of this project
+      // for whatever reason, there's a good chance
+      // it will wind up with a different location /
+      // editability status. So we need to update the
+      // status, and it's essentially the same thing
+      // as creating a new project
       this.fetch().then(() => {
+        let notification = 'You are now working on a copy of this project in ';
+        if (this.status.location === 'PublicScratch') {
+          notification = 'the public scratch space. Log in to take ownership of this project.';
+        } else if (this.status.location === 'PrivateUser') {
+          notification += 'your Private folder.';
+        } else {
+          window.mainPage.trigger('rl:error', new Error('Project copied to an unknown location.'));
+        }
+        window.mainPage.notificationLayer.displayNotification(notification);
         window.mainPage.trigger('rl:createProject');
       });
     });
@@ -93,10 +110,12 @@ let Project = MetadataItem.extend({
           // We haven't loaded this dataset yet; load it and
           // attach some listeners
           dataset = new Dataset({
-            id: datasetSpec.dataset
+            _id: datasetSpec.dataset
           });
           this.listenTo(dataset, 'rl:changeSpec', this.changeDataSpec);
-          this.listenTo(dataset, 'rl:swapId', this.swapDatasetId);
+          this.listenTo(dataset, 'rl:swappedId', oldId => {
+            this.swapDatasetId(dataset, oldId);
+          });
         }
         dataset.cache.filter = datasetSpec.filter;
         dataset.cache.page = datasetSpec.page;
@@ -153,33 +172,61 @@ let Project = MetadataItem.extend({
     let flatMeta = {};
 
     for (let key of Object.keys(meta)) {
-      flatMeta[key] = meta[key];
       if (key === 'preferredWidgets' &&
         meta[key] instanceof Set) {
         flatMeta[key] = [...meta[key]];
+      } else {
+        flatMeta[key] = meta[key];
       }
     }
     return flatMeta;
   },
   getDatasetIds: function () {
-    return this.getMeta('datasets').map(d => d.dataset);
+    return (this.getMeta('datasets') || []).map(d => d.dataset);
   },
-  swapDatasetId: function (newData) {
-    let datasets = this.getMeta('datasets');
-    let index = datasets.findIndex(d => d.dataset === newData._oldId);
-    if (index !== -1 || !(newData._oldId in window.mainPage.loadedDatasets)) {
-      // Update the project metadata to point to the new dataset
-      datasets[index] = newData._id;
-      this.setMeta('datasets', datasets);
-
-      // Update the cached dataset key
-      window.mainPage.loadedDatasets[newData._id] = window.mainPage.loadedDatasets[newData._oldId];
-      delete window.mainPage.loadedDatasets[newData._oldId];
+  swapDatasetId: function (datasetObj, oldId) {
+    let newId = datasetObj.getId();
+    if (newId in window.mainPage.loadedDatasets) {
+      // Another response from the server has already triggered this function
+      // and dealt with everything, so we don't have to worry about it.
+      return;
     } else {
-      window.mainPage.trigger('rl:error',
-        new Error('Couldn\'t update the reference to a scratch copy of a dataset.'));
+      // Okay, this dataset has been moved, and we're the first to
+      // know about it.
+
+      // Update the projet metadata and the loadedDatasets cache
+      // to point to the new dataset
+      let datasets = this.getMeta('datasets');
+      let index = datasets.findIndex(d => d.dataset === oldId);
+      if (index !== -1 && oldId in window.mainPage.loadedDatasets) {
+        datasets[index] = {
+          dataset: newId,
+          filter: datasetObj.cache.filter,
+          page: datasetObj.cache.page
+        };
+        this.setMeta('datasets', datasets);
+        this.save();
+
+        window.mainPage.loadedDatasets[newId] = datasetObj;
+        delete window.mainPage.loadedDatasets[oldId];
+
+        // If the user is logged in, the dataset will have been copied
+        // to the user's private folder
+        let notification = 'You are now working with a copy of the ' +
+                           datasetObj.get('name') +
+                           ' dataset, stored in ';
+        if (window.mainPage.user.isLoggedIn()) {
+          notification += 'your Private folder.';
+        } else {
+          notification += 'the public scratch space. Log in to take ownership of this dataset.';
+        }
+        window.mainPage.notificationLayer.displayNotification(notification);
+      } else {
+        window.mainPage.trigger('rl:error',
+          new Error('Couldn\'t update the reference to a scratch copy of the ' +
+                    datasetObj.get('name') + ' dataset.'));
+      }
     }
-    return this.save();
   },
   setDataset: function (newDatasetId, index = 0) {
     let datasets = this.getMeta('datasets');
@@ -189,11 +236,14 @@ let Project = MetadataItem.extend({
       newDataset = window.mainPage.loadedDatasets[newDatasetId];
     } else {
       newDataset = new Dataset({
-        id: newDatasetId
+        _id: newDatasetId
       });
       this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
-      this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
+      this.listenTo(newDataset, 'rl:swappedId', oldId => {
+        this.swapDatasetId(newDataset, oldId);
+      });
       window.mainPage.loadedDatasets[newDatasetId] = newDataset;
+      newDataset.fetch();
     }
 
     let newDatasetDetails = {
