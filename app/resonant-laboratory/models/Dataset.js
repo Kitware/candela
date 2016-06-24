@@ -132,6 +132,7 @@ class DatasetCache {
       promise.then(() => {
         this.model.trigger(successEvent);
       });
+      return promise;
     }
   }
 }

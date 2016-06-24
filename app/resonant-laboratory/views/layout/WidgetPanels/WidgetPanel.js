@@ -22,8 +22,6 @@ let ICONS = {
   VisualizationView: VisualizationIcon
 };
 
-import swapIcon from '../../../images/swap.svg';
-
 let WidgetPanel = Backbone.View.extend({
   initialize: function (spec) {
     this.spec = spec;
@@ -50,26 +48,12 @@ let WidgetPanel = Backbone.View.extend({
     // the section
     titleEnter.append('h2')
       .attr('class', 'title');
-    header.select('h2.title')
-      .text(this.widget.friendlyName);
 
     // Add a little space for the widget to
     // store status indicators and icons
     let indicatorsEnter = headerEnter.append('div')
       .attr('class', 'indicators');
 
-    let elementType;
-    if (this.widget.spec.widgetType === 'MatchingView') {
-      elementType = 'h2';
-    } else {
-      elementType = 'button';
-    }
-    /* TODO: see issue #214... in the future, we can just do:
-    indicatorsEnter.append('button')
-      .attr('class', 'indicatorText');
-    */
-    indicatorsEnter.append(elementType)
-      .attr('class', 'indicatorText');
     indicatorsEnter.append('div')
       .attr('class', 'indicatorIcons');
 
@@ -90,28 +74,10 @@ let WidgetPanel = Backbone.View.extend({
     this.renderIndicators();
   },
   renderIndicators () {
-    let indicators = d3.select(this.el)
-      .select('.indicators');
-
-    indicators.select('.indicatorText')
+    // Update our title
+    d3.select(this.el).select('h2.title')
       .text(this.widget.statusText.text)
-      .attr('title', this.widget.statusText.title
-        ? this.widget.statusText.title : null)
-      .on('click', () => {
-        d3.event.stopPropagation();
-        if (this.widget.statusText.onclick) {
-          this.widget.statusText.onclick(d3.event);
-        }
-      });
-
-    if (this.widget.spec.widgetType !== 'MatchingView') {
-      indicators.select('.indicatorText')
-        .append('img')
-        .attr('src', swapIcon);
-    } else {
-      indicators.select('.indicatorText')
-        .select('img').remove();
-    }
+      .attr('title', this.widget.statusText.title);
 
     // Update our set of indicator icons
     let indicatorIcons = d3.select(this.el)

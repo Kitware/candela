@@ -50,10 +50,8 @@ let MatchingView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
 
-    this.friendlyName = 'Matching';
-
     this.status = STATUS.NOTHING_TO_MAP;
-    this.icons.splice(0, 0, {
+    this.icons.push({
       src: () => {
         if (this.status === STATUS.OK) {
           return Widget.okayIcon;

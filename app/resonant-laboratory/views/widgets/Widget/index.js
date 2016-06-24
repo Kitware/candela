@@ -1,19 +1,18 @@
 import Backbone from 'backbone';
 
-import collapseIcon from '../../../images/collapse.svg';
-import expandIcon from '../../../images/expand.svg';
 import okayIcon from '../../../images/okay.svg';
 import spinnerIcon from '../../../images/spinner.gif';
 import warningIcon from '../../../images/warning.svg';
 import infoIcon from '../../../images/info.svg';
+import swapIcon from '../../../images/swap.svg';
 
 let Widget = Backbone.View.extend({
   initialize: function (spec) {
-    this.friendlyName = 'ERROR! Abstract Widget!';
     this.spec = spec;
     this.panel = null;
     this.statusText = {
       text: '',
+      title: '',
       onclick: () => {
         this.toggle();
       }
@@ -30,16 +29,6 @@ let Widget = Backbone.View.extend({
       },
       onclick: () => {
         this.renderInfoScreen();
-      }
-    }, {
-      src: () => {
-        return this.isTargeted() ? collapseIcon : expandIcon;
-      },
-      title: () => {
-        return this.isTargeted() ? 'Collapse Panel' : 'Expand Panel';
-      },
-      onclick: () => {
-        this.toggle();
       }
     }];
 
@@ -80,10 +69,10 @@ let Widget = Backbone.View.extend({
     let tips = [];
     let prefix = '#' + this.el.parentNode.getAttribute('id') + ' ';
 
-    // Get the tip for the indicator text
+    // Get the tip for the title text
     if (this.statusText.title) {
       tips.push({
-        selector: prefix + '.indicatorText',
+        selector: prefix + '.title',
         message: this.statusText.title
       });
     }
@@ -103,11 +92,10 @@ let Widget = Backbone.View.extend({
   }
 });
 
-Widget.collapseIcon = okayIcon;
-Widget.expandIcon = okayIcon;
 Widget.okayIcon = okayIcon;
 Widget.spinnerIcon = spinnerIcon;
 Widget.warningIcon = warningIcon;
 Widget.infoIcon = infoIcon;
+Widget.swapIcon = swapIcon;
 
 module.exports = Widget;

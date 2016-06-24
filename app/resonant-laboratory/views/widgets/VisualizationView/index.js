@@ -16,15 +16,16 @@ let VisualizationView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
 
-    this.friendlyName = 'Visualization';
-
-    this.statusText.onclick = () => {
-      window.mainPage.overlay.render('VisualizationLibrary');
-    };
-    this.statusText.title = 'Click to select a different visualization.';
+    this.icons.splice(0, 0, {
+      src: Widget.swapIcon,
+      title: 'Click to select a different visualization',
+      onclick: () => {
+        window.mainPage.overlay.render('VisualizationLibrary');
+      }
+    });
 
     this.status = STATUS.LOADING;
-    this.icons.splice(0, 0, {
+    this.icons.push({
       src: () => {
         if (this.status === STATUS.LOADING) {
           return Widget.spinnerIcon;

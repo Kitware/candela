@@ -22,15 +22,17 @@ let DATA_INTERPRETATIONS = [...new Set(d3.values(Dataset.DEFAULT_INTERPRETATIONS
 let DatasetView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
-    this.friendlyName = 'Dataset';
 
-    this.statusText.onclick = () => {
-      window.mainPage.overlay.render('DatasetLibrary');
-    };
-    this.statusText.title = 'Select a different dataset.';
+    this.icons.splice(0, 0, {
+      src: Widget.swapIcon,
+      title: 'Click to select a different dataset',
+      onclick: () => {
+        window.mainPage.overlay.render('DatasetLibrary');
+      }
+    });
 
     this.status = STATUS.NO_DATA;
-    this.icons.splice(0, 0, {
+    this.icons.push({
       src: () => {
         if (this.status === STATUS.LOADING) {
           return Widget.spinnerIcon;
@@ -64,6 +66,8 @@ let DatasetView = Widget.extend({
 
     this.listenTo(window.mainPage.project, 'rl:changeDatasets',
       this.render);
+
+    this.render();
   },
   renderInfoScreen: function () {
     window.mainPage.helpLayer.showTips(this.getDefaultTips());
