@@ -165,7 +165,7 @@ in order to connect them together.`);
       meta.datasets.forEach(d => {
         let datasetObj = window.mainPage.loadedDatasets[d.dataset];
         if (datasetObj) {
-          specs.data.push(datasetObj.getSpec());
+          specs.data.push(datasetObj.getTypeSpec());
         }
       });
     }

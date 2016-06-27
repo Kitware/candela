@@ -132,7 +132,7 @@ let ProjectLibrary = Backbone.View.extend({
   renderProjects: function (items, divId, icon) {
     let projectModels = items.models.filter(d => {
       let meta = d.get('meta');
-      return !(!meta || !meta.rlab || !meta.rlab.itemType || meta.rlab.itemType !== 'project');
+      return meta && meta.rlab && meta.rlab.itemType && meta.rlab.itemType === 'project';
     });
 
     if (projectModels.length > 0) {

@@ -68,6 +68,12 @@ let Project = MetadataItem.extend({
   create: function () {
     let createPromise = MetadataItem.prototype.create.apply(this, arguments);
     createPromise.then(() => {
+      // Hit the endpoint that identifies the item as a project
+      return this.restRequest({
+        path: 'project'
+      });
+    });
+    createPromise.then(() => {
       // Flag this project as "ours" (esp. for the case when
       // the user is logged out, store the project item info
       // in localStorage)
@@ -112,7 +118,7 @@ let Project = MetadataItem.extend({
           dataset = new Dataset({
             _id: datasetSpec.dataset
           });
-          this.listenTo(dataset, 'rl:changeSpec', this.changeDataSpec);
+          this.listenTo(dataset, 'rl:updatedSchema', this.changeDataSpec);
           this.listenTo(dataset, 'rl:swappedId', oldId => {
             this.swapDatasetId(dataset, oldId);
           });
@@ -238,7 +244,7 @@ let Project = MetadataItem.extend({
       newDataset = new Dataset({
         _id: newDatasetId
       });
-      this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
+      this.listenTo(newDataset, 'rl:updatedSchema', this.changeDataSpec);
       this.listenTo(newDataset, 'rl:swappedId', oldId => {
         this.swapDatasetId(newDataset, oldId);
       });

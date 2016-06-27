@@ -376,7 +376,7 @@ let DatasetView = Widget.extend({
     let datasetObj;
     if (window.mainPage.project) {
       let datasets = window.mainPage.project.getMeta('datasets');
-      if (datasets) {
+      if (datasets && datasets.length > 0) {
         datasetObj = window.mainPage.loadedDatasets[datasets[0].dataset];
       }
     }
@@ -391,7 +391,8 @@ let DatasetView = Widget.extend({
       this.statusText.text = 'Loading...';
       this.renderIndicators();
 
-      Promise.all([datasetObj.cache.overviewHistogram,
+      Promise.all([datasetObj.cache.schema,
+                   datasetObj.cache.overviewHistogram,
                    datasetObj.cache.filterHistogram,
                    datasetObj.cache.pageHistogram,
                    datasetObj.cache.currentDataPage])
@@ -400,7 +401,8 @@ let DatasetView = Widget.extend({
             this.status = STATUS.CANT_LOAD;
             this.statusText.text = 'ERROR';
             this.renderIndicators();
-          } else if (Object.keys(datasetObj.getMeta('schema') || {}).length === 0) {
+          } else if (Object.keys(datasetDetails[0]).length === 0) {
+            // The schema has no attributes...
             this.status = STATUS.NO_ATTRIBUTES;
             this.statusText.text = 'ERROR';
             this.renderIndicators();

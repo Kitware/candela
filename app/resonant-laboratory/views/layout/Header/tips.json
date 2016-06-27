@@ -29,7 +29,7 @@
   },
   {
     "selector": "#helpButton",
-    "message": "Show these tips. Tips that you haven't seen yet are shown in blue."
+    "message": "Show these tips. Tips that you haven't seen yet are shown in yellow."
   },
   {
     "selector": "#achievementsButton",

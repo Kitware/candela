@@ -63,62 +63,118 @@ class DatasetCache {
     delete this.cachedPromises.pageHistogram;
     delete this.cachedPromises.currentDataPage;
   }
+  get schema () {
+    // Do we have the schema already in our metadata,
+    // and TODO: is it current (check the file's updated flag
+    // in girder, or check the last time the mongodb was modified)
+    /* let meta = this.model.getMeta();
+    let girderUpdate = this.model.get('updated');
+    if (!meta || !meta.lastUpdated || !girderUpdate ||
+      new Date(meta.lastUpdated) < new Date(girderUpdate)) {
+      // With an out-of-date schema, we should trash any cached
+      // histograms, and re-run schema inference
+      delete meta['schema'];
+      delete this.cachedPromises.schema;
+    }*/
+
+    if (!this.cachedPromises.schema) {
+      let metaSchema = this.model.getMeta('schema');
+      if (metaSchema) {
+        // We already have up-to-date schema information in the metadata
+        this.cachedPromises.schema = Promise.resolve(metaSchema);
+      } else {
+        // Actually hit the endpoint that does a pass to infer
+        // the (potentially new) schema. This invalidates any histograms
+        // or data that we have
+        this.cachedPromises = {};
+        this.cachedPromises.schema = this.restRequest({
+          path: 'dataset/inferSchema',
+          type: 'POST',
+          data: {
+            binSettings: this.model.getBinSettings(),
+            cache: true
+          }
+        });
+
+        // Store the new schema, the time that we updated it,
+        // and save those changes
+        this.cachedPromises.schema.then(newSchema => {
+          this.model.setMeta('lastUpdated', new Date());
+          return this.model.save();
+          // Technically, we could / will get this from
+          // a fetch, but a separate call would be a little redundant
+          // this.model.setMeta('schema', newSchema);
+        }).then(() => {
+          this.model.trigger('rl:updatedSchema');
+        });
+      }
+    }
+    return this.cachedPromises.schema;
+  }
   get overviewHistogram () {
     if (!this.cachedPromises.overviewHistogram) {
-      this.cachedPromises.overviewHistogram = this.restRequest({
-        path: 'dataset/getHistograms',
-        type: 'POST',
-        data: {
-          binSettings: this.model.getBinSettings(),
-          cache: true
-        }
-      }, 'rl:loadedHistogram');
+      this.cachedPromises.overviewHistogram = this.cachedPromises.schema.then(() => {
+        return this.restRequest({
+          path: 'dataset/getHistograms',
+          type: 'POST',
+          data: {
+            binSettings: this.model.getBinSettings(),
+            cache: true
+          }
+        }, 'rl:loadedHistogram');
+      });
     }
     return this.cachedPromises.overviewHistogram;
   }
   get filteredHistogram () {
     if (!this.cachedPromises.filteredHistogram) {
-      this.cachedPromises.filteredHistogram = this.restRequest({
-        path: 'dataset/getHistograms',
-        type: 'POST',
-        data: {
-          binSettings: this.model.getBinSettings(),
-          filter: this.filter,
-          cache: true
-        }
-      }, 'rl:loadedHistogram');
+      this.cachedPromises.filteredHistogram = this.cachedPromises.schema.then(() => {
+        return this.restRequest({
+          path: 'dataset/getHistograms',
+          type: 'POST',
+          data: {
+            binSettings: this.model.getBinSettings(),
+            filter: this.filter,
+            cache: true
+          }
+        }, 'rl:loadedHistogram');
+      });
     }
     return this.cachedPromises.filteredHistogram;
   }
   get pageHistogram () {
     if (!this.cachedPromises.pageHistogram) {
-      this.cachedPromises.pageHistogram = this.restRequest({
-        path: 'dataset/getHistograms',
-        type: 'POST',
-        data: {
-          binSettings: this.model.getBinSettings(),
-          filter: this.filter,
-          limit: this.page.limit,
-          offset: this.page.offset
-          // Don't cache the page histograms on the server
-        }
-      }, 'rl:loadedHistogram');
+      this.cachedPromises.pageHistogram = this.cachedPromises.schema.then(() => {
+        return this.restRequest({
+          path: 'dataset/getHistograms',
+          type: 'POST',
+          data: {
+            binSettings: this.model.getBinSettings(),
+            filter: this.filter,
+            limit: this.page.limit,
+            offset: this.page.offset
+            // Don't cache the page histograms on the server
+          }
+        }, 'rl:loadedHistogram');
+      });
     }
     return this.cachedPromises.pageHistogram;
   }
   get currentDataPage () {
     if (!this.cachedPromises.currentDataPage) {
-      this.cachedPromises.currentDataPage = this.restRequest({
-        path: 'dataset/getData',
-        type: 'GET',
-        data: {
-          filter: this.filter,
-          limit: this.page.limit,
-          offset: this.page.offset
-          // TODO: optimization: supply the fields option based on which
-          // fields are actually in use in the visualization
-        }
-      }, 'rl:loadedData');
+      this.cachedPromises.currentDataPage = this.cachedPromises.schema.then(() => {
+        return this.restRequest({
+          path: 'dataset/getData',
+          type: 'GET',
+          data: {
+            filter: this.filter,
+            limit: this.page.limit,
+            offset: this.page.offset
+            // TODO: optimization: supply the fields option based on which
+            // fields are actually in use in the visualization
+          }
+        }, 'rl:loadedData');
+      });
     }
     return this.cachedPromises.currentDataPage;
   }
@@ -129,9 +185,11 @@ class DatasetCache {
       return null;
     } else {
       let promise = this.model.restRequest(parameters);
-      promise.then(() => {
-        this.model.trigger(successEvent);
-      });
+      if (successEvent) {
+        promise.then(() => {
+          this.model.trigger(successEvent);
+        });
+      }
       return promise;
     }
   }
@@ -145,47 +203,6 @@ let Dataset = MetadataItem.extend({
     // its own non-Backbone cache class
     this.cache = new DatasetCache(this);
     this.dropped = false;
-  },
-  fetch: function () {
-    // Calling fetch() on a dataset may necessitate more than a
-    // simple metadata update...
-    let fetchPromise = MetadataItem.prototype.fetch.apply(this, arguments);
-    let promiseChain = fetchPromise;
-
-    // Is the schema out of date?
-    let meta = this.getMeta();
-    let girderUpdate = this.get('updated');
-    // TODO: do database items update their girder 'updated' flag
-    // when the database is modified? If not, we may need a deeper
-    // check...
-    if (!meta || !meta.lastUpdated || !girderUpdate ||
-      new Date(meta.lastUpdated) < new Date(girderUpdate)) {
-      // With an out-of-date schema, we should trash any cached
-      // histograms, and re-run schema inference
-      promiseChain = promiseChain.then(() => {
-        return this.restRequest({
-          path: 'dataset/inferSchema',
-          type: 'POST'
-        });
-      });
-    }
-
-    promiseChain.then(() => {
-      // Refresh the histograms and current page of data;
-      // it's not a big deal if the parameters haven't changed,
-      // as the most expensive bits (the overview and filtered
-      // histograms) will be cached on the server
-      this.cache.cachedPromises = {};
-
-      return Promise.all([
-        this.cache.overviewHistogram,
-        this.cache.filteredHistogram,
-        this.cache.pageHistogram,
-        this.cache.currentDataPage
-      ]);
-    });
-
-    return fetchPromise;
   },
   save: function () {
     // It's possible for a dataset to be dropped from the project
@@ -217,10 +234,19 @@ let Dataset = MetadataItem.extend({
       // The user hasn't specified a type; go with the
       // most frequently observed native type in the dataset
       let attrType = 'undefined';
+      let encounteredNative = false;
       Object.keys(attrSpec).forEach(dataType => {
-        if (attrSpec.native === true &&
-            ATTRIBUTE_GENERALITY[dataType] > ATTRIBUTE_GENERALITY[attrType]) {
+        if (encounteredNative === false && attrSpec[dataType].native === true) {
+          // No matter what, keep a native value over a non-native one
           attrType = dataType;
+          encounteredNative = true;
+        }
+        if (ATTRIBUTE_GENERALITY[dataType] > ATTRIBUTE_GENERALITY[attrType]) {
+          // Update if we haven't encountered a native value, or if
+          // this type is also native
+          if (encounteredNative === false || attrSpec[dataType].native === true) {
+            attrType = dataType;
+          }
         }
       });
       return attrType;
@@ -240,11 +266,16 @@ let Dataset = MetadataItem.extend({
     });
     return binSettings;
   },
-  getSpec: function () {
-    return {
+  getTypeSpec: function () {
+    let schema = this.getMeta('schema') || {};
+    let result = {
       name: this.get('name'),
-      attributes: this.getMeta('schema') || {}
+      attributes: {}
     };
+    Object.keys(schema).forEach(attrName => {
+      result.attributes[attrName] = this.inferAttributeType(attrName);
+    });
+    return result;
   },
   setAttributeType: function (attrName, dataType) {
     let schema = this.getMeta('schema');
