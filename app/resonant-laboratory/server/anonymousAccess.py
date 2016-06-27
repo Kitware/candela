@@ -10,6 +10,9 @@ from girder.constants import AccessType
 from girder.models.model_base import AccessException
 
 
+TRUE_VALUES = set([True, 'true', 1, 'True'])
+
+
 class loadAnonymousItem(object):
     """
     This is a decorator that can be used to create a fallback scratch copy of an
@@ -136,7 +139,7 @@ class AnonymousAccess(Resource):
                                            folder=privateFolder,
                                            description=params.get(
             'description', ''),
-            reuseExisting=reuseExisting)
+            reuseExisting=reuseExisting in TRUE_VALUES)
 
         return privateItem
 
@@ -372,13 +375,13 @@ class AnonymousAccess(Resource):
             makePublic = True
             forceCopy = True
 
-        if makePublic is True:
+        if makePublic in TRUE_VALUES:
             targetFolder = self.getOrMakePublicFolder({})
         else:
             targetFolder = self.getOrMakePrivateFolder({})
 
         if currentFolder['_id'] != targetFolder['_id']:
-            if forceCopy is True:
+            if forceCopy in TRUE_VALUES:
                 item = self.model('item').copyItem(srcItem=item,
                                                    creator=user,
                                                    folder=targetFolder)

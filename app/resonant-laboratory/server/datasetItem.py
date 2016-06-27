@@ -23,6 +23,9 @@ from girder.plugins.girder_db_items.dbs.mongo import MongoConnector
 from girder_worker.format import get_csv_reader
 
 
+TRUE_VALUES = set([True, 'true', 1, 'True'])
+
+
 def getSignificantDigit(value, nDigits, roundDown=True):
     # "round" a number to its nearest significant digit
     # As we're looking for low/high boundaries, we control the
@@ -469,7 +472,7 @@ class DatasetItem(Resource):
                 binSettings[attrName]['humanBins'] = []
 
         params['binSettings'] = binSettings
-        params['cache'] = params.get('cache', False)
+        params['cache'] = params.get('cache', False) in TRUE_VALUES
 
         # Stringify the params, both for cache hashing, as well as stitching
         # together the map and reduce code below
