@@ -45,7 +45,7 @@ function toggleCallback () {
     directly to their public folder)
   */
   window.mainPage.project.restRequest({
-    path: '/anonymousAccess/togglePublic',
+    path: 'anonymousAccess/togglePublic',
     type: 'POST',
     data: {
       makePublic: this.value === 'PublicUser'

@@ -169,14 +169,14 @@ let ProjectLibrary = Backbone.View.extend({
     libraryButtons.selectAll('img.badge')
       .attr('src', warningIcon)
       .style('display', d => {
-        if (d.attributes.meta.versionNumber === window.mainPage.versionNumber) {
+        if (d.attributes.meta.rlab.versionNumber === window.mainPage.versionNumber) {
           return 'none';
         } else {
           return 'block';
         }
       })
       .attr('title', d => {
-        return 'This project was created with version ' + d.attributes.meta.versionNumber +
+        return 'This project was created with version ' + d.attributes.meta.rlab.versionNumber +
           ' of Resonant Laboratory.\nYou are currently using version ' + window.mainPage.versionNumber;
       });
 

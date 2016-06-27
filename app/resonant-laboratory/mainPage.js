@@ -93,7 +93,7 @@ let MainPage = Backbone.View.extend({
   },
   newProject: function () {
     this.project = new Project();
-    return this.project.save()
+    return this.project.create()
       .then(() => {
         this.trigger('rl:createProject');
         this.trigger('rl:changeProject');

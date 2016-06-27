@@ -70,7 +70,10 @@ let Project = MetadataItem.extend({
     createPromise.then(() => {
       // Hit the endpoint that identifies the item as a project
       return this.restRequest({
-        path: 'project'
+        path: 'project',
+        method: 'POST'
+      }).then(resp => {
+        this.set(resp);
       });
     });
     createPromise.then(() => {
