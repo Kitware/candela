@@ -1,7 +1,10 @@
 import Underscore from 'underscore';
+import backbone from 'backbone';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 import candela from '../../../../../src/candela';
+import shareIcon from '../../../images/share.svg';
+import ExportView from '../../overlays/ExportView';
 import './style.css';
 
 let STATUS = {
@@ -46,6 +49,16 @@ let VisualizationView = Widget.extend({
       },
       onclick: () => {
         this.renderHelpScreen();
+      }
+    });
+
+    this.icons.splice(0, 0, {
+      src: shareIcon,
+      title: 'Export',
+      onclick: () => {
+        window.mainPage.overlay.render(new ExportView({
+          model: new backbone.Model({vis: this.vis})
+        }));
       }
     });
 

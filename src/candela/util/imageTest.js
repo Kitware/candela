@@ -45,7 +45,7 @@ Promise.onPossiblyUnhandledRejection(err => {
   throw err;
 });
 
-export default function imageTest ({name, url, selector, delay = 0, threshold}) {
+export default function imageTest ({name, extraBaselines = [], url, selector, delay = 0, threshold, verbose = false}) {
   const dirname = callerDirname();
 
   test(`${name} image test`, t => {
@@ -81,24 +81,55 @@ export default function imageTest ({name, url, selector, delay = 0, threshold}) 
     })
     .then(rect => n.screenshot(doSaveImage(name) ? path.join(dirname, `${name}.png`) : undefined, rect))
     .then(imageBuf => {
-      const refImage = dataUrl(fs.readFileSync(path.join(dirname, `${name}.png`)));
-      const image = imageBuf ? dataUrl(imageBuf) : refImage;
+      let image = imageBuf ? dataUrl(imageBuf) : null;
 
-      resemble(image)
-        .compareTo(refImage)
-        .ignoreAntialiasing()
-        .onComplete(analysis => {
-          const passed = Number(analysis.misMatchPercentage) < threshold * 100;
-          if (!passed || doDumpImage(name)) {
-            fs.writeFileSync(path.join(dirname, `${name}-test.png`), imageBuf.toString('base64'), 'base64');
-            fs.writeFileSync(path.join(dirname, `${name}-diff.png`), rawData(analysis.getImageDataUrl()), 'base64');
+      let analyses = [];
+      let count = 0;
+
+      const tally = () => {
+        let best = analyses[0];
+        analyses.forEach((entry) => {
+          if (entry.analysis.misMatchPercentage < best.analysis.misMatchPercentage) {
+            best = entry;
           }
-
-          t.ok(passed, `${name} image matches reference image to within ${threshold * 100}% (actual diff: ${analysis.misMatchPercentage}%)`);
-
-          t.end();
-          return n.end().then();
         });
+
+        const {filename, analysis} = best;
+        const passed = Number(analysis.misMatchPercentage) < threshold * 100;
+        if (!passed || doDumpImage(name)) {
+          fs.writeFileSync(path.join(dirname, `${filename}-test.png`), imageBuf.toString('base64'), 'base64');
+          fs.writeFileSync(path.join(dirname, `${filename}-diff.png`), rawData(analysis.getImageDataUrl()), 'base64');
+        }
+
+        t.ok(passed, `${name} image matches to within ${threshold * 100}% (actual diff: ${analysis.misMatchPercentage}%, baseline: ${filename}.png)`);
+
+        t.end();
+        return n.end().then();
+      };
+
+      const baselines = [name, ...extraBaselines];
+      baselines.forEach((filename, i) => {
+        const refImage = dataUrl(fs.readFileSync(path.join(dirname, `${filename}.png`)));
+
+        if (image === null) {
+          image = refImage;
+        }
+
+        resemble(image)
+          .compareTo(refImage)
+          .ignoreAntialiasing()
+          .onComplete(analysis => {
+            analyses[i] = {
+              analysis,
+              filename
+            };
+            count++;
+
+            if (count === baselines.length) {
+              return tally();
+            }
+          });
+      });
     });
   });
 }

@@ -2,8 +2,6 @@ var webpack = require('webpack');
 var path = require('path');
 
 var CleanPlugin = require('clean-webpack-plugin');
-var CopyPlugin = require('copy-webpack-plugin');
-var HtmlPlugin = require('html-webpack-plugin');
 
 __dirname = path.resolve(__dirname, '..');
 
@@ -11,8 +9,7 @@ module.exports = {
   devtool: 'source-map',
   __dirname: __dirname,
   entry: {
-    candela: ['./src/candela/index.js'],
-    examples: './app/examples/index.js'
+    candela: './src/candela/index.js',
   },
   output: {
     library: '[name]',
@@ -31,20 +28,9 @@ module.exports = {
       vg: 'vega'
     }),
 
-    new CleanPlugin([path.resolve(__dirname, 'build/*')], {
+    new CleanPlugin([path.resolve(__dirname, 'build/candela')], {
       root: __dirname
     }),
-
-    new HtmlPlugin({
-      title: 'Candela Examples',
-      filename: 'examples/index.html',
-      chunks: ['examples']
-    }),
-
-    new CopyPlugin([{
-      from: 'app/examples/data/nba-heatmaps',
-      to: 'examples/nba-heatmaps'
-    }])
   ],
   module: {
     loaders: [

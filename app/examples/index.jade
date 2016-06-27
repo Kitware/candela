@@ -1,5 +1,5 @@
 .page#main
   .test-list
-    each v in visualizations
+    each v in examples
       p
-        a(href='#' + v.hash)= v.name
+        a(href=v.link)= v.title

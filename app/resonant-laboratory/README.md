@@ -25,6 +25,7 @@ using the `virtualenv` described in the girder setup instructions.
   git clone https://github.com/Kitware/candela.git
   cd candela
   npm install
+  npm run build
   npm run build:laboratory
   ```
 
