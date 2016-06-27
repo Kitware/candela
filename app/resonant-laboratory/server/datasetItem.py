@@ -331,7 +331,9 @@ class DatasetItem(Resource):
         if 'histogramCaches' in item['meta']['rlab']:
             del item['meta']['rlab']['histogramCaches']
 
-        return self.model('item').updateItem(item)
+        self.model('item').updateItem(item)
+
+        return schema
 
     @access.public
     @loadAnonymousItem()

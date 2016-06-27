@@ -1,10 +1,7 @@
 import Underscore from 'underscore';
 import d3 from 'd3';
 import Widget from '../Widget';
-import Dataset from '../../../models/Dataset';
 import myTemplate from './template.html';
-import makeValidId from '../../../shims/makeValidId.js';
-import { Set } from '../../../shims/SetOps.js';
 import './style.css';
 
 let STATUS = {
@@ -18,6 +15,8 @@ let STATUS = {
 let DatasetView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
+
+    this.showTable = true;
 
     this.icons.splice(0, 0, {
       src: Widget.swapIcon,
@@ -57,9 +56,6 @@ let DatasetView = Widget.extend({
     this.handleNewProject();
   },
   handleNewProject: function () {
-    this.$el.html('');
-    this.status = STATUS.NO_DATA;
-
     this.listenTo(window.mainPage.project, 'rl:changeDatasets',
       this.render);
 
@@ -81,8 +77,30 @@ let DatasetView = Widget.extend({
       window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to <a>edit</a> or <a>reshape</a> the data in order to use it.');
     }
   },
-  renderAttributeSettings: function (datasetDetails) {
+  renderEmptyState: function () {
+    this.$el.find('#datasetOverview, #tablePreview, #histogramPreview').hide();
+    this.$el.find('#emptyDatasetState').show();
+  },
+  renderOverview: function (datasetDetails) {
+    let bounds = this.$el.find('#datasetOverview')[0].getBoundingClientRect();
+    d3.select(this.el).select('svg')
+      .attr({
+        width: bounds.width,
+        height: bounds.height
+      });
     console.log(datasetDetails);
+  },
+  renderHistograms: function (datasetDetails) {
+    this.$el.find('#emptyDatasetState, #tablePreview').hide();
+    this.$el.find('#datasetOverview, #histogramPreview').show();
+    this.renderOverview(datasetDetails);
+    // TODO
+  },
+  renderTable: function (datasetDetails) {
+    this.$el.find('#emptyDatasetState, #histogramPreview').hide();
+    this.$el.find('#datasetOverview, #tablePreview').show();
+    this.renderOverview(datasetDetails);
+    // TODO
   },
   render: Underscore.debounce(function () {
     let widgetIsShowing = Widget.prototype.render.apply(this, arguments);
@@ -103,7 +121,7 @@ let DatasetView = Widget.extend({
     }
 
     if (!datasetObj) {
-      this.$el.find('#attributeSettings').html('');
+      this.renderEmptyState();
       this.status = STATUS.NO_DATA;
       this.statusText.text = 'No file loaded';
       this.renderIndicators();
@@ -132,7 +150,11 @@ let DatasetView = Widget.extend({
             this.statusText.text = datasetObj.get('name');
             this.renderIndicators();
             if (widgetIsShowing) {
-              this.renderAttributeSettings(datasetDetails);
+              if (this.showTable) {
+                this.renderTable(datasetDetails);
+              } else {
+                this.renderHistograms(datasetDetails);
+              }
             }
           }
         });

@@ -3,132 +3,15 @@
   flex-direction: column;
 }
 
-.DatasetView.content #attributeSettings {
-  overflow: auto;
-  height: 100%;
-}
-
-.DatasetView.content #attributeSettings li div.attributeSettings {
-  margin-top: 1em;
-  margin-bottom: -1.75em;
-}
-
-.DatasetView.content #attributeSettings li.quantitative.binSettings {
-  margin-bottom: -0.5em;
-}
-.DatasetView.content #attributeSettings li.quantitative.binSettings label {
-  position: relative;
-  top: 0.25em;
-  font-size: 0.75em;
-  white-space: nowrap;
-}
-
-.DatasetView.content #attributeSettings li div.attributeSettings,
-.DatasetView.content #attributeSettings li.binSettings {
-  display: flex;
-  justify-content: flex-end;
+.DatasetView.content #overview {
   width: 100%;
-  align-items: center;
-  line-height: 1.5em;
-  flex-wrap: wrap;
-}
-.DatasetView.content #attributeSettings li div.attributeSettings > *,
-.DatasetView.content #attributeSettings li.binSettings > * {
-  margin-left: 0.5em;
-  margin-right: 0.5em;
-}
-.DatasetView.content #attributeSettings li div.attributeSettings > div.flexspacer,
-.DatasetView.content #attributeSettings li.binSettings > div.flexspacer {
-  flex: auto;
-  margin: 0px;
-}
-.DatasetView.content #attributeSettings div.histogramBarContainer {
-  /* whatever happens to the other elements, make sure the
-     histogram bars have the same scale! */
-  min-width: 15em;
-  max-width: 15em;
-  height: 1em;
-  border: 1px solid #999999;
-  position: relative;
-}
-.DatasetView.content #attributeSettings div.histogramBarContainer div.summary,
-.DatasetView.content #attributeSettings div.histogramBarContainer div.current {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  height: 100%;
-  /* width set by d3 */
-}
-.DatasetView.content #attributeSettings div.histogramBarContainer div.summary {
-  background-color: #999999;
-}
-.DatasetView.content #attributeSettings div.histogramBarContainer div.current {
-  background-color: #333333;
+  height: 12em;
+  background-color: #55bada;
 }
 
-/* Special stuff for quantitative bin checkboxes */
-.DatasetView.content li.quantitative.binSettings input.include::before {
-  background: url('../../../images/rangeButtons.png') no-repeat center left;
-  background-position-x: 0px;
-  background-position-y: 0px;
-}
-.DatasetView.content li.quantitative.binSettings input.include:checked::before {
-  background-position-y: -25px;
-}
-.DatasetView.content li.quantitative.binSettings input.include.high::before {
-  background-position-x: -25px;
-  background-position-y: 0px;
-}
-.DatasetView.content li.quantitative.binSettings input.include.bothBounds::before {
-  background-position-x: -25px;
-  background-position-y: -25px;
-}
-.DatasetView.content li.quantitative.binSettings input.include.low::before {
-  background-position-x: -25px;
-  background-position-y: -50px;
-}
-.DatasetView.content li.quantitative.binSettings input.include:indeterminate::before {
-  background-position-x: -50px;
-}
-
-/* CSS hack to make expandable list */
-.DatasetView.content #attributeSettings li > input.expand::before {
-  display: none;
-}
-
-.DatasetView.content #attributeSettings li > input.expand:checked + * {
-  display: block;
-}
-
-.DatasetView.content #attributeSettings li > input.expand + * {
-  display: none;
-}
-
-.DatasetView.content #attributeSettings li > input.expand {
-  position: relative;
-}
-
-.DatasetView.content #attributeSettings li > input.expand::after {
-  display: block;
-  position: relative;
-  top: 0.6em;
-  left: 997em;  /* our CSS hacks hide the normal checkboxes at -999em */
-  content: "+";
-  text-align: center;
-  width: 1em;
-  height: 1em;
-  border: 1px solid #999999;
-  color: #999999;
-  cursor: pointer;
-}
-.DatasetView.content #attributeSettings li > input.expand:checked::after {
-  content: "-";
-}
-
-.DatasetView.content #attributeSettings li label {
-  cursor: pointer;
-}
-
-.DatasetView.content #attributeSettings li {
-  list-style: none;
+.DatasetView.content #histogramPreview,
+.DatasetView.content #tablePreview {
+  width: 100%;
+  height: 12em;
+  background-color: #bada55;
 }
