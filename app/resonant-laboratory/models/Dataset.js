@@ -114,6 +114,7 @@ let Dataset = MetadataItem.extend({
           path: 'item/' + this.getId() + '/download',
           data: {
             extraParameters: JSON.stringify({
+              fileType: 'csv',
               offset: 47,
               limit: 5
             })

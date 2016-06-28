@@ -1,6 +1,6 @@
+import cherrypy
 import csv
 import json
-import os
 import sys
 from girder.models.model_base import GirderException
 from girder.utility.filesystem_assetstore_adapter import FilesystemAssetstoreAdapter
@@ -106,38 +106,54 @@ class StreamFile(object):
         pass
 
 
-class SemanticFilesystemAssetstoreAdapter(FilesystemAssetstoreAdapter):
-    def __init__(self, *args, **kwargs):
-        super(SemanticFilesystemAssetstoreAdapter, self).__init__(*args, **kwargs)
+def semantic_access(Cls):
+    allowed = ['csv']
+    module = 'resonant-laboratory.semantic-filesystem-assetstore-adapter'
 
-    def downloadFile(self, file, offset=0, headers=True, endByte=None,
-                     contentDisposition=None, extraParameters=None, **kwargs):
-        print 'extraParameters: %s' % (extraParameters)
-        if extraParameters is None:
-            return super(SemanticFilesystemAssetstoreAdapter, self).downloadFile(file, offset, headers, endByte, contentDisposition, extraParameters, **kwargs)
+    class NewCls(Cls):
+        def __init__(self, *args, **kwargs):
+            super(NewCls, self).__init__(*args, **kwargs)
 
-        # TODO: for now, treat all special requests as being for a CSV file.
-        path = self.fullPath(file)
+        def downloadFile(self, file, offset=0, headers=True, endByte=None,
+                         contentDisposition=None, extraParameters=None, **kwargs):
+            print 'file: %s' % (file)
 
-        if not os.path.isfile(path):
-            raise GirderException(
-                'File %s does not exist.' % path,
-                'girder.utility.filesystem_assetstore_adapter.'
-                'file-does-not-exist')
+            # Get the parent class's stream.
+            base_stream = super(NewCls, self).downloadFile(file, offset, headers, endByte, contentDisposition, extraParameters, **kwargs)
 
-        extraParameters = json.loads(extraParameters)
-        offset = extraParameters.get('offset', 0)
-        limit = extraParameters.get('limit', 0)
+            # Fall back to base class when no special parameters are specified.
+            if extraParameters is None:
+                return base_stream
 
-        def stream():
-            with open(path) as csvfile:
+            # Construct and return our own stream that implements the special
+            # behaviors requested in extraParameters on top of the base class's
+            # stream.
+            extraParameters = json.loads(extraParameters)
+            offset = extraParameters.get('offset', 0)
+            limit = extraParameters.get('limit', 0)
+
+            fileType = extraParameters.get('fileType')
+            if fileType is None:
+                print 'fileType = None'
+                raise GirderException('"fileType" argument is required', '%s.missing-required-argument' % (module))
+
+            if fileType not in allowed:
+                print 'fileType = %s is not allowed' % (fileType)
+                raise GirderException('"fileType" must be one of: %s' % (', '.join(allowed)), '%s.illegal-argument' % (module))
+
+            # Set content-length header to zero and clear content-range.
+            del cherrypy.response.headers['Content-Length']
+            if 'Content-Range' in cherrypy.response.headers:
+                del cherrypy.response.headers['Content-Range']
+
+            def stream():
+                csvfile = StreamFile(base_stream())
                 data = csv.reader(csvfile)
 
-                # Read and return the header line.
                 header_line = data.next()
+                print 'header_line: %s' % (header_line)
                 yield ','.join(header_line) + '\n'
 
-                # Skip a number of lines equal to the offset parameter.
                 for i in range(offset):
                     data.next()
 
@@ -145,9 +161,14 @@ class SemanticFilesystemAssetstoreAdapter(FilesystemAssetstoreAdapter):
                 try:
                     while limit == 0 or count < limit:
                         line = data.next()
+                        print 'line: %s' % (line)
                         count += 1
                         yield ','.join(line) + '\n'
                 except StopIteration:
                     pass
 
-        return stream
+            return stream
+
+    return NewCls
+
+SemanticFilesystemAssetstoreAdapter = semantic_access(FilesystemAssetstoreAdapter)
