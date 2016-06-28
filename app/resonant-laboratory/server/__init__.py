@@ -2,7 +2,7 @@ import os
 from girder.api.rest import Resource
 from girder.constants import AssetstoreType
 from girder.utility.assetstore_utilities import setAssetstoreAdapter
-from SemanticFilesystemAssetstoreAdapter import SemanticFilesystemAssetstoreAdapter
+from SemanticFilesystemAssetstoreAdapter import SemanticFilesystemAssetstoreAdapter, SemanticGridFsAssetstoreAdapter
 from anonymousAccess import AnonymousAccess
 from versioning import Versioning
 
@@ -58,5 +58,6 @@ def load(info):
     info['apiRoot'].system.route('GET', ('resonantLaboratoryVersion', ),
                                  versioning.versionNumber)
 
-    # Install "semantic" download adapter into Girder's table of adapters.
+    # Install "semantic" download adapters into Girder's table of adapters.
     setAssetstoreAdapter(AssetstoreType.FILESYSTEM, SemanticFilesystemAssetstoreAdapter)
+    setAssetstoreAdapter(AssetstoreType.GRIDFS, SemanticGridFsAssetstoreAdapter)

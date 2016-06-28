@@ -4,6 +4,7 @@ import json
 import sys
 from girder.models.model_base import GirderException
 from girder.utility.filesystem_assetstore_adapter import FilesystemAssetstoreAdapter
+from girder.utility.gridfs_assetstore_adapter import GridFsAssetstoreAdapter
 
 
 class StreamFile(object):
@@ -172,3 +173,4 @@ def semantic_access(Cls):
     return NewCls
 
 SemanticFilesystemAssetstoreAdapter = semantic_access(FilesystemAssetstoreAdapter)
+SemanticGridFsAssetstoreAdapter = semantic_access(GridFsAssetstoreAdapter)
