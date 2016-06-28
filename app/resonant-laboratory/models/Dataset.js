@@ -112,6 +112,14 @@ let Dataset = MetadataItem.extend({
       }, () => {
         return girder.restRequest({
           path: 'item/' + this.getId() + '/download',
+          data: {
+            extraParameters: JSON.stringify({
+              fileType: 'csv',
+              outputType: 'csv',
+              offset: 47,
+              limit: 5
+            })
+          },
           type: 'GET',
           error: null,
           dataType: 'text'
