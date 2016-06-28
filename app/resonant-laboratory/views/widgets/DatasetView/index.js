@@ -2,7 +2,20 @@ import Underscore from 'underscore';
 import d3 from 'd3';
 import Widget from '../Widget';
 import myTemplate from './template.html';
+import rewrap from '../../../shims/svgTextWrap.js';
 import './style.css';
+
+import seekFirst from '../../../images/seekFirst.svg';
+import seekPrev from '../../../images/seekPrev.svg';
+import seekNext from '../../../images/seekNext.svg';
+import seekLast from '../../../images/seekLast.svg';
+
+let ICONS = {
+  seekFirst,
+  seekPrev,
+  seekNext,
+  seekLast
+};
 
 let STATUS = {
   NO_DATA: 0,
@@ -81,14 +94,160 @@ let DatasetView = Widget.extend({
     this.$el.find('#datasetOverview, #tablePreview, #histogramPreview').hide();
     this.$el.find('#emptyDatasetState').show();
   },
+  renderFilterPie: function (overviewCount, filteredCount, pageOffset, pageCount, radius) {
+    // Draw a pie using the left square of space
+    // I know, eww: a pie. But in this case,
+    // there isn't a distant slice comparison problem,
+    // and we want to drive home the "you're working
+    // with a subset" connotation.
+
+    // We want to center the filtered slice on the right
+    let filteredRadians = 2 * Math.PI * filteredCount / overviewCount;
+    let radianScale = d3.scale.linear()
+      .domain([0, overviewCount])
+      .range([Math.PI / 2 - filteredRadians / 2,
+              2.5 * Math.PI - filteredRadians / 2]);
+    let pieData = [
+      {
+        slice: 'overview',
+        offset: 0,
+        count: overviewCount
+      },
+      {
+        slice: 'filtered',
+        offset: 0,
+        count: filteredCount
+      },
+      {
+        slice: 'page',
+        offset: pageOffset,
+        count: pageCount
+      }
+    ];
+    let arc = d3.svg.arc()
+      .outerRadius(radius)
+      .innerRadius(0)
+      .startAngle(d => radianScale(d.offset))
+      .endAngle(d => radianScale(d.offset + d.count));
+    let pie = d3.select(this.el).select('#filterPie')
+      .attr('transform', 'translate(' + radius + ',' + radius + ')');
+    let pieSlices = pie.selectAll('path.pieSlice')
+      .data(pieData, d => d.slice);
+    pieSlices.enter().append('path');
+    pieSlices.attr('d', arc)
+      .attr('class', d => d.slice + ' pieSlice');
+  },
+  renderPagingTools: function (filteredCount, pageOffset, pageCount, bounds) {
+    // Align the buttons
+    this.$el.find('#pagingButtons')
+      .attr('transform', 'translate(' + (bounds.width / 2) + ',0)');
+
+    // Align the bars
+    this.$el.find('#pagingBars')
+      .attr('transform', 'translate(0,' + (2 * this.layout.emSize) + ')');
+
+    // Scale for the bars
+    let xScale = d3.scale.linear()
+      .domain([0, filteredCount])
+      .range([0, bounds.width]);
+
+    // Now draw the bars indicating the size and location of
+    // the page within the current filtered set
+    let barData = [
+      {
+        segment: 'filtered',
+        start: 0,
+        count: filteredCount
+      },
+      {
+        segment: 'page',
+        start: pageOffset,
+        count: pageCount
+      }
+    ];
+    let bars = d3.select(this.el).select('#pagingBars').selectAll('rect.bar')
+      .data(barData, d => d.segment);
+    bars.enter().append('rect');
+    bars.attr('x', d => xScale(d.start))
+      .attr('width', d => xScale(d.count + d.start) - xScale(d.start))
+      .attr('height', bounds.height - 2 * this.layout.emSize)
+      .attr('class', d => d.segment + ' bar');
+  },
   renderOverview: function (datasetDetails) {
     let bounds = this.$el.find('#datasetOverview')[0].getBoundingClientRect();
+    bounds = {
+      width: bounds.width - 2 * this.layout.emSize,
+      height: bounds.height
+    };
     d3.select(this.el).select('svg')
       .attr({
         width: bounds.width,
         height: bounds.height
       });
-    console.log(datasetDetails);
+
+    let overviewCount = datasetDetails.overviewHistogram.__passedFilters__[0].count;
+    let filteredCount = datasetDetails.filteredHistogram.__passedFilters__[0].count;
+    let pageOffset = datasetDetails.datasetObj.cache.page.offset;
+    let pageCount = datasetDetails.datasetObj.cache.page.limit;
+
+    let hasFilters = filteredCount < overviewCount;
+    let hasPaging = pageCount < filteredCount;
+
+    // Show the relevant explanatory label
+    this.$el.find('#labels > text').hide();
+    let labelElement;
+    if (hasFilters && hasPaging) {
+      labelElement = this.$el.find('#hasFiltersAndPaging');
+    } else if (hasFilters) {
+      labelElement = this.$el.find('#hasFilters');
+    } else if (hasPaging) {
+      labelElement = this.$el.find('#hasPaging');
+    } else {
+      labelElement = this.$el.find('#noPagingOrFilters');
+    }
+    labelElement.show();
+    let d3Element = d3.select(labelElement[0]);
+
+    // Update the values in the text
+    d3Element.selectAll('tspan.overview')
+      .text(overviewCount);
+    d3Element.selectAll('tspan.filtered')
+      .text(filteredCount);
+    // Use base 1 for the page text labels
+    d3Element.selectAll('tspan.page')
+      .text((pageOffset + 1) + ' - ' + (pageOffset + pageCount));
+
+    // Reflow and position the text
+    rewrap(labelElement[0], bounds.width);
+    let textHeight = labelElement[0].getBoundingClientRect().height +
+      this.layout.emSize;
+    d3Element.attr('transform', 'translate(0,' +
+      (bounds.height - textHeight + this.layout.emSize * 0.5) + ')');
+
+    // Show + render, or hide the filter pie
+    let pagingOffset;
+    if (hasFilters) {
+      let pieSize = bounds.height - textHeight;
+      this.$el.find('#filterPie').show();
+      this.renderFilterPie(overviewCount, filteredCount,
+        pageOffset, pageCount, pieSize / 2);
+      pagingOffset = pieSize + this.layout.emSize;
+    } else {
+      this.$el.find('#filterPie').hide();
+      pagingOffset = 0;
+    }
+
+    // Show + render, or hide the paging bars and buttons
+    if (hasPaging) {
+      this.$el.find('#paging').show();
+      d3.select('#paging').attr('transform', 'translate(' + pagingOffset + ',0)');
+      this.renderPagingTools(filteredCount, pageOffset, pageCount, {
+        width: bounds.width - pagingOffset,
+        height: bounds.height - textHeight
+      });
+    } else {
+      this.$el.find('#paging').hide();
+    }
   },
   renderHistograms: function (datasetDetails) {
     this.$el.find('#emptyDatasetState, #tablePreview').hide();
@@ -107,8 +266,19 @@ let DatasetView = Widget.extend({
 
     if (!this.addedTemplate) {
       this.$el.html(myTemplate);
+      // Add the seek icons (webpack has trouble with detecting xlink:href)
+      Object.keys(ICONS).forEach(key => {
+        d3.select(this.el).select('image#' + key)
+          .attr('xlink:href', ICONS[key]);
+      });
       this.addedTemplate = true;
     }
+
+    // Get some general settings to help the rendering process
+    this.layout = {
+      emSize: parseFloat(this.$el.css('font-size'))
+    };
+    this.layout.sectionHeight = 6 * this.layout.emSize;
 
     // Get the dataset in the project (if there is one)
     // TODO: get the dataset assigned to this widget
@@ -136,11 +306,21 @@ let DatasetView = Widget.extend({
                    datasetObj.cache.pageHistogram,
                    datasetObj.cache.currentDataPage])
         .then(datasetDetails => {
+          // For cleaner code, reshape the array
+          // of results into a dict
+          let results = {
+            datasetObj: datasetObj,
+            schema: datasetDetails[0],
+            overviewHistogram: datasetDetails[1],
+            filteredHistogram: datasetDetails[2],
+            pageHistogram: datasetDetails[3],
+            currentDataPage: datasetDetails[4]
+          };
           if (datasetDetails.indexOf(null) !== -1) {
             this.status = STATUS.CANT_LOAD;
             this.statusText.text = 'ERROR';
             this.renderIndicators();
-          } else if (Object.keys(datasetDetails[0]).length === 0) {
+          } else if (results.schema.length === 0) {
             // The schema has no attributes...
             this.status = STATUS.NO_ATTRIBUTES;
             this.statusText.text = 'ERROR';
@@ -151,9 +331,9 @@ let DatasetView = Widget.extend({
             this.renderIndicators();
             if (widgetIsShowing) {
               if (this.showTable) {
-                this.renderTable(datasetDetails);
+                this.renderTable(results);
               } else {
-                this.renderHistograms(datasetDetails);
+                this.renderHistograms(results);
               }
             }
           }

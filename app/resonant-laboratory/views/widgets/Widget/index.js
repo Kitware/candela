@@ -58,7 +58,6 @@ let Widget = Backbone.View.extend({
     // document yet
     if (!window.mainPage.project ||
       document.getElementById(this.$el.attr('id')) !== this.el) {
-      this.$el.html('');
       return false;
     } else {
       return true;

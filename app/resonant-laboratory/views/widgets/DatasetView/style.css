@@ -1,17 +1,33 @@
 .DatasetView.content {
   display: flex;
   flex-direction: column;
+  overflow-x:hidden;
+  overflow-y:auto;
+  padding: 1em;
 }
 
-.DatasetView.content #overview {
+.DatasetView.content #datasetOverview {
   width: 100%;
-  height: 12em;
-  background-color: #55bada;
+  height: 8em;
+  font-weight: 900;
+}
+.DatasetView.content image.button:hover {
+  cursor: pointer;
+  -webkit-filter: brightness(150%);
+  filter: brightness(150%);
 }
 
 .DatasetView.content #histogramPreview,
 .DatasetView.content #tablePreview {
   width: 100%;
-  height: 12em;
-  background-color: #bada55;
+}
+
+.DatasetView.content .overview {
+  fill: #41b6c4;
+}
+.DatasetView.content .filtered {
+  fill: #2c7fb8;
+}
+.DatasetView.content .page {
+  fill: #253494;
 }

@@ -1,49 +1,87 @@
 /*
   Quick shim to take an SVG text element, and rewrap its text
-  into tspans (any previous tspans are removed)
+  into tspans, using the element's text-anchor attribute
+  (default: 'start', or align left). Any non-text elements
+  (e.g. nested tspan elements) not produced by this function
+  are treated as single words (i.e. no attempt is made to split
+  nested elements across lines).
 */
 
 import d3 from 'd3';
+
+function newTspan (textElement) {
+  let newTspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+  newTspan.setAttribute('class', 'rewrappedTspan');
+  textElement.appendChild(newTspan);
+  return newTspan;
+}
+
+function extractWords (element) {
+  let words = [];
+  // Pull out all the childNodes and split them into words
+  element.childNodes.forEach(chunk => {
+    if (chunk.nodeType === window.Node.TEXT_NODE) {
+      // This is an actual text node; split into real words
+      chunk.textContent.split(/\s+/).forEach(word => {
+        if (word.length > 0) {
+          words.push(new window.Text(word));
+        }
+      });
+    } else if (chunk.getAttribute('class') === 'rewrappedTspan') {
+      // This is a tspan that we added before; we want to flatten
+      // its contents back down into the main words array
+      words = words.concat(extractWords(chunk));
+    } else {
+      // Some other element was encountered; push it as a single "word"
+      words.push(chunk);
+    }
+  });
+  return words;
+}
 
 export default function rewrap (textElement, pxWidth, emLeading) {
   emLeading = emLeading || 1.1;
 
   let textAnchor = textElement.getAttribute('text-anchor') || 'start';
-
-  let text = textElement.textContent;
-  let words = text.split(/\s+/);
+  let words = extractWords(textElement);
   if (words.length === 0) {
     return;
   }
-  let container = d3.select(textElement).text('');
+  textElement.textContent = '';
 
   let lineLengths = [0];
 
   // First pass: figure out which words go on which lines
 
   // Start with the first word
-  let currentTspan = container.append('tspan')
-    .text(words[0]);
+  let currentTspan = newTspan(textElement);
+  currentTspan.appendChild(words[0]);
 
   words.forEach((word, index) => {
-    // Add the word to the tspan
-    let currentText = currentTspan.text();
-    if (index === 0) {
-      currentTspan.text(word);
-    } else {
-      currentTspan.text(currentText + ' ' + word);
+    // Make a temporary copy of the line
+    let tempCopy = currentTspan.cloneNode(true);
+
+    // Add a space if it's not the first word
+    if (index > 0) {
+      currentTspan.appendChild(new window.Text(' '));
     }
+    // Add the word to the tspan
+    currentTspan.appendChild(word);
 
     // How wide is the line now?
-    let length = currentTspan.node().getComputedTextLength();
+    let length = currentTspan.getComputedTextLength();
 
     // Has it exceeded the space that we allow?
     if (length > pxWidth) {
-      // Revert to the text we had before, and start it on a new line
-      currentTspan.text(currentText);
-      currentTspan = container.append('tspan').text(word);
+      // Revert to the text we had before
+      textElement.removeChild(currentTspan);
+      textElement.appendChild(tempCopy);
+
+      // Add the word to a new line
+      currentTspan = newTspan(textElement);
+      currentTspan.appendChild(word);
       // Store the single word's length
-      lineLengths.push(currentTspan.node().getComputedTextLength());
+      lineLengths.push(currentTspan.getComputedTextLength());
     } else {
       // Update the length of this line
       lineLengths[lineLengths.length - 1] = length;
@@ -51,7 +89,7 @@ export default function rewrap (textElement, pxWidth, emLeading) {
   });
 
   // Second pass: line up each row appropriately
-  container.selectAll('tspan')
+  d3.select(textElement).selectAll('tspan.rewrappedTspan')
     // Apply the leading
     .attr('dy', emLeading + 'em')
     // Align horizontally
