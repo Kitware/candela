@@ -170,7 +170,7 @@ let DatasetView = Widget.extend({
     bars.enter().append('rect');
     bars.attr('x', d => xScale(d.start))
       .attr('width', d => xScale(d.count + d.start) - xScale(d.start))
-      .attr('height', bounds.height - 2 * this.layout.emSize)
+      .attr('height', this.layout.emSize)
       .attr('class', d => d.segment + ' bar');
   },
   renderOverview: function (datasetDetails) {
@@ -240,7 +240,8 @@ let DatasetView = Widget.extend({
     // Show + render, or hide the paging bars and buttons
     if (hasPaging) {
       this.$el.find('#paging').show();
-      d3.select('#paging').attr('transform', 'translate(' + pagingOffset + ',0)');
+      d3.select('#paging').attr('transform', 'translate(' + pagingOffset + ',' +
+        (bounds.height - textHeight - 3 * this.layout.emSize) / 2 + ')');
       this.renderPagingTools(filteredCount, pageOffset, pageCount, {
         width: bounds.width - pagingOffset,
         height: bounds.height - textHeight

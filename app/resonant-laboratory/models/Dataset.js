@@ -47,6 +47,7 @@ class DatasetCache {
     delete this.cachedPromises.filteredHistogram;
     delete this.cachedPromises.pageHistogram;
     delete this.cachedPromises.currentDataPage;
+    this.model.trigger('rl:invalidatedHistograms');
   }
   get page () {
     if (!this._page) {
@@ -62,6 +63,7 @@ class DatasetCache {
     // Invalidate pageHistogram and currentDataPage
     delete this.cachedPromises.pageHistogram;
     delete this.cachedPromises.currentDataPage;
+    this.model.trigger('rl:invalidatedHistograms');
   }
   get schema () {
     // Do we have the schema already in our metadata,
