@@ -1,8 +1,106 @@
 import csv
 import json
 import os
+import sys
 from girder.models.model_base import GirderException
 from girder.utility.filesystem_assetstore_adapter import FilesystemAssetstoreAdapter
+
+
+class StreamFile(object):
+    def __init__(self, stream):
+        self.stream = stream
+        self.buf = ''
+        self.closed = False
+        self.eof = False
+
+    def close(self):
+        self.closed = True
+
+    def flush(self):
+        pass
+
+    def next(self):
+        if self.eof:
+            raise StopIteration
+        return self.readline()
+
+    def read(self, n=None):
+        if self.closed:
+            raise ValueError('I/O operation on closed file')
+
+        if self.eof:
+            return ''
+
+        if n is None:
+            n = sys.maxsize
+
+        try:
+            while len(self.buf) < n:
+                self.buf += self.stream.next()
+        except StopIteration:
+            self.eof = True
+
+        chunk, self.buf = self.buf[:n], self.buf[n:]
+        return chunk
+
+    def readline(self, n=None):
+        if self.closed:
+            raise ValueError('I/O operation on closed file')
+
+        if self.eof:
+            return ''
+
+        if n is None:
+            n = sys.maxsize
+
+        try:
+            index = self.buf.index('\n')
+        except ValueError:
+            index = -1
+
+        try:
+            while index == -1:
+                chunk = self.stream.next()
+
+                try:
+                    index = chunk.index('\n')
+                except ValueError:
+                    index = -1
+
+                if index != -1:
+                    index += len(self.buf)
+
+                self.buf += chunk
+        except StopIteration:
+            self.eof = True
+            return self.buf
+
+        cut = min(index, n)
+        chunk, self.buf = self.buf[:cut + 1], self.buf[cut + 1:]
+
+        return chunk
+
+    def readlines(self, sizehint=None):
+        lines = []
+        while not self.eof:
+            lines.append(self.readline())
+
+        return lines
+
+    def seek(offset, whence):
+        pass
+
+    def tell():
+        return 0
+
+    def truncate(size):
+        pass
+
+    def write(str):
+        pass
+
+    def writelines(seq):
+        pass
 
 
 class SemanticFilesystemAssetstoreAdapter(FilesystemAssetstoreAdapter):
