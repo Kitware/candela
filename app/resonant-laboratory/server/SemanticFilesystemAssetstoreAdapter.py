@@ -19,6 +19,9 @@ class StreamFile(object):
     def flush(self):
         pass
 
+    def __iter__(self):
+        return self
+
     def next(self):
         if self.eof:
             raise StopIteration

@@ -10,6 +10,12 @@ def stream():
     yield ' what\'s up?\n'
     yield 'yay!!!'
 
+line_list = [
+    'hello goodbye adios\n',
+    'buenos dias what\'s up?\n',
+    'yay!!!'
+]
+
 
 class TestStreamFile(unittest.TestCase):
     def test_read(self):
@@ -38,11 +44,7 @@ class TestStreamFile(unittest.TestCase):
         sf = StreamFile(stream())
 
         lines = sf.readlines()
-        self.assertEqual(lines, [
-            'hello goodbye adios\n',
-            'buenos dias what\'s up?\n',
-            'yay!!!'
-        ])
+        self.assertEqual(lines, line_list)
 
     def test_overread(self):
         sf = StreamFile(stream())
@@ -53,6 +55,22 @@ class TestStreamFile(unittest.TestCase):
         text = sf.read(len(target) + 10)
 
         self.assertEqual(text, target)
+
+    def test_generator(self):
+        sf = StreamFile(stream())
+
+        self.assertEqual(sf.next(), 'hello goodbye adios\n')
+        self.assertEqual(sf.next(), 'buenos dias what\'s up?\n')
+        self.assertEqual(sf.next(), 'yay!!!')
+
+        self.assertRaises(StopIteration, sf.next)
+
+    def test_generator_list(self):
+        sf = StreamFile(stream())
+
+        lines = list(sf)
+
+        self.assertEqual(lines, line_list)
 
 if __name__ == '__main__':
     unittest.main()
