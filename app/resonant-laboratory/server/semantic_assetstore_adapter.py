@@ -106,7 +106,9 @@ class StreamFile(object):
 
 
 def semantic_access(Cls):
-    allowed = ['csv']
+    allowed_filetypes = ['csv']
+    allowed_outputtypes = ['csv', 'json']
+
     module = 'resonant-laboratory.semantic-filesystem-assetstore-adapter'
 
     class NewCls(Cls):
@@ -136,9 +138,17 @@ def semantic_access(Cls):
                 print 'fileType = None'
                 raise GirderException('"fileType" argument is required', '%s.missing-required-argument' % (module))
 
-            if fileType not in allowed:
+            if fileType not in allowed_filetypes:
                 print 'fileType = %s is not allowed' % (fileType)
-                raise GirderException('"fileType" must be one of: %s' % (', '.join(allowed)), '%s.illegal-argument' % (module))
+                raise GirderException('"fileType" must be one of: %s' % (', '.join(allowed_filetypes)), '%s.illegal-argument' % (module))
+
+            outputType = extraParameters.get('outputType')
+            if outputType is None:
+                outputType = 'json'
+
+            if outputType not in allowed_outputtypes:
+                print 'outputType = %s is not allowed' % (outputType)
+                raise GirderException('"outputType" must be one of: %s' % (', '.join(allowed_outputtypes)), '%s.illegal-argument' % (module))
 
             # Set content-length header to zero and clear content-range.
             del cherrypy.response.headers['Content-Length']
@@ -151,7 +161,8 @@ def semantic_access(Cls):
 
                 header_line = data.next()
                 print 'header_line: %s' % (header_line)
-                yield ','.join(header_line) + '\n'
+                if outputType == 'csv':
+                    yield ','.join(header_line) + '\n'
 
                 for i in range(offset):
                     data.next()
@@ -162,7 +173,10 @@ def semantic_access(Cls):
                         line = data.next()
                         print 'line: %s' % (line)
                         count += 1
-                        yield ','.join(line) + '\n'
+                        if outputType == 'csv':
+                            yield ','.join(line) + '\n'
+                        elif outputType == 'json':
+                            yield json.dumps(dict(zip(header_line, line)))
                 except StopIteration:
                     pass
 

@@ -115,6 +115,7 @@ let Dataset = MetadataItem.extend({
           data: {
             extraParameters: JSON.stringify({
               fileType: 'csv',
+              outputType: 'csv',
               offset: 47,
               limit: 5
             })
