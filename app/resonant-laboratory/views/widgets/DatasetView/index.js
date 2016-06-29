@@ -191,10 +191,11 @@ let DatasetView = Widget.extend({
       .attr('class', d => d.segment + ' bar');
   },
   renderOverview: function (datasetDetails) {
-    let bounds = this.$el.find('#datasetOverview')[0].getBoundingClientRect();
+    let bounds = this.el.getBoundingClientRect();
+    // TODO: determine the height based on the contents
     bounds = {
       width: bounds.width - 2 * this.layout.emSize,
-      height: bounds.height
+      height: 6 * this.layout.emSize
     };
     d3.select(this.el).select('svg')
       .attr({
@@ -284,7 +285,30 @@ let DatasetView = Widget.extend({
     this.$el.find('#emptyDatasetState, #histogramPreview').hide();
     this.$el.find('#datasetOverview, #tablePreview').show();
     this.renderOverview(datasetDetails);
-    // TODO
+
+    let headerOrder = Object.keys(datasetDetails.schema);
+
+    let headers = d3.select(this.el).select('#tablePreview thead tr')
+      .selectAll('th').data([''].concat(headerOrder));
+    headers.enter().append('th');
+    headers.exit().remove();
+    headers.text(d => d);
+
+    let rows = d3.select(this.el).select('#tablePreview tbody')
+      .selectAll('tr').data(datasetDetails.currentDataPage);
+    rows.enter().append('tr');
+    rows.exit().remove();
+
+    let cells = rows.selectAll('td').data((d, i) => {
+      let row = [datasetDetails.datasetObj.cache.page.offset + i + 1];
+      headerOrder.forEach(attr => {
+        row.push(d[attr]);
+      });
+      return row;
+    });
+    cells.enter().append('td');
+    cells.exit().remove();
+    cells.text(d => d);
   },
   render: Underscore.debounce(function () {
     let widgetIsShowing = Widget.prototype.render.apply(this, arguments);

@@ -1,15 +1,13 @@
 .DatasetView.content {
   display: flex;
   flex-direction: column;
-  overflow-x:hidden;
-  overflow-y:auto;
-  padding: 1em;
 }
 
 .DatasetView.content #datasetOverview {
-  width: 100%;
+  width: calc(100% - 2em);
   height: 8em;
   font-weight: 900;
+  padding: 1em;
 }
 .DatasetView.content image.button:hover {
   cursor: pointer;
@@ -22,9 +20,35 @@
   filter: url(#recolorImageTocccccc);
 }
 
-.DatasetView.content #histogramPreview,
+.DatasetView.content #histogramPreview {
+  width: 100%;
+  flex-grow: 1;
+  overflow-x:hidden;
+  overflow-y:auto;
+}
+
 .DatasetView.content #tablePreview {
   width: 100%;
+  flex-grow: 1;
+  overflow: auto;
+}
+.DatasetView.content #tablePreview table {
+  font-family: Courier, monospace;
+  -ms-user-select: initial;
+  -moz-user-select: initial;
+  -webkit-user-select: initial;
+}
+.DatasetView.content #tablePreview td {
+  padding: 0.25em;
+  white-space: nowrap;
+  max-width: 15em;
+  overflow-x: auto;
+}
+.DatasetView.content #tablePreview td::-webkit-scrollbar {
+  height: 5px;
+}
+.DatasetView.content #tablePreview tbody tr:nth-child(odd) {
+  background: #cccccc;
 }
 
 .DatasetView.content .overview {
