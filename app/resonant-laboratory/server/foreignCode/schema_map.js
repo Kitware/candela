@@ -6,7 +6,7 @@ function map () { // eslint-disable-line no-unused-vars
     var value = keys[key];
     var counters = {};
 
-    /** First determine and count the value's native type **/
+    /** First determine and count the value's "native" type **/
     var nativeType = typeof value;
     if (nativeType === 'number') {
       if (Math.floor(value) === value) {
@@ -66,8 +66,29 @@ function map () { // eslint-disable-line no-unused-vars
       }
     }
     if (nativeType !== 'date') {
-      var dateValue = new Date(value);
-      if (!isNaN(dateValue)) {
+      var dateValue;
+      // TODO: smarter date guessing like the stuff below
+      // (will need similar logic in schema/histogram_map.js, and
+      // in models/Project.js where it coerces values)
+
+      /* if (nativeType === 'integer') {
+        var digits = Math.log10(value);
+        if (value > 999 && value < 3000) {
+          // An integer with the above range could well be a year
+          dateValue = new Date(value, 0, 0);
+        } else if (digits >= 9 && digits <= 15) {
+          // Most millisecond date values should be between 9 and 15 digits
+          // (this will miss some dates in 1969/1970, and beyond 5000AD and 1000BC)
+          dateValue = new Date(value);
+        }
+      } else if (nativeType === 'string') {
+        // Try to convert from a string
+        dateValue = new Date(value);
+      } */
+
+      dateValue = new Date(value);
+
+      if (dateValue && !isNaN(dateValue)) {
         // this value can be coerced into a date (and isn't already one)
         counters['date'] = {
           count: 1,
@@ -77,7 +98,9 @@ function map () { // eslint-disable-line no-unused-vars
       }
     }
     if (nativeType !== 'boolean') {
-      // anything can be coerced into a boolean
+      // anything can be coerced into a boolean using
+      // !!value... we'll do fancier things on the
+      // client side when we have histograms of the values
       counters['boolean'] = {
         count: 1
       };

@@ -11,16 +11,12 @@ let DEFAULT_INTERPRETATIONS = {
   object: 'ignore'
 };
 
-let ATTRIBUTE_GENERALITY = {
-  'undefined': 0,
-  'null': 1,
-  'boolean': 2,
-  'date': 2,
-  'integer': 3,
-  'number': 4,
-  'string': 5,
-  'object': 6
-};
+let ATTRIBUTE_GENERALITY = [
+  'object',
+  'string',
+  'number',
+  'integer'
+];
 
 class DatasetCache {
   constructor (model) {
@@ -74,7 +70,7 @@ class DatasetCache {
       this._cachedPromises.filteredHistogram.then(filteredHistogram => {
         let maxItems = filteredHistogram.__passedFilters__[0].count;
         if (value.offset + value.limit > maxItems) {
-          value.offset = maxItems - (value.limit - value.offset);
+          value.offset = maxItems - value.limit;
           value.limit = maxItems - value.offset;
         }
         value.offset = Math.max(value.offset, 0);
@@ -250,24 +246,19 @@ let Dataset = MetadataItem.extend({
       // The user has specified a data type
       return attrSpec.coerceToType;
     } else {
-      // The user hasn't specified a type; go with the
-      // most frequently observed native type in the dataset
-      let attrType = 'undefined';
-      let encounteredNative = false;
-      Object.keys(attrSpec).forEach(dataType => {
-        if (encounteredNative === false && attrSpec[dataType].native === true) {
-          // No matter what, keep a native value over a non-native one
+      // The user hasn't specified a type; find the most specific
+      // type that can accomodate all the values
+      let attrType = 'object';
+      let count = 0;
+      for (let dataType of ATTRIBUTE_GENERALITY) {
+        if (dataType in attrSpec && attrSpec[dataType].count >= count) {
           attrType = dataType;
-          encounteredNative = true;
+          count = attrSpec[dataType].count;
         }
-        if (ATTRIBUTE_GENERALITY[dataType] > ATTRIBUTE_GENERALITY[attrType]) {
-          // Update if we haven't encountered a native value, or if
-          // this type is also native
-          if (encounteredNative === false || attrSpec[dataType].native === true) {
-            attrType = dataType;
-          }
-        }
-      });
+      }
+      // TODO: if the histograms are available, use them to infer
+      // whether to jump further into booleans (e.g. everything is
+      // 0/1, y/n, true/false, etc)
       return attrType;
     }
   },

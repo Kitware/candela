@@ -75,6 +75,8 @@ function findBin (attrName, value) {
   } else if (coerceToType === 'string') {
     value = String(value);
   } else if (coerceToType === 'date') {
+    // TODO: add fancier coercion logic (see
+    // server/schema_map.js)
     value = new Date(value);
   } else {
     // coerceToType is 'object' or some other kind of passthrough.

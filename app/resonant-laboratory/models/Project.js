@@ -37,6 +37,8 @@ let Project = MetadataItem.extend({
       location: null
     };
 
+    this.visDatasetPromises = {};
+
     this.listenTo(window.mainPage.currentUser, 'rl:login',
       this.fetch);
     this.listenTo(window.mainPage.currentUser, 'rl:logout',
@@ -65,6 +67,8 @@ let Project = MetadataItem.extend({
     });
     this.listenTo(window.mainPage.widgetPanels, 'rl:navigateWidgets',
       this.storePreferredWidgets);
+    this.listenTo(this, 'rl:changeDatasets', this.clearCoercedData);
+    this.listenTo(this, 'rl:changeMatchings', this.clearCoercedData);
   },
   create: function () {
     let createPromise = MetadataItem.prototype.create.apply(this, arguments);
@@ -242,13 +246,15 @@ let Project = MetadataItem.extend({
     }
   },
   updateDatasetPage: Underscore.debounce(function (datasetObj) {
+    // Store the new page and filter info in the project metadata
     let datasets = this.getMeta('datasets');
     let dataSpec = datasets.find(d => d.dataset === datasetObj.getId());
     dataSpec.page = datasetObj.cache.page;
     dataSpec.filter = datasetObj.cache.filter;
-    this.trigger('rl:changeDatasets');
     this.setMeta('datasets', datasets);
     this.save();
+    // Forward the event at the project level
+    this.trigger('rl:changeDatasets');
   }, 50),
   setDataset: function (newDatasetId, index = 0) {
     let datasets = this.getMeta('datasets');
@@ -298,6 +304,7 @@ let Project = MetadataItem.extend({
     if (index >= visualizations.length) {
       visualizations.push(newVisualizatoinDetails);
     } else {
+      delete this.visDatasetPromises[index];
       visualizations[index] = newVisualizatoinDetails;
     }
     this.setMeta('visualizations', visualizations);
@@ -340,7 +347,16 @@ let Project = MetadataItem.extend({
     // Copy the non-field options that are stored in the metadata
     return Object.assign({}, this.getAssignedVisFields(index), visDetails.options || {});
   },
+  clearCoercedData: function () {
+    // Invalidate our coerced dataset caches (TODO: may not
+    // be necessary to invalidate all of them)
+    this.visDatasetPromises = {};
+  },
   shapeDataForVis: function (index = 0) {
+    if (index in this.visDatasetPromises) {
+      return this.visDatasetPromises[index];
+    }
+
     let meta = this.getMeta();
     if (meta.datasets.length <= index) {
       // The indicated dataset isn't loaded yet...
@@ -348,14 +364,54 @@ let Project = MetadataItem.extend({
       return Promise.resolve([]);
     }
 
-    let datasetId = meta.datasets[0].dataset;
+    let datasetObj = window.mainPage.loadedDatasets[meta.datasets[0].dataset];
     // TODO: when candela supports multiple datasets, include
     // all the datasets that the visualization connects to
-    // TODO: potential optimization: use the set of relevant fields
-    // to retrieve less data in the call to dataset/getData in
-    // Dataset.fetch()
-    // TODO: coerce values
-    return window.mainPage.loadedDatasets[datasetId].cache.currentDataPage;
+
+    this.visDatasetPromises[index] = datasetObj.cache.schema.then(schema => {
+      // Collect the attributes that are in use in this dataset,
+      // and figure out what we're coercing those attributes to
+      let fieldsInUse = {};
+      meta.matchings.forEach(matching => {
+        if (matching.visIndex === index && matching.dataIndex === 0) {
+          fieldsInUse[matching.dataAttribute] = datasetObj
+            .inferAttributeType(schema, matching.dataAttribute);
+        }
+      });
+
+      return datasetObj.cache.currentDataPage.then(data => {
+        let coercedData = [];
+        data.forEach(item => {
+          let newItem = {};
+          Object.keys(item).forEach(attrName => {
+            if (attrName in fieldsInUse) {
+              if (fieldsInUse[attrName] === 'object') {
+                newItem[attrName] = item[attrName];
+              } else if (fieldsInUse[attrName] === 'string') {
+                newItem[attrName] = String(item[attrName]);
+              } else if (fieldsInUse[attrName] === 'number') {
+                newItem[attrName] = parseFloat(item[attrName]);
+              } else if (fieldsInUse[attrName] === 'integer') {
+                newItem[attrName] = parseInt(item[attrName]);
+              } else if (fieldsInUse[attrName] === 'date') {
+                // TODO: add fancier coercion logic (see
+                // server/schema_map.js)
+                newItem[attrName] = new Date(item[attrName]);
+              } else if (fieldsInUse[attrName] === 'boolean') {
+                newItem[attrName] = !!item[attrName];
+              } else if (fieldsInUse[attrName] === 'null') {
+                newItem[attrName] = item[attrName] !== undefined ? null : undefined;
+              } else if (fieldsInUse[attrName] === 'undefined') {
+                newItem[attrName] = undefined;
+              }
+            }
+          });
+          coercedData.push(newItem);
+        });
+        return coercedData;
+      });
+    });
+    return this.visDatasetPromises[index];
   },
   updateDataSpec: function () {
     return this.validateMatchings().then(() => {
