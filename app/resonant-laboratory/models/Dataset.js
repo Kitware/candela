@@ -179,14 +179,15 @@ class DatasetCache {
     if (!this.cachedPromises.currentDataPage) {
       this.cachedPromises.currentDataPage = this.schema.then(schema => {
         return this.restRequest({
-          path: 'dataset/getData',
+          path: 'download',
           type: 'GET',
           data: {
-            filter: this.filter,
-            limit: this.page.limit,
-            offset: this.page.offset
-            // TODO: optimization: supply the fields option based on which
-            // fields are actually in use in the visualization
+            extraParameters: JSON.stringify({
+              fileType: this.model.getMeta('format'),
+              outputType: 'json',
+              offset: this.page.offset,
+              limit: this.page.limit
+            })
           }
         }, 'rl:loadedData');
       });
