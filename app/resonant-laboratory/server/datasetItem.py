@@ -65,13 +65,6 @@ class DatasetItem(Resource):
             self.foreignCode[filename] = infile.read()
             infile.close()
 
-        # For each of our mapreduce operations on flat files, we can reasonably
-        # xpect three buffers to be in use at once:
-        # one for the file's raw data, one for the list of parsed objects,
-        # and one to hold the reduced results. For now, this is small for
-        # testing purposes
-        self.bufferSize = 131072   # 128K
-
         self.sniffSampleSize = 131072    # 128K
 
     def getMongoCollection(self, item):
@@ -79,10 +72,11 @@ class DatasetItem(Resource):
         conn = MongoClient(dbMetadata['url'])
         return conn[dbMetadata['database']][dbMetadata['collection']]
 
-    def mongoMapReduce(self, item, mapScript, reduceScript, filters={}, fields={}):
+    def mongoMapReduce(self, item, user, mapScript, reduceScript, params={}):
         collection = self.getMongoCollection(item)
-        # TODO: convert the filters argument to a mongo-style query, and
-        # pass it in as the query parameter
+        # TODO: build a mongo query from params['filter'] and params['offset']
+        # and then do this:
+        # mr_result = collection.inline_map_reduce(item, mapScript, reduceScript, limit=params['limit'], query=filter)
         mr_result = collection.inline_map_reduce(mapScript, reduceScript)
         # rearrange into a neater dict before sending it back
         result = {}
@@ -93,80 +87,45 @@ class DatasetItem(Resource):
             result[r['_id']] = r['value']
         return result
 
-    def bufferedDownloadLineReader(self, fileId, user, lineterminator="\r\n", filters={}, fields={}):
-        # TODO: @ronichoudhury is implementing something cool
-        # that will make this function obsolete
-        lineterminator = re.compile('[' + lineterminator + ']')
-        fileObj = self.model('file').load(fileId, user=user)
-        # TODO: This is my ignorance of Girder... how exactly do we
-        # call download directly?
-        # TODO: only grab a few lines at a time instead of
-        # dumping the whole thing at once
-        # TODO: apply the filters and fields parameters to
-        # limit how much data we actually pull out
-        chunk = functools.partial(self.model('file').download,
-                                  fileObj,
-                                  headers=False,
-                                  endByte=None)()
-        chunk = str(chunk().next())
-        chunk = lineterminator.split(chunk)
-        for line in chunk:
-            yield line
-
-    def bufferedDownloadItemReader(self, fileId, user, jsonPath='$', filters={}, fields={}):
-        # TODO: @ronichoudhury is implementing something cool
-        # that will make this function obsolete
-        fileObj = self.model('file').load(fileId, user=user)
-        # TODO: This is my ignorance of Girder... how exactly do we
-        # call download directly?
-        # TODO: only grab a few lines at a time instead of
-        # dumping the whole thing at once
-        # TODO: apply the filters and fields parameters to
-        # limit how much data we actually pull out
-        chunk = functools.partial(self.model('file').download,
-                                  fileObj,
-                                  headers=False,
-                                  endByte=None)()
-        chunk = str(chunk().next())
-        # TODO: Use the jsonPath argument to
-        # point to the appropriate part of the file
-        chunk = bson.json_util.loads(chunk)
-        for line in chunk:
-            yield line
-
-    def getStringifiedDialect(self, item):
-        dialect = item['meta']['rlab']['dialect']
-        for key, value in dialect.iteritems():
-            if type(value) is unicode:
-                dialect[key] = str(value)
-        return dialect
-
-    def flatFileMapReduce(self, item, user, mapScript, reduceScript):
+    def mapReduceViaDownload(self, item, user, mapScript, reduceScript, params={}):
         # TODO: This is an incredibly naive, single-threaded implementation.
-        # It shouldn't be hard to rewrite this to use multiple threads...
-        # (though, to be fair, the user shouldn't be using big flat files
-        # in the first place)
+        # Potential optimizations:
+
+        # 1. One major bottleneck is shuffling text to and from the javascript
+        # engine via PyExecJS. For testing purposes, bufferSize is small;
+        # larger values might be more performant, depending on how much
+        # memory you want to use.
+        bufferSize = 131072   # 128K
+
+        # 2. Of course, you could bypass this problem entirely if you rewrite
+        # the MapReduce code in Python (then you'll have the problem of
+        # duplicate code).
+
+        # 3. To be fair, if the data is large enough to matter, the user should
+        # be using one of our supported databases instead (i.e. a database
+        # that can run our schema inference / histogram mapReduce code directly).
+        # Probably the best option of the three would be to avoid calling
+        # this function in the first place
+
         mapReduceCode = execjs.compile(mapScript + reduceScript +
                                        self.foreignCode['mapReduceChunk.js'])
-        fileFormat = item['meta']['rlab']['format']
-        reader = None
-        if fileFormat == 'csv':
-            dialect = self.getStringifiedDialect(item)
-            csv.register_dialect(item['name'], **dialect)
-            lineReader = self.bufferedDownloadLineReader(item['meta']['rlab']['fileId'], user,
-                                                         dialect['lineterminator'])
-            reader = csv.DictReader(lineReader, dialect=item['name'])
-        elif fileFormat == 'json':
-            reader = self.bufferedDownloadItemReader(item['meta']['rlab']['fileId'], user, '$')
-        else:
-            raise RestException('Unrecognized file type: ' + fileFormat)
 
+        extraParameters = bson.json_util.dumps({
+            'limit': params.get('limit', 0),
+            'offset': params.get('offset', 0),
+            'fileType': item['meta']['rlab']['format'],
+            'outputType': 'json'
+            # TODO: add a filter parameter as well
+        })
+
+        fileObj = self.model('file').load(item['meta']['rlab']['fileId'], user=user)
+        stream = self.model('file').download(fileObj, headers=False, extraParameters=extraParameters)
         rawData = []
         reducedResult = {}
 
-        for line in reader:
-            rawData.append(line)
-            if sys.getsizeof(rawData) >= self.bufferSize:
+        for line in stream():
+            rawData.append(bson.json_util.loads(line))
+            if sys.getsizeof(rawData) >= bufferSize:
                 reducedResult = mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
                 rawData = []
         # last chunk
@@ -304,18 +263,22 @@ class DatasetItem(Resource):
         mapScript = self.foreignCode['schema_map.js']
         reduceScript = self.foreignCode['schema_reduce.js']
 
+        # TODO: When girder_db_items changes, find a new way to sneak
+        # in to the item's native database (mapReduceViaDownload is VERY
+        # sub-optimal!)
         if 'databaseMetadata' in item:
             if item['databaseMetadata']['type'] == 'mongo':
-                schema = self.mongoMapReduce(item, mapScript, reduceScript)
+                schema = self.mongoMapReduce(item, user, mapScript, reduceScript)
             else:
                 raise RestException('MapReduce for ' +
                                     item['databaseMetadata']['type'] +
                                     ' databases is not yet supported')
         else:
-            schema = self.flatFileMapReduce(item, user, mapScript, reduceScript)
+            schema = self.mapReduceViaDownload(item, user, mapScript, reduceScript)
 
         # We want to preserve any explicit user coerceToType or interpretation settings
-        # thay may have existed in the previous schema
+        # thay may have existed in the previous schema (if they exist, they were
+        # explicitly set by the user)
         existingSchema = item['meta']['rlab'].get('schema', {})
         for attrName in schema.iterkeys():
             if attrName in existingSchema:
@@ -398,7 +361,7 @@ class DatasetItem(Resource):
 
         # Populate params with default settings
         # where settings haven't been specified
-        params['filter'] = bson.json_util.loads(params.get('filter', 'true'))
+        params['filter'] = params.get('filter', None)
         params['limit'] = params.get('limit', 50)
         params['offset'] = params.get('offset', 0)
 
@@ -468,7 +431,7 @@ class DatasetItem(Resource):
                 binSettings[attrName]['lowBound'] = lowBound
                 binSettings[attrName]['highBound'] = highBound
             else:
-                # TODO: if there are cached categorical bins (from a first,
+                # TODO: if there are cached categorical bins (from a first
                 # pass with uncertainty in the results), populate this list with those
                 # known categorical values for the second pass
                 binSettings[attrName]['humanBins'] = []
@@ -499,18 +462,18 @@ class DatasetItem(Resource):
             self.foreignCode['histogram_reduce.js'] + '\n' + \
             'return {histogram: histogram};\n}'
 
+        # TODO: When girder_db_items changes, find a new way to sneak
+        # in to the item's native database (mapReduceViaDownload is VERY
+        # sub-optimal!)
         if 'databaseMetadata' in item:
             if item['databaseMetadata']['type'] == 'mongo':
-                # TODO: instead of filtering inside the mapReduce code,
-                # convert params['filter'] to a mongo query and do this:
-                # histogram = self.mongoMapReduce(item, mapScript, reduceScript, query=query)
-                histogram = self.mongoMapReduce(item, mapScript, reduceScript)
+                histogram = self.mongoMapReduce(item, user, mapScript, reduceScript, params)
             else:
                 raise RestException('MapReduce for ' +
                                     item['databaseMetadata']['type'] +
                                     ' databases is not yet supported')
         else:
-            histogram = self.flatFileMapReduce(item, user, mapScript, reduceScript)
+            histogram = self.mapReduceViaDownload(item, user, mapScript, reduceScript, params)
 
         # We have to clean up the histogram wrappers (mongodb can't return
         # an array from reduce functions). While we're at it, add the
@@ -529,61 +492,3 @@ class DatasetItem(Resource):
             item['meta']['rlab']['histogramCaches'][paramsMD5] = histogram
             self.model('item').updateItem(item)
         return histogram
-
-    @access.public
-    @loadmodel(model='item', level=AccessType.READ)
-    @describeRoute(
-        Description('Filter the data in the item. Returns data formatted as a JSON list of dicts')
-        .param('id', 'The ID of the item.', paramType='path')
-        .param('limit', 'Result set size limit (default=50).',
-               required=False, dataType='int')
-        .param('offset', 'Offset into result set (default=0).',
-               required=False, dataType='int')
-        .param('fields', 'A comma-separated or JSON list of fields (column '
-               'names) to return (default is all fields).  If a JSON list is '
-               'used, instead of a plain string, a field may be a dictionary '
-               'with a function definition and an optional "reference" entry '
-               'which is used to identify the resultant column.',
-               required=False)
-        .param('filter', 'Get the pages of data after the results of this filter. ' +
-               'TODO: describe our filter grammar.', required=False)
-        .errorResponse()
-    )
-    def getData(self, item, params):
-        # TODO: For now I just dump all the unfiltered results
-        # (need to implement the filtering for flat files AND
-        # convert for the database)
-        if 'filter' in params:
-            del params['filter']
-
-        # TODO: I also ignore the fields parameter for now
-        if 'fields' in params:
-            del params['fields']
-
-        params['limit'] = int(params.get('limit', 50))
-        params['offset'] = int(params.get('offset', 0))
-
-        if 'databaseMetadata' in item:
-            params['format'] = 'dict'
-
-            selectResult = self.databaseItemResource.databaseSelect(id=item['_id'], params=params)
-            return bson.json_util.loads(list(selectResult())[0])['data']
-        else:
-            fileFormat = item['meta']['rlab']['format']
-            if fileFormat == 'csv':
-                dialect = self.getStringifiedDialect(item)
-                csv.register_dialect(item['name'], **dialect)
-                lineReader = self.bufferedDownloadLineReader(item['meta']['rlab']['fileId'],
-                                                             self.getCurrentUser(),
-                                                             dialect['lineterminator'])
-                reader = csv.DictReader(lineReader, dialect=item['name'])
-            elif fileFormat == 'json':
-                reader = self.bufferedDownloadItemReader(item['meta']['rlab']['fileId'],
-                                                         self.getCurrentUser(),
-                                                         '$')
-            else:
-                raise RestException('Unrecognized file type: ' + fileFormat)
-
-            # Just slice a page... obviously we'll do something fancier in the future
-            resultReader = itertools.islice(reader, params['offset'], params['offset'] + params['limit'])
-            return [line for line in resultReader]

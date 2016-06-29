@@ -151,7 +151,8 @@ def semantic_access(Cls):
                 raise GirderException('"outputType" must be one of: %s' % (', '.join(allowed_outputtypes)), '%s.illegal-argument' % (module))
 
             # Set content-length header to zero and clear content-range.
-            del cherrypy.response.headers['Content-Length']
+            if 'Content-Length' in cherrypy.response.headers:
+                del cherrypy.response.headers['Content-Length']
             if 'Content-Range' in cherrypy.response.headers:
                 del cherrypy.response.headers['Content-Range']
 

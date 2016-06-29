@@ -76,8 +76,6 @@ def load(info):
                                app.datasetItem.inferSchema)
     info['apiRoot'].item.route('POST', (':id', 'dataset', 'getHistograms'),
                                app.datasetItem.getHistograms)
-    info['apiRoot'].item.route('GET', (':id', 'dataset', 'getData'),
-                               app.datasetItem.getData)
 
     # Expose project endpoint
     info['apiRoot'].item.route('POST', (':id', 'project'),

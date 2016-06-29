@@ -7,54 +7,6 @@
 // function map () {
 //  var params = {...}
 
-function filterRow (dataRow, expression) {
-  // TODO: this is NOT the place to do row filtering!
-  // We *should* let mongo handle the filtering, or
-  // do the filtering in the assetstore...?
-  if (expression === undefined) {
-    expression = params['filter'];
-  }
-  var expType = typeof expression;
-  if (expType === 'string') {
-    if (dataRow.hasOwnProperty(expression)) {
-      return dataRow[expression];
-    } else {
-      return expression;
-    }
-  } else if (expType === 'object' &&
-             (expression.left !== undefined) &&
-             (expression.operator !== undefined) &&
-             (expression.right !== undefined)) {
-    var left = filterRow(dataRow, expression.left);
-    var right = filterRow(dataRow, expression.right);
-    if (expression.operator === 'eq') {
-      return left === right; // || (isNaN(left) && isNaN(right));
-    } else if (expression.operator === 'ne') {
-      return left !== right; // && !(isNaN(left) && isNaN(right));
-    } else if (expression.operator === 'lt') {
-      return left < right;
-    } else if (expression.operator === 'lte') {
-      return left <= right;
-    } else if (expression.operator === 'gt') {
-      return left > right;
-    } else if (expression.operator === 'gte') {
-      return left >= right;
-    } else if (expression.operator === 'in') {
-      return right.indexOf(left) !== -1;
-    } else if (expression.operator === 'notin') {
-      return right.indexOf(left) === -1;
-    } else if (expression.operator === 'and') {
-      return left && right;
-    } else if (expression.operator === 'or') {
-      return left || right;
-    } else {
-      throw new Error('Unknown operator: ' + expression.operator);
-    }
-  } else {
-    return expression;
-  }
-}
-
 function findBin (attrName, value) {
   var coerceToType = params.binSettings[attrName].coerceToType;
   var interpretation = params.binSettings[attrName].interpretation;
@@ -125,30 +77,28 @@ function findBin (attrName, value) {
 }
 
 var dataRow = this;
-if (filterRow(dataRow)) {
-  emit('__passedFilters__', {
-    histogram: [{
-      count: 1,
-      label: 'count'
-    }]
-  });
-  var attrName;
-  for (attrName in dataRow) {
-    if (dataRow.hasOwnProperty(attrName)) {
-      var value = dataRow[attrName];
-      // This is a funky way to wrap up the histogram...
-      // the outer layer has to do with the fact that mongodb
-      // reduce functions can't output an array. The array, of course,
-      // is an ordered list of bins... in the map case, there's only
-      // one bin to emit. The object inside is the way bins are returned
-      // in the output.
-      emit(attrName, {
-        histogram: [{
-          count: 1,
-          label: findBin(attrName, value)
-        }]
-      });
-    }
+emit('__passedFilters__', {
+  histogram: [{
+    count: 1,
+    label: 'count'
+  }]
+});
+var attrName;
+for (attrName in dataRow) {
+  if (dataRow.hasOwnProperty(attrName)) {
+    var value = dataRow[attrName];
+    // This is a funky way to wrap up the histogram...
+    // the outer layer has to do with the fact that mongodb
+    // reduce functions can't output an array. The array, of course,
+    // is an ordered list of bins... in the map case, there's only
+    // one bin to emit. The object inside is the way bins are returned
+    // in the output.
+    emit(attrName, {
+      histogram: [{
+        count: 1,
+        label: findBin(attrName, value)
+      }]
+    });
   }
 }
 
