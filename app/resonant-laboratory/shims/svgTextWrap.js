@@ -7,7 +7,7 @@
   nested elements across lines).
 */
 
-import d3 from 'd3';
+// import d3 from 'd3';
 
 function newTspan (textElement) {
   let newTspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
@@ -72,7 +72,7 @@ export default function rewrap (textElement, pxWidth, emLeading) {
     let length = currentTspan.getComputedTextLength();
 
     // Has it exceeded the space that we allow?
-    if (length > pxWidth) {
+    if (length > pxWidth && index > 0) {
       // Revert to the text we had before
       textElement.removeChild(currentTspan);
       textElement.appendChild(tempCopy);
@@ -89,7 +89,34 @@ export default function rewrap (textElement, pxWidth, emLeading) {
   });
 
   // Second pass: line up each row appropriately
-  d3.select(textElement).selectAll('tspan.rewrappedTspan')
+  textElement.childNodes.forEach((tspan, index) => {
+    if (index === 0) {
+      // Don't move the first line anywhere
+      tspan.setAttribute('dx', '0px');
+      tspan.setAttribute('dy', '0em');
+    } else {
+      tspan.setAttribute('dy', emLeading + 'em');
+      let dx = 0;
+      if (textAnchor === 'start') {
+        // scoot the line back the
+        // length of the previous line
+        dx = -lineLengths[index - 1];
+      } else if (textAnchor === 'middle') {
+        // scoot the line back half the
+        // length of the previous line,
+        // as well as half the length of
+        // the current line
+        dx = -(lineLengths[index - 1] +
+        lineLengths[index]) / 2;
+      } else { // textAnchor === 'end'
+        // scoot the line back the length
+        // of the current line
+        dx = -lineLengths[index];
+      }
+      tspan.setAttribute('dx', dx + 'px');
+    }
+  });
+  /* d3.select(textElement).selectAll('tspan.rewrappedTspan')
     // Apply the leading
     .attr('dy', emLeading + 'em')
     // Align horizontally
@@ -113,5 +140,5 @@ export default function rewrap (textElement, pxWidth, emLeading) {
         // of the current line
         return -lineLengths[index];
       }
-    });
+    });*/
 }

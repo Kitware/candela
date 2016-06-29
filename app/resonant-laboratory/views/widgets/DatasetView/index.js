@@ -10,13 +10,19 @@ import seekPrev from '../../../images/seekPrev.svg';
 import seekNext from '../../../images/seekNext.svg';
 import seekLast from '../../../images/seekLast.svg';
 import pageSettings from '../../../images/gear.svg';
+import tablePreviewIcon from '../../../images/table.svg';
+import tableSwitchIcon from '../../../images/switch.svg';
+import histogramPreviewIcon from '../../../images/histogram.svg';
 
 let ICONS = {
   seekFirst,
   seekPrev,
   seekNext,
   seekLast,
-  pageSettings
+  pageSettings,
+  tablePreviewIcon,
+  tableSwitchIcon,
+  histogramPreviewIcon
 };
 
 let STATUS = {
@@ -92,21 +98,6 @@ let DatasetView = Widget.extend({
       window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to <a>edit</a> or <a>reshape</a> the data in order to use it.');
     }
   },
-  attachSeekListeners: function (datasetObj) {
-    this.$el.find('#pagingButtons image.button').off('click');
-    this.$el.find('#seekFirst').on('click', () => {
-      datasetObj.seekFirst();
-    });
-    this.$el.find('#seekPrev').on('click', () => {
-      datasetObj.seekPrev();
-    });
-    this.$el.find('#seekNext').on('click', () => {
-      datasetObj.seekNext();
-    });
-    this.$el.find('#seekLast').on('click', () => {
-      datasetObj.seekLast();
-    });
-  },
   renderEmptyState: function () {
     this.$el.find('#datasetOverview, #tablePreview, #histogramPreview').hide();
     this.$el.find('#emptyDatasetState').show();
@@ -154,19 +145,34 @@ let DatasetView = Widget.extend({
     pieSlices.attr('d', arc)
       .attr('class', d => d.slice + ' pieSlice');
   },
-  renderPagingTools: function (filteredCount, pageOffset, pageCount, bounds) {
-    // Align the buttons
+  renderPagingTools: function (datasetObj, filteredCount, pageOffset, pageCount, width) {
+    // Align the paging buttons to the center
     this.$el.find('#pagingButtons')
-      .attr('transform', 'translate(' + (bounds.width / 2) + ',0)');
+      .attr('transform', 'translate(' + width / 2 + ',0)');
 
-    // Align the bars
+    // Attach their event listeners
+    this.$el.find('#pagingButtons image.button').off('click');
+    this.$el.find('#seekFirst').on('click', () => {
+      datasetObj.seekFirst();
+    });
+    this.$el.find('#seekPrev').on('click', () => {
+      datasetObj.seekPrev();
+    });
+    this.$el.find('#seekNext').on('click', () => {
+      datasetObj.seekNext();
+    });
+    this.$el.find('#seekLast').on('click', () => {
+      datasetObj.seekLast();
+    });
+
+    // Align the paging bar group
     this.$el.find('#pagingBars')
       .attr('transform', 'translate(0,' + (2 * this.layout.emSize) + ')');
 
     // Scale for the bars
-    let xScale = d3.scale.linear()
+    let pageScale = d3.scale.linear()
       .domain([0, filteredCount])
-      .range([0, bounds.width]);
+      .range([0, width]);
 
     // Now draw the bars indicating the size and location of
     // the page within the current filtered set
@@ -185,24 +191,12 @@ let DatasetView = Widget.extend({
     let bars = d3.select(this.el).select('#pagingBars').selectAll('rect.bar')
       .data(barData, d => d.segment);
     bars.enter().append('rect');
-    bars.attr('x', d => xScale(d.start))
-      .attr('width', d => xScale(d.count + d.start) - xScale(d.start))
+    bars.attr('x', d => pageScale(d.start))
+      .attr('width', d => pageScale(d.count + d.start) - pageScale(d.start))
       .attr('height', this.layout.emSize)
       .attr('class', d => d.segment + ' bar');
   },
   renderOverview: function (datasetDetails) {
-    let bounds = this.el.getBoundingClientRect();
-    // TODO: determine the height based on the contents
-    bounds = {
-      width: bounds.width - 2 * this.layout.emSize,
-      height: 6 * this.layout.emSize
-    };
-    d3.select(this.el).select('svg')
-      .attr({
-        width: bounds.width,
-        height: bounds.height
-      });
-
     let overviewCount = datasetDetails.overviewHistogram.__passedFilters__[0].count;
     let filteredCount = datasetDetails.filteredHistogram.__passedFilters__[0].count;
     let pageOffset = datasetDetails.datasetObj.cache.page.offset;
@@ -210,6 +204,54 @@ let DatasetView = Widget.extend({
 
     let hasFilters = filteredCount < overviewCount;
     let hasPaging = pageCount < filteredCount;
+
+    // How much horizontal space do we have (factor in padding)?
+    let width = this.el.getBoundingClientRect().width -
+      2 * this.layout.emSize;
+
+    // We start by assuming we are going to be 6ems tall
+    let height = 6 * this.layout.emSize;
+
+    // Move the preview switch to the right
+    this.$el.find('#previewSwitch').attr('transform',
+      'translate(' + (width - this.layout.emSize) + ',' +
+      3 * this.layout.emSize + ')');
+    let switchOffset = 2 * this.layout.emSize;
+
+    // Flip the switch appropriately
+    d3.select(this.el).select('#tableSwitchIcon')
+      .attr('transform', this.showTable ? 'scale(1,-1)' : null);
+
+    // Attach the switch event listeners
+    this.$el.find('#previewSwitch image.button').off('click');
+    this.$el.find('#histogramPreviewIcon').on('click', () => {
+      this.showTable = false;
+      this.render();
+    });
+    this.$el.find('#tableSwitchIcon').on('click', () => {
+      this.showTable = !this.showTable;
+      this.render();
+    });
+    this.$el.find('#tablePreviewIcon').on('click', () => {
+      this.showTable = true;
+      this.render();
+    });
+
+    // Show + render, or hide the filter pie on the left
+    let pieOffset;
+    if (hasFilters) {
+      this.$el.find('#filterPie').show();
+      this.renderFilterPie(overviewCount, filteredCount,
+        pageOffset, pageCount, 3 * this.layout.emSize);
+      pieOffset = 7 * this.layout.emSize;
+    } else {
+      this.$el.find('#filterPie').hide();
+      pieOffset = 0;
+    }
+
+    // Render the paging tools with the space that we have left
+    this.renderPagingTools(datasetDetails.datasetObj, filteredCount,
+      pageOffset, pageCount, width - pieOffset - switchOffset);
 
     // Show the relevant explanatory label
     this.$el.find('#labels > text').hide();
@@ -226,7 +268,7 @@ let DatasetView = Widget.extend({
     labelElement.show();
     let d3Element = d3.select(labelElement[0]);
 
-    // Update the values in the text
+    // Update the values in the label
     d3Element.selectAll('tspan.overview')
       .text(overviewCount);
     d3Element.selectAll('tspan.filtered')
@@ -240,40 +282,36 @@ let DatasetView = Widget.extend({
         .text(pageCount);
     }
 
-    // Reflow and position the text
-    rewrap(labelElement[0], bounds.width);
-    let textHeight = labelElement[0].getBoundingClientRect().height +
-      this.layout.emSize;
-    d3Element.attr('transform', 'translate(0,' +
-      (bounds.height - textHeight + this.layout.emSize * 0.5) + ')');
-
-    // Show + render, or hide the filter pie
-    let pagingOffset;
-    if (hasFilters) {
-      let pieSize = bounds.height - textHeight;
-      this.$el.find('#filterPie').show();
-      this.renderFilterPie(overviewCount, filteredCount,
-        pageOffset, pageCount, pieSize / 2);
-      pagingOffset = pieSize + this.layout.emSize;
+    // Attempt to fit the label in the 3em of space between
+    // the pie and the switch, below the paging buttons + bar
+    rewrap(labelElement[0], width - switchOffset - pieOffset);
+    let textHeight = labelElement[0].getBoundingClientRect().height;
+    if (textHeight <= 3 * this.layout.emSize) {
+      // Cool - we fit! Move the text where it belongs
+      d3Element.attr('transform', 'translate(' + pieOffset + ',' +
+        4.5 * this.layout.emSize + ')');
+      // Position the paging tools right at the top
+      d3.select('#paging').attr('transform',
+        'translate(' + pieOffset + ',0)');
     } else {
-      this.$el.find('#filterPie').hide();
-      pagingOffset = 0;
+      // There isn't enough space, so reflow the text below everything,
+      // and boost our total height
+      rewrap(labelElement[0], width);
+      d3Element.attr('transform', 'translate(0,' +
+        7.5 * this.layout.emSize + ')');
+      textHeight = labelElement[0].getBoundingClientRect().height;
+      height += textHeight + this.layout.emSize;
+      // Position the paging tools in the middle
+      d3.select('#paging').attr('transform', 'translate(' + pieOffset + ',' +
+        (1.5 * this.layout.emSize) + ')');
     }
 
-    // Show + render, or hide the paging bars and buttons
-    if (hasPaging) {
-      this.$el.find('#paging').show();
-      d3.select('#paging').attr('transform', 'translate(' + pagingOffset + ',' +
-        (bounds.height - textHeight - 3 * this.layout.emSize) / 2 + ')');
-      this.renderPagingTools(filteredCount, pageOffset, pageCount, {
-        width: bounds.width - pagingOffset,
-        height: bounds.height - textHeight
+    // Set the SVG element to the size that we've discovered
+    d3.select(this.el).select('svg')
+      .attr({
+        width: width,
+        height: height
       });
-      // Attach the listeners
-      this.attachSeekListeners(datasetDetails.datasetObj);
-    } else {
-      this.$el.find('#paging').hide();
-    }
   },
   renderHistograms: function (datasetDetails) {
     this.$el.find('#emptyDatasetState, #tablePreview').hide();

@@ -5,9 +5,8 @@
 
 .DatasetView.content #datasetOverview {
   width: calc(100% - 2em);
-  height: 8em;
   font-weight: 900;
-  padding: 1em;
+  padding: 1em 1em 0em 1em;
 }
 .DatasetView.content image.button:hover {
   cursor: pointer;
@@ -34,6 +33,7 @@
 }
 .DatasetView.content #tablePreview table {
   font-family: Courier, monospace;
+  font-size: 0.75em;
   -ms-user-select: initial;
   -moz-user-select: initial;
   -webkit-user-select: initial;
