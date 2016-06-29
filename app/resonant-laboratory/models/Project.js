@@ -1,3 +1,4 @@
+import Underscore from 'underscore';
 import MetadataItem from './MetadataItem';
 import Dataset from './Dataset';
 import promiseDebounce from '../shims/promiseDebounce.js';
@@ -125,6 +126,9 @@ let Project = MetadataItem.extend({
           this.listenTo(dataset, 'rl:swappedId', oldId => {
             this.swapDatasetId(dataset, oldId);
           });
+          this.listenTo(dataset, 'rl:updatePage', () => {
+            this.updateDatasetPage(dataset);
+          });
         }
         dataset.cache.filter = datasetSpec.filter;
         dataset.cache.page = datasetSpec.page;
@@ -237,6 +241,15 @@ let Project = MetadataItem.extend({
       }
     }
   },
+  updateDatasetPage: Underscore.debounce(function (datasetObj) {
+    let datasets = this.getMeta('datasets');
+    let dataSpec = datasets.find(d => d.dataset === datasetObj.getId());
+    dataSpec.page = datasetObj.cache.page;
+    dataSpec.filter = datasetObj.cache.filter;
+    this.trigger('rl:changeDatasets');
+    this.setMeta('datasets', datasets);
+    this.save();
+  }, 50),
   setDataset: function (newDatasetId, index = 0) {
     let datasets = this.getMeta('datasets');
     let newDataset;
@@ -250,6 +263,9 @@ let Project = MetadataItem.extend({
       this.listenTo(newDataset, 'rl:updatedSchema', this.changeDataSpec);
       this.listenTo(newDataset, 'rl:swappedId', oldId => {
         this.swapDatasetId(newDataset, oldId);
+      });
+      this.listenTo(newDataset, 'rl:updatePage', () => {
+        this.updateDatasetPage(newDataset);
       });
       window.mainPage.loadedDatasets[newDatasetId] = newDataset;
       newDataset.fetch();

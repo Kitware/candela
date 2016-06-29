@@ -47,11 +47,11 @@ class DatasetCache {
     delete this.cachedPromises.filteredHistogram;
     delete this.cachedPromises.pageHistogram;
     delete this.cachedPromises.currentDataPage;
-    this.model.trigger('rl:invalidatedHistograms');
+    this.model.trigger('rl:updatePage');
   }
   get page () {
     if (!this._page) {
-      this._page = {
+      this.page = {
         offset: 0,
         limit: 50
       };
@@ -59,11 +59,32 @@ class DatasetCache {
     return this._page;
   }
   set page (value) {
+    // Tentatively set the new page until we can
+    // validate that the page makes sense
     this._page = value;
+    this.validatePage(value);
     // Invalidate pageHistogram and currentDataPage
     delete this.cachedPromises.pageHistogram;
     delete this.cachedPromises.currentDataPage;
-    this.model.trigger('rl:invalidatedHistograms');
+    this.model.trigger('rl:updatePage');
+  }
+  validatePage (value) {
+    if (this._cachedPromises && this._cachedPromises.filteredHistogram) {
+      // If we can, auto-adjust the page in case it's overshooting
+      this._cachedPromises.filteredHistogram.then(filteredHistogram => {
+        let maxItems = filteredHistogram.__passedFilters__[0].count;
+        if (value.offset + value.limit > maxItems) {
+          value.offset -= value.limit - maxItems;
+          value.limit = maxItems;
+        }
+        value.offset = Math.max(value.offset, 0);
+        let changed = value.offset !== this._page.offset || value.limit !== this._page.limit;
+        this._page = value;
+        if (changed) {
+          this.model.trigger('rl:updatePage');
+        }
+      });
+    }
   }
   get schema () {
     // Do we have the schema already in our metadata,
@@ -292,6 +313,30 @@ let Dataset = MetadataItem.extend({
     this.setMeta('schema', schema);
 
     return this.save();
+  },
+  setPage: function (offset, limit) {
+    this.cache.page = {
+      offset,
+      limit
+    };
+  },
+  seekNext: function () {
+    this.setPage(this.cache.page.offset + this.cache.page.limit,
+                 this.cache.page.limit);
+  },
+  seekPrev: function () {
+    this.setPage(this.cache.page.offset - this.cache.page.limit,
+                 this.cache.page.limit);
+  },
+  seekFirst: function () {
+    this.setPage(0, this.cache.page.limit);
+  },
+  seekLast: function () {
+    if (this.cache._cachedPromises && this.cache._cachedPromises.filteredHistogram) {
+      let lastItem = this.cache.filteredHistogram.__passedFilters__[0].count;
+      this.setPage(lastItem - this.cache.page.limit,
+                   this.cache.page.limit);
+    }
   }
 });
 

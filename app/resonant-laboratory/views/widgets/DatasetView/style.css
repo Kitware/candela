@@ -13,8 +13,13 @@
 }
 .DatasetView.content image.button:hover {
   cursor: pointer;
-  -webkit-filter: brightness(150%);
-  filter: brightness(150%);
+  -webkit-filter: url(#recolorImageTo333333);
+  filter: url(#recolorImageTo333333);
+}
+.DatasetView.content image.button.disabled {
+  cursor: default;
+  -webkit-filter: url(#recolorImageTocccccc);
+  filter: url(#recolorImageTocccccc);
 }
 
 .DatasetView.content #histogramPreview,

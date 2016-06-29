@@ -9,12 +9,14 @@ import seekFirst from '../../../images/seekFirst.svg';
 import seekPrev from '../../../images/seekPrev.svg';
 import seekNext from '../../../images/seekNext.svg';
 import seekLast from '../../../images/seekLast.svg';
+import pageSettings from '../../../images/gear.svg';
 
 let ICONS = {
   seekFirst,
   seekPrev,
   seekNext,
-  seekLast
+  seekLast,
+  pageSettings
 };
 
 let STATUS = {
@@ -89,6 +91,21 @@ let DatasetView = Widget.extend({
     } else if (this.status === STATUS.NO_ATTRIBUTES) {
       window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to <a>edit</a> or <a>reshape</a> the data in order to use it.');
     }
+  },
+  attachSeekListeners: function (datasetObj) {
+    this.$el.find('#pagingButtons image.button').off('click');
+    this.$el.find('#seekFirst').on('click', () => {
+      datasetObj.seekFirst();
+    });
+    this.$el.find('#seekPrev').on('click', () => {
+      datasetObj.seekPrev();
+    });
+    this.$el.find('#seekNext').on('click', () => {
+      datasetObj.seekNext();
+    });
+    this.$el.find('#seekLast').on('click', () => {
+      datasetObj.seekLast();
+    });
   },
   renderEmptyState: function () {
     this.$el.find('#datasetOverview, #tablePreview, #histogramPreview').hide();
@@ -246,6 +263,8 @@ let DatasetView = Widget.extend({
         width: bounds.width - pagingOffset,
         height: bounds.height - textHeight
       });
+      // Attach the listeners
+      this.attachSeekListeners(datasetDetails.datasetObj);
     } else {
       this.$el.find('#paging').hide();
     }
