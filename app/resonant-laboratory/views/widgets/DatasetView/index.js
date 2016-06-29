@@ -230,9 +230,14 @@ let DatasetView = Widget.extend({
       .text(overviewCount);
     d3Element.selectAll('tspan.filtered')
       .text(filteredCount);
-    // Use base 1 for the page text labels
-    d3Element.selectAll('tspan.page')
-      .text((pageOffset + 1) + ' - ' + (pageOffset + pageCount));
+    if (hasPaging) {
+      // Use base 1 for the page text labels
+      d3Element.selectAll('tspan.page')
+        .text((pageOffset + 1) + ' - ' + (pageOffset + pageCount));
+    } else {
+      d3Element.selectAll('tspan.page')
+        .text(pageCount);
+    }
 
     // Reflow and position the text
     rewrap(labelElement[0], bounds.width);

@@ -122,7 +122,7 @@ let Project = MetadataItem.extend({
           dataset = new Dataset({
             _id: datasetSpec.dataset
           });
-          this.listenTo(dataset, 'rl:updatedSchema', this.changeDataSpec);
+          this.listenTo(dataset, 'rl:updatedSchema', this.updateDataSpec);
           this.listenTo(dataset, 'rl:swappedId', oldId => {
             this.swapDatasetId(dataset, oldId);
           });
@@ -260,7 +260,7 @@ let Project = MetadataItem.extend({
       newDataset = new Dataset({
         _id: newDatasetId
       });
-      this.listenTo(newDataset, 'rl:updatedSchema', this.changeDataSpec);
+      this.listenTo(newDataset, 'rl:updatedSchema', this.updateDataSpec);
       this.listenTo(newDataset, 'rl:swappedId', oldId => {
         this.swapDatasetId(newDataset, oldId);
       });
@@ -354,9 +354,10 @@ let Project = MetadataItem.extend({
     // TODO: potential optimization: use the set of relevant fields
     // to retrieve less data in the call to dataset/getData in
     // Dataset.fetch()
+    // TODO: coerce values
     return window.mainPage.loadedDatasets[datasetId].cache.currentDataPage;
   },
-  changeDataSpec: function () {
+  updateDataSpec: function () {
     return this.validateMatchings().then(() => {
       this.trigger('rl:changeDatasets');
     });
@@ -405,14 +406,10 @@ let Project = MetadataItem.extend({
       meta.matchings.splice(index, 1);
     }
 
-    if (indicesToTrash.length > 0) {
-      this.setMeta(meta);
-      return this.save().then(() => {
-        this.trigger('rl:changeMatchings');
-      });
-    } else {
-      return Promise.resolve();
-    }
+    this.setMeta(meta);
+    return this.save().then(() => {
+      this.trigger('rl:changeMatchings');
+    });
   },
   addMatching: function (matching) {
     let meta = this.getMeta();

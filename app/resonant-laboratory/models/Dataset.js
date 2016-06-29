@@ -74,8 +74,8 @@ class DatasetCache {
       this._cachedPromises.filteredHistogram.then(filteredHistogram => {
         let maxItems = filteredHistogram.__passedFilters__[0].count;
         if (value.offset + value.limit > maxItems) {
-          value.offset -= value.limit - maxItems;
-          value.limit = maxItems;
+          value.offset = maxItems - (value.limit - value.offset);
+          value.limit = maxItems - value.offset;
         }
         value.offset = Math.max(value.offset, 0);
         let changed = value.offset !== this._page.offset || value.limit !== this._page.limit;
@@ -112,11 +112,7 @@ class DatasetCache {
         this.cachedPromises = {};
         this.cachedPromises.schema = this.restRequest({
           path: 'dataset/inferSchema',
-          type: 'POST',
-          data: {
-            binSettings: this.model.getBinSettings(),
-            cache: true
-          }
+          type: 'POST'
         });
 
         // Store the new schema, the time that we updated it,
@@ -136,12 +132,12 @@ class DatasetCache {
   }
   get overviewHistogram () {
     if (!this.cachedPromises.overviewHistogram) {
-      this.cachedPromises.overviewHistogram = this.schema.then(() => {
+      this.cachedPromises.overviewHistogram = this.schema.then(schema => {
         return this.restRequest({
           path: 'dataset/getHistograms',
           type: 'POST',
           data: {
-            binSettings: this.model.getBinSettings(),
+            binSettings: this.model.getBinSettings(schema),
             cache: true
           }
         }, 'rl:loadedHistogram');
@@ -151,12 +147,12 @@ class DatasetCache {
   }
   get filteredHistogram () {
     if (!this.cachedPromises.filteredHistogram) {
-      this.cachedPromises.filteredHistogram = this.schema.then(() => {
+      this.cachedPromises.filteredHistogram = this.schema.then(schema => {
         return this.restRequest({
           path: 'dataset/getHistograms',
           type: 'POST',
           data: {
-            binSettings: this.model.getBinSettings(),
+            binSettings: this.model.getBinSettings(schema),
             filter: this.filter,
             cache: true
           }
@@ -167,12 +163,12 @@ class DatasetCache {
   }
   get pageHistogram () {
     if (!this.cachedPromises.pageHistogram) {
-      this.cachedPromises.pageHistogram = this.schema.then(() => {
+      this.cachedPromises.pageHistogram = this.schema.then(schema => {
         return this.restRequest({
           path: 'dataset/getHistograms',
           type: 'POST',
           data: {
-            binSettings: this.model.getBinSettings(),
+            binSettings: this.model.getBinSettings(schema),
             filter: this.filter,
             limit: this.page.limit,
             offset: this.page.offset
@@ -185,7 +181,7 @@ class DatasetCache {
   }
   get currentDataPage () {
     if (!this.cachedPromises.currentDataPage) {
-      this.cachedPromises.currentDataPage = this.schema.then(() => {
+      this.cachedPromises.currentDataPage = this.schema.then(schema => {
         return this.restRequest({
           path: 'dataset/getData',
           type: 'GET',
@@ -238,18 +234,18 @@ let Dataset = MetadataItem.extend({
       return MetadataItem.prototype.save.apply(this);
     }
   },
-  inferAttributeInterpretation: function (attrName) {
-    let attrSpec = this.getMeta('schema')[attrName];
+  inferAttributeInterpretation: function (schema, attrName) {
+    let attrSpec = schema[attrName];
     if (attrSpec.interpretation) {
       // The user has specified an interpretation
       return attrSpec.interpretation;
     } else {
       // Go with the default interpretation for the attribute type
-      return DEFAULT_INTERPRETATIONS[this.inferAttributeType(attrName)];
+      return DEFAULT_INTERPRETATIONS[this.inferAttributeType(schema, attrName)];
     }
   },
-  inferAttributeType: function (attrName) {
-    let attrSpec = this.getMeta('schema')[attrName];
+  inferAttributeType: function (schema, attrName) {
+    let attrSpec = schema[attrName];
     if (attrSpec.coerceToType) {
       // The user has specified a data type
       return attrSpec.coerceToType;
@@ -275,16 +271,15 @@ let Dataset = MetadataItem.extend({
       return attrType;
     }
   },
-  getBinSettings: function (ignoreFilters) {
+  getBinSettings: function (schema) {
     let binSettings = {};
-    let schema = this.getMeta('schema') || {};
     // Assemble the parameters for how we want to see each attribute.
     // For now, other than attempting to auto-infer type and interpretation,
     // we rely on the default behavior
     Object.keys(schema).forEach(attrName => {
       binSettings[attrName] = {
-        coerceToType: this.inferAttributeType(attrName),
-        interpretation: this.inferAttributeInterpretation(attrName)
+        coerceToType: this.inferAttributeType(schema, attrName),
+        interpretation: this.inferAttributeInterpretation(schema, attrName)
       };
     });
     return binSettings;
@@ -296,23 +291,25 @@ let Dataset = MetadataItem.extend({
       attributes: {}
     };
     Object.keys(schema).forEach(attrName => {
-      result.attributes[attrName] = this.inferAttributeType(attrName);
+      result.attributes[attrName] = this.inferAttributeType(schema, attrName);
     });
     return result;
   },
   setAttributeType: function (attrName, dataType) {
-    let schema = this.getMeta('schema');
-    schema[attrName].coerceToType = dataType;
-    this.setMeta('schema', schema);
+    return this.cache.schema.then(schema => {
+      schema[attrName].coerceToType = dataType;
+      this.setMeta('schema', schema);
 
-    return this.save();
+      return this.save();
+    });
   },
   setAttributeInterpretation: function (attrName, interpretation) {
-    let schema = this.getMeta('schema');
-    schema[attrName].interpretation = interpretation;
-    this.setMeta('schema', schema);
+    return this.cache.schema.then(schema => {
+      schema[attrName].interpretation = interpretation;
+      this.setMeta('schema', schema);
 
-    return this.save();
+      return this.save();
+    });
   },
   setPage: function (offset, limit) {
     this.cache.page = {
