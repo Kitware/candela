@@ -136,7 +136,7 @@ class DatasetCache {
   }
   get overviewHistogram () {
     if (!this.cachedPromises.overviewHistogram) {
-      this.cachedPromises.overviewHistogram = this.cachedPromises.schema.then(() => {
+      this.cachedPromises.overviewHistogram = this.schema.then(() => {
         return this.restRequest({
           path: 'dataset/getHistograms',
           type: 'POST',
@@ -151,7 +151,7 @@ class DatasetCache {
   }
   get filteredHistogram () {
     if (!this.cachedPromises.filteredHistogram) {
-      this.cachedPromises.filteredHistogram = this.cachedPromises.schema.then(() => {
+      this.cachedPromises.filteredHistogram = this.schema.then(() => {
         return this.restRequest({
           path: 'dataset/getHistograms',
           type: 'POST',
@@ -167,7 +167,7 @@ class DatasetCache {
   }
   get pageHistogram () {
     if (!this.cachedPromises.pageHistogram) {
-      this.cachedPromises.pageHistogram = this.cachedPromises.schema.then(() => {
+      this.cachedPromises.pageHistogram = this.schema.then(() => {
         return this.restRequest({
           path: 'dataset/getHistograms',
           type: 'POST',
@@ -185,7 +185,7 @@ class DatasetCache {
   }
   get currentDataPage () {
     if (!this.cachedPromises.currentDataPage) {
-      this.cachedPromises.currentDataPage = this.cachedPromises.schema.then(() => {
+      this.cachedPromises.currentDataPage = this.schema.then(() => {
         return this.restRequest({
           path: 'dataset/getData',
           type: 'GET',
@@ -332,11 +332,11 @@ let Dataset = MetadataItem.extend({
     this.setPage(0, this.cache.page.limit);
   },
   seekLast: function () {
-    if (this.cache._cachedPromises && this.cache._cachedPromises.filteredHistogram) {
-      let lastItem = this.cache.filteredHistogram.__passedFilters__[0].count;
+    this.cache.filteredHistogram.then(filteredHistogram => {
+      let lastItem = filteredHistogram.__passedFilters__[0].count;
       this.setPage(lastItem - this.cache.page.limit,
                    this.cache.page.limit);
-    }
+    });
   }
 });
 

@@ -56,10 +56,11 @@ class loadAnonymousItem(object):
                 copiedItem = True
             kwargs['item'] = targetItem
             kwargs['user'] = user
+            originalId = kwargs['id']
             del kwargs['id']
             result = fun(self, *args, **kwargs)
             if copiedItem is True:
-                result['__originalItemId__'] = kwargs['id']
+                result['__originalItemId__'] = originalId
                 result['__copiedItemId__'] = targetItem['_id']
             return result
         return wrapped

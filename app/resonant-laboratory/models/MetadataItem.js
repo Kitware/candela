@@ -130,7 +130,26 @@ let MetadataItem = girder.models.ItemModel.extend({
         this.trigger('rl:swappedId', oldId);
       }
     }).catch(errorObj => {
-      window.mainPage.trigger('rl:error', new Error('Error communicating with the server.'));
+      let newErrorObj = new Error('Error communicating with the server');
+      let details = '';
+      if (errorObj.status) {
+        details += '\nStatus: ' + errorObj.status + '\n';
+      }
+      if (errorObj.responseJSON && errorObj.responseJSON.message) {
+        details += '\nMessage:\n' + errorObj.responseJSON.message;
+      }
+      if (errorObj.responseJSON && errorObj.responseJSON.trace) {
+        details += '\nStack Trace:\n';
+        errorObj.responseJSON.trace.forEach(traceDetails => {
+          details += '\n' + traceDetails[0];
+          details += '\n' + traceDetails[1] + '\t' + traceDetails[2];
+          details += '\n' + traceDetails[3] + '\n';
+        });
+      }
+      if (details.length > 0) {
+        newErrorObj.details = details;
+      }
+      window.mainPage.trigger('rl:error', newErrorObj);
     });
   },
   sync: function (method, model, options) {

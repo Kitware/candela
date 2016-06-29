@@ -228,7 +228,7 @@ let Project = MetadataItem.extend({
         let notification = 'You are now working with a copy of the ' +
                            datasetObj.get('name') +
                            ' dataset, stored in ';
-        if (window.mainPage.user.isLoggedIn()) {
+        if (window.mainPage.currentUser.isLoggedIn()) {
           notification += 'your Private folder.';
         } else {
           notification += 'the public scratch space. Log in to take ownership of this dataset.';

@@ -74,16 +74,17 @@ let Overlay = Backbone.View.extend({
       console.warn('Unknown error! Here\'s what I was given:', arguments);
     }
     // Let the user know something funky is up
-    this.renderReallyBadErrorScreen(message);
+    this.renderReallyBadErrorScreen(message, errorObj.details);
 
     // Actually throw the error if it's a real one
     if (errorObj instanceof Error) {
       throw errorObj;
     }
   },
-  getScreen: function (template, message) {
+  getScreen: function (template, message, details) {
     let options = {
       message: message,
+      details: details || '',
       bugReportLink: 'https://github.com/Kitware/candela/issues',
       consultingLink: 'http://www.kitware.com/company/contact_kitware.php'
     };
@@ -98,8 +99,8 @@ let Overlay = Backbone.View.extend({
   renderUserErrorScreen: function (message) {
     this.render(this.getScreen(userErrorTemplate, message));
   },
-  renderReallyBadErrorScreen: function (message) {
-    this.render(this.getScreen(reallyBadErrorTemplate, message));
+  renderReallyBadErrorScreen: function (message, details) {
+    this.render(this.getScreen(reallyBadErrorTemplate, message, details));
   },
   renderSuccessScreen: function (message) {
     this.render(this.getScreen(successTemplate, message));
