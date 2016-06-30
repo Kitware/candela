@@ -11,6 +11,7 @@ import ResetPasswordView from '../../overlays/ResetPasswordView';
 import AchievementLibrary from '../../overlays/AchievementLibrary';
 import StartingScreen from '../../overlays/StartingScreen';
 import DatasetLibrary from '../../overlays/DatasetLibrary';
+import DatasetSettings from '../../overlays/DatasetSettings';
 import VisualizationLibrary from '../../overlays/VisualizationLibrary';
 import ProjectSettings from '../../overlays/ProjectSettings';
 import AboutResonantLab from '../../overlays/AboutResonantLab';
@@ -22,16 +23,17 @@ import successTemplate from './successTemplate.html';
 import loadingTemplate from './loadingTemplate.html';
 
 let VIEWS = {
-  HamburgerMenu: HamburgerMenu,
-  LoginView: LoginView,
-  ResetPasswordView: ResetPasswordView,
-  RegisterView: RegisterView,
-  AchievementLibrary: AchievementLibrary,
-  ProjectSettings: ProjectSettings,
-  StartingScreen: StartingScreen,
-  DatasetLibrary: DatasetLibrary,
-  VisualizationLibrary: VisualizationLibrary,
-  AboutResonantLab: AboutResonantLab
+  HamburgerMenu,
+  LoginView,
+  ResetPasswordView,
+  RegisterView,
+  AchievementLibrary,
+  ProjectSettings,
+  StartingScreen,
+  DatasetLibrary,
+  DatasetSettings,
+  VisualizationLibrary,
+  AboutResonantLab
 };
 
 import './style.css';

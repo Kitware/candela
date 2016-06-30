@@ -231,36 +231,44 @@ let Dataset = MetadataItem.extend({
       return MetadataItem.prototype.save.apply(this);
     }
   },
-  inferAttributeInterpretation: function (schema, attrName) {
+  autoDetectAttributeInterpretation: function (schema, attrName) {
+    // Go with the default interpretation for the attribute type
+    return DEFAULT_INTERPRETATIONS[this.getAttributeType(schema, attrName)];
+  },
+  getAttributeInterpretation: function (schema, attrName) {
     let attrSpec = schema[attrName];
     if (attrSpec.interpretation) {
       // The user has specified an interpretation
       return attrSpec.interpretation;
     } else {
-      // Go with the default interpretation for the attribute type
-      return DEFAULT_INTERPRETATIONS[this.inferAttributeType(schema, attrName)];
+      // auto-detect the interpretation
+      return this.autoDetectAttributeInterpretation(schema, attrName);
     }
   },
-  inferAttributeType: function (schema, attrName) {
+  autoDetectAttributeType: function (schema, attrName) {
+    let attrSpec = schema[attrName];
+    // Find the most specific type that can accomodate all the values
+    let attrType = 'object';
+    let count = 0;
+    for (let dataType of ATTRIBUTE_GENERALITY) {
+      if (dataType in attrSpec && attrSpec[dataType].count >= count) {
+        attrType = dataType;
+        count = attrSpec[dataType].count;
+      }
+    }
+    // TODO: if the histograms are available, use them to infer
+    // whether to jump further into booleans (e.g. everything is
+    // 0/1, y/n, true/false, etc)
+    return attrType;
+  },
+  getAttributeType: function (schema, attrName) {
     let attrSpec = schema[attrName];
     if (attrSpec.coerceToType) {
       // The user has specified a data type
       return attrSpec.coerceToType;
     } else {
-      // The user hasn't specified a type; find the most specific
-      // type that can accomodate all the values
-      let attrType = 'object';
-      let count = 0;
-      for (let dataType of ATTRIBUTE_GENERALITY) {
-        if (dataType in attrSpec && attrSpec[dataType].count >= count) {
-          attrType = dataType;
-          count = attrSpec[dataType].count;
-        }
-      }
-      // TODO: if the histograms are available, use them to infer
-      // whether to jump further into booleans (e.g. everything is
-      // 0/1, y/n, true/false, etc)
-      return attrType;
+      // auto-detect the data type
+      return this.autoDetectAttributeType(schema, attrName);
     }
   },
   getBinSettings: function (schema) {
@@ -270,8 +278,8 @@ let Dataset = MetadataItem.extend({
     // we rely on the default behavior
     Object.keys(schema).forEach(attrName => {
       binSettings[attrName] = {
-        coerceToType: this.inferAttributeType(schema, attrName),
-        interpretation: this.inferAttributeInterpretation(schema, attrName)
+        coerceToType: this.getAttributeType(schema, attrName),
+        interpretation: this.getAttributeInterpretation(schema, attrName)
       };
     });
     return binSettings;
@@ -283,7 +291,7 @@ let Dataset = MetadataItem.extend({
       attributes: {}
     };
     Object.keys(schema).forEach(attrName => {
-      result.attributes[attrName] = this.inferAttributeType(schema, attrName);
+      result.attributes[attrName] = this.getAttributeType(schema, attrName);
     });
     return result;
   },

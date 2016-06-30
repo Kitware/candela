@@ -15,7 +15,7 @@ module.exports = {
     })
   ],
   debug: true,
-  devtool: 'cheap-source-map',
+  devtool: 'eval',
   module: {
     loaders: [
       {

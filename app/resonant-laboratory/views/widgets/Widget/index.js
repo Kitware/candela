@@ -5,6 +5,7 @@ import spinnerIcon from '../../../images/spinner.gif';
 import warningIcon from '../../../images/warning.svg';
 import infoIcon from '../../../images/info.svg';
 import swapIcon from '../../../images/swap.svg';
+import settingsIcon from '../../../images/gear.svg';
 
 let Widget = Backbone.View.extend({
   initialize: function (spec) {
@@ -95,5 +96,6 @@ Widget.spinnerIcon = spinnerIcon;
 Widget.warningIcon = warningIcon;
 Widget.infoIcon = infoIcon;
 Widget.swapIcon = swapIcon;
+Widget.settingsIcon = settingsIcon;
 
 module.exports = Widget;

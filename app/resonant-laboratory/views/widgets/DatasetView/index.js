@@ -1,28 +1,44 @@
 import Underscore from 'underscore';
 import d3 from 'd3';
+import jQuery from 'jquery';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 import rewrap from '../../../shims/svgTextWrap.js';
+import makeValidId from '../../../shims/makeValidId.js';
 import './style.css';
 
 import seekFirst from '../../../images/seekFirst.svg';
 import seekPrev from '../../../images/seekPrev.svg';
 import seekNext from '../../../images/seekNext.svg';
 import seekLast from '../../../images/seekLast.svg';
-import pageSettings from '../../../images/gear.svg';
 import tablePreviewIcon from '../../../images/table.svg';
 import tableSwitchIcon from '../../../images/switch.svg';
 import histogramPreviewIcon from '../../../images/histogram.svg';
+import booleanIcon from '../../../images/boolean.svg';
+import integerIcon from '../../../images/integer.svg';
+import numberIcon from '../../../images/number.svg';
+import dateIcon from '../../../images/date.svg';
+import stringIcon from '../../../images/string.svg';
+import stringListIcon from '../../../images/string_list.svg';
+import categorical from '../../../images/categorical.svg';
+import ordinal from '../../../images/ordinal.svg';
 
 let ICONS = {
   seekFirst,
   seekPrev,
   seekNext,
   seekLast,
-  pageSettings,
   tablePreviewIcon,
   tableSwitchIcon,
-  histogramPreviewIcon
+  histogramPreviewIcon,
+  boolean: booleanIcon,
+  integer: integerIcon,
+  number: numberIcon,
+  date: dateIcon,
+  string: stringIcon,
+  string_list: stringListIcon,
+  categorical,
+  ordinal
 };
 
 let STATUS = {
@@ -38,6 +54,14 @@ let DatasetView = Widget.extend({
     Widget.prototype.initialize.apply(this, arguments);
 
     this.showTable = true;
+
+    this.icons.splice(0, 0, {
+      src: Widget.settingsIcon,
+      title: 'Dataset filter and paging settings',
+      onclick: () => {
+        window.mainPage.overlay.render('DatasetSettings');
+      }
+    });
 
     this.icons.splice(0, 0, {
       src: Widget.swapIcon,
@@ -129,7 +153,7 @@ let DatasetView = Widget.extend({
       {
         slice: 'page',
         offset: pageOffset,
-        count: pageCount
+        count: Math.min(pageCount, filteredCount)
       }
     ];
     let arc = d3.svg.arc()
@@ -313,6 +337,12 @@ let DatasetView = Widget.extend({
         height: height
       });
   },
+  renderDataTypeMenu: function (element, attrName, schema) {
+    d3.select(element).attr('src', ICONS.string);
+  },
+  renderInterpretationMenu: function (element, attrName, schema) {
+    d3.select(element).attr('src', ICONS.categorical);
+  },
   renderHistograms: function (datasetDetails) {
     this.$el.find('#emptyDatasetState, #tablePreview').hide();
     this.$el.find('#datasetOverview, #histogramPreview').show();
@@ -320,33 +350,91 @@ let DatasetView = Widget.extend({
     // TODO
   },
   renderTable: function (datasetDetails) {
+    let self = this;
+
     this.$el.find('#emptyDatasetState, #histogramPreview').hide();
     this.$el.find('#datasetOverview, #tablePreview').show();
     this.renderOverview(datasetDetails);
 
+    // Render the headers
     let headerOrder = Object.keys(datasetDetails.schema);
 
-    let headers = d3.select(this.el).select('#tablePreview thead tr')
-      .selectAll('th').data([''].concat(headerOrder));
-    headers.enter().append('th');
+    let headers = d3.select(this.el).select('#dataTableHeaders')
+      .selectAll('div.tableHeader:not(.rowHeader)').data(headerOrder);
+    let headersEnter = headers.enter().append('div')
+      .attr('class', 'tableHeader');
     headers.exit().remove();
-    headers.text(d => d);
+    headers.attr('id', d => makeValidId('tableHeader' + d));
 
-    let rows = d3.select(this.el).select('#tablePreview tbody')
+    let fhToolsEnter = headersEnter.append('div').attr('class', 'headerTools');
+    fhToolsEnter.append('img').attr('class', 'dataTypeMenuIcon button');
+    fhToolsEnter.append('img').attr('class', 'interpretationMenuIcon button');
+
+    headersEnter.append('div').attr('class', 'headerText');
+
+    headers.selectAll('div.headerText').text(d => d);
+    headers.selectAll('img.dataTypeMenuIcon').each(function (d) {
+      // this refers to the DOM element
+      self.renderDataTypeMenu(this, d, datasetDetails.schema);
+    });
+    headers.selectAll('img.interpretationMenuIcon').each(function (d) {
+      // this refers to the DOM element
+      self.renderInterpretationMenu(this, d, datasetDetails.schema);
+    });
+
+    // Render the data rows
+    let rows = d3.select(this.el).select('#dataTable tbody')
       .selectAll('tr').data(datasetDetails.currentDataPage);
     rows.enter().append('tr');
     rows.exit().remove();
 
     let cells = rows.selectAll('td').data((d, i) => {
-      let row = [datasetDetails.datasetObj.cache.page.offset + i + 1];
+      let row = [{
+        attr: null,
+        value: datasetDetails.datasetObj.cache.page.offset + i + 1
+      }];
       headerOrder.forEach(attr => {
-        row.push(d[attr]);
+        row.push({
+          attr,
+          value: d[attr]
+        });
       });
       return row;
     });
     cells.enter().append('td');
     cells.exit().remove();
-    cells.text(d => d);
+    cells.text(d => d.value);
+
+    // Align the header and the first row of data (the
+    // rest of the table will respond automatically)
+    let firstRow = rows.filter((d, i) => i === 0);
+    firstRow.selectAll('td')
+      .each(function (d, i) {
+        // this refers to the row DOM element
+        let rowRect = this.getBoundingClientRect();
+        let headerDiv;
+        if (i === 0) {
+          // There isn't any headerDiv to worry about,
+          // instead, set the left padding on #dataTableHeaders
+          headerDiv = d3.select('#dataTableHeaders div.rowHeader');
+        } else {
+          headerDiv = d3.select('#' + makeValidId('tableHeader' + d.attr));
+        }
+        // Use the larger of the header and the data row
+        // to set the width of the column, but ensure that
+        // neither gets larger than 10em
+        let headerRect = headerDiv.node().getBoundingClientRect();
+        let width = headerRect.width + 2 * self.layout.emSize;
+        width = Math.max(rowRect.width, width);
+        width = Math.min(width, 10 * self.layout.emSize);
+        width = width + 'px';
+        width = {
+          'min-width': width,
+          'max-width': width
+        };
+        headerDiv.style(width);
+        d3.select(this).style(width);
+      });
   },
   render: Underscore.debounce(function () {
     let widgetIsShowing = Widget.prototype.render.apply(this, arguments);
@@ -357,6 +445,12 @@ let DatasetView = Widget.extend({
       Object.keys(ICONS).forEach(key => {
         d3.select(this.el).select('image#' + key)
           .attr('xlink:href', ICONS[key]);
+      });
+      // Sync the table header and body horizontal scrolling
+      let self = this;
+      this.$el.find('#dataTableContainer').on('scroll', function () {
+        // this refers to the DOM element
+        self.$el.find('#dataTableHeaders').scrollLeft(jQuery(this).scrollLeft());
       });
       this.addedTemplate = true;
     }

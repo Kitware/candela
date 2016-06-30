@@ -375,7 +375,7 @@ let Project = MetadataItem.extend({
       meta.matchings.forEach(matching => {
         if (matching.visIndex === index && matching.dataIndex === 0) {
           fieldsInUse[matching.dataAttribute] = datasetObj
-            .inferAttributeType(schema, matching.dataAttribute);
+            .getAttributeType(schema, matching.dataAttribute);
         }
       });
 
