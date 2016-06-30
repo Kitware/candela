@@ -307,7 +307,8 @@ class DatasetItem(Resource):
                'Get the histogram after the results of this filter. ' +
                'TODO: describe our filter grammar.',
                required=False)
-        .param('limit', 'Result set size limit (default=50).',
+        .param('limit', 'Result set size limit. Setting to 0 will create ' +
+               'a histogram using all the matching items (default=0).',
                required=False, dataType='int')
         .param('offset', 'Offset into result set (default=0).',
                required=False, dataType='int')
@@ -362,7 +363,7 @@ class DatasetItem(Resource):
         # Populate params with default settings
         # where settings haven't been specified
         params['filter'] = params.get('filter', None)
-        params['limit'] = params.get('limit', 50)
+        params['limit'] = params.get('limit', 0)
         params['offset'] = params.get('offset', 0)
 
         binSettings = bson.json_util.loads(params.get('binSettings', '{}'))
