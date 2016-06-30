@@ -185,7 +185,7 @@ let DatasetView = Widget.extend({
       {
         segment: 'page',
         start: pageOffset,
-        count: pageCount
+        count: Math.min(pageCount, filteredCount)
       }
     ];
     let bars = d3.select(this.el).select('#pagingBars').selectAll('rect.bar')
@@ -279,7 +279,7 @@ let DatasetView = Widget.extend({
         .text((pageOffset + 1) + ' - ' + (pageOffset + pageCount));
     } else {
       d3Element.selectAll('tspan.page')
-        .text(pageCount);
+        .text(filteredCount);
     }
 
     // Attempt to fit the label in the 3em of space between
