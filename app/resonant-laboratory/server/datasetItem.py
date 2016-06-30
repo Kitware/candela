@@ -111,10 +111,10 @@ class DatasetItem(Resource):
                                        self.foreignCode['mapReduceChunk.js'])
 
         extraParameters = bson.json_util.dumps({
-            'limit': params.get('limit', 0),
-            'offset': params.get('offset', 0),
+            'limit': int(params.get('limit', 0)),
+            'offset': int(params.get('offset', 0)),
             'fileType': item['meta']['rlab']['format'],
-            'outputType': 'json'
+            'outputType': 'jsonArray'
             # TODO: add a filter parameter as well
         })
 

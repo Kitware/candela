@@ -107,7 +107,7 @@ class StreamFile(object):
 
 def semantic_access(Cls):
     allowed_filetypes = ['csv']
-    allowed_outputtypes = ['csv', 'json']
+    allowed_outputtypes = ['csv', 'json', 'jsonArray']
 
     module = 'resonant-laboratory.semantic-filesystem-assetstore-adapter'
 
@@ -176,10 +176,19 @@ def semantic_access(Cls):
                         count += 1
                         if outputType == 'csv':
                             yield ','.join(line) + '\n'
-                        elif outputType == 'json':
+                        elif outputType == 'jsonArray':
                             yield json.dumps(dict(zip(header_line, line)))
+                        elif outputType == 'json':
+                            resultLine = json.dumps(dict(zip(header_line, line)))
+                            if count == 1:
+                                resultLine = '[' + resultLine
+                            else:
+                                resultLine = ',' + resultLine
+                            yield resultLine
                 except StopIteration:
                     pass
+                if outputType == 'json':
+                    yield ']'
 
             return stream
 

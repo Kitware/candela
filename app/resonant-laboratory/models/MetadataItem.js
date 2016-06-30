@@ -120,7 +120,7 @@ let MetadataItem = girder.models.ItemModel.extend({
     return this.wrapInPromise((resolve, reject) => {
       requestParameters.path = 'item/' + this.getId() + '/' + requestParameters.path;
       requestParameters.error = reject;
-      girder.restRequest(requestParameters).done(resolve).error(reject);
+      return girder.restRequest(requestParameters).done(resolve).error(reject);
     }, options, resp => {
       if (resp.hasOwnProperty('__copiedItemId__')) {
         // The id of the item changed in the process (e.g. a copy of
