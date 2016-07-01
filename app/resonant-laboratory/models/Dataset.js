@@ -317,6 +317,12 @@ let Dataset = MetadataItem.extend({
       limit
     };
   },
+  setOffset: function (offset) {
+    this.setPage(offset, this.cache.page.limit);
+  },
+  setLimit: function (limit) {
+    this.setPage(this.cache.page.offset, limit);
+  },
   seekNext: function () {
     this.setPage(this.cache.page.offset + this.cache.page.limit,
                  this.cache.page.limit);

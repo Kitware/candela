@@ -198,6 +198,14 @@ let Project = MetadataItem.extend({
     }
     return flatMeta;
   },
+  getDataset: function (index) {
+    let datasets = window.mainPage.project.getMeta('datasets');
+    if (datasets && datasets.length > 0) {
+      return window.mainPage.loadedDatasets[datasets[0].dataset];
+    } else {
+      return undefined;
+    }
+  },
   getDatasetIds: function () {
     return (this.getMeta('datasets') || []).map(d => d.dataset);
   },

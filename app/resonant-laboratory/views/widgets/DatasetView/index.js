@@ -463,13 +463,8 @@ let DatasetView = Widget.extend({
 
     // Get the dataset in the project (if there is one)
     // TODO: get the dataset assigned to this widget
-    let datasetObj;
-    if (window.mainPage.project) {
-      let datasets = window.mainPage.project.getMeta('datasets');
-      if (datasets && datasets.length > 0) {
-        datasetObj = window.mainPage.loadedDatasets[datasets[0].dataset];
-      }
-    }
+    let datasetObj = window.mainPage.project &&
+      window.mainPage.project.getDataset(0);
 
     if (!datasetObj) {
       this.renderEmptyState();
