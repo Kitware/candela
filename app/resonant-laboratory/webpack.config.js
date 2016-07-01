@@ -39,6 +39,10 @@ module.exports = {
         loader: 'html-loader?attrs=img:src'
       },
       {
+        test: /\.pegjs$/,
+        loader: 'pegjs-loader'
+      },
+      {
         test: /\.json$/,
         loaders: ['json-loader', 'strip-json-comments-loader']
       },
