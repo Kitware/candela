@@ -120,33 +120,37 @@ let Overlay = Backbone.View.extend({
     // Add a bunch of ways to close out of the overlay
 
     // Close button:
-    this.$el.find('#closeOverlay').on('click', this.closeOverlay);
+    this.$el.find('#closeOverlay')
+      .off('click.closeOverlay')
+      .on('click.closeOverlay', this.closeOverlay);
 
     // Clicking on the area outside the overlay:
     let self = this;
-    this.$el.on('click', function (event) {
-      // this refers to the DOM element
-      if (event.target !== this) {
-        return;
-      } else {
-        self.closeOverlay();
-      }
-    });
+    this.$el.off('click.closeOverlay')
+      .on('click.closeOverlay', function (event) {
+        // this refers to the DOM element
+        if (event.target !== this) {
+          return;
+        } else {
+          self.closeOverlay();
+        }
+      });
 
     // Hitting the escape key:
-    jQuery(window).on('keyup', e => {
-      if (e.keyCode === 27) {
-        this.closeOverlay();
-      }
-    });
+    jQuery(window).off('keyup.closeOverlay')
+      .on('keyup.closeOverlay', e => {
+        if (e.keyCode === 27) {
+          this.closeOverlay();
+        }
+      });
   },
   removeCloseListeners: function () {
     // Remove the ways to close out of the overlay
     // (both when the overlay is hidden, and when
     // one shows up that can't be closed)
-    this.$el.find('#closeOverlay').off('click');
-    this.$el.off('click');
-    jQuery(window).off('keyup');
+    this.$el.find('#closeOverlay').off('click.closeOverlay');
+    this.$el.off('click.closeOverlay');
+    jQuery(window).off('keyup.closeOverlay');
   },
   render: Underscore.debounce(function (template, nofade) {
     // Don't fade if we're just switching between overlays
@@ -239,6 +243,12 @@ let Overlay = Backbone.View.extend({
       // We're just re-rendering the view
       if (this.view !== null) {
         this.view.render();
+        // It's possible that the view nuked
+        // its closeOverlay listeners-if relevant,
+        // reattach them
+        if (this.$el.find('#closeOverlay').length !== 0) {
+          this.addCloseListeners();
+        }
       }
     }
   }, 300)
