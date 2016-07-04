@@ -70,3 +70,42 @@ test('Disjunction expressions', t => {
   testFunc(t, outside_expression, data, baseline);
   t.end();
 });
+
+test('Associativity', t => {
+  const expr1 = 'age > 47 and age < 50 or name = "Picard"';
+  const expr2 = '(age > 47 and age < 50) or (name = "Picard")';
+
+  const ages = [46, 47, 48, 51];
+  const names = ['Riker', 'Picard'];
+
+  const func1 = parseToFunction(expr1);
+  const func2 = parseToFunction(expr2);
+
+  ages.forEach(age => {
+    names.forEach(name => {
+      const data = { age, name };
+      const result = (age > 47 && age < 50) || (name === 'Picard');
+
+      t.equal(func1(data), func2(data), 'Expression is associative');
+    });
+  });
+
+  t.end();
+});
+
+test('Anti-associativity', t => {
+  const expr1 = 'age < 47 or age > 50 and name = "Picard"';
+  const expr2 = '(age < 47 or age > 50) and (name = "Picard")';
+
+  const func1 = parseToFunction(expr1);
+  const func2 = parseToFunction(expr2);
+
+  const data = {
+    age: 46,
+    name: 'Riker'
+  };
+
+  t.notEqual(func1(data), func2(data), 'Expression is not associative');
+
+  t.end();
+});
