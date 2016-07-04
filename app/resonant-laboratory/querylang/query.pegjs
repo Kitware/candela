@@ -62,7 +62,7 @@ value_list
   / "" { return []; }
 
 identifier
-  = chars:([^ ]*) { return chars.join(''); }
+  = chars:([^ ()]*) { return chars.join(''); }
   / string
 
 value
