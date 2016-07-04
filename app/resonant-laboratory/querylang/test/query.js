@@ -24,14 +24,14 @@ const data = [
   }
 ];
 
-function testFunc (t, batch, string, testData, baselines) {
+function testFunc (t, string, testData, baselines) {
   const func = parseToFunction(string);
 
   for (let i = 0; i < testData.length; i++) {
     const data = testData[i];
     const baseline = baselines[i];
 
-    t.equal(func(data), baseline, `Batch ${batch}, case ${i}`);
+    t.equal(func(data), baseline, `Expression '${string}', data '${JSON.stringify(testData[i])}'`);
   }
 }
 
@@ -49,7 +49,7 @@ test('Operator expressions', t => {
     const expr = operator_expression[i];
     const baselines = baseline[i];
 
-    testFunc(t, expr, expr, data, baselines);
+    testFunc(t, expr, data, baselines);
   }
 
   t.end();
@@ -59,7 +59,7 @@ test('Conjunction expressions', t => {
   const between_expression = 'age < 22 and age > 20';
   const baseline = [false, true, false];
 
-  testFunc(t, between_expression, between_expression, data, baseline);
+  testFunc(t, between_expression, data, baseline);
   t.end();
 });
 
@@ -67,6 +67,6 @@ test('Disjunction expressions', t => {
   const outside_expression = 'age > 22 or age < 20';
   const baseline = [true, false, true];
 
-  testFunc(t, outside_expression, outside_expression, data, baseline);
+  testFunc(t, outside_expression, data, baseline);
   t.end();
 });
