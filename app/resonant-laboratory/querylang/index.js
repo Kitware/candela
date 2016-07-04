@@ -47,16 +47,16 @@ export function astToFunction (ast) {
   switch (ast.operator) {
     case 'or':
       return function (row) {
-        const f1 = parseToFunction(ast.operands[0]);
-        const f2 = parseToFunction(ast.operands[1]);
+        const f1 = astToFunction(ast.operands[0]);
+        const f2 = astToFunction(ast.operands[1]);
 
         return f1(row) || f2(row);
       };
 
     case 'and':
       return function (row) {
-        const f1 = parseToFunction(ast.operands[0]);
-        const f2 = parseToFunction(ast.operands[1]);
+        const f1 = astToFunction(ast.operands[0]);
+        const f2 = astToFunction(ast.operands[1]);
 
         return f1(row) && f2(row);
       };
