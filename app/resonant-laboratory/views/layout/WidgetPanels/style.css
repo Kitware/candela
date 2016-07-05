@@ -31,6 +31,14 @@
   -webkit-filter: url(#recolorImageToWhite);
   filter: url(#recolorImageToWhite);
 }
+#WidgetPanels .sectionHeader img.disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+#WidgetPanels .sectionHeader img.disabled:hover {
+  -webkit-filter: none;
+  filter: none;
+}
 
 #WidgetPanels .sectionHeader .indicatorText img:hover {
   -webkit-filter: opacity(100%);

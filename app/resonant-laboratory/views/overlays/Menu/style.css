@@ -1,0 +1,44 @@
+.menu {
+  position: absolute;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  border-radius: 4px;
+}
+
+.menu hr {
+  position: relative;
+  width: 100%;
+  border: none;
+  height: 1px;
+  background-color: #e5e5e5;
+  margin: 0px;
+}
+
+.menu div.menuItem {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  padding: 0em 0.5em;
+  margin: 0.25em 0em;
+}
+.menu div.separator.menuItem {
+  padding: 0px;
+  margin: 0px;
+}
+
+.menu div.menuItem:hover {
+  background-color: #eee;
+  cursor: pointer;
+}
+
+.menu img {
+  width: 2em;
+  height: 2em;
+  vertical-align: middle;
+}
+
+.menu p {
+  padding: 1em;
+  margin: 0px;
+}
