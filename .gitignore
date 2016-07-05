@@ -11,3 +11,4 @@ npm-debug.log
 *-test.png
 .ipynb_checkpoints
 app/resonant-laboratory/scripts/core/*
+app/resonant-laboratory/querylang/query.js
