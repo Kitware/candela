@@ -438,7 +438,7 @@ let DatasetView = Widget.extend({
         INTERPRETATION_MENU_ITEMS[0].icon = ICONS[autoInterpretation];
         window.mainPage.overlay.render(new Menu({
           targetElement: element,
-          items: TYPE_MENU_ITEMS
+          items: INTERPRETATION_MENU_ITEMS
         }));
       });
   },

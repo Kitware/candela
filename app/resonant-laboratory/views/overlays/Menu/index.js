@@ -14,7 +14,8 @@ let Menu = Backbone.View.extend({
       this.addedTemplate = true;
     }
 
-    let menuItems = d3.select(this.el).select('.menu').selectAll('.menuItem')
+    let menuDiv = d3.select(this.el).select('div.menu');
+    let menuItems = menuDiv.selectAll('.menuItem')
       .data(this.menuSpec.items);
     let menuItemsEnter = menuItems.enter()
       .append('div')
@@ -47,27 +48,26 @@ let Menu = Backbone.View.extend({
 
     // Move the menu to an appropriate place
     let targetBounds = this.menuSpec.targetElement.getBoundingClientRect();
-    let menuDiv = this.$el.find('.menu');
-    let menuBounds = menuDiv[0].getBoundingClientRect();
+    let menuBounds = menuDiv.node().getBoundingClientRect();
 
     if (window.innerWidth - targetBounds.right >= menuBounds.width) {
       // Default: put the menu to the right of the target
-      menuDiv.css('left', targetBounds.right + 'px');
+      menuDiv.style('left', targetBounds.right + 'px');
     } else if (targetBounds.left >= menuBounds.width) {
       // Move it to the left
-      menuDiv.css('right', (window.innerWidth - targetBounds.left) + 'px');
+      menuDiv.style('right', (window.innerWidth - targetBounds.left) + 'px');
     } else {
       // Sheesh, no space. Just put it on the right and let it overlap
-      menuDiv.css('right', '0px');
+      menuDiv.style('right', '0px');
     }
 
     if (window.innerHeight - targetBounds.top >= menuBounds.height) {
       // Default: align the menu to the top of the target
-      menuDiv.css('top', targetBounds.top + 'px');
+      menuDiv.style('top', targetBounds.top + 'px');
     } else {
       // Sheesh, no space. Just put it on the bottom and let it
       // overlap
-      menuDiv.css('bottom', '0px');
+      menuDiv.style('bottom', '0px');
     }
   }
 });

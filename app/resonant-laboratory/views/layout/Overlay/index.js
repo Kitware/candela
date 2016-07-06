@@ -157,8 +157,8 @@ let Overlay = Backbone.View.extend({
     nofade = nofade || (template !== null && this.template !== null);
 
     if (template !== undefined && this.template !== template) {
-      // Because we're switching, save the setting
-      // for next time we simply re-render
+      // Because we're switching to a different overlay, save the setting
+      // for the next time that we simply re-render
       this.template = template;
 
       if (template === null) {
@@ -184,8 +184,20 @@ let Overlay = Backbone.View.extend({
           this.view = null;
         }
       } else {
-        // Instantiate and add the new view
         this.$el.html('');
+
+        // Before we draw the contents, start
+        // the fade in process (if relevant)
+        if (nofade !== true) {
+          d3.select(this.el)
+            .style('display', null)
+            .style('opacity', 0.0)
+            .transition().duration(400)
+            .style('opacity', 1.0);
+        } else {
+          d3.select(this.el).style('opacity', 1.0);
+        }
+
         if (template.prototype &&
           template.prototype instanceof Backbone.View) {
           // This is a View class already
@@ -225,17 +237,6 @@ let Overlay = Backbone.View.extend({
           // something special (e.g. load a project)
           // in order to dismiss it
           this.removeCloseListeners();
-        }
-
-        // Fade in
-        if (nofade !== true) {
-          d3.select(this.el)
-            .style('display', null)
-            .style('opacity', 0.0)
-            .transition().duration(400)
-            .style('opacity', 1.0);
-        } else {
-          d3.select(this.el).style('opacity', 1.0);
         }
       }
       this.trigger('rl:changeOverlay');
