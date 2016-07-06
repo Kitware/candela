@@ -1,50 +1,64 @@
-import jQuery from 'jquery';
-// import d3 from 'd3';
-import Backbone from 'backbone';
-import template from './template.html';
+import Menu from '../Menu';
 
-import './style.css';
-
-let HamburgerMenu = Backbone.View.extend({
-  render: function () {
-    if (!this.addedTemplate) {
-      this.$el.html(template);
-      this.addedTemplate = true;
-    }
-
-    // Main menu items
-    jQuery('#projectSettingsMenuItem > p')
-      .text(window.mainPage.project.get('name') + ' settings...');
-    jQuery('#projectSettingsMenuItem').on('click', () => {
-      window.mainPage.overlay.render('ProjectSettings');
-    });
-
-    jQuery('#closeProjectMenuItem').on('click', () => {
-      window.mainPage.switchProject(null).then(() => {
-        window.mainPage.overlay.render('StartingScreen');
-      });
-    });
-
-    jQuery('#aboutResLabMenuItem').on('click', () => {
-      window.mainPage.overlay.render('AboutResonantLab');
-    });
-
-    if (window.mainPage.currentUser.isLoggedIn()) {
-      jQuery('#loginText').text('Log Out ' +
-        window.mainPage.currentUser.get('firstName') + ' ' +
-        window.mainPage.currentUser.get('lastName'));
-      jQuery('#loginMenuItem').on('click', () => {
-        window.mainPage.currentUser.authenticate(false)
-          .then(() => {
+let HamburgerMenu = Menu.extend({
+  initialize: function () {
+    let items = [
+      {
+        text: window.mainPage.project.get('name') + ' settings...',
+        onclick: () => {
+          window.mainPage.overlay.render('ProjectSettings');
+        }
+      },
+      {
+        text: 'Close project',
+        onclick: () => {
+          window.mainPage.switchProject(null).then(() => {
             window.mainPage.overlay.render('StartingScreen');
           });
+        }
+      },
+      null,
+      {
+        text: 'About Resonant Laboratory...',
+        onclick: () => {
+          window.mainPage.overlay.render('AboutResonantLab');
+        }
+      },
+      null
+    ];
+
+    if (window.mainPage.currentUser.isLoggedIn()) {
+      items.push({
+        text: 'Log Out ' +
+          window.mainPage.currentUser.get('firstName') + ' ' +
+          window.mainPage.currentUser.get('lastName'),
+        onclick: () => {
+          window.mainPage.currentUser.authenticate(false)
+            .then(() => {
+              window.mainPage.overlay.render('StartingScreen');
+            });
+        }
       });
     } else {
-      jQuery('#loginMenuItem > p').text('Log In');
-      jQuery('#loginMenuItem').on('click', () => {
-        window.mainPage.overlay.render('LoginView');
+      items.push({
+        text: 'Log In',
+        onclick: () => {
+          window.mainPage.overlay.render('LoginView');
+        }
       });
     }
+
+    Menu.prototype.initialize.apply(this, [{
+      targetElement: null,
+      items
+    }]);
+  },
+  positionMenu: function () {
+    // The hamburger menu is always fixed in the top corner
+    this.$el.find('.menu').css({
+      'top': '3em',
+      'right': '0em'
+    });
   }
 });
 

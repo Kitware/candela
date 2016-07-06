@@ -2,6 +2,7 @@ import Underscore from 'underscore';
 import d3 from 'd3';
 import jQuery from 'jquery';
 import Widget from '../Widget';
+import Menu from '../../overlays/Menu';
 import myTemplate from './template.html';
 import rewrap from '../../../shims/svgTextWrap.js';
 import makeValidId from '../../../shims/makeValidId.js';
@@ -20,6 +21,7 @@ import numberIcon from '../../../images/number.svg';
 import dateIcon from '../../../images/date.svg';
 import stringIcon from '../../../images/string.svg';
 import stringListIcon from '../../../images/string_list.svg';
+import objectIcon from '../../../images/object.svg';
 import categorical from '../../../images/categorical.svg';
 import ordinal from '../../../images/ordinal.svg';
 
@@ -37,6 +39,7 @@ let ICONS = {
   date: dateIcon,
   string: stringIcon,
   string_list: stringListIcon,
+  object: objectIcon,
   categorical,
   ordinal
 };
@@ -49,6 +52,61 @@ let STATUS = {
   NO_ATTRIBUTES: 4
 };
 
+let TYPE_MENU_ITEMS = [
+  {
+    text: 'Autodetect',
+    dataType: null
+  },
+  null,
+  {
+    icon: ICONS.boolean,
+    text: 'Boolean',
+    dataType: 'boolean'
+  },
+  {
+    icon: ICONS.integer,
+    text: 'Integer',
+    dataType: 'integer'
+  },
+  {
+    icon: ICONS.number,
+    text: 'Number',
+    dataType: 'number'
+  },
+  {
+    icon: ICONS.date,
+    text: 'Date',
+    dataType: 'date'
+  },
+  {
+    icon: ICONS.string,
+    text: 'String',
+    dataType: 'string'
+  },
+  {
+    icon: ICONS.object,
+    text: 'Object (no type coercion)',
+    dataType: 'object'
+  }
+];
+let INTERPRETATION_MENU_ITEMS = [
+  {
+    text: 'Autodetect',
+    interpretation: null
+  },
+  null,
+  {
+    icon: ICONS.categorical,
+    text: 'Categorical',
+    interpretation: 'categorical'
+  },
+  {
+    icon: ICONS.ordinal,
+    text: 'Ordinal',
+    interpretation: 'ordinal'
+  }
+];
+
 let DatasetView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
@@ -59,7 +117,18 @@ let DatasetView = Widget.extend({
       src: Widget.settingsIcon,
       title: 'Dataset filter and paging settings',
       onclick: () => {
-        window.mainPage.overlay.render('DatasetSettings');
+        if (window.mainPage.project &&
+            window.mainPage.project.getMeta('datasets').length > 0) {
+          window.mainPage.overlay.render('DatasetSettings');
+        }
+      },
+      className: () => {
+        if (window.mainPage.project &&
+            window.mainPage.project.getMeta('datasets').length > 0) {
+          return null;
+        } else {
+          return 'disabled';
+        }
       }
     });
 
@@ -337,11 +406,69 @@ let DatasetView = Widget.extend({
         height: height
       });
   },
-  renderDataTypeMenu: function (element, attrName, schema) {
-    d3.select(element).attr('src', ICONS.string);
+  setupDataTypeMenu: function (element, attrName, datasetDetails) {
+    let autoAttrType = datasetDetails.datasetObj
+      .autoDetectAttributeType(datasetDetails.schema, attrName);
+    let attrType = datasetDetails.datasetObj
+      .getAttributeType(datasetDetails.schema, attrName);
+    let isAuto = !(datasetDetails.schema[attrName].hasOwnProperty('coerceToType'));
+    let filterStyle = isAuto ? null : 'url(#recolorImageTo377eb8)';
+    d3.select(element)
+      .attr('src', ICONS[attrType])
+      .style({
+        '-webkit-filter': filterStyle,
+        'filter': filterStyle
+      }).on('click', () => {
+        // Construct the type menu
+        TYPE_MENU_ITEMS[0].icon = ICONS[autoAttrType];
+        TYPE_MENU_ITEMS.forEach(menuItem => {
+          if (menuItem !== null) {
+            menuItem.checked = (menuItem.dataType === null && isAuto) ||
+              (menuItem.dataType === attrType && !isAuto);
+            menuItem.onclick = () => {
+              datasetDetails.datasetObj
+                .setAttributeType(attrName, menuItem.dataType);
+              window.mainPage.overlay.render(null);
+            };
+          }
+        });
+        window.mainPage.overlay.render(new Menu({
+          targetElement: element,
+          items: TYPE_MENU_ITEMS
+        }));
+      });
   },
-  renderInterpretationMenu: function (element, attrName, schema) {
-    d3.select(element).attr('src', ICONS.categorical);
+  setupInterpretationMenu: function (element, attrName, datasetDetails) {
+    let autoInterpretation = datasetDetails.datasetObj
+      .autoDetectAttributeInterpretation(datasetDetails.schema, attrName);
+    let interpretation = datasetDetails.datasetObj
+      .getAttributeInterpretation(datasetDetails.schema, attrName);
+    let isAuto = !(datasetDetails.schema[attrName].hasOwnProperty('interpretation'));
+    let filterStyle = isAuto ? null : 'url(#recolorImageTo377eb8)';
+    d3.select(element)
+      .attr('src', ICONS[interpretation])
+      .style({
+        '-webkit-filter': filterStyle,
+        'filter': filterStyle
+      }).on('click', () => {
+        // Construct the type menu
+        INTERPRETATION_MENU_ITEMS[0].icon = ICONS[autoInterpretation];
+        INTERPRETATION_MENU_ITEMS.forEach(menuItem => {
+          if (menuItem !== null) {
+            menuItem.checked = (menuItem.interpretation === null && isAuto) ||
+              (menuItem.interpretation === interpretation && !isAuto);
+            menuItem.onclick = () => {
+              datasetDetails.datasetObj
+                .setAttributeInterpretation(attrName, menuItem.interpretation);
+              window.mainPage.overlay.render(null);
+            };
+          }
+        });
+        window.mainPage.overlay.render(new Menu({
+          targetElement: element,
+          items: INTERPRETATION_MENU_ITEMS
+        }));
+      });
   },
   renderHistograms: function (datasetDetails) {
     this.$el.find('#emptyDatasetState, #tablePreview').hide();
@@ -375,11 +502,11 @@ let DatasetView = Widget.extend({
     headers.selectAll('div.headerText').text(d => d);
     headers.selectAll('img.dataTypeMenuIcon').each(function (d) {
       // this refers to the DOM element
-      self.renderDataTypeMenu(this, d, datasetDetails.schema);
+      self.setupDataTypeMenu(this, d, datasetDetails);
     });
     headers.selectAll('img.interpretationMenuIcon').each(function (d) {
       // this refers to the DOM element
-      self.renderInterpretationMenu(this, d, datasetDetails.schema);
+      self.setupInterpretationMenu(this, d, datasetDetails);
     });
 
     // Render the data rows
@@ -422,11 +549,11 @@ let DatasetView = Widget.extend({
         }
         // Use the larger of the header and the data row
         // to set the width of the column, but ensure that
-        // neither gets larger than 10em
+        // neither gets larger than 7em
         let headerRect = headerDiv.node().getBoundingClientRect();
         let width = headerRect.width + 2 * self.layout.emSize;
         width = Math.max(rowRect.width, width);
-        width = Math.min(width, 10 * self.layout.emSize);
+        width = Math.min(width, 7 * self.layout.emSize);
         width = width + 'px';
         width = {
           'min-width': width,

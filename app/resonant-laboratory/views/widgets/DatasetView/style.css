@@ -58,7 +58,7 @@
 }
 .DatasetView.content #tablePreview div.headerText,
 .DatasetView.content #tablePreview td {
-  max-width: 10em;
+  max-width: 7em;
   padding: 0.5em 0em;
   white-space: nowrap;
   overflow-x: auto;

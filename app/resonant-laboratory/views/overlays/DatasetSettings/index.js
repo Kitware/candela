@@ -1,6 +1,6 @@
 import Underscore from 'underscore';
 import Backbone from 'backbone';
-import d3 from 'd3';
+// import d3 from 'd3';
 import myTemplate from './template.html';
 
 let DatasetSettings = Backbone.View.extend({
@@ -11,7 +11,10 @@ let DatasetSettings = Backbone.View.extend({
   },
   render: function () {
     let self = this;
-    this.$el.html(myTemplate);
+    if (!this.addedTemplate) {
+      this.$el.html(myTemplate);
+      this.addedTemplate = true;
+    }
 
     // Update the paging parameters
     let datasetObj = window.mainPage.project.getDataset(0);

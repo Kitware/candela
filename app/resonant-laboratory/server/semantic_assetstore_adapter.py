@@ -117,8 +117,6 @@ def semantic_access(Cls):
 
         def downloadFile(self, file, offset=0, headers=True, endByte=None,
                          contentDisposition=None, extraParameters=None, **kwargs):
-            print 'file: %s' % (file)
-
             # Get the parent class's stream.
             base_stream = super(NewCls, self).downloadFile(file, offset, headers, endByte, contentDisposition, extraParameters, **kwargs)
 
@@ -161,7 +159,6 @@ def semantic_access(Cls):
                 data = csv.reader(csvfile)
 
                 header_line = data.next()
-                print 'header_line: %s' % (header_line)
                 if outputType == 'csv':
                     yield ','.join(header_line) + '\n'
 
@@ -172,7 +169,6 @@ def semantic_access(Cls):
                 try:
                     while limit == 0 or count < limit:
                         line = data.next()
-                        print 'line: %s' % (line)
                         count += 1
                         if outputType == 'csv':
                             yield ','.join(line) + '\n'

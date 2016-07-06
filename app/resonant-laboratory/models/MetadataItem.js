@@ -130,6 +130,12 @@ let MetadataItem = girder.models.ItemModel.extend({
         this.trigger('rl:swappedId', oldId);
       }
     }).catch(errorObj => {
+      if (errorObj.status === 401) {
+        // Authentication failures simply mean that the user is logged out;
+        // we can ignore these
+        return;
+      }
+      // Some other server error has occurred...
       let newErrorObj = new Error('Error communicating with the server');
       let details = '';
       if (errorObj.status) {
@@ -324,10 +330,18 @@ let MetadataItem = girder.models.ItemModel.extend({
     if (typeof key === 'object') {
       let obj = key;
       for (key of Object.keys(obj)) {
-        meta.rlab[key] = obj[key];
+        if (obj[key] === null) {
+          delete meta.rlab[key];
+        } else {
+          meta.rlab[key] = obj[key];
+        }
       }
     } else {
-      meta.rlab[key] = value;
+      if (value === null) {
+        delete meta.rlab[key];
+      } else {
+        meta.rlab[key] = value;
+      }
     }
     this.set('meta', meta);
   },
