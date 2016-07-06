@@ -42,10 +42,13 @@ let Menu = Backbone.View.extend({
     menuItems.on('click', d => {
       if (d !== null && d.onclick) {
         d.onclick();
-        window.mainPage.overlay.render(null);
       }
     });
 
+    this.positionMenu();
+  },
+  positionMenu: function () {
+    let menuDiv = d3.select(this.el).select('.menu');
     // Move the menu to an appropriate place
     let targetBounds = this.menuSpec.targetElement.getBoundingClientRect();
     let menuBounds = menuDiv.node().getBoundingClientRect();

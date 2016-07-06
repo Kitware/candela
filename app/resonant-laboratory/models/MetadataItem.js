@@ -130,6 +130,12 @@ let MetadataItem = girder.models.ItemModel.extend({
         this.trigger('rl:swappedId', oldId);
       }
     }).catch(errorObj => {
+      if (errorObj.status === 401) {
+        // Authentication failures simply mean that the user is logged out;
+        // we can ignore these
+        return;
+      }
+      // Some other server error has occurred...
       let newErrorObj = new Error('Error communicating with the server');
       let details = '';
       if (errorObj.status) {
