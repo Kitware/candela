@@ -18,6 +18,12 @@ let ATTRIBUTE_GENERALITY = [
   'integer'
 ];
 
+let FILTER_STATES = {
+  NO_FILTERS: 0,
+  FILTERED: 1,
+  EXCLUDED: 2
+};
+
 class DatasetCache {
   constructor (model) {
     this.model = model;
@@ -319,6 +325,10 @@ let Dataset = MetadataItem.extend({
       return this.save();
     });
   },
+  getFilteredState: function (attrName) {
+    // TODO
+    return FILTER_STATES.NO_FILTERS;
+  },
   setPage: function (offset, limit) {
     this.cache.page = {
       offset,
@@ -352,4 +362,5 @@ let Dataset = MetadataItem.extend({
 });
 
 Dataset.DEFAULT_INTERPRETATIONS = DEFAULT_INTERPRETATIONS;
+Dataset.FILTER_STATES = FILTER_STATES;
 export default Dataset;

@@ -22,10 +22,39 @@
 }
 
 .DatasetView.content #histogramPreview {
-  width: 100%;
+  width: calc(100% - 2em);
   flex-grow: 1;
   overflow-x:hidden;
   overflow-y:auto;
+  padding: 0em 1em;
+}
+.DatasetView.content #histogramPreview .attributeSection {
+  position: relative;
+  width: 100%;
+}
+.DatasetView.content #histogramPreview .header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 1.5em;
+}
+.DatasetView.content #histogramPreview .header label {
+  position: relative;
+  left: 0.25em;
+  bottom: 0.35em;
+}
+.DatasetView.content #histogramPreview .header img {
+  width: 1em;
+  height: 1em;
+}
+.DatasetView.content #histogramPreview .header img.button {
+  margin: 0em 0.25em;
+}
+.DatasetView.content #histogramPreview .header img.button:hover {
+  cursor: pointer;
+  -webkit-filter: url(#recolorImageToBlack) !important;
+  filter: url(#recolorImageToBlack) !important;
 }
 
 .DatasetView.content #tablePreview {
@@ -33,7 +62,7 @@
   width: 100%;
   flex-grow: 1;
 }
-.DatasetView.content #dataTableContainer {
+.DatasetView.content #tablePreview #dataTableContainer {
   overflow-y: auto;
   position: absolute;
   top: 5em;
@@ -69,17 +98,17 @@
 .DatasetView.content #tablePreview td::-webkit-scrollbar {
   height: 5px;
 }
-.DatasetView.content div.headerTools img {
+.DatasetView.content #tablePreview div.headerTools img {
   width: 1em;
   height: 1em;
 }
-.DatasetView.content div.headerTools img.button {
+.DatasetView.content #tablePreview div.headerTools img.button {
   margin: 0em 0.25em;
 }
-.DatasetView.content div.headerTools img.button:hover {
+.DatasetView.content #tablePreview div.headerTools img.button:hover {
   cursor: pointer;
-  -webkit-filter: url(#recolorImageToWhite);
-  filter: url(#recolorImageToWhite);
+  -webkit-filter: url(#recolorImageToWhite) !important;
+  filter: url(#recolorImageToWhite) !important;
 }
 .DatasetView.content #tablePreview table {
   font-family: Courier, monospace;

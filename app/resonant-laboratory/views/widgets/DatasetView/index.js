@@ -1,6 +1,7 @@
 import Underscore from 'underscore';
 import d3 from 'd3';
 import jQuery from 'jquery';
+import Dataset from '../../../models/Dataset.js';
 import Widget from '../Widget';
 import Menu from '../../overlays/Menu';
 import myTemplate from './template.html';
@@ -111,7 +112,7 @@ let DatasetView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
 
-    this.showTable = true;
+    this.showTable = false;
 
     this.icons.splice(0, 0, {
       src: Widget.settingsIcon,
@@ -471,10 +472,80 @@ let DatasetView = Widget.extend({
       });
   },
   renderHistograms: function (datasetDetails) {
+    let self = this;
+
     this.$el.find('#emptyDatasetState, #tablePreview').hide();
     this.$el.find('#datasetOverview, #histogramPreview').show();
     this.renderOverview(datasetDetails);
-    // TODO
+
+    let container = d3.select(this.el).select('#histogramPreview');
+
+    let attributeOrder = Object.keys(datasetDetails.schema);
+
+    let attributeSections = container.selectAll('.attributeSection')
+      .data(attributeOrder);
+    let attributeSectionsEnter = attributeSections.enter().append('div')
+      .attr('class', 'attributeSection');
+    attributeSections.exit().remove();
+
+    // Add a container for the stuff in the header (the stuff
+    // that is shown while collapsed)
+    let sectionHeadersEnter = attributeSectionsEnter.append('div')
+      .attr('class', 'header');
+    let sectionTitlesEnter = sectionHeadersEnter.append('div')
+      .attr('class', 'title');
+    let sectionTitles = attributeSections.selectAll('.header')
+      .selectAll('.title');
+
+    // TODO: an arrow to collapse the section
+
+    // Checkbox that indicates:
+    // - checked: the attribute is included, with no (non-custom) filters
+    // - indeterminate: the attribute is included, with filters
+    // - unchecked: the attribute is excluded
+    sectionTitlesEnter.append('input')
+      .attr('type', 'checkbox');
+    sectionTitles.selectAll('input')
+      .attr('id', d => d + '_checkbox')
+      .each(function (d) {
+        // this refers to the DOM element
+        let filteredState = datasetDetails.datasetObj.getFilteredState(d);
+        if (filteredState === Dataset.FILTER_STATES.NO_FILTERS) {
+          this.checked = true;
+          this.indeterminate = false;
+        } else if (filteredState === Dataset.FILTER_STATES.FILTERED) {
+          this.checked = true;
+          this.indeterminate = true;
+        } else {  // filteredState === Dataset.FILTER_STATES.EXCLUDED
+          this.checked = false;
+          this.indeterminate = false;
+        }
+      });
+
+    // Label for the header
+    sectionTitlesEnter.append('label');
+    sectionTitles.selectAll('label')
+      .text(d => d)
+      .attr('for', d => d + '_checkbox');
+
+    // Type and interpretation icons / menus
+    let sectionButtonsEnter = sectionHeadersEnter.append('div')
+      .attr('class', 'buttons');
+    let sectionButtons = attributeSections.selectAll('.header')
+      .selectAll('.buttons');
+    sectionButtonsEnter.append('img')
+      .attr('class', 'dataTypeMenuIcon button');
+    sectionButtons.selectAll('img.dataTypeMenuIcon').each(function (d) {
+      // this refers to the DOM element
+      self.setupDataTypeMenu(this, d, datasetDetails);
+    });
+
+    sectionButtonsEnter.append('img')
+      .attr('class', 'interpretationMenuIcon button');
+    sectionButtons.selectAll('img.interpretationMenuIcon').each(function (d) {
+      // this refers to the DOM element
+      self.setupInterpretationMenu(this, d, datasetDetails);
+    });
   },
   renderTable: function (datasetDetails) {
     let self = this;
