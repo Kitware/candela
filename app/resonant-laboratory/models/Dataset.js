@@ -139,7 +139,7 @@ class DatasetCache {
           path: 'dataset/getHistograms',
           type: 'POST',
           data: {
-            binSettings: this.model.getBinSettings(schema),
+            binSettings: JSON.stringify(this.model.getBinSettings(schema)),
             cache: true
           }
         }, 'rl:loadedHistogram');
@@ -154,7 +154,7 @@ class DatasetCache {
           path: 'dataset/getHistograms',
           type: 'POST',
           data: {
-            binSettings: this.model.getBinSettings(schema),
+            binSettings: JSON.stringify(this.model.getBinSettings(schema)),
             filter: this.filter,
             cache: true
           }
@@ -170,7 +170,7 @@ class DatasetCache {
           path: 'dataset/getHistograms',
           type: 'POST',
           data: {
-            binSettings: this.model.getBinSettings(schema),
+            binSettings: JSON.stringify(this.model.getBinSettings(schema)),
             filter: this.filter,
             limit: this.page.limit,
             offset: this.page.offset

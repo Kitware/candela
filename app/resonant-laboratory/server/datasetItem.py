@@ -321,7 +321,7 @@ class DatasetItem(Resource):
                'Attempt to coerce all values to "boolean","int",' +
                '"number","date", or "string". Incompatible or missing ' +
                'values will be assigned to appropriate bins such as "NaN" ' +
-               'or "undefined". If no coercion value is supplied, values ' +
+               'or "undefined". If "object" (default) is supplied, values ' +
                'will be binned into type categories ("interpretation" will be ' +
                'ignored).'
                '<br/><br/>interpretation<br/>' +
@@ -370,11 +370,11 @@ class DatasetItem(Resource):
         for attrName, attrSchema in item['meta']['rlab']['schema'].iteritems():
             binSettings[attrName] = binSettings.get(attrName, {})
 
-            coerceToType = attrSchema.get('coerceToType', None)
+            coerceToType = attrSchema.get('coerceToType', 'object')
             coerceToType = binSettings[attrName].get('coerceToType', coerceToType)
             binSettings[attrName]['coerceToType'] = coerceToType
 
-            if binSettings[attrName]['coerceToType'] is None:
+            if binSettings[attrName]['coerceToType'] is 'object':
                 interpretation = binSettings[attrName]['interpretation'] = 'categorical'
             else:
                 interpretation = attrSchema.get('interpretation', 'categorical')
@@ -388,11 +388,24 @@ class DatasetItem(Resource):
             binSettings[attrName]['numBins'] = numBins
 
             if interpretation == 'ordinal':
-                lowBound = attrSchema[coerceToType]['lowBound']
+                lowBound = None
+                highBound = None
+                if coerceToType in attrSchema:
+                    lowBound = attrSchema[coerceToType]['lowBound']
+                    highBound = attrSchema[coerceToType]['highBound']
+                elif coerceToType == 'number' and 'integer' in attrSchema:
+                    # Corner case: the user is coercing to number,
+                    # when we only counted integers
+                    lowBound = attrSchema['integer']['lowBound']
+                    highBound = attrSchema['integer']['highBound']
                 lowBound = binSettings[attrName].get('lowBound', lowBound)
-
-                highBound = attrSchema[coerceToType]['highBound']
                 highBound = binSettings[attrName].get('highBound', highBound)
+                if lowBound is None or highBound is None:
+                    raise RestException('There are no observed values of ' +
+                                        'type ' + coerceToType + ', so it is ' +
+                                        'impossible to automatically determine ' +
+                                        'low/high bounds for an ordinal interpretation.' +
+                                        ' Please supply bounds or change to "categorical".')
 
                 # Pre-populate the bins with human-readable names
                 if coerceToType == 'integer' or coerceToType == 'number':
