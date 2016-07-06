@@ -297,17 +297,25 @@ let Dataset = MetadataItem.extend({
   },
   setAttributeType: function (attrName, dataType) {
     return this.cache.schema.then(schema => {
-      schema[attrName].coerceToType = dataType;
+      if (dataType === null) {
+        delete schema[attrName].coerceToType;
+      } else {
+        schema[attrName].coerceToType = dataType;
+      }
       this.setMeta('schema', schema);
-
+      this.trigger('rl:updatedSchema');
       return this.save();
     });
   },
   setAttributeInterpretation: function (attrName, interpretation) {
     return this.cache.schema.then(schema => {
-      schema[attrName].interpretation = interpretation;
+      if (interpretation === null) {
+        delete schema[attrName].interpretation;
+      } else {
+        schema[attrName].interpretation = interpretation;
+      }
       this.setMeta('schema', schema);
-
+      this.trigger('rl:updatedSchema');
       return this.save();
     });
   },

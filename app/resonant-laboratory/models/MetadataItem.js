@@ -330,10 +330,18 @@ let MetadataItem = girder.models.ItemModel.extend({
     if (typeof key === 'object') {
       let obj = key;
       for (key of Object.keys(obj)) {
-        meta.rlab[key] = obj[key];
+        if (obj[key] === null) {
+          delete meta.rlab[key];
+        } else {
+          meta.rlab[key] = obj[key];
+        }
       }
     } else {
-      meta.rlab[key] = value;
+      if (value === null) {
+        delete meta.rlab[key];
+      } else {
+        meta.rlab[key] = value;
+      }
     }
     this.set('meta', meta);
   },

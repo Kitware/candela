@@ -73,27 +73,26 @@
             these properties are inferred automatically on the fly
           ",
 
-          "stats": {
-            "string": {
-              "native": true,
-              "count": 1234,
-              "lowBound": "0",
-              "highBound": "8"
-            },
-            "integer": {
-              "native": false,
-              "count": 1000,
-              "lowBound": 0,
-              "highBound": 8
-            },
-            "_comment": "
-              These stats refer to the *potential* count and low/high values if
-              all Fertility values are coerced to 'string' or 'number'.
-              The 'native' flag indicates that at least one value in
-              the dataset is stored natively as that type. This is used when
-              automatically attempting to guess an attribute's data type
-            "
-          }
+          "string": {
+            "native": true,
+            "count": 1234,
+            "lowBound": "0",
+            "highBound": "8"
+          },
+          "integer": {
+            "native": false,
+            "count": 1000,
+            "lowBound": 0,
+            "highBound": 8
+          },
+          "_comment2": "
+            These stats refer to the *potential* count and low/high values if
+            all Fertility values are coerced to 'string' or 'number'.
+            The 'native' flag indicates that at least one value in
+            the dataset is stored natively as that type (only really relevant
+            for databases and flat JSON files. With CSV, they'll always be
+            natively stored as strings).
+          "
         }
       },
       "histogramCaches": {

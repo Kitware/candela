@@ -54,46 +54,56 @@ let STATUS = {
 
 let TYPE_MENU_ITEMS = [
   {
-    text: 'Autodetect'
+    text: 'Autodetect',
+    dataType: null
   },
   null,
   {
     icon: ICONS.boolean,
-    text: 'Boolean'
+    text: 'Boolean',
+    dataType: 'boolean'
   },
   {
     icon: ICONS.integer,
-    text: 'Integer'
+    text: 'Integer',
+    dataType: 'integer'
   },
   {
     icon: ICONS.number,
-    text: 'Number'
+    text: 'Number',
+    dataType: 'number'
   },
   {
     icon: ICONS.date,
-    text: 'Date'
+    text: 'Date',
+    dataType: 'date'
   },
   {
     icon: ICONS.string,
-    text: 'String'
+    text: 'String',
+    dataType: 'string'
   },
   {
     icon: ICONS.object,
-    text: 'Object (no type coercion)'
+    text: 'Object (no type coercion)',
+    dataType: 'object'
   }
 ];
 let INTERPRETATION_MENU_ITEMS = [
   {
-    text: 'Autodetect'
+    text: 'Autodetect',
+    interpretation: null
   },
   null,
   {
     icon: ICONS.categorical,
-    text: 'Categorical'
+    text: 'Categorical',
+    interpretation: 'categorical'
   },
   {
     icon: ICONS.ordinal,
-    text: 'Ordinal'
+    text: 'Ordinal',
+    interpretation: 'ordinal'
   }
 ];
 
@@ -413,6 +423,15 @@ let DatasetView = Widget.extend({
       }).on('click', () => {
         // Construct the type menu
         TYPE_MENU_ITEMS[0].icon = ICONS[autoAttrType];
+        TYPE_MENU_ITEMS.forEach(menuItem => {
+          if (menuItem !== null) {
+            menuItem.onclick = () => {
+              datasetDetails.datasetObj
+                .setAttributeType(attrName, menuItem.dataType);
+              window.mainPage.overlay.render(null);
+            };
+          }
+        });
         window.mainPage.overlay.render(new Menu({
           targetElement: element,
           items: TYPE_MENU_ITEMS
@@ -436,6 +455,15 @@ let DatasetView = Widget.extend({
       }).on('click', () => {
         // Construct the type menu
         INTERPRETATION_MENU_ITEMS[0].icon = ICONS[autoInterpretation];
+        INTERPRETATION_MENU_ITEMS.forEach(menuItem => {
+          if (menuItem !== null) {
+            menuItem.onclick = () => {
+              datasetDetails.datasetObj
+                .setAttributeInterpretation(attrName, menuItem.interpretation);
+              window.mainPage.overlay.render(null);
+            };
+          }
+        });
         window.mainPage.overlay.render(new Menu({
           targetElement: element,
           items: INTERPRETATION_MENU_ITEMS

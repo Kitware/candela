@@ -1,5 +1,4 @@
 import Menu from '../Menu';
-import './style.css';
 
 let HamburgerMenu = Menu.extend({
   initialize: function () {
@@ -55,8 +54,11 @@ let HamburgerMenu = Menu.extend({
     }]);
   },
   positionMenu: function () {
-    // Do nothing; the position of the main
-    // menu is set in our stylesheet
+    // The hamburger menu is always fixed in the top corner
+    this.$el.find('.menu').css({
+      'top': '3em',
+      'right': '0em'
+    });
   }
 });
 
