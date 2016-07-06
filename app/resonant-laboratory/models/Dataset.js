@@ -1,14 +1,14 @@
 import MetadataItem from './MetadataItem';
 
 let DEFAULT_INTERPRETATIONS = {
-  'undefined': 'ignore',
-  'null': 'ignore',
+  'undefined': 'categorical',
+  'null': 'categorical',
   boolean: 'categorical',
   integer: 'ordinal',
   number: 'ordinal',
   date: 'categorical',
   string: 'categorical',
-  object: 'ignore'
+  object: 'categorical'
 };
 
 let ATTRIBUTE_GENERALITY = [

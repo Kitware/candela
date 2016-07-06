@@ -372,7 +372,7 @@ let Project = MetadataItem.extend({
       return Promise.resolve([]);
     }
 
-    let datasetObj = window.mainPage.loadedDatasets[meta.datasets[0].dataset];
+    let datasetObj = this.getDataset(0);
     // TODO: when candela supports multiple datasets, include
     // all the datasets that the visualization connects to
 
@@ -394,6 +394,7 @@ let Project = MetadataItem.extend({
           Object.keys(item).forEach(attrName => {
             if (attrName in fieldsInUse) {
               if (fieldsInUse[attrName] === 'object') {
+                // Don't attempt any type coercion
                 newItem[attrName] = item[attrName];
               } else if (fieldsInUse[attrName] === 'string') {
                 newItem[attrName] = String(item[attrName]);
@@ -445,23 +446,24 @@ let Project = MetadataItem.extend({
         continue;
       }
 
-      let dataset = window.mainPage.loadedDatasets[meta.datasets[matching.dataIndex]];
+      let dataset = this.getDataset(matching.dataIndex);
       if (!dataset) {
         indicesToTrash.push(index);
         continue;
       }
 
-      let dataType = dataset.getSpec()
+      let dataType = dataset.getTypeSpec()
         .attributes[matching.dataAttribute];
-      let optionSpec = meta.visualizations[matching.visIndex]
-        .options.find(spec => spec.name === matching.visAttribute);
+      let visName = meta.visualizations[matching.visIndex].name;
+      let visSpec = candela.components[visName].options
+        .find(spec => spec.name === matching.visAttribute);
 
-      if (!dataType || !optionSpec) {
+      if (!dataType || !visSpec || !visSpec.domain || !visSpec.domain.fieldTypes) {
         indicesToTrash.push(index);
         continue;
       }
 
-      if (optionSpec.domain.fieldTypes.indexOf(dataType) === -1) {
+      if (visSpec.domain.fieldTypes.indexOf(dataType) === -1) {
         indicesToTrash.push(index);
       }
     }
