@@ -1,7 +1,6 @@
 import d3 from 'd3';
 import Backbone from 'backbone';
 import template from './template.html';
-
 import './style.css';
 
 let Menu = Backbone.View.extend({
@@ -19,24 +18,49 @@ let Menu = Backbone.View.extend({
       .data(this.menuSpec.items);
     let menuItemsEnter = menuItems.enter()
       .append('div')
-      .attr('class', d => d === null ? 'separator menuItem' : 'menuItem');
+      .attr('class', 'menuItem');
     menuItems.exit().remove();
 
-    // Make sure that only the elements with icons have img elements
-    menuItems.selectAll('img').filter(d => d === null || !d.icon).remove();
-    menuItemsEnter.filter(d => d !== null && d.icon).append('img');
-    menuItems.selectAll('img')
+    // Make sure that only items with icons have img.icon elements
+    menuItems.selectAll('img.icon')
+      .filter(d => d === null || !d.icon)
+      .remove();
+    menuItemsEnter.filter(d => d !== null && d.icon)
+      .append('img')
+      .attr('class', 'icon');
+    menuItems.selectAll('img.icon')
       .attr('src', d => typeof d.icon === 'function' ? d.icon() : d.icon);
 
-    // Make sure that only the elements with text have p elements
-    menuItems.selectAll('p').filter(d => d === null || !d.text).remove();
-    menuItemsEnter.filter(d => d !== null && d.text).append('p');
+    // Make sure that only items with text have p elements
+    menuItems.selectAll('p')
+      .filter(d => d === null || !d.text)
+      .remove();
+    menuItemsEnter.filter(d => d !== null && d.text)
+      .append('p');
     menuItems.selectAll('p')
       .text(d => typeof d.text === 'function' ? d.text() : d.text);
 
     // Make sure that only separators have hr elements
-    menuItems.selectAll('hr').filter(d => d !== null).remove();
-    menuItemsEnter.filter(d => d === null).append('hr');
+    menuItems.selectAll('hr')
+      .filter(d => d !== null)
+      .remove();
+    menuItemsEnter.filter(d => d === null)
+      .append('hr');
+
+    // Add any extra classes to style the items appropriately
+    let checksExist = menuItems.filter(d => d !== null && d.checked).size() > 0;
+    menuItems.attr('class', d => {
+      let classString = 'menuItem';
+      if (checksExist) {
+        classString += ' checkPadded';
+      }
+      if (d === null) {
+        classString += ' separator';
+      } else if (d.checked) {
+        classString += ' checked';
+      }
+      return classString;
+    });
 
     // Attach / update any events
     menuItems.on('click', d => {

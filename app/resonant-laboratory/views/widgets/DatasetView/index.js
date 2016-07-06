@@ -411,10 +411,8 @@ let DatasetView = Widget.extend({
       .autoDetectAttributeType(datasetDetails.schema, attrName);
     let attrType = datasetDetails.datasetObj
       .getAttributeType(datasetDetails.schema, attrName);
-    let filterStyle = null;
-    if (datasetDetails.schema[attrName].hasOwnProperty('coerceToType')) {
-      filterStyle = 'url(#recolorImageTo377eb8)';
-    }
+    let isAuto = !(datasetDetails.schema[attrName].hasOwnProperty('coerceToType'));
+    let filterStyle = isAuto ? null : 'url(#recolorImageTo377eb8)';
     d3.select(element)
       .attr('src', ICONS[attrType])
       .style({
@@ -425,6 +423,8 @@ let DatasetView = Widget.extend({
         TYPE_MENU_ITEMS[0].icon = ICONS[autoAttrType];
         TYPE_MENU_ITEMS.forEach(menuItem => {
           if (menuItem !== null) {
+            menuItem.checked = (menuItem.dataType === null && isAuto) ||
+              (menuItem.dataType === attrType && !isAuto);
             menuItem.onclick = () => {
               datasetDetails.datasetObj
                 .setAttributeType(attrName, menuItem.dataType);
@@ -443,10 +443,8 @@ let DatasetView = Widget.extend({
       .autoDetectAttributeInterpretation(datasetDetails.schema, attrName);
     let interpretation = datasetDetails.datasetObj
       .getAttributeInterpretation(datasetDetails.schema, attrName);
-    let filterStyle = null;
-    if (datasetDetails.schema[attrName].hasOwnProperty('interpretation')) {
-      filterStyle = 'url(#recolorImageTo377eb8)';
-    }
+    let isAuto = !(datasetDetails.schema[attrName].hasOwnProperty('interpretation'));
+    let filterStyle = isAuto ? null : 'url(#recolorImageTo377eb8)';
     d3.select(element)
       .attr('src', ICONS[interpretation])
       .style({
@@ -457,6 +455,8 @@ let DatasetView = Widget.extend({
         INTERPRETATION_MENU_ITEMS[0].icon = ICONS[autoInterpretation];
         INTERPRETATION_MENU_ITEMS.forEach(menuItem => {
           if (menuItem !== null) {
+            menuItem.checked = (menuItem.interpretation === null && isAuto) ||
+              (menuItem.interpretation === interpretation && !isAuto);
             menuItem.onclick = () => {
               datasetDetails.datasetObj
                 .setAttributeInterpretation(attrName, menuItem.interpretation);
