@@ -497,15 +497,28 @@ let DatasetView = Widget.extend({
     let sectionTitles = attributeSections.selectAll('.header')
       .selectAll('.title');
 
-    // TODO: an arrow to collapse the section
+    // Add an arrow to collapse the section
+    sectionTitlesEnter.append('input')
+      .attr('type', 'checkbox')
+      .attr('class', 'expander');
+    sectionTitles.selectAll('input.expander')
+      .on('change', function (d) {
+        // this refers to the DOM element
+        if (this.checked) {
+          self.$el.find('#' + makeValidId(d + '_histogramContent')).removeClass('collapsed');
+        } else {
+          self.$el.find('#' + makeValidId(d + '_histogramContent')).addClass('collapsed');
+        }
+      });
 
     // Checkbox that indicates:
     // - checked: the attribute is included, with no (non-custom) filters
     // - indeterminate: the attribute is included, with filters
     // - unchecked: the attribute is excluded
     sectionTitlesEnter.append('input')
-      .attr('type', 'checkbox');
-    sectionTitles.selectAll('input')
+      .attr('type', 'checkbox')
+      .attr('class', 'filteredState');
+    sectionTitles.selectAll('input.filteredState')
       .attr('id', d => d + '_checkbox')
       .each(function (d) {
         // this refers to the DOM element
@@ -546,6 +559,13 @@ let DatasetView = Widget.extend({
       // this refers to the DOM element
       self.setupInterpretationMenu(this, d, datasetDetails);
     });
+
+    // Now for the actual histgoram content (that gets collapsed)
+    let contentsEnter = attributeSectionsEnter.append('div')
+      .attr('class', 'collapsed content');
+    let contents = attributeSections.selectAll('.content')
+      .attr('id', d => makeValidId(d + '_histogramContent'))
+      .text(d => d);
   },
   renderTable: function (datasetDetails) {
     let self = this;

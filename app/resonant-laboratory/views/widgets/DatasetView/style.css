@@ -44,13 +44,37 @@
   left: 0.25em;
   bottom: 0.35em;
 }
+.DatasetView.content #histogramPreview .header input.expander {
+  width: 1em;
+}
+.DatasetView.content #histogramPreview .header input.expander:before {
+  background-image: url('../../../images/collapse.svg');
+  background-position: 0 0;
+  width: 1em;
+  height: 1em;
+  left: 999em;
+  top: 0.35em;
+}
+.DatasetView.content #histogramPreview .header input.expander:checked:before {
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+.DatasetView.content #histogramPreview .content {
+  position: relative;
+  width: 100%;
+  padding-bottom: 1em;
+}
+.DatasetView.content #histogramPreview .content.collapsed {
+  display: none;
+}
 .DatasetView.content #histogramPreview .header img {
   width: 1em;
   height: 1em;
 }
 .DatasetView.content #histogramPreview .header img.button {
-  margin: 0em 0.25em;
+  margin-left: 0.5em;
 }
+.DatasetView.content #histogramPreview .header input.expander:hover:before,
 .DatasetView.content #histogramPreview .header img.button:hover {
   cursor: pointer;
   -webkit-filter: url(#recolorImageToBlack) !important;
