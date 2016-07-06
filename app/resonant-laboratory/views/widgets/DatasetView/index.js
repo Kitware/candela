@@ -5,6 +5,7 @@ import Dataset from '../../../models/Dataset.js';
 import Widget from '../Widget';
 import Menu from '../../overlays/Menu';
 import myTemplate from './template.html';
+import histogramTemplate from './histogramTemplate.html';
 import rewrap from '../../../shims/svgTextWrap.js';
 import makeValidId from '../../../shims/makeValidId.js';
 import './style.css';
@@ -471,6 +472,11 @@ let DatasetView = Widget.extend({
         }));
       });
   },
+  renderIndividualHistogram: function (element, attrName, datasetDetails) {
+    let svg = d3.select(element);
+
+    // TODO: First, figure out the horizontal scale
+  },
   renderHistograms: function (datasetDetails) {
     let self = this;
 
@@ -564,8 +570,13 @@ let DatasetView = Widget.extend({
     let contentsEnter = attributeSectionsEnter.append('div')
       .attr('class', 'collapsed content');
     let contents = attributeSections.selectAll('.content')
-      .attr('id', d => makeValidId(d + '_histogramContent'))
-      .text(d => d);
+      .attr('id', d => makeValidId(d + '_histogramContent'));
+
+    contentsEnter.html(histogramTemplate);
+    contents.selectAll('svg').each(function (d) {
+      // this refers to the DOM element
+      self.renderIndividualHistogram(this, d, datasetDetails);
+    });
   },
   renderTable: function (datasetDetails) {
     let self = this;
