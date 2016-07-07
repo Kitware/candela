@@ -1,6 +1,7 @@
 import Underscore from 'underscore';
 import d3 from 'd3';
 import jQuery from 'jquery';
+import ComboScale from './comboScale.js';
 import Dataset from '../../../models/Dataset.js';
 import Widget from '../Widget';
 import Menu from '../../overlays/Menu';
@@ -9,6 +10,8 @@ import histogramTemplate from './histogramTemplate.html';
 import rewrap from '../../../shims/svgTextWrap.js';
 import makeValidId from '../../../shims/makeValidId.js';
 import './style.css';
+import './tablePreview.css';
+import './histogramPreview.css';
 
 import seekFirst from '../../../images/seekFirst.svg';
 import seekPrev from '../../../images/seekPrev.svg';
@@ -26,6 +29,8 @@ import stringListIcon from '../../../images/string_list.svg';
 import objectIcon from '../../../images/object.svg';
 import categorical from '../../../images/categorical.svg';
 import ordinal from '../../../images/ordinal.svg';
+import check from '../../../images/check.svg';
+import ex from '../../../images/ex.svg';
 
 let ICONS = {
   seekFirst,
@@ -43,7 +48,9 @@ let ICONS = {
   string_list: stringListIcon,
   object: objectIcon,
   categorical,
-  ordinal
+  ordinal,
+  check,
+  ex
 };
 
 let STATUS = {
@@ -114,6 +121,7 @@ let DatasetView = Widget.extend({
     Widget.prototype.initialize.apply(this, arguments);
 
     this.showTable = false;
+    this.histogramScales = {};
 
     this.icons.splice(0, 0, {
       src: Widget.settingsIcon,
@@ -473,9 +481,83 @@ let DatasetView = Widget.extend({
       });
   },
   renderIndividualHistogram: function (element, attrName, datasetDetails) {
-    let svg = d3.select(element);
+    let scale = this.histogramScales[attrName];
+    let parentWidth = element.parentNode.getBoundingClientRect().width;
+    if (scale === undefined) {
+      scale = this.histogramScales[attrName] = new ComboScale(
+        this, attrName, datasetDetails, parentWidth);
+    } else {
+      scale.update(attrName, datasetDetails, parentWidth);
+    }
 
-    // TODO: First, figure out the horizontal scale
+    let svg = d3.select(element);
+    let width = scale.width;
+    let height = scale.height;
+
+    // Draw the bin groups
+    let labels = datasetDetails.overviewHistogram[attrName].map(d => d.label);
+    let bins = svg.selectAll('.bin')
+      .data(labels, d => d);
+    let binsEnter = bins.enter().append('g')
+      .attr('class', 'bin');
+    bins.exit().remove();
+
+    // Move the bins horizontally
+    bins.attr('transform', d => {
+      let binNo = scale.labelToBin(d, 'overview');
+      return 'translate(' + scale.binForward(binNo) + ',0)';
+    });
+
+    // Draw one bar for each bin
+    binsEnter.append('rect')
+      .attr('class', 'overview');
+    binsEnter.append('rect')
+      .attr('class', 'filtered');
+    binsEnter.append('rect')
+      .attr('class', 'page');
+
+    // Update each bar
+    bins.selectAll('rect.overview')
+      .each(function (d) {
+        // this refers to the DOM element
+        d3.select(this).attr(scale.getBinRect(d, 'overview'));
+      });
+    bins.selectAll('rect.filtered')
+      .each(function (d) {
+        // this refers to the DOM element
+        d3.select(this).attr(scale.getBinRect(d, 'filtered'));
+      });
+    bins.selectAll('rect.page')
+      .each(function (d) {
+        // this refers to the DOM element
+        d3.select(this).attr(scale.getBinRect(d, 'page'));
+      });
+
+    // Add an include / exclude button for each bin
+    binsEnter.append('image')
+      .attr('class', 'button')
+      .attr({
+        x: -0.5 * this.layout.emSize,
+        y: height + 0.5 * this.layout.emSize,
+        width: this.layout.emSize,
+        height: this.layout.emSize
+      });
+    bins.selectAll('image.button')
+      .attr('xlink:href', ICONS.check);
+    height += 2 * this.layout.emSize;
+
+    // Add each bin label
+    binsEnter.append('text');
+    bins.selectAll('text')
+      .text(d => d)
+      .attr('transform', 'rotate(90) translate(' + height + ',' +
+        (0.35 * this.layout.emSize) + ')');
+    height += 4 * this.layout.emSize;
+
+    svg.attr({
+      width,
+      height
+    });
   },
   renderHistograms: function (datasetDetails) {
     let self = this;
@@ -510,10 +592,13 @@ let DatasetView = Widget.extend({
     sectionTitles.selectAll('input.expander')
       .on('change', function (d) {
         // this refers to the DOM element
+        let contentElement = self.$el.find('#' + makeValidId(d + '_histogramContent'));
         if (this.checked) {
-          self.$el.find('#' + makeValidId(d + '_histogramContent')).removeClass('collapsed');
+          contentElement.removeClass('collapsed');
+          // Update that particular histogram
+          self.renderIndividualHistogram(contentElement[0], d, datasetDetails);
         } else {
-          self.$el.find('#' + makeValidId(d + '_histogramContent')).addClass('collapsed');
+          contentElement.addClass('collapsed');
         }
       });
 
@@ -572,7 +657,8 @@ let DatasetView = Widget.extend({
     let contents = attributeSections.selectAll('.content')
       .attr('id', d => makeValidId(d + '_histogramContent'));
 
-    contentsEnter.html(histogramTemplate);
+    contentsEnter.append('svg')
+      .html(histogramTemplate);
     contents.selectAll('svg').each(function (d) {
       // this refers to the DOM element
       self.renderIndividualHistogram(this, d, datasetDetails);
