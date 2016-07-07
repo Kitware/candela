@@ -262,7 +262,8 @@ class DatasetItem(Resource):
             item = self.setupDataset(id=item['_id'], params={}, user=user)
 
         # Run the schema MapReduce code
-        mapScript = self.foreignCode['schema_map.js']
+        mapScript = self.foreignCode['coerceValue.js'] + '\n' + \
+            self.foreignCode['schema_map.js']
         reduceScript = self.foreignCode['schema_reduce.js']
 
         # TODO: When girder_db_items changes, find a new way to sneak
@@ -470,6 +471,7 @@ class DatasetItem(Resource):
 
         # Construct and run the histogram MapReduce code
         mapScript = 'function map () {\n' + \
+            self.foreignCode['coerceValue.js'] + '\n' + \
             'var params = ' + paramsCode + ';\n' + \
             self.foreignCode['histogram_map.js'] + '\n}'
 

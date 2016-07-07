@@ -1,7 +1,7 @@
 About this folder
 =================
 
-The stuff in here is strange voodoo; the javascript code in here is actually used directly in several places, including (but not limited to):
+There's some strange voodoo going on in here; the javascript code in this directory is actually used directly in several places, including (but not limited to):
 
 - in the browser on the client
 - on the server via PyExecJS
@@ -15,5 +15,6 @@ var es6exports = { // eslint-disable-line no-unused-vars
 };
 ```
 
-statement that doesn't do anything in ES5 scenarios (PyExecJS / mongodb), but gets imported via the `exports-loader` in `webpack.config.js`. You can see an example
-of how this gets imported in `views/widgets/DatasetView/comboScale.js`.
+statement that doesn't do anything in ES5 scenarios (PyExecJS / mongodb), but gets imported via the `exports-loader` in `webpack.config.js`. For a simple example, see how `coerceValueWrapper` is imported and used in `models/Project.js`.
+
+There are also complications with stitching files together, especially where these bits of code are going to be used in mongodb. TODO: move the messy/redundant comments explaining this here!

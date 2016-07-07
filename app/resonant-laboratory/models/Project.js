@@ -1,6 +1,7 @@
 import Underscore from 'underscore';
 import MetadataItem from './MetadataItem';
 import Dataset from './Dataset';
+import coerceValueWrapper from '../general_purpose/coerceValue.js';
 import promiseDebounce from '../shims/promiseDebounce.js';
 import { Set } from '../shims/SetOps.js';
 import candela from '../../../src/candela';
@@ -393,26 +394,8 @@ let Project = MetadataItem.extend({
           let newItem = {};
           Object.keys(item).forEach(attrName => {
             if (attrName in fieldsInUse) {
-              if (fieldsInUse[attrName] === 'object') {
-                // Don't attempt any type coercion
-                newItem[attrName] = item[attrName];
-              } else if (fieldsInUse[attrName] === 'string') {
-                newItem[attrName] = String(item[attrName]);
-              } else if (fieldsInUse[attrName] === 'number') {
-                newItem[attrName] = parseFloat(item[attrName]);
-              } else if (fieldsInUse[attrName] === 'integer') {
-                newItem[attrName] = parseInt(item[attrName]);
-              } else if (fieldsInUse[attrName] === 'date') {
-                // TODO: add fancier coercion logic (see
-                // server/schema_map.js)
-                newItem[attrName] = new Date(item[attrName]);
-              } else if (fieldsInUse[attrName] === 'boolean') {
-                newItem[attrName] = !!item[attrName];
-              } else if (fieldsInUse[attrName] === 'null') {
-                newItem[attrName] = item[attrName] !== undefined ? null : undefined;
-              } else if (fieldsInUse[attrName] === 'undefined') {
-                newItem[attrName] = undefined;
-              }
+              newItem[attrName] = coerceValueWrapper.coerceValue(
+                item[attrName], fieldsInUse[attrName]);
             }
           });
           coercedData.push(newItem);

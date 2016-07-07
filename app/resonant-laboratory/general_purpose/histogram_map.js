@@ -1,4 +1,4 @@
-/* globals emit, params */
+/* globals emit, params, coerceValue */
 
 // This script is kind of sloppy, but to use this code with mongodb's
 // mapreduce, the map script must contain exactly one function. Because of
@@ -10,31 +10,15 @@
 function findBin (attrName, value) {
   var coerceToType = params.binSettings[attrName].coerceToType;
   var interpretation = params.binSettings[attrName].interpretation;
-  // What type should we coerce this value to?
-  if (coerceToType === null) {
-    // Bin by native data type
-    if (parseFloat(value) === parseInt(value)) {
-      value = 'integer';
-    } else {
-      value = typeof value;
-    }
-  } else if (coerceToType === 'boolean') {
-    value = !!value;
-  } else if (coerceToType === 'integer') {
-    value = parseInt(value);
-  } else if (coerceToType === 'number') {
-    value = parseFloat(value);
-  } else if (coerceToType === 'string') {
+
+  if (coerceToType === 'object') {
+    // coerceToType is 'object', or in other words, con't coerce.
+    // For the sake of the histograms, force 'object' coercions
+    // into a string (will probably yield '[object Object]') even
+    // though the data will be passed in Resonant Lab unchanged.
     value = String(value);
-  } else if (coerceToType === 'date') {
-    // TODO: add fancier coercion logic (see
-    // server/schema_map.js)
-    value = new Date(value);
   } else {
-    // coerceToType is 'object' or some other kind of passthrough.
-    // for the sake of the histograms, force it to a string (even
-    // though the data will be passed in Resonant Lab unchanged)
-    value = String(value);
+    value = coerceValue(value, coerceToType);
   }
 
   // Is the value a special value (always emit the bin)?
