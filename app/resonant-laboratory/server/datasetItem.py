@@ -56,11 +56,13 @@ class DatasetItem(Resource):
 
         # Load up the external foreign code snippets
         codePath = subprocess.check_output(['girder-install', 'plugin-path']).strip()
-        codePath = os.path.join(codePath, 'resonant-laboratory/server/foreignCode')
+        codePath = os.path.join(codePath, 'resonant-laboratory/general_purpose')
 
         self.foreignCode = {}
 
         for filename in os.listdir(codePath):
+            if (os.path.splitext(filename)[1] != '.js'):
+                continue
             infile = open(os.path.join(codePath, filename), 'rb')
             self.foreignCode[filename] = infile.read()
             infile.close()

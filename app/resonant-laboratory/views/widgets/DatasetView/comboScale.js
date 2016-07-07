@@ -1,8 +1,12 @@
+import binningLogic from '../../../general_purpose/binningLogic.js';
+
 class ComboScale {
   constructor (view, attrName, datasetDetails, idealWidth) {
     this.emSize = view.layout.emSize;
     this.leftAxisPadding = 3 * this.emSize;
     this.height = 6 * this.emSize;
+
+    console.log(binningLogic.test('hi'));
 
     // The x scale is a funky one - we may (or may not) have an ordinal chunk
     // and a categorical chunk on the same scale. We want to try to use the
