@@ -18,6 +18,12 @@ let ATTRIBUTE_GENERALITY = [
   'integer'
 ];
 
+let FILTER_STATES = {
+  NO_FILTERS: 0,
+  FILTERED: 1,
+  EXCLUDED: 2
+};
+
 class DatasetCache {
   constructor (model) {
     this.model = model;
@@ -133,7 +139,7 @@ class DatasetCache {
           path: 'dataset/getHistograms',
           type: 'POST',
           data: {
-            binSettings: this.model.getBinSettings(schema),
+            binSettings: JSON.stringify(this.model.getBinSettings(schema)),
             cache: true
           }
         }, 'rl:loadedHistogram');
@@ -148,7 +154,7 @@ class DatasetCache {
           path: 'dataset/getHistograms',
           type: 'POST',
           data: {
-            binSettings: this.model.getBinSettings(schema),
+            binSettings: JSON.stringify(this.model.getBinSettings(schema)),
             filter: this.filter,
             cache: true
           }
@@ -164,7 +170,7 @@ class DatasetCache {
           path: 'dataset/getHistograms',
           type: 'POST',
           data: {
-            binSettings: this.model.getBinSettings(schema),
+            binSettings: JSON.stringify(this.model.getBinSettings(schema)),
             filter: this.filter,
             limit: this.page.limit,
             offset: this.page.offset
@@ -319,6 +325,10 @@ let Dataset = MetadataItem.extend({
       return this.save();
     });
   },
+  getFilteredState: function (attrName) {
+    // TODO
+    return FILTER_STATES.NO_FILTERS;
+  },
   setPage: function (offset, limit) {
     this.cache.page = {
       offset,
@@ -352,4 +362,5 @@ let Dataset = MetadataItem.extend({
 });
 
 Dataset.DEFAULT_INTERPRETATIONS = DEFAULT_INTERPRETATIONS;
+Dataset.FILTER_STATES = FILTER_STATES;
 export default Dataset;

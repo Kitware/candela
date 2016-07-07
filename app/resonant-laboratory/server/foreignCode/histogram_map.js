@@ -55,6 +55,8 @@ function findBin (attrName, value) {
   }
 
   // Okay, how should we bin things?
+  // WARNING: similar logic exists in views/widgets/DatasetView/comboScale.js
+  // changes here should also be adapted there.
   if (interpretation === 'ordinal') {
     if (coerceToType === 'integer' || coerceToType === 'number') {
       var binIndex = Math.floor(params.binSettings[attrName].numBins *
