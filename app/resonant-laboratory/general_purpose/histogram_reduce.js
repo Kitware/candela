@@ -28,21 +28,23 @@ var binLookup = {};
 var binSettings = params.binSettings[attrName];
 if (binSettings === undefined) {
   binSettings = {
-    humanBins: [],
+    ordinalBins: [],
     specialBins: ['count'],
     numBins: 0
   };
 }
 
-// Initialize all of our human bins to zero,
-// so that there aren't weird gaps in ordinal histograms
-binSettings.humanBins.forEach(function (label) {
-  binLookup[label] = histogram.length;
-  histogram.push({
-    label: label,
-    count: 0
+if (binSettings.ordinalBins) {
+  // Initialize all of our human bins to zero,
+  // so that there aren't weird gaps in ordinal histograms
+  binSettings.ordinalBins.forEach(function (bin) {
+    binLookup[bin.label] = histogram.length;
+    histogram.push({
+      label: bin.label,
+      count: 0
+    });
   });
-});
+}
 
 // Count everything
 allHistograms.forEach(function (wrappedHistogram) {

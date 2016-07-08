@@ -388,18 +388,21 @@ class DatasetItem(Resource):
                                         'impossible to automatically determine ' +
                                         'low/high bounds for an ordinal interpretation.' +
                                         ' Please supply bounds or change to "categorical".')
+                binSettings[attrName]['lowBound'] = lowBound
+                binSettings[attrName]['highBound'] = highBound
 
                 # Pre-populate the bins with human-readable names
                 binUtilsCode = execjs.compile(self.foreignCode['binUtils.js'])
-                binSettings[attrName].ordinalBins = binUtilsCode.call('createBins',
-                                                                      coerceToType,
-                                                                      numBins,
-                                                                      lowBound,
-                                                                      highBound)
-                print attrName, binSettings[attrName].ordinalBins
-            # We can ignore the ordinalBins parameter if we're being
-            # categorical. TODO: the fancier 2-pass idea in histogram_reduce.js
-            # would necessitate that we do something different here
+                binSettings[attrName]['ordinalBins'] = binUtilsCode.call('createBins',
+                                                                         coerceToType,
+                                                                         numBins,
+                                                                         lowBound,
+                                                                         highBound)['bins']
+            else:
+                pass
+                # We can ignore the ordinalBins parameter if we're being
+                # categorical. TODO: the fancier 2-pass idea in histogram_reduce.js
+                # would necessitate that we do something different here
 
         params['binSettings'] = binSettings
         params['cache'] = params.get('cache', False) in TRUE_VALUES
@@ -446,10 +449,10 @@ class DatasetItem(Resource):
         # lowBound / highBound details to each ordinal bin
         for attrName, wrappedHistogram in histogram.iteritems():
             histogram[attrName] = wrappedHistogram['histogram']
-            if attrName in binSettings and 'binBounds' in binSettings[attrName]:
-                for binIndex, bounds in enumerate(binSettings[attrName]['binBounds']):
-                    histogram[attrName][binIndex]['lowBound'] = bounds[0]
-                    histogram[attrName][binIndex]['highBound'] = bounds[1]
+            if attrName in binSettings and 'ordinalBins' in binSettings[attrName]:
+                for binIndex, binObj in enumerate(binSettings[attrName]['ordinalBins']):
+                    histogram[attrName][binIndex]['lowBound'] = binObj['lowBound']
+                    histogram[attrName][binIndex]['highBound'] = binObj['highBound']
 
         # Cache the results before returning them
         if params['cache']:

@@ -114,20 +114,20 @@ function createBins (coerceToType, numBins, lowBound, highBound) {
     step = (highBound - lowBound) / numBins;
     // Get significant digits in terms of the step value; we know that
     // this will always be enough to distinguish between each boundary value
-    var base = Math.pow(Math.floor(Math.log10(Math.abs(step))) - (sigFigs - 1));
+    var base = Math.pow(10, Math.floor(Math.log10(Math.abs(step))) - (sigFigs - 1));
     for (i = 0; i < numBins; i += 1) {
       // Create the bins with raw boundary values
       bin = {
         lowBound: lowBound + i * step,
-        highBound: highBound + (i + 1) * step
+        highBound: lowBound + (i + 1) * step
       };
-      bin.humanLabel = '[' + (Math.floor(bin.lowBound / base) * base) + ' - ';
+      bin.label = '[' + (Math.floor(bin.lowBound / base) * base) + ' - ';
       if (i === numBins - 1) {
-        bin.humanLabel += (Math.ceil(highBound / base) * base) + ']';
+        bin.label += (Math.ceil(highBound / base) * base) + ']';
       } else {
-        bin.humanLabel += (Math.floor(bin.highBound / base) * base) + ')';
+        bin.label += (Math.floor(bin.highBound / base) * base) + ')';
       }
-      lookup[bin.humanLabel] = bins.length;
+      lookup[bin.label] = bins.length;
       bins.push(bin);
     }
   } else if (coerceToType === 'string' || coerceToType === 'object') {
@@ -173,7 +173,7 @@ function createBins (coerceToType, numBins, lowBound, highBound) {
       // Convert the byte arrays back into strings
       bin.lowBound = stem + byteArrayToString(bin.lowBound);
       bin.highBound = stem + byteArrayToString(bin.highBound);
-      bin.humanLabel = '[' + bin.lowBound + ' - ';
+      bin.label = '[' + bin.lowBound + ' - ';
       if (i === numBins - 1) {
         // The original high bound may have been
         // corrupted slightly because of rounding;
@@ -181,11 +181,11 @@ function createBins (coerceToType, numBins, lowBound, highBound) {
         // (unlike the other bins), restore the original
         // (but keep it short)
         bin.highBound = highBound.slice(0, charOffset + charLimit);
-        bin.humanLabel += bin.highBound + ']';
+        bin.label += bin.highBound + ']';
       } else {
-        bin.humanLabel += bin.highBound + ')';
+        bin.label += bin.highBound + ')';
       }
-      lookup[bin.humanLabel] = bins.length;
+      lookup[bin.label] = bins.length;
       bins.push(bin);
     }
   } else if (coerceToType === 'boolean') {
@@ -195,12 +195,12 @@ function createBins (coerceToType, numBins, lowBound, highBound) {
       {
         lowBound: false,
         highBound: false,
-        humanLabel: 'False'
+        label: 'False'
       },
       {
         lowBound: true,
         highBound: true,
-        humanLabel: 'True'
+        label: 'True'
       }
     ];
     lookup = {
@@ -259,12 +259,12 @@ function findBinLabel (value, coerceToType, lowBound, highBound, specialBins, or
       // Does the value fit in this bin?
       if (value >= ordinalBins[i].lowBound &&
           value < ordinalBins[i].highBound) {
-        return ordinalBins[i].humanLabel;
+        return ordinalBins[i].label;
       }
     }
     // Corner case: the highest value is inclusive
     if (value <= ordinalBins[ordinalBins.length - 1].highBound) {
-      return ordinalBins[ordinalBins.length - 1].humanLabel;
+      return ordinalBins[ordinalBins.length - 1].label;
     }
     // Okay, the value didn't make it into any of the ordinal bins.
     // The bins must not include the full range of the data.
