@@ -21,12 +21,6 @@ Pass #2:
     probably do stage 2 in in the map phase, because we already know the bins
 */
 
-// This script is kind of sloppy, but to use this code with mongodb's
-// mapreduce, the reduce script must contain exactly one function. Because of
-// this, these two lines are appended in datasetItem.py (as params can vary,
-// and there's no way to pass in parameters to these functions):
-// function reduce (attrName, allHistograms) {
-//  var params = {...}
 var histogram = [];
 var specialBins = {};
 var binLookup = {};
@@ -101,8 +95,3 @@ for (bin in specialBins) {
     histogram.push(specialBins[bin]);
   }
 }
-
-// datasetItem.py also stitches this on...
-// mongo can't return an array, so we wrap it in an object
-//  return {histogram: histogram};
-// }

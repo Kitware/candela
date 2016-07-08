@@ -15,6 +15,21 @@ var es6exports = { // eslint-disable-line no-unused-vars
 };
 ```
 
-statement that doesn't do anything in ES5 scenarios (PyExecJS / mongodb), but gets imported via the `exports-loader` in `webpack.config.js`. For a simple example, see how `coerceValueWrapper` is imported and used in `models/Project.js`.
+statement that doesn't do anything in ES5 scenarios (PyExecJS / mongodb), but gets imported via the `exports-loader` in `webpack.config.js` for client-side use. For a simple example, see how `binUtils` is imported and used in `models/Project.js`.
 
-There are also complications with stitching files together, especially where these bits of code are going to be used in mongodb. TODO: move the messy/redundant comments explaining this here!
+There are also complications to be aware of with regard to how files are stitched together. For example, to use this code with mongodb's mapreduce engine, the map and reduce script strings must contain exactly one function, and there is no way to pass any additional parameters. datasetItem.py gets around this by wrapping code like this:
+
+```
+function map () {
+  var params = {... stringified parameter object ...};
+
+  ... embedded code ...
+
+}
+```
+
+There are also complications because mongodb can't return an array, so you will see seemingly unnecessary wrapping up of arrays in objects. For example, datasetItem.py appends this kind of return statement in reduce functions:
+
+```
+return {histogram: histogram};
+```

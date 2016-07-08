@@ -1,7 +1,7 @@
 import Underscore from 'underscore';
 import MetadataItem from './MetadataItem';
 import Dataset from './Dataset';
-import coerceValueWrapper from '../general_purpose/coerceValue.js';
+import binUtils from '../general_purpose/binUtils.js';
 import promiseDebounce from '../shims/promiseDebounce.js';
 import { Set } from '../shims/SetOps.js';
 import candela from '../../../src/candela';
@@ -394,7 +394,7 @@ let Project = MetadataItem.extend({
           let newItem = {};
           Object.keys(item).forEach(attrName => {
             if (attrName in fieldsInUse) {
-              newItem[attrName] = coerceValueWrapper.coerceValue(
+              newItem[attrName] = binUtils.coerceValue(
                 item[attrName], fieldsInUse[attrName]);
             }
           });

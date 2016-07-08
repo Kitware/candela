@@ -26,27 +26,6 @@ from girder_worker.format import get_csv_reader
 TRUE_VALUES = set([True, 'true', 1, 'True'])
 
 
-def getSignificantDigit(value, nDigits, roundDown=True):
-    # "round" a number to its nearest significant digit
-    # As we're looking for low/high boundaries, we control the
-    # rounding direction
-    if math.isinf(value) or math.isnan(value):
-        return value
-    if value == 0.0:
-        return int(value)
-
-    base = 10**(int(math.floor(math.log10(abs(value)))) - (nDigits - 1))
-    if roundDown:
-        result = math.floor(value / base) * base
-    else:
-        result = math.ceil(value / base) * base
-
-    # convert to int if necessary
-    if result == math.floor(result):
-        result = int(result)
-    return result
-
-
 class DatasetItem(Resource):
     def __init__(self, app):
         super(Resource, self).__init__()
@@ -262,7 +241,7 @@ class DatasetItem(Resource):
             item = self.setupDataset(id=item['_id'], params={}, user=user)
 
         # Run the schema MapReduce code
-        mapScript = self.foreignCode['coerceValue.js'] + '\n' + \
+        mapScript = self.foreignCode['binUtils.js'] + '\n' + \
             self.foreignCode['schema_map.js']
         reduceScript = self.foreignCode['schema_reduce.js']
 
@@ -361,7 +340,7 @@ class DatasetItem(Resource):
         if 'meta' not in item or 'rlab' not in item['meta']:
             item = self.setupDataset(id=item['_id'], params={}, user=user)
         if 'schema' not in item['meta']['rlab']:
-            item = self.inferSchema(id=item['_id'], params={}, user=user)
+            item['meta']['rlab']['schema'] = self.inferSchema(id=item['_id'], params={}, user=user)
 
         # Populate params with default settings
         # where settings haven't been specified
@@ -411,47 +390,16 @@ class DatasetItem(Resource):
                                         ' Please supply bounds or change to "categorical".')
 
                 # Pre-populate the bins with human-readable names
-                if coerceToType == 'integer' or coerceToType == 'number':
-                    lowBound = getSignificantDigit(lowBound, 2, roundDown=True)
-                    highBound = getSignificantDigit(highBound, 2, roundDown=False)
-
-                    binSettings[attrName]['humanBins'] = []
-                    binSettings[attrName]['binBounds'] = []
-                    for binNo in xrange(numBins):
-                        l = lowBound + (highBound - lowBound) * float(binNo) / numBins
-                        h = lowBound + (highBound - lowBound) * float(binNo + 1) / numBins
-                        if (binNo < numBins - 1):
-                            # Most bins do not include the upper bound
-                            # (and the upper bound is rounded down so that it's
-                            # the same as the next bin's lower bound)
-                            label = '[' + str(getSignificantDigit(l, 2, roundDown=True)) + \
-                                ', ' + str(getSignificantDigit(h, 2, roundDown=True)) + ')'
-                        else:
-                            # The last bin includes the upper bound, and it's rounded up
-                            label = '[' + str(getSignificantDigit(l, 2, roundDown=True)) + \
-                                ', ' + str(getSignificantDigit(h, 2, roundDown=False)) + ']'
-                        binSettings[attrName]['humanBins'].append(label)
-                        binSettings[attrName]['binBounds'].append((l, h))
-
-                elif coerceToType == 'string':
-                    # TODO: ordinal binning of strings (lexographic)
-                    binSettings[attrName]['humanBins'] = []
-                    binSettings[attrName]['binBounds'] = []
-                elif coerceToType == 'date':
-                    # TODO: ordinal binning of dates
-                    binSettings[attrName]['humanBins'] = []
-                    binSettings[attrName]['binBounds'] = []
-                else:
-                    raise RestException('Can not treat attribute ' + attrName +
-                                        ' of type ' + coerceToType + ' as ordinal data.')
-
-                binSettings[attrName]['lowBound'] = lowBound
-                binSettings[attrName]['highBound'] = highBound
-            else:
-                # TODO: if there are cached categorical bins (from a first
-                # pass with uncertainty in the results), populate this list with those
-                # known categorical values for the second pass
-                binSettings[attrName]['humanBins'] = []
+                binUtilsCode = execjs.compile(self.foreignCode['binUtils.js'])
+                binSettings[attrName].ordinalBins = binUtilsCode.call('createBins',
+                                                                      coerceToType,
+                                                                      numBins,
+                                                                      lowBound,
+                                                                      highBound)
+                print attrName, binSettings[attrName].ordinalBins
+            # We can ignore the ordinalBins parameter if we're being
+            # categorical. TODO: the fancier 2-pass idea in histogram_reduce.js
+            # would necessitate that we do something different here
 
         params['binSettings'] = binSettings
         params['cache'] = params.get('cache', False) in TRUE_VALUES
@@ -471,7 +419,7 @@ class DatasetItem(Resource):
 
         # Construct and run the histogram MapReduce code
         mapScript = 'function map () {\n' + \
-            self.foreignCode['coerceValue.js'] + '\n' + \
+            self.foreignCode['binUtils.js'] + '\n' + \
             'var params = ' + paramsCode + ';\n' + \
             self.foreignCode['histogram_map.js'] + '\n}'
 
