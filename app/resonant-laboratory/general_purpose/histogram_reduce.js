@@ -21,12 +21,6 @@ Pass #2:
     probably do stage 2 in in the map phase, because we already know the bins
 */
 
-// This script is kind of sloppy, but to use this code with mongodb's
-// mapreduce, the reduce script must contain exactly one function. Because of
-// this, these two lines are appended in datasetItem.py (as params can vary,
-// and there's no way to pass in parameters to these functions):
-// function reduce (attrName, allHistograms) {
-//  var params = {...}
 var histogram = [];
 var specialBins = {};
 var binLookup = {};
@@ -34,21 +28,23 @@ var binLookup = {};
 var binSettings = params.binSettings[attrName];
 if (binSettings === undefined) {
   binSettings = {
-    humanBins: [],
+    ordinalBins: [],
     specialBins: ['count'],
     numBins: 0
   };
 }
 
-// Initialize all of our human bins to zero,
-// so that there aren't weird gaps in ordinal histograms
-binSettings.humanBins.forEach(function (label) {
-  binLookup[label] = histogram.length;
-  histogram.push({
-    label: label,
-    count: 0
+if (binSettings.ordinalBins) {
+  // Initialize all of our human bins to zero,
+  // so that there aren't weird gaps in ordinal histograms
+  binSettings.ordinalBins.forEach(function (bin) {
+    binLookup[bin.label] = histogram.length;
+    histogram.push({
+      label: bin.label,
+      count: 0
+    });
   });
-});
+}
 
 // Count everything
 allHistograms.forEach(function (wrappedHistogram) {
@@ -101,8 +97,3 @@ for (bin in specialBins) {
     histogram.push(specialBins[bin]);
   }
 }
-
-// datasetItem.py also stitches this on...
-// mongo can't return an array, so we wrap it in an object
-//  return {histogram: histogram};
-// }

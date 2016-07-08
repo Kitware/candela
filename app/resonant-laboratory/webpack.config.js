@@ -47,6 +47,11 @@ module.exports = {
         loaders: ['jade-loader']
       },
       {
+        test: /general_purpose\/.*\.js$/,
+        loader: 'exports-loader',
+        query: 'es6exports'
+      },
+      {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /(node_modules|web_client)/,

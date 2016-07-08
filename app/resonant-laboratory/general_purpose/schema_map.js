@@ -1,4 +1,4 @@
-/* globals emit */
+/* globals emit, coerceValue */
 function map () { // eslint-disable-line no-unused-vars
   var keys = this;
   for (var key in keys) {
@@ -35,7 +35,7 @@ function map () { // eslint-disable-line no-unused-vars
 
     /** Next determine and count its potential coerced types **/
     if (nativeType !== 'string') {
-      var strValue = String(value);
+      var strValue = coerceValue(value, 'string');
       if (strValue !== '[object Object]') {
         // this value can be meaningfully coerced to a string (and isn't already one)
         counters['string'] = {
@@ -46,11 +46,13 @@ function map () { // eslint-disable-line no-unused-vars
       }
     }
     if (nativeType !== 'number' && nativeType !== 'integer') {
-      var numValue = parseFloat(value);
+      var numValue = coerceValue(value, 'number');
       if (!isNaN(numValue)) {
         // this value can be coerced to a number (and isn't already one)
+
         // is it an integer?
         if (Math.floor(numValue) === numValue) {
+          numValue = Math.floor(numValue);
           counters['integer'] = {
             count: 1,
             lowBound: numValue,
@@ -66,27 +68,7 @@ function map () { // eslint-disable-line no-unused-vars
       }
     }
     if (nativeType !== 'date') {
-      var dateValue;
-      // TODO: smarter date guessing like the stuff below
-      // (will need similar logic in schema/histogram_map.js, and
-      // in models/Project.js where it coerces values)
-
-      /* if (nativeType === 'integer') {
-        var digits = Math.log10(value);
-        if (value > 999 && value < 3000) {
-          // An integer with the above range could well be a year
-          dateValue = new Date(value, 0, 0);
-        } else if (digits >= 9 && digits <= 15) {
-          // Most millisecond date values should be between 9 and 15 digits
-          // (this will miss some dates in 1969/1970, and beyond 5000AD and 1000BC)
-          dateValue = new Date(value);
-        }
-      } else if (nativeType === 'string') {
-        // Try to convert from a string
-        dateValue = new Date(value);
-      } */
-
-      dateValue = new Date(value);
+      var dateValue = coerceValue(value, 'date');
 
       if (dateValue && !isNaN(dateValue)) {
         // this value can be coerced into a date (and isn't already one)
@@ -99,8 +81,9 @@ function map () { // eslint-disable-line no-unused-vars
     }
     if (nativeType !== 'boolean') {
       // anything can be coerced into a boolean using
-      // !!value... we'll do fancier things on the
-      // client side when we have histograms of the values
+      // !!value. We'll allow fancier conversions in the
+      // future, but those will only apply to the histogram
+      // calculations and client-side type coercion
       counters['boolean'] = {
         count: 1
       };
