@@ -237,7 +237,8 @@ class DatasetItem(Resource):
         .errorResponse()
     )
     def inferSchema(self, item, params, user):
-        if 'meta' not in item or 'rlab' not in item['meta']:
+        if 'meta' not in item or 'rlab' not in item['meta'] or \
+                ('databaseMetadata' not in item and 'format' not in item['meta']['rlab']):
             item = self.setupDataset(id=item['_id'], params={}, user=user)
 
         # Run the schema MapReduce code

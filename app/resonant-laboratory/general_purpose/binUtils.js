@@ -108,15 +108,26 @@ function createBins (coerceToType, numBins, lowBound, highBound) {
   var lookup = {};
   var step;
   var i;
+  if (highBound === lowBound) {
+    // Weird corner case; this really *should* be categorical.
+    // Just return one bin for all the values.
+    return [
+      {
+        lowBound: lowBound,
+        highBound: highBound,
+        label: String(lowBound)
+      }
+    ];
+  }
+  if (coerceToType === 'integer') {
+    // Can't have more bins than integers in the range
+    numBins = Math.min(highBound - lowBound, numBins);
+  }
   if (coerceToType === 'integer' || coerceToType === 'number' ||
       coerceToType === 'date') {
-    // TODO: smarter date binning
-    if (highBound === lowBound) {
-      // Weird corner case where this really SHOULD be
-      // categorical; just add numBins to the number
-      // so we get the expected number of bins
-      highBound += numBins;
-    }
+    // TODO: We're throwing date binning in here with numbers
+    // because it technically works, but we should be doing something
+    // smarter (e.g. try to bin by year, month, day, etc)
     step = (highBound - lowBound) / numBins;
     // Get significant digits in terms of the step value; we know that
     // this will always be enough to distinguish between each boundary value
@@ -129,6 +140,11 @@ function createBins (coerceToType, numBins, lowBound, highBound) {
         lowBound: lowBound + i * step,
         highBound: lowBound + (i + 1) * step
       };
+      if (coerceToType === 'integer') {
+        bin.lowBound = Math.floor(bin.lowBound);
+        bin.highBound = Math.floor(bin.highBound);
+      }
+      // Create the human-readable label for the bin
       bin.label = '[' + (Math.floor(bin.lowBound / base) * base) + ' - ';
       if (i === numBins - 1) {
         bin.label += (Math.ceil(highBound / base) * base) + ']';
@@ -194,9 +210,9 @@ function createBins (coerceToType, numBins, lowBound, highBound) {
         // corrupted slightly because of rounding;
         // because the highest bound is inclusive
         // (unlike the other bins), restore the original
-        // (but keep it short)
-        bin.highBound = highBound.slice(0, charOffset + charLimit);
-        bin.label += bin.highBound + ']';
+        // (but keep the label short)
+        bin.highBound = highBound;
+        bin.label += bin.highBound.slice(0, charOffset + charLimit) + ']';
       } else {
         bin.label += bin.highBound + ')';
       }

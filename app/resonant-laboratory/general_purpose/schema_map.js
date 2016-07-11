@@ -58,13 +58,14 @@ function map () { // eslint-disable-line no-unused-vars
             lowBound: numValue,
             highBound: numValue
           };
-        } else {
-          counters['number'] = {
-            count: 1,
-            lowBound: numValue,
-            highBound: numValue
-          };
         }
+        // count that we saw this as a potential number
+        // (integers will be counted twice)
+        counters['number'] = {
+          count: 1,
+          lowBound: numValue,
+          highBound: numValue
+        };
       }
     }
     if (nativeType !== 'date') {
