@@ -547,16 +547,21 @@ let DatasetView = Widget.extend({
     height += 2 * this.layout.emSize;
 
     // Add each bin label
+    let maxLabelHeight = 0;
     binsEnter.append('text');
     bins.selectAll('text')
       .text(d => d)
       .attr('transform', 'rotate(90) translate(' + height + ',' +
-        (0.35 * this.layout.emSize) + ')');
-    height += 4 * this.layout.emSize;
+        (0.35 * this.layout.emSize) + ')')
+      .each(function () {
+        // this refers to the DOM element
+        maxLabelHeight = Math.max(this.getComputedTextLength(), maxLabelHeight);
+      });
+    height += maxLabelHeight;
 
     svg.attr({
-      width,
-      height
+      width: width + 'px',
+      height: height + 'px'
     });
   },
   renderHistograms: function (datasetDetails) {
@@ -596,7 +601,7 @@ let DatasetView = Widget.extend({
         if (this.checked) {
           contentElement.removeClass('collapsed');
           // Update that particular histogram
-          self.renderIndividualHistogram(contentElement[0], d, datasetDetails);
+          self.renderIndividualHistogram(contentElement.find('svg')[0], d, datasetDetails);
         } else {
           contentElement.addClass('collapsed');
         }
