@@ -58,6 +58,9 @@
 .DatasetView.content #histogramPreview .content.collapsed {
   display: none;
 }
-.DatasetView.content #histogramPreview .content g.bin image {
-  
+.DatasetView.content #histogramPreview .yAxis line,
+.DatasetView.content #histogramPreview .yAxis path {
+  fill: none;
+  stroke: black;
+  stroke-width: 1px;
 }

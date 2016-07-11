@@ -99,7 +99,7 @@ class ComboScale {
       return this.leftAxisPadding + this.barSize * (0.75 + binNo);
     } else {
       // Categorical bin
-      return this.dividerPosition + this.barSize * (1.5 * binNo - 0.75);
+      return this.dividerPosition + this.barSize * (1.5 * (binNo - this.dividerIndex) + 0.75);
     }
   }
   binInverse (position) {

@@ -492,11 +492,23 @@ let DatasetView = Widget.extend({
 
     let svg = d3.select(element);
     let width = scale.width;
-    let height = scale.height;
+    let topPadding = 0.5 * this.layout.emSize;
+    let height = scale.height + topPadding;
+
+    // Draw the y axis
+    let yAxis = d3.svg.axis()
+      .scale(d3.scale.linear()
+        .domain([0, scale.yMax])
+        .range([height, topPadding]))
+      .orient('left')
+      .ticks(4);
+    svg.select('.yAxis')
+      .attr('transform', 'translate(' + scale.leftAxisPadding + ',0)')
+      .call(yAxis);
 
     // Draw the bin groups
     let labels = datasetDetails.overviewHistogram[attrName].map(d => d.label);
-    let bins = svg.selectAll('.bin')
+    let bins = svg.select('.bins').selectAll('.bin')
       .data(labels, d => d);
     let binsEnter = bins.enter().append('g')
       .attr('class', 'bin');
@@ -505,7 +517,7 @@ let DatasetView = Widget.extend({
     // Move the bins horizontally
     bins.attr('transform', d => {
       let binNo = scale.labelToBin(d, 'overview');
-      return 'translate(' + scale.binForward(binNo) + ',0)';
+      return 'translate(' + scale.binForward(binNo) + ',' + topPadding + ')';
     });
 
     // Draw one bar for each bin
@@ -557,7 +569,7 @@ let DatasetView = Widget.extend({
         // this refers to the DOM element
         maxLabelHeight = Math.max(this.getComputedTextLength(), maxLabelHeight);
       });
-    height += maxLabelHeight;
+    height += maxLabelHeight + topPadding;
 
     svg.attr({
       width: width + 'px',

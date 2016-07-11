@@ -309,8 +309,10 @@ let Dataset = MetadataItem.extend({
         schema[attrName].coerceToType = dataType;
       }
       this.setMeta('schema', schema);
+      let savePromise = this.save();
+      this.cache.cachedPromises = {};
       this.trigger('rl:updatedSchema');
-      return this.save();
+      return savePromise;
     });
   },
   setAttributeInterpretation: function (attrName, interpretation) {
@@ -321,8 +323,10 @@ let Dataset = MetadataItem.extend({
         schema[attrName].interpretation = interpretation;
       }
       this.setMeta('schema', schema);
+      let savePromise = this.save();
+      this.cache.cachedPromises = {};
       this.trigger('rl:updatedSchema');
-      return this.save();
+      return savePromise;
     });
   },
   getFilteredState: function (attrName) {
