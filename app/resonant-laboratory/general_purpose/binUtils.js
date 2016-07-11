@@ -111,10 +111,18 @@ function createBins (coerceToType, numBins, lowBound, highBound) {
   if (coerceToType === 'integer' || coerceToType === 'number' ||
       coerceToType === 'date') {
     // TODO: smarter date binning
+    if (highBound === lowBound) {
+      // Weird corner case where this really SHOULD be
+      // categorical; just add numBins to the number
+      // so we get the expected number of bins
+      highBound += numBins;
+    }
     step = (highBound - lowBound) / numBins;
     // Get significant digits in terms of the step value; we know that
     // this will always be enough to distinguish between each boundary value
-    var base = Math.pow(10, Math.floor(Math.log10(Math.abs(step))) - (sigFigs - 1));
+    var base = Math.log10(Math.abs(step));
+    base = Math.floor(base) - (sigFigs - 1);
+    base = Math.pow(10, base);
     for (i = 0; i < numBins; i += 1) {
       // Create the bins with raw boundary values
       bin = {
@@ -127,6 +135,13 @@ function createBins (coerceToType, numBins, lowBound, highBound) {
       } else {
         bin.label += (Math.floor(bin.highBound / base) * base) + ')';
       }
+      // In spite of all that, it's *still* totally possible
+      // to wind up with long strings of 0s or 9s as a result
+      // of floating point math. So we apply a crazy regex
+      // that trims these (plus some boundary logic to keep
+      // one 9 if it's 9s, and ignore the last digit that
+      // could be anything)
+      bin.label = bin.label.replace(/(9?)[09]{5}[09]+\d/g, '$1');
       lookup[bin.label] = bins.length;
       bins.push(bin);
     }
@@ -234,8 +249,12 @@ function findBinLabel (value, coerceToType, lowBound, highBound, specialBins, or
     return 'undefined';
   } else if (value === null || value === 'null') {
     return 'null';
-  } else if (typeof value === 'number' && isNaN(value)) {
-    return 'NaN';
+  } else if (isNaN(value)) {
+    if (coerceToType === 'number' || coerceToType === 'integer') {
+      return 'NaN';
+    } else if (value instanceof Date) {
+      return 'Invalid Date';
+    }
   } else if (value === Infinity) {
     return 'Infinity';
   } else if (value === -Infinity) {

@@ -320,7 +320,7 @@ class DatasetItem(Resource):
                'An array of values that will be put into their own bins, regardless of ' +
                'all other settings. This lets you separate bad values/error codes, e.g. ' +
                '[-9999,"N/A"]. These special values will be added to the set of natively ' +
-               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, "", "other"]'
+               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, "" (empty string), "Invalid Date", "other"]'
                '<br/><br/>numBins<br/>' +
                'Defines the maximum number of bins to use, in addition to the specialBins ' +
                '(default: 10 bins). For categorical data, the bins are arbitrarily chosen' +

@@ -24,12 +24,22 @@ Pass #2:
 var histogram = [];
 var specialBins = {};
 var binLookup = {};
+var specialValues = {
+  'undefined': true,
+  'null': true,
+  'NaN': true,
+  'Infinity': true,
+  '-Infinity': true,
+  '"" (empty string)': true,
+  'Invalid Date': true,
+  'other': true
+};
 
 var binSettings = params.binSettings[attrName];
 if (binSettings === undefined) {
   binSettings = {
     ordinalBins: [],
-    specialBins: ['count'],
+    specialBins: [],
     numBins: 0
   };
 }
@@ -46,13 +56,19 @@ if (binSettings.ordinalBins) {
   });
 }
 
+if (binSettings.specialBins) {
+  binSettings.specialBins.forEach(function (value) {
+    specialValues[value] = true;
+  });
+}
+
 // Count everything
 allHistograms.forEach(function (wrappedHistogram) {
   wrappedHistogram.histogram.forEach(function (bin) {
     if (binLookup.hasOwnProperty(bin.label)) {
       // We already have a bin for this value
       histogram[binLookup[bin.label]].count += bin.count;
-    } else if (binSettings.specialBins.indexOf(bin.label) !== -1) {
+    } else if (specialValues.hasOwnProperty(bin.label)) {
       // This is a special bin; always count these
       if (!specialBins.hasOwnProperty(bin.label)) {
         specialBins[bin.label] = {
@@ -79,7 +95,7 @@ allHistograms.forEach(function (wrappedHistogram) {
             count: 0
           };
         }
-        specialBins.other.count += bin.count;
+        specialBins['other'].count += bin.count;
       }
     }
   });
@@ -88,12 +104,10 @@ allHistograms.forEach(function (wrappedHistogram) {
 // Okay, add the special bins on to the end of the regular ones
 // (starting with "other" if it exists)
 if (specialBins.hasOwnProperty('other')) {
-  histogram.push(specialBins.other);
-  delete specialBins.other;
+  histogram.push(specialBins['other']);
 }
-var bin;
-for (bin in specialBins) {
-  if (specialBins.hasOwnProperty(bin)) {
+Object.keys(specialBins).forEach(function (bin) {
+  if (bin !== 'other') {
     histogram.push(specialBins[bin]);
   }
-}
+});
