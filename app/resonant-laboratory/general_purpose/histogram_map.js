@@ -1,4 +1,4 @@
-/* globals emit, params, findBinLabel */
+/* globals emit, params, coerceValue, findBinLabel */
 
 var dataRow = this;
 emit('__passedFilters__', {
@@ -10,10 +10,12 @@ emit('__passedFilters__', {
 var attrName;
 for (attrName in dataRow) {
   if (dataRow.hasOwnProperty(attrName)) {
+    var value = coerceValue(dataRow[attrName],
+      params.binSettings[attrName].coerceToType);
     emit(attrName, {
       histogram: [{
         count: 1,
-        label: findBinLabel(dataRow[attrName],
+        label: findBinLabel(value,
           params.binSettings[attrName].coerceToType,
           params.binSettings[attrName].lowBound,
           params.binSettings[attrName].highBound,

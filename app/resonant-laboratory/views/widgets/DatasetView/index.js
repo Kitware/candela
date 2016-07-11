@@ -492,11 +492,23 @@ let DatasetView = Widget.extend({
 
     let svg = d3.select(element);
     let width = scale.width;
-    let height = scale.height;
+    let topPadding = 0.5 * this.layout.emSize;
+    let height = scale.height + topPadding;
+
+    // Draw the y axis
+    let yAxis = d3.svg.axis()
+      .scale(d3.scale.linear()
+        .domain([0, scale.yMax])
+        .range([height, topPadding]))
+      .orient('left')
+      .ticks(4);
+    svg.select('.yAxis')
+      .attr('transform', 'translate(' + scale.leftAxisPadding + ',0)')
+      .call(yAxis);
 
     // Draw the bin groups
     let labels = datasetDetails.overviewHistogram[attrName].map(d => d.label);
-    let bins = svg.selectAll('.bin')
+    let bins = svg.select('.bins').selectAll('.bin')
       .data(labels, d => d);
     let binsEnter = bins.enter().append('g')
       .attr('class', 'bin');
@@ -505,7 +517,7 @@ let DatasetView = Widget.extend({
     // Move the bins horizontally
     bins.attr('transform', d => {
       let binNo = scale.labelToBin(d, 'overview');
-      return 'translate(' + scale.binForward(binNo) + ',0)';
+      return 'translate(' + scale.binForward(binNo) + ',' + topPadding + ')';
     });
 
     // Draw one bar for each bin
@@ -547,16 +559,21 @@ let DatasetView = Widget.extend({
     height += 2 * this.layout.emSize;
 
     // Add each bin label
+    let maxLabelHeight = 0;
     binsEnter.append('text');
     bins.selectAll('text')
       .text(d => d)
       .attr('transform', 'rotate(90) translate(' + height + ',' +
-        (0.35 * this.layout.emSize) + ')');
-    height += 4 * this.layout.emSize;
+        (0.35 * this.layout.emSize) + ')')
+      .each(function () {
+        // this refers to the DOM element
+        maxLabelHeight = Math.max(this.getComputedTextLength(), maxLabelHeight);
+      });
+    height += maxLabelHeight + topPadding;
 
     svg.attr({
-      width,
-      height
+      width: width + 'px',
+      height: height + 'px'
     });
   },
   renderHistograms: function (datasetDetails) {
@@ -596,7 +613,7 @@ let DatasetView = Widget.extend({
         if (this.checked) {
           contentElement.removeClass('collapsed');
           // Update that particular histogram
-          self.renderIndividualHistogram(contentElement[0], d, datasetDetails);
+          self.renderIndividualHistogram(contentElement.find('svg')[0], d, datasetDetails);
         } else {
           contentElement.addClass('collapsed');
         }

@@ -237,7 +237,8 @@ class DatasetItem(Resource):
         .errorResponse()
     )
     def inferSchema(self, item, params, user):
-        if 'meta' not in item or 'rlab' not in item['meta']:
+        if 'meta' not in item or 'rlab' not in item['meta'] or \
+                ('databaseMetadata' not in item and 'format' not in item['meta']['rlab']):
             item = self.setupDataset(id=item['_id'], params={}, user=user)
 
         # Run the schema MapReduce code
@@ -320,7 +321,7 @@ class DatasetItem(Resource):
                'An array of values that will be put into their own bins, regardless of ' +
                'all other settings. This lets you separate bad values/error codes, e.g. ' +
                '[-9999,"N/A"]. These special values will be added to the set of natively ' +
-               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, "", "other"]'
+               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, "" (empty string), "Invalid Date", "other"]'
                '<br/><br/>numBins<br/>' +
                'Defines the maximum number of bins to use, in addition to the specialBins ' +
                '(default: 10 bins). For categorical data, the bins are arbitrarily chosen' +
