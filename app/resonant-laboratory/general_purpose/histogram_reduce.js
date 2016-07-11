@@ -38,8 +38,6 @@ var specialValues = {
 var binSettings = params.binSettings[attrName];
 if (binSettings === undefined) {
   binSettings = {
-    ordinalBins: [],
-    specialBins: [],
     numBins: 0
   };
 }
@@ -100,6 +98,15 @@ allHistograms.forEach(function (wrappedHistogram) {
     }
   });
 });
+
+if (!binSettings.ordinalBins) {
+  // Sort categorical bins alphabetically (TODO: sort
+  // by count when we do the fancier stuff in the
+  // comments at the top)
+  histogram.sort(function (a, b) {
+    return a.label >= b.label;
+  });
+}
 
 // Okay, add the special bins on to the end of the regular ones
 // (starting with "other" if it exists)

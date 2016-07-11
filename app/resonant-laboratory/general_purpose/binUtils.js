@@ -17,23 +17,24 @@ function coerceValue (value, coerceToType) {
   } else if (coerceToType === 'string') {
     value = String(value);
   } else if (coerceToType === 'date') {
+    value = new Date(value);
     // TODO: apply smarter date coercion in the vein of the stuff below
-
-    /* if (typeof value === 'integer') {
+    /*
+    if (coerceToType === 'integer') {
       var digits = Math.log10(value);
       if (value > 999 && value < 3000) {
         // An integer with the above range is probably a year
-        dateValue = new Date(value, 0, 0);
+        value = new Date(value, 0, 0);
       } else if (digits >= 9 && digits <= 15) {
         // Most millisecond date values should be between 9 and 15 digits
         // (this will miss some dates in 1969/1970, and beyond 5000AD and 1000BC)
-        dateValue = new Date(value);
+        value = new Date(value);
       }
-    } else if (typeof value === 'string') {
-      // Try to convert from a string
-      dateValue = new Date(value);
-    } */
-    value = new Date(value);
+    } else { // if (typeof value === 'string') {
+      // Try to convert from whatever it is (probably a string)
+      value = new Date(value);
+    }
+    */
   }
   // Otherwise, coerceToType is 'object' - default
   // behavior is simply to pass the value through unchanged
@@ -86,6 +87,25 @@ function byteArrayToString (value) {
   return result;
 }
 
+function formatDate (dateObj, levels) {
+  var dateString;
+  if (levels.milliseconds === true) {
+    return dateObj.getSeconds() + dateObj.getMilliseconds() / 1000;
+  } else if (levels.time === true && levels.date === false) {
+    return dateObj.toLocaleTimeString();
+  } else if (levels.time === true && levels.date === true) {
+    return dateObj.toLocaleString();
+  } else if (levels.date === true) {
+    dateString = dateObj.toLocaleDateString();
+  } else {
+    dateString = Math.abs(dateObj.getFullYear());
+  }
+  if (levels.era === true && dateObj.getFullYear() < 0) {
+    dateString += ' BCE';
+  }
+  return dateString;
+}
+
 function createBins (coerceToType, numBins, lowBound, highBound) {
   // Create:
   // 1. a list of bins with raw boundary values, plus a human-readable label
@@ -123,11 +143,7 @@ function createBins (coerceToType, numBins, lowBound, highBound) {
     // Can't have more bins than integers in the range
     numBins = Math.min(highBound - lowBound, numBins);
   }
-  if (coerceToType === 'integer' || coerceToType === 'number' ||
-      coerceToType === 'date') {
-    // TODO: We're throwing date binning in here with numbers
-    // because it technically works, but we should be doing something
-    // smarter (e.g. try to bin by year, month, day, etc)
+  if (coerceToType === 'integer' || coerceToType === 'number') {
     step = (highBound - lowBound) / numBins;
     // Get significant digits in terms of the step value; we know that
     // this will always be enough to distinguish between each boundary value
@@ -238,6 +254,44 @@ function createBins (coerceToType, numBins, lowBound, highBound) {
       'False': 0,
       'True': 1
     };
+  } else if (coerceToType === 'date') {
+    var span = highBound - lowBound;
+    step = span / numBins;
+    // What sort of scale are we dealing with?
+    var includeTimeLevels = {
+      // only show milliseconds if bins are less than a minute
+      milliseconds: step < 60000,
+      // only show the time string if bins are at least a minute,
+      // and less than a day long
+      time: step >= 60000 && step < 86400000,
+      // only show the date string if the span covers more than
+      // one day, and each bin is less than a decade long
+      date: (span >= 86400000 || lowBound.getDate() !== highBound.getDate()) &&
+        step < 315360000000,
+      // only show the era if lowBound reaches into BCE
+      era: lowBound < -62135578800000
+    };
+    for (i = 0; i < numBins; i += 1) {
+      // Create the bins with raw boundary values (the - 0 ensures that
+      // we're working with a number, not concatenating a date string).
+      bin = {
+        lowBound: new Date(Math.floor(lowBound - 0 + i * step)),
+        highBound: new Date(Math.floor(lowBound - 0 + (i + 1) * step))
+      };
+      // Create the human-readable label for the bin
+      bin.label = '[' + formatDate(bin.lowBound, includeTimeLevels) + ' - ';
+      if (i === numBins - 1) {
+        bin.label += formatDate(highBound, includeTimeLevels) + ']';
+      } else {
+        bin.label += formatDate(bin.highBound, includeTimeLevels) + ')';
+      }
+      // Because they'll fly around as JSON strings, store the raw bounds in
+      // ISO 8601 format, where string comparisons are still valid
+      bin.lowBound = bin.lowBound.toISOString();
+      bin.highBound = bin.highBound.toISOString();
+      lookup[bin.label] = bins.length;
+      bins.push(bin);
+    }
   } else {
     throw new Error('Can\'t create ordinal bins for type ' + coerceToType);
   }
@@ -279,6 +333,12 @@ function findBinLabel (value, coerceToType, lowBound, highBound, specialBins, or
     return '"" (empty string)';
   } else if (specialBins.indexOf(value) !== -1) {
     return value;
+  }
+
+  // Because dates have to fly around as JSON strings, we want
+  // to use ISO 8601 (where string comparisons are still valid)
+  if (value instanceof Date) {
+    value = value.toISOString();
   }
 
   if (!ordinalBins) {
