@@ -546,6 +546,8 @@ let DatasetView = Widget.extend({
       });
 
     // Add an include / exclude button for each bin
+    // TODO: uncomment when we support filtering
+    /*
     binsEnter.append('image')
       .attr('class', 'button')
       .attr({
@@ -557,6 +559,7 @@ let DatasetView = Widget.extend({
     bins.selectAll('image.button')
       .attr('xlink:href', ICONS.check);
     height += 2 * this.layout.emSize;
+    */
 
     // Add each bin label
     let maxLabelHeight = 0;
@@ -623,6 +626,8 @@ let DatasetView = Widget.extend({
     // - checked: the attribute is included, with no (non-custom) filters
     // - indeterminate: the attribute is included, with filters
     // - unchecked: the attribute is excluded
+    // TODO: uncomment when we support filtering
+    /*
     sectionTitlesEnter.append('input')
       .attr('type', 'checkbox')
       .attr('class', 'filteredState');
@@ -642,6 +647,7 @@ let DatasetView = Widget.extend({
           this.indeterminate = false;
         }
       });
+      */
 
     // Label for the header
     sectionTitlesEnter.append('label');
