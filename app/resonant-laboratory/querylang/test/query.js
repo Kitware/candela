@@ -1,5 +1,7 @@
+import process from 'process';
+import fs from 'fs';
 import test from 'tape';
-import { parseToFunction } from '..';
+import { parseToAst } from '..';
 
 const operator_expression = [
   'age < 21',
@@ -9,6 +11,23 @@ const operator_expression = [
   'age = 21',
   'age != 21'
 ];
+
+test('Query language parser', t => {
+  const asts = operator_expression.map(parseToAst);
+
+  const baseline_path = './app/resonant-laboratory/server/test/ast-baselines.json';
+  if (process.env.RESLAB_DUMP_AST) {
+    fs.writeFileSync(baseline_path, JSON.stringify(asts, null, 4), {encoding: 'utf8'});
+  }
+
+  const baselines = JSON.parse(fs.readFileSync(baseline_path, {encoding: 'utf8'}));
+
+  for (let i = 0; i < operator_expression.length; i++) {
+    t.deepEqual(asts[i], baselines[i], `Expression '${operator_expression[i]}' parses correctly`);
+  }
+
+  t.end();
+});
 
 const data = [
   {
@@ -34,26 +53,6 @@ function testFunc (t, string, testData, baselines) {
     t.equal(func(data), baseline, `Expression '${string}', data '${JSON.stringify(testData[i])}'`);
   }
 }
-
-test('Operator expressions', t => {
-  const baseline = [
-    [true, false, false],
-    [true, true, false],
-    [false, false, true],
-    [false, true, true],
-    [false, true, false],
-    [true, false, true]
-  ];
-
-  for (let i = 0; i < operator_expression.length; i++) {
-    const expr = operator_expression[i];
-    const baselines = baseline[i];
-
-    testFunc(t, expr, data, baselines);
-  }
-
-  t.end();
-});
 
 test('Conjunction expressions', t => {
   const between_expression = 'age < 22 and age > 20';
