@@ -160,6 +160,15 @@ let Project = MetadataItem.extend({
 
     return fetchPromise;
   }, 100),
+  save: function () {
+    // Prevent any lingering attempts to save the
+    // project once the project has been closed
+    if (window.mainPage.project === null) {
+      return Promise.resolve(null);
+    } else {
+      return MetadataItem.prototype.save.apply(this, arguments);
+    }
+  },
   getMeta: function (key) {
     let meta = MetadataItem.prototype.getMeta.apply(this, [key]);
 

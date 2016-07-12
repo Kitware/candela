@@ -170,7 +170,7 @@ if __name__ == '__main__':
                     # folder name with a Girder ID
                     if folder == 'Projects':
                         for i, d in enumerate(metadata['rlab']['datasets']):
-                            metadata['rlab']['datasets'][i]['itemId'] = dataItemIdLookup[d['itemId']]
+                            metadata['rlab']['datasets'][i]['dataset'] = dataItemIdLookup[d['itemId']]
 
                     gc.addMetadataToItem(itemSpec['_id'], metadata)
                     addedMetadata = True
