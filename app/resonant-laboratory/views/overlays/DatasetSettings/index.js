@@ -23,14 +23,14 @@ let DatasetSettings = Backbone.View.extend({
       .on('change', Underscore.debounce(function () {
         // this refers to the DOM element
         self.$el.find('#totalPages').text('...');
-        datasetObj.setOffset(parseInt(this.value));
+        datasetObj.setOffset(parseInt(this.value, 10));
       }, 300));
     this.$el.find('#limitInput')
       .val(datasetObj.cache.page.limit)
       .on('change', Underscore.debounce(function () {
         // this refers to the DOM element
         self.$el.find('#totalPages').text('...');
-        datasetObj.setLimit(parseInt(this.value));
+        datasetObj.setLimit(parseInt(this.value, 10));
       }, 300));
     datasetObj.cache.filteredHistogram.then(histogram => {
       let count = Math.min(histogram.__passedFilters__[0].count,

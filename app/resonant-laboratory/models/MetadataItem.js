@@ -86,7 +86,7 @@ let MetadataItem = girder.models.ItemModel.extend({
       timeout = window.setTimeout(() => {
         forceReject(new Error(`MetadataItem timed out waiting for
         an event from Girder.`));
-      }, 10000);
+      }, 20000);
     }
 
     // beforeSuccess is a function that should
@@ -115,6 +115,36 @@ let MetadataItem = girder.models.ItemModel.extend({
 
     return promiseObj;
   },
+  triggerCommunicationError: function (errorObj) {
+    if (errorObj.status === 401) {
+      // Authentication failures simply mean that the user is logged out;
+      // we can ignore these
+      return;
+    }
+    // Some other server error has occurred...
+    let newErrorObj = new Error('Error communicating with the server');
+    let details = '';
+    if (errorObj.status) {
+      details += '\nStatus: ' + errorObj.status + '\n';
+    }
+    if (errorObj.message) {
+      details += '\nMessage:\n' + errorObj.message;
+    } else if (errorObj.responseJSON && errorObj.responseJSON.message) {
+      details += '\nMessage:\n' + errorObj.responseJSON.message;
+    }
+    if (errorObj.responseJSON && errorObj.responseJSON.trace) {
+      details += '\nStack Trace:\n';
+      errorObj.responseJSON.trace.forEach(traceDetails => {
+        details += '\n' + traceDetails[0];
+        details += '\n' + traceDetails[1] + '\t' + traceDetails[2];
+        details += '\n' + traceDetails[3] + '\n';
+      });
+    }
+    if (details.length > 0) {
+      newErrorObj.details = details;
+    }
+    window.mainPage.trigger('rl:error', newErrorObj);
+  },
   restRequest: function (requestParameters, options) {
     options = options || {};
     return this.wrapInPromise((resolve, reject) => {
@@ -134,32 +164,7 @@ let MetadataItem = girder.models.ItemModel.extend({
       }
       return resp;
     }).catch(errorObj => {
-      if (errorObj.status === 401) {
-        // Authentication failures simply mean that the user is logged out;
-        // we can ignore these
-        return;
-      }
-      // Some other server error has occurred...
-      let newErrorObj = new Error('Error communicating with the server');
-      let details = '';
-      if (errorObj.status) {
-        details += '\nStatus: ' + errorObj.status + '\n';
-      }
-      if (errorObj.responseJSON && errorObj.responseJSON.message) {
-        details += '\nMessage:\n' + errorObj.responseJSON.message;
-      }
-      if (errorObj.responseJSON && errorObj.responseJSON.trace) {
-        details += '\nStack Trace:\n';
-        errorObj.responseJSON.trace.forEach(traceDetails => {
-          details += '\n' + traceDetails[0];
-          details += '\n' + traceDetails[1] + '\t' + traceDetails[2];
-          details += '\n' + traceDetails[3] + '\n';
-        });
-      }
-      if (details.length > 0) {
-        newErrorObj.details = details;
-      }
-      window.mainPage.trigger('rl:error', newErrorObj);
+      this.triggerCommunicationError(errorObj);
     });
   },
   sync: function (method, model, options) {
@@ -296,7 +301,7 @@ let MetadataItem = girder.models.ItemModel.extend({
   fetch: function (options) {
     return this.sync('read', this.toJSON(), options)
       .catch(errorObj => {
-        window.mainPage.trigger('rl:error', new Error('Error communicating with the server.'));
+        this.triggerCommunicationError(errorObj);
       });
   },
   create: function (attributes, options) {
@@ -310,7 +315,7 @@ let MetadataItem = girder.models.ItemModel.extend({
     });
     return this.sync('create', this.toJSON(), options)
       .catch(errorObj => {
-        window.mainPage.trigger('rl:error', new Error('Error communicating with the server.'));
+        this.triggerCommunicationError(errorObj);
       });
   },
   save: function (attributes, options) {
@@ -319,13 +324,13 @@ let MetadataItem = girder.models.ItemModel.extend({
     }
     return this.sync('update', this.toJSON(), options)
       .catch(errorObj => {
-        window.mainPage.trigger('rl:error', new Error('Error communicating with the server.'));
+        this.triggerCommunicationError(errorObj);
       });
   },
   destroy: function (options) {
     return this.sync('delete', this.toJSON(), options)
       .catch(errorObj => {
-        window.mainPage.trigger('rl:error', new Error('Error communicating with the server.'));
+        this.triggerCommunicationError(errorObj);
       });
   },
   setMeta: function (key, value) {

@@ -11,9 +11,9 @@ function coerceValue (value, coerceToType) {
   } else if (coerceToType === 'boolean') {
     value = !!value;
   } else if (coerceToType === 'integer') {
-    value = parseInt(value);
+    value = parseInt(value, 10);
   } else if (coerceToType === 'number') {
-    value = parseFloat(value);
+    value = parseFloat(value, 10);
   } else if (coerceToType === 'string') {
     value = String(value);
   } else if (coerceToType === 'date') {

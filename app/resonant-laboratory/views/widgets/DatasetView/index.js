@@ -2,7 +2,6 @@ import Underscore from 'underscore';
 import d3 from 'd3';
 import jQuery from 'jquery';
 import ComboScale from './comboScale.js';
-import Dataset from '../../../models/Dataset.js';
 import Widget from '../Widget';
 import Menu from '../../overlays/Menu';
 import myTemplate from './template.html';

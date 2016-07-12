@@ -84,6 +84,7 @@ class ComboScale {
     this.width = idealWidth - this.leftAxisPadding;
     this.barSize = Math.max(this.emSize,
       this.width / (0.5 + this.ordinalBinCount + 1.5 * this.categoricalBinCount));
+    this.barSize = Math.min(3 * this.emSize, this.barSize);
     this.width = this.leftAxisPadding +
       this.barSize * (0.5 + this.ordinalBinCount + 1.5 * this.categoricalBinCount);
 
