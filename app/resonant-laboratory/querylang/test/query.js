@@ -16,37 +16,27 @@ const conjunction_expression = [
   'age < 22 and age > 20'  
 ];
 
-test('Operator expression parsing', t => {
-  const asts = operator_expression.map(parseToAst);
+function test_expressions (t, exprs, baseline_path) {
+  const asts = exprs.map(parseToAst);
 
-  const baseline_path = './app/resonant-laboratory/server/test/operator-ast-baselines.json';
   if (process.env.RESLAB_DUMP_AST) {
     fs.writeFileSync(baseline_path, JSON.stringify(asts, null, 4), {encoding: 'utf8'});
   }
 
   const baselines = JSON.parse(fs.readFileSync(baseline_path, {encoding: 'utf8'}));
 
-  for (let i = 0; i < operator_expression.length; i++) {
-    t.deepEqual(asts[i], baselines[i], `Expression '${operator_expression[i]}' parses correctly`);
+  for (let i = 0; i < exprs.length; i++) {
+    t.deepEqual(asts[i], baselines[i], `Expression '${exprs[i]}' parses correctly`);
   }
+}
 
+test('Operator expression parsing', t => {
+  test_expressions(t, operator_expression, './app/resonant-laboratory/server/test/operator-ast-baselines.json')
   t.end();
 });
 
 test('Conjunction expression parsing', t => {
-  const asts = conjunction_expression.map(parseToAst);
-
-  const baseline_path = './app/resonant-laboratory/server/test/conjunction-ast-baselines.json';
-  if (process.env.RESLAB_DUMP_AST) {
-    fs.writeFileSync(baseline_path, JSON.stringify(asts, null, 4), {encoding: 'utf8'});
-  }
-
-  const baselines = JSON.parse(fs.readFileSync(baseline_path, {encoding: 'utf8'}));
-
-  for (let i = 0; i < conjunction_expression.length; i++) {
-    t.deepEqual(asts[i], baselines[i], `Expression '${conjunction_expression[i]}' parses correctly`);
-  }
-
+  test_expressions(t, conjunction_expression, './app/resonant-laboratory/server/test/conjunction-ast-baselines.json')
   t.end();
 });
 
