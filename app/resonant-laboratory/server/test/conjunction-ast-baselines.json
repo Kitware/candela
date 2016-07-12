@@ -1,0 +1,21 @@
+[
+    {
+        "operator": "and",
+        "operands": [
+            {
+                "operator": "<",
+                "operands": [
+                    "age",
+                    22
+                ]
+            },
+            {
+                "operator": ">",
+                "operands": [
+                    "age",
+                    20
+                ]
+            }
+        ]
+    }
+]
