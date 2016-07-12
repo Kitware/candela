@@ -7,7 +7,7 @@ from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
 from girder.constants import AccessType
-from girder.models.model_base import AccessException
+from girder.models.model_base import AccessException, ValidationException
 
 
 TRUE_VALUES = set([True, 'true', 1, 'True'])
@@ -29,7 +29,7 @@ class loadAnonymousItem(object):
             anonymous = False
             if user is None:
                 anonymous = True
-                user = self.app.anonymousAccess._getAnonymousUser()
+                user = self.app.anonymousAccess.getAnonymousUser()
 
             copiedItem = False
             try:
@@ -54,6 +54,7 @@ class loadAnonymousItem(object):
                                             creator=user,
                                             folder=targetFolder)
                 copiedItem = True
+
             kwargs['item'] = targetItem
             kwargs['user'] = user
             originalId = kwargs['id']
@@ -71,7 +72,7 @@ class AnonymousAccess(Resource):
         super(Resource, self).__init__()
         self.app = app
 
-    def _getAnonymousUser(self):
+    def getAnonymousUser(self):
         try:
             return list(self.model('user').textSearch('anonymous'))[0]
         except:
@@ -156,7 +157,7 @@ class AnonymousAccess(Resource):
         user = self.getCurrentUser()
 
         if user is None:
-            user = self._getAnonymousUser()
+            user = self.getAnonymousUser()
 
         return self.model('folder').createFolder(parent=user,
                                                  name='Public',
@@ -183,7 +184,7 @@ class AnonymousAccess(Resource):
             params['reuseExisting'] = False
             return self.getOrMakePrivateItem(params)
         else:
-            user = self._getAnonymousUser()
+            user = self.getAnonymousUser()
 
             publicFolder = self.getOrMakePublicFolder({})
 
@@ -207,7 +208,7 @@ class AnonymousAccess(Resource):
     def itemInfo(self, item, params):
         info = {}
 
-        anonUser = self._getAnonymousUser()
+        anonUser = self.getAnonymousUser()
         user = self.getCurrentUser()
         if user is None:
             user = anonUser
@@ -249,7 +250,7 @@ class AnonymousAccess(Resource):
         idList = json.loads(params['ids'])
 
         user = self.getCurrentUser()
-        anonUser = self._getAnonymousUser()
+        anonUser = self.getAnonymousUser()
 
         folderModel = self.model('folder')
         scratchFolder = folderModel.createFolder(parent=anonUser,
@@ -266,7 +267,7 @@ class AnonymousAccess(Resource):
                                                level=AccessType.READ,
                                                user=user,
                                                exc=True)
-            except AccessException:
+            except (AccessException, ValidationException):
                 continue
             if item['folderId'] == scratchFolder['_id']:
                 result.append(item)
@@ -291,7 +292,7 @@ class AnonymousAccess(Resource):
             return []
         privateFolder = self.getOrMakePrivateFolder({})
 
-        anonUser = self._getAnonymousUser()
+        anonUser = self.getAnonymousUser()
 
         result = []
         for itemId in idList:
@@ -302,7 +303,7 @@ class AnonymousAccess(Resource):
                                                exc=True)
                 self.model('item').move(item, privateFolder)
                 result.append(item)
-            except AccessException:
+            except (AccessException, ValidationException):
                 continue
 
         return result
@@ -372,7 +373,7 @@ class AnonymousAccess(Resource):
         makePublic = params.get('makePublic', currentFolder['name'] == 'Private')
         forceCopy = params.get('forceCopy', False)
 
-        if user is self._getAnonymousUser():
+        if user is self.getAnonymousUser():
             makePublic = True
             forceCopy = True
 

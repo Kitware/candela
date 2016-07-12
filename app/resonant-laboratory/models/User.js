@@ -52,7 +52,6 @@ let User = girder.models.UserModel.extend({
     }).set({});
     this.authToken = undefined;
     if (wasLoggedIn) {
-      this.preferences.resetToDefaults();
       window.mainPage.switchProject(null)
         .then(() => {
           this.trigger('rl:logout');
@@ -69,7 +68,7 @@ let User = girder.models.UserModel.extend({
       // We're logged in! First, let's see if
       // the user already has preferences stored
       this.preferences.fetch()
-        .catch((errorObj) => {
+        .catch(errorObj => {
           window.mainPage.trigger('rl:error', errorObj);
         });
     }

@@ -98,7 +98,7 @@ let Project = MetadataItem.extend({
     // Whenever we update the project metadata, we also want
     // to update the information about where the project is stored
     // and whether the user can edit it
-    fetchPromise.then(() => {
+    let statusPromise = fetchPromise.then(() => {
       return this.restRequest({
         path: 'anonymousAccess/info',
         type: 'GET'
@@ -108,10 +108,10 @@ let Project = MetadataItem.extend({
       });
     });
 
-    // Calling fetch() on a project should also call trigger
+    // Calling fetch() on a project should also call
     // fetch() on all the project's datasets (and update which
     // ones are stored in window.mainPage.loadedDatasets)
-    fetchPromise.then(() => {
+    let datasetsPromise = fetchPromise.then(() => {
       let datasetPromises = [];
       let newLoadedDatasets = {};
       let datasetSpecs = this.getMeta('datasets');
@@ -158,8 +158,22 @@ let Project = MetadataItem.extend({
       });
     });
 
-    return fetchPromise;
+    // Though we only return the main fetch response, the fetch isn't
+    // complete until the status and dataset promises have been resolved
+    return Promise.all([fetchPromise, statusPromise, datasetsPromise])
+      .then(responses => {
+        return responses[0];
+      });
   }, 100),
+  save: function () {
+    // Prevent any lingering attempts to save the
+    // project once the project has been closed
+    if (window.mainPage.project === null) {
+      return Promise.resolve(null);
+    } else {
+      return MetadataItem.prototype.save.apply(this, arguments);
+    }
+  },
   getMeta: function (key) {
     let meta = MetadataItem.prototype.getMeta.apply(this, [key]);
 
@@ -269,8 +283,11 @@ let Project = MetadataItem.extend({
     let datasets = this.getMeta('datasets');
     let newDataset;
 
+    let promises = [];
+
     if (newDatasetId in window.mainPage.loadedDatasets) {
       newDataset = window.mainPage.loadedDatasets[newDatasetId];
+      promises.push(Promise.resolve(newDataset));
     } else {
       newDataset = new Dataset({
         _id: newDatasetId
@@ -283,7 +300,7 @@ let Project = MetadataItem.extend({
         this.updateDatasetPage(newDataset);
       });
       window.mainPage.loadedDatasets[newDatasetId] = newDataset;
-      newDataset.fetch();
+      promises.push(newDataset.fetch());
     }
 
     let newDatasetDetails = {
@@ -298,10 +315,11 @@ let Project = MetadataItem.extend({
       datasets[index] = newDatasetDetails;
     }
     this.setMeta('datasets', datasets);
-    return this.save().then(() => {
+    promises.push(this.save().then(() => {
       this.trigger('rl:changeDatasets');
       return this.validateMatchings();
-    });
+    }));
+    return Promise.all(promises);
   },
   setVisualization: function (visName, index = 0) {
     let visualizations = this.getMeta('visualizations');

@@ -95,7 +95,8 @@ let ProjectLibrary = Backbone.View.extend({
       }).then(folder => {
         this.getFolderContents(folder, 'publicProjects', publicFileIcon);
       }).catch(() => {
-      }); // fail silently
+        // fail silently
+      });
     } else {
       // The user is logged out
       let ids = window.localStorage.getItem('scratchProjects');
@@ -111,10 +112,17 @@ let ProjectLibrary = Backbone.View.extend({
           type: 'GET',
           error: null
         })).then(items => {
+          // items may be a subset of the projects that we asked for
+          // (a registered user - likely us - may have adopted our old
+          // project, or the project could have been deleted... that's
+          // the risk you run when you leave stuff in the public scratch
+          // space)
+          window.mainPage.currentUser.preferences.updateScratchProjects(items);
+
+          // Show the set of items to the user
           this.renderProjects(new girder.collections.ItemCollection(items),
             'scratchProjects', scratchFileIcon);
-        }).catch(() => {
-        }); // fail silently
+        });
       }
     }
   }, 300),
@@ -165,20 +173,23 @@ let ProjectLibrary = Backbone.View.extend({
       .attr('src', icon);
 
     libraryButtonsEnter.append('img')
-      .attr('class', 'badge');
-    libraryButtons.selectAll('img.badge')
-      .attr('src', warningIcon)
-      .style('display', d => {
-        if (d.attributes.meta.rlab.versionNumber === window.mainPage.versionNumber) {
-          return 'none';
-        } else {
-          return 'block';
-        }
-      })
-      .attr('title', d => {
-        return 'This project was created with version ' + d.attributes.meta.rlab.versionNumber +
-          ' of Resonant Laboratory.\nYou are currently using version ' + window.mainPage.versionNumber;
-      });
+      .attr('class', 'badge')
+      .style('display', 'none');
+    window.mainPage.versionNumber.then(appVersion => {
+      libraryButtons.selectAll('img.badge')
+        .attr('src', warningIcon)
+        .style('display', d => {
+          if (d.attributes.meta.rlab.versionNumber === appVersion) {
+            return 'none';
+          } else {
+            return 'block';
+          }
+        })
+        .attr('title', d => {
+          return 'This project was created with version ' + d.attributes.meta.rlab.versionNumber +
+            ' of Resonant Laboratory.\nYou are currently using version ' + appVersion;
+        });
+    });
 
     libraryButtonsEnter.append('span');
     libraryButtons.selectAll('span')

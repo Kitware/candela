@@ -24,14 +24,12 @@ window.girder.apiRoot = 'api/v1';
 let MainPage = Backbone.View.extend({
   initialize: function () {
     // Get the current app version
-    new Promise((resolve, reject) => {
+    this.versionNumber = new Promise((resolve, reject) => {
       window.girder.restRequest({
         path: 'system/resonantLaboratoryVersion',
         type: 'GET',
         error: reject
       }).done(resolve).error(reject);
-    }).then(versionNumber => {
-      this.versionNumber = versionNumber;
     });
 
     // Set up navigation
@@ -109,8 +107,7 @@ let MainPage = Backbone.View.extend({
     if (id === null) {
       this.project = null;
       this.trigger('rl:changeProject');
-      return new Promise(() => {
-      });
+      return new Promise(() => {});
     } else {
       this.project = new Project({
         _id: id

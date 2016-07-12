@@ -74,6 +74,10 @@ you move or delete this item, your preferences will be lost.`,
         JSON.stringify(scratchProjects));
     }
   },
+  updateScratchProjects: function (validatedProjects) {
+    window.localStorage.setItem('scratchProjects',
+      JSON.stringify(validatedProjects.map(d => d['_id'])));
+  },
   adoptScratchProjects: function () {
     if (!window.mainPage.currentUser.isLoggedIn()) {
       return;
@@ -85,6 +89,7 @@ you move or delete this item, your preferences will be lost.`,
     let scratchProjects = window.localStorage.getItem('scratchProjects');
 
     if (scratchProjects) {
+      let attemptedAdoptions = JSON.parse(scratchProjects).length;
       new Promise((resolve, reject) => {
         girder.restRequest({
           path: 'item/anonymousAccess/adoptScratchItems',
@@ -105,28 +110,32 @@ you move or delete this item, your preferences will be lost.`,
           }
         });
         window.mainPage.notificationLayer.displayNotification(
-          'Successfully moved the projects that you ' +
+          'Moved ' + successfulAdoptions.length + ' of ' +
+          attemptedAdoptions + ' projects that you ' +
           'were working on when you were logged out ' +
-          'to your Private folder');
+          'to your Private folder',
+          successfulAdoptions.length === attemptedAdoptions ? undefined : 'error');
         window.localStorage.clear('scratchProjects');
+
+        datasetIds = [...datasetIds];
+        attemptedAdoptions = datasetIds.length;
 
         new Promise((resolve, reject) => {
           girder.restRequest({
             path: 'item/anonymousAccess/adoptScratchItems',
             data: {
-              'ids': JSON.stringify([...datasetIds])
+              'ids': JSON.stringify(datasetIds)
             },
             error: reject,
             type: 'PUT'
           });
-        }).catch(() => {
+        }).then(successfulAdoptions => {
           window.mainPage.notificationLayer.displayNotification(
-            'Could not restore datasets from when you were logged out', 'error');
-        }).then(() => {
-          window.mainPage.notificationLayer.displayNotification(
-            'Successfully moved the datasets that you ' +
+            'Moved ' + successfulAdoptions.length + ' of ' +
+            attemptedAdoptions + ' datasets that you ' +
             'were working on when you were logged out ' +
-            'to your Private folder');
+            'to your Private folder',
+            successfulAdoptions.length === attemptedAdoptions ? undefined : 'error');
           window.mainPage.currentUser.trigger('rl:updateLibrary');
           // In addition to changing the user's library, the current
           // project will (pretty much always) have just changed
@@ -134,6 +143,9 @@ you move or delete this item, your preferences will be lost.`,
           if (window.mainPage.project) {
             window.mainPage.project.fetch();
           }
+        }).catch(() => {
+          window.mainPage.notificationLayer.displayNotification(
+            'Could not restore datasets from when you were logged out', 'error');
         });
       }).catch(() => {
         window.localStorage.clear('scratchProjects');
