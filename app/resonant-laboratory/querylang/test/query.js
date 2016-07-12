@@ -49,66 +49,26 @@ test('Disjunction expression parsing', t => {
   t.end();
 });
 
-const data = [
-  {
-    age: 19
-  },
+test('Associative expression parsing', t => {
+  const expr = [
+    'age > 47 and age < 50 or name = "Picard"',
+    '(age > 47 and age < 50) or (name = "Picard")'
+  ];
 
-  {
-    age: 21
-  },
+  const ast = expr.map(parseToAst);
 
-  {
-    age: 23
-  }
-];
-
-function testFunc (t, string, testData, baselines) {
-  const func = parseToFunction(string);
-
-  for (let i = 0; i < testData.length; i++) {
-    const data = testData[i];
-    const baseline = baselines[i];
-
-    t.equal(func(data), baseline, `Expression '${string}', data '${JSON.stringify(testData[i])}'`);
-  }
-}
-
-test('Associativity', t => {
-  const expr1 = 'age > 47 and age < 50 or name = "Picard"';
-  const expr2 = '(age > 47 and age < 50) or (name = "Picard")';
-
-  const ages = [46, 47, 48, 51];
-  const names = ['Riker', 'Picard'];
-
-  const func1 = parseToFunction(expr1);
-  const func2 = parseToFunction(expr2);
-
-  ages.forEach(age => {
-    names.forEach(name => {
-      const data = { age, name };
-      const result = (age > 47 && age < 50) || (name === 'Picard');
-
-      t.equal(func1(data), func2(data), 'Expression is associative');
-    });
-  });
-
+  t.deepEqual(ast[0], ast[1], `'${expr[0]}' and '${expr[1]}' parse to same AST`);
   t.end();
 });
 
-test('Anti-associativity', t => {
-  const expr1 = 'age < 47 or age > 50 and name = "Picard"';
-  const expr2 = '(age < 47 or age > 50) and (name = "Picard")';
+test('Anti-associative expression parsing', t => {
+  const expr = [
+    'age < 47 or age > 50 and name = "Picard"',
+    '(age < 47 or age > 50) and (name = "Picard")'
+  ];
 
-  const func1 = parseToFunction(expr1);
-  const func2 = parseToFunction(expr2);
+  const ast = expr.map(parseToAst);
 
-  const data = {
-    age: 46,
-    name: 'Riker'
-  };
-
-  t.notEqual(func1(data), func2(data), 'Expression is not associative');
-
+  t.notDeepEqual(ast[0], ast[1], `'${expr[0]}' and '${expr[1]}' parse to different ASTs`);
   t.end();
 });
