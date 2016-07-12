@@ -15,6 +15,7 @@ data = [
 
 class TestQueryLanguage(unittest.TestCase):
     """Test suite."""
+
     def run_expressions(self, ast_file, data, baseline):
         """Test several ASTs on a sequence of data against a set of baselines."""
         asts = None
@@ -40,6 +41,10 @@ class TestQueryLanguage(unittest.TestCase):
     def test_conjunction_expressions(self):
         """Test conjunction expressions."""
         self.run_expressions('test/conjunction-ast-baselines.json', data, [False, True, False])
+
+    def test_disjunction_expressions(self):
+        """Test disjunction expressions."""
+        self.run_expressions('test/disjunction-ast-baselines.json', data, [True, False, True])
 
 
 if __name__ == '__main__':

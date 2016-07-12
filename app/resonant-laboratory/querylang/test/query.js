@@ -16,6 +16,10 @@ const conjunction_expression = [
   'age < 22 and age > 20'  
 ];
 
+const disjunction_expression = [
+  'age > 22 or age < 20'
+];
+
 function test_expressions (t, exprs, baseline_path) {
   const asts = exprs.map(parseToAst);
 
@@ -37,6 +41,11 @@ test('Operator expression parsing', t => {
 
 test('Conjunction expression parsing', t => {
   test_expressions(t, conjunction_expression, './app/resonant-laboratory/server/test/conjunction-ast-baselines.json')
+  t.end();
+});
+
+test('Disjunction expression parsing', t => {
+  test_expressions(t, disjunction_expression, './app/resonant-laboratory/server/test/disjunction-ast-baselines.json');
   t.end();
 });
 
@@ -64,14 +73,6 @@ function testFunc (t, string, testData, baselines) {
     t.equal(func(data), baseline, `Expression '${string}', data '${JSON.stringify(testData[i])}'`);
   }
 }
-
-test('Disjunction expressions', t => {
-  const outside_expression = 'age > 22 or age < 20';
-  const baseline = [true, false, true];
-
-  testFunc(t, outside_expression, data, baseline);
-  t.end();
-});
 
 test('Associativity', t => {
   const expr1 = 'age > 47 and age < 50 or name = "Picard"';
