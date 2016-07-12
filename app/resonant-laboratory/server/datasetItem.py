@@ -237,9 +237,28 @@ class DatasetItem(Resource):
         .errorResponse()
     )
     def inferSchema(self, item, params, user):
-        if 'meta' not in item or 'rlab' not in item['meta'] or \
-                ('databaseMetadata' not in item and 'format' not in item['meta']['rlab']):
-            item = self.setupDataset(id=item['_id'], params={}, user=user)
+        # Do we have the necessary basic metadata?
+        invalid = 'meta' not in item or 'rlab' not in item['meta']
+        if not invalid:
+            # Do we have a dataset definition or a file format specified?
+            invalid = 'databaseMetadata' not in item and 'format' not in item['meta']['rlab']
+        if not invalid and 'fileId' in item['meta']['rlab']:
+            # Do we specify a file that we don't have (this happens
+            # when making anonymous copies of datasets)?
+            invalid = True
+            for f in self.model('item').childFiles(item=item):
+                if f['_id'] == item['meta']['rlab']['fileId']:
+                    invalid = False
+                    break
+        if invalid:
+            # We need to update the basic dataset details
+            temp = self.setupDataset(id=item['_id'], params={}, user=user)
+            # We need to reload the item with the new changes
+            temp = temp.get('__copiedItemId__', temp['_id'])
+            item = self.model('item').load(temp,
+                                           level=AccessType.WRITE,
+                                           user=user,
+                                           exc=True)
 
         # Run the schema MapReduce code
         mapScript = self.foreignCode['binUtils.js'] + '\n' + \
@@ -282,7 +301,7 @@ class DatasetItem(Resource):
         return schema
 
     @access.public
-    @loadAnonymousItem()
+    @loadmodel(model='item', level=AccessType.READ)
     @describeRoute(
         Description('Get a histogram for all data attributes')
         .param('id', 'The ID of the dataset item.', paramType='path')
@@ -332,16 +351,15 @@ class DatasetItem(Resource):
                'each bin will span a range of values (defined by lowBound and highBound).',
                required=False)
         .param('cache', 'If true, attempt to retrieve results cached in the item\'s metadata ' +
-                        'if the same query has been run previously. Also, store the results ' +
-                        'of this query in the metadata cache.',
+                        'if the same query has been run previously. Also, attempt to store the results ' +
+                        'of this query in the metadata cache (fails silently if the user does not have ' +
+                        'write access).',
                required=False, dataType='boolean')
         .errorResponse()
     )
-    def getHistograms(self, item, params, user):
-        if 'meta' not in item or 'rlab' not in item['meta']:
-            item = self.setupDataset(id=item['_id'], params={}, user=user)
-        if 'schema' not in item['meta']['rlab']:
-            item['meta']['rlab']['schema'] = self.inferSchema(id=item['_id'], params={}, user=user)
+    def getHistograms(self, item, params):
+        if 'meta' not in item or 'rlab' not in item['meta'] or 'schema' not in item['meta']['rlab']:
+            raise RestException('Item ' + str(item['_id']) + ' has no schema information.')
 
         # Populate params with default settings
         # where settings haven't been specified
@@ -435,6 +453,9 @@ class DatasetItem(Resource):
         # TODO: When girder_db_items changes, find a new way to sneak
         # in to the item's native database (mapReduceViaDownload is VERY
         # sub-optimal!)
+        user = self.getCurrentUser()
+        if user is None:
+            user = self.app.anonymousAccess.getAnonymousUser()
         if 'databaseMetadata' in item:
             if item['databaseMetadata']['type'] == 'mongo':
                 histogram = self.mongoMapReduce(item, user, mapScript, reduceScript, params)
@@ -460,5 +481,10 @@ class DatasetItem(Resource):
             if 'histogramCaches' not in item['meta']['rlab']:
                 item['meta']['rlab']['histogramCaches'] = {}
             item['meta']['rlab']['histogramCaches'][paramsMD5] = histogram
-            self.model('item').updateItem(item)
+            try:
+                self.model('item').updateItem(item)
+            except AccessException:
+                # Meh, we couldn't cache the result. Not a big enough deal
+                # to throw / catch errors, so just fail silently
+                pass
         return histogram

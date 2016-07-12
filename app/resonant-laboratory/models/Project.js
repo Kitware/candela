@@ -283,8 +283,11 @@ let Project = MetadataItem.extend({
     let datasets = this.getMeta('datasets');
     let newDataset;
 
+    let promises = [];
+
     if (newDatasetId in window.mainPage.loadedDatasets) {
       newDataset = window.mainPage.loadedDatasets[newDatasetId];
+      promises.push(Promise.resolve(newDataset));
     } else {
       newDataset = new Dataset({
         _id: newDatasetId
@@ -297,7 +300,7 @@ let Project = MetadataItem.extend({
         this.updateDatasetPage(newDataset);
       });
       window.mainPage.loadedDatasets[newDatasetId] = newDataset;
-      newDataset.fetch();
+      promises.push(newDataset.fetch());
     }
 
     let newDatasetDetails = {
@@ -312,10 +315,11 @@ let Project = MetadataItem.extend({
       datasets[index] = newDatasetDetails;
     }
     this.setMeta('datasets', datasets);
-    return this.save().then(() => {
+    promises.push(this.save().then(() => {
       this.trigger('rl:changeDatasets');
       return this.validateMatchings();
-    });
+    }));
+    return Promise.all(promises);
   },
   setVisualization: function (visName, index = 0) {
     let visualizations = this.getMeta('visualizations');

@@ -116,10 +116,9 @@ class DatasetCache {
           path: 'dataset/inferSchema',
           type: 'POST'
         }).then(newSchema => {
-          // Store the new schema, the time that we updated it,
-          // and save those changes
-          this.model.setMeta('lastUpdated', new Date());
-          return this.model.save().then(() => {
+          // Inferring a new schema will update a few things;
+          // we want to fetch our model as well
+          return this.model.fetch().then(() => {
             this.model.trigger('rl:updatedSchema');
             return newSchema;
           });

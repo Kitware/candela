@@ -29,7 +29,7 @@ class loadAnonymousItem(object):
             anonymous = False
             if user is None:
                 anonymous = True
-                user = self.app.anonymousAccess._getAnonymousUser()
+                user = self.app.anonymousAccess.getAnonymousUser()
 
             copiedItem = False
             try:
@@ -53,14 +53,6 @@ class loadAnonymousItem(object):
                     .model('item').copyItem(srcItem=srcItem,
                                             creator=user,
                                             folder=targetFolder)
-                # TODO: Here we trash the rlab meta key when stuff is copied
-                # (it contains a reference to the file ID inside the object that will no longer be
-                # valid). This really should be moved to its own Resonant Laboratory-specific
-                # decorator...
-                if 'meta' in targetItem and 'rlab' in targetItem['meta']:
-                    del targetItem['meta']['rlab']
-                    self.model('item').updateItem(targetItem)
-
                 copiedItem = True
 
             kwargs['item'] = targetItem
@@ -80,7 +72,7 @@ class AnonymousAccess(Resource):
         super(Resource, self).__init__()
         self.app = app
 
-    def _getAnonymousUser(self):
+    def getAnonymousUser(self):
         try:
             return list(self.model('user').textSearch('anonymous'))[0]
         except:
@@ -165,7 +157,7 @@ class AnonymousAccess(Resource):
         user = self.getCurrentUser()
 
         if user is None:
-            user = self._getAnonymousUser()
+            user = self.getAnonymousUser()
 
         return self.model('folder').createFolder(parent=user,
                                                  name='Public',
@@ -192,7 +184,7 @@ class AnonymousAccess(Resource):
             params['reuseExisting'] = False
             return self.getOrMakePrivateItem(params)
         else:
-            user = self._getAnonymousUser()
+            user = self.getAnonymousUser()
 
             publicFolder = self.getOrMakePublicFolder({})
 
@@ -216,7 +208,7 @@ class AnonymousAccess(Resource):
     def itemInfo(self, item, params):
         info = {}
 
-        anonUser = self._getAnonymousUser()
+        anonUser = self.getAnonymousUser()
         user = self.getCurrentUser()
         if user is None:
             user = anonUser
@@ -258,7 +250,7 @@ class AnonymousAccess(Resource):
         idList = json.loads(params['ids'])
 
         user = self.getCurrentUser()
-        anonUser = self._getAnonymousUser()
+        anonUser = self.getAnonymousUser()
 
         folderModel = self.model('folder')
         scratchFolder = folderModel.createFolder(parent=anonUser,
@@ -300,7 +292,7 @@ class AnonymousAccess(Resource):
             return []
         privateFolder = self.getOrMakePrivateFolder({})
 
-        anonUser = self._getAnonymousUser()
+        anonUser = self.getAnonymousUser()
 
         result = []
         for itemId in idList:
@@ -381,7 +373,7 @@ class AnonymousAccess(Resource):
         makePublic = params.get('makePublic', currentFolder['name'] == 'Private')
         forceCopy = params.get('forceCopy', False)
 
-        if user is self._getAnonymousUser():
+        if user is self.getAnonymousUser():
             makePublic = True
             forceCopy = True
 
