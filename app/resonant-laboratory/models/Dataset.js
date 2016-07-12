@@ -115,18 +115,14 @@ class DatasetCache {
         this.cachedPromises.schema = this.restRequest({
           path: 'dataset/inferSchema',
           type: 'POST'
-        });
-
-        // Store the new schema, the time that we updated it,
-        // and save those changes
-        this.cachedPromises.schema.then(newSchema => {
+        }).then(newSchema => {
+          // Store the new schema, the time that we updated it,
+          // and save those changes
           this.model.setMeta('lastUpdated', new Date());
-          return this.model.save();
-          // Technically, we could / will get this from
-          // a fetch, but a separate call would be a little redundant
-          // this.model.setMeta('schema', newSchema);
-        }).then(() => {
-          this.model.trigger('rl:updatedSchema');
+          return this.model.save().then(() => {
+            this.model.trigger('rl:updatedSchema');
+            return newSchema;
+          });
         });
       }
     }

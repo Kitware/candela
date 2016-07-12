@@ -91,17 +91,17 @@ let MetadataItem = girder.models.ItemModel.extend({
 
     // beforeSuccess is a function that should
     // be called before options.success
-    beforeSuccess = beforeSuccess || (() => {
-    });
+    beforeSuccess = beforeSuccess || (d => d);
 
-    let self = this;
-    promiseObj.then(function () {
-      // Things were successfully; call beforeSuccess first,
+    var self = this;
+    promiseObj.then(function (resp) {
+      // Things were successful; call beforeSuccess first,
       // and then call options.success if it exists
-      beforeSuccess.apply(self, arguments);
+      resp = beforeSuccess.apply(self, arguments);
       if (options.success) {
         options.success.apply(self, arguments);
       }
+      return resp;
     });
 
     if (options.error) {
@@ -126,9 +126,13 @@ let MetadataItem = girder.models.ItemModel.extend({
         // The id of the item changed in the process (e.g. a copy of
         // the item was made because the user had read, but not write access)
         let oldId = this.getId();
+        this.set('__originalItemId__', resp['__originalItemId__']);
         this.set(this.idAttribute, resp['__copiedItemId__']);
+        delete resp['__originalItemId__'];
+        delete resp['__copiedItemId__'];
         this.trigger('rl:swappedId', oldId);
       }
+      return resp;
     }).catch(errorObj => {
       if (errorObj.status === 401) {
         // Authentication failures simply mean that the user is logged out;
@@ -201,8 +205,8 @@ let MetadataItem = girder.models.ItemModel.extend({
           // And now we want to finish creating
           // the item by saving our current state
           // (this calls sync again, but that's
-          // a good thing in case we have metadata
-          this.sync('update', model, options);
+          // a good thing in case we have metadata)
+          return this.sync('update', model, options);
         }
       });
     } else if (method === 'update') {
@@ -253,6 +257,7 @@ let MetadataItem = girder.models.ItemModel.extend({
           this.set(resp, {
             silent: true
           });
+          return resp;
         });
       } else {
         // Otherwise, just go with the default girder behavior

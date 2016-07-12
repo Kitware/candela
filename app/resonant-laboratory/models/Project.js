@@ -98,7 +98,7 @@ let Project = MetadataItem.extend({
     // Whenever we update the project metadata, we also want
     // to update the information about where the project is stored
     // and whether the user can edit it
-    fetchPromise.then(() => {
+    let statusPromise = fetchPromise.then(() => {
       return this.restRequest({
         path: 'anonymousAccess/info',
         type: 'GET'
@@ -108,10 +108,10 @@ let Project = MetadataItem.extend({
       });
     });
 
-    // Calling fetch() on a project should also call trigger
+    // Calling fetch() on a project should also call
     // fetch() on all the project's datasets (and update which
     // ones are stored in window.mainPage.loadedDatasets)
-    fetchPromise.then(() => {
+    let datasetsPromise = fetchPromise.then(() => {
       let datasetPromises = [];
       let newLoadedDatasets = {};
       let datasetSpecs = this.getMeta('datasets');
@@ -158,7 +158,12 @@ let Project = MetadataItem.extend({
       });
     });
 
-    return fetchPromise;
+    // Though we only return the main fetch response, the fetch isn't
+    // complete until the status and dataset promises have been resolved
+    return Promise.all([fetchPromise, statusPromise, datasetsPromise])
+      .then(responses => {
+        return responses[0];
+      });
   }, 100),
   save: function () {
     // Prevent any lingering attempts to save the

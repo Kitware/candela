@@ -7,7 +7,7 @@ from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
 from girder.constants import AccessType
-from girder.models.model_base import AccessException
+from girder.models.model_base import AccessException, ValidationException
 
 
 TRUE_VALUES = set([True, 'true', 1, 'True'])
@@ -53,7 +53,16 @@ class loadAnonymousItem(object):
                     .model('item').copyItem(srcItem=srcItem,
                                             creator=user,
                                             folder=targetFolder)
+                # TODO: Here we trash the rlab meta key when stuff is copied
+                # (it contains a reference to the file ID inside the object that will no longer be
+                # valid). This really should be moved to its own Resonant Laboratory-specific
+                # decorator...
+                if 'meta' in targetItem and 'rlab' in targetItem['meta']:
+                    del targetItem['meta']['rlab']
+                    self.model('item').updateItem(targetItem)
+
                 copiedItem = True
+
             kwargs['item'] = targetItem
             kwargs['user'] = user
             originalId = kwargs['id']
@@ -266,7 +275,7 @@ class AnonymousAccess(Resource):
                                                level=AccessType.READ,
                                                user=user,
                                                exc=True)
-            except AccessException:
+            except (AccessException, ValidationException):
                 continue
             if item['folderId'] == scratchFolder['_id']:
                 result.append(item)
@@ -302,7 +311,7 @@ class AnonymousAccess(Resource):
                                                exc=True)
                 self.model('item').move(item, privateFolder)
                 result.append(item)
-            except AccessException:
+            except (AccessException, ValidationException):
                 continue
 
         return result
