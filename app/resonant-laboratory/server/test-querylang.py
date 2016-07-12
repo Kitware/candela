@@ -47,5 +47,23 @@ class TestQueryLanguage(unittest.TestCase):
         self.run_expressions('test/disjunction-ast-baselines.json', data, [True, False, True])
 
 
+class TestQueryLanguageMongo(unittest.TestCase):
+    """Test functions for generating Mongo queries from query language expressions."""
+
+    def test_conjunction_expressions(self):
+        """Test conjunction expressions."""
+        asts = None
+        with open('test/conjunction-ast-baselines.json') as f:
+            asts = json.load(f)
+
+        baselines = [
+            {'$and': [{'age': {'$lt': 22}},
+                      {'age': {'$gt': 20}}]}
+        ]
+
+        for expr, baseline in zip(map(ql.astToMongo, asts), baselines):
+            self.assertEqual(expr, baseline)
+
+
 if __name__ == '__main__':
     unittest.main()
