@@ -86,6 +86,17 @@
   height: 3em;
 }
 
+#Overlay summary {
+  outline: none;
+}
+#Overlay summary pre {
+  display: inline-block;
+  padding: 0px;
+  margin: 0px;
+  position: relative;
+  bottom: 0.15em;
+}
+
 #Overlay #closeOverlay {
   position: absolute;
   top: 1em;

@@ -58,6 +58,31 @@ let Overlay = Backbone.View.extend({
     // is responsible for picking the appropriate next
     // view)
   },
+  extractErrorDetails: function (errorObj) {
+    if (errorObj.status === 401) {
+      // Authentication failures simply mean that the user is logged out;
+      // we can ignore these
+      return;
+    }
+    // Some other server error has occurred...
+    let details = '';
+    if (errorObj.status) {
+      details += 'Status: ' + errorObj.status + '\n\n';
+    }
+    if (errorObj.stack) {
+      details += 'Stack Trace:\n' + errorObj.stack + '\n\n';
+    }
+    if (errorObj.responseJSON && errorObj.responseJSON.trace) {
+      details += 'Stack Trace:';
+      errorObj.responseJSON.trace.forEach(traceDetails => {
+        details += '\n' + traceDetails[0];
+        details += '\n' + traceDetails[1] + '\t' + traceDetails[2];
+        details += '\n' + traceDetails[3] + '\n';
+      });
+      details += '\n';
+    }
+    return details;
+  },
   handleError: function (errorObj) {
     let message;
 
@@ -68,7 +93,7 @@ let Overlay = Backbone.View.extend({
 
     if (errorObj.responseJSON && errorObj.responseJSON.message) {
       message = errorObj.responseJSON.message;
-    } else if (errorObj instanceof Error) {
+    } else if (errorObj.message) {
       message = errorObj.message;
     } else {
       // Fallback if I can't tell what it is
@@ -76,7 +101,7 @@ let Overlay = Backbone.View.extend({
       console.warn('Unknown error! Here\'s what I was given:', arguments);
     }
     // Let the user know something funky is up
-    this.renderReallyBadErrorScreen(message, errorObj.details);
+    this.renderReallyBadErrorScreen(message, this.extractErrorDetails(errorObj));
 
     // Actually throw the error if it's a real one
     if (errorObj instanceof Error) {
