@@ -132,6 +132,9 @@ let MetadataItem = girder.models.ItemModel.extend({
     } else if (errorObj.responseJSON && errorObj.responseJSON.message) {
       details += '\nMessage:\n' + errorObj.responseJSON.message;
     }
+    if (errorObj.stack) {
+      details += '\nStack Trace:\n' + errorObj.stack;
+    }
     if (errorObj.responseJSON && errorObj.responseJSON.trace) {
       details += '\nStack Trace:\n';
       errorObj.responseJSON.trace.forEach(traceDetails => {

@@ -287,7 +287,7 @@ let DatasetView = Widget.extend({
       {
         segment: 'page',
         start: pageOffset,
-        count: Math.min(pageCount, filteredCount)
+        count: pageCount
       }
     ];
     let bars = d3.select(this.el).select('#pagingBars').selectAll('rect.bar')
@@ -303,6 +303,7 @@ let DatasetView = Widget.extend({
     let filteredCount = datasetDetails.filteredHistogram.__passedFilters__[0].count;
     let pageOffset = datasetDetails.datasetObj.cache.page.offset;
     let pageCount = datasetDetails.datasetObj.cache.page.limit;
+    pageCount = Math.min(pageOffset + pageCount, filteredCount) - pageOffset;
 
     let hasFilters = filteredCount < overviewCount;
     let hasPaging = pageCount < filteredCount;

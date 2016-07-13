@@ -55,37 +55,39 @@ class DatasetCache {
     if (!this._page) {
       this.page = {
         offset: 0,
-        limit: 50
+        limit: 100
       };
     }
     return this._page;
   }
   set page (value) {
-    // Tentatively set the new page until we can
-    // validate that the page makes sense
-    this._page = value;
-    this.validatePage(value);
-    // Invalidate pageHistogram and currentDataPage
-    delete this.cachedPromises.pageHistogram;
-    delete this.cachedPromises.currentDataPage;
-    this.model.trigger('rl:updatePage');
-  }
-  validatePage (value) {
-    if (this._cachedPromises && this._cachedPromises.filteredHistogram) {
-      // If we can, auto-adjust the page in case it's overshooting
-      this._cachedPromises.filteredHistogram.then(filteredHistogram => {
-        let maxItems = filteredHistogram.__passedFilters__[0].count;
-        if (value.offset + value.limit > maxItems) {
-          value.offset = maxItems - value.limit;
-          value.limit = maxItems - value.offset;
-        }
-        value.offset = Math.max(value.offset, 0);
-        let changed = value.offset !== this._page.offset || value.limit !== this._page.limit;
-        this._page = value;
-        if (changed) {
-          this.model.trigger('rl:updatePage');
-        }
-      });
+    // We have to show at least one data item
+    value.limit = Math.max(1, value.limit);
+    // Don't let the offset go lower than zero
+    value.offset = Math.max(0, value.offset);
+    // Align offset to limit-defined pages
+    value.offset = value.limit * Math.floor(value.offset / value.limit);
+
+    if (!this._page || value.offset !== this._page.offset || value.limit !== this._page.limit) {
+      // Tentatively set the new page until we can
+      // validate that offset doesn't exceed the
+      // number of items that we have
+      this._page = value;
+      // Invalidate pageHistogram and currentDataPage
+      delete this.cachedPromises.pageHistogram;
+      delete this.cachedPromises.currentDataPage;
+      this.model.trigger('rl:updatePage');
+
+      if (this._cachedPromises && this._cachedPromises.filteredHistogram) {
+        this._cachedPromises.filteredHistogram.then(filteredHistogram => {
+          let maxItems = filteredHistogram.__passedFilters__[0].count;
+          if (value.offset >= maxItems) {
+            // Move back to the top page
+            value.offset = value.limit * Math.floor(maxItems / value.limit);
+            this.page = value;
+          }
+        });
+      }
     }
   }
   get schema () {
@@ -354,8 +356,7 @@ let Dataset = MetadataItem.extend({
   seekLast: function () {
     this.cache.filteredHistogram.then(filteredHistogram => {
       let lastItem = filteredHistogram.__passedFilters__[0].count;
-      this.setPage(lastItem - this.cache.page.limit,
-                   this.cache.page.limit);
+      this.setPage(lastItem, this.cache.page.limit);
     });
   }
 });
