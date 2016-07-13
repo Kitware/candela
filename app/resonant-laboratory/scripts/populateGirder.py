@@ -180,7 +180,7 @@ if __name__ == '__main__':
                     ignoredFiles += 1
                 else:
                     fileSize = os.stat('./' + folder + '/' + item + '/' + fileName).st_size
-                    if (fileSize > int(args.databaseThreshold)):
+                    if (fileSize > int(args.databaseThreshold)) or os.path.splitext(fileName)[1] == '.json':
                         createMongoCollection(args, './' + folder + '/' + item + '/', fileName)
                         gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/database', {}, json.dumps({
                             'url': args.mongoHost + ':' + args.mongoPort,
