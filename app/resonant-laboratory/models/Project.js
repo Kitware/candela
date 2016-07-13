@@ -135,8 +135,12 @@ let Project = MetadataItem.extend({
             this.updateDatasetPage(dataset);
           });
         }
-        dataset.cache.filter = datasetSpec.filter;
-        dataset.cache.page = datasetSpec.page;
+        if (datasetSpec.filter) {
+          dataset.cache.filter = datasetSpec.filter;
+        }
+        if (datasetSpec.page) {
+          dataset.cache.page = datasetSpec.page;
+        }
         newLoadedDatasets[datasetSpec.dataset] = dataset;
         datasetPromises.push(newLoadedDatasets[datasetSpec.dataset].fetch());
       });
