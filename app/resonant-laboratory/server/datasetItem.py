@@ -263,9 +263,12 @@ class DatasetItem(Resource):
                                            exc=True)
 
         # Run the schema MapReduce code
-        mapScript = self.foreignCode['binUtils.js'] + '\n' + \
-            self.foreignCode['schema_map.js']
-        reduceScript = self.foreignCode['schema_reduce.js']
+        mapScript = 'function map () {\n' + \
+            self.foreignCode['binUtils.js'] + '\n' + \
+            self.foreignCode['schema_map.js'] + '\n}'
+        reduceScript = 'function reduce(key, values) {\n' + \
+            self.foreignCode['schema_reduce.js'] + '\n' + \
+            'return counters;\n}'
 
         # TODO: When girder_db_items changes, find a new way to sneak
         # in to the item's native database (mapReduceViaDownload is VERY
