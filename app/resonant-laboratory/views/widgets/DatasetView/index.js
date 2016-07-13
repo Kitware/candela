@@ -591,7 +591,7 @@ let DatasetView = Widget.extend({
     let attributeOrder = Object.keys(datasetDetails.schema);
 
     let attributeSections = container.selectAll('.attributeSection')
-      .data(attributeOrder);
+      .data(attributeOrder, d => d);
     let attributeSectionsEnter = attributeSections.enter().append('div')
       .attr('class', 'attributeSection');
     attributeSections.exit().remove();

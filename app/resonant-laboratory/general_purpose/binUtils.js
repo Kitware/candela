@@ -1,5 +1,7 @@
 /*globals LOCALE_INDEXES*/
 
+var FALSEY_STRINGS = ['0', 'N', 'n'];
+
 function coerceValue (value, coerceToType) {
   // What type should we coerce this value to?
   if (!coerceToType) {
@@ -11,7 +13,7 @@ function coerceValue (value, coerceToType) {
       value = typeof value;
     }
   } else if (coerceToType === 'boolean') {
-    value = !!value;
+    value = !!value && FALSEY_STRINGS.indexOf(value) === -1;
   } else if (coerceToType === 'integer') {
     value = parseInt(value, 10);
   } else if (coerceToType === 'number') {
@@ -168,17 +170,17 @@ function createBins (coerceToType, numBins, lowBound, highBound, locale) {
       {
         lowBound: false,
         highBound: false,
-        label: 'False'
+        label: 'false'
       },
       {
         lowBound: true,
         highBound: true,
-        label: 'True'
+        label: 'true'
       }
     ];
     lookup = {
-      'False': 0,
-      'True': 1
+      'false': 0,
+      'true': 1
     };
   } else if (coerceToType === 'date') {
     var span = highBound - lowBound;

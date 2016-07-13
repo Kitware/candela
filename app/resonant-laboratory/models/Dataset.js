@@ -261,7 +261,10 @@ let Dataset = MetadataItem.extend({
     }
     // TODO: if the histograms are available, use them to infer
     // whether to jump further into booleans (e.g. everything is
-    // 0/1, y/n, true/false, etc)
+    // 0/1, y/n, true/false, etc) - this will require sending
+    // (and storing) custom falsey strings in place of the
+    // FALSEY_STRINGS list in general_purpose/binUtils.js,
+    // with any dependent server-side logic
     return attrType;
   },
   getAttributeType: function (schema, attrName) {
