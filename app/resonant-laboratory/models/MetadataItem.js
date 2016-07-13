@@ -83,10 +83,16 @@ let MetadataItem = girder.models.ItemModel.extend({
         forceReject.apply(waiter, arguments);
       });
 
+      /*
+      TODO: Not sure why, but I seem to be getting a lot of
+      spurious timeout errors, so I've disabled this check
+      for now.
+
       timeout = window.setTimeout(() => {
         forceReject(new Error(`MetadataItem timed out waiting for
         an event from Girder.`));
       }, 20000);
+      */
     }
 
     // beforeSuccess is a function that should
@@ -128,15 +134,16 @@ let MetadataItem = girder.models.ItemModel.extend({
       details += '\nStatus: ' + errorObj.status + '\n';
     }
     if (errorObj.message) {
-      details += '\nMessage:\n' + errorObj.message;
-    } else if (errorObj.responseJSON && errorObj.responseJSON.message) {
-      details += '\nMessage:\n' + errorObj.responseJSON.message;
+      details += '\nMessage:\n' + errorObj.message + '\n';
     }
     if (errorObj.stack) {
-      details += '\nStack Trace:\n' + errorObj.stack;
+      details += '\nStack Trace:\n' + errorObj.stack + '\n';
+    }
+    if (errorObj.responseJSON && errorObj.responseJSON.message) {
+      details += '\nServer Message:\n' + errorObj.responseJSON.message + '\n';
     }
     if (errorObj.responseJSON && errorObj.responseJSON.trace) {
-      details += '\nStack Trace:\n';
+      details += '\nServer Stack Trace:';
       errorObj.responseJSON.trace.forEach(traceDetails => {
         details += '\n' + traceDetails[0];
         details += '\n' + traceDetails[1] + '\t' + traceDetails[2];

@@ -9,8 +9,7 @@ function reduce (key, values) {  // eslint-disable-line no-unused-vars
             native: false,
             count: 0
           };
-          if (dataType === 'integer' || dataType === 'number' ||
-              dataType === 'string' || dataType === 'date') {
+          if (dataType === 'integer' || dataType === 'number' || dataType === 'date') {
             counters[dataType].lowBound = counts[dataType].lowBound;
             counters[dataType].highBound = counts[dataType].highBound;
           }
@@ -18,8 +17,7 @@ function reduce (key, values) {  // eslint-disable-line no-unused-vars
         // Update the native flag, add the count, and update the low/high bounds
         counters[dataType].native = counters[dataType].native || !!counts[dataType].native;
         counters[dataType].count += counts[dataType].count;
-        if (dataType === 'integer' || dataType === 'number' ||
-            dataType === 'string' || dataType === 'date') {
+        if (dataType === 'integer' || dataType === 'number' || dataType === 'date') {
           if (counts[dataType].lowBound < counters[dataType].lowBound) {
             counters[dataType].lowBound = counts[dataType].lowBound;
           }

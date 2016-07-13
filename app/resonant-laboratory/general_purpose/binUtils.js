@@ -1,9 +1,11 @@
+/*globals LOCALE_INDEXES*/
+
 function coerceValue (value, coerceToType) {
   // What type should we coerce this value to?
   if (!coerceToType) {
     // No type specified - this is a magic
     // mode that bins by native data type
-    if (parseFloat(value) === parseInt(value)) {
+    if (parseFloat(value, 10) === parseInt(value, 10)) {
       value = 'integer';
     } else {
       value = typeof value;
@@ -42,51 +44,6 @@ function coerceValue (value, coerceToType) {
   return value;
 }
 
-function stringToByteArray (value, offset, limit, defaultChar) {
-  offset = offset || 0;
-  limit = limit === undefined ? value.length - offset : limit;
-  defaultChar = defaultChar || 0;
-  var result = [];
-  for (var i = offset; i < offset + limit; i += 1) {
-    if (i >= value.length) {
-      result.push(defaultChar);
-    } else {
-      result.push(value.charCodeAt(i));
-    }
-  }
-  return result;
-}
-
-var UTF_BASE = Math.pow(2, 16);
-
-function byteArrayToNumber (value) {
-  var result = 0;
-  value.forEach(function (d, i) {
-    result += Math.pow(UTF_BASE, value.length - i - 1) * d;
-  });
-  return result;
-}
-
-function numberToByteArray (value) {
-  var result = [];
-  var digits = Math.ceil(Math.log(value) / Math.log(UTF_BASE));
-  for (var i = digits - 1; i >= 0; i -= 1) {
-    var divisor = Math.pow(UTF_BASE, i);
-    var byte = Math.floor(value / divisor);
-    value -= byte * divisor;
-    result.push(byte);
-  }
-  return result;
-}
-
-function byteArrayToString (value) {
-  var result = '';
-  value.forEach(function (b) {
-    result += String.fromCharCode(b);
-  });
-  return result;
-}
-
 function formatDate (dateObj, levels) {
   var dateString;
   if (levels.milliseconds === true) {
@@ -106,39 +63,37 @@ function formatDate (dateObj, levels) {
   return dateString;
 }
 
-function createBins (coerceToType, numBins, lowBound, highBound) {
+function createBins (coerceToType, numBins, lowBound, highBound, locale) {
   // Create:
   // 1. a list of bins with raw boundary values, plus a human-readable label
   // 2. a dictionary that looks up those bins by its human-readable label
-
   var sigFigs = 3;
-  // sigFigs refers to the minimum number of significant
-  // characters / digits that each bin label must have so that they
-  // can be distinguished in the human-readable label. Note that
-  // if you want to increase this beyond 3, you will need to
-  // rework the string binning logic (javascript can't represent
-  // integers larger than 2^53 without corruption - using more
-  // than three UTF-16 characters will break that limit)
-
-  lowBound = coerceValue(lowBound, coerceToType);
-  highBound = coerceValue(highBound, coerceToType);
-
   var bin;
   var bins = [];
   var lookup = {};
   var step;
   var i;
-  if (highBound === lowBound) {
-    // Weird corner case; this really *should* be categorical.
-    // Just return one bin for all the values.
-    return [
-      {
+
+  if (coerceToType !== 'string' && coerceToType !== 'object') {
+    lowBound = coerceValue(lowBound, coerceToType);
+    highBound = coerceValue(highBound, coerceToType);
+    if (highBound === lowBound) {
+      // Weird corner case; this really *should* be categorical.
+      // Just return one bin for all the values.
+      bins = [{
         lowBound: lowBound,
         highBound: highBound,
         label: String(lowBound)
-      }
-    ];
+      }];
+      lookup = {};
+      lookup[lowBound] = 0;
+      return {
+        bins: bins,
+        lookup: lookup
+      };
+    }
   }
+
   if (coerceToType === 'integer') {
     // Can't have more bins than integers in the range
     numBins = Math.min(highBound - lowBound, numBins);
@@ -178,59 +133,30 @@ function createBins (coerceToType, numBins, lowBound, highBound) {
       bins.push(bin);
     }
   } else if (coerceToType === 'string' || coerceToType === 'object') {
-    // Objects are treated as strings for the sake of binning
-    lowBound = String(lowBound);
-    highBound = String(highBound);
-    var charOffset = 0;
-    var charLimit = sigFigs;
+    // Objects are treated as strings for the sake of binning.
 
-    var lowBytes = stringToByteArray(lowBound);
-    var highBytes = stringToByteArray(highBound);
-
-    // When we need to extend strings, attempt to use familiar
-    // characters from the actual data
-    var lowChar = Math.min.apply(null, lowBytes.concat(highBytes));
-    var highChar = Math.max.apply(null, lowBytes.concat(highBytes));
-
-    // Which is the last index with a common character?
-    while (charOffset < lowBytes.length &&
-           charOffset < highBytes.length &&
-           lowBytes[charOffset] === highBytes[charOffset]) {
-      charOffset += 1;
+    // Use the locale to get the index definition
+    if (!LOCALE_INDEXES.hasOwnProperty(locale)) {
+      locale = 'en';
     }
-    var stem = lowBound.slice(0, charOffset);
-
-    // To compute raw boundary values, we need the number corresponding
-    // to the slice of the string that we've identified. Where
-    // strings are too short, extend them by the lowest / highest
-    // observed character
-    var rawLowBound = stringToByteArray(lowBound, charOffset, charLimit, lowChar);
-    rawLowBound = byteArrayToNumber(rawLowBound);
-    var rawHighBound = stringToByteArray(highBound, charOffset, charLimit, highChar);
-    rawHighBound = byteArrayToNumber(rawHighBound);
-
-    // Now that we have numbers to play with, we can split the
-    // range up into bins using math!
-    step = (rawHighBound - rawLowBound) / numBins;
-    for (i = 0; i < numBins; i += 1) {
+    var index = LOCALE_INDEXES[locale];
+    // Can't have more bins than characters in the index
+    numBins = Math.min(index.length, numBins);
+    var charsPerBin = Math.ceil(index.length / numBins);
+    for (i = 0; i < index.length; i += charsPerBin) {
       bin = {
-        lowBound: numberToByteArray(rawLowBound + i * step),
-        highBound: numberToByteArray(rawLowBound + (i + 1) * step)
+        lowBound: index[i],
+        highBound: index[Math.min(index.length - 1, i + charsPerBin)]
       };
-      // Convert the byte arrays back into strings
-      bin.lowBound = stem + byteArrayToString(bin.lowBound);
-      bin.highBound = stem + byteArrayToString(bin.highBound);
-      bin.label = '[' + bin.lowBound + ' - ';
-      if (i === numBins - 1) {
-        // The original high bound may have been
-        // corrupted slightly because of rounding;
-        // because the highest bound is inclusive
-        // (unlike the other bins), restore the original
-        // (but keep the label short)
-        bin.highBound = highBound;
-        bin.label += bin.highBound.slice(0, charOffset + charLimit) + ']';
+      if (bin.lowBound === bin.highBound) {
+        bin.label = lowBound;
       } else {
-        bin.label += bin.highBound + ')';
+        bin.label = '[' + bin.lowBound + ' - ' + bin.highBound;
+        if (i + charsPerBin >= index.length) {
+          bin.label += ']';
+        } else {
+          bin.label += ')';
+        }
       }
       lookup[bin.label] = bins.length;
       bins.push(bin);
@@ -341,6 +267,23 @@ function findBinLabel (value, coerceToType, lowBound, highBound, specialBins, or
     value = value.toISOString();
   }
 
+  var compare;
+  if (coerceToType === 'string') {
+    compare = function (a, b) {
+      return a.localeCompare(b);
+    };
+  } else {
+    compare = function (a, b) {
+      if (a < b) {
+        return -1;
+      } else if (a === b) {
+        return 0;
+      } else {
+        return 1;
+      }
+    };
+  }
+
   if (!ordinalBins) {
     // If we're being categorical, just return the value itself.
     // An external step is responsible for preventing too many
@@ -352,13 +295,13 @@ function findBinLabel (value, coerceToType, lowBound, highBound, specialBins, or
     // Find which ordinal bin the value belongs to
     for (var i = 0; i < ordinalBins.length; i += 1) {
       // Does the value fit in this bin?
-      if (value >= ordinalBins[i].lowBound &&
-          value < ordinalBins[i].highBound) {
+      if (compare(value, ordinalBins[i].lowBound) >= 0 &&
+          compare(value, ordinalBins[i].highBound) < 0) {
         return ordinalBins[i].label;
       }
     }
     // Corner case: the highest value is inclusive
-    if (value <= ordinalBins[ordinalBins.length - 1].highBound) {
+    if (compare(value, ordinalBins[ordinalBins.length - 1].highBound) <= 0) {
       return ordinalBins[ordinalBins.length - 1].label;
     }
     // Okay, the value didn't make it into any of the ordinal bins.

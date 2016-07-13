@@ -27,8 +27,7 @@ function map () { // eslint-disable-line no-unused-vars
     };
     // counters[nativeType][map._dummy] = 1;
     // store the mins and maxes if relevant
-    if (nativeType === 'integer' || nativeType === 'number' ||
-        nativeType === 'string' || nativeType === 'date') {
+    if (nativeType === 'integer' || nativeType === 'number' || nativeType === 'date') {
       counters[nativeType].lowBound = value;
       counters[nativeType].highBound = value;
     }
@@ -39,9 +38,7 @@ function map () { // eslint-disable-line no-unused-vars
       if (strValue !== '[object Object]') {
         // this value can be meaningfully coerced to a string (and isn't already one)
         counters['string'] = {
-          count: 1,
-          lowBound: strValue,
-          highBound: strValue
+          count: 1
         };
       }
     }

@@ -12,6 +12,7 @@ import bson.json_util
 import md5
 import math
 import itertools
+import cherrypy
 from pymongo import MongoClient
 from anonymousAccess import loadAnonymousItem
 from girder.api import access
@@ -40,7 +41,8 @@ class DatasetItem(Resource):
         self.foreignCode = {}
 
         for filename in os.listdir(codePath):
-            if (os.path.splitext(filename)[1] != '.js'):
+            extension = os.path.splitext(filename)[1]
+            if extension != '.js' and extension != '.json':
                 continue
             infile = open(os.path.join(codePath, filename), 'rb')
             self.foreignCode[filename] = infile.read()
@@ -332,15 +334,19 @@ class DatasetItem(Resource):
                'If "categorical" (default), values will be treated as unordered, categorical data.' +
                '<br/><br/>lowBound<br/>' +
                'Defines the low bound of the histogram if interpretation=ordinal. Default is ' +
-               'to use the minimum value in the dataset.'
+               'to use the minimum value in the dataset.' +
                '<br/><br/>highBound<br/>' +
                'Defines the high bound of the histogram if interpretation=ordinal. Default is ' +
-               'to use the maximum value in the dataset.'
+               'to use the maximum value in the dataset.' +
+               '<br/><br/>locale<br/>' +
+               'Specify the locale for binning ordinal strings. Default behavior is to use the ' +
+               'locale specified by the Accept-Language header, followed by "en" if that can not ' +
+               'be determined.' +
                '<br/><br/>specialBins<br/>' +
                'An array of values that will be put into their own bins, regardless of ' +
                'all other settings. This lets you separate bad values/error codes, e.g. ' +
                '[-9999,"N/A"]. These special values will be added to the set of natively ' +
-               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, "" (empty string), "Invalid Date", "other"]'
+               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, "" (empty string), "Invalid Date", "other"]' +
                '<br/><br/>numBins<br/>' +
                'Defines the maximum number of bins to use, in addition to the specialBins ' +
                '(default: 10 bins). For categorical data, the bins are arbitrarily chosen' +
@@ -371,10 +377,12 @@ class DatasetItem(Resource):
         for attrName, attrSchema in item['meta']['rlab']['schema'].iteritems():
             binSettings[attrName] = binSettings.get(attrName, {})
 
+            # Get user-defined or default type coercion setting
             coerceToType = attrSchema.get('coerceToType', 'object')
             coerceToType = binSettings[attrName].get('coerceToType', coerceToType)
             binSettings[attrName]['coerceToType'] = coerceToType
 
+            # Get user-defined or default interpretation setting
             if binSettings[attrName]['coerceToType'] is 'object':
                 interpretation = binSettings[attrName]['interpretation'] = 'categorical'
             else:
@@ -382,41 +390,59 @@ class DatasetItem(Resource):
                 interpretation = binSettings[attrName].get('interpretation', interpretation)
                 binSettings[attrName]['interpretation'] = interpretation
 
+            # Get any user-defined special bins (the defaults are
+            # listed in histogram_reduce.js)
             specialBins = bson.json_util.loads(binSettings[attrName].get('specialBins', '[]'))
             binSettings[attrName]['specialBins'] = specialBins
 
+            # Get user-defined or default number of bins
             numBins = binSettings[attrName].get('numBins', 10)
             binSettings[attrName]['numBins'] = numBins
 
+            # For ordinal binning, we need some more details:
             if interpretation == 'ordinal':
-                lowBound = None
-                highBound = None
-                if coerceToType in attrSchema:
+                if coerceToType == 'string' or coerceToType == 'object':
+                    # Use the locale to construct the bins
+                    lowBound = None
+                    highBound = None
+                    locale = binSettings[attrName].get('locale', None)
+                    if locale is None:
+                        # Default is to try to extract locale information
+                        # from the Accept-Language header, with 'en' as
+                        # a backup (TODO: do smarter things with alternative
+                        # locales)
+                        locale = cherrypy.request.headers.get('Accept-Language', 'en')
+                        if ',' in locale:
+                            locale = locale.split(',')[0].strip()
+                        if ';' in locale:
+                            locale = locale.split(';')[0].strip()
+                else:
+                    # Use default or user-defined low/high boundary values
+                    # to construct the bins
+                    locale = None
                     lowBound = attrSchema[coerceToType]['lowBound']
                     highBound = attrSchema[coerceToType]['highBound']
-                elif coerceToType == 'number' and 'integer' in attrSchema:
-                    # Corner case: the user is coercing to number,
-                    # when we only counted integers
-                    lowBound = attrSchema['integer']['lowBound']
-                    highBound = attrSchema['integer']['highBound']
-                lowBound = binSettings[attrName].get('lowBound', lowBound)
-                highBound = binSettings[attrName].get('highBound', highBound)
-                if lowBound is None or highBound is None:
-                    raise RestException('There are no observed values of ' +
-                                        'type ' + coerceToType + ', so it is ' +
-                                        'impossible to automatically determine ' +
-                                        'low/high bounds for an ordinal interpretation.' +
-                                        ' Please supply bounds or change to "categorical".')
-                binSettings[attrName]['lowBound'] = lowBound
-                binSettings[attrName]['highBound'] = highBound
+                    lowBound = binSettings[attrName].get('lowBound', lowBound)
+                    highBound = binSettings[attrName].get('highBound', highBound)
+                    if lowBound is None or highBound is None:
+                        raise RestException('There are no observed values of ' +
+                                            'type ' + coerceToType + ', so it is ' +
+                                            'impossible to automatically determine ' +
+                                            'low/high bounds for an ordinal interpretation.' +
+                                            ' Please supply bounds or change to "categorical".')
+                    binSettings[attrName]['lowBound'] = lowBound
+                    binSettings[attrName]['highBound'] = highBound
 
                 # Pre-populate the bins with human-readable names
-                binUtilsCode = execjs.compile(self.foreignCode['binUtils.js'])
+                binUtilsCode = execjs.compile('var LOCALE_INDEXES = ' +
+                                              self.foreignCode['localeIndexes.json'] + ';\n' +
+                                              self.foreignCode['binUtils.js'])
                 binSettings[attrName]['ordinalBins'] = binUtilsCode.call('createBins',
                                                                          coerceToType,
                                                                          numBins,
                                                                          lowBound,
-                                                                         highBound)['bins']
+                                                                         highBound,
+                                                                         locale)['bins']
             else:
                 pass
                 # We can ignore the ordinalBins parameter if we're being

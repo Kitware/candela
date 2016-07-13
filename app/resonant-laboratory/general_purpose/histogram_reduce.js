@@ -100,7 +100,7 @@ allHistograms.forEach(function (wrappedHistogram) {
 });
 
 if (!binSettings.ordinalBins) {
-  // Sort categorical bins alphabetically (TODO: sort
+  // Sort categorical by unicode value (TODO: sort
   // by count when we do the fancier stuff in the
   // comments at the top)
   histogram.sort(function (a, b) {

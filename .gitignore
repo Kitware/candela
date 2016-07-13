@@ -10,3 +10,4 @@ npm-debug.log
 *-diff.png
 *-test.png
 .ipynb_checkpoints
+app/resonant-laboratory/scripts/core/*

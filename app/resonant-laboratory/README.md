@@ -43,17 +43,17 @@ using the `virtualenv` described in the girder setup instructions.
   girder-server
   ```
 
-2. Register an admin account at ([localhost:8080](http://localhost:8080))
+2. Register an admin account at [localhost:8080](http://localhost:8080)
 
 3. Go to Admin console -> Plugins to enable the Resonant Laboratory plugin
 
 4. Restart Girder
 
-Resonant Laboratory will replace the Girder interface at ([localhost:8080](http://localhost:8080))
-(you can still access the girder interface at ([localhost:8080/girder](http://localhost:8080/girder)))
+Resonant Laboratory will replace the Girder interface at [localhost:8080](http://localhost:8080)
+(you can still access the girder interface at [localhost:8080/girder](http://localhost:8080/girder))
 
 5. Optionally, you can add an example library to the girder instance
-   by running this script from the `examples` directory (by default, it assumes that you've set up an user account named `admin`; see `python populateGirder.py --help` for details):
+   by running this script from the `scripts` directory (by default, it assumes that you've set up a user account named `admin`; try `python populateGirder.py --help` for details about how to change this):
 
    ```bash
    cd examples
@@ -62,9 +62,9 @@ Resonant Laboratory will replace the Girder interface at ([localhost:8080](http:
    ```
 
 ## Adding datasets
-For now, `.csv` and `.json` files can to be uploaded via girder's interface to the user's public or private directories.
+For now, `.csv` and `.json` files can to be uploaded via girder's interface to the user's public or private directories. Once a file has been uploaded, you should issue a `POST` request to `/item/{id}/dataset` so that Resonant Laboratory will know that it's a dataset.
 
-Resonant Laboratory also supports connnecting to mongo databases. For example, a mongo collection could be added from a `json` file this way:
+In addition to flat files, Resonant Laboratory also supports connecting to mongo databases. For example, a mongo collection could be added from a `json` file this way:
 
   ```bash
   mongoimport --db test --collection gapminder --drop --file gapminder.json --jsonArray
@@ -73,7 +73,7 @@ Resonant Laboratory also supports connnecting to mongo databases. For example, a
 or to load a `csv` file:
 
   ```bash
-  mongoimport --db test --collection cars --drop --file cars.csv --type csv --headerline
+  mongoimport --db test --collection cars --drop --file gapminder.csv --type csv --headerline
   ```
 
 Then an item should be created in the user's public or private directory to represent this database (in this case, probably named "gapminder"). To connect the item to the database, issue a `POST` request to `/item/{id}/database`:
@@ -81,6 +81,8 @@ Then an item should be created in the user's public or private directory to repr
   ```
   {"url":"localhost:27017","database":"test","collection":"gapminder","type":"mongo"}
   ```
+
+Of course, after connecting the girder item to the database, you also still need to hit the `/item/{id}/dataset` endpoint to indicate that it is also a dataset intended for Resonant Laboratory.
 
 ## Development
 

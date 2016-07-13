@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
     # Create the Data and Projects folders
     dataItemIdLookup = {}
-    for folder in ['Data', 'Projects']:
+    for folder in ['examples/Data', 'examples/Projects']:
         if not os.path.isdir(folder):
             continue
 
@@ -114,7 +114,9 @@ if __name__ == '__main__':
         print '## ' + folder + ':'
         print ''
 
-        folderSpec = gc.load_or_create_folder(folder, collectionID, 'collection')
+        folderSpec = gc.load_or_create_folder(os.path.split(folder)[1],
+                                              collectionID,
+                                              'collection')
 
         # The second-level directories correspond to items
         items = os.listdir('./' + folder)
@@ -139,7 +141,7 @@ if __name__ == '__main__':
 
             # If this is a dataset, store its ID for Projects
             # to look up later
-            if folder == 'Data':
+            if folder == 'examples/Data':
                 dataItemIdLookup[item] = itemSpec['_id']
 
             # Now upload any files that don't already
@@ -168,7 +170,7 @@ if __name__ == '__main__':
 
                     # If this is a project, we need to replace the dataset
                     # folder name with a Girder ID
-                    if folder == 'Projects':
+                    if folder == 'examples/Projects':
                         for i, d in enumerate(metadata['rlab']['datasets']):
                             metadata['rlab']['datasets'][i]['dataset'] = dataItemIdLookup[d['itemId']]
 
@@ -193,9 +195,9 @@ if __name__ == '__main__':
 
             # Hit the endpoint that identifies the item as a dataset or a project,
             # and populates the metadata appropriately
-            if folder == 'Data':
+            if folder == 'examples/Data':
                 gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/dataset')
-            elif folder == 'Projects':
+            elif folder == 'examples/Projects':
                 gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/project')
 
             message += '\t%i            \t%i               \t%i                \t' % (
