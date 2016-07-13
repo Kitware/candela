@@ -46,7 +46,9 @@ for f in os.listdir(path):
         indexDiscovered = False
         characterList = getNodeText(exemplarTag)
         characterList = characterList[1:-1].split()
-        for c in characterList:
+        for i, c in enumerate(characterList):
+            if c.startswith('{') and c.endswith('}'):
+                characterList[i] = c = c.strip('{').strip('}')
             if c not in characterLookup:
                 newCharacters += 1
                 characterLookup[c] = set()

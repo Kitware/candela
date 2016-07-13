@@ -5,7 +5,7 @@ function coerceValue (value, coerceToType) {
   if (!coerceToType) {
     // No type specified - this is a magic
     // mode that bins by native data type
-    if (parseFloat(value, 10) === parseInt(value, 10)) {
+    if (parseFloat(value) === parseInt(value, 10)) {
       value = 'integer';
     } else {
       value = typeof value;
@@ -15,7 +15,7 @@ function coerceValue (value, coerceToType) {
   } else if (coerceToType === 'integer') {
     value = parseInt(value, 10);
   } else if (coerceToType === 'number') {
-    value = parseFloat(value, 10);
+    value = parseFloat(value);
   } else if (coerceToType === 'string') {
     value = String(value);
   } else if (coerceToType === 'date') {
