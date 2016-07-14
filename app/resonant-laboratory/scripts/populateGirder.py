@@ -126,12 +126,13 @@ if __name__ == '__main__':
         longestItemName = max([len(item) for item in items])
 
         print 'Item' + ''.join([' ' for x in xrange(longestItemName - 4)]),
-        print '\tIgnored files\tFlat files added\tMongo Collections added\tMetadata attached'
+        print '\tIgnored files\tFlat files added\tMongo Collections added\tMetadata attached\tSuppressed Item'
 
         for item in items:
             if not os.path.isdir('./' + folder + '/' + item):
                 continue
             print item,
+            suppressItem = False
 
             spacesNeeded = longestItemName - len(item)
             message = ''.join([' ' for x in xrange(spacesNeeded)])
@@ -154,6 +155,7 @@ if __name__ == '__main__':
             ignoredFiles = 0
             addedFiles = 0
             addedCollections = 0
+            skippedFiles = 0
             addedMetadata = False
 
             # Load each of the files into the item
@@ -172,40 +174,50 @@ if __name__ == '__main__':
                     # folder name with a Girder ID
                     if folder == 'examples/Projects':
                         for i, d in enumerate(metadata['rlab']['datasets']):
-                            metadata['rlab']['datasets'][i]['dataset'] = dataItemIdLookup[d['itemId']]
-
-                    gc.addMetadataToItem(itemSpec['_id'], metadata)
-                    addedMetadata = True
+                            if d['itemId'] not in dataItemIdLookup:
+                                # Hmm... the dataset that this project is
+                                # referring to doesn't exist
+                                suppressItem = True
+                            else:
+                                metadata['rlab']['datasets'][i]['dataset'] = dataItemIdLookup[d['itemId']]
+                    if not suppressItem:
+                        gc.addMetadataToItem(itemSpec['_id'], metadata)
+                        addedMetadata = True
                 elif fileName in existingFiles:
                     ignoredFiles += 1
                 else:
                     fileSize = os.stat('./' + folder + '/' + item + '/' + fileName).st_size
                     if (fileSize > int(args.databaseThreshold)) or os.path.splitext(fileName)[1] == '.json':
-                        createMongoCollection(args, './' + folder + '/' + item + '/', fileName)
+                        # For now, we skip large / json files and suppress the dataset item
+                        if item in dataItemIdLookup:
+                            del dataItemIdLookup[item]
+                        suppressItem = True
+                        '''createMongoCollection(args, './' + folder + '/' + item + '/', fileName)
                         gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/database', {}, json.dumps({
                             'url': args.mongoHost + ':' + args.mongoPort,
                             'database': args.dbName,
                             'collection': os.path.splitext(fileName)[0],
                             'type': 'mongo'
                         }))
-                        addedCollections += 1
+                        addedCollections += 1'''
                     else:
                         gc.uploadFileToItem(itemSpec['_id'], './' + folder + '/' + item + '/' + fileName)
                         addedFiles += 1
 
             # Hit the endpoint that identifies the item as a dataset or a project,
             # and populates the metadata appropriately
-            if folder == 'examples/Data':
-                gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/dataset')
-            elif folder == 'examples/Projects':
-                gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/project')
-
-            message += '\t%i            \t%i               \t%i                \t' % (
-                ignoredFiles, addedFiles, addedCollections)
-            if addedMetadata is False:
-                message += 'N'
+            if suppressItem:
+                gc.delete('item/' + itemSpec['_id'])
             else:
-                message += 'Y'
+                if folder == 'examples/Data':
+                    gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/dataset')
+                elif folder == 'examples/Projects':
+                    gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/project')
+
+            message += '\t%i            \t%i               \t%i                \t%s                \t%s' % (
+                ignoredFiles, addedFiles, addedCollections,
+                'Y' if addedMetadata else 'N',
+                'Y' if suppressItem else 'N')
             print message
 
     print 'finished'
