@@ -1,0 +1,44 @@
+[
+    {
+        "operator": "<",
+        "operands": [
+            "age",
+            21
+        ]
+    },
+    {
+        "operator": "<=",
+        "operands": [
+            "age",
+            21
+        ]
+    },
+    {
+        "operator": ">",
+        "operands": [
+            "age",
+            21
+        ]
+    },
+    {
+        "operator": ">=",
+        "operands": [
+            "age",
+            21
+        ]
+    },
+    {
+        "operator": "=",
+        "operands": [
+            "age",
+            21
+        ]
+    },
+    {
+        "operator": "!=",
+        "operands": [
+            "age",
+            21
+        ]
+    }
+]

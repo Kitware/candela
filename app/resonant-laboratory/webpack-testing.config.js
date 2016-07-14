@@ -1,15 +1,15 @@
 var webpack = require('webpack');
-var GruntWatchPlugin = require('./grunt-watch-plugin.js');
 
 /*globals module*/
 module.exports = {
-  entry: './mainPage.js',
+  entry: {
+    'query-test': './app/resonant-laboratory/querylang/test/query.js'
+  },
   output: {
-    path: 'web_client/lib',
-    filename: 'webpack_bundle.js'
+    path: './build/resonant-laboratory',
+    filename: 'tests.js'
   },
   plugins: [
-    GruntWatchPlugin,
     new webpack.ProvidePlugin({
       vg: 'vega'
     })
@@ -51,11 +51,6 @@ module.exports = {
         loaders: ['jade-loader']
       },
       {
-        test: /general_purpose\/.*\.js$/,
-        loader: 'exports-loader',
-        query: 'es6exports'
-      },
-      {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /(node_modules|web_client)/,
@@ -64,5 +59,6 @@ module.exports = {
         }
       }
     ]
-  }
+  },
+  target: 'node'
 };
