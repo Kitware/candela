@@ -181,18 +181,30 @@ class DatasetCache {
   get currentDataPage () {
     if (!this.cachedPromises.currentDataPage) {
       this.cachedPromises.currentDataPage = this.schema.then(schema => {
-        return this.restRequest({
-          path: 'download',
-          type: 'GET',
-          data: {
-            extraParameters: JSON.stringify({
-              fileType: this.model.getMeta('format'),
-              outputType: 'json',
+        if (this.model.getMeta('format') === 'mongodb.collection') {
+          return this.restRequest({
+            path: 'database/select',
+            type: 'GET',
+            data: {
+              format: 'dict',
               offset: this.page.offset,
               limit: this.page.limit
-            })
-          }
-        }, 'rl:loadedData');
+            }
+          }, 'rl:loadedData').then(resp => resp.data);
+        } else {
+          return this.restRequest({
+            path: 'download',
+            type: 'GET',
+            data: {
+              extraParameters: JSON.stringify({
+                fileType: this.model.getMeta('format'),
+                outputType: 'json',
+                offset: this.page.offset,
+                limit: this.page.limit
+              })
+            }
+          }, 'rl:loadedData');
+        }
       });
     }
     return this.cachedPromises.currentDataPage;
