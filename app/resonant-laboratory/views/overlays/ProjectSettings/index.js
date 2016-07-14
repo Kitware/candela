@@ -79,8 +79,7 @@ let ProjectSettings = Backbone.View.extend({
       this.$el.html(myTemplate);
 
       this.library = new ProjectLibrary({
-        el: '#libraryChunk',
-        keepOpenOnSelect: true
+        el: '#libraryChunk'
       });
 
       // Wire up simple events that don't change

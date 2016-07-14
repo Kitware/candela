@@ -12,9 +12,7 @@ import './style.css';
 let girder = window.girder;
 
 let ProjectLibrary = Backbone.View.extend({
-  initialize: function (params) {
-    this.keepOpenOnSelect = params.keepOpenOnSelect === true;
-
+  initialize: function () {
     this.listenTo(window.mainPage.currentUser, 'rl:updateLibrary', this.render);
     this.listenTo(window.mainPage.currentUser, 'rl:updateLibrary', this.render);
 
@@ -198,9 +196,7 @@ let ProjectLibrary = Backbone.View.extend({
     d3.select('#' + divId).selectAll('.circleButton')
       .on('click', d => {
         window.mainPage.switchProject(d.id);
-        if (!this.keepOpenOnSelect) {
-          window.mainPage.overlay.closeOverlay();
-        }
+        window.mainPage.overlay.closeOverlay();
       });
   }
 });
