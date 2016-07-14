@@ -44,7 +44,7 @@ for (var key in keys) {
   }
   if (nativeType !== 'number' && nativeType !== 'integer') {
     var numValue = coerceValue(value, 'number');
-    if (!isNaN(numValue)) {
+    if (!isNaN(numValue) && isFinite(numValue)) {
       // this value can be coerced to a number (and isn't already one)
 
       // is it an integer?
