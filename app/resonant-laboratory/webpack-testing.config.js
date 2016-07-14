@@ -1,10 +1,9 @@
 var webpack = require('webpack');
-var path = require('path');
 
 /*globals module*/
 module.exports = {
   entry: {
-    'query-test': './app/resonant-laboratory/querylang/test/query.js',
+    'query-test': './app/resonant-laboratory/querylang/test/query.js'
   },
   output: {
     path: './build/resonant-laboratory',

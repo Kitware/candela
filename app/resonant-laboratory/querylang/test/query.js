@@ -13,7 +13,7 @@ const operator_expression = [
 ];
 
 const conjunction_expression = [
-  'age < 22 and age > 20'  
+  'age < 22 and age > 20'
 ];
 
 const disjunction_expression = [
@@ -35,12 +35,12 @@ function test_expressions (t, exprs, baseline_path) {
 }
 
 test('Operator expression parsing', t => {
-  test_expressions(t, operator_expression, './app/resonant-laboratory/server/test/operator-ast-baselines.json')
+  test_expressions(t, operator_expression, './app/resonant-laboratory/server/test/operator-ast-baselines.json');
   t.end();
 });
 
 test('Conjunction expression parsing', t => {
-  test_expressions(t, conjunction_expression, './app/resonant-laboratory/server/test/conjunction-ast-baselines.json')
+  test_expressions(t, conjunction_expression, './app/resonant-laboratory/server/test/conjunction-ast-baselines.json');
   t.end();
 });
 
