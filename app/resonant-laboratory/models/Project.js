@@ -1,11 +1,10 @@
 import Underscore from 'underscore';
 import MetadataItem from './MetadataItem';
 import Dataset from './Dataset';
-import {
-  Set
-}
-from '../shims/SetOps.js';
-let girder = window.girder;
+import binUtils from '../general_purpose/binUtils.js';
+import promiseDebounce from '../shims/promiseDebounce.js';
+import { Set } from '../shims/SetOps.js';
+import candela from '../../../src/candela';
 /*
     A Project represents a user's saved session;
     it includes specific dataset IDs, with specific
@@ -20,15 +19,16 @@ let girder = window.girder;
 */
 
 let Project = MetadataItem.extend({
-  defaults: function () {
+  defaults: () => {
     return {
-      name: 'Untitled Project',
-      meta: {
-        versionNumber: window.mainPage.versionNumber,
-        datasets: [],
-        matchings: [],
-        visualizations: [],
-        preferredWidgets: []
+      'name': 'Untitled Project',
+      'meta': {
+        'rlab': {
+          datasets: [],
+          matchings: [],
+          visualizations: [],
+          preferredWidgets: []
+        }
       }
     };
   },
@@ -38,128 +38,145 @@ let Project = MetadataItem.extend({
       location: null
     };
 
+    this.visDatasetPromises = {};
+
     this.listenTo(window.mainPage.currentUser, 'rl:login',
-      this.updateStatus);
+      this.fetch);
     this.listenTo(window.mainPage.currentUser, 'rl:logout',
-      this.updateStatus);
+      this.fetch);
     this.listenTo(window.mainPage, 'rl:changeProject',
-      this.updateStatus);
-    this.listenTo(this, 'rl:swapId', () => {
-      this.updateStatus().then(() => {
+      this.fetch);
+    this.listenTo(this, 'rl:swappedId', () => {
+      // If the server makes a copy of this project
+      // for whatever reason, there's a good chance
+      // it will wind up with a different location /
+      // editability status. So we need to update the
+      // status, and it's essentially the same thing
+      // as creating a new project
+      this.fetch().then(() => {
+        let notification = 'You are now working on a copy of this project in ';
+        if (this.status.location === 'PublicScratch') {
+          notification = 'the public scratch space. Log in to take ownership of this project.';
+        } else if (this.status.location === 'PrivateUser') {
+          notification += 'your Private folder.';
+        } else {
+          window.mainPage.trigger('rl:error', new Error('Project copied to an unknown location.'));
+        }
+        window.mainPage.notificationLayer.displayNotification(notification);
         window.mainPage.trigger('rl:createProject');
       });
     });
     this.listenTo(window.mainPage.widgetPanels, 'rl:navigateWidgets',
       this.storePreferredWidgets);
+    this.listenTo(this, 'rl:changeDatasets', this.clearCoercedData);
+    this.listenTo(this, 'rl:changeMatchings', this.clearCoercedData);
   },
-  updateStatus: Underscore.debounce(function (copyOnError) {
-    let id = this.getId();
+  create: function () {
+    let createPromise = MetadataItem.prototype.create.apply(this, arguments);
+    createPromise.then(() => {
+      // Hit the endpoint that identifies the item as a project
+      return this.restRequest({
+        path: 'project',
+        method: 'POST'
+      }).then(resp => {
+        this.set(resp);
+      });
+    });
+    createPromise.then(() => {
+      // Flag this project as "ours" (esp. for the case when
+      // the user is logged out, store the project item info
+      // in localStorage)
+      window.mainPage.currentUser.preferences.claimProject();
+      // Let everyone know about the new project
+      window.mainPage.trigger('rl:createProject');
+    });
+    return createPromise;
+  },
+  fetch: promiseDebounce(function () {
+    let fetchPromise = MetadataItem.prototype.fetch.apply(this, arguments);
 
-    // Look up where the project lives,
+    // Whenever we update the project metadata, we also want
+    // to update the information about where the project is stored
     // and whether the user can edit it
-
-    if (id === undefined) {
-      if (copyOnError) {
-        this.makeCopy();
-      } else {
-        this.status = {
-          editable: false,
-          location: null
-        };
+    let statusPromise = fetchPromise.then(() => {
+      return this.restRequest({
+        path: 'anonymousAccess/info',
+        type: 'GET'
+      }).then(resp => {
+        this.status = resp;
         this.trigger('rl:changeStatus');
-        return Promise.reject(new Error('Project has no ID'));
-      }
+      });
+    });
+
+    // Calling fetch() on a project should also call
+    // fetch() on all the project's datasets (and update which
+    // ones are stored in window.mainPage.loadedDatasets)
+    let datasetsPromise = fetchPromise.then(() => {
+      let datasetPromises = [];
+      let newLoadedDatasets = {};
+      let datasetSpecs = this.getMeta('datasets');
+      datasetSpecs.forEach((datasetSpec, index) => {
+        let dataset;
+        if (datasetSpec.dataset in window.mainPage.loadedDatasets) {
+          // We've already loaded this dataset; update its filter and
+          // paging parameters
+          dataset = window.mainPage.loadedDatasets[datasetSpec.dataset];
+        } else {
+          // We haven't loaded this dataset yet; load it and
+          // attach some listeners
+          dataset = new Dataset({
+            _id: datasetSpec.dataset
+          });
+          this.listenTo(dataset, 'rl:updatedSchema', this.updateDataSpec);
+          this.listenTo(dataset, 'rl:swappedId', oldId => {
+            this.swapDatasetId(dataset, oldId);
+          });
+          this.listenTo(dataset, 'rl:updatePage', () => {
+            this.updateDatasetPage(dataset);
+          });
+        }
+        if (datasetSpec.filter) {
+          dataset.cache.filter = datasetSpec.filter;
+        }
+        if (datasetSpec.page) {
+          dataset.cache.page = datasetSpec.page;
+        }
+        newLoadedDatasets[datasetSpec.dataset] = dataset;
+        datasetPromises.push(newLoadedDatasets[datasetSpec.dataset].fetch());
+      });
+      // Now go through and discard any references to
+      // old datasets that we don't need anymore
+      Object.keys(window.mainPage.loadedDatasets).forEach(datasetId => {
+        if (!(datasetId in newLoadedDatasets)) {
+          // Flag this dataset as one that isn't being used anymore
+          // in case anyone (e.g. a view) is still holding a reference
+          // to it, so that we don't accidentally try to save anything
+          // about it anymore
+          window.mainPage.loadedDatasets[datasetId].dropped = true;
+          window.mainPage.loadedDatasets[datasetId].stopListening();
+        }
+      });
+      window.mainPage.loadedDatasets = newLoadedDatasets;
+      return Promise.all(datasetPromises).then(() => {
+        this.trigger('rl:changeDatasets');
+      });
+    });
+
+    // Though we only return the main fetch response, the fetch isn't
+    // complete until the status and dataset promises have been resolved
+    return Promise.all([fetchPromise, statusPromise, datasetsPromise])
+      .then(responses => {
+        return responses[0];
+      });
+  }, 100),
+  save: function () {
+    // Prevent any lingering attempts to save the
+    // project once the project has been closed
+    if (window.mainPage.project === null) {
+      return Promise.resolve(null);
+    } else {
+      return MetadataItem.prototype.save.apply(this, arguments);
     }
-
-    // Load up any datasets that the project references
-    let datasetPromises = [];
-
-    this.getMeta('datasets').forEach(datasetId => {
-      datasetPromises.push(new Promise((resolve, reject) => {
-        girder.restRequest({
-          path: 'item/' + datasetId,
-          type: 'GET',
-          error: reject
-        }).done(resolve).error(reject);
-      }));
-    });
-    Promise.all(datasetPromises).catch(errorObj => {
-      window.mainPage.trigger('rl:error', errorObj);
-    }).then(respObjects => {
-      if (!respObjects) {
-        window.mainPage.trigger('rl:error',
-          new Error('Could not access this project\'s dataset(s)'));
-      } else {
-        respObjects.forEach(resp => {
-          try {
-            let newDataset = new Dataset(resp);
-            this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
-            this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
-          } catch (e) {
-            if (e instanceof Dataset.DuplicateDatasetError) {
-              // We've already loaded the dataset...
-              return;
-              // TODO: when we support multiple datasets, it may
-              // be valid to swap in a dataset we've already loaded
-              // into a different slot...
-            } else {
-              window.mainPage.trigger('rl:error', e);
-            }
-          }
-        });
-      }
-      this.trigger('rl:changeDatasets');
-    });
-
-    // Get access information about this project
-    let statusPromise = new Promise((resolve, reject) => {
-      girder.restRequest({
-        path: 'item/' + id + '/info',
-        type: 'GET',
-        error: reject
-      }).done(resolve).error(reject);
-    }).then((resp) => {
-      this.status = resp;
-    }).catch(() => {
-      this.status = {
-        editable: false,
-        location: null
-      };
-      if (copyOnError) {
-        this.makeCopy();
-      }
-    }).then(() => {
-      this.trigger('rl:changeStatus');
-    });
-
-    return statusPromise;
-  }, 300),
-  makeCopy: function () {
-    /*
-    When something weird happens (e.g. the user is
-    trying to edit a project that they don't have write
-    access to, or the project is in an unexpected location),
-    we want to make sure that the user's actions are still
-    always saved. This function copies the current state of
-    the project to either the user's Private directory, or
-    to the public scratch space if the user is logged out
-    */
-    let _fail = function (err) {
-      // If we can't even save a copy, something
-      // is seriously wrong.
-      window.mainPage.switchProject(null);
-      window.mainPage.trigger('rl:error', err);
-    };
-
-    this.unset('_id');
-    return this.create()
-      .then(() => {
-        // This copy is now "ours"
-        window.mainPage.currentUser.preferences.claimProject();
-        // Let everyone know about the new project
-        window.mainPage.trigger('rl:createProject');
-        this.updateStatus();
-      }).catch(_fail);
   },
   getMeta: function (key) {
     let meta = MetadataItem.prototype.getMeta.apply(this, [key]);
@@ -191,142 +208,229 @@ let Project = MetadataItem.extend({
     let flatMeta = {};
 
     for (let key of Object.keys(meta)) {
-      flatMeta[key] = meta[key];
       if (key === 'preferredWidgets' &&
         meta[key] instanceof Set) {
         flatMeta[key] = [...meta[key]];
+      } else {
+        flatMeta[key] = meta[key];
       }
     }
     return flatMeta;
   },
-  isEmpty: function () {
-    let meta = this.getMeta();
-    return meta.datasets.length === 0 &&
-      meta.visualizations.length === 0 &&
-      meta.matchings.length === 0;
-  },
-  rename: function (newName) {
-    this.set('name', newName);
-    this.save().then(() => {
-      this.trigger('rl:rename');
-    }).catch((errorObj) => {
-      window.mainPage.trigger('rl:error', errorObj);
-    });
+  getDataset: function (index) {
+    let datasets = window.mainPage.project.getMeta('datasets');
+    if (datasets && datasets.length > 0) {
+      return window.mainPage.loadedDatasets[datasets[0].dataset];
+    } else {
+      return undefined;
+    }
   },
   getDatasetIds: function () {
-    return this.getMeta('datasets');
+    return (this.getMeta('datasets') || []).map(d => d.dataset);
   },
-  changeDataSpec: function () {
-    this.validateMatchings();
-    this.trigger('rl:changeDatasets');
-  },
-  swapDatasetId: function (newData) {
-    let datasets = this.getMeta('datasets');
-    let index = datasets.indexOf(newData._oldId);
-    if (index !== -1) {
-      datasets[index] = newData._id;
-      this.setMeta('datasets', datasets);
+  swapDatasetId: function (datasetObj, oldId) {
+    let newId = datasetObj.getId();
+    if (newId in window.mainPage.loadedDatasets) {
+      // Another response from the server has already triggered this function
+      // and dealt with everything, so we don't have to worry about it.
+      return;
     } else {
-      window.mainPage.trigger('rl:error',
-        new Error('Encountered a problem handling swapped dataset id'));
-    }
-  },
-  setDataset: function (newDataset, index = 0) {
-    let datasets = this.getMeta('datasets');
-    let newId;
+      // Okay, this dataset has been moved, and we're the first to
+      // know about it.
 
-    // Need to convert the raw girder.ItemModel
-    try {
-      newDataset = new Dataset(newDataset.toJSON());
-      newId = newDataset.getId();
-      this.listenTo(newDataset, 'rl:changeSpec', this.changeDataSpec);
-      this.listenTo(newDataset, 'rl:swapId', this.swapDatasetId);
-    } catch (e) {
-      if (e instanceof Dataset.DuplicateDatasetError) {
-        // We've already loaded the dataset...
-        return;
-        // TODO: when we support multiple datasets, it may
-        // be valid to swap in a dataset we've already loaded
-        // into a different slot...
+      // Update the projet metadata and the loadedDatasets cache
+      // to point to the new dataset
+      let datasets = this.getMeta('datasets');
+      let index = datasets.findIndex(d => d.dataset === oldId);
+      if (index !== -1 && oldId in window.mainPage.loadedDatasets) {
+        datasets[index] = {
+          dataset: newId,
+          filter: datasetObj.cache.filter,
+          page: datasetObj.cache.page
+        };
+        this.setMeta('datasets', datasets);
+        this.save();
+
+        window.mainPage.loadedDatasets[newId] = datasetObj;
+        delete window.mainPage.loadedDatasets[oldId];
+
+        // If the user is logged in, the dataset will have been copied
+        // to the user's private folder
+        let notification = 'You are now working with a copy of the ' +
+                           datasetObj.get('name') +
+                           ' dataset, stored in ';
+        if (window.mainPage.currentUser.isLoggedIn()) {
+          notification += 'your Private folder.';
+        } else {
+          notification += 'the public scratch space. Log in to take ownership of this dataset.';
+        }
+        window.mainPage.notificationLayer.displayNotification(notification);
       } else {
-        window.mainPage.trigger('rl:error', e);
+        window.mainPage.trigger('rl:error',
+          new Error('Couldn\'t update the reference to a scratch copy of the ' +
+                    datasetObj.get('name') + ' dataset.'));
       }
     }
+  },
+  updateDatasetPage: Underscore.debounce(function (datasetObj) {
+    // Store the new page and filter info in the project metadata
+    let datasets = this.getMeta('datasets');
+    let dataSpec = datasets.find(d => d.dataset === datasetObj.getId());
+    dataSpec.page = datasetObj.cache.page;
+    dataSpec.filter = datasetObj.cache.filter;
+    this.setMeta('datasets', datasets);
+    this.save();
+    // Forward the event at the project level
+    this.trigger('rl:changeDatasets');
+  }, 50),
+  setDataset: function (newDatasetId, index = 0) {
+    let datasets = this.getMeta('datasets');
+    let newDataset;
+
+    let promises = [];
+
+    if (newDatasetId in window.mainPage.loadedDatasets) {
+      newDataset = window.mainPage.loadedDatasets[newDatasetId];
+      promises.push(Promise.resolve(newDataset));
+    } else {
+      newDataset = new Dataset({
+        _id: newDatasetId
+      });
+      this.listenTo(newDataset, 'rl:updatedSchema', this.updateDataSpec);
+      this.listenTo(newDataset, 'rl:swappedId', oldId => {
+        this.swapDatasetId(newDataset, oldId);
+      });
+      this.listenTo(newDataset, 'rl:updatePage', () => {
+        this.updateDatasetPage(newDataset);
+      });
+      window.mainPage.loadedDatasets[newDatasetId] = newDataset;
+      promises.push(newDataset.fetch());
+    }
+
+    let newDatasetDetails = {
+      dataset: newDatasetId,
+      filter: newDataset.cache.filter,
+      page: newDataset.cache.page
+    };
 
     if (index >= datasets.length) {
-      datasets.push(newId);
+      datasets.push(newDatasetDetails);
     } else {
-      let oldDataset = window.mainPage.loadedDatasets[datasets[index]];
-      if (oldDataset) {
-        // If the dataset hasn't already dropped itself...
-        this.stopListening(oldDataset, 'rl:changeSpec', this.changeDataSpec);
-        this.stopListening(oldDataset, 'rl:swapId', this.swapDatasetId);
-        oldDataset.drop();
-      }
-      datasets[index] = newId;
+      datasets[index] = newDatasetDetails;
     }
     this.setMeta('datasets', datasets);
-    this.save().then(() => {
+    promises.push(this.save().then(() => {
       this.trigger('rl:changeDatasets');
-      this.validateMatchings();
-    }).catch((errorObj) => {
-      window.mainPage.trigger('rl:error', errorObj);
-    });
+      return this.validateMatchings();
+    }));
+    return Promise.all(promises);
   },
-  setVisualization: function (newVisualization, index = 0) {
+  setVisualization: function (visName, index = 0) {
     let visualizations = this.getMeta('visualizations');
+    let newVisualizatoinDetails = {
+      'name': visName,
+      'options': {}
+    };
 
     if (index >= visualizations.length) {
-      visualizations.push(newVisualization);
+      visualizations.push(newVisualizatoinDetails);
     } else {
-      visualizations[index] = newVisualization;
+      delete this.visDatasetPromises[index];
+      visualizations[index] = newVisualizatoinDetails;
     }
     this.setMeta('visualizations', visualizations);
-    this.save().then(() => {
+    return this.save().then(() => {
       this.trigger('rl:changeVisualizations');
-      this.validateMatchings();
-    }).catch((errorObj) => {
-      window.mainPage.trigger('rl:error', errorObj);
+      return this.validateMatchings();
     });
   },
-  shapeDataForVis: function (index = 0) {
+  getAssignedVisFields: function (index = 0) {
     let meta = this.getMeta();
-
-    let datasetId = meta.datasets[0];
-    if (!window.mainPage.loadedDatasets[datasetId]) {
-      return Promise.resolve([]);
-    } else {
-      // Use the matching to transform
-      // the parsed data into the shape
-      // that the visualization expects
-      return window.mainPage.loadedDatasets[datasetId].parse();
-    }
-  },
-  getVisOptions: function (index = 0) {
-    let meta = this.getMeta();
+    let visDetails = meta.visualizations[index];
+    // Copy the non-field options that are stored in the metadata
     let options = {};
 
-    // Figure out which options allow multiple fields
+    // Add field options as defined by the matchings
     meta.matchings.forEach(matching => {
-      for (let optionSpec of meta.visualizations[matching.visIndex].options) {
-        if (optionSpec.name === matching.visAttribute) {
-          if (optionSpec.type === 'string_list') {
+      if (matching.visIndex === index) {
+        let candelaOptionSpec = candela.components[visDetails.name].options.find(spec => {
+          return spec.name === matching.visAttribute;
+        });
+        if (!candelaOptionSpec) {
+          window.mainPage.trigger('rl:error', new Error('Unknown candela option: ' +
+            matching.visAttribute));
+        }
+        if (candelaOptionSpec.type === 'string_list') {
+          if (!(matching.visAttribute in options)) {
             options[matching.visAttribute] = [];
           }
-          break;
+          options[matching.visAttribute].push(matching.dataAttribute);
+        } else {
+          options[matching.visAttribute] = matching.dataAttribute;
         }
       }
     });
-
-    // Construct the options
-    meta.matchings.forEach(matching => {
-      if (Array.isArray(options[matching.visAttribute])) {
-        options[matching.visAttribute].push(matching.dataAttribute);
-      } else {
-        options[matching.visAttribute] = matching.dataAttribute;
-      }
-    });
     return options;
+  },
+  getVisOptions: function (index = 0) {
+    let meta = this.getMeta();
+    let visDetails = meta.visualizations[index];
+    // Copy the non-field options that are stored in the metadata
+    return Object.assign({}, this.getAssignedVisFields(index), visDetails.options || {});
+  },
+  clearCoercedData: function () {
+    // Invalidate our coerced dataset caches (TODO: may not
+    // be necessary to invalidate all of them)
+    this.visDatasetPromises = {};
+  },
+  shapeDataForVis: function (index = 0) {
+    if (index in this.visDatasetPromises) {
+      return this.visDatasetPromises[index];
+    }
+
+    let meta = this.getMeta();
+    if (meta.datasets.length <= index) {
+      // The indicated dataset isn't loaded yet...
+      // send the visualization a temporary empty dataset instead
+      return Promise.resolve([]);
+    }
+
+    let datasetObj = this.getDataset(0);
+    // TODO: when candela supports multiple datasets, include
+    // all the datasets that the visualization connects to
+
+    this.visDatasetPromises[index] = datasetObj.cache.schema.then(schema => {
+      // Collect the attributes that are in use in this dataset,
+      // and figure out what we're coercing those attributes to
+      let fieldsInUse = {};
+      meta.matchings.forEach(matching => {
+        if (matching.visIndex === index && matching.dataIndex === 0) {
+          fieldsInUse[matching.dataAttribute] = datasetObj
+            .getAttributeType(schema, matching.dataAttribute);
+        }
+      });
+
+      return datasetObj.cache.currentDataPage.then(data => {
+        let coercedData = [];
+        data.forEach(item => {
+          let newItem = {};
+          Object.keys(item).forEach(attrName => {
+            if (attrName in fieldsInUse) {
+              newItem[attrName] = binUtils.coerceValue(
+                item[attrName], fieldsInUse[attrName]);
+            }
+          });
+          coercedData.push(newItem);
+        });
+        return coercedData;
+      });
+    });
+    return this.visDatasetPromises[index];
+  },
+  updateDataSpec: function () {
+    return this.validateMatchings().then(() => {
+      this.trigger('rl:changeDatasets');
+    });
   },
   validateMatchings: function () {
     let meta = this.getMeta();
@@ -347,23 +451,24 @@ let Project = MetadataItem.extend({
         continue;
       }
 
-      let dataset = window.mainPage.loadedDatasets[meta.datasets[matching.dataIndex]];
+      let dataset = this.getDataset(matching.dataIndex);
       if (!dataset) {
         indicesToTrash.push(index);
         continue;
       }
 
-      let dataType = dataset.getSpec()
+      let dataType = dataset.getTypeSpec()
         .attributes[matching.dataAttribute];
-      let optionSpec = meta.visualizations[matching.visIndex]
-        .options.find(spec => spec.name === matching.visAttribute);
+      let visName = meta.visualizations[matching.visIndex].name;
+      let visSpec = candela.components[visName].options
+        .find(spec => spec.name === matching.visAttribute);
 
-      if (!dataType || !optionSpec) {
+      if (!dataType || !visSpec || !visSpec.domain || !visSpec.domain.fieldTypes) {
         indicesToTrash.push(index);
         continue;
       }
 
-      if (optionSpec.domain.fieldTypes.indexOf(dataType) === -1) {
+      if (visSpec.domain.fieldTypes.indexOf(dataType) === -1) {
         indicesToTrash.push(index);
       }
     }
@@ -373,22 +478,26 @@ let Project = MetadataItem.extend({
     }
 
     this.setMeta(meta);
-    this.save().then(() => {
+    return this.save().then(() => {
       this.trigger('rl:changeMatchings');
-    }).catch(errorObj => {
-      window.mainPage.trigger('rl:error', errorObj);
     });
   },
   addMatching: function (matching) {
     let meta = this.getMeta();
 
     // Figure out if the vis option allows multiple fields
-    let optionSpec = meta.visualizations[matching.visIndex]
-      .options.find(spec => spec.name === matching.visAttribute);
+    let visDetails = meta.visualizations[matching.visIndex];
+    let candelaOptionSpec = candela.components[visDetails.name].options.find(spec => {
+      return spec.name === matching.visAttribute;
+    });
+    if (!candelaOptionSpec) {
+      window.mainPage.trigger('rl:error', new Error('Unknown candela option: ' +
+        matching.visAttribute));
+    }
 
     // If the vis option doesn't allow multiple fields,
     // remove any existing matchings for that vis option
-    if (optionSpec.type !== 'string_list') {
+    if (candelaOptionSpec.type !== 'string_list') {
       meta.matchings = meta.matchings.filter(m => {
         return m.visIndex !== matching.visIndex ||
           m.visAttribute !== matching.visAttribute;
@@ -399,32 +508,28 @@ let Project = MetadataItem.extend({
     meta.matchings.push(matching);
 
     this.setMeta(meta);
-    this.save().then(() => {
+    return this.save().then(() => {
       this.trigger('rl:changeMatchings');
-    }).catch(errorObj => {
-      window.mainPage.trigger('rl:error', errorObj);
     });
   },
   removeMatching: function (matching) {
     let matchings = this.getMeta('matchings');
 
-    let index;
-    let temp = matchings.find((m, i) => {
-      index = i;
+    let index = matchings.findIndex((m, i) => {
       return matching.visIndex === m.visIndex &&
         matching.visAttribute === m.visAttribute &&
         matching.dataIndex === m.dataIndex &&
         matching.dataAttribute === m.dataAttribute;
     });
-    if (temp) {
+    if (index !== -1) {
       matchings.splice(index, 1);
+      this.setMeta('matchings', matchings);
+      return this.save().then(() => {
+        this.trigger('rl:changeMatchings');
+      });
+    } else {
+      return Promise.resolve();
     }
-    this.setMeta('matchings', matchings);
-    this.save().then(() => {
-      this.trigger('rl:changeMatchings');
-    }).catch(errorObj => {
-      window.mainPage.trigger('rl:error', errorObj);
-    });
   },
   getAllWidgetSpecs: function () {
     // Construct a list of all the widgets that
@@ -432,32 +537,59 @@ let Project = MetadataItem.extend({
     let meta = this.getMeta();
     let result = [];
 
-    meta.datasets.forEach((id, i) => {
+    if (!meta.datasets || meta.datasets.length === 0) {
+      // If there aren't any datasets yet,
+      // include a dummy, empty dataset widget
       result.push({
         widgetType: 'DatasetView',
-        hashName: 'DatasetView' + i,
-        index: i,
-        id: id
+        hashName: 'DatasetViewDummy',
+        index: null,
+        id: null
       });
-    });
+    } else {
+      // Add a widget for every dataset
+      meta.datasets.forEach((id, i) => {
+        result.push({
+          widgetType: 'DatasetView',
+          hashName: 'DatasetView' + i,
+          index: i,
+          id: id
+        });
+      });
+    }
+    // Add the matching widget
     result.push({
       widgetType: 'MatchingView',
       hashName: 'MatchingView'
     });
-    meta.visualizations.forEach((spec, i) => {
+
+    if (!meta.visualizations || meta.visualizations.length === 0) {
+      // If there aren't any visualizations yet,
+      // include a dummy, empty visualization widget
       result.push({
         widgetType: 'VisualizationView',
-        hashName: 'VisualizationView' + i,
-        index: i,
-        spec: spec
+        hashName: 'VisualizationViewDummy',
+        index: null,
+        id: null
       });
-    });
+    } else {
+      // Add a widget for every visualization
+      meta.visualizations.forEach((spec, i) => {
+        result.push({
+          widgetType: 'VisualizationView',
+          hashName: 'VisualizationView' + i,
+          index: i,
+          spec: spec
+        });
+      });
+    }
 
     return result;
   },
   storePreferredWidgets: function () {
     this.setMeta('preferredWidgets',
       window.mainPage.widgetPanels.expandedWidgets);
+    return this.save();
   }
 });
 

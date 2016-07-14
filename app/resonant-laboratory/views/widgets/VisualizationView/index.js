@@ -19,15 +19,16 @@ let VisualizationView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
 
-    this.friendlyName = 'Visualization';
-
-    this.statusText.onclick = () => {
-      window.mainPage.overlay.render('VisualizationLibrary');
-    };
-    this.statusText.title = 'Click to select a different visualization.';
+    this.icons.splice(0, 0, {
+      src: Widget.swapIcon,
+      title: 'Click to select a different visualization',
+      onclick: () => {
+        window.mainPage.overlay.render('VisualizationLibrary');
+      }
+    });
 
     this.status = STATUS.LOADING;
-    this.icons.splice(0, 0, {
+    this.icons.push({
       src: () => {
         if (this.status === STATUS.LOADING) {
           return Widget.spinnerIcon;
@@ -86,7 +87,7 @@ let VisualizationView = Widget.extend({
     } else if (this.status === STATUS.NO_VIS_SELECTED) {
       window.mainPage.overlay.renderUserErrorScreen('You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render(\'VisualizationLibrary\')"> here</a> to choose one.');
     } else if (this.status === STATUS.NOT_ENOUGH_MAPPINGS) {
-      window.mainPage.overlay.renderUserErrorScreen('This visualization needs more data matchings. Make sure all the circles in the Matching panel are green.');
+      window.mainPage.overlay.renderUserErrorScreen('This visualization needs more data matchings. Make sure there are no orange warning triangles in the Matching panel.');
     } else if (this.status === STATUS.FAILED_RENDER) {
       window.mainPage.overlay.renderReallyBadErrorScreen('There was a failure in attempting to render the visualization. There may be some hints in the developer console.');
     }
@@ -104,7 +105,7 @@ let VisualizationView = Widget.extend({
       spec = spec[0];
 
       // Get the options for the vis
-      let options = window.mainPage.project.getVisOptions();
+      let options = window.mainPage.project.getVisOptions(0);
 
       // Start with an initial empty dataset (gets populated
       // asynchronously)

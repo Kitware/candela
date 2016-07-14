@@ -1,0 +1,56 @@
+{
+  "datasets": [
+    {
+      "dataset": "movies.csv",
+      "itemId": "movies"
+    }
+  ],
+  "matchings": [
+    {
+      "dataAttribute": "Movie",
+      "dataIndex": 0,
+      "visAttribute": "x",
+      "visIndex": 0
+    },
+    {
+      "dataAttribute": "Rating IMDB",
+      "dataIndex": 0,
+      "visAttribute": "y",
+      "visIndex": 0
+    },
+    {
+      "dataAttribute": "Movie",
+      "dataIndex": 0,
+      "visAttribute": "hover",
+      "visIndex": 0
+    },
+    {
+      "dataAttribute": "Genre",
+      "dataIndex": 0,
+      "visAttribute": "color",
+      "visIndex": 0
+    },
+    {
+      "dataAttribute": "Total Domestic Box Office",
+      "dataIndex": 0,
+      "visAttribute": "hover",
+      "visIndex": 0
+    },
+    {
+      "dataAttribute": "Production Budget",
+      "dataIndex": 0,
+      "visAttribute": "hover",
+      "visIndex": 0
+    }
+  ],
+  "preferredWidgets": [
+    "VisualizationView0",
+    "MatchingView"
+  ],
+  "visualizations": [
+    {
+      "name": "BarChart",
+      "options": {}
+    }
+  ]
+}

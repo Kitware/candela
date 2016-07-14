@@ -3,6 +3,7 @@ import d3 from 'd3';
 import jQuery from 'jquery';
 import myTemplate from './template.html';
 import Widget from '../Widget';
+import candela from '../../../../../src/candela';
 import './style.css';
 
 import booleanIcon from '../../../images/boolean.svg';
@@ -49,10 +50,8 @@ let MatchingView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
 
-    this.friendlyName = 'Matching';
-
     this.status = STATUS.NOTHING_TO_MAP;
-    this.icons.splice(0, 0, {
+    this.icons.push({
       src: () => {
         if (this.status === STATUS.OK) {
           return Widget.okayIcon;
@@ -162,14 +161,19 @@ in order to connect them together.`);
       vis: []
     };
 
-    for (let d of meta.datasets) {
-      if (window.mainPage.loadedDatasets[d]) {
-        specs.data.push(window.mainPage.loadedDatasets[d].getSpec());
-      }
+    if (meta.datasets) {
+      meta.datasets.forEach(d => {
+        let datasetObj = window.mainPage.loadedDatasets[d.dataset];
+        if (datasetObj) {
+          specs.data.push(datasetObj.getTypeSpec());
+        }
+      });
     }
-    meta.visualizations.forEach(d => {
-      specs.vis.push(d);
-    });
+    if (meta.visualizations) {
+      meta.visualizations.forEach(d => {
+        specs.vis.push(d);
+      });
+    }
 
     // Reshape the specs into node/edge tables
     // for easy drawing and interaction
@@ -319,25 +323,30 @@ in order to connect them together.`);
         }
       });
       specs.vis.forEach((visSpec, visIndex) => {
-        visSpec.options.forEach((option, attrIndex) => {
-          _createNode('vis', visIndex, option.name, option.domain.fieldTypes, option.optional,
-            option.type === 'string_list' ? Infinity : 1);
+        let candelaSpec = candela.components[visSpec.name];
+        candelaSpec.options.forEach((option, attrIndex) => {
+          if (option.domain && option.domain.mode === 'field') {
+            _createNode('vis', visIndex, option.name, option.domain.fieldTypes, option.optional,
+              option.type === 'string_list' ? Infinity : 1);
+          }
         });
       });
 
       // Get the established edges
-      for (let matching of meta.matchings) {
-        let newEdge = _createEdge(true, matching.visIndex, matching.visAttribute,
-          matching.dataIndex, matching.dataAttribute);
-        // Count this connection in each node
-        visNodes[newEdge.visIndex].establishedConnections += 1;
-        dataNodes[newEdge.dataIndex].establishedConnections += 1;
-        if (!visNodes[newEdge.visIndex].optional &&
-             visNodes[newEdge.visIndex].establishedConnections === 1) {
-          // this edge just satisfied a requirement (for now, we're
-          // assuming that a non-optional vis encoding only requires
-          // one connection to satisfy the requirement)
-          satisfiedConnections += 1;
+      if (meta.matchings) {
+        for (let matching of meta.matchings) {
+          let newEdge = _createEdge(true, matching.visIndex, matching.visAttribute,
+            matching.dataIndex, matching.dataAttribute);
+          // Count this connection in each node
+          visNodes[newEdge.visIndex].establishedConnections += 1;
+          dataNodes[newEdge.dataIndex].establishedConnections += 1;
+          if (!visNodes[newEdge.visIndex].optional &&
+               visNodes[newEdge.visIndex].establishedConnections === 1) {
+            // this edge just satisfied a requirement (for now, we're
+            // assuming that a non-optional vis encoding only requires
+            // one connection to satisfy the requirement)
+            satisfiedConnections += 1;
+          }
         }
       }
 
@@ -345,9 +354,12 @@ in order to connect them together.`);
       if (this.selection !== null) {
         if (this.selection.side === 'data') {
           specs.vis.forEach((visSpec, visGroupIndex) => {
-            visSpec.options.forEach(option => {
-              _createEdge(false, visGroupIndex, option.name,
-                this.selection.groupIndex, this.selection.attrName);
+            let candelaSpec = candela.components[visSpec.name];
+            candelaSpec.options.forEach(option => {
+              if (option.domain && option.domain.mode === 'field') {
+                _createEdge(false, visGroupIndex, option.name,
+                  this.selection.groupIndex, this.selection.attrName);
+              }
             });
           });
         } else {

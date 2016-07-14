@@ -43,25 +43,21 @@ let VisualizationLibrary = Backbone.View.extend({
 
     d3.select('div.libraryInterface').selectAll('.circleButton')
       .on('click', d => {
+        let projectPromise;
         if (window.mainPage.project) {
-          // We already have a project loaded, so
-          // swap it in (TODO: load multiple visualizations?)
-          window.mainPage.project.setVisualization(d);
+          projectPromise = Promise.resolve(window.mainPage.project);
+        } else {
+          // No project is loaded, so create an empty
+          // project with this visualization
+          projectPromise = window.mainPage.newProject();
+        }
+        projectPromise.then(() => {
+          window.mainPage.project.setVisualization(d.name);
           window.mainPage.widgetPanels.toggleWidget({
             hashName: 'VisualizationView0'
           }, true);
           window.mainPage.overlay.closeOverlay();
-        } else {
-          // No project exists yet, so create an empty
-          // project with this visualization
-          window.mainPage.newProject().then(() => {
-            window.mainPage.project.setVisualization(d);
-            window.mainPage.widgetPanels.toggleWidget({
-              hashName: 'VisualizationView0'
-            }, true);
-            window.mainPage.overlay.closeOverlay();
-          });
-        }
+        });
       });
   }
 });

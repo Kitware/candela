@@ -1,0 +1,2 @@
+PyExecJS
+-e git://github.com/girder/girder_worker.git#egg=girder_worker

@@ -174,16 +174,18 @@ input[type="file"]:active:after {
 
 input[type="radio"],
 input[type="checkbox"] {
-  position: absolute;
+  position: relative;
   left: -999em;
+  width: 25px;
+  height: 25px;
 }
 
-input[type="checkbox"] + label:before,
-input[type="radio"] + label:before {
+input[type="checkbox"]::before,
+input[type="radio"]::before {
   display: inline-block;
   position: relative;
-  top: 0.25em;
-  left: -2px;
+  top: -0.1em;
+  left: calc(999em + 2px);
   content: '';
   width: 25px;
   height: 25px;
@@ -191,26 +193,28 @@ input[type="radio"] + label:before {
   cursor: pointer;
 }
 
-input[type="checkbox"] + label:before {
+input[type="checkbox"]::before {
   background-position: 0 -25px;
 }
 
-input[type="checkbox"]:checked + label:before {
+input[type="checkbox"]:checked::before {
   background-position: 0 0;
 }
 
-input[type="radio"] + label:before {
+input[type="radio"]::before {
   background-position: -25px -25px;
 }
 
-input[type="radio"]:checked + label:before {
+input[type="radio"]:checked::before {
   background-position: -25px 0;
 }
 
+input[type="checkbox"]:disabled::before,
+input[type="radio"]:disabled::before,
+label + input[type="checkbox"]:disabled,
+label + input[type="radio"]:disabled,
 input[type="checkbox"]:disabled + label,
-input[type="radio"]:disabled + label,
-input[type="checkbox"]:disabled + label:before,
-input[type="radio"]:disabled + label:before {
+input[type="radio"]:disabled + label {
   opacity: 0.5;
   cursor: default;
 }

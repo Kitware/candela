@@ -15,7 +15,7 @@ module.exports = {
     })
   ],
   debug: true,
-  devtool: 'cheap-source-map',
+  devtool: 'eval',
   module: {
     loaders: [
       {
@@ -45,6 +45,11 @@ module.exports = {
       {
         test: /\.jade$/,
         loaders: ['jade-loader']
+      },
+      {
+        test: /general_purpose\/.*\.js$/,
+        loader: 'exports-loader',
+        query: 'es6exports'
       },
       {
         test: /\.js$/,

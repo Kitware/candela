@@ -11,6 +11,7 @@ import ResetPasswordView from '../../overlays/ResetPasswordView';
 import AchievementLibrary from '../../overlays/AchievementLibrary';
 import StartingScreen from '../../overlays/StartingScreen';
 import DatasetLibrary from '../../overlays/DatasetLibrary';
+import DatasetSettings from '../../overlays/DatasetSettings';
 import VisualizationLibrary from '../../overlays/VisualizationLibrary';
 import ProjectSettings from '../../overlays/ProjectSettings';
 import AboutResonantLab from '../../overlays/AboutResonantLab';
@@ -22,16 +23,17 @@ import successTemplate from './successTemplate.html';
 import loadingTemplate from './loadingTemplate.html';
 
 let VIEWS = {
-  HamburgerMenu: HamburgerMenu,
-  LoginView: LoginView,
-  ResetPasswordView: ResetPasswordView,
-  RegisterView: RegisterView,
-  AchievementLibrary: AchievementLibrary,
-  ProjectSettings: ProjectSettings,
-  StartingScreen: StartingScreen,
-  DatasetLibrary: DatasetLibrary,
-  VisualizationLibrary: VisualizationLibrary,
-  AboutResonantLab: AboutResonantLab
+  HamburgerMenu,
+  LoginView,
+  ResetPasswordView,
+  RegisterView,
+  AchievementLibrary,
+  ProjectSettings,
+  StartingScreen,
+  DatasetLibrary,
+  DatasetSettings,
+  VisualizationLibrary,
+  AboutResonantLab
 };
 
 import './style.css';
@@ -56,6 +58,31 @@ let Overlay = Backbone.View.extend({
     // is responsible for picking the appropriate next
     // view)
   },
+  extractErrorDetails: function (errorObj) {
+    if (errorObj.status === 401) {
+      // Authentication failures simply mean that the user is logged out;
+      // we can ignore these
+      return;
+    }
+    // Some other server error has occurred...
+    let details = '';
+    if (errorObj.status) {
+      details += 'Status: ' + errorObj.status + '\n\n';
+    }
+    if (errorObj.stack) {
+      details += 'Stack Trace:\n' + errorObj.stack + '\n\n';
+    }
+    if (errorObj.responseJSON && errorObj.responseJSON.trace) {
+      details += 'Stack Trace:';
+      errorObj.responseJSON.trace.forEach(traceDetails => {
+        details += '\n' + traceDetails[0];
+        details += '\n' + traceDetails[1] + '\t' + traceDetails[2];
+        details += '\n' + traceDetails[3] + '\n';
+      });
+      details += '\n';
+    }
+    return details;
+  },
   handleError: function (errorObj) {
     let message;
 
@@ -66,7 +93,7 @@ let Overlay = Backbone.View.extend({
 
     if (errorObj.responseJSON && errorObj.responseJSON.message) {
       message = errorObj.responseJSON.message;
-    } else if (errorObj instanceof Error) {
+    } else if (errorObj.message) {
       message = errorObj.message;
     } else {
       // Fallback if I can't tell what it is
@@ -74,16 +101,17 @@ let Overlay = Backbone.View.extend({
       console.warn('Unknown error! Here\'s what I was given:', arguments);
     }
     // Let the user know something funky is up
-    this.renderReallyBadErrorScreen(message);
+    this.renderReallyBadErrorScreen(message, this.extractErrorDetails(errorObj));
 
     // Actually throw the error if it's a real one
     if (errorObj instanceof Error) {
       throw errorObj;
     }
   },
-  getScreen: function (template, message) {
+  getScreen: function (template, message, details) {
     let options = {
       message: message,
+      details: details || '',
       bugReportLink: 'https://github.com/Kitware/candela/issues',
       consultingLink: 'http://www.kitware.com/company/contact_kitware.php'
     };
@@ -98,8 +126,8 @@ let Overlay = Backbone.View.extend({
   renderUserErrorScreen: function (message) {
     this.render(this.getScreen(userErrorTemplate, message));
   },
-  renderReallyBadErrorScreen: function (message) {
-    this.render(this.getScreen(reallyBadErrorTemplate, message));
+  renderReallyBadErrorScreen: function (message, details) {
+    this.render(this.getScreen(reallyBadErrorTemplate, message, details));
   },
   renderSuccessScreen: function (message) {
     this.render(this.getScreen(successTemplate, message));
@@ -117,41 +145,45 @@ let Overlay = Backbone.View.extend({
     // Add a bunch of ways to close out of the overlay
 
     // Close button:
-    this.$el.find('#closeOverlay').on('click', this.closeOverlay);
+    this.$el.find('#closeOverlay')
+      .off('click.closeOverlay')
+      .on('click.closeOverlay', this.closeOverlay);
 
     // Clicking on the area outside the overlay:
     let self = this;
-    this.$el.on('click', function (event) {
-      // this refers to the DOM element
-      if (event.target !== this) {
-        return;
-      } else {
-        self.closeOverlay();
-      }
-    });
+    this.$el.off('click.closeOverlay')
+      .on('click.closeOverlay', function (event) {
+        // this refers to the DOM element
+        if (event.target !== this) {
+          return;
+        } else {
+          self.closeOverlay();
+        }
+      });
 
     // Hitting the escape key:
-    jQuery(window).on('keyup', e => {
-      if (e.keyCode === 27) {
-        this.closeOverlay();
-      }
-    });
+    jQuery(window).off('keyup.closeOverlay')
+      .on('keyup.closeOverlay', e => {
+        if (e.keyCode === 27) {
+          this.closeOverlay();
+        }
+      });
   },
   removeCloseListeners: function () {
     // Remove the ways to close out of the overlay
     // (both when the overlay is hidden, and when
     // one shows up that can't be closed)
-    this.$el.find('#closeOverlay').off('click');
-    this.$el.off('click');
-    jQuery(window).off('keyup');
+    this.$el.find('#closeOverlay').off('click.closeOverlay');
+    this.$el.off('click.closeOverlay');
+    jQuery(window).off('keyup.closeOverlay');
   },
   render: Underscore.debounce(function (template, nofade) {
     // Don't fade if we're just switching between overlays
     nofade = nofade || (template !== null && this.template !== null);
 
     if (template !== undefined && this.template !== template) {
-      // Because we're switching, save the setting
-      // for next time we simply re-render
+      // Because we're switching to a different overlay, save the setting
+      // for the next time that we simply re-render
       this.template = template;
 
       if (template === null) {
@@ -177,8 +209,20 @@ let Overlay = Backbone.View.extend({
           this.view = null;
         }
       } else {
-        // Instantiate and add the new view
         this.$el.html('');
+
+        // Before we draw the contents, start
+        // the fade in process (if relevant)
+        if (nofade !== true) {
+          d3.select(this.el)
+            .style('display', null)
+            .style('opacity', 0.0)
+            .transition().duration(400)
+            .style('opacity', 1.0);
+        } else {
+          d3.select(this.el).style('opacity', 1.0);
+        }
+
         if (template.prototype &&
           template.prototype instanceof Backbone.View) {
           // This is a View class already
@@ -219,23 +263,18 @@ let Overlay = Backbone.View.extend({
           // in order to dismiss it
           this.removeCloseListeners();
         }
-
-        // Fade in
-        if (nofade !== true) {
-          d3.select(this.el)
-            .style('display', null)
-            .style('opacity', 0.0)
-            .transition().duration(400)
-            .style('opacity', 1.0);
-        } else {
-          d3.select(this.el).style('opacity', 1.0);
-        }
       }
       this.trigger('rl:changeOverlay');
     } else {
       // We're just re-rendering the view
       if (this.view !== null) {
         this.view.render();
+        // It's possible that the view nuked
+        // its closeOverlay listeners-if relevant,
+        // reattach them
+        if (this.$el.find('#closeOverlay').length !== 0) {
+          this.addCloseListeners();
+        }
       }
     }
   }, 300)

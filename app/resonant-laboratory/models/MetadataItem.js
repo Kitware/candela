@@ -32,6 +32,10 @@ let girder = window.girder;
      private folder and the anonymous user's scratch
      space (the server endpoints handle most of this
      logic)
+
+  3. Namespace Resonant Laboratory's specific metadata
+     under an 'rlab' key so that it plays nicely with other
+     girder-based projects
 */
 
 function MetadataSyncError () {}
@@ -79,25 +83,31 @@ let MetadataItem = girder.models.ItemModel.extend({
         forceReject.apply(waiter, arguments);
       });
 
+      /*
+      TODO: Not sure why, but I seem to be getting a lot of
+      spurious timeout errors, so I've disabled this check
+      for now.
+
       timeout = window.setTimeout(() => {
         forceReject(new Error(`MetadataItem timed out waiting for
         an event from Girder.`));
-      }, 10000);
+      }, 20000);
+      */
     }
 
     // beforeSuccess is a function that should
     // be called before options.success
-    beforeSuccess = beforeSuccess || (() => {
-    });
+    beforeSuccess = beforeSuccess || (d => d);
 
-    let self = this;
-    promiseObj.then(function () {
-      // Things were successfully; call beforeSuccess first,
+    var self = this;
+    promiseObj.then(function (resp) {
+      // Things were successful; call beforeSuccess first,
       // and then call options.success if it exists
-      beforeSuccess.apply(self, arguments);
+      resp = beforeSuccess.apply(self, arguments);
       if (options.success) {
         options.success.apply(self, arguments);
       }
+      return resp;
     });
 
     if (options.error) {
@@ -110,6 +120,28 @@ let MetadataItem = girder.models.ItemModel.extend({
     }
 
     return promiseObj;
+  },
+  restRequest: function (requestParameters, options) {
+    options = options || {};
+    return this.wrapInPromise((resolve, reject) => {
+      requestParameters.path = 'item/' + this.getId() + '/' + requestParameters.path;
+      requestParameters.error = reject;
+      return girder.restRequest(requestParameters).done(resolve).error(reject);
+    }, options, resp => {
+      if (resp.hasOwnProperty('__copiedItemId__')) {
+        // The id of the item changed in the process (e.g. a copy of
+        // the item was made because the user had read, but not write access)
+        let oldId = this.getId();
+        this.set('__originalItemId__', resp['__originalItemId__']);
+        this.set(this.idAttribute, resp['__copiedItemId__']);
+        delete resp['__originalItemId__'];
+        delete resp['__copiedItemId__'];
+        this.trigger('rl:swappedId', oldId);
+      }
+      return resp;
+    }).catch(errorObj => {
+      window.mainPage.trigger('rl:error', errorObj);
+    });
   },
   sync: function (method, model, options) {
     options = options || {};
@@ -133,16 +165,16 @@ let MetadataItem = girder.models.ItemModel.extend({
           reject(new MetadataSyncError('Item must have a name to be created'));
         }
         girder.restRequest({
-          path: 'item/scratchItem',
+          path: 'item/anonymousAccess/scratchItem',
           data: {
             name: this.get('name'),
             description: this.get('description') || '',
             reuseExisting: false
           },
           error: reject,
-          type: 'GET'
+          type: 'POST'
         }).done(resolve).error(reject);
-      }, options, (resp) => {
+      }, options, resp => {
         // This *should* assign us our new ID:
         this.set(resp, {
           silent: true
@@ -154,8 +186,8 @@ let MetadataItem = girder.models.ItemModel.extend({
           // And now we want to finish creating
           // the item by saving our current state
           // (this calls sync again, but that's
-          // a good thing in case we have metadata
-          this.sync('update', model, options);
+          // a good thing in case we have metadata)
+          return this.sync('update', model, options);
         }
       });
     } else if (method === 'update') {
@@ -177,32 +209,15 @@ let MetadataItem = girder.models.ItemModel.extend({
         return this.sync('create', model, options);
       }
 
-      return this.wrapInPromise((resolve, reject) => {
-        girder.restRequest({
-          path: 'item/' + this.getId() + '/updateScratch?' +
-            jQuery.param(args),
-          contentType: 'application/json',
-          data: JSON.stringify(this.getFlatMeta()),
-          type: 'POST',
-          error: reject
-        }).done(resolve).error(reject);
-      }, options, (resp) => {
-        // It's possible that the id changed
-        // in the process (e.g. a copy of
-        // the project was made
-        // because the user is logged out)
-        let swappedId = false;
-        if (this.getId() !== resp[this.idAttribute]) {
-          resp['_oldId'] = this.getId();
-          swappedId = true;
-        }
-        this.set(resp, {
-          silent: true
-        });
-        if (swappedId) {
-          this.trigger('rl:swapId', resp);
-        }
-      });
+      return this.restRequest({
+        path: 'anonymousAccess/updateScratch?' +
+          jQuery.param(args),
+        contentType: 'application/json',
+        data: JSON.stringify({
+          rlab: this.getFlatMeta()
+        }),
+        type: 'POST'
+      }, options);
     } else if (method === 'read') {
       if (this.getId() === undefined) {
         // If we haven't yet identified the id, look for it
@@ -210,12 +225,12 @@ let MetadataItem = girder.models.ItemModel.extend({
         // an item there if it doesn't exist
         return this.wrapInPromise((resolve, reject) => {
           girder.restRequest({
-            path: 'item/privateItem',
+            path: 'item/anonymousAccess/privateItem',
             data: {
               name: this.get('name') || 'Untitled Item',
               description: this.get('description') || ''
             },
-            type: 'GET',
+            type: 'POST',
             error: reject
           }).done(resolve).error(reject);
         }, options, (resp) => {
@@ -223,6 +238,7 @@ let MetadataItem = girder.models.ItemModel.extend({
           this.set(resp, {
             silent: true
           });
+          return resp;
         });
       } else {
         // Otherwise, just go with the default girder behavior
@@ -259,7 +275,10 @@ let MetadataItem = girder.models.ItemModel.extend({
     }
   },
   fetch: function (options) {
-    return this.sync('read', this.toJSON(), options);
+    return this.sync('read', this.toJSON(), options)
+      .catch(errorObj => {
+        window.mainPage.trigger('rl:error', errorObj);
+      });
   },
   create: function (attributes, options) {
     if (attributes) {
@@ -270,35 +289,54 @@ let MetadataItem = girder.models.ItemModel.extend({
     this.unset(this.idAttribute, {
       silent: true
     });
-    return this.sync('create', this.toJSON(), options);
+    return this.sync('create', this.toJSON(), options)
+      .catch(errorObj => {
+        window.mainPage.trigger('rl:error', errorObj);
+      });
   },
   save: function (attributes, options) {
     if (attributes) {
       this.set(attributes, options);
     }
-    return this.sync('update', this.toJSON(), options);
+    return this.sync('update', this.toJSON(), options)
+      .catch(errorObj => {
+        window.mainPage.trigger('rl:error', errorObj);
+      });
   },
   destroy: function (options) {
-    return this.sync('delete', this.toJSON(), options);
+    return this.sync('delete', this.toJSON(), options)
+      .catch(errorObj => {
+        window.mainPage.trigger('rl:error', errorObj);
+      });
   },
   setMeta: function (key, value) {
-    let meta = this.getMeta();
+    let meta = this.get('meta');
     meta = meta || {};
+    meta.rlab = meta.rlab || {};
     if (typeof key === 'object') {
       let obj = key;
       for (key of Object.keys(obj)) {
-        meta[key] = obj[key];
+        if (obj[key] === null) {
+          delete meta.rlab[key];
+        } else {
+          meta.rlab[key] = obj[key];
+        }
       }
     } else {
-      meta[key] = value;
+      if (value === null) {
+        delete meta.rlab[key];
+      } else {
+        meta.rlab[key] = value;
+      }
     }
     this.set('meta', meta);
   },
   unsetMeta: function (key) {
-    let meta = this.getMeta();
+    let meta = this.get('meta');
     meta = meta || {};
+    meta.rlab = meta.rlab || {};
     if (key !== undefined) {
-      meta[key] = null;
+      meta.rlab[key] = null;
       this.setMeta(meta);
     } else {
       this.unset('meta');
@@ -311,10 +349,11 @@ let MetadataItem = girder.models.ItemModel.extend({
   getMeta: function (key) {
     let meta = this.get('meta');
     meta = meta || {};
+    meta.rlab = meta.rlab || {};
     if (key !== undefined) {
-      return meta[key];
+      return meta.rlab[key];
     } else {
-      return meta;
+      return meta.rlab;
     }
   },
   getId: function () {
@@ -323,10 +362,11 @@ let MetadataItem = girder.models.ItemModel.extend({
   previousMeta: function (key) {
     let prevMeta = this.previous('meta');
     prevMeta = prevMeta || {};
+    prevMeta.rlab = prevMeta.rlab || {};
     if (key !== undefined) {
-      return prevMeta[key];
+      return prevMeta.rlab[key];
     } else {
-      return prevMeta;
+      return prevMeta.rlab;
     }
   },
   hasMetaChanged: function (key, eqFunc) {
@@ -338,6 +378,12 @@ let MetadataItem = girder.models.ItemModel.extend({
     } else {
       return !eqFunc(this.previousMeta(key), this.getMeta(key));
     }
+  },
+  rename: function (newName) {
+    this.set('name', newName);
+    return this.save().then(() => {
+      this.trigger('rl:rename');
+    });
   }
 });
 

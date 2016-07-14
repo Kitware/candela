@@ -1,0 +1,106 @@
+{
+  "_comment": "In Girder, a project item's metadata might look something like:",
+
+  "meta": {
+    "rlab": {
+      "itemType": "project",
+      "versionNumber": "master",
+
+      "datasets": [
+        {
+          "dataset": "575ab712ed27aa2cacfcc7b1",
+          "filter": {
+            "left": {
+              "left": "Movie",
+              "operator": "in",
+              "right": ["The Bourne Identity","The Bourne Supremacy","The Bourne Ultimatum"]
+            },
+            "operator": "and",
+            "right": {
+              "left": "Rating IMDB",
+              "operator": "gte",
+              "right": 3
+            }
+          },
+          "page": {
+            "offset": 0,
+            "limit": 1000
+          }
+        }
+      ],
+      "matchings": [
+        {
+          "dataAttribute": "Movie",
+          "dataIndex": 0,
+          "visAttribute": "x",
+          "visIndex": 0
+        },
+        {
+          "dataAttribute": "Rating IMDB",
+          "dataIndex": 0,
+          "visAttribute": "y",
+          "visIndex": 0
+        },
+        {
+          "dataAttribute": "Movie",
+          "dataIndex": 0,
+          "visAttribute": "hover",
+          "visIndex": 0
+        },
+        {
+          "dataAttribute": "Genre",
+          "dataIndex": 0,
+          "visAttribute": "color",
+          "visIndex": 0
+        },
+        {
+          "dataAttribute": "Total Domestic Box Office",
+          "dataIndex": 0,
+          "visAttribute": "hover",
+          "visIndex": 0
+        },
+        {
+          "dataAttribute": "Production Budget",
+          "dataIndex": 0,
+          "visAttribute": "hover",
+          "visIndex": 0
+        },
+        {
+          "dataAttribute": "Rating IMDB",
+          "dataIndex": 0,
+          "visAttribute": "fields",
+          "visIndex": 1
+        },
+        {
+          "dataAttribute": "Total Domestic Box Office",
+          "dataIndex": 0,
+          "visAttribute": "fields",
+          "visIndex": 1
+        },
+        {
+          "dataAttribute": "Production Budget",
+          "dataIndex": 0,
+          "visAttribute": "fields",
+          "visIndex": 1
+        }
+      ],
+      "visualizations": [
+        {
+          "name": "BarChart",
+          "options": {}
+        },
+        {
+          "name": "LineUp",
+          "options": {
+            "stacked": true,
+            "animated": false
+          }
+        }
+      ],
+      "preferredWidgets": [
+        "VisualizationView0",
+        "MatchingView"
+      ]
+    }
+  }
+}

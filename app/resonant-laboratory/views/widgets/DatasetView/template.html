@@ -1,2 +1,58 @@
-<div id="editor"></div>
-<div id="attributeSettings"></div>
+<div id="datasetOverview">
+  <svg>
+    <g id="connector"></g>
+    <g id="filterPie"></g>
+    <g id="paging">
+      <g id="pagingBars"></g>
+      <g id="pagingButtons">
+        <image id="seekFirst" x="-3.5em" height="1em" width="1em" class="button"/>
+        <image id="seekPrev" x="-1.5em" height="1em" width="1em" class="button"/>
+        <image id="seekNext" x="0.5em" height="1em" width="1em" class="button"/>
+        <image id="seekLast" x="2.5em" height="1em" width="1em" class="button"/>
+      </g>
+    </g>
+    <g id="labels">
+      <text id="noPagingOrFilters">
+        Visualizing all <tspan class="page">10</tspan>
+        items in the dataset.
+      </text>
+      <text id="hasPaging">
+        Visualizing items <tspan class="page">0 - 10</tspan>
+        of <tspan class="filtered">100</tspan> total items.
+      </text>
+      <text id="hasFilters">
+        Visualizing <tspan class="filtered">100</tspan> items
+        of the <tspan class="overview">1000</tspan> total
+        items in the dataset.
+      </text>
+      <text id="hasFiltersAndPaging">
+        Visualizing items <tspan class="page">0 - 10</tspan>
+        of <tspan class="filtered">100</tspan> filtered
+        items. There are
+        <tspan class="overview">1000</tspan> total items
+        in the dataset (ignoring filters).
+      </text>
+    </g>
+    <g id="previewSwitch">
+      <image id="histogramPreviewIcon" y="-3em" height="1em" width="1em" class="button"/>
+      <image id="tableSwitchIcon" y="-1em" height="2em" width="1em" class="button"/>
+      <image id="tablePreviewIcon" y="2em" height="1em" width="1em" class="button"/>
+    </g>
+  </svg>
+</div>
+<div id="histogramPreview">
+</div>
+<div id="tablePreview">
+  <div id="dataTableContainer">
+    <table id="dataTable">
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+  <div id="dataTableHeaders">
+    <div class="tableHeader rowHeader">
+    </div>
+  </div>
+</div>
+<div id="emptyDatasetState">
+</div>

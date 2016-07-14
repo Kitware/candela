@@ -24,8 +24,8 @@
 }
 #Header img.headerButton:hover {
   cursor: pointer;
-  -webkit-filter: grayscale(100%) brightness(1000%);
-  filter: grayscale(100%) brightness(1000%);
+  -webkit-filter: url(#recolorImageToWhite);
+  filter: url(#recolorImageToWhite);
 }
 
 #Header div.indicators {

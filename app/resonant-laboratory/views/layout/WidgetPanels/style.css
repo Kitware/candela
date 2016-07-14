@@ -28,8 +28,16 @@
   filter: url(#recolorImageToffff33);
 }
 #WidgetPanels .sectionHeader img:hover {
-  -webkit-filter: grayscale(100%) brightness(1000%);
-  filter: grayscale(100%) brightness(1000%);
+  -webkit-filter: url(#recolorImageToWhite);
+  filter: url(#recolorImageToWhite);
+}
+#WidgetPanels .sectionHeader img.disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+#WidgetPanels .sectionHeader img.disabled:hover {
+  -webkit-filter: none;
+  filter: none;
 }
 
 #WidgetPanels .sectionHeader .indicatorText img:hover {

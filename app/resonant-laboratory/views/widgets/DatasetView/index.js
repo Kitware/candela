@@ -1,34 +1,156 @@
 import Underscore from 'underscore';
 import d3 from 'd3';
 import jQuery from 'jquery';
-import ace from 'brace';
-import 'brace/theme/textmate';
+import ComboScale from './comboScale.js';
 import Widget from '../Widget';
-import Dataset from '../../../models/Dataset';
+import Menu from '../../overlays/Menu';
 import myTemplate from './template.html';
+import histogramTemplate from './histogramTemplate.html';
+import rewrap from '../../../shims/svgTextWrap.js';
+import makeValidId from '../../../shims/makeValidId.js';
 import './style.css';
+import './tablePreview.css';
+import './histogramPreview.css';
+
+import seekFirst from '../../../images/seekFirst.svg';
+import seekPrev from '../../../images/seekPrev.svg';
+import seekNext from '../../../images/seekNext.svg';
+import seekLast from '../../../images/seekLast.svg';
+import tablePreviewIcon from '../../../images/table.svg';
+import tableSwitchIcon from '../../../images/switch.svg';
+import histogramPreviewIcon from '../../../images/histogram.svg';
+import booleanIcon from '../../../images/boolean.svg';
+import integerIcon from '../../../images/integer.svg';
+import numberIcon from '../../../images/number.svg';
+import dateIcon from '../../../images/date.svg';
+import stringIcon from '../../../images/string.svg';
+import stringListIcon from '../../../images/string_list.svg';
+import objectIcon from '../../../images/object.svg';
+import categorical from '../../../images/categorical.svg';
+import ordinal from '../../../images/ordinal.svg';
+import check from '../../../images/check.svg';
+import ex from '../../../images/ex.svg';
+
+let ICONS = {
+  seekFirst,
+  seekPrev,
+  seekNext,
+  seekLast,
+  tablePreviewIcon,
+  tableSwitchIcon,
+  histogramPreviewIcon,
+  boolean: booleanIcon,
+  integer: integerIcon,
+  number: numberIcon,
+  date: dateIcon,
+  string: stringIcon,
+  string_list: stringListIcon,
+  object: objectIcon,
+  categorical,
+  ordinal,
+  check,
+  ex
+};
 
 let STATUS = {
   NO_DATA: 0,
   SUCCESS: 1,
   CANT_LOAD: 2,
-  CANT_PARSE: 3,
-  LOADING: 4,
-  NO_ATTRIBUTES: 5
+  LOADING: 3,
+  NO_ATTRIBUTES: 4
 };
+
+let TYPE_MENU_ITEMS = [
+  {
+    text: 'Autodetect',
+    dataType: null
+  },
+  null,
+  {
+    icon: ICONS.boolean,
+    text: 'Boolean',
+    dataType: 'boolean'
+  },
+  {
+    icon: ICONS.integer,
+    text: 'Integer',
+    dataType: 'integer'
+  },
+  {
+    icon: ICONS.number,
+    text: 'Number',
+    dataType: 'number'
+  },
+  {
+    icon: ICONS.date,
+    text: 'Date',
+    dataType: 'date'
+  },
+  {
+    icon: ICONS.string,
+    text: 'String',
+    dataType: 'string'
+  },
+  {
+    icon: ICONS.object,
+    text: 'Object (no type coercion)',
+    dataType: 'object'
+  }
+];
+let INTERPRETATION_MENU_ITEMS = [
+  {
+    text: 'Autodetect',
+    interpretation: null
+  },
+  null,
+  {
+    icon: ICONS.categorical,
+    text: 'Categorical',
+    interpretation: 'categorical'
+  },
+  {
+    icon: ICONS.ordinal,
+    text: 'Ordinal',
+    interpretation: 'ordinal'
+  }
+];
 
 let DatasetView = Widget.extend({
   initialize: function () {
     Widget.prototype.initialize.apply(this, arguments);
-    this.friendlyName = 'Dataset';
 
-    this.statusText.onclick = () => {
-      window.mainPage.overlay.render('DatasetLibrary');
-    };
-    this.statusText.title = 'Select a different dataset.';
+    this.showTable = false;
+    this.histogramScales = {};
+
+    this.icons.splice(0, 0, {
+      src: Widget.settingsIcon,
+      title: 'Dataset filter and paging settings',
+      onclick: () => {
+        if (window.mainPage.project &&
+            window.mainPage.project.getMeta('datasets').length > 0) {
+          window.mainPage.overlay.render('DatasetSettings');
+        }
+      },
+      className: () => {
+        if (window.mainPage.project &&
+            window.mainPage.project.getMeta('datasets').length > 0) {
+          return null;
+        } else {
+          return 'disabled';
+        }
+      }
+    });
+
+    this.icons.splice(0, 0, {
+      src: Widget.swapIcon,
+      title: 'Click to select a different dataset',
+      onclick: () => {
+        window.mainPage.overlay.render('DatasetLibrary');
+      }
+    });
 
     this.status = STATUS.NO_DATA;
-    this.icons.splice(0, 0, {
+    this.icons.push({
       src: () => {
         if (this.status === STATUS.LOADING) {
           return Widget.spinnerIcon;
@@ -57,13 +179,10 @@ let DatasetView = Widget.extend({
     this.handleNewProject();
   },
   handleNewProject: function () {
-    this.$el.html('');
-    this.status = STATUS.NO_DATA;
-
     this.listenTo(window.mainPage.project, 'rl:changeDatasets',
       this.render);
-    /* this.listenTo(window.mainPage.project, 'rl:changeMatchings',
-      this.render);*/
+
+    this.render();
   },
   renderInfoScreen: function () {
     window.mainPage.helpLayer.showTips(this.getDefaultTips());
@@ -81,78 +200,612 @@ let DatasetView = Widget.extend({
       window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to <a>edit</a> or <a>reshape</a> the data in order to use it.');
     }
   },
-  renderAttributeSettings: function () {
-    let datasets = window.mainPage.project.getMeta('datasets');
-    let dataset;
-    let attrs;
-    if (datasets && datasets[0] && window.mainPage.loadedDatasets[datasets[0]]) {
-      dataset = window.mainPage.loadedDatasets[datasets[0]];
-      attrs = dataset.getSpec().attributes;
+  renderEmptyState: function () {
+    this.$el.find('#datasetOverview, #tablePreview, #histogramPreview').hide();
+    this.$el.find('#emptyDatasetState').show();
+  },
+  renderFilterPie: function (overviewCount, filteredCount, pageOffset, pageCount, radius) {
+    // Draw a pie using the left square of space
+    // I know, eww: a pie. But in this case,
+    // there isn't a distant slice comparison problem,
+    // and we want to drive home the "you're working
+    // with a subset" connotation.
+
+    // We want to center the filtered slice on the right
+    let filteredRadians = 2 * Math.PI * filteredCount / overviewCount;
+    let radianScale = d3.scale.linear()
+      .domain([0, overviewCount])
+      .range([Math.PI / 2 - filteredRadians / 2,
+              2.5 * Math.PI - filteredRadians / 2]);
+    let pieData = [
+      {
+        slice: 'overview',
+        offset: 0,
+        count: overviewCount
+      },
+      {
+        slice: 'filtered',
+        offset: 0,
+        count: filteredCount
+      },
+      {
+        slice: 'page',
+        offset: pageOffset,
+        count: Math.min(pageCount, filteredCount)
+      }
+    ];
+    let arc = d3.svg.arc()
+      .outerRadius(radius)
+      .innerRadius(0)
+      .startAngle(d => radianScale(d.offset))
+      .endAngle(d => radianScale(d.offset + d.count));
+    let pie = d3.select(this.el).select('#filterPie')
+      .attr('transform', 'translate(' + radius + ',' + radius + ')');
+    let pieSlices = pie.selectAll('path.pieSlice')
+      .data(pieData, d => d.slice);
+    pieSlices.enter().append('path');
+    pieSlices.attr('d', arc)
+      .attr('class', d => d.slice + ' pieSlice');
+  },
+  renderPagingTools: function (datasetObj, filteredCount, pageOffset, pageCount, width) {
+    // Align the paging buttons to the center
+    this.$el.find('#pagingButtons')
+      .attr('transform', 'translate(' + width / 2 + ',0)');
+
+    // Attach their event listeners
+    this.$el.find('#pagingButtons image.button').off('click');
+    this.$el.find('#seekFirst').on('click', () => {
+      datasetObj.seekFirst();
+    });
+    this.$el.find('#seekPrev').on('click', () => {
+      datasetObj.seekPrev();
+    });
+    this.$el.find('#seekNext').on('click', () => {
+      datasetObj.seekNext();
+    });
+    this.$el.find('#seekLast').on('click', () => {
+      datasetObj.seekLast();
+    });
+
+    // Align the paging bar group
+    this.$el.find('#pagingBars')
+      .attr('transform', 'translate(0,' + (2 * this.layout.emSize) + ')');
+
+    // Scale for the bars
+    let pageScale = d3.scale.linear()
+      .domain([0, filteredCount])
+      .range([0, width]);
+
+    // Now draw the bars indicating the size and location of
+    // the page within the current filtered set
+    let barData = [
+      {
+        segment: 'filtered',
+        start: 0,
+        count: filteredCount
+      },
+      {
+        segment: 'page',
+        start: pageOffset,
+        count: pageCount
+      }
+    ];
+    let bars = d3.select(this.el).select('#pagingBars').selectAll('rect.bar')
+      .data(barData, d => d.segment);
+    bars.enter().append('rect');
+    bars.attr('x', d => pageScale(d.start))
+      .attr('width', d => pageScale(d.count + d.start) - pageScale(d.start))
+      .attr('height', this.layout.emSize)
+      .attr('class', d => d.segment + ' bar');
+  },
+  renderOverview: function (datasetDetails) {
+    let overviewCount = datasetDetails.overviewHistogram.__passedFilters__[0].count;
+    let filteredCount = datasetDetails.filteredHistogram.__passedFilters__[0].count;
+    let pageOffset = datasetDetails.datasetObj.cache.page.offset;
+    let pageCount = datasetDetails.datasetObj.cache.page.limit;
+    pageCount = Math.min(pageOffset + pageCount, filteredCount) - pageOffset;
+
+    let hasFilters = filteredCount < overviewCount;
+    let hasPaging = pageCount < filteredCount;
+
+    // How much horizontal space do we have (factor in padding)?
+    let width = this.el.getBoundingClientRect().width -
+      2 * this.layout.emSize;
+
+    // We start by assuming we are going to be 6ems tall
+    let height = 6 * this.layout.emSize;
+
+    // Move the preview switch to the right
+    this.$el.find('#previewSwitch').attr('transform',
+      'translate(' + (width - this.layout.emSize) + ',' +
+      3 * this.layout.emSize + ')');
+    let switchOffset = 2 * this.layout.emSize;
+
+    // Flip the switch appropriately
+    d3.select(this.el).select('#tableSwitchIcon')
+      .attr('transform', this.showTable ? 'scale(1,-1)' : null);
+
+    // Attach the switch event listeners
+    this.$el.find('#previewSwitch image.button').off('click');
+    this.$el.find('#histogramPreviewIcon').on('click', () => {
+      this.showTable = false;
+      this.render();
+    });
+    this.$el.find('#tableSwitchIcon').on('click', () => {
+      this.showTable = !this.showTable;
+      this.render();
+    });
+    this.$el.find('#tablePreviewIcon').on('click', () => {
+      this.showTable = true;
+      this.render();
+    });
+
+    // Show + render, or hide the filter pie on the left
+    let pieOffset;
+    if (hasFilters) {
+      this.$el.find('#filterPie').show();
+      this.renderFilterPie(overviewCount, filteredCount,
+        pageOffset, pageCount, 3 * this.layout.emSize);
+      pieOffset = 7 * this.layout.emSize;
     } else {
-      attrs = {};
+      this.$el.find('#filterPie').hide();
+      pieOffset = 0;
     }
-    let attrOrder = Object.keys(attrs);
-    // TODO: this is technically cheating; relying on the order
-    // of the dict entries to preserve the order on screen
 
-    let cells = d3.select(this.el).select('#attributeSettings')
-      .selectAll('div.cell')
-      .data(attrOrder, d => d + attrs[d]);
-    let cellsEnter = cells.enter().append('div')
-      .attr('class', 'cell');
+    // Render the paging tools with the space that we have left
+    this.renderPagingTools(datasetDetails.datasetObj, filteredCount,
+      pageOffset, pageCount, width - pieOffset - switchOffset);
+
+    // Show the relevant explanatory label
+    this.$el.find('#labels > text').hide();
+    let labelElement;
+    if (hasFilters && hasPaging) {
+      labelElement = this.$el.find('#hasFiltersAndPaging');
+    } else if (hasFilters) {
+      labelElement = this.$el.find('#hasFilters');
+    } else if (hasPaging) {
+      labelElement = this.$el.find('#hasPaging');
+    } else {
+      labelElement = this.$el.find('#noPagingOrFilters');
+    }
+    labelElement.show();
+    let d3Element = d3.select(labelElement[0]);
+
+    // Update the values in the label
+    d3Element.selectAll('tspan.overview')
+      .text(overviewCount);
+    d3Element.selectAll('tspan.filtered')
+      .text(filteredCount);
+    if (hasPaging) {
+      // Use base 1 for the page text labels
+      d3Element.selectAll('tspan.page')
+        .text((pageOffset + 1) + ' - ' + (pageOffset + pageCount));
+    } else {
+      d3Element.selectAll('tspan.page')
+        .text(filteredCount);
+    }
+
+    // Attempt to fit the label in the 3em of space between
+    // the pie and the switch, below the paging buttons + bar
+    rewrap(labelElement[0], width - switchOffset - pieOffset);
+    let textHeight = labelElement[0].getBoundingClientRect().height;
+    if (textHeight <= 3 * this.layout.emSize) {
+      // Cool - we fit! Move the text where it belongs
+      d3Element.attr('transform', 'translate(' + pieOffset + ',' +
+        4.5 * this.layout.emSize + ')');
+      // Position the paging tools right at the top
+      d3.select('#paging').attr('transform',
+        'translate(' + pieOffset + ',0)');
+    } else {
+      // There isn't enough space, so reflow the text below everything,
+      // and boost our total height
+      rewrap(labelElement[0], width);
+      d3Element.attr('transform', 'translate(0,' +
+        7.5 * this.layout.emSize + ')');
+      textHeight = labelElement[0].getBoundingClientRect().height;
+      height += textHeight + this.layout.emSize;
+      // Position the paging tools in the middle
+      d3.select('#paging').attr('transform', 'translate(' + pieOffset + ',' +
+        (1.5 * this.layout.emSize) + ')');
+    }
+
+    // Set the SVG element to the size that we've discovered
+    d3.select(this.el).select('svg')
+      .attr({
+        width: width,
+        height: height
+      });
+  },
+  setupDataTypeMenu: function (element, attrName, datasetDetails) {
+    let autoAttrType = datasetDetails.datasetObj
+      .autoDetectAttributeType(datasetDetails.schema, attrName);
+    let attrType = datasetDetails.datasetObj
+      .getAttributeType(datasetDetails.schema, attrName);
+    let isAuto = !(datasetDetails.schema[attrName].hasOwnProperty('coerceToType'));
+    let filterStyle = isAuto ? null : 'url(#recolorImageTo377eb8)';
+    d3.select(element)
+      .attr('src', ICONS[attrType])
+      .style({
+        '-webkit-filter': filterStyle,
+        'filter': filterStyle
+      }).on('click', () => {
+        // Construct the type menu
+        TYPE_MENU_ITEMS[0].icon = ICONS[autoAttrType];
+        TYPE_MENU_ITEMS.forEach(menuItem => {
+          if (menuItem !== null) {
+            menuItem.checked = (menuItem.dataType === null && isAuto) ||
+              (menuItem.dataType === attrType && !isAuto);
+            menuItem.onclick = () => {
+              datasetDetails.datasetObj
+                .setAttributeType(attrName, menuItem.dataType);
+              window.mainPage.overlay.render(null);
+            };
+          }
+        });
+        window.mainPage.overlay.render(new Menu({
+          targetElement: element,
+          items: TYPE_MENU_ITEMS
+        }));
+      });
+  },
+  setupInterpretationMenu: function (element, attrName, datasetDetails) {
+    let autoInterpretation = datasetDetails.datasetObj
+      .autoDetectAttributeInterpretation(datasetDetails.schema, attrName);
+    let interpretation = datasetDetails.datasetObj
+      .getAttributeInterpretation(datasetDetails.schema, attrName);
+    let isAuto = !(datasetDetails.schema[attrName].hasOwnProperty('interpretation'));
+    let filterStyle = isAuto ? null : 'url(#recolorImageTo377eb8)';
+    d3.select(element)
+      .attr('src', ICONS[interpretation])
+      .style({
+        '-webkit-filter': filterStyle,
+        'filter': filterStyle
+      }).on('click', () => {
+        // Construct the type menu
+        INTERPRETATION_MENU_ITEMS[0].icon = ICONS[autoInterpretation];
+        INTERPRETATION_MENU_ITEMS.forEach(menuItem => {
+          if (menuItem !== null) {
+            menuItem.checked = (menuItem.interpretation === null && isAuto) ||
+              (menuItem.interpretation === interpretation && !isAuto);
+            menuItem.onclick = () => {
+              datasetDetails.datasetObj
+                .setAttributeInterpretation(attrName, menuItem.interpretation);
+              window.mainPage.overlay.render(null);
+            };
+          }
+        });
+        window.mainPage.overlay.render(new Menu({
+          targetElement: element,
+          items: INTERPRETATION_MENU_ITEMS
+        }));
+      });
+  },
+  renderIndividualHistogram: function (element, attrName, datasetDetails) {
+    let scale = this.histogramScales[attrName];
+    let parentWidth = element.parentNode.getBoundingClientRect().width;
+    if (scale === undefined) {
+      scale = this.histogramScales[attrName] = new ComboScale(
+        this, attrName, datasetDetails, parentWidth);
+    } else {
+      scale.update(attrName, datasetDetails, parentWidth);
+    }
+
+    let svg = d3.select(element);
+    let width = scale.width;
+    let topPadding = 0.5 * this.layout.emSize;
+    let height = scale.height + topPadding;
+
+    // Draw the y axis
+    let yAxis = d3.svg.axis()
+      .scale(d3.scale.linear()
+        .domain([0, scale.yMax])
+        .range([height, topPadding]))
+      .orient('left')
+      .ticks(4);
+    svg.select('.yAxis')
+      .attr('transform', 'translate(' + scale.leftAxisPadding + ',0)')
+      .call(yAxis);
+
+    // Draw the bin groups
+    let labels = datasetDetails.overviewHistogram[attrName].map(d => d.label);
+    let bins = svg.select('.bins').selectAll('.bin')
+      .data(labels, d => d);
+    let binsEnter = bins.enter().append('g')
+      .attr('class', 'bin');
+    bins.exit().remove();
+
+    // Move the bins horizontally
+    bins.attr('transform', d => {
+      let binNo = scale.labelToBin(d, 'overview');
+      return 'translate(' + scale.binForward(binNo) + ',' + topPadding + ')';
+    });
+
+    // Draw one bar for each bin
+    binsEnter.append('rect')
+      .attr('class', 'overview');
+    binsEnter.append('rect')
+      .attr('class', 'filtered');
+    binsEnter.append('rect')
+      .attr('class', 'page');
+
+    // Update each bar
+    bins.selectAll('rect.overview')
+      .each(function (d) {
+        // this refers to the DOM element
+        d3.select(this).attr(scale.getBinRect(d, 'overview'));
+      });
+    bins.selectAll('rect.filtered')
+      .each(function (d) {
+        // this refers to the DOM element
+        d3.select(this).attr(scale.getBinRect(d, 'filtered'));
+      });
+    bins.selectAll('rect.page')
+      .each(function (d) {
+        // this refers to the DOM element
+        d3.select(this).attr(scale.getBinRect(d, 'page'));
+      });
+
+    // Add an include / exclude button for each bin
+    // TODO: uncomment when we support filtering
+    /*
+    binsEnter.append('image')
+      .attr('class', 'button')
+      .attr({
+        x: -0.5 * this.layout.emSize,
+        y: height + 0.5 * this.layout.emSize,
+        width: this.layout.emSize,
+        height: this.layout.emSize
+      });
+    bins.selectAll('image.button')
+      .attr('xlink:href', ICONS.check);
+    height += 2 * this.layout.emSize;
+    */
+
+    // Add each bin label
+    let maxLabelHeight = 0;
+    binsEnter.append('text');
+    bins.selectAll('text')
+      .text(d => d)
+      .attr('transform', 'rotate(90) translate(' + height + ',' +
+        (0.35 * this.layout.emSize) + ')')
+      .each(function () {
+        // this refers to the DOM element
+        maxLabelHeight = Math.max(this.getComputedTextLength(), maxLabelHeight);
+      });
+    height += maxLabelHeight + topPadding;
+
+    svg.attr({
+      width: width + 'px',
+      height: height + 'px'
+    });
+  },
+  renderHistograms: function (datasetDetails) {
+    let self = this;
+
+    this.$el.find('#emptyDatasetState, #tablePreview').hide();
+    this.$el.find('#datasetOverview, #histogramPreview').show();
+    this.renderOverview(datasetDetails);
+
+    let container = d3.select(this.el).select('#histogramPreview');
+
+    let attributeOrder = Object.keys(datasetDetails.schema);
+
+    let attributeSections = container.selectAll('.attributeSection')
+      .data(attributeOrder, d => d);
+    let attributeSectionsEnter = attributeSections.enter().append('div')
+      .attr('class', 'attributeSection');
+    attributeSections.exit().remove();
+
+    // Add a container for the stuff in the header (the stuff
+    // that is shown while collapsed)
+    let sectionHeadersEnter = attributeSectionsEnter.append('div')
+      .attr('class', 'header');
+    let sectionTitlesEnter = sectionHeadersEnter.append('div')
+      .attr('class', 'title');
+    let sectionTitles = attributeSections.selectAll('.header')
+      .selectAll('.title');
+
+    // Add an arrow to collapse the section
+    sectionTitlesEnter.append('input')
+      .attr('type', 'checkbox')
+      .attr('class', 'expander');
+    sectionTitles.selectAll('input.expander')
+      .on('change', function (d) {
+        // this refers to the DOM element
+        let contentElement = self.$el.find('#' + makeValidId(d + '_histogramContent'));
+        if (this.checked) {
+          contentElement.removeClass('collapsed');
+          // Update that particular histogram
+          self.renderIndividualHistogram(contentElement.find('svg')[0], d, datasetDetails);
+        } else {
+          contentElement.addClass('collapsed');
+        }
+      });
+
+    // Checkbox that indicates:
+    // - checked: the attribute is included, with no (non-custom) filters
+    // - indeterminate: the attribute is included, with filters
+    // - unchecked: the attribute is excluded
+    // TODO: uncomment when we support filtering
+    /*
+    sectionTitlesEnter.append('input')
+      .attr('type', 'checkbox')
+      .attr('class', 'filteredState');
+    sectionTitles.selectAll('input.filteredState')
+      .attr('id', d => d + '_checkbox')
+      .each(function (d) {
+        // this refers to the DOM element
+        let filteredState = datasetDetails.datasetObj.getFilteredState(d);
+        if (filteredState === Dataset.FILTER_STATES.NO_FILTERS) {
+          this.checked = true;
+          this.indeterminate = false;
+        } else if (filteredState === Dataset.FILTER_STATES.FILTERED) {
+          this.checked = true;
+          this.indeterminate = true;
+        } else {  // filteredState === Dataset.FILTER_STATES.EXCLUDED
+          this.checked = false;
+          this.indeterminate = false;
+        }
+      });
+      */
+
+    // Label for the header
+    sectionTitlesEnter.append('label');
+    sectionTitles.selectAll('label')
+      .text(d => d)
+      .attr('for', d => d + '_checkbox');
+
+    // Type and interpretation icons / menus
+    let sectionButtonsEnter = sectionHeadersEnter.append('div')
+      .attr('class', 'buttons');
+    let sectionButtons = attributeSections.selectAll('.header')
+      .selectAll('.buttons');
+    sectionButtonsEnter.append('img')
+      .attr('class', 'dataTypeMenuIcon button');
+    sectionButtons.selectAll('img.dataTypeMenuIcon').each(function (d) {
+      // this refers to the DOM element
+      self.setupDataTypeMenu(this, d, datasetDetails);
+    });
+
+    sectionButtonsEnter.append('img')
+      .attr('class', 'interpretationMenuIcon button');
+    sectionButtons.selectAll('img.interpretationMenuIcon').each(function (d) {
+      // this refers to the DOM element
+      self.setupInterpretationMenu(this, d, datasetDetails);
+    });
+
+    // Now for the actual histgoram content (that gets collapsed)
+    let contentsEnter = attributeSectionsEnter.append('div')
+      .attr('class', 'collapsed content');
+    let contents = attributeSections.selectAll('.content')
+      .attr('id', d => makeValidId(d + '_histogramContent'));
+
+    contentsEnter.append('svg')
+      .html(histogramTemplate);
+    contents.selectAll('svg').each(function (d) {
+      // this refers to the DOM element
+      self.renderIndividualHistogram(this, d, datasetDetails);
+    });
+  },
+  renderTable: function (datasetDetails) {
+    let self = this;
+
+    this.$el.find('#emptyDatasetState, #histogramPreview').hide();
+    this.$el.find('#datasetOverview, #tablePreview').show();
+    this.renderOverview(datasetDetails);
+
+    // Render the headers
+    let headerOrder = Object.keys(datasetDetails.schema);
+
+    let headers = d3.select(this.el).select('#dataTableHeaders')
+      .selectAll('div.tableHeader:not(.rowHeader)').data(headerOrder);
+    let headersEnter = headers.enter().append('div')
+      .attr('class', 'tableHeader');
+    headers.exit().remove();
+    headers.attr('id', d => makeValidId('tableHeader' + d));
+
+    let fhToolsEnter = headersEnter.append('div').attr('class', 'headerTools');
+    fhToolsEnter.append('img').attr('class', 'dataTypeMenuIcon button');
+    fhToolsEnter.append('img').attr('class', 'interpretationMenuIcon button');
+
+    headersEnter.append('div').attr('class', 'headerText');
+
+    headers.selectAll('div.headerText').text(d => d);
+    headers.selectAll('img.dataTypeMenuIcon').each(function (d) {
+      // this refers to the DOM element
+      self.setupDataTypeMenu(this, d, datasetDetails);
+    });
+    headers.selectAll('img.interpretationMenuIcon').each(function (d) {
+      // this refers to the DOM element
+      self.setupInterpretationMenu(this, d, datasetDetails);
+    });
+
+    // Render the data rows
+    let rows = d3.select(this.el).select('#dataTable tbody')
+      .selectAll('tr').data(datasetDetails.currentDataPage);
+    rows.enter().append('tr');
+    rows.exit().remove();
+
+    let cells = rows.selectAll('td').data((d, i) => {
+      let row = [{
+        attr: null,
+        value: datasetDetails.datasetObj.cache.page.offset + i + 1
+      }];
+      headerOrder.forEach(attr => {
+        row.push({
+          attr,
+          value: d[attr]
+        });
+      });
+      return row;
+    });
+    cells.enter().append('td');
     cells.exit().remove();
+    cells.text(d => d.value);
 
-    cellsEnter.append('span');
-    cells.selectAll('span').text(d => d);
-
-    cellsEnter.append('select');
-    let typeMenuOptions = cells.selectAll('select').selectAll('option')
-      .data(d3.keys(Dataset.COMPATIBLE_TYPES));
-    typeMenuOptions.enter().append('option');
-    typeMenuOptions.attr('value', d => d)
-      .text(d => d);
-
-    cells.selectAll('select')
-      .property('value', d => attrs[d])
-      .on('change', d => {
-        let newType = jQuery(d3.event.target).val();
-        dataset.setAttribute(d, newType);
+    // Align the header and the first row of data (the
+    // rest of the table will respond automatically)
+    let firstRow = rows.filter((d, i) => i === 0);
+    firstRow.selectAll('td')
+      .each(function (d, i) {
+        // this refers to the row DOM element
+        let rowRect = this.getBoundingClientRect();
+        let headerDiv;
+        if (i === 0) {
+          // There isn't any headerDiv to worry about,
+          // instead, set the left padding on #dataTableHeaders
+          headerDiv = d3.select('#dataTableHeaders div.rowHeader');
+        } else {
+          headerDiv = d3.select('#' + makeValidId('tableHeader' + d.attr));
+        }
+        // Use the larger of the header and the data row
+        // to set the width of the column, but ensure that
+        // neither gets larger than 7em
+        let headerRect = headerDiv.node().getBoundingClientRect();
+        let width = headerRect.width + 2 * self.layout.emSize;
+        width = Math.max(rowRect.width, width);
+        width = Math.min(width, 7 * self.layout.emSize);
+        width = width + 'px';
+        width = {
+          'min-width': width,
+          'max-width': width
+        };
+        headerDiv.style(width);
+        d3.select(this).style(width);
       });
   },
   render: Underscore.debounce(function () {
     let widgetIsShowing = Widget.prototype.render.apply(this, arguments);
 
-    // Get the dataset in the project (if there is one)
-
-    let dataset;
-    if (window.mainPage.project) {
-      let datasets = window.mainPage.project.getMeta('datasets');
-      dataset = window.mainPage.loadedDatasets[datasets[0]];
-    }
-
-    let editor;
-    if (widgetIsShowing) {
+    if (!this.addedTemplate) {
       this.$el.html(myTemplate);
-      this.renderAttributeSettings();
-
-      editor = ace.edit('editor');
-      editor.setOptions({
-        fontFamily: 'Cutive Mono, Courier, Monospace',
-        fontSize: '10pt'
+      // Add the seek icons (webpack has trouble with detecting xlink:href)
+      Object.keys(ICONS).forEach(key => {
+        d3.select(this.el).select('image#' + key)
+          .attr('xlink:href', ICONS[key]);
       });
-      editor.setTheme('ace/theme/textmate');
-      editor.$blockScrolling = Infinity;
-    } else {
-      // dummy "editor" that does nothing
-      // if the widget is collapsed
-      editor = {
-        setValue: () => {},
-        setReadOnly: () => {}
-      };
+      // Sync the table header and body horizontal scrolling
+      let self = this;
+      this.$el.find('#dataTableContainer').on('scroll', function () {
+        // this refers to the DOM element
+        self.$el.find('#dataTableHeaders').scrollLeft(jQuery(this).scrollLeft());
+      });
+      this.addedTemplate = true;
     }
 
-    if (!dataset) {
-      editor.setValue('');
+    // Get some general settings to help the rendering process
+    this.layout = {
+      emSize: parseFloat(this.$el.css('font-size'))
+    };
+    this.layout.sectionHeight = 6 * this.layout.emSize;
+
+    // Get the dataset in the project (if there is one)
+    // TODO: get the dataset assigned to this widget
+    let datasetObj = window.mainPage.project &&
+      window.mainPage.project.getDataset(0);
+
+    if (!datasetObj) {
+      this.renderEmptyState();
       this.status = STATUS.NO_DATA;
       this.statusText.text = 'No file loaded';
       this.renderIndicators();
@@ -161,37 +814,46 @@ let DatasetView = Widget.extend({
       this.statusText.text = 'Loading...';
       this.renderIndicators();
 
-      dataset.parse().then(parsedData => {
-        let rawData = dataset.rawCache;
-        let spec = dataset.getSpec();
-        if (rawData === null) {
-          editor.setValue('');
-          this.status = STATUS.CANT_LOAD;
-          this.statusText.text = 'ERROR';
-          this.renderIndicators();
-        } else if (parsedData === null) {
-          editor.setValue(rawData);
-          this.status = STATUS.CANT_PARSE;
-          this.statusText.text = 'ERROR';
-          this.renderIndicators();
-        } else if (Object.keys(spec.attributes).length === 0) {
-          editor.setValue(rawData);
-          this.status = STATUS.NO_ATTRIBUTES;
-          this.statusText.text = 'ERROR';
-          this.renderIndicators();
-        } else {
-          editor.setValue(rawData);
-          this.status = STATUS.SUCCESS;
-          this.statusText.text = dataset.get('name');
-          this.renderIndicators();
-        }
-      });
+      Promise.all([datasetObj.cache.schema,
+                   datasetObj.cache.overviewHistogram,
+                   datasetObj.cache.filteredHistogram,
+                   datasetObj.cache.pageHistogram,
+                   datasetObj.cache.currentDataPage])
+        .then(datasetDetails => {
+          // For cleaner code, reshape the array
+          // of results into a dict
+          let results = {
+            datasetObj: datasetObj,
+            schema: datasetDetails[0],
+            overviewHistogram: datasetDetails[1],
+            filteredHistogram: datasetDetails[2],
+            pageHistogram: datasetDetails[3],
+            currentDataPage: datasetDetails[4]
+          };
+          if (datasetDetails.indexOf(null) !== -1) {
+            this.status = STATUS.CANT_LOAD;
+            this.statusText.text = 'ERROR';
+            this.renderIndicators();
+          } else if (results.schema.length === 0) {
+            // The schema has no attributes...
+            this.status = STATUS.NO_ATTRIBUTES;
+            this.statusText.text = 'ERROR';
+            this.renderIndicators();
+          } else {
+            this.status = STATUS.SUCCESS;
+            this.statusText.text = datasetObj.get('name');
+            this.renderIndicators();
+            if (widgetIsShowing) {
+              if (this.showTable) {
+                this.renderTable(results);
+              } else {
+                this.renderHistograms(results);
+              }
+            }
+          }
+        });
     }
-    // TODO: allow the user to edit the data (convert
-    // to in-browser dataset)... for now, always disable
-    // the textarea
-    editor.setReadOnly(true);
-  }, 200)
+  }, 300)
 });
 
 export default DatasetView;
