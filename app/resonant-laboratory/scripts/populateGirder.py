@@ -125,8 +125,10 @@ if __name__ == '__main__':
 
         longestItemName = max([len(item) for item in items])
 
-        print 'Item' + ''.join([' ' for x in xrange(longestItemName - 4)]),
-        print '\tIgnored files\tFlat files added\tMongo Collections added\tMetadata attached\tSuppressed Item'
+        message = 'Item' + ''.join([' ' for x in xrange(longestItemName - 3)])
+        message += ' | Ignored files | Flat files added | Mongo Collections added | Metadata attached | Suppressed Item'
+        print message
+        print ''.join(['=' for x in message])   # underline
 
         for item in items:
             if not os.path.isdir('./' + folder + '/' + item):
@@ -156,7 +158,7 @@ if __name__ == '__main__':
             addedFiles = 0
             addedCollections = 0
             skippedFiles = 0
-            addedMetadata = False
+            metadata = None
 
             # Load each of the files into the item
             for fileName in files:
@@ -165,58 +167,57 @@ if __name__ == '__main__':
                     # metadata instead of uploading it as a file
                     temp = open('./' + folder + '/' + item + '/metadata.json', 'rb')
                     contents = temp.read()
-                    metadata = {
-                        'rlab': json.loads(contents)
-                    }
+                    metadata = json.loads(contents)
                     temp.close()
 
                     # If this is a project, we need to replace the dataset
                     # folder name with a Girder ID
                     if folder == 'examples/Projects':
-                        for i, d in enumerate(metadata['rlab']['datasets']):
+                        for i, d in enumerate(metadata['datasets']):
                             if d['itemId'] not in dataItemIdLookup:
                                 # Hmm... the dataset that this project is
                                 # referring to doesn't exist
                                 suppressItem = True
                             else:
-                                metadata['rlab']['datasets'][i]['dataset'] = dataItemIdLookup[d['itemId']]
-                    if not suppressItem:
-                        gc.addMetadataToItem(itemSpec['_id'], metadata)
-                        addedMetadata = True
+                                metadata['datasets'][i]['dataset'] = dataItemIdLookup[d['itemId']]
                 elif fileName in existingFiles:
                     ignoredFiles += 1
                 else:
                     fileSize = os.stat('./' + folder + '/' + item + '/' + fileName).st_size
                     if (fileSize > int(args.databaseThreshold)) or os.path.splitext(fileName)[1] == '.json':
-                        # For now, we skip large / json files and suppress the dataset item
-                        if item in dataItemIdLookup:
-                            del dataItemIdLookup[item]
-                        suppressItem = True
-                        '''createMongoCollection(args, './' + folder + '/' + item + '/', fileName)
+                        createMongoCollection(args, './' + folder + '/' + item + '/', fileName)
                         gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/database', {}, json.dumps({
                             'url': args.mongoHost + ':' + args.mongoPort,
                             'database': args.dbName,
                             'collection': os.path.splitext(fileName)[0],
                             'type': 'mongo'
                         }))
-                        addedCollections += 1'''
+                        addedCollections += 1
                     else:
                         gc.uploadFileToItem(itemSpec['_id'], './' + folder + '/' + item + '/' + fileName)
                         addedFiles += 1
 
-            # Hit the endpoint that identifies the item as a dataset or a project,
-            # and populates the metadata appropriately
             if suppressItem:
                 gc.delete('item/' + itemSpec['_id'])
             else:
+                # Hit the endpoint that identifies the item as a dataset or a project,
+                # and populates the metadata appropriately
                 if folder == 'examples/Data':
-                    gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/dataset')
+                    response = gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/dataset')
                 elif folder == 'examples/Projects':
-                    gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/project')
+                    response = gc.sendRestRequest('POST', 'item/' + itemSpec['_id'] + '/project')
+                # Add any additional metadata that has been supplied
+                # (e.g. schema settings)
+                if metadata is not None:
+                    meta = response.get('meta', {})
+                    rlab = meta.get('rlab', {})
+                    rlab.update(metadata)
+                    meta['rlab'] = rlab
+                    gc.addMetadataToItem(itemSpec['_id'], meta)
 
-            message += '\t%i            \t%i               \t%i                \t%s                \t%s' % (
+            message += ' | %i             | %i                | %i                       | %s                 | %s' % (
                 ignoredFiles, addedFiles, addedCollections,
-                'Y' if addedMetadata else 'N',
+                'N' if metadata is None else 'Y',
                 'Y' if suppressItem else 'N')
             print message
 
