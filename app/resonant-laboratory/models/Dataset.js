@@ -55,7 +55,7 @@ class DatasetCache {
     if (!this._page) {
       this.page = {
         offset: 0,
-        limit: 100
+        limit: 1000
       };
     }
     return this._page;
