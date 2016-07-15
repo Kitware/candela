@@ -20,6 +20,18 @@ const disjunction_expression = [
   'age > 22 or age < 20'
 ];
 
+const not_expression = [
+  'not(age < 22 and age > 20)',
+  'not(age <= 22 and age > 20)',
+  'not(age > 22 and age < 20)',
+  'not(age >= 22 and age < 20)',
+  'not(age = 10)',
+  'not(age != 10)',
+  'not(age in [1, 2, 3, 4, 5])',
+  'not(age not in [1, 2, 3, 4, 5])',
+  'not(not(age > 22))'
+];
+
 function test_expressions (t, exprs, baseline_path) {
   const asts = exprs.map(parseToAst);
 
@@ -46,6 +58,11 @@ test('Conjunction expression parsing', t => {
 
 test('Disjunction expression parsing', t => {
   test_expressions(t, disjunction_expression, './app/resonant-laboratory/server/test/disjunction-ast-baselines.json');
+  t.end();
+});
+
+test('Not expression parsing', t => {
+  test_expressions(t, not_expression, './app/resonant-laboratory/server/test/not-ast-baselines.json');
   t.end();
 });
 
