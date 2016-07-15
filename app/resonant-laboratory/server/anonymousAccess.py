@@ -220,7 +220,7 @@ class AnonymousAccess(Resource):
         if item['baseParentType'] == 'user':
             if item['baseParentId'] == anonUser['_id']:
                 info['location'] = 'PublicScratch'
-            elif folder['public'] is True:
+            elif folder.get('public', False) is True:
                 info['location'] = 'PublicUser'
             else:
                 info['location'] = 'PrivateUser'

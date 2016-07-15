@@ -94,7 +94,9 @@ let MainPage = Backbone.View.extend({
     return this.project.create()
       .then(() => {
         this.trigger('rl:createProject');
-        this.trigger('rl:changeProject');
+        this.project.fetch().then(() => {
+          this.trigger('rl:changeProject');
+        });
       }).catch((err) => {
         this.switchProject(null);
         this.trigger('rl:error', err);

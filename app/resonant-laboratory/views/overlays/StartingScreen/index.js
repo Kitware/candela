@@ -44,8 +44,7 @@ let StartingScreen = Backbone.View.extend({
       });
 
       this.library = new ProjectLibrary({
-        el: '#libraryChunk',
-        keepOpenOnSelect: false
+        el: '#libraryChunk'
       });
 
       this.addedTemplate = true;

@@ -2,7 +2,11 @@
   "datasets": [
     {
       "dataset": "iris.json",
-      "itemId": "iris"
+      "itemId": "iris",
+      "page": {
+        "limit": 150,
+        "offset": 0
+      }
     }
   ],
   "matchings": [
