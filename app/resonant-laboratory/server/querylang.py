@@ -27,7 +27,7 @@ def astToFunction(ast):
 
         return lambda row: f0(row) and f1(row)
     elif operator == 'not':
-        f = astToFunction(operands[0])
+        f = astToFunction(operands)
         return lambda row: not f(row)
     elif operator == 'in':
         field = operands[0]
