@@ -48,7 +48,7 @@ class DatasetCache {
   get filter () {
     if (!this._filter) {
       this._filter = {
-        regular: {},
+        standard: {},
         custom: []
       };
     }
@@ -166,7 +166,7 @@ class DatasetCache {
           type: 'POST',
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
-            filter: this.model.getFilterExpression(schema),
+            filter: this.model.formatFilterExpression(),
             cache: true
           }
         }, 'rl:loadedHistogram');
@@ -182,7 +182,7 @@ class DatasetCache {
           type: 'POST',
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
-            filter: this.model.getFilterExpression(schema),
+            filter: this.model.formatFilterExpression(),
             limit: this.page.limit,
             offset: this.page.offset
             // Don't cache the page histograms on the server
@@ -203,7 +203,7 @@ class DatasetCache {
               format: 'dict',
               offset: this.page.offset,
               limit: this.page.limit
-              // filter: this.model.getFilterExpression(schema)
+              // filter: this.model.formatFilterExpression()
               // TODO: For this to technically work,
               // we need to convert to the old
               // girder_db_items query format...
@@ -222,7 +222,7 @@ class DatasetCache {
                 outputType: 'json',
                 offset: this.page.offset,
                 limit: this.page.limit,
-                filter: this.model.getFilterExpression(schema)
+                filter: this.model.formatFilterExpression()
               })
             }
           }, 'rl:loadedData');
@@ -324,54 +324,63 @@ let Dataset = MetadataItem.extend({
     });
     return binSettings;
   },
-  getFilterExpression (schema) {
-    let result = '(';
-    let firstExpr = true;
-    function addExpr (s) {
-      if (!firstExpr) {
-        result += ') and (';
-      }
-      firstExpr = false;
-      result += s;
+  listCategoricalFilterExpressions (attrName, filterSpec) {
+    let results = [];
+    if (filterSpec.excludeValues) {
+      results.push(attrName + ' not in ' + JSON.stringify(filterSpec.excludeValues));
     }
-
-    Object.keys(this.cache.filter.regular).forEach(attrName => {
-      let filterSpec = this.cache.filter.regular[attrName];
-      if (filterSpec.excludeValues) {
-        addExpr(attrName + ' not in ' + JSON.stringify(filterSpec.excludeValues));
-      }
-      if (filterSpec.excludeRanges) {
-        let temp = '(';
-        let firstRange = true;
-        filterSpec.excludeRanges.forEach(range => {
-          if (!firstRange) {
-            temp += ' or ';
+    return results;
+  },
+  listRangeFilterExpressions (attrName, filterSpec) {
+    let results = [];
+    if (filterSpec.excludeRanges) {
+      let temp = '(';
+      let firstRange = true;
+      filterSpec.excludeRanges.forEach(range => {
+        if (!firstRange) {
+          temp += ' or ';
+        }
+        firstRange = false;
+        temp += '(';
+        let includeLow = false;
+        if ('lowBound' in range) {
+          temp += attrName + ' >= ' + JSON.stringify(range.lowBound);
+          includeLow = true;
+        }
+        if ('highBound' in range) {
+          if (includeLow) {
+            temp += ' and ';
           }
-          firstRange = false;
-          temp += '(';
-          let includeLow = false;
-          if ('lowBound' in range) {
-            temp += attrName + ' >= ' + JSON.stringify(range.lowBound);
-            includeLow = true;
-          }
-          if ('highBound' in range) {
-            if (includeLow) {
-              temp += ' and ';
-            }
-            temp += attrName + ' < ' + JSON.stringify(range.highBound);
-          }
-          temp += ')';
-        });
+          temp += attrName + ' < ' + JSON.stringify(range.highBound);
+        }
         temp += ')';
-        addExpr(temp);
-      }
+      });
+      temp += ')';
+      results.push(temp);
+    }
+    return results;
+  },
+  listStandardFilterExpressions () {
+    let results = [];
+    Object.keys(this.cache.filter.standard).forEach(attrName => {
+      let filterSpec = this.cache.filter.standard[attrName];
+      results = results.concat(this.listCategoricalFilterExpressions(attrName, filterSpec));
+      results = results.concat(this.listRangeFilterExpressions(attrName, filterSpec));
     });
-    this.cache.filter.custom.forEach(addExpr);
-    if (result.length > 1) {
-      result += ')';
-      result = parseToAst(result);
-      result = JSON.stringify(result);
-      return result;
+
+    return results;
+  },
+  listAllFilterExpressions () {
+    let exprList = this.listStandardFilterExpressions();
+    exprList = exprList.concat(this.cache.filter.custom);
+    return exprList;
+  },
+  formatFilterExpression () {
+    let exprList = this.listAllFilterExpressions();
+
+    if (exprList.length > 0) {
+      let fullExpression = '(' + exprList.join(') and (') + ')';
+      return JSON.stringify(parseToAst(fullExpression));
     } else {
       return undefined;
     }
@@ -416,18 +425,18 @@ let Dataset = MetadataItem.extend({
     });
   },
   clearFilters: function (attrName) {
-    delete this.cache.filter.regular[attrName];
+    delete this.cache.filter.standard[attrName];
     this.cache.applyFilter();
   },
   excludeAttribute: function (attrName) {
-    this.cache.filter.regular[attrName] = {
+    this.cache.filter.standard[attrName] = {
       excludeAttribute: true
     };
     this.cache.applyFilter();
   },
   getBinStatus: function (schema, attrName, bin) {
     // Easy check (that also validates whether
-    // this.cache.filter.regular[attrName] even exists)
+    // this.cache.filter.standard[attrName] even exists)
     let filterState = this.getFilteredState(attrName);
     if (filterState === FILTER_STATES.NO_FILTERS) {
       return BIN_STATES.INCLUDED;
@@ -435,7 +444,7 @@ let Dataset = MetadataItem.extend({
       return BIN_STATES.EXCLUDED;
     }
 
-    let filterSpec = this.cache.filter.regular[attrName];
+    let filterSpec = this.cache.filter.standard[attrName];
 
     // Next easiest check: is the label excluded?
     if (filterSpec.excludeValues &&
@@ -482,8 +491,8 @@ let Dataset = MetadataItem.extend({
 
     // Temporarily init a filter object for this attribute
     // if it doesn't already exist
-    if (!this.cache.filter.regular[attrName]) {
-      this.cache.filter.regular[attrName] = {};
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
     }
 
     // like an indeterminate check box,
@@ -498,20 +507,20 @@ let Dataset = MetadataItem.extend({
       if (this.getAttributeType(schema, attrName) === 'string') {
         comparator = (a, b) => a.localeCompare(b);
       }
-      let excludeRanges = this.cache.filter.regular[attrName].excludeRanges || [];
+      let excludeRanges = this.cache.filter.standard[attrName].excludeRanges || [];
       if (exclude) {
         excludeRanges = RangeSet.rangeUnion(excludeRanges, [bin], comparator);
       } else {
         excludeRanges = RangeSet.rangeSubtract(excludeRanges, [bin], comparator);
       }
       if (excludeRanges.length === 0) {
-        delete this.cache.filter.regular[attrName].excludeRanges;
+        delete this.cache.filter.standard[attrName].excludeRanges;
       } else {
-        this.cache.filter.regular[attrName].excludeRanges = excludeRanges;
+        this.cache.filter.standard[attrName].excludeRanges = excludeRanges;
       }
     } else {
       // This is a categorical bin
-      let excludeValues = this.cache.filter.regular[attrName].excludeValues || [];
+      let excludeValues = this.cache.filter.standard[attrName].excludeValues || [];
       let valueIndex = excludeValues.indexOf(bin.label);
       if (valueIndex === -1) {
         if (exclude) {
@@ -521,35 +530,35 @@ let Dataset = MetadataItem.extend({
         }
       }
       if (excludeValues.length === 0) {
-        delete this.cache.filter.regular[attrName].excludeValues;
+        delete this.cache.filter.standard[attrName].excludeValues;
       } else {
-        this.cache.filter.regular[attrName].excludeValues = excludeValues;
+        this.cache.filter.standard[attrName].excludeValues = excludeValues;
       }
     }
 
-    if (this.cache.filter.regular[attrName].excludeAttribute) {
+    if (this.cache.filter.standard[attrName].excludeAttribute) {
       // If we just messed with a bin for this attribute, the user clearly means
       // to include the attribute in the results. We should clear the
       // excludeAttribute flag. Note that we shouldn't try to add it back;
       // filtering out all the data with this attribute still enabled is
       // perfectly valid---disabling the attribute simply means that we should
       // suppress it from the results, not filter on it.
-      delete this.cache.filter.regular[attrName].excludeAttribute;
+      delete this.cache.filter.standard[attrName].excludeAttribute;
     }
 
     // Cleanup: if we don't have excludeValues, excludeRanges, or excludeAttribute,
     // we can trash the filter object altogether
-    if (!('excludeValues' in this.cache.filter.regular[attrName]) &&
-        !('excludeRanges' in this.cache.filter.regular[attrName]) &&
-        !('excludeAttribute' in this.cache.filter.regular[attrName])) {
-      delete this.cache.filter.regular[attrName];
+    if (!('excludeValues' in this.cache.filter.standard[attrName]) &&
+        !('excludeRanges' in this.cache.filter.standard[attrName]) &&
+        !('excludeAttribute' in this.cache.filter.standard[attrName])) {
+      delete this.cache.filter.standard[attrName];
     }
 
     this.cache.applyFilter();
   },
   getFilteredState: function (attrName) {
-    if (this.cache.filter.regular[attrName]) {
-      if (this.cache.filter.regular[attrName].excludeAttribute) {
+    if (this.cache.filter.standard[attrName]) {
+      if (this.cache.filter.standard[attrName].excludeAttribute) {
         return FILTER_STATES.EXCLUDED;
       } else {
         return FILTER_STATES.FILTERED;

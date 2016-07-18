@@ -12,11 +12,11 @@
           "filter": {
             "_comment": "
               filter should always contain two objects:
-              'regular':{}, and 'custom':[]
+              'standard':{}, and 'custom':[]
             ",
-            "regular": {
+            "standard": {
               "_comment": "
-                Regular filters map attribute names to objects. Those objects
+                standard filters map attribute names to objects. Those objects
                 may optionally contain: 'excludeRanges': [], 'exludeValues': [],
                 and/or 'excludeAttribute': true
               ",
