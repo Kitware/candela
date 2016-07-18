@@ -1,0 +1,154 @@
+{
+  "width": 500,
+  "height": 200,
+  "padding": 30,
+  "data": [
+    {
+      "name": "table",
+      "values": [
+        {
+          "time": 0,
+          "survivors": 5
+        },
+        {
+          "ID": 1,
+          "time": 1,
+          "age": 5,
+          "censor": 1,
+          "survivors": 4
+        },
+        {
+          "ID": 2,
+          "time": 2,
+          "age": 6,
+          "censor": 0,
+          "survivors": 4
+        },
+        {
+          "ID": 3,
+          "time": 3,
+          "age": 8,
+          "censor": 1,
+          "survivors": 3
+        },
+        {
+          "ID": 4,
+          "time": 4,
+          "age": 3,
+          "censor": 1,
+          "survivors": 2
+        },
+        {
+          "ID": 5,
+          "time": 5,
+          "age": 22,
+          "censor": 1,
+          "survivors": 1
+        }
+      ],
+      "transform": [
+        {
+          "type": "sort",
+          "by": ["time"]
+        }
+      ]
+    },
+    {
+      "name": "censored",
+      "source": "table",
+      "transform": [
+        {
+          "type": "sort",
+          "by": ["time"]
+        },
+        {
+          "type": "filter",
+          "test": "datum.censor == 0"
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "xscale",
+      "range": "width",
+      "domain": {
+        "data": "table",
+        "field": "time"
+      }
+    },
+    {
+      "name": "yscale",
+      "range": "height",
+      "domain": {
+        "data": "table",
+        "field": "survivors"
+      }
+    }
+  ],
+  "axes": [
+    {
+      "type": "x",
+      "scale": "xscale"
+    },
+    {
+      "type": "y",
+      "scale": "yscale"
+    }
+  ],
+  "marks": [
+    {
+      "type": "line",
+      "from": {
+        "data": "table"
+      },
+      "properties": {
+        "enter": {
+          "interpolate": {"value": "step-after"},
+          "x": {
+            "scale": "xscale",
+            "field": "time"
+          },
+          "y": {
+            "scale": "yscale",
+            "field": "survivors"
+          },
+
+          "stroke": {"value": "black"},
+          "strokeWidth": {"value": 1}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {
+        "data": "censored"
+      },
+      "properties": {
+        "enter": {
+          "x": {
+            "scale": "xscale",
+            "field": "time",
+            "offset": -0.5
+          },
+          "x2": {
+            "scale": "xscale",
+            "field": "time",
+            "offset": 0.5
+          },
+          "y": {
+            "scale": "yscale",
+            "field": "survivors",
+            "offset": -3
+          },
+          "y2": {
+            "scale": "yscale",
+            "field": "survivors",
+            "offset": 3
+          },
+          "fill": {"value": "black"}
+        }
+      }
+    }
+  ]
+}
