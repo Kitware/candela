@@ -93,8 +93,22 @@ function mostExtremeValue (values, direction, comparator = defaultComparator) {
   return result;
 }
 
+function copyRangeList (list) {
+  let result = [];
+  list.forEach((range, index) => {
+    result.push({});
+    if ('lowBound' in range) {
+      result[index].lowBound = range.lowBound;
+    }
+    if ('highBound' in range) {
+      result[index].highBound = range.highBound;
+    }
+  });
+  return result;
+}
+
 function cleanRangeList (list, comparator = defaultComparator) {
-  list.sort(d => compareRanges(d, comparator));
+  list = copyRangeList(list).sort(d => compareRanges(d, comparator));
   let indicesToTrash = [];
 
   for (let i = 0; i < list.length; i += 1) {
@@ -113,16 +127,21 @@ function cleanRangeList (list, comparator = defaultComparator) {
           comparator(lastRange.highBound, range.lowBound) >= 0) {
         lastRange.highBound = mostExtremeValue(
           [lastRange.highBound, range.highBound], '>', comparator);
+        lastRange.lowBound = mostExtremeValue(
+          [lastRange.lowBound, range.lowBound], '<', comparator);
+        // remove spurious undefined values
         if (lastRange.highBound === undefined) {
-          // remove spurious undefined values
           delete lastRange.highBound;
+        }
+        if (lastRange.lowBound === undefined) {
+          delete lastRange.lowBound;
         }
         indicesToTrash.push(i);
       }
     }
   }
 
-  indicesToTrash.forEach(i => {
+  indicesToTrash.reverse().forEach(i => {
     list.splice(i, 1);
   });
 
@@ -289,6 +308,9 @@ function rangeSubtract (list1, list2, comparator = defaultComparator) {
 }
 
 export default {
+  mostExtremeValue,
+  compareRanges,
+  cleanRangeList,
   rangeUnion,
   rangeIntersection,
   rangeSubtract
