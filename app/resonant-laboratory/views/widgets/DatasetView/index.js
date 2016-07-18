@@ -2,6 +2,7 @@ import Underscore from 'underscore';
 import d3 from 'd3';
 import jQuery from 'jquery';
 import ComboScale from './comboScale.js';
+import Dataset from '../../../models/Dataset.js';
 import Widget from '../Widget';
 import Menu from '../../overlays/Menu';
 import myTemplate from './template.html';
@@ -30,6 +31,7 @@ import categorical from '../../../images/categorical.svg';
 import ordinal from '../../../images/ordinal.svg';
 import check from '../../../images/check.svg';
 import ex from '../../../images/ex.svg';
+import dash from '../../../images/dash.svg';
 
 let ICONS = {
   seekFirst,
@@ -49,7 +51,8 @@ let ICONS = {
   categorical,
   ordinal,
   check,
-  ex
+  ex,
+  dash
 };
 
 let STATUS = {
@@ -517,7 +520,7 @@ let DatasetView = Widget.extend({
     // Move the bins horizontally
     bins.attr('transform', d => {
       let binNo = scale.labelToBin(d, 'overview');
-      return 'translate(' + scale.binForward(binNo) + ',' + topPadding + ')';
+      return 'translate(' + scale.binToPosition(binNo) + ',' + topPadding + ')';
     });
 
     // Draw one bar for each bin
@@ -547,7 +550,6 @@ let DatasetView = Widget.extend({
 
     // Add an include / exclude button for each bin
     // TODO: uncomment when we support filtering
-    /*
     binsEnter.append('image')
       .attr('class', 'button')
       .attr({
@@ -557,9 +559,26 @@ let DatasetView = Widget.extend({
         height: this.layout.emSize
       });
     bins.selectAll('image.button')
-      .attr('xlink:href', ICONS.check);
+      .attr('xlink:href', d => {
+        let bin = scale.labelToBin(d, 'overview');
+        bin = datasetDetails.overviewHistogram[attrName][bin];
+        let status = datasetDetails.datasetObj.getBinStatus(
+          datasetDetails.schema, attrName, bin);
+        if (status === Dataset.BIN_STATES.INCLUDED) {
+          return ICONS.check;
+        } else if (status === Dataset.BIN_STATES.EXCLUDED) {
+          return ICONS.ex;
+        } else {
+          return ICONS.dash;
+        }
+      })
+      .on('click', d => {
+        let bin = scale.labelToBin(d, 'overview');
+        bin = datasetDetails.overviewHistogram[attrName][bin];
+        datasetDetails.datasetObj.toggleBin(
+          datasetDetails.schema, attrName, bin);
+      });
     height += 2 * this.layout.emSize;
-    */
 
     // Add each bin label
     let maxLabelHeight = 0;
@@ -626,8 +645,6 @@ let DatasetView = Widget.extend({
     // - checked: the attribute is included, with no (non-custom) filters
     // - indeterminate: the attribute is included, with filters
     // - unchecked: the attribute is excluded
-    // TODO: uncomment when we support filtering
-    /*
     sectionTitlesEnter.append('input')
       .attr('type', 'checkbox')
       .attr('class', 'filteredState');
@@ -646,8 +663,19 @@ let DatasetView = Widget.extend({
           this.checked = false;
           this.indeterminate = false;
         }
+      }).on('change', function (d) {
+        // this refers to the DOM element
+        if (this.checked === false || this.indeterminate === true) {
+          // Clear any filters on this attribute
+          datasetDetails.datasetObj.clearFilters(d);
+          // Until the update gets back, enforce the check
+          // (prevents a weird moment when the box is blank)
+          this.checked = true;
+          this.indeterminate = false;
+        } else {
+          datasetDetails.datasetObj.excludeAttribute(d);
+        }
       });
-      */
 
     // Label for the header
     sectionTitlesEnter.append('label');
