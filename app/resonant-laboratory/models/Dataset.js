@@ -65,58 +65,6 @@ class DatasetCache {
     delete this.cachedPromises.currentDataPage;
     this.model.trigger('rl:updatePage');
   }
-  get filterExpression () {
-    let result = '(';
-    let firstExpr = true;
-    function addExpr (s) {
-      if (!firstExpr) {
-        result += ') and (';
-      }
-      firstExpr = false;
-      result += s;
-    }
-
-    Object.keys(this.filter.regular).forEach(attrName => {
-      let filterSpec = this.filter.regular[attrName];
-      if (filterSpec.excludeValues) {
-        addExpr(attrName + ' not in [' + filterSpec.excludeValues.join(',') + ']');
-      }
-      if (filterSpec.excludeRanges) {
-        let temp = '(';
-        let firstRange = true;
-        filterSpec.excludeRanges.forEach(range => {
-          if (!firstRange) {
-            temp += ' or ';
-          }
-          firstRange = false;
-          temp += '(';
-          let includeLow = false;
-          if ('lowBound' in range) {
-            temp += attrName + ' >= ' + range.lowBound;
-            includeLow = true;
-          }
-          if ('highBound' in range) {
-            if (includeLow) {
-              temp += ' and ';
-            }
-            temp += attrName + ' < ' + range.highBound;
-          }
-          temp += ')';
-        });
-        temp += ')';
-        addExpr(temp);
-      }
-    });
-    this.filter.custom.forEach(addExpr);
-    if (result.length > 1) {
-      result += ')';
-      result = parseToAst(result);
-      result = JSON.stringify(result);
-      return result;
-    } else {
-      return undefined;
-    }
-  }
   get page () {
     if (!this._page) {
       this.page = {
@@ -218,7 +166,7 @@ class DatasetCache {
           type: 'POST',
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
-            filter: this.filterExpression,
+            filter: this.model.getFilterExpression(schema),
             cache: true
           }
         }, 'rl:loadedHistogram');
@@ -234,7 +182,7 @@ class DatasetCache {
           type: 'POST',
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
-            filter: this.filterExpression,
+            filter: this.model.getFilterExpression(schema),
             limit: this.page.limit,
             offset: this.page.offset
             // Don't cache the page histograms on the server
@@ -255,7 +203,7 @@ class DatasetCache {
               format: 'dict',
               offset: this.page.offset,
               limit: this.page.limit
-              // filter: this.filterExpression
+              // filter: this.model.getFilterExpression(schema)
               // TODO: For this to technically work,
               // we need to convert to the old
               // girder_db_items query format...
@@ -274,7 +222,7 @@ class DatasetCache {
                 outputType: 'json',
                 offset: this.page.offset,
                 limit: this.page.limit,
-                filter: this.filterExpression
+                filter: this.model.getFilterExpression(schema)
               })
             }
           }, 'rl:loadedData');
@@ -375,6 +323,58 @@ let Dataset = MetadataItem.extend({
       };
     });
     return binSettings;
+  },
+  getFilterExpression (schema) {
+    let result = '(';
+    let firstExpr = true;
+    function addExpr (s) {
+      if (!firstExpr) {
+        result += ') and (';
+      }
+      firstExpr = false;
+      result += s;
+    }
+
+    Object.keys(this.cache.filter.regular).forEach(attrName => {
+      let filterSpec = this.cache.filter.regular[attrName];
+      if (filterSpec.excludeValues) {
+        addExpr(attrName + ' not in ' + JSON.stringify(filterSpec.excludeValues));
+      }
+      if (filterSpec.excludeRanges) {
+        let temp = '(';
+        let firstRange = true;
+        filterSpec.excludeRanges.forEach(range => {
+          if (!firstRange) {
+            temp += ' or ';
+          }
+          firstRange = false;
+          temp += '(';
+          let includeLow = false;
+          if ('lowBound' in range) {
+            temp += attrName + ' >= ' + JSON.stringify(range.lowBound);
+            includeLow = true;
+          }
+          if ('highBound' in range) {
+            if (includeLow) {
+              temp += ' and ';
+            }
+            temp += attrName + ' < ' + JSON.stringify(range.highBound);
+          }
+          temp += ')';
+        });
+        temp += ')';
+        addExpr(temp);
+      }
+    });
+    this.cache.filter.custom.forEach(addExpr);
+    if (result.length > 1) {
+      result += ')';
+      result = parseToAst(result);
+      result = JSON.stringify(result);
+      return result;
+    } else {
+      return undefined;
+    }
   },
   getTypeSpec: function () {
     let schema = this.getMeta('schema') || {};
