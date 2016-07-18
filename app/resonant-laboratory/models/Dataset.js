@@ -1,4 +1,6 @@
 import MetadataItem from './MetadataItem';
+import { parseToAst } from '../querylang';
+import RangeSet from '../shims/rangeSet.js';
 
 let DEFAULT_INTERPRETATIONS = {
   'undefined': 'categorical',
@@ -24,6 +26,12 @@ let FILTER_STATES = {
   EXCLUDED: 2
 };
 
+let BIN_STATES = {
+  INCLUDED: 0,
+  EXCLUDED: 1,
+  PARTIAL: 2
+};
+
 class DatasetCache {
   constructor (model) {
     this.model = model;
@@ -39,17 +47,75 @@ class DatasetCache {
   }
   get filter () {
     if (!this._filter) {
-      this._filter = {};
+      this._filter = {
+        regular: {},
+        custom: []
+      };
     }
     return this._filter;
   }
   set filter (value) {
     this._filter = value;
+    this.applyFilter();
+  }
+  applyFilter () {
     // Invalidate filteredHistogram, pageHistogram, and currentDataPage
     delete this.cachedPromises.filteredHistogram;
     delete this.cachedPromises.pageHistogram;
     delete this.cachedPromises.currentDataPage;
     this.model.trigger('rl:updatePage');
+  }
+  get filterExpression () {
+    let result = '(';
+    let firstExpr = true;
+    function addExpr (s) {
+      if (!firstExpr) {
+        result += ') and (';
+      }
+      firstExpr = false;
+      result += s;
+    }
+
+    Object.keys(this.filter.regular).forEach(attrName => {
+      let filterSpec = this.filter.regular[attrName];
+      if (filterSpec.excludeValues) {
+        addExpr(attrName + ' not in [' + filterSpec.excludeValues.join(',') + ']');
+      }
+      if (filterSpec.excludeRanges) {
+        let temp = '(';
+        let firstRange = true;
+        filterSpec.excludeRanges.forEach(range => {
+          if (!firstRange) {
+            temp += ' or ';
+          }
+          firstRange = false;
+          temp += '(';
+          let includeLow = false;
+          if ('lowBound' in range) {
+            temp += attrName + ' >= ' + range.lowBound;
+            includeLow = true;
+          }
+          if ('highBound' in range) {
+            if (includeLow) {
+              temp += ' and ';
+            }
+            temp += attrName + ' < ' + range.highBound;
+          }
+          temp += ')';
+        });
+        temp += ')';
+        addExpr(temp);
+      }
+    });
+    this.filter.custom.forEach(addExpr);
+    if (result.length > 1) {
+      result += ')';
+      result = parseToAst(result);
+      result = JSON.stringify(result);
+      return result;
+    } else {
+      return undefined;
+    }
   }
   get page () {
     if (!this._page) {
@@ -152,7 +218,7 @@ class DatasetCache {
           type: 'POST',
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
-            filter: this.filter,
+            filter: this.filterExpression,
             cache: true
           }
         }, 'rl:loadedHistogram');
@@ -168,7 +234,7 @@ class DatasetCache {
           type: 'POST',
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
-            filter: this.filter,
+            filter: this.filterExpression,
             limit: this.page.limit,
             offset: this.page.offset
             // Don't cache the page histograms on the server
@@ -189,6 +255,13 @@ class DatasetCache {
               format: 'dict',
               offset: this.page.offset,
               limit: this.page.limit
+              // filter: this.filterExpression
+              // TODO: For this to technically work,
+              // we need to convert to the old
+              // girder_db_items query format...
+              // but when that changes, this whole
+              // separate call that differentiates between
+              // mongodb vs flat files will be going away
             }
           }, 'rl:loadedData').then(resp => resp.data);
         } else {
@@ -200,7 +273,8 @@ class DatasetCache {
                 fileType: this.model.getMeta('format'),
                 outputType: 'json',
                 offset: this.page.offset,
-                limit: this.page.limit
+                limit: this.page.limit,
+                filter: this.filterExpression
               })
             }
           }, 'rl:loadedData');
@@ -341,9 +415,148 @@ let Dataset = MetadataItem.extend({
       return savePromise;
     });
   },
+  clearFilters: function (attrName) {
+    delete this.cache.filter.regular[attrName];
+    this.cache.applyFilter();
+  },
+  excludeAttribute: function (attrName) {
+    this.cache.filter.regular[attrName] = {
+      excludeAttribute: true
+    };
+    this.cache.applyFilter();
+  },
+  getBinStatus: function (schema, attrName, bin) {
+    // Easy check (that also validates whether
+    // this.cache.filter.regular[attrName] even exists)
+    let filterState = this.getFilteredState(attrName);
+    if (filterState === FILTER_STATES.NO_FILTERS) {
+      return BIN_STATES.INCLUDED;
+    } else if (filterState === FILTER_STATES.EXCLUDED) {
+      return BIN_STATES.EXCLUDED;
+    }
+
+    let filterSpec = this.cache.filter.regular[attrName];
+
+    // Next easiest check: is the label excluded?
+    if (filterSpec.excludeValues &&
+      filterSpec.excludeValues.indexOf(bin.label) !== -1) {
+      return BIN_STATES.EXCLUDED;
+    }
+
+    // Trickiest check: is the range excluded (or
+    // partially excluded)?
+    if (filterSpec.excludeRanges &&
+        'lowBound' in bin && 'highBound' in bin) {
+      // Make sure to use proper string comparisons if this is a string bin
+      let comparator;
+      if (this.getAttributeType(schema, attrName) !== 'string') {
+        comparator = (a, b) => a.localeCompare(b);
+      }
+      // Intersect the bin with the excluded values
+      let includedRanges = RangeSet.rangeSubtract([{
+        lowBound: bin.lowBound,
+        highBound: bin.highBound
+      }], filterSpec.excludeRanges, comparator);
+
+      if (includedRanges.length === 1 &&
+          includedRanges[0].lowBound === bin.lowBound &&
+          includedRanges[0].highBound === bin.highBound) {
+        // Wound up with the same range we started with;
+        // the whole bin is included
+        return BIN_STATES.INCLUDED;
+      } else if (includedRanges.length > 0) {
+        // Only a piece survived; this is a partial!
+        return BIN_STATES.PARTIAL;
+      } else {
+        // Nothing survived the subtraction; this bin
+        // is excluded
+        return BIN_STATES.EXCLUDED;
+      }
+    }
+
+    // No filter info left to check; the bin must be included
+    return BIN_STATES.INCLUDED;
+  },
+  toggleBin: function (schema, attrName, bin) {
+    let binStatus = this.getBinStatus(attrName, bin);
+
+    // Temporarily init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.regular[attrName]) {
+      this.cache.filter.regular[attrName] = {};
+    }
+
+    // like an indeterminate check box,
+    // toggling a partial bin should turn it on.
+    // So treat EXCLUDED and PARTIAL the same way
+    let exclude = binStatus === BIN_STATES.INCLUDED;
+
+    if ('lowBound' in bin && 'highBound' in bin) {
+      // This is an ordinal bin
+      // Make sure to use proper string comparisons if this is a string bin
+      let comparator;
+      if (this.getAttributeType(schema, attrName) !== 'string') {
+        comparator = (a, b) => a.localeCompare(b);
+      }
+      let excludeRanges = this.cache.filter.regular[attrName].excludeRanges || [];
+      if (exclude) {
+        excludeRanges = RangeSet.rangeUnion(excludeRanges, bin, comparator);
+      } else {
+        excludeRanges = RangeSet.rangeSubtract(excludeRanges, bin, comparator);
+      }
+      if (excludeRanges.length === 0) {
+        delete this.cache.filter.regular[attrName].excludeRanges;
+      } else {
+        this.cache.filter.regular[attrName].excludeRanges = excludeRanges;
+      }
+    } else {
+      // This is a categorical bin
+      let excludeValues = this.cache.filter.regular[attrName].excludeValues || [];
+      let valueIndex = excludeValues.indexOf(bin.label);
+      if (valueIndex === -1) {
+        if (exclude) {
+          excludeValues.push(bin.label);
+        } else {
+          excludeValues.splice(valueIndex, 1);
+        }
+      }
+      if (excludeValues.length === 0) {
+        delete this.cache.filter.regular[attrName].excludeValues;
+      } else {
+        this.cache.filter.regular[attrName].excludeValues = excludeValues;
+      }
+    }
+
+    if (this.cache.filter.regular[attrName].excludeAttribute) {
+      // If we just messed with a bin for this attribute, the user clearly means
+      // to include the attribute in the results. We should clear the
+      // excludeAttribute flag. Note that we shouldn't try to add it back;
+      // filtering out all the data with this attribute still enabled is
+      // perfectly valid---disabling the attribute simply means that we should
+      // suppress it from the results, not filter on it.
+      delete this.cache.filter.regular[attrName].excludeAttribute;
+    }
+
+    // Cleanup: if we don't have excludeValues, excludeRanges, or excludeAttribute,
+    // we can trash the filter object altogether
+    if (!('excludeValues' in this.cache.filter.regular[attrName]) &&
+        !('excludeRanges' in this.cache.filter.regular[attrName]) &&
+        !('excludeAttribute' in this.cache.filter.regular[attrName])) {
+      delete this.cache.filter.regular[attrName];
+    }
+
+    this.cache.applyFilter();
+  },
   getFilteredState: function (attrName) {
-    // TODO
-    return FILTER_STATES.NO_FILTERS;
+    if (this.cache.filter.regular[attrName]) {
+      if (this.cache.filter.regular[attrName].excludeAttribute) {
+        return FILTER_STATES.EXCLUDED;
+      } else {
+        return FILTER_STATES.FILTERED;
+      }
+    } else {
+      return FILTER_STATES.NO_FILTERS;
+    }
   },
   setPage: function (offset, limit) {
     this.cache.page = {
@@ -378,4 +591,5 @@ let Dataset = MetadataItem.extend({
 
 Dataset.DEFAULT_INTERPRETATIONS = DEFAULT_INTERPRETATIONS;
 Dataset.FILTER_STATES = FILTER_STATES;
+Dataset.BIN_STATES = BIN_STATES;
 export default Dataset;
