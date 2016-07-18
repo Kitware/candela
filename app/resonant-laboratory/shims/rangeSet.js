@@ -67,15 +67,20 @@ function compareRanges (a, b, comparator = defaultComparator) {
   return comp;
 }
 
-function mostExtremeValue (values, direction, comparator = defaultComparator) {
+function mostExtremeValue (values, direction,
+  comparator = defaultComparator, excludeUnbounded = false) {
   let result = null;
   for (let i = 0; i < values.length; i += 1) {
     if (values[i] === null) {
       // ignore null
       continue;
     } else if (values[i] === undefined) {
-      // found an unbounded range; return our proxy for Infinity (undefined)
-      return undefined;
+      if (excludeUnbounded) {
+        continue;
+      } else {
+        // found an unbounded range; return our proxy for Infinity (undefined)
+        return undefined;
+      }
     } else if (result === null) {
       // first regular value encountered
       result = values[i];
@@ -220,16 +225,22 @@ function rangeUnion (list1, list2, comparator = defaultComparator) {
 
 function rangeIntersection (list1, list2, comparator = defaultComparator) {
   let result = [];
+  list1 = cleanRangeList(list1);
+  list2 = cleanRangeList(list2);
   // TODO: there's probably a more efficient way to do this...
   list1.forEach(l1 => {
     list2.forEach(l2 => {
       let newRange = {
-        lowBound: mostExtremeValue([l1.lowBound, l2.lowBound], '>', comparator),
-        highBound: mostExtremeValue([l1.highBound, l2.highBound], '<', comparator)
+        lowBound: mostExtremeValue([l1.lowBound, l2.lowBound], '>', comparator, true),
+        highBound: mostExtremeValue([l1.highBound, l2.highBound], '<', comparator, true)
       };
-      if (newRange.lowBound !== null && newRange.highBound !== null) {
-        result.push(newRange);
+      if (newRange.lowBound === null) {
+        delete newRange.lowBound;
       }
+      if (newRange.highBound === null) {
+        delete newRange.highBound;
+      }
+      result.push(newRange);
     });
   });
 
@@ -265,10 +276,11 @@ function rangeSubtract (list1, list2, comparator = defaultComparator) {
       newRanges[0].highBound = l1.highBound;
     }
 
-    // Now go through the second list to remove pieces of
-    // this range
+    // Now go through the second list that will hack
+    // up the stuff in newRanges
     list2.forEach(l2 => {
-      newRanges.forEach(newRange => {
+      let indicesToTrash = [];
+      newRanges.forEach((newRange, index) => {
         // First, a corner case: if the range to subtract is
         // entirely inside the original range, we need to
         // split the original range
@@ -287,16 +299,36 @@ function rangeSubtract (list1, list2, comparator = defaultComparator) {
           newRange.highBound = l2.lowBound;
         } else {
           // Next, the regular case: chop off the ends of newRange
-          // ranges where relevant
-          if ('highBound' in l2 && (!('lowBound' in newRange) ||
-                comparator(l2.highBound, newRange.lowBound) > 0)) {
-            newRange.lowBound = l2.highBound;
+
+          // Try to chop off newRange's low bound
+          if (compareLowBounds(l2, newRange) <= 0) {
+            // l2's lowBound is below newRange's lowBound.
+            // What's it going to do specifically?
+            if (compareHighBounds(l2, newRange) >= 0) {
+              // l2 kills off newRange entirely
+              indicesToTrash.push(index);
+            } else if (!('lowBound' in newRange) ||
+                         comparator(l2.highBound, newRange.lowBound) > 0) {
+              // l2 just chops off newRange's bottom bound
+              newRange.lowBound = l2.highBound;
+            }
           }
-          if ('lowBound' in l2 && (!('highBound' in newRange) ||
-                comparator(l2.lowBound, newRange.highBound) < 0)) {
-            newRange.highBound = l2.lowBound;
+
+          // Try to chop off newRange's high bound
+          if (compareHighBounds(l2, newRange) >= 0) {
+            // l2's highBound is above newRange's highBound,
+            // and we already know that its lowBound is above
+            // newRange's lowBound... so there's only a chance
+            // to chop:
+            if (!('highBound' in newRange) ||
+                  comparator(l2.lowBound, newRange.highBound) < 0) {
+              newRange.highBound = l2.lowBound;
+            }
           }
         }
+      });
+      indicesToTrash.reverse().forEach(i => {
+        newRanges.splice(i, 1);
       });
     });
 
