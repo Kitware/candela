@@ -449,7 +449,7 @@ let Dataset = MetadataItem.extend({
         'lowBound' in bin && 'highBound' in bin) {
       // Make sure to use proper string comparisons if this is a string bin
       let comparator;
-      if (this.getAttributeType(schema, attrName) !== 'string') {
+      if (this.getAttributeType(schema, attrName) === 'string') {
         comparator = (a, b) => a.localeCompare(b);
       }
       // Intersect the bin with the excluded values
@@ -495,14 +495,14 @@ let Dataset = MetadataItem.extend({
       // This is an ordinal bin
       // Make sure to use proper string comparisons if this is a string bin
       let comparator;
-      if (this.getAttributeType(schema, attrName) !== 'string') {
+      if (this.getAttributeType(schema, attrName) === 'string') {
         comparator = (a, b) => a.localeCompare(b);
       }
       let excludeRanges = this.cache.filter.regular[attrName].excludeRanges || [];
       if (exclude) {
-        excludeRanges = RangeSet.rangeUnion(excludeRanges, bin, comparator);
+        excludeRanges = RangeSet.rangeUnion(excludeRanges, [bin], comparator);
       } else {
-        excludeRanges = RangeSet.rangeSubtract(excludeRanges, bin, comparator);
+        excludeRanges = RangeSet.rangeSubtract(excludeRanges, [bin], comparator);
       }
       if (excludeRanges.length === 0) {
         delete this.cache.filter.regular[attrName].excludeRanges;
