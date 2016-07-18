@@ -97,12 +97,12 @@ function cleanRangeList (list, comparator = defaultComparator) {
   list.sort(d => compareRanges(d, comparator));
   let indicesToTrash = [];
 
-  for (let i = 0; i <= list.length; i += 1) {
+  for (let i = 0; i < list.length; i += 1) {
     let range = list[i];
 
     // Throw away any invalid ranges
     if ('highBound' in range && 'lowBound' in range &&
-        comparator(range.highBound, range.lowBound) >= 0) {
+        comparator(range.highBound, range.lowBound) < 0) {
       indicesToTrash.push(i);
     }
 
@@ -145,7 +145,7 @@ function rangeUnion (list1, list2, comparator = defaultComparator) {
 
   while (i1 < list1.length || i2 < list2.length) {
     let l1 = i1 < list1.length ? list1[i1] : IGNORE_RANGE;
-    let l2 = i2 < list2.length ? list1[i2] : IGNORE_RANGE;
+    let l2 = i2 < list2.length ? list2[i2] : IGNORE_RANGE;
 
     if (r >= result.length) {
       // We need to add a new range
