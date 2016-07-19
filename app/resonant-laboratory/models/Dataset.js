@@ -571,7 +571,12 @@ let Dataset = MetadataItem.extend({
     return BIN_STATES.INCLUDED;
   },
   clearFilters: function (attrName) {
-    delete this.cache.filter.standard[attrName];
+    if (attrName in this.cache.filter.standard) {
+      delete this.cache.filter.standard[attrName].excludeRanges;
+      delete this.cache.filter.standard[attrName].excludeValues;
+      delete this.cache.filter.standard[attrName].includeValues;
+    }
+
     this.cache.applyFilter();
   },
   selectRange: function (attrName, lowBound, highBound) {

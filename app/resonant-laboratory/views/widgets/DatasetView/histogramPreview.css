@@ -72,5 +72,5 @@
   fill: #999999;
 }
 .DatasetView.content #histogramPreview .attributeSection.excluded rect {
-  opacity: 0.5;
+  opacity: 0.25;
 }
