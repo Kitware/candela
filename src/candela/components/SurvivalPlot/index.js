@@ -36,18 +36,18 @@ export default class SurvivalPlot extends VegaChart(VisComponent, spec) {
   constructor (el, options) {
     super(el, options);
 
-    // Sort the events by time, and capture the total number of events.
-    options.data.sort((x, y) => x.time - y.time);
-    let surv = options.data.length;
+    // Sort the events by time.
+    options.data.sort((x, y) => x[options.time] - y[options.time]);
 
     // Append a dummy value to the start of the dataset.
     options.data = [{time: 0}, ...options.data];
+    let surv = options.data.length;
 
     // Compute the number of survivors at each event. A patient is assumed to
     // have not survived, unless the reason for the event is "right censoring"
     // (aka, censor == 1).
     options.data.forEach(d => {
-      if (d.censor !== 0) {
+      if (d[options.censor] !== 0) {
         surv--;
       }
       d.survivors = surv;

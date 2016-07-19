@@ -4,39 +4,28 @@ window.onload = () => {
   showComponent('SurvivalPlot', 'div', {
     data: [
       {
-        ID: 1,
-        time: 1,
-        age: 5,
-        censor: 1,
-        survivors: 4
-      },
-      {
-        ID: 2,
-        time: 2,
-        age: 6,
-        censor: 0,
-        survivors: 4
-      },
-      {
-        ID: 3,
-        time: 3,
-        age: 8,
-        censor: 1,
-        survivors: 3
-      },
-      {
-        ID: 4,
         time: 4,
-        age: 3,
-        censor: 1,
-        survivors: 2
+        censor: 1
       },
       {
-        ID: 5,
-        time: 5,
-        age: 22,
-        censor: 1,
-        survivors: 1
+        time: 16,
+        censor: 0
+      },
+      {
+        time: 8,
+        censor: 0
+      },
+      {
+        time: 42,
+        censor: 1
+      },
+      {
+        time: 23,
+        censor: 0
+      },
+      {
+        time: 15,
+        censor: 1
       }
     ],
     time: 'time',

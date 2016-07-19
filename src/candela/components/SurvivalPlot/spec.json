@@ -4,7 +4,9 @@
     ["width", 800],
     ["height", 500],
     ["padding", 30],
-    ["tickSize", 6]
+    ["tickSize", 6],
+    ["time", "time"],
+    ["censor", "censor"]
   ],
   {
     "width": ["@get", "width"],
@@ -17,7 +19,7 @@
         "transform": [
           {
             "type": "sort",
-            "by": ["time"]
+            "by": [["@get", "time"]]
           }
         ]
       },
@@ -27,11 +29,11 @@
         "transform": [
           {
             "type": "sort",
-            "by": ["time"]
+            "by": [["@get", "time"]]
           },
           {
             "type": "filter",
-            "test": "datum.censor == 0"
+            "test": ["@join", "", ["datum['", ["@get", "censor"], "'] == 0"]]
           }
         ]
       }
@@ -42,7 +44,7 @@
         "range": "width",
         "domain": {
           "data": "table",
-          "field": "time"
+          "field": ["@get", "time"]
         }
       },
       {
@@ -75,7 +77,7 @@
             "interpolate": {"value": "step-after"},
             "x": {
               "scale": "xscale",
-              "field": "time"
+              "field": ["@get", "time"]
             },
             "y": {
               "scale": "yscale",
@@ -96,12 +98,12 @@
           "enter": {
             "x": {
               "scale": "xscale",
-              "field": "time",
+              "field": ["@get", "time"],
               "offset": -0.5
             },
             "x2": {
               "scale": "xscale",
-              "field": "time",
+              "field": ["@get", "time"],
               "offset": 0.5
             },
             "y": {
