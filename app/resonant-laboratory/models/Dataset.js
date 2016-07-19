@@ -169,7 +169,7 @@ class DatasetCache {
           type: 'POST',
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
-            cache: true
+            cache: false
           }
         }, 'rl:loadedHistogram');
       });
@@ -185,7 +185,7 @@ class DatasetCache {
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
             filter: this.model.formatFilterExpression(),
-            cache: true
+            cache: false
           }
         }, 'rl:loadedHistogram');
       });

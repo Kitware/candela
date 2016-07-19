@@ -15,6 +15,7 @@ import itertools
 import cherrypy
 from pymongo import MongoClient
 from anonymousAccess import loadAnonymousItem
+from querylang import astToMongo, astToFunction
 from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
@@ -54,10 +55,14 @@ class DatasetItem(Resource):
 
     def mongoMapReduce(self, item, user, mapScript, reduceScript, params={}):
         collection = self.getMongoCollection(item)
+        # Convert our AST filter expression to a mongo filter
+        query = None
+        if 'filter' in params and params['filter'] is not None:
+            query = astToMongo(bson.json_util.loads(params['filter']))
         # TODO: build a mongo query from params['filter'] and params['offset']
         # and then do this:
         # mr_result = collection.inline_map_reduce(item, mapScript, reduceScript, limit=params['limit'], query=filter)
-        mr_result = collection.inline_map_reduce(mapScript, reduceScript)
+        mr_result = collection.inline_map_reduce(mapScript, reduceScript, query=query)
         # rearrange into a neater dict before sending it back
         result = {}
         for r in mr_result:
