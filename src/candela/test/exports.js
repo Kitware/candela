@@ -16,6 +16,7 @@ const componentList = [
   'ParallelCoordinates',
   'ScatterPlot',
   'ScatterPlotMatrix',
+  'SurvivalPlot',
   'UpSet'
 ];
 
