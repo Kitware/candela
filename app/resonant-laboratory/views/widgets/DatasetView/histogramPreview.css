@@ -58,9 +58,19 @@
 .DatasetView.content #histogramPreview .content.collapsed {
   display: none;
 }
-.DatasetView.content #histogramPreview .yAxis line,
-.DatasetView.content #histogramPreview .yAxis path {
+.DatasetView.content #histogramPreview .attributeSection .yAxis line,
+.DatasetView.content #histogramPreview .attributeSection .yAxis path {
   fill: none;
   stroke: black;
   stroke-width: 1px;
+}
+.DatasetView.content #histogramPreview .attributeSection.excluded .yAxis line,
+.DatasetView.content #histogramPreview .attributeSection.excluded .yAxis path {
+  stroke: #999999;
+}
+.DatasetView.content #histogramPreview .attributeSection.excluded text {
+  fill: #999999;
+}
+.DatasetView.content #histogramPreview .attributeSection.excluded rect {
+  opacity: 0.5;
 }
