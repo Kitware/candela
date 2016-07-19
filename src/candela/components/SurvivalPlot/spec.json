@@ -3,7 +3,8 @@
   [
     ["width", 800],
     ["height", 500],
-    ["padding", 30]
+    ["padding", 30],
+    ["tickSize", 6]
   ],
   {
     "width": ["@get", "width"],
@@ -106,12 +107,12 @@
             "y": {
               "scale": "yscale",
               "field": "survivors",
-              "offset": -3
+              "offset": ["@mult", ["@get", "tickSize"], -0.5]
             },
             "y2": {
               "scale": "yscale",
               "field": "survivors",
-              "offset": 3
+              "offset": ["@mult", ["@get", "tickSize"], 0.5]
             },
             "fill": {"value": "black"}
           }
