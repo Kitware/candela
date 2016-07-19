@@ -350,7 +350,14 @@ let Dataset = MetadataItem.extend({
   },
   listCategoricalFilterExpressions (attrName, filterSpec, hexify = false) {
     let results = [];
-    if (filterSpec.excludeValues) {
+    if (filterSpec.includeValues) {
+      let temp = filterSpec.includeValues;
+      if (hexify) {
+        temp = [];
+        filterSpec.includeValues.forEach(value => temp.push(this.stringToHex(value)));
+      }
+      results.push(this.stringToHex(attrName) + ' in ' + JSON.stringify(temp));
+    } else if (filterSpec.excludeValues) {
       let temp = filterSpec.excludeValues;
       if (hexify) {
         temp = [];
@@ -360,7 +367,7 @@ let Dataset = MetadataItem.extend({
     }
     return results;
   },
-  listRangeFilterExpressions (attrName, filterSpec, hexify) {
+  listRangeFilterExpressions (attrName, filterSpec, hexify = false) {
     let results = [];
     if (filterSpec.excludeRanges) {
       let temp = '(';
@@ -490,8 +497,12 @@ let Dataset = MetadataItem.extend({
 
     let filterSpec = this.cache.filter.standard[attrName];
 
-    // Next easiest check: is the label excluded?
-    if (filterSpec.excludeValues &&
+    // Next easiest check: is the label not in the
+    // include list (if there is one) / specifically excluded?
+    if (filterSpec.includeValues &&
+      filterSpec.includeValues.indexOf(bin.label) === -1) {
+      return BIN_STATES.EXCLUDED;
+    } else if (filterSpec.excludeValues &&
       filterSpec.excludeValues.indexOf(bin.label) !== -1) {
       return BIN_STATES.EXCLUDED;
     }
@@ -530,75 +541,140 @@ let Dataset = MetadataItem.extend({
     // No filter info left to check; the bin must be included
     return BIN_STATES.INCLUDED;
   },
-  toggleBin: function (schema, attrName, bin) {
-    let binStatus = this.getBinStatus(attrName, bin);
-
+  selectRange: function (attrName, lowBound, highBound) {
     // Temporarily init a filter object for this attribute
     // if it doesn't already exist
     if (!this.cache.filter.standard[attrName]) {
       this.cache.filter.standard[attrName] = {};
     }
 
-    // like an indeterminate check box,
-    // toggling a partial bin should turn it on.
-    // So treat EXCLUDED and PARTIAL the same way
-    let exclude = binStatus === BIN_STATES.INCLUDED;
+    // Include ONLY the values in the indicated range, AKA
+    // exclude everything outside it
+    this.cache.filter.standard[attrName].excludeRanges = [
+      { highBound: lowBound },
+      { lowBound: highBound }
+    ];
 
-    if ('lowBound' in bin && 'highBound' in bin) {
-      // This is an ordinal bin
-      // Make sure to use proper string comparisons if this is a string bin
-      let comparator;
-      if (this.getAttributeType(schema, attrName) === 'string') {
-        comparator = (a, b) => a.localeCompare(b);
-      }
+    this.cache.applyFilter();
+  },
+  removeRange: function (attrName, lowBound, highBound, comparator) {
+    // Temporarily init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+
+    let excludeRanges = this.cache.filter.standard[attrName].excludeRanges || [];
+    let range = {};
+    if (lowBound !== undefined) {
+      range.lowBound = lowBound;
+    }
+    if (highBound !== undefined) {
+      range.highBound = highBound;
+    }
+    excludeRanges = RangeSet.rangeUnion(excludeRanges, [range], comparator);
+    this.cache.filter.standard[attrName].excludeRanges = excludeRanges;
+
+    this.cache.applyFilter();
+  },
+  includeRange: function (attrName, lowBound, highBound, comparator) {
+    // Temporarily init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+
+    if (this.cache.filter.standard[attrName].excludeAttribute) {
+      // This is an odd state; the attribute was completely excluded from
+      // the results (in the interface, all bins will have been off).
+      // We want to clear this flag, and then *ONLY* include this
+      // range... AKA remove everything above and below it
+      delete this.cache.filter.standard[attrName].excludeAttribute;
+      this.selectRange(attrName, lowBound, highBound, comparator);
+    } else {
       let excludeRanges = this.cache.filter.standard[attrName].excludeRanges || [];
-      if (exclude) {
-        excludeRanges = RangeSet.rangeUnion(excludeRanges, [bin], comparator);
-      } else {
-        excludeRanges = RangeSet.rangeSubtract(excludeRanges, [bin], comparator);
+      let range = {};
+      if (lowBound !== undefined) {
+        range.lowBound = lowBound;
       }
+      if (highBound !== undefined) {
+        range.highBound = highBound;
+      }
+      excludeRanges = RangeSet.rangeSubtract(excludeRanges, [range], comparator);
       if (excludeRanges.length === 0) {
         delete this.cache.filter.standard[attrName].excludeRanges;
       } else {
         this.cache.filter.standard[attrName].excludeRanges = excludeRanges;
       }
+
+      this.cache.applyFilter();
+    }
+  },
+  selectValue: function (attrName, value) {
+    // TODO
+  },
+  removeValue: function (attrName, value) {
+    // Temporarily init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+
+    let excludeValues = this.cache.filter.standard[attrName].excludeValues || [];
+    let valueIndex = excludeValues.indexOf(value);
+    if (valueIndex === -1) {
+      excludeValues.push(value);
+    }
+    this.cache.filter.standard[attrName].excludeValues = excludeValues;
+
+    let includeValues = this.cache.filter.standard[attrName].includeValues || [];
+    valueIndex = includeValues.indexOf(value);
+    if (valueIndex === -1) {
+      includeValues.splice(valueIndex, 1);
+    }
+    if (includeValues.length === 0) {
+      delete this.cache.filter.standard[attrName].includeValues;
     } else {
-      // This is a categorical bin
-      let excludeValues = this.cache.filter.standard[attrName].excludeValues || [];
-      let valueIndex = excludeValues.indexOf(bin.label);
+      this.cache.filter.standard[attrName].includeValues = includeValues;
+    }
+
+    this.cache.applyFilter();
+  },
+  includeValue: function (attrName, value) {
+    // Temporarily init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+
+    if (this.cache.filter.standard[attrName].excludeAttribute) {
+      // This is an odd state; the attribute was completely excluded from
+      // the results (in the interface, all bins will have been off).
+      // We want to clear this flag, and then *ONLY* include this
+      // value... AKA remove all other categorical values
+      delete this.cache.filter.standard[attrName].excludeAttribute;
+      this.selectValue(attrName, value);
+    } else {
+      let includeValues = this.cache.filter.standard[attrName].includeValues || [];
+      let valueIndex = includeValues.indexOf(value);
       if (valueIndex === -1) {
-        if (exclude) {
-          excludeValues.push(bin.label);
-        } else {
-          excludeValues.splice(valueIndex, 1);
-        }
+        includeValues.push(value);
+      }
+      this.cache.filter.standard[attrName].includeValues = includeValues;
+
+      let excludeValues = this.cache.filter.standard[attrName].excludeValues || [];
+      valueIndex = excludeValues.indexOf(value);
+      if (valueIndex === -1) {
+        excludeValues.splice(valueIndex, 1);
       }
       if (excludeValues.length === 0) {
         delete this.cache.filter.standard[attrName].excludeValues;
       } else {
         this.cache.filter.standard[attrName].excludeValues = excludeValues;
       }
-    }
 
-    if (this.cache.filter.standard[attrName].excludeAttribute) {
-      // If we just messed with a bin for this attribute, the user clearly means
-      // to include the attribute in the results. We should clear the
-      // excludeAttribute flag. Note that we shouldn't try to add it back;
-      // filtering out all the data with this attribute still enabled is
-      // perfectly valid---disabling the attribute simply means that we should
-      // suppress it from the results, not filter on it.
-      delete this.cache.filter.standard[attrName].excludeAttribute;
+      this.cache.applyFilter();
     }
-
-    // Cleanup: if we don't have excludeValues, excludeRanges, or excludeAttribute,
-    // we can trash the filter object altogether
-    if (!('excludeValues' in this.cache.filter.standard[attrName]) &&
-        !('excludeRanges' in this.cache.filter.standard[attrName]) &&
-        !('excludeAttribute' in this.cache.filter.standard[attrName])) {
-      delete this.cache.filter.standard[attrName];
-    }
-
-    this.cache.applyFilter();
   },
   getFilteredState: function (attrName) {
     if (this.cache.filter.standard[attrName]) {

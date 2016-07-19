@@ -18,7 +18,7 @@
               "_comment": "
                 standard filters map attribute names to objects. Those objects
                 may optionally contain: 'excludeRanges': [], 'exludeValues': [],
-                and/or 'excludeAttribute': true
+                'includeValues': [], and/or 'excludeAttribute': true
               ",
               "age": {
                 "excludeRanges" : [
@@ -35,7 +35,7 @@
                 ]
               },
               "name": {
-                "excludeValues" : [
+                "includeValues" : [
                   "Ron Swanson"
                 ]
               },
