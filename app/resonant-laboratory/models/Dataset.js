@@ -610,8 +610,18 @@ let Dataset = MetadataItem.extend({
       this.cache.applyFilter();
     }
   },
-  selectValue: function (attrName, value) {
-    // TODO
+  selectValues: function (attrName, values) {
+    // Temporarily init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+
+    // Select ONLY the given values
+    this.cache.filter.standard[attrName].includeValues = values;
+    delete this.cache.filter.standard[attrName].excludeValues;
+
+    this.cache.applyFilter();
   },
   removeValue: function (attrName, value) {
     // Temporarily init a filter object for this attribute
@@ -653,7 +663,7 @@ let Dataset = MetadataItem.extend({
       // We want to clear this flag, and then *ONLY* include this
       // value... AKA remove all other categorical values
       delete this.cache.filter.standard[attrName].excludeAttribute;
-      this.selectValue(attrName, value);
+      this.selectValues(attrName, [value]);
     } else {
       let includeValues = this.cache.filter.standard[attrName].includeValues || [];
       let valueIndex = includeValues.indexOf(value);
