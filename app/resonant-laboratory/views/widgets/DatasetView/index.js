@@ -509,6 +509,16 @@ let DatasetView = Widget.extend({
       .attr('transform', 'translate(' + scale.leftAxisPadding + ',0)')
       .call(yAxis);
 
+    // Move the special buttons into place and attach their events
+    svg.select('.selectAllBins')
+      .attr('transform', 'translate(' +
+        (scale.leftAxisPadding - 0.5 * this.layout.emSize) + ',' +
+        (height + this.layout.emSize) + ')');
+    svg.select('.selectAll')
+      .on('click', () => {
+        datasetDetails.datasetObj.clearFilters(attrName);
+      });
+
     // Draw the bin groups
     let labels = datasetDetails.overviewHistogram[attrName].map(d => d.label);
     let bins = svg.select('.bins').selectAll('.bin')
@@ -604,8 +614,9 @@ let DatasetView = Widget.extend({
       });
     height += 2 * this.layout.emSize;
 
-    // Add each bin label
-    let maxLabelHeight = 0;
+    // Add each bin label, and compute the total needed height
+    let maxLabelHeight = svg.select('.selectAllBins').select('text')
+      .node().getComputedTextLength();
     binsEnter.append('text');
     bins.selectAll('text')
       .text(d => d)
