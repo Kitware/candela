@@ -559,24 +559,49 @@ let DatasetView = Widget.extend({
         height: this.layout.emSize
       });
     bins.selectAll('image.button')
-      .attr('xlink:href', d => {
+      .each(function (d) {
+        // this refers to the DOM element
         let bin = scale.labelToBin(d, 'overview');
         bin = datasetDetails.overviewHistogram[attrName][bin];
         let status = datasetDetails.datasetObj.getBinStatus(
           datasetDetails.schema, attrName, bin);
-        if (status === Dataset.BIN_STATES.INCLUDED) {
-          return ICONS.check;
-        } else if (status === Dataset.BIN_STATES.EXCLUDED) {
-          return ICONS.ex;
-        } else {
-          return ICONS.dash;
+
+        // To add / remove ranges, we need to provide the proper
+        // comparison function
+        let comparator;
+        if (datasetDetails.datasetObj.getAttributeType(
+            datasetDetails.schema, attrName) === 'string') {
+          comparator = (a, b) => a.localeCompare(b);
         }
-      })
-      .on('click', d => {
-        let bin = scale.labelToBin(d, 'overview');
-        bin = datasetDetails.overviewHistogram[attrName][bin];
-        datasetDetails.datasetObj.toggleBin(
-          datasetDetails.schema, attrName, bin);
+
+        d3.select(this)
+          .attr('xlink:href', () => {
+            if (status === Dataset.BIN_STATES.INCLUDED) {
+              return ICONS.check;
+            } else if (status === Dataset.BIN_STATES.EXCLUDED) {
+              return ICONS.ex;
+            } else {
+              return ICONS.dash;
+            }
+          }).on('click', d => {
+            if (status === Dataset.BIN_STATES.INCLUDED) {
+              // Remove this bin
+              if ('lowBound' in bin && 'highBound' in bin) {
+                datasetDetails.datasetObj.removeRange(
+                  attrName, bin.lowBound, bin.highBound, comparator);
+              } else {
+                datasetDetails.datasetObj.removeValue(attrName, bin.label);
+              }
+            } else {
+              // Add this bin
+              if ('lowBound' in bin && 'highBound' in bin) {
+                datasetDetails.datasetObj.includeRange(
+                  attrName, bin.lowBound, bin.highBound, comparator);
+              } else {
+                datasetDetails.datasetObj.includeValue(attrName, bin.label);
+              }
+            }
+          });
       });
     height += 2 * this.layout.emSize;
 
@@ -657,7 +682,7 @@ let DatasetView = Widget.extend({
           this.checked = true;
           this.indeterminate = false;
         } else if (filteredState === Dataset.FILTER_STATES.FILTERED) {
-          this.checked = true;
+          this.checked = false;
           this.indeterminate = true;
         } else {  // filteredState === Dataset.FILTER_STATES.EXCLUDED
           this.checked = false;
@@ -665,13 +690,9 @@ let DatasetView = Widget.extend({
         }
       }).on('change', function (d) {
         // this refers to the DOM element
-        if (this.checked === false || this.indeterminate === true) {
+        if (this.checked === true || this.indeterminate === true) {
           // Clear any filters on this attribute
           datasetDetails.datasetObj.clearFilters(d);
-          // Until the update gets back, enforce the check
-          // (prevents a weird moment when the box is blank)
-          this.checked = true;
-          this.indeterminate = false;
         } else {
           datasetDetails.datasetObj.excludeAttribute(d);
         }
