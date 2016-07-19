@@ -324,18 +324,50 @@ let Dataset = MetadataItem.extend({
     });
     return binSettings;
   },
-  listCategoricalFilterExpressions (attrName, filterSpec) {
+  stringToHex (value) {
+    let result = '';
+    for (let i = 0; i < value.length; i += 1) {
+      result += '%' + value.charCodeAt(i).toString(16);
+    }
+    return result;
+  },
+  dehexify (obj) {
+    let dataType = typeof obj;
+    if (dataType === 'object') {
+      if (obj instanceof Array) {
+        obj.forEach((d, i) => {
+          obj[i] = this.dehexify(d);
+        });
+      } else {
+        Object.keys(obj).forEach(k => {
+          obj[k] = this.dehexify(obj[k]);
+        });
+      }
+    } else if (dataType === 'string') {
+      obj = decodeURIComponent(obj);
+    }
+    return obj;
+  },
+  listCategoricalFilterExpressions (attrName, filterSpec, hexify = false) {
     let results = [];
     if (filterSpec.excludeValues) {
-      results.push(attrName + ' not in ' + JSON.stringify(filterSpec.excludeValues));
+      let temp = filterSpec.excludeValues;
+      if (hexify) {
+        temp = [];
+        filterSpec.excludeValues.forEach(value => temp.push(this.stringToHex(value)));
+      }
+      results.push(this.stringToHex(attrName) + ' not in ' + JSON.stringify(temp));
     }
     return results;
   },
-  listRangeFilterExpressions (attrName, filterSpec) {
+  listRangeFilterExpressions (attrName, filterSpec, hexify) {
     let results = [];
     if (filterSpec.excludeRanges) {
       let temp = '(';
       let firstRange = true;
+      if (hexify) {
+        attrName = this.stringToHex(attrName);
+      }
       filterSpec.excludeRanges.forEach(range => {
         if (!firstRange) {
           temp += ' or ';
@@ -344,14 +376,24 @@ let Dataset = MetadataItem.extend({
         temp += '(';
         let includeLow = false;
         if ('lowBound' in range) {
-          temp += attrName + ' >= ' + JSON.stringify(range.lowBound);
+          let lowBound = range.lowBound;
+          let dataType = typeof lowBound;
+          if (hexify && (dataType === 'string' || dataType === 'object')) {
+            lowBound = '"' + this.stringToHex(String(lowBound)) + '"';
+          }
+          temp += attrName + ' >= ' + lowBound;
           includeLow = true;
         }
         if ('highBound' in range) {
           if (includeLow) {
             temp += ' and ';
           }
-          temp += attrName + ' < ' + JSON.stringify(range.highBound);
+          let highBound = range.highBound;
+          let dataType = typeof highBound;
+          if (hexify && (dataType === 'string' || dataType === 'object')) {
+            highBound = '"' + this.stringToHex(String(highBound)) + '"';
+          }
+          temp += attrName + ' < ' + highBound;
         }
         temp += ')';
       });
@@ -360,27 +402,29 @@ let Dataset = MetadataItem.extend({
     }
     return results;
   },
-  listStandardFilterExpressions () {
+  listStandardFilterExpressions (hexify = false) {
     let results = [];
     Object.keys(this.cache.filter.standard).forEach(attrName => {
       let filterSpec = this.cache.filter.standard[attrName];
-      results = results.concat(this.listCategoricalFilterExpressions(attrName, filterSpec));
-      results = results.concat(this.listRangeFilterExpressions(attrName, filterSpec));
+      results = results.concat(this.listCategoricalFilterExpressions(attrName, filterSpec, hexify));
+      results = results.concat(this.listRangeFilterExpressions(attrName, filterSpec, hexify));
     });
 
     return results;
   },
-  listAllFilterExpressions () {
-    let exprList = this.listStandardFilterExpressions();
+  listAllFilterExpressions (hexify = false) {
+    let exprList = this.listStandardFilterExpressions(hexify);
     exprList = exprList.concat(this.cache.filter.custom);
     return exprList;
   },
   formatFilterExpression () {
-    let exprList = this.listAllFilterExpressions();
+    let exprList = this.listAllFilterExpressions(true);
 
     if (exprList.length > 0) {
       let fullExpression = '(' + exprList.join(') and (') + ')';
-      return JSON.stringify(parseToAst(fullExpression));
+      let ast = parseToAst(fullExpression);
+      this.dehexify(ast);
+      return JSON.stringify(ast);
     } else {
       return undefined;
     }
