@@ -59,6 +59,24 @@ class DatasetCache {
     this.applyFilter();
   }
   applyFilter () {
+    // Clean up the filter specification
+    let standardKeys = Object.keys(this.filter.standard);
+    standardKeys.forEach(k => {
+      let removeFilterSpec = !('excludeAttribute' in this.filter.standard[k]);
+      ['excludeRanges', 'includeValues', 'excludeValues'].forEach(d => {
+        if (d in this.filter.standard[k]) {
+          if (this.filter.standard[k][d].length === 0) {
+            delete this.filter.standard[k][d];
+          } else {
+            removeFilterSpec = false;
+          }
+        }
+      });
+      if (removeFilterSpec) {
+        delete this.filter.standard[k];
+      }
+    });
+
     // Invalidate filteredHistogram, pageHistogram, and currentDataPage
     delete this.cachedPromises.filteredHistogram;
     delete this.cachedPromises.pageHistogram;
@@ -349,23 +367,24 @@ let Dataset = MetadataItem.extend({
     return obj;
   },
   listCategoricalFilterExpressions (attrName, filterSpec, hexify = false) {
-    let results = [];
-    if (filterSpec.includeValues) {
-      let temp = filterSpec.includeValues;
-      if (hexify) {
-        temp = [];
-        filterSpec.includeValues.forEach(value => temp.push(this.stringToHex(value)));
-      }
-      results.push(this.stringToHex(attrName) + ' in ' + JSON.stringify(temp));
-    } else if (filterSpec.excludeValues) {
-      let temp = filterSpec.excludeValues;
-      if (hexify) {
-        temp = [];
-        filterSpec.excludeValues.forEach(value => temp.push(this.stringToHex(value)));
-      }
-      results.push(this.stringToHex(attrName) + ' not in ' + JSON.stringify(temp));
+    let values;
+    let operation;
+    if ('includeValues' in filterSpec) {
+      values = filterSpec.includeValues;
+      operation = ' in ';
+    } else if ('excludeValues' in filterSpec) {
+      values = filterSpec.excludeValues;
+      operation = ' not in ';
+    } else {
+      return [];
     }
-    return results;
+    if (hexify) {
+      attrName = this.stringToHex(attrName);
+      let temp = values;
+      values = [];
+      temp.forEach(value => values.push(this.stringToHex(value)));
+    }
+    return [attrName + operation + JSON.stringify(values)];
   },
   listRangeFilterExpressions (attrName, filterSpec, hexify = false) {
     let results = [];
@@ -385,8 +404,11 @@ let Dataset = MetadataItem.extend({
         if ('lowBound' in range) {
           let lowBound = range.lowBound;
           let dataType = typeof lowBound;
-          if (hexify && (dataType === 'string' || dataType === 'object')) {
-            lowBound = '"' + this.stringToHex(String(lowBound)) + '"';
+          if (dataType === 'string' || dataType === 'object') {
+            if (hexify) {
+              lowBound = this.stringToHex(String(lowBound));
+            }
+            lowBound = '"' + lowBound + '"';
           }
           temp += attrName + ' >= ' + lowBound;
           includeLow = true;
@@ -397,8 +419,11 @@ let Dataset = MetadataItem.extend({
           }
           let highBound = range.highBound;
           let dataType = typeof highBound;
-          if (hexify && (dataType === 'string' || dataType === 'object')) {
-            highBound = '"' + this.stringToHex(String(highBound)) + '"';
+          if (dataType === 'string' || dataType === 'object') {
+            if (hexify) {
+              highBound = this.stringToHex(String(highBound));
+            }
+            highBound = '"' + highBound + '"';
           }
           temp += attrName + ' < ' + highBound;
         }
@@ -475,14 +500,19 @@ let Dataset = MetadataItem.extend({
       return savePromise;
     });
   },
-  clearFilters: function (attrName) {
-    delete this.cache.filter.standard[attrName];
+  excludeAttribute: function (attrName) {
+    // Init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+    this.cache.filter.standard[attrName].excludeAttribute = true;
     this.cache.applyFilter();
   },
-  excludeAttribute: function (attrName) {
-    this.cache.filter.standard[attrName] = {
-      excludeAttribute: true
-    };
+  includeAttribute: function (attrName) {
+    if (attrName in this.cache.filter.standard) {
+      delete this.cache.filter.standard[attrName].excludeAttribute;
+    }
     this.cache.applyFilter();
   },
   getBinStatus: function (schema, attrName, bin) {
@@ -491,14 +521,13 @@ let Dataset = MetadataItem.extend({
     let filterState = this.getFilteredState(attrName);
     if (filterState === FILTER_STATES.NO_FILTERS) {
       return BIN_STATES.INCLUDED;
-    } else if (filterState === FILTER_STATES.EXCLUDED) {
-      return BIN_STATES.EXCLUDED;
     }
 
     let filterSpec = this.cache.filter.standard[attrName];
 
     // Next easiest check: is the label not in the
-    // include list (if there is one) / specifically excluded?
+    // include list (if there is one) / in the list
+    // that is specifically excluded?
     if (filterSpec.includeValues &&
       filterSpec.includeValues.indexOf(bin.label) === -1) {
       return BIN_STATES.EXCLUDED;
@@ -540,6 +569,10 @@ let Dataset = MetadataItem.extend({
 
     // No filter info left to check; the bin must be included
     return BIN_STATES.INCLUDED;
+  },
+  clearFilters: function (attrName) {
+    delete this.cache.filter.standard[attrName];
+    this.cache.applyFilter();
   },
   selectRange: function (attrName, lowBound, highBound) {
     // Temporarily init a filter object for this attribute
@@ -584,31 +617,18 @@ let Dataset = MetadataItem.extend({
       this.cache.filter.standard[attrName] = {};
     }
 
-    if (this.cache.filter.standard[attrName].excludeAttribute) {
-      // This is an odd state; the attribute was completely excluded from
-      // the results (in the interface, all bins will have been off).
-      // We want to clear this flag, and then *ONLY* include this
-      // range... AKA remove everything above and below it
-      delete this.cache.filter.standard[attrName].excludeAttribute;
-      this.selectRange(attrName, lowBound, highBound, comparator);
-    } else {
-      let excludeRanges = this.cache.filter.standard[attrName].excludeRanges || [];
-      let range = {};
-      if (lowBound !== undefined) {
-        range.lowBound = lowBound;
-      }
-      if (highBound !== undefined) {
-        range.highBound = highBound;
-      }
-      excludeRanges = RangeSet.rangeSubtract(excludeRanges, [range], comparator);
-      if (excludeRanges.length === 0) {
-        delete this.cache.filter.standard[attrName].excludeRanges;
-      } else {
-        this.cache.filter.standard[attrName].excludeRanges = excludeRanges;
-      }
-
-      this.cache.applyFilter();
+    let excludeRanges = this.cache.filter.standard[attrName].excludeRanges || [];
+    let range = {};
+    if (lowBound !== undefined) {
+      range.lowBound = lowBound;
     }
+    if (highBound !== undefined) {
+      range.highBound = highBound;
+    }
+    excludeRanges = RangeSet.rangeSubtract(excludeRanges, [range], comparator);
+    this.cache.filter.standard[attrName].excludeRanges = excludeRanges;
+
+    this.cache.applyFilter();
   },
   selectValues: function (attrName, values) {
     // Temporarily init a filter object for this attribute
@@ -636,17 +656,7 @@ let Dataset = MetadataItem.extend({
       excludeValues.push(value);
     }
     this.cache.filter.standard[attrName].excludeValues = excludeValues;
-
-    let includeValues = this.cache.filter.standard[attrName].includeValues || [];
-    valueIndex = includeValues.indexOf(value);
-    if (valueIndex === -1) {
-      includeValues.splice(valueIndex, 1);
-    }
-    if (includeValues.length === 0) {
-      delete this.cache.filter.standard[attrName].includeValues;
-    } else {
-      this.cache.filter.standard[attrName].includeValues = includeValues;
-    }
+    delete this.cache.filter.standard[attrName].includeValues;
 
     this.cache.applyFilter();
   },
@@ -657,34 +667,15 @@ let Dataset = MetadataItem.extend({
       this.cache.filter.standard[attrName] = {};
     }
 
-    if (this.cache.filter.standard[attrName].excludeAttribute) {
-      // This is an odd state; the attribute was completely excluded from
-      // the results (in the interface, all bins will have been off).
-      // We want to clear this flag, and then *ONLY* include this
-      // value... AKA remove all other categorical values
-      delete this.cache.filter.standard[attrName].excludeAttribute;
-      this.selectValues(attrName, [value]);
-    } else {
-      let includeValues = this.cache.filter.standard[attrName].includeValues || [];
-      let valueIndex = includeValues.indexOf(value);
-      if (valueIndex === -1) {
-        includeValues.push(value);
-      }
-      this.cache.filter.standard[attrName].includeValues = includeValues;
-
-      let excludeValues = this.cache.filter.standard[attrName].excludeValues || [];
-      valueIndex = excludeValues.indexOf(value);
-      if (valueIndex === -1) {
-        excludeValues.splice(valueIndex, 1);
-      }
-      if (excludeValues.length === 0) {
-        delete this.cache.filter.standard[attrName].excludeValues;
-      } else {
-        this.cache.filter.standard[attrName].excludeValues = excludeValues;
-      }
-
-      this.cache.applyFilter();
+    let excludeValues = this.cache.filter.standard[attrName].excludeValues || [];
+    let valueIndex = excludeValues.indexOf(value);
+    if (valueIndex !== -1) {
+      excludeValues.splice(valueIndex, 1);
     }
+    this.cache.filter.standard[attrName].excludeValues = excludeValues;
+    delete this.cache.filter.standard[attrName].includeValues;
+
+    this.cache.applyFilter();
   },
   getFilteredState: function (attrName) {
     if (this.cache.filter.standard[attrName]) {

@@ -549,7 +549,6 @@ let DatasetView = Widget.extend({
       });
 
     // Add an include / exclude button for each bin
-    // TODO: uncomment when we support filtering
     binsEnter.append('image')
       .attr('class', 'button')
       .attr({
@@ -566,8 +565,8 @@ let DatasetView = Widget.extend({
         let status = datasetDetails.datasetObj.getBinStatus(
           datasetDetails.schema, attrName, bin);
 
-        // To add / remove ranges, we need to provide the proper
-        // comparison function
+        // To add / remove ranges, we might need to provide a comparison
+        // function (undefined will just do default comparisons)
         let comparator;
         if (datasetDetails.datasetObj.getAttributeType(
             datasetDetails.schema, attrName) === 'string') {
@@ -636,9 +635,16 @@ let DatasetView = Widget.extend({
 
     let attributeSections = container.selectAll('.attributeSection')
       .data(attributeOrder, d => d);
-    let attributeSectionsEnter = attributeSections.enter().append('div')
-      .attr('class', 'attributeSection');
+    let attributeSectionsEnter = attributeSections.enter().append('div');
     attributeSections.exit().remove();
+    attributeSections.attr('class', d => {
+      let filteredState = datasetDetails.datasetObj.getFilteredState(d);
+      if (filteredState === Dataset.FILTER_STATES.EXCLUDED) {
+        return 'excluded attributeSection';
+      } else {
+        return 'attributeSection';
+      }
+    });
 
     // Add a container for the stuff in the header (the stuff
     // that is shown while collapsed)
@@ -666,10 +672,7 @@ let DatasetView = Widget.extend({
         }
       });
 
-    // Checkbox that indicates:
-    // - checked: the attribute is included, with no (non-custom) filters
-    // - indeterminate: the attribute is included, with filters
-    // - unchecked: the attribute is excluded
+    // Checkbox that indicates whether to include the attribute in the output
     sectionTitlesEnter.append('input')
       .attr('type', 'checkbox')
       .attr('class', 'filteredState');
@@ -678,21 +681,11 @@ let DatasetView = Widget.extend({
       .each(function (d) {
         // this refers to the DOM element
         let filteredState = datasetDetails.datasetObj.getFilteredState(d);
-        if (filteredState === Dataset.FILTER_STATES.NO_FILTERS) {
-          this.checked = true;
-          this.indeterminate = false;
-        } else if (filteredState === Dataset.FILTER_STATES.FILTERED) {
-          this.checked = false;
-          this.indeterminate = true;
-        } else {  // filteredState === Dataset.FILTER_STATES.EXCLUDED
-          this.checked = false;
-          this.indeterminate = false;
-        }
+        this.checked = filteredState !== Dataset.FILTER_STATES.EXCLUDED;
       }).on('change', function (d) {
         // this refers to the DOM element
-        if (this.checked === true || this.indeterminate === true) {
-          // Clear any filters on this attribute
-          datasetDetails.datasetObj.clearFilters(d);
+        if (this.checked) {
+          datasetDetails.datasetObj.includeAttribute(d);
         } else {
           datasetDetails.datasetObj.excludeAttribute(d);
         }
