@@ -480,6 +480,7 @@ let Dataset = MetadataItem.extend({
         schema[attrName].coerceToType = dataType;
       }
       this.setMeta('schema', schema);
+      this.clearFilters(attrName);
       let savePromise = this.save();
       this.cache.cachedPromises = {};
       this.trigger('rl:updatedSchema');
@@ -494,6 +495,7 @@ let Dataset = MetadataItem.extend({
         schema[attrName].interpretation = interpretation;
       }
       this.setMeta('schema', schema);
+      this.clearFilters(attrName);
       let savePromise = this.save();
       this.cache.cachedPromises = {};
       this.trigger('rl:updatedSchema');

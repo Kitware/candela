@@ -66,55 +66,55 @@ let STATUS = {
 let TYPE_MENU_ITEMS = [
   {
     text: 'Autodetect',
-    dataType: null
+    value: null
   },
   null,
   {
     icon: ICONS.boolean,
     text: 'Boolean',
-    dataType: 'boolean'
+    value: 'boolean'
   },
   {
     icon: ICONS.integer,
     text: 'Integer',
-    dataType: 'integer'
+    value: 'integer'
   },
   {
     icon: ICONS.number,
     text: 'Number',
-    dataType: 'number'
+    value: 'number'
   },
   {
     icon: ICONS.date,
     text: 'Date',
-    dataType: 'date'
+    value: 'date'
   },
   {
     icon: ICONS.string,
     text: 'String',
-    dataType: 'string'
+    value: 'string'
   },
   {
     icon: ICONS.object,
     text: 'Object (no type coercion)',
-    dataType: 'object'
+    value: 'object'
   }
 ];
 let INTERPRETATION_MENU_ITEMS = [
   {
     text: 'Autodetect',
-    interpretation: null
+    value: null
   },
   null,
   {
     icon: ICONS.categorical,
     text: 'Categorical',
-    interpretation: 'categorical'
+    value: 'categorical'
   },
   {
     icon: ICONS.ordinal,
     text: 'Ordinal',
-    interpretation: 'ordinal'
+    value: 'ordinal'
   }
 ];
 
@@ -419,6 +419,45 @@ let DatasetView = Widget.extend({
         height: height
       });
   },
+  attachMenuToButton: function (element, attrName, datasetDetails,
+    items, auto, current, isAuto, successFunc) {
+    d3.select(element).on('click', () => {
+      // Construct the menu
+      items[0].icon = ICONS[auto];
+      items.forEach(menuItem => {
+        if (menuItem !== null) {
+          menuItem.checked = (menuItem.value === null && isAuto) ||
+            (menuItem.value === current && !isAuto);
+          menuItem.onclick = () => {
+            if (menuItem.value === current) {
+              // No change was made; just close the menu
+              window.mainPage.overlay.render(null);
+              return;
+            }
+            let filteredState = datasetDetails.datasetObj.getFilteredState(attrName);
+            if (filteredState === Dataset.FILTER_STATES.NO_FILTERS) {
+              // Go ahead and set the attribute right away
+              successFunc(attrName, menuItem.value);
+              window.mainPage.overlay.render(null);
+            } else {
+              // Confirm that the user wants to clear filters first
+              let promiseObj = window.mainPage.overlay.confirmDialog(
+                'This will clear the filters on ' + attrName +
+                '. Are you sure you want to proceed?');
+              promiseObj.then(() => {
+                // The user clicked OK
+                successFunc(menuItem.value);
+              }, () => {}); // Do nothing if the user clicks cancel
+            }
+          };
+        }
+      });
+      window.mainPage.overlay.render(new Menu({
+        targetElement: element,
+        items: items
+      }));
+    });
+  },
   setupDataTypeMenu: function (element, attrName, datasetDetails) {
     let autoAttrType = datasetDetails.datasetObj
       .autoDetectAttributeType(datasetDetails.schema, attrName);
@@ -431,24 +470,11 @@ let DatasetView = Widget.extend({
       .style({
         '-webkit-filter': filterStyle,
         'filter': filterStyle
-      }).on('click', () => {
-        // Construct the type menu
-        TYPE_MENU_ITEMS[0].icon = ICONS[autoAttrType];
-        TYPE_MENU_ITEMS.forEach(menuItem => {
-          if (menuItem !== null) {
-            menuItem.checked = (menuItem.dataType === null && isAuto) ||
-              (menuItem.dataType === attrType && !isAuto);
-            menuItem.onclick = () => {
-              datasetDetails.datasetObj
-                .setAttributeType(attrName, menuItem.dataType);
-              window.mainPage.overlay.render(null);
-            };
-          }
-        });
-        window.mainPage.overlay.render(new Menu({
-          targetElement: element,
-          items: TYPE_MENU_ITEMS
-        }));
+      });
+    this.attachMenuToButton(element, attrName, datasetDetails,
+      TYPE_MENU_ITEMS, autoAttrType, attrType, isAuto,
+      (newDataType) => {
+        datasetDetails.datasetObj.setAttributeType(attrName, newDataType);
       });
   },
   setupInterpretationMenu: function (element, attrName, datasetDetails) {
@@ -463,24 +489,11 @@ let DatasetView = Widget.extend({
       .style({
         '-webkit-filter': filterStyle,
         'filter': filterStyle
-      }).on('click', () => {
-        // Construct the type menu
-        INTERPRETATION_MENU_ITEMS[0].icon = ICONS[autoInterpretation];
-        INTERPRETATION_MENU_ITEMS.forEach(menuItem => {
-          if (menuItem !== null) {
-            menuItem.checked = (menuItem.interpretation === null && isAuto) ||
-              (menuItem.interpretation === interpretation && !isAuto);
-            menuItem.onclick = () => {
-              datasetDetails.datasetObj
-                .setAttributeInterpretation(attrName, menuItem.interpretation);
-              window.mainPage.overlay.render(null);
-            };
-          }
-        });
-        window.mainPage.overlay.render(new Menu({
-          targetElement: element,
-          items: INTERPRETATION_MENU_ITEMS
-        }));
+      });
+    this.attachMenuToButton(element, attrName, datasetDetails,
+      INTERPRETATION_MENU_ITEMS, autoInterpretation, interpretation, isAuto,
+      (newInterpretation) => {
+        datasetDetails.datasetObj.setAttributeInterpretation(attrName, newInterpretation);
       });
   },
   renderIndividualHistogram: function (element, attrName, datasetDetails) {

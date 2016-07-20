@@ -22,6 +22,9 @@ import userErrorTemplate from './userErrorTemplate.html';
 import successTemplate from './successTemplate.html';
 import loadingTemplate from './loadingTemplate.html';
 
+import alertTemplate from './alertTemplate.html';
+import confirmTemplate from './confirmTemplate.html';
+
 let VIEWS = {
   HamburgerMenu,
   LoginView,
@@ -132,6 +135,32 @@ let Overlay = Backbone.View.extend({
   renderSuccessScreen: function (message) {
     this.render(this.getScreen(successTemplate, message));
   },
+  alertDialog: function (message) {
+    this.render(this.getScreen(alertTemplate, message), false, () => {
+      this.$el.find('#okButton').on('click', this.closeOverlay);
+    });
+  },
+  confirmDialog: function (message) {
+    let forceResolve, forceReject;
+
+    let waiter = new Promise((resolve, reject) => {
+      forceResolve = resolve;
+      forceReject = reject;
+    });
+
+    this.render(this.getScreen(confirmTemplate, message), false, () => {
+      this.$el.find('#okButton').on('click', () => {
+        this.closeOverlay();
+        forceResolve();
+      });
+      this.$el.find('#cancelButton').on('click', () => {
+        this.closeOverlay();
+        forceReject();
+      });
+    });
+
+    return waiter;
+  },
   closeOverlay: function () {
     // If we don't have a project, jump straight to the
     // opening overlay (don't actually close)
@@ -177,7 +206,7 @@ let Overlay = Backbone.View.extend({
     this.$el.off('click.closeOverlay');
     jQuery(window).off('keyup.closeOverlay');
   },
-  render: Underscore.debounce(function (template, nofade) {
+  render: Underscore.debounce(function (template, nofade, callback) {
     // Don't fade if we're just switching between overlays
     nofade = nofade || (template !== null && this.template !== null);
 
@@ -276,6 +305,10 @@ let Overlay = Backbone.View.extend({
           this.addCloseListeners();
         }
       }
+    }
+
+    if (callback !== undefined) {
+      callback();
     }
   }, 300)
 });
