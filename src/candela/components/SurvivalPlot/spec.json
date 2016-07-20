@@ -133,12 +133,48 @@
                   "y": {
                     "scale": "y",
                     "field": "survivors",
-                    "offset": ["@mult", ["@get", "tickSize"], -0.5]
+                    "offset": ["@mult", -0.5, ["@get", "tickSize"]]
                   },
                   "y2": {
                     "scale": "y",
                     "field": "survivors",
-                    "offset": ["@mult", ["@get", "tickSize"], 0.5]
+                    "offset": ["@mult", 0.5, ["@get", "tickSize"]]
+                  }
+                }
+              }
+            },
+            {
+              "type": "rect",
+              "from": {
+                "data": "censored"
+              },
+              "properties": {
+                "enter": {
+                  "fill": {
+                    "scale": "color",
+                    "field": ["@get", "group"]
+                  }
+                },
+                "update": {
+                  "x": {
+                    "scale": "x",
+                    "field": ["@get", "time"],
+                    "offset": ["@mult", -0.5, ["@get", "tickSize"]]
+                  },
+                  "x2": {
+                    "scale": "x",
+                    "field": ["@get", "time"],
+                    "offset": ["@mult", 0.5, ["@get", "tickSize"]]
+                  },
+                  "y": {
+                    "scale": "y",
+                    "field": "survivors",
+                    "offset": ["@mult", -0.5, ["@get", "strokeWidth"]]
+                  },
+                  "y2": {
+                    "scale": "y",
+                    "field": "survivors",
+                    "offset": ["@mult", 0.5, ["@get", "strokeWidth"]]
                   }
                 }
               }
