@@ -599,6 +599,10 @@ let DatasetView = Widget.extend({
         yAxisObj.call(yAxis);
         // and the bars
         drawBars();
+      }).on('dragstart', () => {
+        svg.style('cursor', 'ns-resize');
+      }).on('dragend', () => {
+        svg.style('cursor', null);
       }));
 
     // Add an include / exclude button for each bin
