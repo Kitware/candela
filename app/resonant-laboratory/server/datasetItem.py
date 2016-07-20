@@ -62,7 +62,7 @@ class DatasetItem(Resource):
         # TODO: build a mongo query from params['filter'] and params['offset']
         # and then do this:
         # mr_result = collection.inline_map_reduce(item, mapScript, reduceScript, limit=params['limit'], query=filter)
-        mr_result = collection.inline_map_reduce(mapScript, reduceScript, query=query)
+        mr_result = collection.inline_map_reduce(mapScript, reduceScript, query=query, scope={'counter': -1})
         # rearrange into a neater dict before sending it back
         result = {}
         for r in mr_result:
