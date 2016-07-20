@@ -16,6 +16,7 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
     this.trend = settings.trend;
     this.currentValues = this.current.sort(d3.ascending),
     this.median = d3.median(this.currentValues);
+    this.outOfBounds = this.median <= 0 || this.median >= this.trend.max;
     $(window).resize(_.bind(this.render, this));
   },
 
@@ -62,6 +63,16 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
       svg.append("g")
         .attr("transform", "translate(0,30)")
         .call(xAxis);
+    }
+
+    if (this.outOfBounds) {
+        svg.append("rect")
+          .attr("x", -margin.left)
+          .attr("width", w + margin.left + margin.right)
+          .attr("height", h + margin.top + margin.bottom)
+          .attr("stroke", colors.fail)
+          .attr("stroke-width", 3)
+          .attr("fill-opacity", 0);
     }
 
     const quantiles = [
