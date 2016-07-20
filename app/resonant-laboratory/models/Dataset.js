@@ -396,7 +396,7 @@ let Dataset = MetadataItem.extend({
       }
       filterSpec.excludeRanges.forEach(range => {
         if (!firstRange) {
-          temp += ' or ';
+          temp += ' and ';
         }
         firstRange = false;
         temp += '(';
@@ -410,12 +410,12 @@ let Dataset = MetadataItem.extend({
             }
             lowBound = '"' + lowBound + '"';
           }
-          temp += attrName + ' >= ' + lowBound;
+          temp += attrName + ' < ' + lowBound;
           includeLow = true;
         }
         if ('highBound' in range) {
           if (includeLow) {
-            temp += ' and ';
+            temp += ' or ';
           }
           let highBound = range.highBound;
           let dataType = typeof highBound;
@@ -425,7 +425,7 @@ let Dataset = MetadataItem.extend({
             }
             highBound = '"' + highBound + '"';
           }
-          temp += attrName + ' < ' + highBound;
+          temp += attrName + ' >= ' + highBound;
         }
         temp += ')';
       });
