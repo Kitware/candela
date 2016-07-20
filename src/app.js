@@ -51,7 +51,8 @@ export let dash = Backbone.View.extend({
           let aggTrend = _.clone(trendMap[trends[i]]);
           let trendVals = _.chain(byTrend[aggTrend.name])
                            .pluck('current')
-                           .sortBy((num) => { return num; })
+                           // '+' converts values to numeric for a numeric sort.
+                           .sortBy((num) => { return +num; })
                            .value();
           aggTrend.history = [calcPercentile(trendVals, percentile / 100)];
           aggTrend.title = 'Default of ' + percentile + ' percentile key metric value (' + aggTrend.name + '), No saved aggregate metrics for trend';
