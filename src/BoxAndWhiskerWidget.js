@@ -64,8 +64,6 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
         .call(xAxis);
     }
 
-    svg = svg.append("g");
-
     const quantiles = [
       d3.quantile(this.currentValues, 0.05),
       d3.quantile(this.currentValues, 0.25),
@@ -77,6 +75,41 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
     const outliers = _.filter(this.currentValues, (val) => {
         return val < q1 - outlierRange || val > q3 + outlierRange;
     });
+
+    // Setup tooltip
+    svg.on("mouseover", (d) => {
+        toolTipDiv.transition()
+          .duration(200)
+          .style("opacity", 1.0);
+        let cells = [
+          ['Min', standardRound(this.currentValues[0])],
+          ['5th %ile', standardRound(quantiles[0])],
+          ['25th %ile', standardRound(quantiles[1])],
+          ['Median', standardRound(this.median)],
+          ['75th %ile', standardRound(quantiles[3])],
+          ['95th %ile', standardRound(quantiles[4])],
+          ['Max', standardRound(this.currentValues[this.currentValues.length-1])],
+          ['# of Samples', this.currentValues.length],
+          // Add in a blank row to separate Outliers.
+          ['&nbsp', '&nbsp'],
+          ['Outliers', _.map(outliers, standardRound).join(", ")]
+        ];
+        let toolTipHtml = '<table style="border-collapse: separate; border-spacing: 10px 2px;">';
+        _.each(cells, function (cell) {
+          toolTipHtml += '<tr><td>'+cell[0]+'</td><td>'+cell[1]+'</td></tr>';
+        });
+        toolTipHtml += '</table>';
+        toolTipDiv.html(toolTipHtml)
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", (d) => {
+        toolTipDiv.transition()
+          .duration(200)
+          .style("opacity", 0);
+      });
+
+    svg = svg.append("g");
 
     let vals = svg.selectAll("circle")
       .data(outliers)
@@ -109,38 +142,7 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
     const qtr = qtrGroup.selectAll("rect")
       .data([{q1: q1, q3: q3}])
       .enter()
-      .append("rect")
-      .on("mouseover", (d) => {
-        toolTipDiv.transition()
-          .duration(200)
-          .style("opacity", 1.0);
-        let cells = [
-          ['Min', standardRound(this.currentValues[0])],
-          ['5th %ile', standardRound(quantiles[0])],
-          ['25th %ile', standardRound(quantiles[1])],
-          ['Median', standardRound(this.median)],
-          ['75th %ile', standardRound(quantiles[3])],
-          ['95th %ile', standardRound(quantiles[4])],
-          ['Max', standardRound(this.currentValues[this.currentValues.length-1])],
-          ['# of Samples', this.currentValues.length],
-          // Add in a blank row to separate Outliers.
-          ['&nbsp', '&nbsp'],
-          ['Outliers', _.map(outliers, standardRound).join(", ")]
-        ];
-        let toolTipHtml = '<table style="border-collapse: separate; border-spacing: 10px 2px;">';
-        _.each(cells, function (cell) {
-          toolTipHtml += '<tr><td>'+cell[0]+'</td><td>'+cell[1]+'</td></tr>';
-        });
-        toolTipHtml += '</table>';
-        toolTipDiv.html(toolTipHtml)
-          .style("left", (d3.event.pageX) + "px")
-          .style("top", (d3.event.pageY - 28) + "px");
-      })
-      .on("mouseout", (d) => {
-        toolTipDiv.transition()
-          .duration(200)
-          .style("opacity", 0);
-      });
+      .append("rect");
 
     qtr.attr("x", (d, i) => {
       return (d.q1/max)*w;

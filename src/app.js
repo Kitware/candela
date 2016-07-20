@@ -120,7 +120,7 @@ export let dash = Backbone.View.extend({
         var syntheticTrend = sanitizeTrend({
           name: trendValue.trend,
           synth: true,
-          max: trendValue.current
+          max: d3.median(trendValue.current)
         });
         settings.trendMap[syntheticTrend.name] = syntheticTrend;
         settings.trends.push(syntheticTrend);
