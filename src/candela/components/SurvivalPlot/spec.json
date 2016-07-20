@@ -78,6 +78,40 @@
     ],
     "marks": [
       {
+        "type": "rect",
+        "from": {
+          "data": "censored"
+        },
+        "properties": {
+          "enter": {
+            "x": {
+              "scale": "xscale",
+              "field": ["@get", "time"],
+              "offset": ["@mult", -0.5, ["@get", "strokeWidth"]]
+            },
+            "x2": {
+              "scale": "xscale",
+              "field": ["@get", "time"],
+              "offset": ["@mult", 0.5, ["@get", "strokeWidth"]]
+            },
+            "y": {
+              "scale": "yscale",
+              "field": "survivors",
+              "offset": ["@mult", ["@get", "tickSize"], -0.5]
+            },
+            "y2": {
+              "scale": "yscale",
+              "field": "survivors",
+              "offset": ["@mult", ["@get", "tickSize"], 0.5]
+            },
+            "fill": {
+              "scale": "color",
+              "field": ["@get", "group"]
+            }
+          }
+        }
+      },
+      {
         "type": "group",
         "from": {
           "data": "table",
@@ -120,40 +154,6 @@
             }
           }
         ]
-      },
-      {
-        "type": "rect",
-        "from": {
-          "data": "censored"
-        },
-        "properties": {
-          "enter": {
-            "x": {
-              "scale": "xscale",
-              "field": ["@get", "time"],
-              "offset": ["@mult", -0.5, ["@get", "strokeWidth"]]
-            },
-            "x2": {
-              "scale": "xscale",
-              "field": ["@get", "time"],
-              "offset": ["@mult", 0.5, ["@get", "strokeWidth"]]
-            },
-            "y": {
-              "scale": "yscale",
-              "field": "survivors",
-              "offset": ["@mult", ["@get", "tickSize"], -0.5]
-            },
-            "y2": {
-              "scale": "yscale",
-              "field": "survivors",
-              "offset": ["@mult", ["@get", "tickSize"], 0.5]
-            },
-            "fill": {
-              "scale": "color",
-              "field": ["@get", "group"]
-            }
-          }
-        }
       }
     ]
   }
