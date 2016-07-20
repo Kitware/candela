@@ -213,38 +213,19 @@ class DatasetCache {
   get currentDataPage () {
     if (!this.cachedPromises.currentDataPage) {
       this.cachedPromises.currentDataPage = this.schema.then(schema => {
-        if (this.model.getMeta('format') === 'mongodb.collection') {
-          return this.restRequest({
-            path: 'database/select',
-            type: 'GET',
-            data: {
-              format: 'dict',
+        return this.restRequest({
+          path: 'download',
+          type: 'GET',
+          data: {
+            extraParameters: JSON.stringify({
+              fileType: this.model.getMeta('format'),
+              outputType: 'json',
               offset: this.page.offset,
-              limit: this.page.limit
-              // filter: this.model.formatFilterExpression()
-              // TODO: For this to technically work,
-              // we need to convert to the old
-              // girder_db_items query format...
-              // but when that changes, this whole
-              // separate call that differentiates between
-              // mongodb vs flat files will be going away
-            }
-          }, 'rl:loadedData').then(resp => resp.data);
-        } else {
-          return this.restRequest({
-            path: 'download',
-            type: 'GET',
-            data: {
-              extraParameters: JSON.stringify({
-                fileType: this.model.getMeta('format'),
-                outputType: 'json',
-                offset: this.page.offset,
-                limit: this.page.limit,
-                filter: this.model.formatFilterExpression()
-              })
-            }
-          }, 'rl:loadedData');
-        }
+              limit: this.page.limit,
+              filter: this.model.formatFilterExpression()
+            })
+          }
+        }, 'rl:loadedData');
       });
     }
     return this.cachedPromises.currentDataPage;
