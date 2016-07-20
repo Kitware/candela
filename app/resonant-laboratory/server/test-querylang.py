@@ -64,6 +64,30 @@ class TestQueryLanguageMongo(unittest.TestCase):
         for expr, baseline in zip(map(ql.astToMongo, asts), baselines):
             self.assertEqual(expr, baseline)
 
+    def test_not_expressions(self):
+        """Test not expressions."""
+        asts = None
+        with open('test/not-ast-baselines.json') as f:
+            asts = json.load(f)
+
+        baselines = [
+            {'$or': [{'age': {'$gte': 22}},
+                     {'age': {'$lte': 20}}]},
+            {'$or': [{'age': {'$gt': 22}},
+                     {'age': {'$lte': 20}}]},
+            {'$or': [{'age': {'$lte': 22}},
+                     {'age': {'$gte': 20}}]},
+            {'$or': [{'age': {'$lt': 22}},
+                     {'age': {'$gte': 20}}]},
+            {'age': {'$ne': 10}},
+            {'age': {'$eq': 10}},
+            {'age': {'$nin': [1, 2, 3, 4, 5]}},
+            {'age': {'$in': [1, 2, 3, 4, 5]}},
+            {'age': {'$gt': 22}}
+        ]
+
+        for expr, baseline in zip(map(ql.astToMongo, asts), baselines):
+            self.assertEqual(expr, baseline)
 
 if __name__ == '__main__':
     unittest.main()
