@@ -6,6 +6,8 @@
     ["padding", 30],
     ["tickSize", 6],
     ["strokeWidth", 2],
+    ["legend", true],
+    ["legendTitle", "Legend"],
     ["time", "time"],
     ["censor", "censor"],
     ["xAxis.title", ["@get", "time"]],
@@ -93,6 +95,17 @@
           },
           "range": "category10"
         }
+      ],
+      "legends": [
+        "@if",
+        ["@get", "legend"],
+        [
+          {
+            "stroke": "color",
+            "title": ["@get", "legendTitle"]
+          }
+        ],
+        null
       ],
       "marks": [
         {

@@ -18,6 +18,8 @@ window.onload = () => {
     xAxis: {
       title: 'days'
     },
+    legend: false,
+    legendTitle: 'Drug',
     renderer: 'svg'
   });
 };
