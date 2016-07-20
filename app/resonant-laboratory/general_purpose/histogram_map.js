@@ -1,4 +1,10 @@
-/* globals emit, params, coerceValue, findBinLabel */
+/* globals emit, params, coerceValue, findBinLabel, counter */
+
+counter += 1;
+if (counter < params.offset ||
+    (params.limit !== 0 && counter >= params.offset + params.limit)) {
+  return;
+}
 
 var dataRow = this;
 emit('__passedFilters__', {
