@@ -512,13 +512,15 @@ let DatasetView = Widget.extend({
     let height = scale.height + topPadding;
 
     // Draw the y axis
+    let yScale = d3.scale.linear()
+      .domain([0, scale.yMax])
+      .range([height, topPadding]);
     let yAxis = d3.svg.axis()
-      .scale(d3.scale.linear()
-        .domain([0, scale.yMax])
-        .range([height, topPadding]))
+      .scale(yScale)
       .orient('left')
-      .ticks(4);
-    svg.select('.yAxis')
+      .ticks(Math.min(4, scale.yMax))
+      .tickFormat(d3.format('s'));
+    let yAxisObj = svg.select('.yAxis')
       .attr('transform', 'translate(' + scale.leftAxisPadding + ',0)')
       .call(yAxis);
 
@@ -555,21 +557,49 @@ let DatasetView = Widget.extend({
       .attr('class', 'page');
 
     // Update each bar
-    bins.selectAll('rect.overview')
-      .each(function (d) {
-        // this refers to the DOM element
-        d3.select(this).attr(scale.getBinRect(d, 'overview'));
-      });
-    bins.selectAll('rect.filtered')
-      .each(function (d) {
-        // this refers to the DOM element
-        d3.select(this).attr(scale.getBinRect(d, 'filtered'));
-      });
-    bins.selectAll('rect.page')
-      .each(function (d) {
-        // this refers to the DOM element
-        d3.select(this).attr(scale.getBinRect(d, 'page'));
-      });
+    function drawBars () {
+      bins.selectAll('rect.overview')
+        .each(function (d) {
+          // this refers to the DOM element
+          d3.select(this).attr(scale.getBinRect(d, 'overview'));
+        });
+      bins.selectAll('rect.filtered')
+        .each(function (d) {
+          // this refers to the DOM element
+          d3.select(this).attr(scale.getBinRect(d, 'filtered'));
+        });
+      bins.selectAll('rect.page')
+        .each(function (d) {
+          // this refers to the DOM element
+          d3.select(this).attr(scale.getBinRect(d, 'page'));
+        });
+    }
+    drawBars();
+
+    // Add the scale adjustment knob (needs a distinct scale instance)
+    let knobScale = yScale.copy();
+    let knob = svg.select('.yAxisKnob')
+      .attr('transform', 'translate(' + scale.leftAxisPadding + ',' +
+        knobScale(scale.yMax) + ')');
+    knob.call(d3.behavior.drag()
+      .origin(() => {
+        return { x: 0, y: knobScale(scale.yMax) };
+      }).on('drag', () => {
+        // the yMax setter automagically prevents bad values...
+        scale.yMax = knobScale.invert(d3.event.y);
+
+        // update everything that cares about the y scale:
+        // the knob
+        knob.attr('transform', 'translate(' + scale.leftAxisPadding + ',' +
+          knobScale(scale.yMax) + ')');
+        // the axis
+        yScale.domain([0, scale.yMax]);
+        yAxis.scale(yScale)
+          .ticks(Math.min(4, scale.yMax));
+        yAxisObj.call(yAxis);
+        // and the bars
+        drawBars();
+      }));
 
     // Add an include / exclude button for each bin
     binsEnter.append('image')
