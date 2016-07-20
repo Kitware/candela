@@ -437,7 +437,7 @@ let DatasetView = Widget.extend({
             let filteredState = datasetDetails.datasetObj.getFilteredState(attrName);
             if (filteredState === Dataset.FILTER_STATES.NO_FILTERS) {
               // Go ahead and set the attribute right away
-              successFunc(attrName, menuItem.value);
+              successFunc(menuItem.value);
               window.mainPage.overlay.render(null);
             } else {
               // Confirm that the user wants to clear filters first
