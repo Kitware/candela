@@ -54,6 +54,15 @@
           "data": "table",
           "field": "survivors"
         }
+      },
+      {
+        "name": "color",
+        "type": "ordinal",
+        "domain": {
+          "data": "table",
+          "field": ["@get", "group"]
+        },
+        "range": "category10"
       }
     ],
     "axes": [
@@ -68,26 +77,48 @@
     ],
     "marks": [
       {
-        "type": "line",
+        "type": "group",
         "from": {
-          "data": "table"
+          "data": "table",
+          "transform": [
+            {
+              "type": "facet",
+              "groupby": [["@get", "group"]]
+            }
+          ]
         },
         "properties": {
           "enter": {
-            "interpolate": {"value": "step-after"},
-            "x": {
-              "scale": "xscale",
-              "field": ["@get", "time"]
-            },
-            "y": {
-              "scale": "yscale",
-              "field": "survivors"
-            },
-
-            "stroke": {"value": "black"},
-            "strokeWidth": {"value": 1}
+            "x": {"value": 0},
+            "width": {"field": {"group": "width"}},
+            "y": {"value": 0},
+            "height": {"field": {"group": "height"}},
+            "clip": {"value": true}
           }
-        }
+        },
+        "marks": [
+          {
+            "type": "line",
+            "properties": {
+              "enter": {
+                "interpolate": {"value": "step-after"},
+                "x": {
+                  "scale": "xscale",
+                  "field": ["@get", "time"]
+                },
+                "y": {
+                  "scale": "yscale",
+                  "field": "survivors"
+                },
+                "stroke": {
+                  "scale": "color",
+                  "field": ["@get", "group"]
+                },
+                "strokeWidth": {"value": 1}
+              }
+            }
+          }
+        ]
       },
       {
         "type": "rect",
@@ -116,7 +147,10 @@
               "field": "survivors",
               "offset": ["@mult", ["@get", "tickSize"], 0.5]
             },
-            "fill": {"value": "black"}
+            "fill": {
+              "scale": "color",
+              "field": ["@get", "group"]
+            }
           }
         }
       }
