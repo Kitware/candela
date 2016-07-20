@@ -26,8 +26,8 @@ class ComboScale {
     this.coerceToType = datasetDetails.datasetObj.getAttributeType(
       datasetDetails.schema, attrName);
     this.overviewHistogram = datasetDetails.overviewHistogram[attrName];
-    this.filteredHistogram = datasetDetails.filteredHistogram[attrName];
-    this.pageHistogram = datasetDetails.pageHistogram[attrName];
+    this.filteredHistogram = datasetDetails.filteredHistogram[attrName] || [];
+    this.pageHistogram = datasetDetails.pageHistogram[attrName] || [];
 
     this.dividerIndex = undefined;
     this.dividerPosition = undefined;
@@ -67,10 +67,10 @@ class ComboScale {
       this.overviewLabelLookup[bin.label] = index;
       this.realYmax = Math.max(this.realYmax, bin.count);
     });
-    datasetDetails.filteredHistogram[attrName].forEach((bin, index) => {
+    this.filteredHistogram.forEach((bin, index) => {
       this.filteredLabelLookup[bin.label] = index;
     });
-    datasetDetails.pageHistogram[attrName].forEach((bin, index) => {
+    this.pageHistogram.forEach((bin, index) => {
       this.pageLabelLookup[bin.label] = index;
     });
 

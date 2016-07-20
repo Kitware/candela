@@ -507,6 +507,15 @@ class DatasetItem(Resource):
                     histogram[attrName][binIndex]['lowBound'] = binObj['lowBound']
                     histogram[attrName][binIndex]['highBound'] = binObj['highBound']
 
+        if '__passedFilters__' not in histogram:
+            # This will only happen if there's a count of zero;
+            # we should populate the histogram with zero counts
+            # for every bin
+            histogram['__passedFilters__'] = [{
+                'count': 0,
+                'label': 'count'
+            }]
+
         # Cache the results before returning them
         if params['cache']:
             if 'histogramCaches' not in item['meta']['rlab']:
