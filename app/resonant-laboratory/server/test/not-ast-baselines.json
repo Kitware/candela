@@ -1,0 +1,155 @@
+[
+    {
+        "operator": "not",
+        "operands": {
+            "operator": "and",
+            "operands": [
+                {
+                    "operator": "<",
+                    "operands": [
+                        "age",
+                        22
+                    ]
+                },
+                {
+                    "operator": ">",
+                    "operands": [
+                        "age",
+                        20
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "operator": "not",
+        "operands": {
+            "operator": "and",
+            "operands": [
+                {
+                    "operator": "<=",
+                    "operands": [
+                        "age",
+                        22
+                    ]
+                },
+                {
+                    "operator": ">",
+                    "operands": [
+                        "age",
+                        20
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "operator": "not",
+        "operands": {
+            "operator": "and",
+            "operands": [
+                {
+                    "operator": ">",
+                    "operands": [
+                        "age",
+                        22
+                    ]
+                },
+                {
+                    "operator": "<",
+                    "operands": [
+                        "age",
+                        20
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "operator": "not",
+        "operands": {
+            "operator": "and",
+            "operands": [
+                {
+                    "operator": ">=",
+                    "operands": [
+                        "age",
+                        22
+                    ]
+                },
+                {
+                    "operator": "<",
+                    "operands": [
+                        "age",
+                        20
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "operator": "not",
+        "operands": {
+            "operator": "=",
+            "operands": [
+                "age",
+                10
+            ]
+        }
+    },
+    {
+        "operator": "not",
+        "operands": {
+            "operator": "!=",
+            "operands": [
+                "age",
+                10
+            ]
+        }
+    },
+    {
+        "operator": "not",
+        "operands": {
+            "operator": "in",
+            "operands": [
+                "age",
+                [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5
+                ]
+            ]
+        }
+    },
+    {
+        "operator": "not",
+        "operands": {
+            "operator": "not in",
+            "operands": [
+                "age",
+                [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5
+                ]
+            ]
+        }
+    },
+    {
+        "operator": "not",
+        "operands": {
+            "operator": "not",
+            "operands": {
+                "operator": ">",
+                "operands": [
+                    "age",
+                    22
+                ]
+            }
+        }
+    }
+]
