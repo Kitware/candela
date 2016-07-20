@@ -15,6 +15,9 @@ window.onload = () => {
       top: 20,
       bottom: 40
     },
+    xAxis: {
+      title: 'days'
+    },
     renderer: 'svg'
   });
 };

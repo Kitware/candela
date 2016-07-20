@@ -7,148 +7,183 @@
     ["tickSize", 6],
     ["strokeWidth", 2],
     ["time", "time"],
-    ["censor", "censor"]
+    ["censor", "censor"],
+    ["xAxis.title", ["@get", "time"]],
+    ["yAxis.title", "survivors"]
   ],
-  {
-    "width": ["@get", "width"],
-    "height": ["@get", "height"],
-    "padding": ["@get", "padding"],
-    "data": [
-      {
-        "name": "table",
-        "values": ["@get", "data"]
-      },
-      {
-        "name": "censored",
-        "source": "table",
-        "transform": [
-          {
-            "type": "sort",
-            "by": [["@get", "time"]]
+  [
+    "@merge",
+    [
+      "@axis",
+      [
+        "@merge",
+        ["@get", "xAxis"],
+        {
+          "axis": "x",
+          "size": ["@get", "width"],
+          "data": ["@get", "data"],
+          "field": ["@get", "time"],
+          "domain": {
+            "fields": [
+              {
+                "data": "table",
+                "field": ["@get", "time"]
+              }
+            ]
           },
-          {
-            "type": "filter",
-            "test": ["@join", "", ["datum['", ["@get", "censor"], "'] == 0"]]
-          }
-        ]
-      }
+          "pan": false,
+          "zoom": false
+        }
+      ]
     ],
-    "scales": [
-      {
-        "name": "xscale",
-        "range": "width",
-        "domain": {
-          "data": "table",
-          "field": ["@get", "time"]
+    [
+      "@axis",
+      [
+        "@merge",
+        ["@get", "yAxis"],
+        {
+          "axis": "y",
+          "size": ["@get", "height"],
+          "data": ["@get", "data"],
+          "field": "survivors",
+          "domain": {
+            "fields": [
+              {
+                "data": "table",
+                "field": "survivors"
+              }
+            ]
+          },
+          "pan": false,
+          "zoom": false
         }
-      },
-      {
-        "name": "yscale",
-        "range": "height",
-        "domain": {
-          "data": "table",
-          "field": "survivors"
-        }
-      },
-      {
-        "name": "color",
-        "type": "ordinal",
-        "domain": {
-          "data": "table",
-          "field": ["@get", "group"]
+      ]
+    ],
+    {
+      "width": ["@get", "width"],
+      "height": ["@get", "height"],
+      "padding": ["@get", "padding"],
+      "data": [
+        {
+          "name": "table",
+          "values": ["@get", "data"]
         },
-        "range": "category10"
-      }
-    ],
-    "axes": [
-      {
-        "type": "x",
-        "scale": "xscale"
-      },
-      {
-        "type": "y",
-        "scale": "yscale"
-      }
-    ],
-    "marks": [
-      {
-        "type": "rect",
-        "from": {
-          "data": "censored"
-        },
-        "properties": {
-          "enter": {
-            "x": {
-              "scale": "xscale",
-              "field": ["@get", "time"],
-              "offset": ["@mult", -0.5, ["@get", "strokeWidth"]]
-            },
-            "x2": {
-              "scale": "xscale",
-              "field": ["@get", "time"],
-              "offset": ["@mult", 0.5, ["@get", "strokeWidth"]]
-            },
-            "y": {
-              "scale": "yscale",
-              "field": "survivors",
-              "offset": ["@mult", ["@get", "tickSize"], -0.5]
-            },
-            "y2": {
-              "scale": "yscale",
-              "field": "survivors",
-              "offset": ["@mult", ["@get", "tickSize"], 0.5]
-            },
-            "fill": {
-              "scale": "color",
-              "field": ["@get", "group"]
-            }
-          }
-        }
-      },
-      {
-        "type": "group",
-        "from": {
-          "data": "table",
+        {
+          "name": "censored",
+          "source": "table",
           "transform": [
             {
-              "type": "facet",
-              "groupby": [["@get", "group"]]
+              "type": "sort",
+              "by": [["@get", "time"]]
+            },
+            {
+              "type": "filter",
+              "test": ["@join", "", ["datum['", ["@get", "censor"], "'] == 0"]]
             }
           ]
+        }
+      ],
+      "scales": [
+        {
+          "name": "color",
+          "type": "ordinal",
+          "domain": {
+            "data": "table",
+            "field": ["@get", "group"]
+          },
+          "range": "category10"
+        }
+      ],
+      "axes": [
+        {
+          "type": "x",
+          "scale": "x"
         },
-        "properties": {
-          "enter": {
-            "x": {"value": 0},
-            "width": {"field": {"group": "width"}},
-            "y": {"value": 0},
-            "height": {"field": {"group": "height"}},
-            "clip": {"value": true}
-          }
-        },
-        "marks": [
-          {
-            "type": "line",
-            "properties": {
-              "enter": {
-                "interpolate": {"value": "step-after"},
-                "x": {
-                  "scale": "xscale",
-                  "field": ["@get", "time"]
-                },
-                "y": {
-                  "scale": "yscale",
-                  "field": "survivors"
-                },
-                "stroke": {
-                  "scale": "color",
-                  "field": ["@get", "group"]
-                },
-                "strokeWidth": {"value": ["@get", "strokeWidth"]}
+        {
+          "type": "y",
+          "scale": "y"
+        }
+      ],
+      "marks": [
+        {
+          "type": "rect",
+          "from": {
+            "data": "censored"
+          },
+          "properties": {
+            "enter": {
+              "x": {
+                "scale": "x",
+                "field": ["@get", "time"],
+                "offset": ["@mult", -0.5, ["@get", "strokeWidth"]]
+              },
+              "x2": {
+                "scale": "x",
+                "field": ["@get", "time"],
+                "offset": ["@mult", 0.5, ["@get", "strokeWidth"]]
+              },
+              "y": {
+                "scale": "y",
+                "field": "survivors",
+                "offset": ["@mult", ["@get", "tickSize"], -0.5]
+              },
+              "y2": {
+                "scale": "y",
+                "field": "survivors",
+                "offset": ["@mult", ["@get", "tickSize"], 0.5]
+              },
+              "fill": {
+                "scale": "color",
+                "field": ["@get", "group"]
               }
             }
           }
-        ]
-      }
-    ]
-  }
+        },
+        {
+          "type": "group",
+          "from": {
+            "data": "table",
+            "transform": [
+              {
+                "type": "facet",
+                "groupby": [["@get", "group"]]
+              }
+            ]
+          },
+          "properties": {
+            "enter": {
+              "x": {"value": 0},
+              "width": {"field": {"group": "width"}},
+              "y": {"value": 0},
+              "height": {"field": {"group": "height"}},
+              "clip": {"value": true}
+            }
+          },
+          "marks": [
+            {
+              "type": "line",
+              "properties": {
+                "enter": {
+                  "interpolate": {"value": "step-after"},
+                  "x": {
+                    "scale": "x",
+                    "field": ["@get", "time"]
+                  },
+                  "y": {
+                    "scale": "y",
+                    "field": "survivors"
+                  },
+                  "stroke": {
+                    "scale": "color",
+                    "field": ["@get", "group"]
+                  },
+                  "strokeWidth": {"value": ["@get", "strokeWidth"]}
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
 ]
