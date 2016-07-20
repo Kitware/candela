@@ -16,13 +16,7 @@
     "data": [
       {
         "name": "table",
-        "values": ["@get", "data"],
-        "transform": [
-          {
-            "type": "sort",
-            "by": [["@get", "time"]]
-          }
-        ]
+        "values": ["@get", "data"]
       },
       {
         "name": "censored",
