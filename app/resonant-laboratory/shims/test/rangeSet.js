@@ -5,18 +5,26 @@ function stringComparator (a, b) {
   return a.localeCompare(b);
 }
 
+let regularRange = {
+  lowBound: 4,
+  highBound: 8
+};
 let unboundedRange = {};
 let invalidRange = {
   lowBound: 10,
   highBound: 0
 };
-let regularRange = {
-  lowBound: 4,
-  highBound: 8
-};
 let littleRange = {
   lowBound: 5.5,
   highBound: 6
+};
+let lowDisjoinRange = {
+  lowBound: 2,
+  highBound: 3
+};
+let highDisjointRange = {
+  lowBound: 9,
+  highBound: 10
 };
 let highBoundedRange = {
   highBound: 7
@@ -27,11 +35,15 @@ let lowBoundedRange = {
 
 let testRanges = [
   [unboundedRange, regularRange],
-  [highBoundedRange, lowBoundedRange],
+  [lowBoundedRange, highBoundedRange],
   [invalidRange],
   [highBoundedRange, regularRange],
   [lowBoundedRange, regularRange],
-  [regularRange]
+  [regularRange],
+  [],
+  [regularRange],
+  [lowDisjoinRange, regularRange],
+  [regularRange, highDisjointRange, lowDisjoinRange]
 ];
 let testRanges2 = [
   [invalidRange],
@@ -39,7 +51,11 @@ let testRanges2 = [
   [lowBoundedRange],
   [regularRange],
   [regularRange],
-  [littleRange]
+  [littleRange],
+  [regularRange],
+  [lowDisjoinRange],
+  [highDisjointRange],
+  []
 ];
 
 test('RangeSet: Finding most extreme values', t => {
@@ -55,6 +71,28 @@ test('RangeSet: Finding most extreme values', t => {
   t.end();
 });
 
+test('RangeSet: Sorting ranges', t => {
+  let sortingSolutions = [
+    [unboundedRange, regularRange],
+    [highBoundedRange, lowBoundedRange],
+    [invalidRange],
+    [highBoundedRange, regularRange],
+    [regularRange, lowBoundedRange],
+    [regularRange],
+    [],
+    [regularRange],
+    [lowDisjoinRange, regularRange],
+    [lowDisjoinRange, regularRange, highDisjointRange]
+  ];
+  for (let i = 0; i < testRanges.length; i += 1) {
+    let outputRange = JSON.stringify(testRanges[i]);
+    let outputSolution = JSON.stringify(sortingSolutions[i]);
+    t.deepEqual(testRanges[i].concat().sort(RangeSet.compareRanges), sortingSolutions[i],
+      `${outputRange} sorts as ${outputSolution}`);
+  }
+  t.end();
+});
+
 test('RangeSet: Cleaning range lists', t => {
   let cleaningSolutions = [
     [unboundedRange],
@@ -62,7 +100,11 @@ test('RangeSet: Cleaning range lists', t => {
     [],
     [{ highBound: 8 }],
     [{ lowBound: 4 }],
-    [regularRange]
+    [regularRange],
+    [],
+    [regularRange],
+    [lowDisjoinRange, regularRange],
+    [lowDisjoinRange, regularRange, highDisjointRange]
   ];
   for (let i = 0; i < testRanges.length; i += 1) {
     let outputRange = JSON.stringify(testRanges[i]);
@@ -80,7 +122,11 @@ test('RangeSet: Union', t => {
     [lowBoundedRange],
     [{ highBound: 8 }],
     [{ lowBound: 4 }],
-    [regularRange]
+    [regularRange],
+    [regularRange],
+    [lowDisjoinRange, regularRange],
+    [lowDisjoinRange, regularRange, highDisjointRange],
+    [lowDisjoinRange, regularRange, highDisjointRange]
   ];
   for (let i = 0; i < testRanges.length; i += 1) {
     let outputRange = JSON.stringify(testRanges[i]);
@@ -93,38 +139,46 @@ test('RangeSet: Union', t => {
 });
 
 test('RangeSet: Intersection', t => {
-  let unionSolutions = [
+  let intersectionSolutions = [
     [],
     [{ highBound: 7 }],
     [],
     [regularRange],
     [regularRange],
-    [littleRange]
+    [littleRange],
+    [],
+    [],
+    [],
+    []
   ];
   for (let i = 0; i < testRanges.length; i += 1) {
     let outputRange = JSON.stringify(testRanges[i]);
     let outputRange2 = JSON.stringify(testRanges2[i]);
-    let outputSolution = JSON.stringify(unionSolutions[i]);
-    t.deepEqual(RangeSet.rangeIntersection(testRanges[i], testRanges2[i]), unionSolutions[i],
+    let outputSolution = JSON.stringify(intersectionSolutions[i]);
+    t.deepEqual(RangeSet.rangeIntersection(testRanges[i], testRanges2[i]), intersectionSolutions[i],
       `${outputRange} intersect ${outputRange2} = ${outputSolution}`);
   }
   t.end();
 });
 
 test('RangeSet: Subtraction', t => {
-  let unionSolutions = [
+  let subtractionSolutions = [
     [unboundedRange],
     [{ lowBound: 7 }],
     [],
     [{ highBound: 4 }],
     [{ lowBound: 8 }],
-    [{ lowBound: 4, highBound: 5.5 }, { lowBound: 6, highBound: 8 }]
+    [{ lowBound: 4, highBound: 5.5 }, { lowBound: 6, highBound: 8 }],
+    [],
+    [regularRange],
+    [lowDisjoinRange, regularRange],
+    [lowDisjoinRange, regularRange, highDisjointRange]
   ];
   for (let i = 0; i < testRanges.length; i += 1) {
     let outputRange = JSON.stringify(testRanges[i]);
     let outputRange2 = JSON.stringify(testRanges2[i]);
-    let outputSolution = JSON.stringify(unionSolutions[i]);
-    t.deepEqual(RangeSet.rangeSubtract(testRanges[i], testRanges2[i]), unionSolutions[i],
+    let outputSolution = JSON.stringify(subtractionSolutions[i]);
+    t.deepEqual(RangeSet.rangeSubtract(testRanges[i], testRanges2[i]), subtractionSolutions[i],
       `${outputRange} - ${outputRange2} = ${outputSolution}`);
   }
   t.end();

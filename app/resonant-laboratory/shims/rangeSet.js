@@ -113,16 +113,17 @@ function copyRangeList (list) {
 }
 
 function cleanRangeList (list, comparator = defaultComparator) {
-  list = copyRangeList(list).sort(d => compareRanges(d, comparator));
-  let indicesToTrash = [];
+  list = copyRangeList(list).sort((a, b) => compareRanges(a, b, comparator));
 
-  for (let i = 0; i < list.length; i += 1) {
+  let i = 0;
+  while (i < list.length) {
     let range = list[i];
 
     // Throw away any invalid ranges
     if ('highBound' in range && 'lowBound' in range &&
         comparator(range.highBound, range.lowBound) < 0) {
-      indicesToTrash.push(i);
+      list.splice(i, 1);
+      continue;
     }
 
     // Merge any overlapping ranges
@@ -141,86 +142,19 @@ function cleanRangeList (list, comparator = defaultComparator) {
         if (lastRange.lowBound === undefined) {
           delete lastRange.lowBound;
         }
-        indicesToTrash.push(i);
+        list.splice(i, 1);
+        continue;
       }
     }
-  }
 
-  indicesToTrash.reverse().forEach(i => {
-    list.splice(i, 1);
-  });
+    i += 1;
+  }
 
   return list;
 }
 
 function rangeUnion (list1, list2, comparator = defaultComparator) {
-  const IGNORE_RANGE = {
-    lowBound: null,
-    highBound: null
-  };
-
-  let result = [];
-  list1 = cleanRangeList(list1);
-  list2 = cleanRangeList(list2);
-
-  let r = 0;
-  let i1 = 0;
-  let i2 = 0;
-
-  while (i1 < list1.length || i2 < list2.length) {
-    let l1 = i1 < list1.length ? list1[i1] : IGNORE_RANGE;
-    let l2 = i2 < list2.length ? list2[i2] : IGNORE_RANGE;
-
-    if (r >= result.length) {
-      // We need to add a new range
-      let newBin = {};
-      let low = mostExtremeValue([l1.lowBound, l2.lowBound], '<', comparator);
-      if (low !== undefined) {
-        newBin.lowBound = low;
-      }
-      let high = mostExtremeValue([l1.highBound, l2.highBound], '>', comparator);
-      if (high !== undefined) {
-        newBin.highBound = high;
-      }
-      result.push(newBin);
-      i1 += 1;
-      i2 += 1;
-      continue;
-    }
-
-    // If the current range is already high-unbounded,
-    // we can terminate early
-    if (!('highBound' in result[r])) {
-      break;
-    }
-
-    // See if either range can be merged into the current one
-    let mergedOne = false;
-    if (l1 !== IGNORE_RANGE && (!('lowBound' in l1) ||
-        comparator(l1.lowBound, result[r].highBound) <= 0)) {
-      // The lower range intersects the current one; merge it
-      result[r].highBound = mostExtremeValue(
-        [result[r].highBound, list1[i1].highBound], '>', comparator);
-      i1 += 1;
-      mergedOne = true;
-    }
-    if (l2 !== IGNORE_RANGE && l2.lowBound <= result[r].highBound) {
-      // The higher range intersects the current one; merge it
-      result[r].highBound = mostExtremeValue(
-        [result[r].highBound, list2[i2].highBound], '>', comparator);
-      i2 += 1;
-      mergedOne = true;
-    }
-
-    if (!mergedOne) {
-      // Okay, we couldn't merge either range. This means
-      // that we need to add a distinct range on the next
-      // pass
-      r += 1;
-    }
-  }
-
-  return result;
+  return cleanRangeList(list1.concat(list2), comparator);
 }
 
 function rangeIntersection (list1, list2, comparator = defaultComparator) {
