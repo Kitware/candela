@@ -20,11 +20,3 @@
   </p>
   <button id="okButton">OK</button>
 </div>
-<script type="application/javascript">
-  jQuery('#okButton').on('click', () => {
-    window.mainPage.switchProject(null)
-      .then(() => {
-        window.mainPage.overlay.render('StartingScreen');
-      });
-  });
-</script>
