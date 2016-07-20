@@ -5,6 +5,7 @@
     ["height", 500],
     ["padding", 30],
     ["tickSize", 6],
+    ["strokeWidth", 2],
     ["time", "time"],
     ["censor", "censor"]
   ],
@@ -114,7 +115,7 @@
                   "scale": "color",
                   "field": ["@get", "group"]
                 },
-                "strokeWidth": {"value": 1}
+                "strokeWidth": {"value": ["@get", "strokeWidth"]}
               }
             }
           }
@@ -130,12 +131,12 @@
             "x": {
               "scale": "xscale",
               "field": ["@get", "time"],
-              "offset": -0.5
+              "offset": ["@mult", -0.5, ["@get", "strokeWidth"]]
             },
             "x2": {
               "scale": "xscale",
               "field": ["@get", "time"],
-              "offset": 0.5
+              "offset": ["@mult", 0.5, ["@get", "strokeWidth"]]
             },
             "y": {
               "scale": "yscale",
