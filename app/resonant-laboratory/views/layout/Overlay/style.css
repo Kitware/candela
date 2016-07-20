@@ -8,7 +8,8 @@
 }
 
 #Overlay .modal-dialog,
-#Overlay div.libraryInterface,
+#Overlay div.largeDialog,
+#Overlay div.smallDialog,
 #Overlay div.hint {
   background-color: white;
   border: 1px solid rgba(0,0,0,0.2);
@@ -16,14 +17,22 @@
   min-height: 15em;
 }
 
-#Overlay div.libraryInterface {
+#Overlay div.largeDialog {
   position: relative;
   max-width: 50em;
   margin: 5em auto 5em auto;
   padding: 1em 2em 2em 3em;
 }
 
-#Overlay .libraryInterface hr {
+#Overlay div.smallDialog {
+  position: relative;
+  max-width: 30em;
+  min-height: initial;
+  margin: 10em auto auto auto;
+  padding: 1em 2em 2em 3em;
+}
+
+#Overlay .largeDialog hr {
   position: relative;
   left: -3em;
   width: calc(100% + 5em);
