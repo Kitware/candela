@@ -31,8 +31,8 @@
               }
             ]
           },
-          "pan": false,
-          "zoom": false
+          "pan": true,
+          "zoom": true
         }
       ]
     ],
@@ -54,8 +54,8 @@
               }
             ]
           },
-          "pan": false,
-          "zoom": false
+          "pan": true,
+          "zoom": true
         }
       ]
     ],
@@ -94,50 +94,56 @@
           "range": "category10"
         }
       ],
-      "axes": [
-        {
-          "type": "x",
-          "scale": "x"
-        },
-        {
-          "type": "y",
-          "scale": "y"
-        }
-      ],
       "marks": [
         {
-          "type": "rect",
-          "from": {
-            "data": "censored"
-          },
+          "type": "group",
           "properties": {
             "enter": {
-              "x": {
-                "scale": "x",
-                "field": ["@get", "time"],
-                "offset": ["@mult", -0.5, ["@get", "strokeWidth"]]
+              "x": {"value": 0},
+              "width": {"field": {"group": "width"}},
+              "y": {"value": 0},
+              "height": {"field": {"group": "height"}},
+              "clip": {"value": true}
+            }
+          },
+          "marks": [
+            {
+              "type": "rect",
+              "from": {
+                "data": "censored"
               },
-              "x2": {
-                "scale": "x",
-                "field": ["@get", "time"],
-                "offset": ["@mult", 0.5, ["@get", "strokeWidth"]]
-              },
-              "y": {
-                "scale": "y",
-                "field": "survivors",
-                "offset": ["@mult", ["@get", "tickSize"], -0.5]
-              },
-              "y2": {
-                "scale": "y",
-                "field": "survivors",
-                "offset": ["@mult", ["@get", "tickSize"], 0.5]
-              },
-              "fill": {
-                "scale": "color",
-                "field": ["@get", "group"]
+              "properties": {
+                "enter": {
+                  "fill": {
+                    "scale": "color",
+                    "field": ["@get", "group"]
+                  }
+                },
+                "update": {
+                  "x": {
+                    "scale": "x",
+                    "field": ["@get", "time"],
+                    "offset": ["@mult", -0.5, ["@get", "strokeWidth"]]
+                  },
+                  "x2": {
+                    "scale": "x",
+                    "field": ["@get", "time"],
+                    "offset": ["@mult", 0.5, ["@get", "strokeWidth"]]
+                  },
+                  "y": {
+                    "scale": "y",
+                    "field": "survivors",
+                    "offset": ["@mult", ["@get", "tickSize"], -0.5]
+                  },
+                  "y2": {
+                    "scale": "y",
+                    "field": "survivors",
+                    "offset": ["@mult", ["@get", "tickSize"], 0.5]
+                  }
+                }
               }
             }
-          }
+          ]
         },
         {
           "type": "group",
@@ -164,6 +170,13 @@
               "type": "line",
               "properties": {
                 "enter": {
+                  "stroke": {
+                    "scale": "color",
+                    "field": ["@get", "group"]
+                  },
+                  "strokeWidth": {"value": ["@get", "strokeWidth"]}
+                },
+                "update": {
                   "interpolate": {"value": "step-after"},
                   "x": {
                     "scale": "x",
@@ -172,12 +185,7 @@
                   "y": {
                     "scale": "y",
                     "field": "survivors"
-                  },
-                  "stroke": {
-                    "scale": "color",
-                    "field": ["@get", "group"]
-                  },
-                  "strokeWidth": {"value": ["@get", "strokeWidth"]}
+                  }
                 }
               }
             }
