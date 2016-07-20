@@ -166,7 +166,7 @@ class ComboScale {
     return this.customYmax === null ? this.realYmax : this.customYmax;
   }
   set yMax (value) {
-    this.customYmax = value;
+    this.customYmax = Math.max(1, Math.min(this.realYmax, value));
   }
 }
 export default ComboScale;
