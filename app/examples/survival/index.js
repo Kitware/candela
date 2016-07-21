@@ -7,6 +7,7 @@ window.onload = () => {
     time: 'time',
     censor: 'censor',
     group: 'drug',
+    hover: ['age', 'drug', 'censor', 'entdate', 'enddate'],
     width: 625,
     height: 540,
     padding: {
