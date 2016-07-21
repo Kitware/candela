@@ -49,10 +49,17 @@ using the `virtualenv` described in the girder setup instructions.
 
 4. Restart Girder
 
-Resonant Laboratory will replace the Girder interface at [localhost:8080](http://localhost:8080)
-(you can still access the girder interface at [localhost:8080/girder](http://localhost:8080/girder))
+Resonant Laboratory will replace the Girder interface at [localhost:8080](http://localhost:8080). It should give you an
+error telling you that no assetstores have been configured.
 
-5. Optionally, you can add an example library to the girder instance
+5. Access the girder interface again, this time at [localhost:8080/girder](http://localhost:8080/girder). Navigate to
+Admin console -> Assetstores
+
+6. Click Create new Database assetstore, and choose a name (anything is fine), MongoDB as the Database Type, and `mongodb://localhost:27017/assetstore` as the Database URI (feel free to change "assetstore" to whatever database name you like)
+
+7. Click Create new Filesystem assetstore, again picking whatever name strikes your fancy, and give it a path that you have write access to for its Root directory. Once created, make sure to click "Set as current"
+
+8. Optionally, at this point you can add an example library to the girder instance
    by running this script from the `scripts` directory (by default, it assumes that you've set up a user account named `admin`; try `python populateGirder.py --help` for details about how to change this):
 
    ```bash
