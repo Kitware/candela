@@ -18,7 +18,7 @@ window.onload = () => {
     xAxis: {
       title: 'days'
     },
-    legend: false,
+    legend: true,
     legendTitle: 'Drug',
     renderer: 'svg'
   });
