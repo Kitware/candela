@@ -59,7 +59,7 @@ let ProjectLibrary = Backbone.View.extend({
     // Get the set of projects in the public library
     new Promise((resolve, reject) => {
       girder.restRequest({
-        path: 'resource/lookup?path=/collection/ResonantLaboratory/Projects',
+        path: 'resource/lookup?path=/collection/Resonant Laboratory Library/Projects',
         type: 'GET',
         error: reject
       }).done(resolve).error(reject);

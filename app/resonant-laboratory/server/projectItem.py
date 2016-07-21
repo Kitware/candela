@@ -3,7 +3,6 @@ from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
 from girder.constants import AccessType
-from girder.plugins.girder_db_items.rest import DatabaseItemResource
 from girder.plugins.girder_db_items.dbs.mongo import MongoConnector
 from girder_worker.format import get_csv_reader
 
