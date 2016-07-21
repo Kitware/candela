@@ -60,7 +60,7 @@ class DatasetItem(Resource):
         # Convert our AST filter expression to a mongo filter
         query = None
         if 'filter' in params and params['filter'] is not None:
-            query = astToMongo(json.loads(params['filter']))
+            query = astToMongo(params['filter'])
         mr_result = collection.inline_map_reduce(mapScript, reduceScript, query=query, scope={'counter': -1})
         # rearrange into a neater dict before sending it back
         result = {}
