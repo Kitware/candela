@@ -222,7 +222,7 @@ class DatasetCache {
               outputType: 'json',
               offset: this.page.offset,
               limit: this.page.limit,
-              filter: this.model.formatFilterExpression()
+              filter: this.model.getFilterAstTree()
             })
           }
         }, 'rl:loadedData');
@@ -430,17 +430,23 @@ let Dataset = MetadataItem.extend({
     exprList = exprList.concat(this.cache.filter.custom);
     return exprList;
   },
-  formatFilterExpression () {
+  getFilterAstTree () {
     let exprList = this.listAllFilterExpressions(true);
 
     if (exprList.length > 0) {
       let fullExpression = '(' + exprList.join(') and (') + ')';
       let ast = parseToAst(fullExpression);
-      this.dehexify(ast);
-      return JSON.stringify(ast);
+      return this.dehexify(ast);
     } else {
       return undefined;
     }
+  },
+  formatFilterExpression () {
+    let tree = this.getFilterAstTree();
+    if (tree !== undefined) {
+      tree = JSON.stringify(tree);
+    }
+    return tree;
   },
   getTypeSpec: function () {
     let schema = this.getMeta('schema') || {};

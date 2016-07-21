@@ -15,7 +15,7 @@ import itertools
 import cherrypy
 from pymongo import MongoClient
 from anonymousAccess import loadAnonymousItem
-from querylang import astToMongo, astToFunction
+from querylang import astToMongo
 from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
@@ -61,9 +61,6 @@ class DatasetItem(Resource):
         query = None
         if 'filter' in params and params['filter'] is not None:
             query = astToMongo(json.loads(params['filter']))
-        # TODO: build a mongo query from params['filter'] and params['offset']
-        # and then do this:
-        # mr_result = collection.inline_map_reduce(item, mapScript, reduceScript, limit=params['limit'], query=filter)
         mr_result = collection.inline_map_reduce(mapScript, reduceScript, query=query, scope={'counter': -1})
         # rearrange into a neater dict before sending it back
         result = {}
@@ -97,13 +94,15 @@ class DatasetItem(Resource):
         mapReduceCode = execjs.compile(mapScript + reduceScript +
                                        self.foreignCode['mapReduceChunk.js'])
 
-        extraParameters = json.dumps({
+        extraParameters = {
             'limit': int(params.get('limit', 0)),
             'offset': int(params.get('offset', 0)),
             'fileType': item['meta']['rlab']['format'],
             'outputType': 'jsonArray'
-            # TODO: add a filter parameter as well
-        })
+        }
+        if 'filter' in params and params['filter'] is not None:
+            extraParameters['filter'] = params['filter']
+        extraParameters = json.dumps(extraParameters)
 
         fileObj = self.model('file').load(item['meta']['rlab']['fileId'], user=user)
         stream = self.model('file').download(fileObj, headers=False, extraParameters=extraParameters)
@@ -159,7 +158,7 @@ class DatasetItem(Resource):
         .param('format',
                'The format of the file. Must be one of "csv", "json", ' +
                'or "mongodb.collection". If not supplied, the default behavior ' +
-               'is to infer the format from the file extension or (TODO:) MIME type',
+               'is to infer the format from the file extension or MIME type',
                required=False)
         .param('jsonPath',
                'If the format of the file is "json", this parameter is a JSONPath ' +
@@ -325,6 +324,8 @@ class DatasetItem(Resource):
         # Populate params with default settings
         # where settings haven't been specified
         params['filter'] = params.get('filter', None)
+        if params['filter'] is not None:
+            params['filter'] = json.loads(params['filter'])
         params['limit'] = params.get('limit', 0)
         params['offset'] = params.get('offset', 0)
 
@@ -416,7 +417,7 @@ class DatasetItem(Resource):
         .param('id', 'The ID of the dataset item.', paramType='path')
         .param('filter',
                'Get the histogram after the results of this filter. ' +
-               'TODO: describe our filter grammar.',
+               'TODO: describe our filter grammar (an AST tree).',
                required=False)
         .param('limit', 'Result set size limit. Setting to 0 will create ' +
                'a histogram using all the matching items (default=0).',
@@ -511,8 +512,7 @@ class DatasetItem(Resource):
 
         if '__passedFilters__' not in histogram:
             # This will only happen if there's a count of zero;
-            # we should populate the histogram with zero counts
-            # for every bin
+            # the __passedFilters__ bin will never have been emitted
             histogram['__passedFilters__'] = [{
                 'count': 0,
                 'label': 'count'
@@ -527,6 +527,6 @@ class DatasetItem(Resource):
                 self.model('item').updateItem(item)
             except AccessException:
                 # Meh, we couldn't cache the result. Not a big enough deal
-                # to throw / catch errors, so just fail silently
+                # to throw / display errors, so just fail silently
                 pass
         return histogram
