@@ -8,14 +8,14 @@ import copy
 import inspect
 import re
 import csv
-import bson.json_util
+import json
 import md5
 import math
 import itertools
 import cherrypy
 from pymongo import MongoClient
 from anonymousAccess import loadAnonymousItem
-from querylang import astToMongo, astToFunction
+from querylang import astToMongo
 from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
@@ -48,20 +48,19 @@ class DatasetItem(Resource):
 
         self.sniffSampleSize = 131072    # 128K
 
-    def getMongoCollection(self, item):
-        dbMetadata = item['databaseMetadata']
-        conn = MongoClient(dbMetadata['url'])
-        return conn[dbMetadata['database']][dbMetadata['collection']]
+    def getMongoCollection(self, fileInfo, assetstoreInfo):
+        uri = assetstoreInfo['database']['uri']
+        uri = uri[:uri.rfind('/')]  # strip off the assetstore db name
+        dbName = fileInfo['databaseMetadata']['database']
+        tableName = fileInfo['databaseMetadata']['table']
+        connection = MongoClient(uri)
+        return connection[dbName][tableName]
 
-    def mongoMapReduce(self, item, user, mapScript, reduceScript, params={}):
-        collection = self.getMongoCollection(item)
+    def mongoMapReduce(self, mapScript, reduceScript, collection, params):
         # Convert our AST filter expression to a mongo filter
         query = None
         if 'filter' in params and params['filter'] is not None:
-            query = astToMongo(bson.json_util.loads(params['filter']))
-        # TODO: build a mongo query from params['filter'] and params['offset']
-        # and then do this:
-        # mr_result = collection.inline_map_reduce(item, mapScript, reduceScript, limit=params['limit'], query=filter)
+            query = astToMongo(params['filter'])
         mr_result = collection.inline_map_reduce(mapScript, reduceScript, query=query, scope={'counter': -1})
         # rearrange into a neater dict before sending it back
         result = {}
@@ -72,7 +71,7 @@ class DatasetItem(Resource):
             result[r['_id']] = r['value']
         return result
 
-    def mapReduceViaDownload(self, item, user, mapScript, reduceScript, params={}):
+    def mapReduceViaDownload(self, item, user, mapScript, reduceScript, params):
         # TODO: This is an incredibly naive, single-threaded implementation.
         # Potential optimizations:
 
@@ -95,13 +94,15 @@ class DatasetItem(Resource):
         mapReduceCode = execjs.compile(mapScript + reduceScript +
                                        self.foreignCode['mapReduceChunk.js'])
 
-        extraParameters = bson.json_util.dumps({
+        extraParameters = {
             'limit': int(params.get('limit', 0)),
             'offset': int(params.get('offset', 0)),
             'fileType': item['meta']['rlab']['format'],
             'outputType': 'jsonArray'
-            # TODO: add a filter parameter as well
-        })
+        }
+        if 'filter' in params and params['filter'] is not None:
+            extraParameters['filter'] = params['filter']
+        extraParameters = json.dumps(extraParameters)
 
         fileObj = self.model('file').load(item['meta']['rlab']['fileId'], user=user)
         stream = self.model('file').download(fileObj, headers=False, extraParameters=extraParameters)
@@ -109,12 +110,39 @@ class DatasetItem(Resource):
         reducedResult = {}
 
         for line in stream():
-            rawData.append(bson.json_util.loads(line))
+            rawData.append(json.loads(line))
             if sys.getsizeof(rawData) >= bufferSize:
                 reducedResult = mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
                 rawData = []
         # last chunk
         return mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
+
+    def mapReduce(self, item, mapScript, reduceScript, params={}):
+        # Get the current or the anonymous user
+        user = self.getCurrentUser()
+        if user is None:
+            user = self.app.anonymousAccess.getAnonymousUser()
+
+        # Figure out what kind of assetstore the file is in
+        fileInfo = self.model('file').load(item['meta']['rlab']['fileId'],
+                                           level=AccessType.WRITE,
+                                           user=user,
+                                           exc=True)
+        assetstoreinfo = self.model('assetstore').load(fileInfo['assetstoreId'])
+
+        # Okay, figure out how/where we want to run our mapreduce code
+        if assetstoreinfo['type'] == 'database':
+            if assetstoreinfo['database']['dbtype'] == 'mongo':
+                collection = self.getMongoCollection(fileInfo, assetstoreinfo)
+                result = self.mongoMapReduce(mapScript, reduceScript, collection, params)
+            else:
+                raise RestException('MapReduce for ' +
+                                    assetstoreinfo['database']['dbtype'] +
+                                    ' databases is not yet supported')
+        else:
+            result = self.mapReduceViaDownload(item, user, mapScript, reduceScript, params)
+
+        return result
 
     @access.public
     @loadAnonymousItem()
@@ -130,7 +158,7 @@ class DatasetItem(Resource):
         .param('format',
                'The format of the file. Must be one of "csv", "json", ' +
                'or "mongodb.collection". If not supplied, the default behavior ' +
-               'is to infer the format from the file extension or (TODO:) MIME type',
+               'is to infer the format from the file extension or MIME type',
                required=False)
         .param('jsonPath',
                'If the format of the file is "json", this parameter is a JSONPath ' +
@@ -157,15 +185,11 @@ class DatasetItem(Resource):
             # We were given the fileId
             rlab['fileId'] = params['fileId']
         else:
-            if 'databaseMetadata' in item:
-                # This is a database; there is no fileId
-                rlab['format'] = 'mongodb.collection'
-            else:
-                # Use the first file in this item
-                childFiles = [f for f in self.model('item').childFiles(item=item)]
-                if (len(childFiles) == 0):
-                    raise RestException('Item contains no files')
-                rlab['fileId'] = childFiles[0]['_id']
+            # Use the first file in this item
+            childFiles = [f for f in self.model('item').childFiles(item=item)]
+            if (len(childFiles) == 0):
+                raise RestException('Item contains no files')
+            rlab['fileId'] = childFiles[0]['_id']
 
         # Determine format
         fileObj = None
@@ -188,7 +212,7 @@ class DatasetItem(Resource):
                 rlab['jsonPath'] = '$'
         elif rlab['format'] == 'csv':
             if 'dialect' in params:
-                rlab['dialect'] = bson.json_util.loads(params['dialect'])
+                rlab['dialect'] = json.loads(params['dialect'])
             else:
                 # use girder_worker's enhancements of csv.Sniffer()
                 # to infer the dialect
@@ -244,8 +268,8 @@ class DatasetItem(Resource):
         # Do we have the necessary basic metadata?
         invalid = 'meta' not in item or 'rlab' not in item['meta']
         if not invalid:
-            # Do we have a dataset definition or a file format specified?
-            invalid = 'databaseMetadata' not in item and 'format' not in item['meta']['rlab']
+            # Do we have a file format specified?
+            invalid = 'format' not in item['meta']['rlab']
         if not invalid and 'fileId' in item['meta']['rlab']:
             # Do we specify a file that we don't have (this happens
             # when making anonymous copies of datasets)?
@@ -272,18 +296,7 @@ class DatasetItem(Resource):
             self.foreignCode['schema_reduce.js'] + '\n' + \
             'return counters;\n}'
 
-        # TODO: When girder_db_items changes, find a new way to sneak
-        # in to the item's native database (mapReduceViaDownload is VERY
-        # sub-optimal!)
-        if 'databaseMetadata' in item:
-            if item['databaseMetadata']['type'] == 'mongo':
-                schema = self.mongoMapReduce(item, user, mapScript, reduceScript)
-            else:
-                raise RestException('MapReduce for ' +
-                                    item['databaseMetadata']['type'] +
-                                    ' databases is not yet supported')
-        else:
-            schema = self.mapReduceViaDownload(item, user, mapScript, reduceScript)
+        schema = self.mapReduce(item, mapScript, reduceScript)
 
         # We want to preserve any explicit user coerceToType or interpretation settings
         # thay may have existed in the previous schema (if they exist, they were
@@ -307,78 +320,16 @@ class DatasetItem(Resource):
 
         return schema
 
-    @access.public
-    @loadmodel(model='item', level=AccessType.READ)
-    @describeRoute(
-        Description('Get a histogram for all data attributes')
-        .param('id', 'The ID of the dataset item.', paramType='path')
-        .param('filter',
-               'Get the histogram after the results of this filter. ' +
-               'TODO: describe our filter grammar.',
-               required=False)
-        .param('limit', 'Result set size limit. Setting to 0 will create ' +
-               'a histogram using all the matching items (default=0).',
-               required=False, dataType='int')
-        .param('offset', 'Offset into result set (default=0).',
-               required=False, dataType='int')
-        .param('binSettings',
-               'A JSON dictionary containing settings that control how ' +
-               'each attribute is binned. Each key should correspond to an attribute ' +
-               'name, and the value should be a dictionary containing zero or more of ' +
-               'these settings:' +
-               '<br/><br/>coerceToType<br/>' +
-               'Attempt to coerce all values to "boolean","int",' +
-               '"number","date", or "string". Incompatible or missing ' +
-               'values will be assigned to appropriate bins such as "NaN" ' +
-               'or "undefined". If "object" (default) is supplied, values ' +
-               'will be binned into type categories ("interpretation" will be ' +
-               'ignored).'
-               '<br/><br/>interpretation<br/>' +
-               'If "ordinal", values will be summarized in order---either number range ' +
-               'bins (e.g. 0-10, 11-20, ...), or lexicographic bins (e.g. A-D, E-H, ...). ' +
-               'If "categorical" (default), values will be treated as unordered, categorical data.' +
-               '<br/><br/>lowBound<br/>' +
-               'Defines the low bound of the histogram if interpretation=ordinal. Default is ' +
-               'to use the minimum value in the dataset.' +
-               '<br/><br/>highBound<br/>' +
-               'Defines the high bound of the histogram if interpretation=ordinal. Default is ' +
-               'to use the maximum value in the dataset.' +
-               '<br/><br/>locale<br/>' +
-               'Specify the locale for binning ordinal strings. Default behavior is to use the ' +
-               'locale specified by the Accept-Language header, followed by "en" if that can not ' +
-               'be determined.' +
-               '<br/><br/>specialBins<br/>' +
-               'An array of values that will be put into their own bins, regardless of ' +
-               'all other settings. This lets you separate bad values/error codes, e.g. ' +
-               '[-9999,"N/A"]. These special values will be added to the set of natively ' +
-               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, "" (empty string), "Invalid Date", "other"]' +
-               '<br/><br/>numBins<br/>' +
-               'Defines the maximum number of bins to use, in addition to the specialBins ' +
-               '(default: 10 bins). For categorical data, the bins are arbitrarily chosen' +
-               '(in the future, the n-most frequent values will be chosen), and an "other" ' +
-               'bin will be created for values not in this set. Setting this to 0 will ' +
-               'create distinct bins for every value encountered (can be very expensive/useless for ' +
-               'attributes with lots of distinct values, such as IDs!). For ordinal data, ' +
-               'each bin will span a range of values (defined by lowBound and highBound).',
-               required=False)
-        .param('cache', 'If true, attempt to retrieve results cached in the item\'s metadata ' +
-                        'if the same query has been run previously. Also, attempt to store the results ' +
-                        'of this query in the metadata cache (fails silently if the user does not have ' +
-                        'write access).',
-               required=False, dataType='boolean')
-        .errorResponse()
-    )
-    def getHistograms(self, item, params):
-        if 'meta' not in item or 'rlab' not in item['meta'] or 'schema' not in item['meta']['rlab']:
-            raise RestException('Item ' + str(item['_id']) + ' has no schema information.')
-
+    def fillInDefaultHistogramParams(self, item, params):
         # Populate params with default settings
         # where settings haven't been specified
         params['filter'] = params.get('filter', None)
+        if params['filter'] is not None:
+            params['filter'] = json.loads(params['filter'])
         params['limit'] = params.get('limit', 0)
         params['offset'] = params.get('offset', 0)
 
-        binSettings = bson.json_util.loads(params.get('binSettings', '{}'))
+        binSettings = json.loads(params.get('binSettings', '{}'))
         for attrName, attrSchema in item['meta']['rlab']['schema'].iteritems():
             binSettings[attrName] = binSettings.get(attrName, {})
 
@@ -397,7 +348,7 @@ class DatasetItem(Resource):
 
             # Get any user-defined special bins (the defaults are
             # listed in histogram_reduce.js)
-            specialBins = bson.json_util.loads(binSettings[attrName].get('specialBins', '[]'))
+            specialBins = json.loads(binSettings[attrName].get('specialBins', '[]'))
             binSettings[attrName]['specialBins'] = specialBins
 
             # Get user-defined or default number of bins
@@ -457,12 +408,78 @@ class DatasetItem(Resource):
         params['binSettings'] = binSettings
         params['cache'] = params.get('cache', False) in TRUE_VALUES
 
+        return params, binSettings
+
+    @access.public
+    @loadmodel(model='item', level=AccessType.READ)
+    @describeRoute(
+        Description('Get a histogram for all data attributes')
+        .param('id', 'The ID of the dataset item.', paramType='path')
+        .param('filter',
+               'Get the histogram after the results of this filter. ' +
+               'TODO: describe our filter grammar (an AST tree).',
+               required=False)
+        .param('limit', 'Result set size limit. Setting to 0 will create ' +
+               'a histogram using all the matching items (default=0).',
+               required=False, dataType='int')
+        .param('offset', 'Offset into result set (default=0).',
+               required=False, dataType='int')
+        .param('binSettings',
+               'A JSON dictionary containing settings that control how ' +
+               'each attribute is binned. Each key should correspond to an attribute ' +
+               'name, and the value should be a dictionary containing zero or more of ' +
+               'these settings:' +
+               '<br/><br/>coerceToType<br/>' +
+               'Attempt to coerce all values to "boolean","int",' +
+               '"number","date", or "string". Incompatible or missing ' +
+               'values will be assigned to appropriate bins such as "NaN" ' +
+               'or "undefined". If "object" (default) is supplied, values ' +
+               'will be binned into type categories ("interpretation" will be ' +
+               'ignored).'
+               '<br/><br/>interpretation<br/>' +
+               'If "ordinal", values will be summarized in order---either number range ' +
+               'bins (e.g. 0-10, 11-20, ...), or lexicographic bins (e.g. A-D, E-H, ...). ' +
+               'If "categorical" (default), values will be treated as unordered, categorical data.' +
+               '<br/><br/>lowBound<br/>' +
+               'Defines the low bound of the histogram if interpretation=ordinal. Default is ' +
+               'to use the minimum value in the dataset.' +
+               '<br/><br/>highBound<br/>' +
+               'Defines the high bound of the histogram if interpretation=ordinal. Default is ' +
+               'to use the maximum value in the dataset.' +
+               '<br/><br/>locale<br/>' +
+               'Specify the locale for binning ordinal strings. Default behavior is to use the ' +
+               'locale specified by the Accept-Language header, followed by "en" if that can not ' +
+               'be determined.' +
+               '<br/><br/>specialBins<br/>' +
+               'An array of values that will be put into their own bins, regardless of ' +
+               'all other settings. This lets you separate bad values/error codes, e.g. ' +
+               '[-9999,"N/A"]. These special values will be added to the set of natively ' +
+               'recognized special bins: [undefined, null, NaN, Infinity, -Infinity, "" (empty string), "Invalid Date", "other"]' +
+               '<br/><br/>numBins<br/>' +
+               'Defines the maximum number of bins to use, in addition to the specialBins ' +
+               '(default: 10 bins). For categorical data, the bins are arbitrarily chosen' +
+               '(in the future, the n-most frequent values will be chosen), and an "other" ' +
+               'bin will be created for values not in this set. Setting this to 0 will ' +
+               'create distinct bins for every value encountered (can be very expensive/useless for ' +
+               'attributes with lots of distinct values, such as IDs!). For ordinal data, ' +
+               'each bin will span a range of values (defined by lowBound and highBound).',
+               required=False)
+        .param('cache', 'If true, attempt to retrieve results cached in the item\'s metadata ' +
+                        'if the same query has been run previously. Also, attempt to store the results ' +
+                        'of this query in the metadata cache (fails silently if the user does not have ' +
+                        'write access).',
+               required=False, dataType='boolean')
+        .errorResponse()
+    )
+    def getHistograms(self, item, params):
+        if 'meta' not in item or 'rlab' not in item['meta'] or 'schema' not in item['meta']['rlab']:
+            raise RestException('Item ' + str(item['_id']) + ' has no schema information.')
+
+        params, binSettings = self.fillInDefaultHistogramParams(item, params)
+
         # Stringify the params, both for cache hashing, as well as stitching
         # together the map and reduce code below
-        paramsCode = bson.json_util.dumps(params,
-                                          sort_keys=True,
-                                          indent=2,
-                                          separators=(',', ': '))
+        paramsCode = json.dumps(params, sort_keys=True, indent=2, separators=(',', ': '))
 
         # Check if this query has already been run - if so, return the cached result
         if params['cache']:
@@ -481,21 +498,7 @@ class DatasetItem(Resource):
             self.foreignCode['histogram_reduce.js'] + '\n' + \
             'return {histogram: histogram};\n}'
 
-        # TODO: When girder_db_items changes, find a new way to sneak
-        # in to the item's native database (mapReduceViaDownload is VERY
-        # sub-optimal!)
-        user = self.getCurrentUser()
-        if user is None:
-            user = self.app.anonymousAccess.getAnonymousUser()
-        if 'databaseMetadata' in item:
-            if item['databaseMetadata']['type'] == 'mongo':
-                histogram = self.mongoMapReduce(item, user, mapScript, reduceScript, params)
-            else:
-                raise RestException('MapReduce for ' +
-                                    item['databaseMetadata']['type'] +
-                                    ' databases is not yet supported')
-        else:
-            histogram = self.mapReduceViaDownload(item, user, mapScript, reduceScript, params)
+        histogram = self.mapReduce(item, mapScript, reduceScript, params)
 
         # We have to clean up the histogram wrappers (mongodb can't return
         # an array from reduce functions). While we're at it, add the
@@ -509,8 +512,7 @@ class DatasetItem(Resource):
 
         if '__passedFilters__' not in histogram:
             # This will only happen if there's a count of zero;
-            # we should populate the histogram with zero counts
-            # for every bin
+            # the __passedFilters__ bin will never have been emitted
             histogram['__passedFilters__'] = [{
                 'count': 0,
                 'label': 'count'
@@ -525,6 +527,6 @@ class DatasetItem(Resource):
                 self.model('item').updateItem(item)
             except AccessException:
                 # Meh, we couldn't cache the result. Not a big enough deal
-                # to throw / catch errors, so just fail silently
+                # to throw / display errors, so just fail silently
                 pass
         return histogram

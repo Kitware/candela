@@ -12,7 +12,7 @@ module.exports = {
   apply: function (compiler) {
     compiler.plugin('emit', (compilation, callback) => {
       if (compilation.options.watch === true) {
-        exec('cd $GIRDER_PATH && grunt', function (error, stdout, stderr) {
+        exec('cd $GIRDER_PATH && grunt --force', function (error, stdout, stderr) {
           if (error) {
             console.log('Couldn\'t run grunt. Did you forget to export GIRDER_PATH ?');
             process.exit(1);

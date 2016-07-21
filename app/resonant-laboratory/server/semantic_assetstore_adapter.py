@@ -2,6 +2,7 @@ import cherrypy
 import csv
 import json
 import sys
+from querylang import astToFunction
 from girder.models.model_base import GirderException
 
 
@@ -148,6 +149,12 @@ def semantic_access(Cls):
                 print 'outputType = %s is not allowed' % (outputType)
                 raise GirderException('"outputType" must be one of: %s' % (', '.join(allowed_outputtypes)), '%s.illegal-argument' % (module))
 
+            filterFunc = extraParameters.get('filter')
+            if filterFunc is None:
+                def filterFunc(x): return True
+            else:
+                filterFunc = astToFunction(filterFunc)
+
             # Set content-length header to zero and clear content-range.
             if 'Content-Length' in cherrypy.response.headers:
                 del cherrypy.response.headers['Content-Length']
@@ -169,6 +176,9 @@ def semantic_access(Cls):
                 try:
                     while limit == 0 or count < limit:
                         line = data.next()
+                        dictLine = dict(zip(header_line, line))
+                        if not filterFunc(dictLine):
+                            continue
                         count += 1
                         if outputType == 'csv':
                             yield ','.join(line) + '\n'

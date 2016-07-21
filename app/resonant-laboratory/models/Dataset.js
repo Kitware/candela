@@ -213,38 +213,19 @@ class DatasetCache {
   get currentDataPage () {
     if (!this.cachedPromises.currentDataPage) {
       this.cachedPromises.currentDataPage = this.schema.then(schema => {
-        if (this.model.getMeta('format') === 'mongodb.collection') {
-          return this.restRequest({
-            path: 'database/select',
-            type: 'GET',
-            data: {
-              format: 'dict',
+        return this.restRequest({
+          path: 'download',
+          type: 'GET',
+          data: {
+            extraParameters: JSON.stringify({
+              fileType: this.model.getMeta('format'),
+              outputType: 'json',
               offset: this.page.offset,
-              limit: this.page.limit
-              // filter: this.model.formatFilterExpression()
-              // TODO: For this to technically work,
-              // we need to convert to the old
-              // girder_db_items query format...
-              // but when that changes, this whole
-              // separate call that differentiates between
-              // mongodb vs flat files will be going away
-            }
-          }, 'rl:loadedData').then(resp => resp.data);
-        } else {
-          return this.restRequest({
-            path: 'download',
-            type: 'GET',
-            data: {
-              extraParameters: JSON.stringify({
-                fileType: this.model.getMeta('format'),
-                outputType: 'json',
-                offset: this.page.offset,
-                limit: this.page.limit,
-                filter: this.model.formatFilterExpression()
-              })
-            }
-          }, 'rl:loadedData');
-        }
+              limit: this.page.limit,
+              filter: this.model.getFilterAstTree()
+            })
+          }
+        }, 'rl:loadedData');
       });
     }
     return this.cachedPromises.currentDataPage;
@@ -449,17 +430,23 @@ let Dataset = MetadataItem.extend({
     exprList = exprList.concat(this.cache.filter.custom);
     return exprList;
   },
-  formatFilterExpression () {
+  getFilterAstTree () {
     let exprList = this.listAllFilterExpressions(true);
 
     if (exprList.length > 0) {
       let fullExpression = '(' + exprList.join(') and (') + ')';
       let ast = parseToAst(fullExpression);
-      this.dehexify(ast);
-      return JSON.stringify(ast);
+      return this.dehexify(ast);
     } else {
       return undefined;
     }
+  },
+  formatFilterExpression () {
+    let tree = this.getFilterAstTree();
+    if (tree !== undefined) {
+      tree = JSON.stringify(tree);
+    }
+    return tree;
   },
   getTypeSpec: function () {
     let schema = this.getMeta('schema') || {};
