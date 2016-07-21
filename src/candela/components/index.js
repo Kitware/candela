@@ -11,6 +11,7 @@ import LineUp from './LineUp';
 import ParallelCoordinates from './ParallelCoordinates';
 import ScatterPlot from './ScatterPlot';
 import ScatterPlotMatrix from './ScatterPlotMatrix';
+import SurvivalPlot from './SurvivalPlot';
 import UpSet from './UpSet';
 
 export default {
@@ -27,5 +28,6 @@ export default {
   ParallelCoordinates,
   ScatterPlot,
   ScatterPlotMatrix,
+  SurvivalPlot,
   UpSet
 };
