@@ -70,8 +70,13 @@ value
   / string
 
 number
-  = value:[0-9]+ frac:('.'[0-9]*) { return parseFloat(value.join('') + '.' + frac[1].join('')); }
-  / value:[0-9]+ { return parseInt(value.join('')); }
+  = negate:'-'? value:[0-9]+ frac:(('.'[0-9]*)?) {
+    negate = negate ? -1 : 1;
+    var intpart = value.join('');
+    frac = frac ? '.' + frac[1].join('') : '';
+
+    return negate * parseFloat(intpart + frac);
+  }
 
 string
   = '"' chars:([^\r\n"]*) '"' { return chars.join(''); }
