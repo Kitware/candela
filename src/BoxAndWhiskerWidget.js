@@ -101,10 +101,12 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
           ['95th %ile', standardRound(quantiles[4])],
           ['Max', standardRound(this.currentValues[this.currentValues.length-1])],
           ['# of Samples', this.currentValues.length],
-          // Add in a blank row to separate Outliers.
-          ['&nbsp', '&nbsp'],
-          ['Outliers', _.map(outliers, standardRound).join(", ")]
         ];
+        if (outliers.length > 0) {
+          // Add in a blank row to separate Outliers.
+          cells.push(['&nbsp', '&nbsp']);
+          cells.push(['Outliers', _.map(outliers, standardRound).join(", ")]);
+        }
         let toolTipHtml = '<table style="border-collapse: separate; border-spacing: 10px 2px;">';
         _.each(cells, function (cell) {
           toolTipHtml += '<tr><td>'+cell[0]+'</td><td>'+cell[1]+'</td></tr>';
