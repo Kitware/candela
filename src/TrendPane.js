@@ -4,6 +4,8 @@ import $ from 'jquery';
 import nv from 'nvd3';
 import d3 from 'd3';
 
+import { deArray } from './utility.js';
+
 import trendPane from '../templates/trendPane';
 
 export let TrendPane = Backbone.View.extend({
@@ -20,7 +22,8 @@ export let TrendPane = Backbone.View.extend({
     const byTrend = _.groupBy(trends, 'trend');
 
     const min = _.reduce(trends, (memo, num) => {
-      return Math.min(memo, num.current);
+      let current = deArray(num.current, d3.min);
+      return Math.min(memo, current);
     }, 0);  // we want 0 to be the min
 
     const maxXSet = !_.isNaN(parseFloat(maxX));
@@ -33,7 +36,7 @@ export let TrendPane = Backbone.View.extend({
       binWidth = (max - min) / (bins - 1);
     } else {
       max = _.reduce(trends, (memo, num) => {
-        return Math.max(memo, num.current);
+        return Math.max(memo, deArray(num.current, d3.max));
       }, 0);
       binWidth = (max - min) / bins;
     }
@@ -41,7 +44,8 @@ export let TrendPane = Backbone.View.extend({
     let hists = _.map(byTrend, (element, key) => {
       let el = {trend: this.trendMap[key].display_name};
       el['values'] = _.countBy(_.map(element, (value) => {
-        let res = Math.floor(value.current / binWidth);
+        let current = deArray(value.current, d3.median);
+        let res = Math.floor(current / binWidth);
         if (maxXSet) {
           if (res > bins - 1) {
             res = bins - 1;

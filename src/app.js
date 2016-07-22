@@ -9,7 +9,7 @@ import { InfoPane } from './InfoPane';
 import { TrendPane } from './TrendPane';
 import { ResultTablePane } from './ResultTablePane';
 import { TopInfoBar } from './TopInfoBar';
-import { sanitizeSelector } from './utility.js';
+import { sanitizeSelector, deArray } from './utility.js';
 
 import layout from '../templates/layout';
 
@@ -51,6 +51,9 @@ export let dash = Backbone.View.extend({
           let aggTrend = _.clone(trendMap[trends[i]]);
           let trendVals = _.chain(byTrend[aggTrend.name])
                            .pluck('current')
+                           .map((value) => {
+                               return deArray(value, d3.median);
+                           })
                            // '+' converts values to numeric for a numeric sort.
                            .sortBy((num) => { return +num; })
                            .value();
@@ -118,17 +121,19 @@ export let dash = Backbone.View.extend({
     // the max as the max input value for that trend.
     _.each(settings.trendValuesByDataset, function (trendValue) {
       if (!_.has(settings.trendMap, trendValue.trend)) {
+        let current = deArray(trendValue.current, d3.median);
         var syntheticTrend = sanitizeTrend({
           name: trendValue.trend,
           synth: true,
-          max: d3.median(trendValue.current)
+          max: current
         });
         settings.trendMap[syntheticTrend.name] = syntheticTrend;
         settings.trends.push(syntheticTrend);
       } else {
+        let current = deArray(trendValue.current, d3.median);
         var trend = settings.trendMap[trendValue.trend];
-        if (trend.synth && trend.max < trendValue.current) {
-          trend.max = trendValue.current;
+        if (trend.synth && trend.max < current) {
+          trend.max = current;
         }
       }
     });

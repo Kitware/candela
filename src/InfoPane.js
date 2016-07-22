@@ -6,7 +6,7 @@ import nv from 'nvd3';
 
 import { StatusBarWidget } from './StatusBarWidget';
 import { ErrorBulletWidget } from './ErrorBulletWidget';
-import { failValue, warningValue } from './utility.js';
+import { deArray, failValue, warningValue } from './utility.js';
 
 import infoPane from '../templates/infoPane';
 
@@ -29,16 +29,17 @@ export let InfoPane = Backbone.View.extend({
     this.allValues = [];
     this.aggTrends = settings.aggTrends;
     _.each(settings.trendValuesByDataset, _.bind(function (dataset) {
-      this.allValues.push(dataset.current);
+      let current = deArray(dataset.current, d3.median);
+      this.allValues.push(current);
 
       if (settings.trendMap[dataset.trend].incompleteThreshold) {
         this.numIncomplete++;
       } else {
         var failTrend = settings.trendMap[dataset.trend].fail;
         var warningTrend = settings.trendMap[dataset.trend].warning;
-        if (failValue(dataset.current, warningTrend, failTrend)) {
+        if (failValue(current, warningTrend, failTrend)) {
           this.numFail++;
-        } else if (warningValue(dataset.current, warningTrend, failTrend)) {
+        } else if (warningValue(current, warningTrend, failTrend)) {
           this.numBad++;
         } else {
           this.numSuccess++;
@@ -115,6 +116,7 @@ export let InfoPane = Backbone.View.extend({
           });
         }
         let current = trend.history[trend.history.length - 1];
+        current = deArray(current, d3.median);
         this.aggBullets[trend.id_selector] = new ErrorBulletWidget({
           el: '#' + trend.id_selector + '-aggregate-bullet',
           result: {

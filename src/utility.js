@@ -46,3 +46,11 @@ export let computeColor = (trend, value) => {
       }
     }
 };
+
+export let deArray = (values, reducer) => {
+      if (Array.isArray(values)) {
+          return reducer(values);
+      } else {
+          return values;
+      }
+};
