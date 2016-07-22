@@ -9,14 +9,14 @@ Choose your own visualization adventure.
 2. [Install Girder from a Git checkout](http://girder.readthedocs.org/en/latest/installation.html#install-from-git-checkout). Note that all the following steps assume you are running shell commands
 using the `virtualenv` described in the girder setup instructions.
 
-3. Install the [girder_db_items plugin](https://github.com/OpenGeoscience/girder_db_items):
+3. Install the [database_assetstore plugin](https://github.com/OpenGeoscience/girder_db_items):
 
   ```bash
-  git clone https://github.com/OpenGeoscience/girder_db_items.git
-  cd girder_db_items
+  git clone https://github.com/OpenGeoscience/girder_db_items.git database_assetstore
+  cd database_assetstore
   npm install
   cd ..
-  girder-install plugin -s girder_db_items
+  girder-install plugin -s database_assetstore
   ```
 
 4. Run the following after cloning this repository:
