@@ -90,15 +90,15 @@ export let ResultTablePane = Backbone.View.extend({
       _.each(this.results, function (result) {
         var trend = this.trendMap[result.trend];
         var resultDivSelector = '#' + result.dataset_id_selector + '-' + trend.id_selector;
-        // render bullets
-        let errorBullet = new ValueWidget({
-          el: resultDivSelector + '-bullet',
+        // Render value widgets.
+        let valueWidget = new ValueWidget({
+          el: resultDivSelector + '-valueWidget',
           result: result,
           trend: trend
         });
-        errorBullet.render();
+        valueWidget.render();
 
-        // activate callback for bullet if specified
+        // Activate callback for valueWidget if specified.
         if (typeof result.callback === 'function') {
           $(resultDivSelector)
             .css('cursor', 'pointer')

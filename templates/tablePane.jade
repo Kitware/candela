@@ -47,6 +47,6 @@ table.table.table-striped.table-hover.table-responsive.table-compact
             .dataset-label(id="#{resultSet[0].dataset_id_selector}-label")
               | #{datasetLabelMap[resultSet[0].dataset_id_selector]}
         each trend in trends
-          td.bullet-container(id="#{resultSet[0].dataset_id_selector}-#{trend.id_selector}")
-            .bullet(id="#{resultSet[0].dataset_id_selector}-#{trend.id_selector}-bullet")
-              svg(id="#{resultSet[0].dataset_id_selector}-#{trend.id_selector}-bullet-svg")
+          td.valueWidget-container(id="#{resultSet[0].dataset_id_selector}-#{trend.id_selector}")
+            .valueWidget(id="#{resultSet[0].dataset_id_selector}-#{trend.id_selector}-valueWidget")
+              svg(id="#{resultSet[0].dataset_id_selector}-#{trend.id_selector}-valueWidget-svg")
