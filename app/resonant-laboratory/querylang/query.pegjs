@@ -66,9 +66,12 @@ identifier
   / string
 
 value
+  = number
+  / string
+
+number
   = value:[0-9]+ frac:('.'[0-9]*) { return parseFloat(value.join('') + '.' + frac[1].join('')); }
   / value:[0-9]+ { return parseInt(value.join('')); }
-  / string
 
 string
   = '"' chars:([^\r\n"]*) '"' { return chars.join(''); }
