@@ -3,6 +3,11 @@ import fs from 'fs';
 import test from 'tape';
 import { parseToAst } from '..';
 
+const negative_expressions = [
+  'negative_pi = -3.14159',
+  'negative_pi_indiana = -3'
+];
+
 const operator_expression = [
   'age < 21',
   'age <= 21',
@@ -45,6 +50,11 @@ function test_expressions (t, exprs, baseline_path) {
     t.deepEqual(asts[i], baselines[i], `Expression '${exprs[i]}' parses correctly`);
   }
 }
+
+test('Negative number parsing', t => {
+  test_expressions(t, negative_expressions, './app/resonant-laboratory/server/test/negative-ast-baselines.json');
+  t.end();
+});
 
 test('Operator expression parsing', t => {
   test_expressions(t, operator_expression, './app/resonant-laboratory/server/test/operator-ast-baselines.json');
