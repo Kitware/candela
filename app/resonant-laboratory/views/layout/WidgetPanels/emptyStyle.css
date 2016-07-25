@@ -1,0 +1,22 @@
+#WidgetPanels .emptyState {
+  position: absolute;
+  top: 1.5em;
+  right: 1.5em;
+  height: calc(100vh - 6em);
+  color: #f0f0f0;
+}
+#WidgetPanels .emptyState > div {
+  width: 20em;
+}
+#WidgetPanels .emptyState #QuestionHint {
+  position: absolute;
+  top: 0em;
+  right: 0em;
+  text-align: right;
+}
+#WidgetPanels .emptyState img {
+  width: 1em;
+  height: 1em;
+  -webkit-filter: url(#recolorImageToffffcc);
+  filter: url(#recolorImageToffffcc);
+}

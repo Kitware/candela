@@ -3,6 +3,8 @@ import Backbone from 'backbone';
 import jQuery from 'jquery';
 import d3 from 'd3';
 
+import emptyStateTemplate from './emptyState.html';
+import './emptyStyle.css';
 import './accordionhorz.css';
 import './style.css';
 
@@ -99,15 +101,14 @@ let WidgetPanels = Backbone.View.extend({
       .css('width', style);
 
     // Are all the widgets closed (and no overlay is showing)?
-    if (expandedSections === 0 &&
-      window.mainPage.overlay.template === null) {
-      // Show the empty state image
-      jQuery('#EmptyState')
+    if (expandedSections === 0 && !(window.mainPage.overlay.template)) {
+      // Show the empty state stuff
+      jQuery('.emptyState')
         .css('left', (1.5 + 2.5 * collapsedSections) + 'em')
-        .show();
+        .html(emptyStateTemplate);
     } else {
-      // Hide the empty state image
-      jQuery('#EmptyState').hide();
+      // Hide the empty state stuff
+      jQuery('.emptyState').html('');
     }
 
     // Finally, get all the widgets to render
