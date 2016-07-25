@@ -4,6 +4,12 @@ Resonant Laboratory Colors and their meanings
 We currently make use of three ColorBrewer schemes: [dark](http://colorbrewer2.org/?type=qualitative&scheme=Set1&n=9), [light](http://colorbrewer2.org/?type=qualitative&scheme=Pastel1&n=9), and
 [sequential](http://colorbrewer2.org/?type=sequential&scheme=YlGnBu&n=6)
 
+This table outlines how each color is used. To preview the colors on GitHub, paste this code in the browser's console:
+
+```
+Array.from(document.getElementsByTagName('td')).filter(function (d) { return d.textContent.startsWith('#'); }).forEach(function (d) { d.setAttribute('style','background-color:' + d.textContent); });
+```
+
 | Color       | Scheme      | Hex     | Use(s)                                   |                                                                   |                                        |
 |-------------|-------------|---------|------------------------------------------|-------------------------------------------------------------------|----------------------------------------|
 | Black       | Grays       | #000000 | Rollover (light background)              |                                                                   |                                        |
