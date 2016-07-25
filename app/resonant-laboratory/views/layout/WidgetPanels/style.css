@@ -24,8 +24,8 @@
 }
 
 #WidgetPanels .sectionHeader img.new {
-  -webkit-filter: url(#recolorImageToffff33);
-  filter: url(#recolorImageToffff33);
+  -webkit-filter: url(#recolorImageToffffcc);
+  filter: url(#recolorImageToffffcc);
 }
 #WidgetPanels .sectionHeader img:hover {
   -webkit-filter: url(#recolorImageToWhite);

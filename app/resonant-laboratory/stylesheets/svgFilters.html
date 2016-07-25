@@ -5,7 +5,7 @@
     <!-- CSS stylesheets can reference these simply with
     filter: url(#recolorImageTo333333);
 
-    CB Colors:
+    CB Colors: http://colorbrewer2.org/?type=qualitative&scheme=Set1&n=9
     #e41a1c
     #377eb8
     #4daf4a
@@ -14,6 +14,17 @@
     #ffff33
     #a65628
     #f781bf
+
+    CB Colors: http://colorbrewer2.org/?type=qualitative&scheme=Pastel1&n=9
+    #fbb4ae
+    #b3cde3
+    #ccebc5
+    #decbe4
+    #fed9a6
+    #ffffcc
+    #e5d8bd
+    #fddaec
+    #f2f2f2
     -->
     <filter id="recolorImageToWhite">
       <feComponentTransfer in="SourceAlpha" result="color">
@@ -85,7 +96,28 @@
         <feFuncB type="linear" slope="0" intercept="0.04000000000000001" />
       </feComponentTransfer>
     </filter>
-    <!-- TODO: brown and pink -->
+    <filter id="recolorImageToa65628">
+      <feComponentTransfer in="SourceAlpha" result="color">
+        <feFuncR type="linear" slope="0" intercept="0.42377547097270285" />
+        <feFuncG type="linear" slope="0" intercept="0.11374086889657825" />
+        <feFuncB type="linear" slope="0" intercept="0.024605920799692427" />
+      </feComponentTransfer>
+    </filter>
+    <filter id="recolorImageTof781bf">
+      <feComponentTransfer in="SourceAlpha" result="color">
+        <feFuncR type="linear" slope="0" intercept="0.938239138792772" />
+        <feFuncG type="linear" slope="0" intercept="0.255916955017301" />
+        <feFuncB type="linear" slope="0" intercept="0.5610303729334871" />
+      </feComponentTransfer>
+    </filter>
+
+    <filter id="recolorImageToffffcc">
+      <feComponentTransfer in="SourceAlpha" result="color">
+        <feFuncR type="linear" slope="0" intercept="1" />
+        <feFuncG type="linear" slope="0" intercept="1" />
+        <feFuncB type="linear" slope="0" intercept="0.6400000000000001" />
+      </feComponentTransfer>
+    </filter>
 
     <!-- Similarly-accessible effect: drop shadow -->
     <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
