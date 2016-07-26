@@ -2,42 +2,60 @@
     {
         "operator": "<",
         "operands": [
-            "age",
+            {
+                "identifier": "age",
+                "type": null
+            },
             21
         ]
     },
     {
         "operator": "<=",
         "operands": [
-            "age",
+            {
+                "identifier": "age",
+                "type": null
+            },
             21
         ]
     },
     {
         "operator": ">",
         "operands": [
-            "age",
+            {
+                "identifier": "age",
+                "type": null
+            },
             21
         ]
     },
     {
         "operator": ">=",
         "operands": [
-            "age",
+            {
+                "identifier": "age",
+                "type": null
+            },
             21
         ]
     },
     {
         "operator": "=",
         "operands": [
-            "age",
+            {
+                "identifier": "age",
+                "type": null
+            },
             21
         ]
     },
     {
         "operator": "!=",
         "operands": [
-            "age",
+            {
+                "identifier": "age",
+                "type": null
+            },
             21
         ]
     }
