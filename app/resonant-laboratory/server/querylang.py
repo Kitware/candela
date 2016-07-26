@@ -30,17 +30,17 @@ def astToFunction(ast):
         f = astToFunction(operands)
         return lambda row: not f(row)
     elif operator == 'in':
-        field = operands[0]
+        field = operands[0]['identifier']
         candidates = operands[1]
 
         return lambda row: field in row and row[field] in candidates
     elif operator == 'not in':
-        field = operands[0]
+        field = operands[0]['identifier']
         candidates = operands[1]
 
         return lambda row: field in row and row[field] not in candidates
     elif operator in ['<=', '<', '>=', '>', '=', '!=']:
-        field = operands[0]
+        field = operands[0]['identifier']
         value = operands[1]
 
         return lambda row: _opfunc[operator](row[field], value)
@@ -73,7 +73,7 @@ def _astToMongo_helper(ast):
     elif operator == 'not':
         raise TypeError('_astToMongo_helper() cannot operate on an AST with not-nodes.')
     elif operator in ['in', 'not in', '<=', '<', '>=', '>', '=', '!=']:
-        field = operands[0]
+        field = operands[0]['identifier']
         value = operands[1]
 
         return {field: {_mongo_operators[operator]: value}}
