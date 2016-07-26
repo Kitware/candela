@@ -132,5 +132,10 @@
       <feGaussianBlur result="blurOut" in="offOut" stdDeviation="15" />
       <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
     </filter>
+    <filter id="dropHalo" x="-50%" y="-50%" width="200%" height="200%">
+      <feOffset result="offOut" in="SourceAlpha" dx="0" dy="5" />
+      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="15" />
+      <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+    </filter>
   </defs>
 </svg>

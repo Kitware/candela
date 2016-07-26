@@ -18,35 +18,17 @@
   height: 1.5em;
   margin: 0.75em;
 }
-#Header img.headerButton.new {
-  -webkit-filter: url(#recolorImageToffffcc);
-  filter: url(#recolorImageToffffcc);
-}
-#Header img.headerButton:hover {
-  cursor: pointer;
-  -webkit-filter: url(#recolorImageToWhite);
-  filter: url(#recolorImageToWhite);
-}
 
-#Header div.indicators {
-  position: relative;
-  width: 0px;
-  height: 0px;
+#Header #brandingIcons img {
+  -webkit-filter: url(#recolorImageTo999999);
+  filter: url(#recolorImageTo999999);
+  width: 2em;
+  height: 2em;
+  margin: 0.25;
 }
-
-#Header div.indicators img {
-  position: absolute;
-  width: 1em;
-  height: 1em;
-  top: 0.5em;
-}
-
-#Header div.indicators img.left {
-  left: -3em;
-}
-
-#Header div.indicators img.right {
-  left: -1em;
+#Header #brandingIcons img:hover {
+  -webkit-filter: url(#dropShadow);
+  filter: url(#dropShadow);
 }
 
 #Header #interfaceIcons {
@@ -70,4 +52,35 @@
   margin: 0.75em;
   text-align: center;
   box-shadow: none;
+}
+
+#Header img.headerButton.new {
+  -webkit-filter: url(#recolorImageToffffcc);
+  filter: url(#recolorImageToffffcc);
+}
+#Header img.headerButton:hover {
+  cursor: pointer;
+  -webkit-filter: url(#recolorImageToWhite) url(#dropShadow);
+  filter: url(#recolorImageToWhite) url(#dropShadow);
+}
+
+#Header div.indicators {
+  position: relative;
+  width: 0px;
+  height: 0px;
+}
+
+#Header div.indicators img {
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  top: 0.5em;
+}
+
+#Header div.indicators img.left {
+  left: -3em;
+}
+
+#Header div.indicators img.right {
+  left: -1em;
 }
