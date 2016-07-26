@@ -37,6 +37,15 @@ const not_expression = [
   'not(not(age > 22))'
 ];
 
+const typed_expression = [
+  'negative_pi::number = -3.14159',
+  'negative_pi_indiana::integer = -3',
+  'age::number < 21',
+  'name::string = "11001001"',
+  'flag::bool = false',
+  'start::date > "2016-07-26"'
+];
+
 function test_expressions (t, exprs, baseline_path) {
   const asts = exprs.map(parseToAst);
 
@@ -73,6 +82,11 @@ test('Disjunction expression parsing', t => {
 
 test('Not expression parsing', t => {
   test_expressions(t, not_expression, './app/resonant-laboratory/server/test/not-ast-baselines.json');
+  t.end();
+});
+
+test('Typed expression parsing', t => {
+  test_expressions(t, typed_expression, './app/resonant-laboratory/server/test/typed-ast-baselines.json');
   t.end();
 });
 
