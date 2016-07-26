@@ -101,7 +101,7 @@ let WidgetPanels = Backbone.View.extend({
       .css('width', style);
 
     // Are all the widgets closed (and no overlay is showing)?
-    if (expandedSections === 0 && !(window.mainPage.overlay.template)) {
+    if (expandedSections === 0) {
       // Show the empty state stuff
       jQuery('.emptyState')
         .css('left', (1.5 + 2.5 * collapsedSections) + 'em')
