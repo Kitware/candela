@@ -4,6 +4,7 @@ from girder.constants import AssetstoreType
 from girder.utility.assetstore_utilities import setAssetstoreAdapter
 from girder.utility.filesystem_assetstore_adapter import FilesystemAssetstoreAdapter
 from girder.utility.gridfs_assetstore_adapter import GridFsAssetstoreAdapter
+from girder.plugins.database_assetstore.assetstore import DatabaseAssetstoreAdapter
 from semantic_assetstore_adapter import semantic_access
 from anonymousAccess import AnonymousAccess
 from versioning import Versioning
@@ -84,3 +85,4 @@ def load(info):
     # Install "semantic" download adapters into Girder's table of adapters.
     setAssetstoreAdapter(AssetstoreType.FILESYSTEM, semantic_access(FilesystemAssetstoreAdapter))
     setAssetstoreAdapter(AssetstoreType.GRIDFS, semantic_access(GridFsAssetstoreAdapter))
+    setAssetstoreAdapter(AssetstoreType.DATABASE, semantic_access(DatabaseAssetstoreAdapter, offset_limit=False))
