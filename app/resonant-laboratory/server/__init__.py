@@ -85,4 +85,4 @@ def load(info):
     # Install "semantic" download adapters into Girder's table of adapters.
     setAssetstoreAdapter(AssetstoreType.FILESYSTEM, semantic_access(FilesystemAssetstoreAdapter))
     setAssetstoreAdapter(AssetstoreType.GRIDFS, semantic_access(GridFsAssetstoreAdapter))
-    setAssetstoreAdapter(AssetstoreType.DATABASE, semantic_access(DatabaseAssetstoreAdapter, offset_limit=False))
+    setAssetstoreAdapter(AssetstoreType.DATABASE, semantic_access(DatabaseAssetstoreAdapter))
