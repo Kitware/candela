@@ -5,14 +5,20 @@
             {
                 "operator": "<",
                 "operands": [
-                    "age",
+                    {
+                        "identifier": "age",
+                        "type": null
+                    },
                     22
                 ]
             },
             {
                 "operator": ">",
                 "operands": [
-                    "age",
+                    {
+                        "identifier": "age",
+                        "type": null
+                    },
                     20
                 ]
             }

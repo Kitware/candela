@@ -7,14 +7,20 @@
                 {
                     "operator": "<",
                     "operands": [
-                        "age",
+                        {
+                            "identifier": "age",
+                            "type": null
+                        },
                         22
                     ]
                 },
                 {
                     "operator": ">",
                     "operands": [
-                        "age",
+                        {
+                            "identifier": "age",
+                            "type": null
+                        },
                         20
                     ]
                 }
@@ -29,14 +35,20 @@
                 {
                     "operator": "<=",
                     "operands": [
-                        "age",
+                        {
+                            "identifier": "age",
+                            "type": null
+                        },
                         22
                     ]
                 },
                 {
                     "operator": ">",
                     "operands": [
-                        "age",
+                        {
+                            "identifier": "age",
+                            "type": null
+                        },
                         20
                     ]
                 }
@@ -51,14 +63,20 @@
                 {
                     "operator": ">",
                     "operands": [
-                        "age",
+                        {
+                            "identifier": "age",
+                            "type": null
+                        },
                         22
                     ]
                 },
                 {
                     "operator": "<",
                     "operands": [
-                        "age",
+                        {
+                            "identifier": "age",
+                            "type": null
+                        },
                         20
                     ]
                 }
@@ -73,14 +91,20 @@
                 {
                     "operator": ">=",
                     "operands": [
-                        "age",
+                        {
+                            "identifier": "age",
+                            "type": null
+                        },
                         22
                     ]
                 },
                 {
                     "operator": "<",
                     "operands": [
-                        "age",
+                        {
+                            "identifier": "age",
+                            "type": null
+                        },
                         20
                     ]
                 }
@@ -92,7 +116,10 @@
         "operands": {
             "operator": "=",
             "operands": [
-                "age",
+                {
+                    "identifier": "age",
+                    "type": null
+                },
                 10
             ]
         }
@@ -102,7 +129,10 @@
         "operands": {
             "operator": "!=",
             "operands": [
-                "age",
+                {
+                    "identifier": "age",
+                    "type": null
+                },
                 10
             ]
         }
@@ -112,7 +142,10 @@
         "operands": {
             "operator": "in",
             "operands": [
-                "age",
+                {
+                    "identifier": "age",
+                    "type": null
+                },
                 [
                     1,
                     2,
@@ -128,7 +161,10 @@
         "operands": {
             "operator": "not in",
             "operands": [
-                "age",
+                {
+                    "identifier": "age",
+                    "type": null
+                },
                 [
                     1,
                     2,
@@ -146,7 +182,10 @@
             "operands": {
                 "operator": ">",
                 "operands": [
-                    "age",
+                    {
+                        "identifier": "age",
+                        "type": null
+                    },
                     22
                 ]
             }
