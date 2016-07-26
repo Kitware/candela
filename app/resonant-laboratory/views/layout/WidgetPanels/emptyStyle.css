@@ -14,9 +14,23 @@
   right: 0em;
   text-align: right;
 }
-#WidgetPanels .emptyState img {
+#WidgetPanels .emptyState #QuestionHint img {
   width: 1em;
   height: 1em;
   -webkit-filter: url(#recolorImageToffffcc);
   filter: url(#recolorImageToffffcc);
+}
+#WidgetPanels .emptyState .watermark {
+  position: absolute;
+  top: calc(50% - 4em);
+  left: calc(50% - 4em);
+  width: 8em;
+  height: 8em;
+  cursor: pointer;
+  -webkit-filter: url(#recolorImageTo999999);
+  filter: url(#recolorImageTo999999);
+}
+#WidgetPanels .emptyState .watermark:hover {
+  -webkit-filter: url(#dropShadow);
+  filter: url(#dropShadow);
 }

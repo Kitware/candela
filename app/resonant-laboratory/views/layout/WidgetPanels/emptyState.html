@@ -4,3 +4,10 @@
 <div id="QuestionHint">
   Need a hand? Try the <img src="../../../images/info.svg"/> buttons.
 </div>
+<img src="../../../images/Kitware_Mark.svg" class="watermark"/>
+
+<script type="application/javascript">
+  jQuery('#WidgetPanels .emptyState .watermark').on('click', () => {
+    window.mainPage.overlay.render('AboutResonantLab');
+  });
+</script>
