@@ -61,7 +61,13 @@ class DatasetItem(Resource):
         query = None
         if 'filter' in params and params['filter'] is not None:
             query = astToMongo(params['filter'])
-        mr_result = collection.inline_map_reduce(mapScript, reduceScript, query=query, scope={'counter': -1})
+        mr_result = collection.inline_map_reduce(mapScript,
+                                                 reduceScript,
+                                                 query=query,
+                                                 scope={
+                                                     'counter': -1,
+                                                     'params': params
+                                                 })
         # rearrange into a neater dict before sending it back
         result = {}
         for r in mr_result:
@@ -91,9 +97,6 @@ class DatasetItem(Resource):
         # Probably the best option of the three would be to avoid calling
         # this function in the first place
 
-        mapReduceCode = execjs.compile(mapScript + reduceScript +
-                                       self.foreignCode['mapReduceChunk.js'])
-
         extraParameters = {
             'limit': int(params.get('limit', 0)),
             'offset': int(params.get('offset', 0)),
@@ -106,6 +109,18 @@ class DatasetItem(Resource):
 
         fileObj = self.model('file').load(item['meta']['rlab']['fileId'], user=user)
         stream = self.model('file').download(fileObj, headers=False, extraParameters=extraParameters)
+
+        # Because we already used the offset and limit params in the download endpoint,
+        # the mapReduce code should run on the full result
+        params['offset'] = 0
+        params['limit'] = 0
+
+        # Stitch together the code for running via PyExecJS
+        paramsCode = json.dumps(params, indent=2, separators=(',', ': '))
+        mapReduceCode = execjs.compile(mapScript + reduceScript +
+                                       'var params = ' + paramsCode + ';\n' +
+                                       self.foreignCode['mapReduceChunk.js'])
+
         rawData = []
         reducedResult = {}
 
@@ -477,9 +492,8 @@ class DatasetItem(Resource):
 
         params, binSettings = self.fillInDefaultHistogramParams(item, params)
 
-        # Stringify the params, both for cache hashing, as well as stitching
-        # together the map and reduce code below
-        paramsCode = json.dumps(params, sort_keys=True, indent=2, separators=(',', ': '))
+        # Stringify the params for cache hashing
+        paramsCode = json.dumps(params, sort_keys=True)
 
         # Check if this query has already been run - if so, return the cached result
         if params['cache']:
@@ -490,11 +504,9 @@ class DatasetItem(Resource):
         # Construct and run the histogram MapReduce code
         mapScript = 'function map () {\n' + \
             self.foreignCode['binUtils.js'] + '\n' + \
-            'var params = ' + paramsCode + ';\n' + \
             self.foreignCode['histogram_map.js'] + '\n}'
 
         reduceScript = 'function reduce (attrName, allHistograms) {\n' + \
-            'var params = ' + paramsCode + ';\n' + \
             self.foreignCode['histogram_reduce.js'] + '\n' + \
             'return {histogram: histogram};\n}'
 
