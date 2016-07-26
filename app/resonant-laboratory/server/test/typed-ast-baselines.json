@@ -1,0 +1,62 @@
+[
+    {
+        "operator": "=",
+        "operands": [
+            {
+                "identifier": "negative_pi",
+                "type": "number"
+            },
+            -3.14159
+        ]
+    },
+    {
+        "operator": "=",
+        "operands": [
+            {
+                "identifier": "negative_pi_indiana",
+                "type": "integer"
+            },
+            -3
+        ]
+    },
+    {
+        "operator": "<",
+        "operands": [
+            {
+                "identifier": "age",
+                "type": "number"
+            },
+            21
+        ]
+    },
+    {
+        "operator": "=",
+        "operands": [
+            {
+                "identifier": "name",
+                "type": "string"
+            },
+            "11001001"
+        ]
+    },
+    {
+        "operator": "=",
+        "operands": [
+            {
+                "identifier": "flag",
+                "type": "bool"
+            },
+            false
+        ]
+    },
+    {
+        "operator": ">",
+        "operands": [
+            {
+                "identifier": "start",
+                "type": "date"
+            },
+            "2016-07-26"
+        ]
+    }
+]
