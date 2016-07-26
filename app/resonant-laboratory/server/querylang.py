@@ -33,12 +33,12 @@ def astToFunction(ast):
         field = operands[0]
         candidates = operands[1]
 
-        return lambda row: row[field] in candidates
+        return lambda row: field in row and row[field] in candidates
     elif operator == 'not in':
         field = operands[0]
         candidates = operands[1]
 
-        return lambda row: row[field] not in candidates
+        return lambda row: field in row and row[field] not in candidates
     elif operator in ['<=', '<', '>=', '>', '=', '!=']:
         field = operands[0]
         value = operands[1]
