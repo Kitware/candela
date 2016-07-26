@@ -62,7 +62,7 @@ value_list
   / "" { return []; }
 
 identifier
-  = chars:([^ ()]*) { return chars.join(''); }
+  = chars:([^ ():]*) type:("::" ("integer"/"float"))? { return {identifier: chars.join(''), type: type ? type[1] : null}; }
   / string
 
 value
