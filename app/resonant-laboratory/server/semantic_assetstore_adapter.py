@@ -118,9 +118,15 @@ def semantic_access(Cls, offset_limit=True):
 
         def downloadFile(self, file, offset=0, headers=True, endByte=None,
                          contentDisposition=None, extraParameters=None, **kwargs):
+            dataOffset = limit = 0
+
             if extraParameters is not None:
                 extraParameters = json.loads(extraParameters)
                 extraParameters['format'] = 'csv'
+                dataOffset = extraParameters.get('offset', 0)
+                limit = extraParameters.get('limit', 0)
+                extraParameters['offset'] = 0
+                extraParameters['limit'] = 0
 
             # Get the parent class's stream.
             base_stream = super(NewCls, self).downloadFile(file, offset, headers, endByte, contentDisposition, json.dumps(extraParameters), **kwargs)
@@ -132,11 +138,6 @@ def semantic_access(Cls, offset_limit=True):
             # Construct and return our own stream that implements the special
             # behaviors requested in extraParameters on top of the base class's
             # stream.
-            if self.offset_limit:
-                offset = extraParameters.get('offset', 0)
-                limit = extraParameters.get('limit', 0)
-            else:
-                offset = limit = 0
 
             outputType = extraParameters.get('outputType')
             if outputType is None:
@@ -159,35 +160,41 @@ def semantic_access(Cls, offset_limit=True):
                 del cherrypy.response.headers['Content-Range']
 
             def stream():
-                csvfile = StreamFile(base_stream())
+                temp = base_stream()
+                csvfile = StreamFile(temp)
                 data = csv.reader(csvfile)
 
                 header_line = data.next()
                 if outputType == 'csv':
                     yield ','.join(header_line) + '\n'
+                elif outputType == 'json':
+                    yield '['
 
-                for i in range(offset):
-                    data.next()
-
-                count = 0
+                skipCount = 0
+                emitCount = 0
                 try:
-                    while limit == 0 or count < limit:
+                    while limit == 0 or emitCount < limit:
                         line = data.next()
                         dictLine = dict(zip(header_line, line))
+
+                        # print filterFunc(dictLine), dictLine
                         if not filterFunc(dictLine):
                             continue
-                        count += 1
+
+                        if skipCount < dataOffset:
+                            skipCount += 1
+                            continue
+
                         if outputType == 'csv':
                             yield ','.join(line) + '\n'
                         elif outputType == 'jsonArray':
                             yield json.dumps(dict(zip(header_line, line)))
                         elif outputType == 'json':
                             resultLine = json.dumps(dict(zip(header_line, line)))
-                            if count == 1:
-                                resultLine = '[' + resultLine
-                            else:
+                            if emitCount > 0:
                                 resultLine = ',' + resultLine
                             yield resultLine
+                        emitCount += 1
                 except StopIteration:
                     pass
                 if outputType == 'json':
