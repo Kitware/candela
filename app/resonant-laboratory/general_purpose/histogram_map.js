@@ -1,6 +1,6 @@
-/* globals emit, params, coerceValue, findBinLabel, counter */
+/* globals emit, params, coerceValue, findBinLabel, counter:true */
 
-counter += 1; // eslint-disable-line no-native-reassign
+counter += 1;
 if (counter >= params.offset &&
     (params.limit === 0 || counter < params.offset + params.limit)) {
   var dataRow = this;
