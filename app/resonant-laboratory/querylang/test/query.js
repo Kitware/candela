@@ -3,7 +3,7 @@ import fs from 'fs';
 import test from 'tape';
 import { parseToAst } from '..';
 
-const negative_expressions = [
+const negative_expression = [
   'negative_pi = -3.14159',
   'negative_pi_indiana = -3'
 ];
@@ -52,7 +52,7 @@ function test_expressions (t, exprs, baseline_path) {
 }
 
 test('Negative number parsing', t => {
-  test_expressions(t, negative_expressions, './app/resonant-laboratory/server/test/negative-ast-baselines.json');
+  test_expressions(t, negative_expression, './app/resonant-laboratory/server/test/negative-ast-baselines.json');
   t.end();
 });
 
