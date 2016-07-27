@@ -1,62 +1,62 @@
 [
-    {
-        "operator": "<",
-        "operands": [
-            {
-                "identifier": "age",
-                "type": null
-            },
-            21
-        ]
-    },
-    {
-        "operator": "<=",
-        "operands": [
-            {
-                "identifier": "age",
-                "type": null
-            },
-            21
-        ]
-    },
-    {
-        "operator": ">",
-        "operands": [
-            {
-                "identifier": "age",
-                "type": null
-            },
-            21
-        ]
-    },
-    {
-        "operator": ">=",
-        "operands": [
-            {
-                "identifier": "age",
-                "type": null
-            },
-            21
-        ]
-    },
-    {
-        "operator": "=",
-        "operands": [
-            {
-                "identifier": "age",
-                "type": null
-            },
-            21
-        ]
-    },
-    {
-        "operator": "!=",
-        "operands": [
-            {
-                "identifier": "age",
-                "type": null
-            },
-            21
-        ]
-    }
+  {
+    "operator": "<",
+    "operands": [
+      {
+        "identifier": "age",
+        "type": null
+      },
+      21
+    ]
+  },
+  {
+    "operator": "<=",
+    "operands": [
+      {
+        "identifier": "age",
+        "type": null
+      },
+      21
+    ]
+  },
+  {
+    "operator": ">",
+    "operands": [
+      {
+        "identifier": "age",
+        "type": null
+      },
+      21
+    ]
+  },
+  {
+    "operator": ">=",
+    "operands": [
+      {
+        "identifier": "age",
+        "type": null
+      },
+      21
+    ]
+  },
+  {
+    "operator": "=",
+    "operands": [
+      {
+        "identifier": "age",
+        "type": null
+      },
+      21
+    ]
+  },
+  {
+    "operator": "!=",
+    "operands": [
+      {
+        "identifier": "age",
+        "type": null
+      },
+      21
+    ]
+  }
 ]

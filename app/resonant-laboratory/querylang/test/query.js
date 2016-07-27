@@ -50,7 +50,7 @@ function test_expressions (t, exprs, baseline_path) {
   const asts = exprs.map(parseToAst);
 
   if (process.env.RESLAB_DUMP_AST) {
-    fs.writeFileSync(baseline_path, JSON.stringify(asts, null, 4) + '\n', {encoding: 'utf8'});
+    fs.writeFileSync(baseline_path, JSON.stringify(asts, null, 2) + '\n', {encoding: 'utf8'});
   }
 
   const baselines = JSON.parse(fs.readFileSync(baseline_path, {encoding: 'utf8'}));

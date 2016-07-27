@@ -1,27 +1,27 @@
 [
-    {
-        "operator": "or",
+  {
+    "operator": "or",
+    "operands": [
+      {
+        "operator": ">",
         "operands": [
-            {
-                "operator": ">",
-                "operands": [
-                    {
-                        "identifier": "age",
-                        "type": null
-                    },
-                    22
-                ]
-            },
-            {
-                "operator": "<",
-                "operands": [
-                    {
-                        "identifier": "age",
-                        "type": null
-                    },
-                    20
-                ]
-            }
+          {
+            "identifier": "age",
+            "type": null
+          },
+          22
         ]
-    }
+      },
+      {
+        "operator": "<",
+        "operands": [
+          {
+            "identifier": "age",
+            "type": null
+          },
+          20
+        ]
+      }
+    ]
+  }
 ]
