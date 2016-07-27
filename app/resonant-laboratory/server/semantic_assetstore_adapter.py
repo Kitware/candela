@@ -120,26 +120,34 @@ def semantic_access(Cls, offset_limit=True):
                          contentDisposition=None, extraParameters=None, **kwargs):
             dataOffset = limit = 0
 
+            compatibleParameters = None
+
+            # Can we make use of extraParameters?
             if extraParameters is not None:
-                extraParameters = json.loads(extraParameters)
-                extraParameters['format'] = 'csv'
-                dataOffset = extraParameters.get('offset', 0)
-                limit = extraParameters.get('limit', 0)
-                extraParameters['offset'] = 0
-                extraParameters['limit'] = 0
+                try:
+                    compatibleParameters = json.loads(extraParameters)
+                    # Temporary fix: always ask for CSV
+                    compatibleParameters['format'] = 'csv'
+                    dataOffset = compatibleParameters.get('offset', 0)
+                    limit = compatibleParameters.get('limit', 0)
+                    compatibleParameters['offset'] = 0
+                    compatibleParameters['limit'] = 0
+                    extraParameters = json.dumps(compatibleParameters)
+                except ValueError:
+                    pass
 
             # Get the parent class's stream.
-            base_stream = super(NewCls, self).downloadFile(file, offset, headers, endByte, contentDisposition, json.dumps(extraParameters), **kwargs)
+            base_stream = super(NewCls, self).downloadFile(file, offset, headers, endByte, contentDisposition, extraParameters, **kwargs)
 
             # Fall back to base class when no special parameters are specified.
-            if extraParameters is None:
+            if compatibleParameters is None:
                 return base_stream
 
             # Construct and return our own stream that implements the special
             # behaviors requested in extraParameters on top of the base class's
             # stream.
 
-            outputType = extraParameters.get('outputType')
+            outputType = compatibleParameters.get('outputType')
             if outputType is None:
                 outputType = 'json'
 
@@ -147,7 +155,7 @@ def semantic_access(Cls, offset_limit=True):
                 print 'outputType = %s is not allowed' % (outputType)
                 raise GirderException('"outputType" must be one of: %s' % (', '.join(allowed_outputtypes)), '%s.illegal-argument' % (module))
 
-            filterFunc = extraParameters.get('filter')
+            filterFunc = compatibleParameters.get('filter')
             if filterFunc is None:
                 def filterFunc(x): return True
             else:
