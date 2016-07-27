@@ -1,4 +1,4 @@
-import test from 'tape';
+import test from 'tape-catch';
 import vega from '..';
 
 test.skip('chart width and height should be based on el properties', t => {

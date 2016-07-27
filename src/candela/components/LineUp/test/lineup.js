@@ -1,4 +1,4 @@
-import test from 'tape';
+import test from 'tape-catch';
 
 // needed to handle Babel's conversion of for `(x of array)`
 import 'babel-polyfill';

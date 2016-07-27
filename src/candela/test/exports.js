@@ -1,4 +1,4 @@
-import test from 'tape';
+import test from 'tape-catch';
 
 import candela from '..';
 
