@@ -1,6 +1,6 @@
 import process from 'process';
 import fs from 'fs';
-import test from 'tape';
+import test from 'tape-catch';
 import { parseToAst } from '..';
 
 const negative_expression = [
