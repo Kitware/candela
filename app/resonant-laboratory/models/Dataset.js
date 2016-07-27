@@ -339,7 +339,13 @@ let Dataset = MetadataItem.extend({
       attrName = this.stringToHex(attrName);
       let temp = values;
       values = [];
-      temp.forEach(value => values.push(this.stringToHex(value)));
+      temp.forEach(value => {
+        let dataType = typeof value;
+        if (dataType === 'string' || dataType === 'object') {
+          value = this.stringToHex(value);
+        }
+        values.push(value);
+      });
     }
     return [attrName + operation + JSON.stringify(values)];
   },
@@ -437,7 +443,12 @@ let Dataset = MetadataItem.extend({
     if (typeof obj !== 'object') {
       return obj;
     } else if ('identifier' in obj && 'type' in obj && obj.type === null) {
-      obj.type = this.getAttributeType(schema, obj.identifier);
+      let attrType = this.getAttributeType(schema, obj.identifier);
+      if (attrType !== 'object') {
+        // 'object' is really a passthrough; don't attempt
+        // any coercion while performing the filter
+        obj.type = attrType;
+      }
     } else if (obj instanceof Array) {
       obj.forEach((d, i) => {
         obj[i] = this.specifyAttrTypes(schema, d);

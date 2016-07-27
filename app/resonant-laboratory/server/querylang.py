@@ -18,9 +18,15 @@ def cast(value, typename):
     if typename is None:
         return value
     elif typename == 'integer':
-        return int(value)
+        try:
+            return int(value)
+        except ValueError:
+            return float('NaN')
     elif typename == 'number':
-        return float(value)
+        try:
+            return float(value)
+        except ValueError:
+            return float('NaN')
     elif typename == 'boolean':
         return bool(value) and value not in ['false', '0', 0, 'n']
     elif typename == 'string':
