@@ -184,7 +184,7 @@ class DatasetCache {
           type: 'POST',
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
-            filter: this.model.formatFilterExpression(),
+            filter: this.model.formatFilterExpression(schema),
             cache: false
           }
         }, 'rl:loadedHistogram');
@@ -200,7 +200,7 @@ class DatasetCache {
           type: 'POST',
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
-            filter: this.model.formatFilterExpression(),
+            filter: this.model.formatFilterExpression(schema),
             limit: this.page.limit,
             offset: this.page.offset
             // Don't cache the page histograms on the server
@@ -222,7 +222,7 @@ class DatasetCache {
               outputType: 'json',
               offset: this.page.offset,
               limit: this.page.limit,
-              filter: this.model.getFilterAstTree()
+              filter: this.model.getFilterAstTree(schema)
             })
           }
         }, 'rl:loadedData');
@@ -323,30 +323,6 @@ let Dataset = MetadataItem.extend({
     });
     return binSettings;
   },
-  stringToHex (value) {
-    let result = '';
-    for (let i = 0; i < value.length; i += 1) {
-      result += '%' + value.charCodeAt(i).toString(16);
-    }
-    return result;
-  },
-  dehexify (obj) {
-    let dataType = typeof obj;
-    if (dataType === 'object') {
-      if (obj instanceof Array) {
-        obj.forEach((d, i) => {
-          obj[i] = this.dehexify(d);
-        });
-      } else {
-        Object.keys(obj).forEach(k => {
-          obj[k] = this.dehexify(obj[k]);
-        });
-      }
-    } else if (dataType === 'string') {
-      obj = decodeURIComponent(obj);
-    }
-    return obj;
-  },
   listCategoricalFilterExpressions (attrName, filterSpec, hexify = false) {
     let values;
     let operation;
@@ -430,19 +406,63 @@ let Dataset = MetadataItem.extend({
     exprList = exprList.concat(this.cache.filter.custom);
     return exprList;
   },
-  getFilterAstTree () {
+  stringToHex (value) {
+    let result = '';
+    for (let i = 0; i < value.length; i += 1) {
+      result += '%' + value.charCodeAt(i).toString(16);
+    }
+    return result;
+  },
+  dehexify (obj) {
+    let objType = typeof obj;
+    if (!obj) {
+      return obj;
+    }
+    if (objType === 'object') {
+      if (obj instanceof Array) {
+        obj.forEach((d, i) => {
+          obj[i] = this.dehexify(d);
+        });
+      } else {
+        Object.keys(obj).forEach(k => {
+          obj[k] = this.dehexify(obj[k]);
+        });
+      }
+    } else if (objType === 'string') {
+      obj = decodeURIComponent(obj);
+    }
+    return obj;
+  },
+  specifyAttrTypes (schema, obj) {
+    if (typeof obj !== 'object') {
+      return obj;
+    } else if ('identifier' in obj && 'type' in obj && obj.type === null) {
+      obj.type = this.getAttributeType(schema, obj.identifier);
+    } else if (obj instanceof Array) {
+      obj.forEach((d, i) => {
+        obj[i] = this.specifyAttrTypes(schema, d);
+      });
+    } else {
+      Object.keys(obj).forEach(k => {
+        obj[k] = this.specifyAttrTypes(schema, obj[k]);
+      });
+    }
+    return obj;
+  },
+  getFilterAstTree (schema) {
     let exprList = this.listAllFilterExpressions(true);
 
     if (exprList.length > 0) {
       let fullExpression = '(' + exprList.join(') and (') + ')';
       let ast = parseToAst(fullExpression);
-      return this.dehexify(ast);
+      ast = this.dehexify(ast);
+      return this.specifyAttrTypes(schema, ast);
     } else {
       return undefined;
     }
   },
-  formatFilterExpression () {
-    let tree = this.getFilterAstTree();
+  formatFilterExpression (schema) {
+    let tree = this.getFilterAstTree(schema);
     if (tree !== undefined) {
       tree = JSON.stringify(tree);
     }
