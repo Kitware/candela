@@ -58,7 +58,7 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        exclude: /(node_modules|web_client)/,
+        exclude: /(node_modules|web_client|build)/,
         query: {
           presets: ['es2015']
         }
