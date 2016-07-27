@@ -1,4 +1,4 @@
-import test from 'tape';
+import test from 'tape-catch';
 import vega from '..';
 
 test('vega.transform() without spec', t => {
