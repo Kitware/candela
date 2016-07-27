@@ -42,7 +42,7 @@ const typed_expression = [
   'negative_pi_indiana::integer = -3',
   'age::number < 21',
   'name::string = "11001001"',
-  'flag::bool = false',
+  'flag::boolean = false',
   'start::date > "2016-07-26"'
 ];
 
