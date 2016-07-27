@@ -1,4 +1,4 @@
-<div class="libraryInterface">
+<div class="largeDialog">
   <img class="headerIcon" src="../../../images/hugeMistake.svg"/>
   <img src="../../../images/close.svg" id="closeOverlay" />
   <h1>
@@ -22,11 +22,3 @@
   </p>
   <button id="okButton">OK</button>
 </div>
-<script type="application/javascript">
-  jQuery('#okButton').on('click', function () {
-    window.mainPage.switchProject(null)
-      .then(() => {
-        window.mainPage.overlay.render('StartingScreen');
-      });
-  });
-</script>

@@ -19,7 +19,7 @@ let DatasetLibrary = Backbone.View.extend({
 
     new Promise((resolve, reject) => {
       girder.restRequest({
-        path: 'resource/lookup?path=/collection/ResonantLaboratory/Data',
+        path: 'resource/lookup?path=/collection/Resonant Laboratory Library/Data',
         type: 'GET',
         error: reject
       }).done(resolve).error(reject);

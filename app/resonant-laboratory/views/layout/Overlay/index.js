@@ -22,6 +22,9 @@ import userErrorTemplate from './userErrorTemplate.html';
 import successTemplate from './successTemplate.html';
 import loadingTemplate from './loadingTemplate.html';
 
+import alertTemplate from './alertTemplate.html';
+import confirmTemplate from './confirmTemplate.html';
+
 let VIEWS = {
   HamburgerMenu,
   LoginView,
@@ -118,19 +121,67 @@ let Overlay = Backbone.View.extend({
     return Underscore.template(template)(options);
   },
   renderLoadingScreen: function (message) {
-    this.render(this.getScreen(loadingTemplate, message));
+    this.render(this.getScreen(loadingTemplate, message), false, () => {
+      this.$el.find('#okButton').on('click', this.closeOverlay);
+    });
   },
   renderErrorScreen: function (message) {
-    this.render(this.getScreen(errorTemplate, message));
+    this.render(this.getScreen(errorTemplate, message), false,
+      () => {
+        this.$el.find('#okButton').on('click', () => {
+          window.mainPage.switchProject(null)
+            .then(() => {
+              window.mainPage.overlay.render('StartingScreen');
+            });
+        });
+      });
   },
   renderUserErrorScreen: function (message) {
-    this.render(this.getScreen(userErrorTemplate, message));
+    this.render(this.getScreen(userErrorTemplate, message), false, () => {
+      this.$el.find('#okButton').on('click', this.closeOverlay);
+    });
   },
   renderReallyBadErrorScreen: function (message, details) {
-    this.render(this.getScreen(reallyBadErrorTemplate, message, details));
+    this.render(this.getScreen(reallyBadErrorTemplate, message, details), false,
+      () => {
+        this.$el.find('#okButton').on('click', () => {
+          window.mainPage.switchProject(null)
+            .then(() => {
+              window.mainPage.overlay.render('StartingScreen');
+            });
+        });
+      });
   },
   renderSuccessScreen: function (message) {
-    this.render(this.getScreen(successTemplate, message));
+    this.render(this.getScreen(successTemplate, message), false, () => {
+      this.$el.find('#okButton').on('click', this.closeOverlay);
+    });
+  },
+  alertDialog: function (message) {
+    this.render(this.getScreen(alertTemplate, message), false, () => {
+      this.$el.find('#okButton').on('click', this.closeOverlay);
+    });
+  },
+  confirmDialog: function (message) {
+    let forceResolve, forceReject;
+
+    let waiter = new Promise((resolve, reject) => {
+      forceResolve = resolve;
+      forceReject = reject;
+    });
+
+    this.render(this.getScreen(confirmTemplate, message), false, () => {
+      this.$el.find('#okButton').on('click', () => {
+        this.closeOverlay();
+        forceResolve();
+      });
+      this.$el.find('#cancelButton').on('click', () => {
+        this.closeOverlay();
+        forceReject();
+      });
+    });
+
+    return waiter;
   },
   closeOverlay: function () {
     // If we don't have a project, jump straight to the
@@ -177,7 +228,7 @@ let Overlay = Backbone.View.extend({
     this.$el.off('click.closeOverlay');
     jQuery(window).off('keyup.closeOverlay');
   },
-  render: Underscore.debounce(function (template, nofade) {
+  render: Underscore.debounce(function (template, nofade, callback) {
     // Don't fade if we're just switching between overlays
     nofade = nofade || (template !== null && this.template !== null);
 
@@ -276,6 +327,10 @@ let Overlay = Backbone.View.extend({
           this.addCloseListeners();
         }
       }
+    }
+
+    if (callback !== undefined) {
+      callback();
     }
   }, 300)
 });

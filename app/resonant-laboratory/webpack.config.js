@@ -36,7 +36,7 @@ module.exports = {
       },
       {
         test: /\.html$/,
-        loader: 'html-loader?attrs=img:src'
+        loader: 'html-loader?attrs=img:src image:xlink:href'
       },
       {
         test: /\.pegjs$/,

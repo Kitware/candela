@@ -3,6 +3,11 @@ import fs from 'fs';
 import test from 'tape-catch';
 import { parseToAst } from '..';
 
+const negative_expression = [
+  'negative_pi = -3.14159',
+  'negative_pi_indiana = -3'
+];
+
 const operator_expression = [
   'age < 21',
   'age <= 21',
@@ -32,11 +37,20 @@ const not_expression = [
   'not(not(age > 22))'
 ];
 
+const typed_expression = [
+  'negative_pi::number = -3.14159',
+  'negative_pi_indiana::integer = -3',
+  'age::number < 21',
+  'name::string = "11001001"',
+  'flag::boolean = false',
+  'start::date > "2016-07-26"'
+];
+
 function test_expressions (t, exprs, baseline_path) {
   const asts = exprs.map(parseToAst);
 
   if (process.env.RESLAB_DUMP_AST) {
-    fs.writeFileSync(baseline_path, JSON.stringify(asts, null, 4), {encoding: 'utf8'});
+    fs.writeFileSync(baseline_path, JSON.stringify(asts, null, 2) + '\n', {encoding: 'utf8'});
   }
 
   const baselines = JSON.parse(fs.readFileSync(baseline_path, {encoding: 'utf8'}));
@@ -45,6 +59,11 @@ function test_expressions (t, exprs, baseline_path) {
     t.deepEqual(asts[i], baselines[i], `Expression '${exprs[i]}' parses correctly`);
   }
 }
+
+test('Negative number parsing', t => {
+  test_expressions(t, negative_expression, './app/resonant-laboratory/server/test/negative-ast-baselines.json');
+  t.end();
+});
 
 test('Operator expression parsing', t => {
   test_expressions(t, operator_expression, './app/resonant-laboratory/server/test/operator-ast-baselines.json');
@@ -63,6 +82,11 @@ test('Disjunction expression parsing', t => {
 
 test('Not expression parsing', t => {
   test_expressions(t, not_expression, './app/resonant-laboratory/server/test/not-ast-baselines.json');
+  t.end();
+});
+
+test('Typed expression parsing', t => {
+  test_expressions(t, typed_expression, './app/resonant-laboratory/server/test/typed-ast-baselines.json');
   t.end();
 });
 

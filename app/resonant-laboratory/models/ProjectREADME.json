@@ -10,17 +10,47 @@
         {
           "dataset": "575ab712ed27aa2cacfcc7b1",
           "filter": {
-            "left": {
-              "left": "Movie",
-              "operator": "in",
-              "right": ["The Bourne Identity","The Bourne Supremacy","The Bourne Ultimatum"]
+            "_comment": "
+              filter should always contain two objects:
+              'standard':{}, and 'custom':[]
+            ",
+            "standard": {
+              "_comment": "
+                standard filters map attribute names to objects. Those objects
+                may optionally contain: 'excludeRanges': [], 'excludeValues': [],
+                'includeValues': [], and/or 'excludeAttribute': true
+              ",
+              "age": {
+                "excludeRanges" : [
+                  {
+                    "lowBound": 8,
+                    "highBound": 18
+                  },
+                  {
+                    "lowBound": 80
+                  }
+                ],
+                "excludeValues" : [
+                  "NaN"
+                ]
+              },
+              "name": {
+                "includeValues" : [
+                  "Ron Swanson"
+                ]
+              },
+              "weight": {
+                "excludeAttribute": true
+              }
             },
-            "operator": "and",
-            "right": {
-              "left": "Rating IMDB",
-              "operator": "gte",
-              "right": 3
-            }
+            "custom": [
+              "_comment:
+                Custom filters are just strings, added by the user
+                directly, or maybe even added by a Candela component",
+              "'Ron Swanson' in picture",
+              "latitude >= 37.83 and latitude <= 41.75 and
+               longitude >= -88.11 and longitude <= -84.80"
+            ]
           },
           "page": {
             "offset": 0,

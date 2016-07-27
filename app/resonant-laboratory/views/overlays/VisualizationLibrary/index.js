@@ -41,7 +41,7 @@ let VisualizationLibrary = Backbone.View.extend({
     libraryButtons.selectAll('span')
       .text(d => d.name);
 
-    d3.select('div.libraryInterface').selectAll('.circleButton')
+    d3.select('div.largeDialog').selectAll('.circleButton')
       .on('click', d => {
         let projectPromise;
         if (window.mainPage.project) {

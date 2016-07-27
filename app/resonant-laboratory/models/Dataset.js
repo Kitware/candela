@@ -1,4 +1,6 @@
 import MetadataItem from './MetadataItem';
+import { parseToAst } from '../querylang';
+import RangeSet from '../shims/rangeSet.js';
 
 let DEFAULT_INTERPRETATIONS = {
   'undefined': 'categorical',
@@ -24,6 +26,12 @@ let FILTER_STATES = {
   EXCLUDED: 2
 };
 
+let BIN_STATES = {
+  INCLUDED: 0,
+  EXCLUDED: 1,
+  PARTIAL: 2
+};
+
 class DatasetCache {
   constructor (model) {
     this.model = model;
@@ -39,12 +47,36 @@ class DatasetCache {
   }
   get filter () {
     if (!this._filter) {
-      this._filter = {};
+      this._filter = {
+        standard: {},
+        custom: []
+      };
     }
     return this._filter;
   }
   set filter (value) {
     this._filter = value;
+    this.applyFilter();
+  }
+  applyFilter () {
+    // Clean up the filter specification
+    let standardKeys = Object.keys(this.filter.standard);
+    standardKeys.forEach(k => {
+      let removeFilterSpec = !('excludeAttribute' in this.filter.standard[k]);
+      ['excludeRanges', 'includeValues', 'excludeValues'].forEach(d => {
+        if (d in this.filter.standard[k]) {
+          if (this.filter.standard[k][d].length === 0) {
+            delete this.filter.standard[k][d];
+          } else {
+            removeFilterSpec = false;
+          }
+        }
+      });
+      if (removeFilterSpec) {
+        delete this.filter.standard[k];
+      }
+    });
+
     // Invalidate filteredHistogram, pageHistogram, and currentDataPage
     delete this.cachedPromises.filteredHistogram;
     delete this.cachedPromises.pageHistogram;
@@ -137,7 +169,7 @@ class DatasetCache {
           type: 'POST',
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
-            cache: true
+            cache: false
           }
         }, 'rl:loadedHistogram');
       });
@@ -152,8 +184,8 @@ class DatasetCache {
           type: 'POST',
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
-            filter: this.filter,
-            cache: true
+            filter: this.model.formatFilterExpression(schema),
+            cache: false
           }
         }, 'rl:loadedHistogram');
       });
@@ -168,7 +200,7 @@ class DatasetCache {
           type: 'POST',
           data: {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
-            filter: this.filter,
+            filter: this.model.formatFilterExpression(schema),
             limit: this.page.limit,
             offset: this.page.offset
             // Don't cache the page histograms on the server
@@ -181,30 +213,19 @@ class DatasetCache {
   get currentDataPage () {
     if (!this.cachedPromises.currentDataPage) {
       this.cachedPromises.currentDataPage = this.schema.then(schema => {
-        if (this.model.getMeta('format') === 'mongodb.collection') {
-          return this.restRequest({
-            path: 'database/select',
-            type: 'GET',
-            data: {
-              format: 'dict',
+        return this.restRequest({
+          path: 'download',
+          type: 'GET',
+          data: {
+            extraParameters: JSON.stringify({
+              fileType: this.model.getMeta('format'),
+              outputType: 'json',
               offset: this.page.offset,
-              limit: this.page.limit
-            }
-          }, 'rl:loadedData').then(resp => resp.data);
-        } else {
-          return this.restRequest({
-            path: 'download',
-            type: 'GET',
-            data: {
-              extraParameters: JSON.stringify({
-                fileType: this.model.getMeta('format'),
-                outputType: 'json',
-                offset: this.page.offset,
-                limit: this.page.limit
-              })
-            }
-          }, 'rl:loadedData');
-        }
+              limit: this.page.limit,
+              filter: this.model.getFilterAstTree(schema)
+            })
+          }
+        }, 'rl:loadedData');
       });
     }
     return this.cachedPromises.currentDataPage;
@@ -302,6 +323,162 @@ let Dataset = MetadataItem.extend({
     });
     return binSettings;
   },
+  listCategoricalFilterExpressions (attrName, filterSpec, hexify = false) {
+    let values;
+    let operation;
+    if ('includeValues' in filterSpec) {
+      values = filterSpec.includeValues;
+      operation = ' in ';
+    } else if ('excludeValues' in filterSpec) {
+      values = filterSpec.excludeValues;
+      operation = ' not in ';
+    } else {
+      return [];
+    }
+    if (hexify) {
+      attrName = this.stringToHex(attrName);
+      let temp = values;
+      values = [];
+      temp.forEach(value => {
+        let dataType = typeof value;
+        if (dataType === 'string' || dataType === 'object') {
+          value = this.stringToHex(value);
+        }
+        values.push(value);
+      });
+    }
+    return [attrName + operation + JSON.stringify(values)];
+  },
+  listRangeFilterExpressions (attrName, filterSpec, hexify = false) {
+    let results = [];
+    if (filterSpec.excludeRanges) {
+      let temp = '(';
+      let firstRange = true;
+      if (hexify) {
+        attrName = this.stringToHex(attrName);
+      }
+      filterSpec.excludeRanges.forEach(range => {
+        if (!firstRange) {
+          temp += ' and ';
+        }
+        firstRange = false;
+        temp += '(';
+        let includeLow = false;
+        if ('lowBound' in range) {
+          let lowBound = range.lowBound;
+          let dataType = typeof lowBound;
+          if (dataType === 'string' || dataType === 'object') {
+            if (hexify) {
+              lowBound = this.stringToHex(String(lowBound));
+            }
+            lowBound = '"' + lowBound + '"';
+          }
+          temp += attrName + ' < ' + lowBound;
+          includeLow = true;
+        }
+        if ('highBound' in range) {
+          if (includeLow) {
+            temp += ' or ';
+          }
+          let highBound = range.highBound;
+          let dataType = typeof highBound;
+          if (dataType === 'string' || dataType === 'object') {
+            if (hexify) {
+              highBound = this.stringToHex(String(highBound));
+            }
+            highBound = '"' + highBound + '"';
+          }
+          temp += attrName + ' >= ' + highBound;
+        }
+        temp += ')';
+      });
+      temp += ')';
+      results.push(temp);
+    }
+    return results;
+  },
+  listStandardFilterExpressions (hexify = false) {
+    let results = [];
+    Object.keys(this.cache.filter.standard).forEach(attrName => {
+      let filterSpec = this.cache.filter.standard[attrName];
+      results = results.concat(this.listCategoricalFilterExpressions(attrName, filterSpec, hexify));
+      results = results.concat(this.listRangeFilterExpressions(attrName, filterSpec, hexify));
+    });
+
+    return results;
+  },
+  listAllFilterExpressions (hexify = false) {
+    let exprList = this.listStandardFilterExpressions(hexify);
+    exprList = exprList.concat(this.cache.filter.custom);
+    return exprList;
+  },
+  stringToHex (value) {
+    let result = '';
+    for (let i = 0; i < value.length; i += 1) {
+      result += '%' + value.charCodeAt(i).toString(16);
+    }
+    return result;
+  },
+  dehexify (obj) {
+    let objType = typeof obj;
+    if (!obj) {
+      return obj;
+    }
+    if (objType === 'object') {
+      if (obj instanceof Array) {
+        obj.forEach((d, i) => {
+          obj[i] = this.dehexify(d);
+        });
+      } else {
+        Object.keys(obj).forEach(k => {
+          obj[k] = this.dehexify(obj[k]);
+        });
+      }
+    } else if (objType === 'string') {
+      obj = decodeURIComponent(obj);
+    }
+    return obj;
+  },
+  specifyAttrTypes (schema, obj) {
+    if (typeof obj !== 'object') {
+      return obj;
+    } else if ('identifier' in obj && 'type' in obj && obj.type === null) {
+      let attrType = this.getAttributeType(schema, obj.identifier);
+      if (attrType !== 'object') {
+        // 'object' is really a passthrough; don't attempt
+        // any coercion while performing the filter
+        obj.type = attrType;
+      }
+    } else if (obj instanceof Array) {
+      obj.forEach((d, i) => {
+        obj[i] = this.specifyAttrTypes(schema, d);
+      });
+    } else {
+      Object.keys(obj).forEach(k => {
+        obj[k] = this.specifyAttrTypes(schema, obj[k]);
+      });
+    }
+    return obj;
+  },
+  getFilterAstTree (schema) {
+    let exprList = this.listAllFilterExpressions(true);
+
+    if (exprList.length > 0) {
+      let fullExpression = '(' + exprList.join(') and (') + ')';
+      let ast = parseToAst(fullExpression);
+      ast = this.dehexify(ast);
+      return this.specifyAttrTypes(schema, ast);
+    } else {
+      return undefined;
+    }
+  },
+  formatFilterExpression (schema) {
+    let tree = this.getFilterAstTree(schema);
+    if (tree !== undefined) {
+      tree = JSON.stringify(tree);
+    }
+    return tree;
+  },
   getTypeSpec: function () {
     let schema = this.getMeta('schema') || {};
     let result = {
@@ -321,6 +498,7 @@ let Dataset = MetadataItem.extend({
         schema[attrName].coerceToType = dataType;
       }
       this.setMeta('schema', schema);
+      this.clearFilters(attrName);
       let savePromise = this.save();
       this.cache.cachedPromises = {};
       this.trigger('rl:updatedSchema');
@@ -335,15 +513,205 @@ let Dataset = MetadataItem.extend({
         schema[attrName].interpretation = interpretation;
       }
       this.setMeta('schema', schema);
+      this.clearFilters(attrName);
       let savePromise = this.save();
       this.cache.cachedPromises = {};
       this.trigger('rl:updatedSchema');
       return savePromise;
     });
   },
+  excludeAttribute: function (attrName) {
+    // Init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+    this.cache.filter.standard[attrName].excludeAttribute = true;
+    this.cache.applyFilter();
+  },
+  includeAttribute: function (attrName) {
+    if (attrName in this.cache.filter.standard) {
+      delete this.cache.filter.standard[attrName].excludeAttribute;
+    }
+    this.cache.applyFilter();
+  },
+  getBinStatus: function (schema, attrName, bin) {
+    // Easy check (that also validates whether
+    // this.cache.filter.standard[attrName] even exists)
+    let filterState = this.getFilteredState(attrName);
+    if (filterState === FILTER_STATES.NO_FILTERS) {
+      return BIN_STATES.INCLUDED;
+    }
+
+    let filterSpec = this.cache.filter.standard[attrName];
+
+    // Next easiest check: is the label not in the
+    // include list (if there is one) / in the list
+    // that is specifically excluded?
+    if (filterSpec.includeValues &&
+      filterSpec.includeValues.indexOf(bin.label) === -1) {
+      return BIN_STATES.EXCLUDED;
+    } else if (filterSpec.excludeValues &&
+      filterSpec.excludeValues.indexOf(bin.label) !== -1) {
+      return BIN_STATES.EXCLUDED;
+    }
+
+    // Trickiest check: is the range excluded (or
+    // partially excluded)?
+    if (filterSpec.excludeRanges &&
+        'lowBound' in bin && 'highBound' in bin) {
+      // Make sure to use proper string comparisons if this is a string bin
+      let comparator;
+      if (this.getAttributeType(schema, attrName) === 'string') {
+        comparator = (a, b) => a.localeCompare(b);
+      }
+      // Intersect the bin with the excluded values
+      let includedRanges = RangeSet.rangeSubtract([{
+        lowBound: bin.lowBound,
+        highBound: bin.highBound
+      }], filterSpec.excludeRanges, comparator);
+
+      if (includedRanges.length === 1 &&
+          includedRanges[0].lowBound === bin.lowBound &&
+          includedRanges[0].highBound === bin.highBound) {
+        // Wound up with the same range we started with;
+        // the whole bin is included
+        return BIN_STATES.INCLUDED;
+      } else if (includedRanges.length > 0) {
+        // Only a piece survived; this is a partial!
+        return BIN_STATES.PARTIAL;
+      } else {
+        // Nothing survived the subtraction; this bin
+        // is excluded
+        return BIN_STATES.EXCLUDED;
+      }
+    }
+
+    // No filter info left to check; the bin must be included
+    return BIN_STATES.INCLUDED;
+  },
+  clearFilters: function (attrName) {
+    if (attrName in this.cache.filter.standard) {
+      delete this.cache.filter.standard[attrName].excludeRanges;
+      delete this.cache.filter.standard[attrName].excludeValues;
+      delete this.cache.filter.standard[attrName].includeValues;
+    }
+
+    this.cache.applyFilter();
+  },
+  selectRange: function (attrName, lowBound, highBound) {
+    // Temporarily init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+
+    // Include ONLY the values in the indicated range, AKA
+    // exclude everything outside it
+    this.cache.filter.standard[attrName].excludeRanges = [
+      { highBound: lowBound },
+      { lowBound: highBound }
+    ];
+
+    this.cache.applyFilter();
+  },
+  removeRange: function (attrName, lowBound, highBound, comparator) {
+    // Temporarily init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+
+    let excludeRanges = this.cache.filter.standard[attrName].excludeRanges || [];
+    let range = {};
+    if (lowBound !== undefined) {
+      range.lowBound = lowBound;
+    }
+    if (highBound !== undefined) {
+      range.highBound = highBound;
+    }
+    excludeRanges = RangeSet.rangeUnion(excludeRanges, [range], comparator);
+    this.cache.filter.standard[attrName].excludeRanges = excludeRanges;
+
+    this.cache.applyFilter();
+  },
+  includeRange: function (attrName, lowBound, highBound, comparator) {
+    // Temporarily init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+
+    let excludeRanges = this.cache.filter.standard[attrName].excludeRanges || [];
+    let range = {};
+    if (lowBound !== undefined) {
+      range.lowBound = lowBound;
+    }
+    if (highBound !== undefined) {
+      range.highBound = highBound;
+    }
+    excludeRanges = RangeSet.rangeSubtract(excludeRanges, [range], comparator);
+    this.cache.filter.standard[attrName].excludeRanges = excludeRanges;
+
+    this.cache.applyFilter();
+  },
+  selectValues: function (attrName, values) {
+    // Temporarily init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+
+    // Select ONLY the given values
+    this.cache.filter.standard[attrName].includeValues = values;
+    delete this.cache.filter.standard[attrName].excludeValues;
+
+    this.cache.applyFilter();
+  },
+  removeValue: function (attrName, value) {
+    // Temporarily init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+
+    let excludeValues = this.cache.filter.standard[attrName].excludeValues || [];
+    let valueIndex = excludeValues.indexOf(value);
+    if (valueIndex === -1) {
+      excludeValues.push(value);
+    }
+    this.cache.filter.standard[attrName].excludeValues = excludeValues;
+    delete this.cache.filter.standard[attrName].includeValues;
+
+    this.cache.applyFilter();
+  },
+  includeValue: function (attrName, value) {
+    // Temporarily init a filter object for this attribute
+    // if it doesn't already exist
+    if (!this.cache.filter.standard[attrName]) {
+      this.cache.filter.standard[attrName] = {};
+    }
+
+    let excludeValues = this.cache.filter.standard[attrName].excludeValues || [];
+    let valueIndex = excludeValues.indexOf(value);
+    if (valueIndex !== -1) {
+      excludeValues.splice(valueIndex, 1);
+    }
+    this.cache.filter.standard[attrName].excludeValues = excludeValues;
+    delete this.cache.filter.standard[attrName].includeValues;
+
+    this.cache.applyFilter();
+  },
   getFilteredState: function (attrName) {
-    // TODO
-    return FILTER_STATES.NO_FILTERS;
+    if (this.cache.filter.standard[attrName]) {
+      if (this.cache.filter.standard[attrName].excludeAttribute) {
+        return FILTER_STATES.EXCLUDED;
+      } else {
+        return FILTER_STATES.FILTERED;
+      }
+    } else {
+      return FILTER_STATES.NO_FILTERS;
+    }
   },
   setPage: function (offset, limit) {
     this.cache.page = {
@@ -378,4 +746,5 @@ let Dataset = MetadataItem.extend({
 
 Dataset.DEFAULT_INTERPRETATIONS = DEFAULT_INTERPRETATIONS;
 Dataset.FILTER_STATES = FILTER_STATES;
+Dataset.BIN_STATES = BIN_STATES;
 export default Dataset;

@@ -1,5 +1,7 @@
 """Utilities for handling query language expressions on the serverside."""
 
+import datetime
+import dateutil.parser
 
 _opfunc = {
     '<=': lambda x, y: x <= y,
@@ -9,6 +11,33 @@ _opfunc = {
     '=': lambda x, y: x == y,
     '!=': lambda x, y: x != y
 }
+
+
+def cast(value, typename):
+    """Cast a value to a type, including special-purpose semantic processing for some values."""
+    if typename is None:
+        return value
+    elif typename == 'integer':
+        try:
+            return int(value)
+        except ValueError:
+            return float('NaN')
+    elif typename == 'number':
+        try:
+            return float(value)
+        except ValueError:
+            return float('NaN')
+    elif typename == 'boolean':
+        return bool(value) and value not in ['false', '0', 0, 'n']
+    elif typename == 'string':
+        return str(value)
+    elif typename == 'date':
+        if type(value) == int:
+            return datetime.datetime.fromtimestamp(float(value) / 1000)
+        else:
+            return dateutil.parser.parse(value, default=datetime.datetime.fromtimestamp(0))
+    else:
+        raise ValueError('Illegal value for argument "typename": %s' % (typename))
 
 
 def astToFunction(ast):
@@ -30,20 +59,32 @@ def astToFunction(ast):
         f = astToFunction(operands)
         return lambda row: not f(row)
     elif operator == 'in':
-        field = operands[0]
-        candidates = operands[1]
+        field = operands[0]['identifier']
 
-        return lambda row: row[field] in candidates
+        def coerce(x):
+            return cast(x, operands[0]['type'])
+
+        candidates = map(coerce, operands[1])
+
+        return lambda row: field in row and coerce(row[field]) in candidates
     elif operator == 'not in':
-        field = operands[0]
-        candidates = operands[1]
+        field = operands[0]['identifier']
 
-        return lambda row: row[field] not in candidates
+        def coerce(x):
+            return cast(x, operands[0]['type'])
+
+        candidates = map(coerce, operands[1])
+
+        return lambda row: field in row and coerce(row[field]) not in candidates
     elif operator in ['<=', '<', '>=', '>', '=', '!=']:
-        field = operands[0]
-        value = operands[1]
+        field = operands[0]['identifier']
 
-        return lambda row: _opfunc[operator](row[field], value)
+        def coerce(x):
+            return cast(x, operands[0]['type'])
+
+        value = coerce(operands[1])
+
+        return lambda row: _opfunc[operator](coerce(row[field]), value)
 
 
 _mongo_operators = {
@@ -73,7 +114,7 @@ def _astToMongo_helper(ast):
     elif operator == 'not':
         raise TypeError('_astToMongo_helper() cannot operate on an AST with not-nodes.')
     elif operator in ['in', 'not in', '<=', '<', '>=', '>', '=', '!=']:
-        field = operands[0]
+        field = operands[0]['identifier']
         value = operands[1]
 
         return {field: {_mongo_operators[operator]: value}}

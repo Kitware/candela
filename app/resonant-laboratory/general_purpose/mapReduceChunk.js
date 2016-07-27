@@ -8,6 +8,7 @@
 // of multiple mapReduceChunk calls
 
 var chunk;
+var counter = -1;  // eslint-disable-line no-unused-vars
 
 function emit (key, obj) { // eslint-disable-line no-unused-vars
   if (!chunk.hasOwnProperty(key)) {

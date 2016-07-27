@@ -2,6 +2,7 @@ import cherrypy
 import csv
 import json
 import sys
+from querylang import astToFunction
 from girder.models.model_base import GirderException
 
 
@@ -105,20 +106,30 @@ class StreamFile(object):
         pass
 
 
-def semantic_access(Cls):
-    allowed_filetypes = ['csv']
+def semantic_access(Cls, offset_limit=True):
     allowed_outputtypes = ['csv', 'json', 'jsonArray']
 
     module = 'resonant-laboratory.semantic-filesystem-assetstore-adapter'
 
     class NewCls(Cls):
         def __init__(self, *args, **kwargs):
+            self.offset_limit = offset_limit
             super(NewCls, self).__init__(*args, **kwargs)
 
         def downloadFile(self, file, offset=0, headers=True, endByte=None,
                          contentDisposition=None, extraParameters=None, **kwargs):
+            dataOffset = limit = 0
+
+            if extraParameters is not None:
+                extraParameters = json.loads(extraParameters)
+                extraParameters['format'] = 'csv'
+                dataOffset = extraParameters.get('offset', 0)
+                limit = extraParameters.get('limit', 0)
+                extraParameters['offset'] = 0
+                extraParameters['limit'] = 0
+
             # Get the parent class's stream.
-            base_stream = super(NewCls, self).downloadFile(file, offset, headers, endByte, contentDisposition, extraParameters, **kwargs)
+            base_stream = super(NewCls, self).downloadFile(file, offset, headers, endByte, contentDisposition, json.dumps(extraParameters), **kwargs)
 
             # Fall back to base class when no special parameters are specified.
             if extraParameters is None:
@@ -127,18 +138,6 @@ def semantic_access(Cls):
             # Construct and return our own stream that implements the special
             # behaviors requested in extraParameters on top of the base class's
             # stream.
-            extraParameters = json.loads(extraParameters)
-            offset = extraParameters.get('offset', 0)
-            limit = extraParameters.get('limit', 0)
-
-            fileType = extraParameters.get('fileType')
-            if fileType is None:
-                print 'fileType = None'
-                raise GirderException('"fileType" argument is required', '%s.missing-required-argument' % (module))
-
-            if fileType not in allowed_filetypes:
-                print 'fileType = %s is not allowed' % (fileType)
-                raise GirderException('"fileType" must be one of: %s' % (', '.join(allowed_filetypes)), '%s.illegal-argument' % (module))
 
             outputType = extraParameters.get('outputType')
             if outputType is None:
@@ -148,6 +147,12 @@ def semantic_access(Cls):
                 print 'outputType = %s is not allowed' % (outputType)
                 raise GirderException('"outputType" must be one of: %s' % (', '.join(allowed_outputtypes)), '%s.illegal-argument' % (module))
 
+            filterFunc = extraParameters.get('filter')
+            if filterFunc is None:
+                def filterFunc(x): return True
+            else:
+                filterFunc = astToFunction(filterFunc)
+
             # Set content-length header to zero and clear content-range.
             if 'Content-Length' in cherrypy.response.headers:
                 del cherrypy.response.headers['Content-Length']
@@ -155,32 +160,41 @@ def semantic_access(Cls):
                 del cherrypy.response.headers['Content-Range']
 
             def stream():
-                csvfile = StreamFile(base_stream())
+                temp = base_stream()
+                csvfile = StreamFile(temp)
                 data = csv.reader(csvfile)
 
                 header_line = data.next()
                 if outputType == 'csv':
                     yield ','.join(header_line) + '\n'
+                elif outputType == 'json':
+                    yield '['
 
-                for i in range(offset):
-                    data.next()
-
-                count = 0
+                skipCount = 0
+                emitCount = 0
                 try:
-                    while limit == 0 or count < limit:
+                    while limit == 0 or emitCount < limit:
                         line = data.next()
-                        count += 1
+                        dictLine = dict(zip(header_line, line))
+
+                        # print filterFunc(dictLine), dictLine
+                        if not filterFunc(dictLine):
+                            continue
+
+                        if skipCount < dataOffset:
+                            skipCount += 1
+                            continue
+
                         if outputType == 'csv':
                             yield ','.join(line) + '\n'
                         elif outputType == 'jsonArray':
                             yield json.dumps(dict(zip(header_line, line)))
                         elif outputType == 'json':
                             resultLine = json.dumps(dict(zip(header_line, line)))
-                            if count == 1:
-                                resultLine = '[' + resultLine
-                            else:
+                            if emitCount > 0:
                                 resultLine = ',' + resultLine
                             yield resultLine
+                        emitCount += 1
                 except StopIteration:
                     pass
                 if outputType == 'json':
