@@ -731,6 +731,7 @@ let DatasetView = Widget.extend({
       });
 
     // Checkbox that indicates whether to include the attribute in the output
+    /*
     sectionTitlesEnter.append('input')
       .attr('type', 'checkbox')
       .attr('class', 'filteredState');
@@ -748,6 +749,7 @@ let DatasetView = Widget.extend({
           datasetDetails.datasetObj.excludeAttribute(d);
         }
       });
+    */
 
     // Label for the header
     sectionTitlesEnter.append('label');
