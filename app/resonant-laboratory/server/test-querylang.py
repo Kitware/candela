@@ -12,6 +12,21 @@ data = [
     {'age': 23}
 ]
 
+typed_data = [
+    {'negative_pi': '-3.14159',
+     'negative_pi_indiana': '-3',
+     'age': '19',
+     'name': '11001001',
+     'flag': 'n',
+     'start': '2016-07-27'},
+    {'negative_pi': '3.14159',
+     'negative_pi_indiana': '3',
+     'age': '22',
+     'name': '11001002',
+     'flag': 'y',
+     'start': '2016-07-21'}
+]
+
 
 class TestQueryLanguage(unittest.TestCase):
     """Test suite."""
@@ -45,6 +60,17 @@ class TestQueryLanguage(unittest.TestCase):
     def test_disjunction_expressions(self):
         """Test disjunction expressions."""
         self.run_expressions('test/disjunction-ast-baselines.json', data, [True, False, True])
+
+    def test_typed_expressions(self):
+        """Test typed expressions."""
+        self.run_expressions('test/typed-ast-baselines.json', typed_data, [
+            True, False,
+            True, False,
+            True, False,
+            True, False,
+            True, False,
+            True, False
+        ])
 
 
 class TestQueryLanguageMongo(unittest.TestCase):

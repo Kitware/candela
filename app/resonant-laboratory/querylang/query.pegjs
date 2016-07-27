@@ -62,12 +62,16 @@ value_list
   / "" { return []; }
 
 identifier
-  = chars:([^ ()]*) { return chars.join(''); }
+  = chars:([^ ():]*) type:("::" type)? { return {identifier: chars.join(''), type: type ? type[1] : null}; }
   / string
+
+type
+  = "number" / "integer" / "boolean" / "date" / "string"
 
 value
   = number
   / string
+  / boolean
 
 number
   = negate:'-'? value:[0-9]+ frac:(('.'[0-9]*)?) {
@@ -81,5 +85,8 @@ number
 string
   = '"' chars:([^\r\n"]*) '"' { return chars.join(''); }
   / "'" chars:([^\r\n']*) "'" { return chars.join(''); }
+
+boolean
+  = value:("true" / "false") { return value === "true"; }
  _
   = [ \t\n\r]*

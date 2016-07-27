@@ -1,16 +1,22 @@
 [
-    {
-        "operator": "=",
-        "operands": [
-            "negative_pi",
-            -3.14159
-        ]
-    },
-    {
-        "operator": "=",
-        "operands": [
-            "negative_pi_indiana",
-            -3
-        ]
-    }
+  {
+    "operator": "=",
+    "operands": [
+      {
+        "identifier": "negative_pi",
+        "type": null
+      },
+      -3.14159
+    ]
+  },
+  {
+    "operator": "=",
+    "operands": [
+      {
+        "identifier": "negative_pi_indiana",
+        "type": null
+      },
+      -3
+    ]
+  }
 ]
