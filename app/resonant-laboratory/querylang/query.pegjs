@@ -66,7 +66,7 @@ identifier
   / string
 
 type
-  = "number" / "integer" / "bool" / "date" / "string"
+  = "number" / "integer" / "boolean" / "date" / "string"
 
 value
   = number

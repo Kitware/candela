@@ -44,7 +44,7 @@
         "operands": [
             {
                 "identifier": "flag",
-                "type": "bool"
+                "type": "boolean"
             },
             false
         ]

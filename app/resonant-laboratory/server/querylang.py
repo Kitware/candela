@@ -21,7 +21,7 @@ def cast(value, typename):
         return int(value)
     elif typename == 'number':
         return float(value)
-    elif typename == 'bool':
+    elif typename == 'boolean':
         return bool(value) and value not in ['false', '0', 0, 'n']
     elif typename == 'string':
         return str(value)
