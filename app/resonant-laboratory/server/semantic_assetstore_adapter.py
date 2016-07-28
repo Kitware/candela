@@ -159,47 +159,49 @@ def semantic_access(Cls, offset_limit=True):
             if 'Content-Range' in cherrypy.response.headers:
                 del cherrypy.response.headers['Content-Range']
 
-            def stream():
-                temp = base_stream()
-                csvfile = StreamFile(temp)
-                data = csv.reader(csvfile)
+            fileType = extraParameters.get('fileType')
+            if fileType == 'csv':
+                def stream():
+                    temp = base_stream()
+                    csvfile = StreamFile(temp)
+                    data = csv.reader(csvfile)
 
-                header_line = data.next()
-                if outputType == 'csv':
-                    yield ','.join(header_line) + '\n'
-                elif outputType == 'json':
-                    yield '['
+                    header_line = data.next()
+                    if outputType == 'csv':
+                        yield ','.join(header_line) + '\n'
+                    elif outputType == 'json':
+                        yield '['
 
-                skipCount = 0
-                emitCount = 0
-                try:
-                    while limit == 0 or emitCount < limit:
-                        line = data.next()
-                        dictLine = dict(zip(header_line, line))
+                    skipCount = 0
+                    emitCount = 0
+                    try:
+                        while limit == 0 or emitCount < limit:
+                            line = data.next()
+                            dictLine = dict(zip(header_line, line))
 
-                        # print filterFunc(dictLine), dictLine
-                        if not filterFunc(dictLine):
-                            continue
+                            # print filterFunc(dictLine), dictLine
+                            if not filterFunc(dictLine):
+                                continue
 
-                        if skipCount < dataOffset:
-                            skipCount += 1
-                            continue
+                            if skipCount < dataOffset:
+                                skipCount += 1
+                                continue
 
-                        if outputType == 'csv':
-                            yield ','.join(line) + '\n'
-                        elif outputType == 'jsonArray':
-                            yield json.dumps(dict(zip(header_line, line)))
-                        elif outputType == 'json':
-                            resultLine = json.dumps(dict(zip(header_line, line)))
-                            if emitCount > 0:
-                                resultLine = ',' + resultLine
-                            yield resultLine
-                        emitCount += 1
-                except StopIteration:
-                    pass
-                if outputType == 'json':
-                    yield ']'
+                            if outputType == 'csv':
+                                yield ','.join(line) + '\n'
+                            elif outputType == 'jsonArray':
+                                yield json.dumps(dict(zip(header_line, line)))
+                            elif outputType == 'json':
+                                resultLine = json.dumps(dict(zip(header_line, line)))
+                                if emitCount > 0:
+                                    resultLine = ',' + resultLine
+                                yield resultLine
+                            emitCount += 1
+                    except StopIteration:
+                        pass
+                    if outputType == 'json':
+                        yield ']'
 
-            return stream
+                return stream
 
     return NewCls
