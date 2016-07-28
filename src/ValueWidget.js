@@ -8,7 +8,12 @@ export let ValueWidget = Backbone.View.extend({
   initialize: function (settings) {
     this.settings = settings;
     if (Array.isArray(settings.result.current)) {
-      this.type = BoxAndWhiskerWidget;
+        if (settings.result.current.length > 1) {
+            this.type = BoxAndWhiskerWidget;
+        } else {
+            settings.result.current = settings.result.current[0];
+            this.type = ErrorBulletWidget;
+        }
     } else {
       this.type = ErrorBulletWidget;
     }
