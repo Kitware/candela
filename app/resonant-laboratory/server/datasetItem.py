@@ -98,10 +98,10 @@ class DatasetItem(Resource):
         # this function in the first place
 
         extraParameters = {
-            'limit': int(params.get('limit', 0)),
-            'offset': int(params.get('offset', 0)),
+            # 'limit': int(params.get('limit', 0)),
+            # 'offset': int(params.get('offset', 0)),
             'fileType': item['meta']['rlab']['format'],
-            'outputType': 'jsonArray'
+            'outputType': 'jsonlines'
         }
         if 'filter' in params and params['filter'] is not None:
             extraParameters['filter'] = params['filter']
@@ -125,6 +125,7 @@ class DatasetItem(Resource):
         reducedResult = {}
 
         for line in stream():
+            print 'XXX %s' % (line)
             rawData.append(json.loads(line))
             if sys.getsizeof(rawData) >= bufferSize:
                 reducedResult = mapReduceCode.call('mapReduceChunk', rawData, reducedResult)
@@ -283,9 +284,11 @@ class DatasetItem(Resource):
         # Do we have the necessary basic metadata?
         invalid = 'meta' not in item or 'rlab' not in item['meta']
         if not invalid:
+            print 'not invalid'
             # Do we have a file format specified?
             invalid = 'format' not in item['meta']['rlab']
         if not invalid and 'fileId' in item['meta']['rlab']:
+            print 'not invalid+'
             # Do we specify a file that we don't have (this happens
             # when making anonymous copies of datasets)?
             invalid = True
@@ -294,6 +297,7 @@ class DatasetItem(Resource):
                     invalid = False
                     break
         if invalid:
+            print 'invalid'
             # We need to update the basic dataset details
             temp = self.setupDataset(id=item['_id'], params={}, user=user)
             # We need to reload the item with the new changes
@@ -341,7 +345,7 @@ class DatasetItem(Resource):
         params['filter'] = params.get('filter', None)
         if params['filter'] is not None:
             params['filter'] = json.loads(params['filter'])
-        params['limit'] = params.get('limit', 0)
+        params['limit'] = params.get('limit', None)
         params['offset'] = params.get('offset', 0)
 
         binSettings = json.loads(params.get('binSettings', '{}'))

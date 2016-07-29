@@ -1,5 +1,6 @@
 import cherrypy
 import csv
+import ijson
 import json
 import sys
 from querylang import astToFunction
@@ -21,7 +22,7 @@ def csv_stream(base_stream, offset, limit, filterFunc, outputType):
         skipCount = 0
         emitCount = 0
         try:
-            while limit == 0 or emitCount < limit:
+            while limit is None or emitCount < limit:
                 line = data.next()
                 dictLine = dict(zip(header_line, line))
 
@@ -35,16 +36,64 @@ def csv_stream(base_stream, offset, limit, filterFunc, outputType):
 
                 if outputType == 'csv':
                     yield ','.join(line) + '\n'
-                elif outputType == 'jsonArray':
+                elif outputType == 'jsonlines':
                     yield json.dumps(dict(zip(header_line, line)))
                 elif outputType == 'json':
                     resultLine = json.dumps(dict(zip(header_line, line)))
                     if emitCount > 0:
                         resultLine = ',' + resultLine
+                    print resultLine
                     yield resultLine
                 emitCount += 1
         except StopIteration:
             pass
+        if outputType == 'json':
+            yield ']'
+
+    return stream
+
+
+def json_stream(base_stream, offset, limit, filterFunc, outputType):
+    def stream():
+        temp = base_stream()
+        jsonfile = StreamFile(temp)
+        data = ijson.items(jsonfile, 'item')
+
+        if outputType == 'csv':
+            raise RuntimeError('no csv output for json_stream')
+        elif outputType == 'json':
+            yield '['
+
+        print 'offset', offset
+        print 'limit', limit
+
+        skip_count = 0
+        emit_count = 0
+        for obj in data:
+            print 'skip_count', skip_count
+            print 'emit_count', emit_count
+
+            if limit is not None and emit_count == limit:
+                break
+
+            if skip_count < offset and filterFunc(obj):
+                skip_count += 1
+                continue
+
+            print outputType
+
+            if outputType == 'csv':
+                raise RuntimeError('no csv output for json_stream')
+            elif outputType == 'jsonlines':
+                yield json.dumps(obj) + '\n'
+            elif outputType == 'json':
+                resultLine = json.dumps(obj)
+                if emit_count > 0:
+                    resultLine = ',' + resultLine
+                yield resultLine
+
+            emit_count += 1
+
         if outputType == 'json':
             yield ']'
 
@@ -152,7 +201,7 @@ class StreamFile(object):
 
 
 def semantic_access(Cls, offset_limit=True):
-    allowed_outputtypes = ['csv', 'json', 'jsonArray']
+    allowed_outputtypes = ['csv', 'json', 'jsonlines']
 
     module = 'resonant-laboratory.semantic-filesystem-assetstore-adapter'
 
@@ -169,7 +218,7 @@ def semantic_access(Cls, offset_limit=True):
                 extraParameters = json.loads(extraParameters)
                 extraParameters['format'] = 'csv'
                 dataOffset = extraParameters.get('offset', 0)
-                limit = extraParameters.get('limit', 0)
+                limit = extraParameters.get('limit', None)
                 extraParameters['offset'] = 0
                 extraParameters['limit'] = 0
 
@@ -204,7 +253,12 @@ def semantic_access(Cls, offset_limit=True):
             if 'Content-Range' in cherrypy.response.headers:
                 del cherrypy.response.headers['Content-Range']
 
-            fileType = extraParameters.get('fileType')
+            fileType = extraParameters.get('fileType', 'csv')
             if fileType == 'csv':
                 return csv_stream(base_stream, dataOffset, limit, filterFunc, outputType)
+            elif fileType == 'json':
+                return json_stream(base_stream, dataOffset, limit, filterFunc, outputType)
+            else:
+                raise RuntimeError('illegal fileType: %s' % (fileType))
+
     return NewCls
