@@ -1,10 +1,3 @@
-// Page-wide Styles
-import svgFilters from './stylesheets/svgFilters.html';
-import './stylesheets/colors.scss';
-import './stylesheets/pure-css-custom-form-elements/style.css';
-import './stylesheets/mainPage.scss';
-import './stylesheets/girderPatches.css';
-
 import Backbone from 'backbone';
 import d3 from 'd3';
 import { Set } from './shims/SetOps.js';
@@ -18,6 +11,13 @@ import WidgetPanels from './views/layout/WidgetPanels';
 import Overlay from './views/layout/Overlay';
 import HelpLayer from './views/layout/HelpLayer';
 import NotificationLayer from './views/layout/NotificationLayer';
+
+// Page-wide Styles
+import colorScheme from '!!sass-variable-loader!./stylesheets/colors.scss';
+import svgFilters from './stylesheets/svgFilters.html';
+import './stylesheets/pure-css-custom-form-elements/style.css';
+import './stylesheets/mainPage.scss';
+import './stylesheets/girderPatches.css';
 
 // The API root is different
 window.girder.apiRoot = 'api/v1';
@@ -91,39 +91,15 @@ let MainPage = Backbone.View.extend({
     this.helpLayer.render();
     this.notificationLayer.render();
   },
-  fixColor: function (color) {
-    // TODO: This function should be unnecessary; it patches
-    // Chrome's attempt to interpret the first character
-    // in a CSSRule's color hex string as a unicode character code
-    // (see this issue):
-    // https://bugs.chromium.org/p/chromium/issues/detail?id=633300
-    return color.replace(/\\(\d\d)\s*/, (fullMatch, charMatch) => {
-      return String.fromCharCode(parseInt(charMatch, 16));
-    });
-  },
   generateFilters: function () {
     let svg = d3.select('#SvgFilters');
     svg.html(svgFilters);
 
-    // Discover the color scheme
-    this.colorScheme = {};
+    // Collect all colors in use
+    this.colorScheme = colorScheme;
     let allColors = new Set();
-    Array.from(document.styleSheets).some(sheet => {
-      if (sheet.cssRules) {
-        return Array.from(sheet.cssRules).some(rule => {
-          if (rule.cssText.startsWith('#ColorScheme')) {
-            // Crazy regex magic that extracts
-            // --prop: #color
-            // from the CSS text (it doesn't actually replace anything)
-            rule.cssText.replace(/(?:--)([^:]+):\s*(#[^;]+);/g,
-              (fullMatch, prop, color) => {
-                color = this.fixColor(color);
-                this.colorScheme[prop] = color;
-                allColors.add(color);
-              });
-          }
-        });
-      }
+    Object.keys(this.colorScheme).forEach(colorName => {
+      allColors.add(this.colorScheme[colorName]);
     });
 
     // Generate SVG filters that can recolor images to whatever

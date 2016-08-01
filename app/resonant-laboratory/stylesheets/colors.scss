@@ -79,34 +79,3 @@ Function to get the ID of an SVG color-changing filter
 @function imgColorFilter($colorValue) {
   @return url(#recolorImageTo + str-slice(inspect($colorValue), 2));
 }
-
-/*
-A sneaky way to make the variables accessible in Javascript
-*/
-#ColorScheme {
-  --darkTextColor: $darkTextColor;
-  --lightTextColor: $lightTextColor;
-  --pageBackgroundColor: $pageBackgroundColor;
-  --pageHeaderColor: $pageHeaderColor;
-  --panelHeaderColor: $panelHeaderColor;
-  --panelBackgroundColor: $panelBackgroundColor;
-  --defaultIconColor: $defaultIconColor;
-  --rolloverColor: $rolloverColor;
-  --successIconColor: $successIconColor;
-  --warningIconColor: $warningIconColor;
-  --notificationColor: $notificationColor;
-  --notificationBackgroundColor: $notificationBackgroundColor;
-  --errorNotificationColor: $notificationColor;
-  --errorNotificationBackgroundColor: $notificationBackgroundColor;
-  --data_tableHeaderColor: $data_tableHeaderColor;
-  --data_tableOddRowColor: $data_tableOddRowColor;
-  --data_overviewColor: $data_overviewColor;
-  --data_filteredColor: $data_filteredColor;
-  --data_currentPageColor: $data_currentPageColor;
-  --matching_createLinkColor: $matching_createLinkColor;
-  --matching_createLinkBackgroundColor: $matching_createLinkBackgroundColor;
-  --matching_existingLinkColor: $matching_existingLinkColor;
-  --matching_existingLinkBackgroundColor: $matching_existingLinkBackgroundColor;
-  --matching_deleteLinkColor: $matching_deleteLinkColor;
-  --matching_deleteLinkBackgroundColor: $matching_deleteLinkBackgroundColor;
-}
