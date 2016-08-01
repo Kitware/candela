@@ -1,3 +1,5 @@
 web_client/extra/
 web_client/lib/
 *.pyc
+*.ai
+*.pdf

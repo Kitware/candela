@@ -201,6 +201,10 @@ input[type="checkbox"]:checked::before {
   background-position: 0 0;
 }
 
+input[type="checkbox"]:indeterminate::before {
+  background-position: 0 -50px;
+}
+
 input[type="radio"]::before {
   background-position: -25px -25px;
 }

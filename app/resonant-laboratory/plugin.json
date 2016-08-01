@@ -6,5 +6,5 @@
     "autobuild": false,
     "file": "Gruntfile.js"
   },
-  "dependencies": ["girder_db_items"]
+  "dependencies": ["database_assetstore"]
 }
