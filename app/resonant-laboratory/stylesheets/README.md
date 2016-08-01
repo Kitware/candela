@@ -10,30 +10,30 @@ This table outlines how each color is used. To preview the colors on GitHub, pas
 Array.from(document.getElementsByTagName('td')).filter(function (d) { return d.textContent.startsWith('#'); }).forEach(function (d) { d.setAttribute('style','background-color:' + d.textContent); });
 ```
 
-| Color       | Scheme      | Hex     | Use(s)                                   |                                                                   |                                        |
-|-------------|-------------|---------|------------------------------------------|-------------------------------------------------------------------|----------------------------------------|
-| Black       | Grays       | #000000 | Rollover (light background)              |                                                                   |                                        |
-| Girder Gray | Girder’s UI | #3f3b3b | Header (page, panels, and table)         | Optional link count badge (matching view)                         |                                        |
-| Gray 2      | Grays       | #666666 | Page background                          |                                                                   |                                        |
-| Gray 3      | Grays       | #999999 | Default color for all icons              |                                                                   |                                        |
-| Gray 4      | Grays       | #cccccc | Alternating table row background         |                                                                   |                                        |
-| White       | Grays       | #ffffff | Rollover (dark background)               |                                                                   |                                        |
-| Red         | CB Dark     | #e41a1c | Delete a link (matching view)            |                                                                   |                                        |
-| Red         | CB Light    | #fbb4ae | Delete a link background (matching view) |                                                                   |                                        |
-| Blue        | CB Dark     | #377eb8 | Create a link (matching view)            | Indicator that a custom type / interpretation setting is in place |                                        |
-| Blue        | CB Light    | #b3cde3 | Create a link background (matching view) |                                                                   |                                        |
-| Blue 1      | CB Seq      | #41b6c4 | Overview (dataset view)                  |                                                                   |                                        |
-| Blue 2      | CB Seq      | #2c7fb8 | Filtered set (dataset view)              |                                                                   |                                        |
-| Blue 3      | CB Seq      | #253494 | Current page (dataset view)              |                                                                   |                                        |
-| Green       | CB Dark     | #4daf4a | Success icon                             | Fulfilled link count badge (matching view)                        |                                        |
-| Green       | CB Light    | #ccebc5 |                                          |                                                                   |                                        |
-| Purple      | CB Dark     | #984ea3 | Existing link (matching view)            |                                                                   |                                        |
-| Purple      | CB Light    | #decbe4 | Existing link background (matching view) |                                                                   |                                        |
-| Orange      | CB Dark     | #ff7f00 | Warning icon                             | Unfulfilled link count badge (matching view)                      | Warning notification                   |
-| Orange      | CB Light    | #fed9a6 | Warning notification background          |                                                                   |                                        |
-| Yellow      | CB Dark     | #ffff33 | Regular notification                     | Help bubble                                                       |                                        |
-| Yellow      | CB Light    | #ffffcc | Regular notification background          | Help bubble background                                            | Icon indicating new tips are available |
-| Brown       | CB Dark     | #a65628 |                                          |                                                                   |                                        |
-| Brown       | CB Light    | #e5d8bd |                                          |                                                                   |                                        |
-| Pink        | CB Dark     | #f781bf |                                          |                                                                   |                                        |
-| Pink        | CB Light    | #fddaec |                                          |                                                                   |                                        |
+| Color           | Hex    | Use(s)                                  |                                         |                                         |   |
+|-----------------|--------|-----------------------------------------|-----------------------------------------|-----------------------------------------|---|
+| Black           | 000000 | Text (light background)                 |                                         |                                         |   |
+| White           | FFFFFF | Panel Background                        | Text (dark background)                  |                                         |   |
+| Lightest Green  | A2E4A2 | Dataset view: Overview                  | Matching view: Create a link background |                                         |   |
+| Light Green     | 4AC44A |                                         |                                         |                                         |   |
+| Green           | 12AF12 | Dataset view: Filtered set              |                                         |                                         |   |
+| Dark Green      | 008000 | Success icon                            | Matching view: Create a link            |                                         |   |
+| Darkest Green   | 004700 | Dataset view: Current page              |                                         |                                         |   |
+| Lightest Blue   | 9AB2D1 | Page Background                         | Alternating table row background        | Matching view: Existing link background |   |
+| Light Blue      | 456DA0 | Default color for all icons             |                                         |                                         |   |
+| Blue            | 194D8F |                                         |                                         |                                         |   |
+| Dark Blue       | 083269 | Matching view: Existing Link            |                                         |                                         |   |
+| Darkest Blue    | 021B3A | Header (page, panels, and table)        |                                         |                                         |   |
+| Lightest Orange | FFE3B5 | Regular notification background         |                                         |                                         |   |
+| Light Orange    | F4BA5C | Rollover                                |                                         |                                         |   |
+| Orange          | DA8F16 |                                         |                                         |                                         |   |
+| Dark Orange     | 9F6300 | Warning icon                            | Regular notification                    |                                         |   |
+| Darkest Orange  | 593700 |                                         |                                         |                                         |   |
+| Lightest Red    | FFB5B5 | Matching view: Delete a link background | Error notification background           |                                         |   |
+| Light Red       | F45C5C |                                         |                                         |                                         |   |
+| Red             | DA1616 |                                         |                                         |                                         |   |
+| Dark Red        | 9F0000 | Matching view: Delete a link            | Error notification                      |                                         |   |
+| Darkest Red     | 590000 |                                         |                                         |                                         |   |
+|                 |        |                                         |                                         |                                         |   |
+|                 |        |                                         |                                         |                                         |   |
+|                 |        |                                         |                                         |                                         |   |
