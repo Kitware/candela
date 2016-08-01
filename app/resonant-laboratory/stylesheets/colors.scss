@@ -1,0 +1,98 @@
+/*
+Current color scheme
+
+This scheme can be edited using this tool:
+http://paletton.com/#uid=72P0P0ksLro9iKfjZuGxXk0Oob9
+*/
+
+$Black: #000000;
+$White: #FFFFFF;
+$LightestGreen: #A2E4A2;
+$LightGreen: #4AC44A;
+$Green: #12AF12;
+$DarkGreen: #008000;
+$DarkestGreen: #004700;
+$UltralightBlue: #E0E7F1;
+$LightestBlue: #9AB2D1;
+$LightBlue: #456DA0;
+$Blue: #194D8F;
+$DarkBlue: #083269;
+$DarkestBlue: #021B3A;
+$LightestOrange: #FFE3B5;
+$LightOrange: #F4BA5C;
+$Orange: #DA8F16;
+$DarkOrange: #9F6300;
+$DarkestOrange: #593700;
+$LightestRed: #FFB5B5;
+$LightRed: #F45C5C;
+$Red: #DA1616;
+$DarkRed: #9F0000;
+$DarkestRed: #590000;
+
+/*
+Color meanings:
+*/
+
+$darkText: $Black;
+$lightText: $White;
+
+$pageBackground: $LightestBlue;
+$pageHeader: $DarkestBlue;
+
+$panelHeader: $DarkestBlue;
+$panelBackground: $White;
+
+$defaultIconColor: $LightBlue;
+$rolloverColor: $LightOrange;
+$successIcon: $DarkGreen;
+$warningIcon: $Orange;
+
+$notification: $LightestOrange;
+$notificationBackground: $LightestOrange;
+$errorNotification: $DarkRed;
+$errorNotificationBackground: $LightestRed;
+
+$data_tableHeader: $DarkestBlue;
+$data_tableOddRow: $LightestBlue;
+
+$data_overview: $LightestGreen;
+$data_filtered: $Green;
+$data_currentPage: $DarkestGreen;
+
+$matching_createLink: $DarkGreen;
+$matching_createLinkBackground: $LightestGreen;
+$matching_existingLink: $DarkBlue;
+$matching_existingLinkBackground: $LightestBlue;
+$matching_deleteLink: $DarkRed;
+$matching_deleteLinkBackground: $LightestRed;
+
+/*
+A sneaky way to make the variables accessible in Javascript
+*/
+#ColorScheme {
+  --darkText: $darkText;
+  --lightText: $lightText;
+  --pageBackground: $pageBackground;
+  --pageHeader: $pageHeader;
+  --panelHeader: $panelHeader;
+  --panelBackground: $panelBackground;
+  --defaultIconColor: $defaultIconColor;
+  --rolloverColor: $rolloverColor;
+  --successIcon: $successIcon;
+  --warningIcon: $warningIcon;
+  --notification: $notification;
+  --notificationBackground: $notificationBackground;
+  --errorNotification: $notification;
+  --errorNotificationBackground: $notificationBackground;
+  --data_tableHeader: $data_tableHeader;
+  --data_tableOddRow: $data_tableOddRow;
+  --data_overview: $data_overview;
+  --data_filtered: $data_filtered;
+  --data_currentPage: $data_currentPage;
+  --matching_createLink: $matching_createLink;
+  --matching_createLinkBackground: $matching_createLinkBackground;
+  --matching_existingLink: $matching_existingLink;
+  --matching_existingLinkBackground: $matching_existingLinkBackground;
+  --matching_deleteLink: $matching_deleteLink;
+  --matching_deleteLinkBackground: $matching_deleteLinkBackground;
+}
