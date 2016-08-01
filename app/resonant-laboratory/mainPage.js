@@ -1,5 +1,5 @@
 import Backbone from 'backbone';
-import jQuery from 'jquery';
+import d3 from 'd3';
 
 import Router from './Router';
 import User from './models/User';
@@ -12,7 +12,8 @@ import HelpLayer from './views/layout/HelpLayer';
 import NotificationLayer from './views/layout/NotificationLayer';
 
 // Page-wide Styles
-import iconFilters from './stylesheets/svgFilters.html';
+import colorScheme from './stylesheets/colorScheme.json';
+import svgFilters from './stylesheets/svgFilters.html';
 import './stylesheets/pure-css-custom-form-elements/style.css';
 import './stylesheets/mainPage.css';
 import './stylesheets/girderPatches.css';
@@ -61,7 +62,7 @@ let MainPage = Backbone.View.extend({
       actually add them until we call render()
     */
     if (!this.addedPageChunks) {
-      jQuery('#SvgFilters').html(iconFilters);
+      this.generateFilters();
       this.header = new Header({
         el: '#Header'
       });
@@ -88,6 +89,43 @@ let MainPage = Backbone.View.extend({
     this.overlay.render();
     this.helpLayer.render();
     this.notificationLayer.render();
+  },
+  generateFilters: function () {
+    let svg = d3.select('#SvgFilters');
+    svg.html(svgFilters);
+
+    // Generate SVG filters that can recolor images to whatever
+    // color we need. Styles simply do something like
+    // filter: url(#recolorImageToFFFFFF)
+    let recolorFilters = svg.select('defs').selectAll('filter.recolor')
+      .data(Object.keys(colorScheme), d => d)
+      .attr('class', 'recolor')
+      .attr('id', d => 'recolorImageTo' + d);
+    let cmpTransferEnter = recolorFilters.enter()
+      .append('filter').append('feComponentTransfer')
+      .attr('in', 'SourceAlpha')
+      .attr('result', 'color');
+    cmpTransferEnter.append('feFuncR')
+      .attr('type', 'linear')
+      .attr('slope', 0)
+      .attr('intercept', d => {
+        let hexvalue = d.slice(0, 2);
+        return Math.pow(parseInt(hexvalue, 16) / 255, 2);
+      });
+    cmpTransferEnter.append('feFuncG')
+      .attr('type', 'linear')
+      .attr('slope', 0)
+      .attr('intercept', d => {
+        let hexvalue = d.slice(2, 4);
+        return Math.pow(parseInt(hexvalue, 16) / 255, 2);
+      });
+    cmpTransferEnter.append('feFuncB')
+      .attr('type', 'linear')
+      .attr('slope', 0)
+      .attr('intercept', d => {
+        let hexvalue = d.slice(4, 6);
+        return Math.pow(parseInt(hexvalue, 16) / 255, 2);
+      });
   },
   newProject: function () {
     this.project = new Project();

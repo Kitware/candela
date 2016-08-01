@@ -1,0 +1,75 @@
+{
+  "#000000": [
+    "Rollover (light background)"
+  ],
+  "#3f3b3b": [
+    "Header (page, panels, and table)",
+    "Optional link count badge (matching view)"
+  ],
+  "#666666": [
+    "Page background"
+  ],
+  "#999999": [
+    "Default color for all icons"
+  ],
+  "#cccccc": [
+    "Alternating table row background"
+  ],
+  "#ffffff": [
+    "Rollover (dark background)"
+  ],
+  "#e41a1c": [
+    "Delete a link (matching view)"
+  ],
+  "#fbb4ae": [
+    "Delete a link background (matching view)"
+  ],
+  "#377eb8": [
+    "Create a link (matching view)",
+    "Indicator that a custom type / interpretation setting is in place"
+  ],
+  "#b3cde3": [
+    "Create a link background (matching view)"
+  ],
+  "#41b6c4": [
+    "Overview (dataset view)"
+  ],
+  "#2c7fb8": [
+    "Filtered set (dataset view)"
+  ],
+  "#253494": [
+    "Current page (dataset view)"
+  ],
+  "#4daf4a": [
+    "Success icon",
+    "Fulfilled link count badge (matching view)"
+  ],
+  "#ccebc5": [],
+  "#984ea3": [
+    "Existing link (matching view)"
+  ],
+  "#decbe4": [
+    "Existing link background (matching view)"
+  ],
+  "#ff7f00": [
+    "Warning icon",
+    "Unfulfilled link count badge (matching view)",
+    "Warning notification"
+  ],
+  "#fed9a6": [
+    "Warning notification background"
+  ],
+  "#ffff33": [
+    "Regular notification",
+    "Help bubble"
+  ],
+  "#ffffcc": [
+    "Regular notification background",
+    "Help bubble background",
+    "Icon indicating new tips are available"
+  ],
+  "#a65628": [],
+  "#e5d8bd": [],
+  "#f781bf": [],
+  "#fddaec": []
+}
