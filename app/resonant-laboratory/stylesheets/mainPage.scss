@@ -1,3 +1,5 @@
+@import './colors.scss';
+
 body {
   /*background-color: #666;*/
   padding: 0px;
@@ -9,7 +11,8 @@ body {
   (they cheat and just use Helvetica Neue) */
   font-family: "Josefin Sans", "Helvetica", "Arial", sans-serif;
   font-weight: 400;
-  background-color: #666;
+  background-color: $pageBackgroundColor;
+  color: $darkTextColor;
 }
 
 h1, button, h2, h3, h4, h5, h6 {
@@ -32,8 +35,8 @@ hr {
 }
 
 a {
-  color: #377eb8;
-  fill: #377eb8;  /* for links in SVG */
+  color: $linkTextColor;
+  fill: $linkTextColor;  /* for links in SVG */
   cursor: pointer;
 }
 

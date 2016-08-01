@@ -32,7 +32,7 @@ let ICONS = {
 
 import tips from './tips.json';
 
-import './header.css';
+import './header.scss';
 
 let Header = Backbone.View.extend({
   addListeners: function () {

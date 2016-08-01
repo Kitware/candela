@@ -2,7 +2,7 @@
 import svgFilters from './stylesheets/svgFilters.html';
 import './stylesheets/colors.scss';
 import './stylesheets/pure-css-custom-form-elements/style.css';
-import './stylesheets/mainPage.css';
+import './stylesheets/mainPage.scss';
 import './stylesheets/girderPatches.css';
 
 import Backbone from 'backbone';
