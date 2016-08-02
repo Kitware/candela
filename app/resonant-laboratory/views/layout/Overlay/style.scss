@@ -1,8 +1,10 @@
+@import '../../../stylesheets/colors.scss';
+
 #Overlay {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.35);
+  background-color: rgba($shadowColor,0.35);
   z-index: 1108;
   overflow: auto;
 }
@@ -11,9 +13,9 @@
 #Overlay div.largeDialog,
 #Overlay div.smallDialog,
 #Overlay div.hint {
-  background-color: white;
-  border: 1px solid rgba(0,0,0,0.2);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  background-color: $panelBackgroundColor;
+  border: 1px solid rgba($shadowColor,0.2);
+  box-shadow: 0 5px 15px rgba($shadowColor,0.5);
   min-height: 15em;
 }
 
@@ -38,7 +40,7 @@
   width: calc(100% + 5em);
   border: none;
   height: 1px;
-  background-color: #e5e5e5;
+  background-color: $separatorColor;
 }
 
 #Overlay div.hint {
@@ -81,13 +83,13 @@
   padding: 1em;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid rgba(0,0,0,0);
+  border: 2px solid rgba($shadowColor,0);
 }
 #Overlay div.current.circleButton {
-  background-color: #ccc;
+  background-color: $rolloverColor;
 }
 #Overlay div.circleButton:hover {
-  border: 2px solid #ccc;
+  border: 2px solid $rolloverColor;
 }
 
 #Overlay div.circleButton img {

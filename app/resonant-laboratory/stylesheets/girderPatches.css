@@ -17,7 +17,7 @@
 
 #Overlay button.close {
   position: absolute;
-  color: rgba(0,0,0,0);
+  color: transparent;
   background-image: url('../images/close.svg');
   top: 1em;
   right: 1em;

@@ -4,9 +4,9 @@ import jQuery from 'jquery';
 import d3 from 'd3';
 
 import emptyStateTemplate from './emptyState.html';
-import './emptyStyle.css';
-import './accordionhorz.css';
-import './style.css';
+import './emptyStyle.scss';
+import './accordionhorz.scss';
+import './style.scss';
 
 import WidgetPanel from './WidgetPanel.js';
 import SetOps, { Set } from '../../../shims/SetOps.js';

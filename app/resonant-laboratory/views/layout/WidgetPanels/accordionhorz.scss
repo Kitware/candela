@@ -1,3 +1,5 @@
+@import '../../../stylesheets/colors.scss';
+
 /* CSS-only horizontal accordion adapted from:
     http://www.sitepoint.com/css3-horizontal-accordion-using-target-selector/
 */
@@ -11,7 +13,7 @@ div.accordion {
 
 div.accordion section {
   position: relative;
-  background-color: white;
+  background-color: $panelBackgroundColor;
   float: left;
   width: 2em;
   height: calc(100% - 1em);
@@ -36,7 +38,7 @@ div.accordion section .sectionHeader {
   position: absolute;
   justify-content: space-between;
   cursor: pointer;
-  background-color: #3f3b3b;
+  background-color: $panelHeaderColor;
   width: calc(100vh - 4.5em);
   padding: 0 0.25em;
   height: 2em;

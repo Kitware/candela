@@ -42,6 +42,9 @@ $pageHeaderColor: $DarkestBlue;
 $panelHeaderColor: $DarkestBlue;
 $panelBackgroundColor: $White;
 
+$shadowColor: $Black;
+$separatorColor: darken($White, 10%);
+
 $defaultIconColor: $LightBlue;
 $rolloverColor: $LightOrange;
 $successIconColor: $DarkGreen;
@@ -54,23 +57,23 @@ $notificationBackgroundColor: $LightestOrange;
 $errorNotificationColor: $Red;
 $errorNotificationBackgroundColor: $LightestRed;
 
-$data_tableHeaderColor: $DarkestBlue;
-$data_tableOddRowColor: $LightestBlue;
+$dataTableHeaderColor: $DarkestBlue;
+$dataTableOddRowColor: $LightestBlue;
 
-$data_overviewColor: $LightestGreen;
-$data_filteredColor: $Green;
-$data_currentPageColor: $DarkestGreen;
+$dataOverviewColor: $LightestGreen;
+$dataFilteredColor: $Green;
+$dataCurrentPageColor: $DarkestGreen;
 
-$matching_createLinkColor: $DarkGreen;
-$matching_createLinkBackgroundColor: $LightestGreen;
-$matching_existingLinkColor: $DarkBlue;
-$matching_existingLinkBackgroundColor: $LightestBlue;
-$matching_deleteLinkColor: $DarkRed;
-$matching_deleteLinkBackgroundColor: $LightestRed;
+$matchingCreateLinkColor: $DarkGreen;
+$matchingCreateLinkBackgroundColor: $LightestGreen;
+$matchingExistingLinkColor: $DarkBlue;
+$matchingExistingLinkBackgroundColor: $LightestBlue;
+$matchingDeleteLinkColor: $DarkRed;
+$matchingDeleteLinkBackgroundColor: $LightestRed;
 
-$matching_successColor: $DarkGreen;
-$matching_warningColor: $Orange;
-$matching_optionalColor: $DarkestBlue;
+$matchingSuccessColor: $DarkGreen;
+$matchingWarningColor: $Orange;
+$matchingOptionalColor: $DarkestBlue;
 
 /*
 Function to get the ID of an SVG color-changing filter

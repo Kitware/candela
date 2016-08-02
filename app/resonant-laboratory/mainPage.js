@@ -96,10 +96,9 @@ let MainPage = Backbone.View.extend({
     svg.html(svgFilters);
 
     // Collect all colors in use
-    this.colorScheme = colorScheme;
     let allColors = new Set();
-    Object.keys(this.colorScheme).forEach(colorName => {
-      allColors.add(this.colorScheme[colorName]);
+    Object.keys(colorScheme).forEach(colorName => {
+      allColors.add(colorScheme[colorName]);
     });
 
     // Generate SVG filters that can recolor images to whatever

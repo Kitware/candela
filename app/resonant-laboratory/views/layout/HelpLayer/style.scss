@@ -13,7 +13,7 @@
   pointer-events: initial;
 }
 #HelpLayer #helpLayerMask {
-  fill: rgba(0,0,0,0.35);
+  fill: rgba($shadowColor,0.35);
   stroke: none;
 }
 #HelpLayer #arrow,
@@ -38,7 +38,7 @@
 #HelpLayer #gotIt rect,
 #HelpLayer.old #bubble circle {
   stroke-width: 1px;
-  stroke: rgba(0,0,0,0.2);
+  stroke: rgba($shadowColor,0.2);
 }
 #HelpLayer.new #arrow,
 #HelpLayer.new #bubble circle {

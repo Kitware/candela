@@ -39,7 +39,7 @@ let VIEWS = {
   AboutResonantLab
 };
 
-import './style.css';
+import './style.scss';
 
 let Overlay = Backbone.View.extend({
   initialize: function () {
