@@ -50,8 +50,8 @@
 }
 .DatasetView.content #tablePreview div.headerTools img.button:hover {
   cursor: pointer;
-  -webkit-filter: imgColorFilter($rolloverColor) !important;
-  filter: imgColorFilter($rolloverColor) !important;
+  -webkit-filter: imgColorFilter($lightRolloverColor) !important;
+  filter: imgColorFilter($lightRolloverColor) !important;
 }
 .DatasetView.content #tablePreview table {
   font-family: Courier, monospace;

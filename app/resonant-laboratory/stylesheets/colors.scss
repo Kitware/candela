@@ -50,12 +50,16 @@ $panelBackgroundColor: $White;
 $shadowColor: $Black;
 $separatorColor: $LightGrey;
 $disabledColor: $Grey;
+$lightDisabledColor: $LightestGrey;
 
 $defaultIconColor: $LightBlue;
-$rolloverColor: $LightOrange;
 $successIconColor: $DarkGreen;
 $warningIconColor: $Orange;
 $newInfoIconColor: $LightestBlue;
+$overriddenIconColor: $Blue;
+
+$lightRolloverColor: $LightOrange;
+$darkRolloverColor: $DarkOrange;
 
 $helpBubbleColor: $White;
 $oldHelpBubbleColor: $LightestBlue;
@@ -73,6 +77,7 @@ $dataOverviewColor: $LightestGreen;
 $dataFilteredColor: $Green;
 $dataCurrentPageColor: $DarkestGreen;
 
+$matchingNodeColor: $DarkestGrey;
 $matchingNodeBackgroundColor: $LightGrey;
 $matchingCreateLinkColor: $DarkGreen;
 $matchingCreateLinkBackgroundColor: $LightestGreen;

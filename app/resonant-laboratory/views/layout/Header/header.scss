@@ -30,8 +30,8 @@
   filter: imgColorFilter($newInfoIconColor);
 }
 #Header img.headerButton:hover {
-  -webkit-filter: imgColorFilter($rolloverColor);
-  filter: imgColorFilter($rolloverColor);
+  -webkit-filter: imgColorFilter($lightRolloverColor);
+  filter: imgColorFilter($lightRolloverColor);
 }
 
 #Header div.indicators {

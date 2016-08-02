@@ -21,12 +21,14 @@
 .MatchingView.content .node text {
   font-size: 12pt;
   font-weight: bold;
-  fill: $darkTextColor;
+  fill: $matchingNodeColor;
 }
 
 .MatchingView.content .node image {
   width: 1em;
   height: 1em;
+  -webkit-filter: imgColorFilter($matchingNodeColor);
+  filter: imgColorFilter($matchingNodeColor);
 }
 .MatchingView.content .node.data image {
   y: -0.5em;
@@ -76,12 +78,15 @@
 
 /* interaction state: node is hovered (will change selection) */
 .MatchingView.content .node.hovered rect.nodeBackground {
-  fill: $rolloverColor;
-  stroke: $rolloverColor;
+  fill: $lightRolloverColor;
+  stroke: $darkRolloverColor;
+}
+.MatchingView.content .node.hovered > text {
+  fill: $darkRolloverColor;
 }
 .MatchingView.content .node.hovered image {
-  -webkit-filter: imgColorFilter($darkTextColor);
-  filter: imgColorFilter($darkTextColor);
+  -webkit-filter: imgColorFilter($darkRolloverColor);
+  filter: imgColorFilter($darkRolloverColor);
 }
 
 /* interaction state: node can't be connected */
@@ -93,11 +98,11 @@
   stroke: none;
 }
 .MatchingView.content .node.ineligible > text {
-  fill: $lightTextColor;
+  fill: $lightDisabledColor;
 }
 .MatchingView.content .node.ineligible image {
-  -webkit-filter: imgColorFilter($lightTextColor);
-  filter: imgColorFilter($lightTextColor);
+  -webkit-filter: imgColorFilter($lightDisabledColor);
+  filter: imgColorFilter($lightDisabledColor);
 }
 
 /* interaction state: node can be connected */
@@ -126,11 +131,14 @@
   stroke-dasharray: none;
 }
 
-/* interaction state: node is selected */
+/* interaction state: link exists, but is not involved
+   in any current interaction */
 .MatchingView.content .established.edge path.visiblePath {
   stroke-width: 3px;
-  stroke: $matchingExistingLinkColor;
+  stroke: $matchingExistingLinkBackgroundColor;
 }
+
+/* interaction state: node is selected */
 .MatchingView.content .node.selected rect.nodeBackground {
   fill: $matchingExistingLinkBackgroundColor;
 }

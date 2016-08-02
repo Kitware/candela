@@ -32,9 +32,21 @@
   -webkit-filter: imgColorFilter($newInfoIconColor);
   filter: imgColorFilter($newInfoIconColor);
 }
+#WidgetPanels .sectionHeader img.loading {
+  -webkit-filter: none;
+  filter: none;
+}
+#WidgetPanels .sectionHeader img.okay {
+  -webkit-filter: imgColorFilter($successIconColor);
+  filter: imgColorFilter($successIconColor);
+}
+#WidgetPanels .sectionHeader img.warning {
+  -webkit-filter: imgColorFilter($warningIconColor);
+  filter: imgColorFilter($warningIconColor);
+}
 #WidgetPanels .sectionHeader img:hover {
-  -webkit-filter: imgColorFilter($rolloverColor);
-  filter: imgColorFilter($rolloverColor);
+  -webkit-filter: imgColorFilter($lightRolloverColor);
+  filter: imgColorFilter($lightRolloverColor);
 }
 #WidgetPanels .sectionHeader img.disabled {
   opacity: 0.25;

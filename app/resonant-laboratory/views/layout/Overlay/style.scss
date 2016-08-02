@@ -86,10 +86,10 @@
   border: 2px solid rgba($shadowColor,0);
 }
 #Overlay div.current.circleButton {
-  background-color: $rolloverColor;
+  background-color: $lightRolloverColor;
 }
 #Overlay div.circleButton:hover {
-  border: 2px solid $rolloverColor;
+  border: 2px solid $darkRolloverColor;
 }
 
 #Overlay div.circleButton img {

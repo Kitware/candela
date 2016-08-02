@@ -62,6 +62,16 @@ let MatchingView = Widget.extend({
           return Widget.warningIcon;
         }
       },
+      className: () => {
+        if (this.status === STATUS.OK) {
+          return 'okay';
+        } else if (this.status === STATUS.DATASETS_NOT_LOADED ||
+          this.status === STATUS.STALE_MAPPINGS) {
+          return 'loading';
+        } else {
+          return 'warning';
+        }
+      },
       title: () => {
         if (this.status === STATUS.OK) {
           return 'All the needed matchings have been specified';

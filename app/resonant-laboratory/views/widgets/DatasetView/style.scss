@@ -10,12 +10,23 @@
   font-weight: 900;
   padding: 1em;
 }
+.DatasetView.content img.button,
+.DatasetView.content image.button {
+  -webkit-filter: imgColorFilter($defaultIconColor);
+  filter: imgColorFilter($defaultIconColor);
+}
+.DatasetView.content img.button.overridden,
+.DatasetView.content image.button.overridden {
+  -webkit-filter: imgColorFilter($overriddenIconColor);
+  filter: imgColorFilter($overriddenIconColor);
+}
 .DatasetView.content img.button:hover,
 .DatasetView.content image.button:hover {
   cursor: pointer;
-  -webkit-filter: imgColorFilter($rolloverColor);
-  filter: imgColorFilter($rolloverColor);
+  -webkit-filter: imgColorFilter($darkRolloverColor);
+  filter: imgColorFilter($darkRolloverColor);
 }
+.DatasetView.content img.button.disabled,
 .DatasetView.content image.button.disabled {
   cursor: default;
   -webkit-filter: imgColorFilter($disabledColor);

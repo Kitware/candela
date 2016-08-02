@@ -163,6 +163,15 @@ let DatasetView = Widget.extend({
           return Widget.warningIcon;
         }
       },
+      className: () => {
+        if (this.status === STATUS.LOADING) {
+          return 'loading';
+        } else if (this.status === STATUS.SUCCESS) {
+          return 'okay';
+        } else {
+          return 'warning';
+        }
+      },
       title: () => {
         if (this.status === STATUS.LOADING) {
           return 'The dataset hasn\'t finished loading yet';
@@ -464,13 +473,10 @@ let DatasetView = Widget.extend({
     let attrType = datasetDetails.datasetObj
       .getAttributeType(datasetDetails.schema, attrName);
     let isAuto = !(datasetDetails.schema[attrName].hasOwnProperty('coerceToType'));
-    let filterStyle = isAuto ? null : 'url(#recolorImageTo377eb8)';
+    let buttonClass = isAuto ? 'dataTypeMenuIcon button' : 'overridden dataTypeMenuIcon button';
     d3.select(element)
       .attr('src', ICONS[attrType])
-      .style({
-        '-webkit-filter': filterStyle,
-        'filter': filterStyle
-      });
+      .attr('class', buttonClass);
     this.attachMenuToButton(element, attrName, datasetDetails,
       TYPE_MENU_ITEMS, autoAttrType, attrType, isAuto,
       (newDataType) => {
@@ -483,13 +489,10 @@ let DatasetView = Widget.extend({
     let interpretation = datasetDetails.datasetObj
       .getAttributeInterpretation(datasetDetails.schema, attrName);
     let isAuto = !(datasetDetails.schema[attrName].hasOwnProperty('interpretation'));
-    let filterStyle = isAuto ? null : 'url(#recolorImageTo377eb8)';
+    let buttonClass = isAuto ? 'interpretationMenuIcon button' : 'overridden interpretationMenuIcon button';
     d3.select(element)
       .attr('src', ICONS[interpretation])
-      .style({
-        '-webkit-filter': filterStyle,
-        'filter': filterStyle
-      });
+      .attr('class', buttonClass);
     this.attachMenuToButton(element, attrName, datasetDetails,
       INTERPRETATION_MENU_ITEMS, autoInterpretation, interpretation, isAuto,
       (newInterpretation) => {
