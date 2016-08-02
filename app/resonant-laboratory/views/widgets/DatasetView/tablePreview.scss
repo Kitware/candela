@@ -1,3 +1,5 @@
+@import '../../../stylesheets/colors.scss';
+
 .DatasetView.content #tablePreview {
   position: relative;
   width: 100%;
@@ -12,8 +14,8 @@
 }
 .DatasetView.content #tablePreview #dataTableHeaders {
   position: absolute;
-  background-color: #3f3b3b;
-  color: white;
+  background-color: $dataTableHeaderColor;
+  color: $lightTextColor;
   top: 0em;
   height: 5em;
   width: 100%;
@@ -48,8 +50,8 @@
 }
 .DatasetView.content #tablePreview div.headerTools img.button:hover {
   cursor: pointer;
-  -webkit-filter: url(#recolorImageToWhite) !important;
-  filter: url(#recolorImageToWhite) !important;
+  -webkit-filter: imgColorFilter($rolloverColor) !important;
+  filter: imgColorFilter($rolloverColor) !important;
 }
 .DatasetView.content #tablePreview table {
   font-family: Courier, monospace;
@@ -61,5 +63,5 @@
   -webkit-user-select: initial;
 }
 .DatasetView.content #tablePreview tr:nth-child(odd) {
-  background: #cccccc;
+  background: $dataTableOddRowColor;
 }

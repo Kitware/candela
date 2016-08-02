@@ -1,3 +1,5 @@
+@import '../../../stylesheets/colors.scss';
+
 .DatasetView.content #histogramPreview {
   width: calc(100% - 2em);
   flex-grow: 1;
@@ -46,8 +48,8 @@
 .DatasetView.content #histogramPreview .header input.expander:hover:before,
 .DatasetView.content #histogramPreview .header img.button:hover {
   cursor: pointer;
-  -webkit-filter: url(#recolorImageToBlack) !important;
-  filter: url(#recolorImageToBlack) !important;
+  -webkit-filter: imgColorFilter($rolloverColor) !important;
+  filter: imgColorFilter($rolloverColor) !important;
 }
 .DatasetView.content #histogramPreview .content {
   position: relative;
@@ -61,18 +63,20 @@
 .DatasetView.content #histogramPreview .attributeSection .yAxis line,
 .DatasetView.content #histogramPreview .attributeSection .yAxis path {
   fill: none;
-  stroke: black;
+  stroke: $dataAxisColor;
   stroke-width: 1px;
 }
 .DatasetView.content #histogramPreview .attributeSection .yAxisKnob {
   cursor: ns-resize;
+  fill: $dataAxisColor;
+  stroke: none;
 }
 .DatasetView.content #histogramPreview .attributeSection.excluded .yAxis line,
 .DatasetView.content #histogramPreview .attributeSection.excluded .yAxis path {
-  stroke: #999999;
+  stroke: $disabledColor;
 }
 .DatasetView.content #histogramPreview .attributeSection.excluded text {
-  fill: #999999;
+  fill: $disabledColor;
 }
 .DatasetView.content #histogramPreview .attributeSection.excluded rect {
   opacity: 0.25;

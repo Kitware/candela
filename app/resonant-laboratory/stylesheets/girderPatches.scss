@@ -1,3 +1,5 @@
+@import './colors.scss';
+
 /*
   Girder's (and Bootstrap's) massive stylesheets interfere with
   Resonant Laboratory's styles in lots of places. Instead, while
@@ -85,7 +87,7 @@
 }
 
 #Overlay .g-validation-failed-message {
-  color: #e41a1c;
+  color: $errorNotificationColor;
 }
 
 #Overlay .modal-footer > *,

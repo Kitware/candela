@@ -24,16 +24,18 @@
 #HelpLayer #arrow {
   fill: none;
 }
-#HelpLayer #gotIt rect,
-#HelpLayer.old #bubble circle {
+#HelpLayer #gotIt rect {
   fill: $panelBackgroundColor;
+}
+#HelpLayer.old #bubble circle {
+  fill: $oldHelpBubbleColor;
 }
 #HelpLayer.new #bubble circle {
   fill: $helpBubbleColor;
 }
 #HelpLayer.old #arrow {
   stroke-width: 2px;
-  stroke: $panelBackgroundColor;
+  stroke: $oldHelpBubbleColor;
 }
 #HelpLayer #gotIt rect,
 #HelpLayer.old #bubble circle {

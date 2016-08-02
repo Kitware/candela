@@ -19,6 +19,6 @@
 #WidgetPanels .emptyState img {
   width: 1em;
   height: 1em;
-  -webkit-filter: imgColorFilter($newInfoIconColor);
-  filter: imgColorFilter($newInfoIconColor);
+  -webkit-filter: imgColorFilter($defaultIconColor);
+  filter: imgColorFilter($defaultIconColor);
 }

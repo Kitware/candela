@@ -9,9 +9,9 @@ import myTemplate from './template.html';
 import histogramTemplate from './histogramTemplate.html';
 import rewrap from '../../../shims/svgTextWrap.js';
 import makeValidId from '../../../shims/makeValidId.js';
-import './style.css';
-import './tablePreview.css';
-import './histogramPreview.css';
+import './style.scss';
+import './tablePreview.scss';
+import './histogramPreview.scss';
 
 import seekFirst from '../../../images/seekFirst.svg';
 import seekPrev from '../../../images/seekPrev.svg';

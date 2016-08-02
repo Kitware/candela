@@ -1,3 +1,5 @@
+@import '../../../stylesheets/colors.scss';
+
 .DatasetView.content {
   display: flex;
   flex-direction: column;
@@ -11,22 +13,21 @@
 .DatasetView.content img.button:hover,
 .DatasetView.content image.button:hover {
   cursor: pointer;
-  -webkit-filter: url(#recolorImageTo333333);
-  filter: url(#recolorImageTo333333);
+  -webkit-filter: imgColorFilter($rolloverColor);
+  filter: imgColorFilter($rolloverColor);
 }
-.DatasetView.content img.button:hover,
 .DatasetView.content image.button.disabled {
   cursor: default;
-  -webkit-filter: url(#recolorImageTocccccc);
-  filter: url(#recolorImageTocccccc);
+  -webkit-filter: imgColorFilter($disabledColor);
+  filter: imgColorFilter($disabledColor);
 }
 
 .DatasetView.content .overview {
-  fill: #41b6c4;
+  fill: $dataOverviewColor;
 }
 .DatasetView.content .filtered {
-  fill: #2c7fb8;
+  fill: $dataFilteredColor;
 }
 .DatasetView.content .page {
-  fill: #253494;
+  fill: $dataCurrentPageColor;
 }

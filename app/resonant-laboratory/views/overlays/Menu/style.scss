@@ -1,8 +1,10 @@
+@import '../../../stylesheets/colors.scss';
+
 .menu {
   position: absolute;
-  background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  background-color: $panelBackgroundColor;
+  border: 1px solid rgba($shadowColor, 0.2);
+  box-shadow: 0 6px 12px rgba($shadowColor, 0.175);
   border-radius: 4px;
 }
 .menu.withChecks {
@@ -14,7 +16,7 @@
   width: 100%;
   border: none;
   height: 1px;
-  background-color: #e5e5e5;
+  background-color: $separatorColor;
   margin: 0px;
 }
 
@@ -43,7 +45,7 @@
 }
 
 .menu div.menuItem:hover {
-  background-color: #eee;
+  background-color: $rolloverColor;
   cursor: pointer;
 }
 

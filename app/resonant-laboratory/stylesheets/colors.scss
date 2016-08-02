@@ -5,8 +5,13 @@ This scheme can be edited using this tool:
 http://paletton.com/#uid=72P0P0ksLro9iKfjZuGxXk0Oob9
 */
 
-$Black: #000000;
 $White: #FFFFFF;
+$LightestGrey: #F7F7F7;
+$LightGrey: #CCCCCC;
+$Grey: #969696;
+$DarkGrey: #636363;
+$DarkestGrey: #252525;
+$Black: #000000;
 $LightestGreen: #A2E4A2;
 $LightGreen: #4AC44A;
 $Green: #12AF12;
@@ -43,7 +48,8 @@ $panelHeaderColor: $DarkestBlue;
 $panelBackgroundColor: $White;
 
 $shadowColor: $Black;
-$separatorColor: darken($White, 10%);
+$separatorColor: $LightGrey;
+$disabledColor: $Grey;
 
 $defaultIconColor: $LightBlue;
 $rolloverColor: $LightOrange;
@@ -51,7 +57,8 @@ $successIconColor: $DarkGreen;
 $warningIconColor: $Orange;
 $newInfoIconColor: $LightestBlue;
 
-$helpBubbleColor: $LightestBlue;
+$helpBubbleColor: $White;
+$oldHelpBubbleColor: $LightestBlue;
 $notificationColor: $Orange;
 $notificationBackgroundColor: $LightestOrange;
 $errorNotificationColor: $Red;
@@ -60,10 +67,13 @@ $errorNotificationBackgroundColor: $LightestRed;
 $dataTableHeaderColor: $DarkestBlue;
 $dataTableOddRowColor: $LightestBlue;
 
+$dataAxisColor: $Black;
+
 $dataOverviewColor: $LightestGreen;
 $dataFilteredColor: $Green;
 $dataCurrentPageColor: $DarkestGreen;
 
+$matchingNodeBackgroundColor: $LightGrey;
 $matchingCreateLinkColor: $DarkGreen;
 $matchingCreateLinkBackgroundColor: $LightestGreen;
 $matchingExistingLinkColor: $DarkBlue;
@@ -72,8 +82,11 @@ $matchingDeleteLinkColor: $DarkRed;
 $matchingDeleteLinkBackgroundColor: $LightestRed;
 
 $matchingSuccessColor: $DarkGreen;
+$matchingSuccessTextColor: $LightestGreen;
 $matchingWarningColor: $Orange;
+$matchingWarningTextColor: $LightestOrange;
 $matchingOptionalColor: $DarkestBlue;
+$matchingOptionalTextColor: $LightestBlue;
 
 /*
 Function to get the ID of an SVG color-changing filter

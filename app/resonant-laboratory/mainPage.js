@@ -17,7 +17,7 @@ import colorScheme from '!!sass-variable-loader!./stylesheets/colors.scss';
 import svgFilters from './stylesheets/svgFilters.html';
 import './stylesheets/pure-css-custom-form-elements/style.css';
 import './stylesheets/mainPage.scss';
-import './stylesheets/girderPatches.css';
+import './stylesheets/girderPatches.scss';
 
 // The API root is different
 window.girder.apiRoot = 'api/v1';

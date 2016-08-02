@@ -1,3 +1,5 @@
+@import '../../../stylesheets/colors.scss';
+
 .MatchingView.content {
   overflow: auto;
 }
@@ -9,8 +11,8 @@
 }
 
 .MatchingView.content .node rect.nodeBackground {
-  fill: #ddd;
-  stroke: #ddd;
+  fill: $matchingNodeBackgroundColor;
+  stroke: $matchingNodeBackgroundColor;
   stroke-width: 5px;
   rx: 5px;
   ry: 5px;
@@ -19,7 +21,7 @@
 .MatchingView.content .node text {
   font-size: 12pt;
   font-weight: bold;
-  fill: #3f3b3b;
+  fill: $darkTextColor;
 }
 
 .MatchingView.content .node image {
@@ -37,7 +39,7 @@
   fill: none;
 }
 .MatchingView.content .edge path.ghostPath {
-  stroke: rgba(0,0,0,0.01);
+  stroke: transparent;
   stroke-width: 20px;
 }
 
@@ -51,30 +53,35 @@
   letter-spacing: 1px;
 }
 .MatchingView.content .node .connectionStats.optional path.statsBackground {
-  fill: #3f3b3b;
-  stroke: #3f3b3b;
+  fill: $matchingOptionalColor;
+  stroke: $matchingOptionalColor;
 }
 .MatchingView.content .node .connectionStats.optional text {
-  fill: white;
+  fill: $matchingOptionalTextColor;
 }
 .MatchingView.content .node .connectionStats.satisfied path.statsBackground {
-  fill: #4daf4a;
-  stroke: #4daf4a;
+  fill: $matchingSuccessColor;
+  stroke: $matchingSuccessColor;
 }
 .MatchingView.content .node .connectionStats.satisfied text {
-  fill: #ccebc5;
+  fill: $matchingSuccessTextColor;
 }
 .MatchingView.content .node .connectionStats.notSatisfied path.statsBackground {
-  fill: #ff7f00;
-  stroke: #ff7f00;
+  fill: $matchingWarningColor;
+  stroke: $matchingWarningColor;
 }
 .MatchingView.content .node .connectionStats.notSatisfied text {
-  fill: #fed9a6;
+  fill: $matchingWarningTextColor;
 }
 
 /* interaction state: node is hovered (will change selection) */
 .MatchingView.content .node.hovered rect.nodeBackground {
-  stroke: #984ea3;
+  fill: $rolloverColor;
+  stroke: $rolloverColor;
+}
+.MatchingView.content .node.hovered image {
+  -webkit-filter: imgColorFilter($darkTextColor);
+  filter: imgColorFilter($darkTextColor);
 }
 
 /* interaction state: node can't be connected */
@@ -82,35 +89,39 @@
   cursor: not-allowed;
 }
 .MatchingView.content .node.ineligible rect.nodeBackground {
-  fill: #ddd;
+  fill: $disabledColor;
   stroke: none;
 }
 .MatchingView.content .node.ineligible > text {
-  fill: #999;
+  fill: $lightTextColor;
+}
+.MatchingView.content .node.ineligible image {
+  -webkit-filter: imgColorFilter($lightTextColor);
+  filter: imgColorFilter($lightTextColor);
 }
 
 /* interaction state: node can be connected */
 .MatchingView.content .node.connectable rect.nodeBackground {
-  fill: #b3cde3;
+  fill: $matchingCreateLinkBackgroundColor;
   stroke: none;
 }
 .MatchingView.content .node.connectable > text {
-  fill: #377eb8;
+  fill: $matchingCreateLinkColor;
 }
 .MatchingView.content .node.connectable image {
-  -webkit-filter: url(#recolorImageTo377eb8);
-  filter: url(#recolorImageTo377eb8);
+  -webkit-filter: imgColorFilter($matchingCreateLinkColor);
+  filter: imgColorFilter($matchingCreateLinkColor);
 }
 .MatchingView.content .potential.edge path.visiblePath {
   stroke-dasharray: 5, 5;
   stroke-width: 5px;
-  stroke: #b3cde3;
+  stroke: $matchingCreateLinkBackgroundColor;
 }
 
 /* interaction state: node is about to be connected */
 .MatchingView.content .node.connectable.hovered rect.nodeBackground,
 .MatchingView.content .potential.edge.hovered path.visiblePath {
-  stroke: #377eb8;
+  stroke: $matchingCreateLinkColor;
   stroke-width: 5px;
   stroke-dasharray: none;
 }
@@ -118,29 +129,29 @@
 /* interaction state: node is selected */
 .MatchingView.content .established.edge path.visiblePath {
   stroke-width: 3px;
-  stroke: #decbe4;
+  stroke: $matchingExistingLinkColor;
 }
 .MatchingView.content .node.selected rect.nodeBackground {
-  fill: #984ea3;
+  fill: $matchingExistingLinkBackgroundColor;
 }
 .MatchingView.content .node.selected > text {
-  fill: #3f3b3b;
+  fill: $matchingExistingLinkColor;
 }
 .MatchingView.content .node.selected image {
-  -webkit-filter: url(#recolorImageTo333333);
-  filter: url(#recolorImageTo333333);
+  -webkit-filter: imgColorFilter($matchingExistingLinkColor);
+  filter: imgColorFilter($matchingExistingLinkColor);
 }
 
 /* interaction state: node is connected to the selected node */
 .MatchingView.content .node.linked rect.nodeBackground {
-  fill: #decbe4;
+  fill: $matchingExistingLinkBackgroundColor;
 }
 .MatchingView.content .node.linked > text {
-  fill: #984ea3;
+  fill: $matchingExistingLinkColor;
 }
 .MatchingView.content .node.linked image {
-  -webkit-filter: url(#recolorImageTo984ea3);
-  filter: url(#recolorImageTo984ea3);
+  -webkit-filter: imgColorFilter($matchingExistingLinkColor);
+  filter: imgColorFilter($matchingExistingLinkColor);
 }
 
 /* interaction state: link / borders of selected+connected nodes */
@@ -148,27 +159,27 @@
 .MatchingView.content .node.linked rect.nodeBackground,
 .MatchingView.content .established.selected.edge path.visiblePath {
   stroke-width: 5px;
-  stroke: #984ea3;
+  stroke: $matchingExistingLinkColor;
 }
 
 /* interaction state: connection is about to be broken */
 .MatchingView.content .node.linked.hovered rect.nodeBackground,
 .MatchingView.content .node.disconnectable rect.nodeBackground {
-  fill: #fbb4ae;
+  fill: $matchingDeleteLinkBackgroundColor;
 }
 .MatchingView.content .node.linked.hovered > text,
 .MatchingView.content .node.disconnectable > text {
-  fill: #e41a1c;
+  fill: $matchingDeleteLinkColor;
 }
 .MatchingView.content .node.linked.hovered image,
 .MatchingView.content .node.disconnectable image {
-  -webkit-filter: url(#recolorImageToe41a1c);
-  filter: url(#recolorImageToe41a1c);
+  -webkit-filter: imgColorFilter($matchingDeleteLinkColor);
+  filter: imgColorFilter($matchingDeleteLinkColor);
 }
 .MatchingView.content .node.linked.hovered rect.nodeBackground,
 .MatchingView.content .node.disconnectable rect.nodeBackground,
 .MatchingView.content .established.edge.hovered path.visiblePath {
-  stroke: #e41a1c;
+  stroke: $matchingDeleteLinkColor;
 }
 .MatchingView.content .established.edge.hovered {
   /* TODO: create a less dorky cursor */

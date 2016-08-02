@@ -4,7 +4,7 @@ import jQuery from 'jquery';
 import myTemplate from './template.html';
 import Widget from '../Widget';
 import candela from '../../../../../src/candela';
-import './style.css';
+import './style.scss';
 
 import booleanIcon from '../../../images/boolean.svg';
 import integerIcon from '../../../images/integer.svg';
