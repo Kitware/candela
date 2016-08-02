@@ -5,7 +5,7 @@
   top: 1.5em;
   right: 1.5em;
   height: calc(100vh - 6em);
-  color: $lightTextColor;
+  color: $darkTextColor;
 }
 #WidgetPanels .emptyState > div {
   width: 20em;
@@ -19,8 +19,8 @@
 #WidgetPanels .emptyState #QuestionHint img {
   width: 1em;
   height: 1em;
-  -webkit-filter: imgColorFilter($defaultIconColor);
-  filter: imgColorFilter($defaultIconColor);
+  -webkit-filter: imgColorFilter($defaultDarkIconColor);
+  filter: imgColorFilter($defaultDarkIconColor);
 }
 #WidgetPanels .emptyState .watermark {
   position: absolute;
@@ -29,10 +29,10 @@
   width: 8em;
   height: 8em;
   cursor: pointer;
-  -webkit-filter: url(#recolorImageTo999999);
-  filter: url(#recolorImageTo999999);
+  -webkit-filter: imgColorFilter($watermarkColor);
+  filter: imgColorFilter($watermarkColor);
 }
 #WidgetPanels .emptyState .watermark:hover {
-  -webkit-filter: url(#dropShadow);
-  filter: url(#dropShadow);
+  -webkit-filter: url(#dropSoftShadow);
+  filter: url(#dropSoftShadow);
 }

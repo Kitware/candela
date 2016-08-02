@@ -38,7 +38,10 @@ div.accordion section .sectionHeader {
   position: absolute;
   justify-content: space-between;
   cursor: pointer;
-  background-color: $panelHeaderColor;
+  background: linear-gradient(2deg,
+    $panelHeaderDarkColor,
+    $panelHeaderLightColor 65%,
+    $panelHeaderLightColor);
   width: calc(100vh - 4.5em);
   padding: 0 0.25em;
   height: 2em;

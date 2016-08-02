@@ -38,6 +38,8 @@
   position: absolute;
   left: 0.5em;
   top: calc(50% - 0.75em);
+  -webkit-filter: imgColorFilter($overriddenIconColor);
+  filter: imgColorFilter($overriddenIconColor);
 }
 .menu div.menuItem.separator {
   padding: 0px;
@@ -45,14 +47,22 @@
 }
 
 .menu div.menuItem:hover {
-  background-color: $lightRolloverColor;
+  background-color: $menuRolloverColor;
+  color: $darkRolloverColor;
   cursor: pointer;
 }
 
-.menu img.icon {
+.menu div.menuItem img.icon {
   vertical-align: middle;
   width: 1.5em;
   height: 1.5em;
+  -webkit-filter: imgColorFilter($defaultDarkIconColor);
+  filter: imgColorFilter($defaultDarkIconColor);
+}
+
+.menu div.menuItem:hover img.icon {
+  -webkit-filter: imgColorFilter($darkRolloverColor);
+  filter: imgColorFilter($darkRolloverColor);
 }
 
 .menu p {

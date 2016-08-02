@@ -12,8 +12,8 @@
 }
 .DatasetView.content img.button,
 .DatasetView.content image.button {
-  -webkit-filter: imgColorFilter($defaultIconColor);
-  filter: imgColorFilter($defaultIconColor);
+  -webkit-filter: imgColorFilter($defaultDarkIconColor);
+  filter: imgColorFilter($defaultDarkIconColor);
 }
 .DatasetView.content img.button.overridden,
 .DatasetView.content image.button.overridden {

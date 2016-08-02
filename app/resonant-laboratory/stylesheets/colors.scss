@@ -5,13 +5,13 @@ This scheme can be edited using this tool:
 http://paletton.com/#uid=72P0P0ksLro9iKfjZuGxXk0Oob9
 */
 
-$White: #FFFFFF;
-$LightestGrey: #F7F7F7;
-$LightGrey: #CCCCCC;
+$White: #F7F7F7;
+$LightestGrey: #D9D9D9;
+$LightGrey: #BDBDBD;
 $Grey: #969696;
-$DarkGrey: #636363;
-$DarkestGrey: #252525;
-$Black: #000000;
+$DarkGrey: #737373;
+$DarkestGrey: #525252;
+$Black: #252525;
 $LightestGreen: #A2E4A2;
 $LightGreen: #4AC44A;
 $Green: #12AF12;
@@ -41,10 +41,12 @@ $darkTextColor: $Black;
 $lightTextColor: $White;
 $linkTextColor: $Blue;
 
-$pageBackgroundColor: $LightestBlue;
-$pageHeaderColor: $DarkestBlue;
+$pageBackgroundColor: $LightGrey;
+$pageHeaderLightColor: $DarkGreen;
+$pageHeaderDarkColor: $DarkestGreen;
 
-$panelHeaderColor: $DarkestBlue;
+$panelHeaderDarkColor: $DarkBlue;
+$panelHeaderLightColor: $DarkestBlue;
 $panelBackgroundColor: $White;
 
 $shadowColor: $Black;
@@ -52,23 +54,26 @@ $separatorColor: $LightGrey;
 $disabledColor: $Grey;
 $lightDisabledColor: $LightestGrey;
 
-$defaultIconColor: $LightBlue;
+$defaultLightIconColor: $LightestGrey;
+$defaultDarkIconColor: $DarkGrey;
 $successIconColor: $DarkGreen;
 $warningIconColor: $Orange;
-$newInfoIconColor: $LightestBlue;
-$overriddenIconColor: $Blue;
+$newInfoIconColor: $LightestGrey;
+$overriddenIconColor: $LightBlue;
+$watermarkColor: $LightestGrey;
 
-$lightRolloverColor: $LightOrange;
-$darkRolloverColor: $DarkOrange;
+$lightRolloverColor: $White;
+$menuRolloverColor: $LightestGrey;
+$darkRolloverColor: $Black;
 
 $helpBubbleColor: $White;
-$oldHelpBubbleColor: $LightestBlue;
+$oldHelpBubbleColor: $LightestGrey;
 $notificationColor: $Orange;
 $notificationBackgroundColor: $LightestOrange;
 $errorNotificationColor: $Red;
 $errorNotificationBackgroundColor: $LightestRed;
 
-$dataTableHeaderColor: $DarkestBlue;
+$dataTableHeaderColor: $DarkBlue;
 $dataTableOddRowColor: $LightestBlue;
 
 $dataAxisColor: $Black;
@@ -90,7 +95,7 @@ $matchingSuccessColor: $DarkGreen;
 $matchingSuccessTextColor: $LightestGreen;
 $matchingWarningColor: $Orange;
 $matchingWarningTextColor: $LightestOrange;
-$matchingOptionalColor: $DarkestBlue;
+$matchingOptionalColor: $DarkBlue;
 $matchingOptionalTextColor: $LightestBlue;
 
 /*

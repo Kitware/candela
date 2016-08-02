@@ -46,12 +46,18 @@
   height: 1em;
 }
 .DatasetView.content #tablePreview div.headerTools img.button {
+  cursor: pointer;
   margin: 0em 0.25em;
+  -webkit-filter: imgColorFilter($defaultLightIconColor);
+  filter: imgColorFilter($defaultLightIconColor);
+}
+.DatasetView.content #tablePreview div.headerTools img.button.overridden {
+  -webkit-filter: imgColorFilter($overriddenIconColor);
+  filter: imgColorFilter($overriddenIconColor);
 }
 .DatasetView.content #tablePreview div.headerTools img.button:hover {
-  cursor: pointer;
-  -webkit-filter: imgColorFilter($lightRolloverColor) !important;
-  filter: imgColorFilter($lightRolloverColor) !important;
+  -webkit-filter: imgColorFilter($lightRolloverColor) url(#dropShadow);
+  filter: imgColorFilter($lightRolloverColor) url(#dropShadow);
 }
 .DatasetView.content #tablePreview table {
   font-family: Courier, monospace;

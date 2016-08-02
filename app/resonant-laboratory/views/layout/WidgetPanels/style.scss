@@ -25,8 +25,8 @@
   transform: rotate(90deg);
 }
 #WidgetPanels .sectionHeader img {
-  -webkit-filter: imgColorFilter($defaultIconColor);
-  filter: imgColorFilter($defaultIconColor);
+  -webkit-filter: imgColorFilter($defaultLightIconColor);
+  filter: imgColorFilter($defaultLightIconColor);
 }
 #WidgetPanels .sectionHeader img.new {
   -webkit-filter: imgColorFilter($newInfoIconColor);
@@ -45,8 +45,8 @@
   filter: imgColorFilter($warningIconColor);
 }
 #WidgetPanels .sectionHeader img:hover {
-  -webkit-filter: imgColorFilter($lightRolloverColor);
-  filter: imgColorFilter($lightRolloverColor);
+  -webkit-filter: imgColorFilter($lightRolloverColor) url(#dropHalo);
+  filter: imgColorFilter($lightRolloverColor) url(#dropHalo);
 }
 #WidgetPanels .sectionHeader img.disabled {
   opacity: 0.25;

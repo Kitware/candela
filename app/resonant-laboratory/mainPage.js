@@ -1,6 +1,5 @@
 import Backbone from 'backbone';
 import d3 from 'd3';
-import { Set } from './shims/SetOps.js';
 
 import Router from './Router';
 import User from './models/User';
@@ -96,16 +95,20 @@ let MainPage = Backbone.View.extend({
     svg.html(svgFilters);
 
     // Collect all colors in use
-    let allColors = new Set();
+    this.allColors = {};
     Object.keys(colorScheme).forEach(colorName => {
-      allColors.add(colorScheme[colorName]);
+      let color = colorScheme[colorName];
+      if (!(color in this.allColors)) {
+        this.allColors[color] = [];
+      }
+      this.allColors[color].push(colorName);
     });
 
     // Generate SVG filters that can recolor images to whatever
     // color we need. Styles simply do something like
     // filter: url(#recolorImageToFFFFFF)
     let recolorFilters = svg.select('defs').selectAll('filter.recolor')
-      .data(Array.from(allColors), d => d);
+      .data(Object.keys(this.allColors), d => d);
     let recolorFiltersEnter = recolorFilters.enter().append('filter')
       .attr('class', 'recolor')
       .attr('id', d => 'recolorImageTo' + d.slice(1));

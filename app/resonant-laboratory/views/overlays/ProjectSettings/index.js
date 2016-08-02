@@ -9,7 +9,7 @@ import publicIcon from '../../../images/public.svg';
 import libraryIcon from '../../../images/library.svg';
 import scratchIcon from '../../../images/scratchSpace.svg';
 import '../../../shims/copyToClipboard.js';
-import './style.css';
+import './style.scss';
 
 let visibilityIcons = {
   PublicUser: publicIcon,
