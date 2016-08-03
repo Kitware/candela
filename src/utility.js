@@ -2,18 +2,22 @@ import md5 from 'md5';
 
 import colors from './colors.js'
 
-export let failValue = (value, warning, fail) => {
-  if (warning > fail) {
-    // Lower values are better.
-    return (value <= fail);
-  } else {
+export let failValue = (value, warning, fail, lower_is_better) => {
+  if (lower_is_better === undefined || lower_is_better === null) {
+    lower_is_better = (warning < fail);
+  }
+  if (lower_is_better) {
     return (value >= fail);
+  } else {
+    return (value <= fail);
   }
 };
 
-export let warningValue = (value, warning, fail) => {
-  if (warning > fail) {
-    // Lower values are better.
+export let warningValue = (value, warning, fail, lower_is_better) => {
+  if (lower_is_better === undefined || lower_is_better === null) {
+    lower_is_better = (warning < fail);
+  }
+  if (lower_is_better) {
     return (value <= warning);
   } else {
     return (value >= warning);
@@ -35,11 +39,13 @@ export let computeColor = (trend, value) => {
     } else {
       if (failValue(value,
                     trend.warning,
-                    trend.fail)) {
+                    trend.fail,
+                    trend.lower_is_better)) {
         return colors.fail;
       } else if (warningValue(value,
                               trend.warning,
-                              trend.fail)) {
+                              trend.fail,
+                              trend.lower_is_better)) {
         return colors.bad;
       } else {
         return colors.good;
