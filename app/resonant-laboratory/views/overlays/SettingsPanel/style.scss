@@ -19,13 +19,21 @@
   flex-grow: 3;
 }
 
-#Overlay #leftChunk .clickable {
+#Overlay #leftChunk .menuItem {
   cursor: pointer;
-  padding: 0.5em 0em;
+  padding: 0.5em 0em 0.5em 1em;
+  margin: 0em -1em;
   line-height: 1.5em;
 }
-
-#Overlay #leftChunk .clickable:hover {
+#Overlay #leftChunk .disabled.menuItem {
+  cursor: default;
+  color: $disabledColor;
+}
+#Overlay #leftChunk .focused.menuItem {
+  background-color: $darkRolloverColor;
+  color: $lightRolloverColor;
+}
+#Overlay #leftChunk .clickable.menuItem:hover {
   background-color: $menuRolloverColor;
   color: $darkRolloverColor;
 }

@@ -5,17 +5,13 @@ import template from './template.html';
 import './style.scss';
 
 let SettingsPanel = Backbone.View.extend({
-  initialize: function (title, blurb, actionItems) {
-    this.title = title;
-    this.blurb = blurb;
-    this.actionItems = actionItems;
+  initialize: function () {
+    this.blurb = this.blurb || '';
+    this.sideMenu = this.sideMenu || '';
   },
   render: function () {
     if (!this.addedTemplate) {
-      let options = {
-        title: this.title
-      };
-      this.$el.html(Underscore.template(template)(options));
+      this.$el.html(template);
       if (this.blurb) {
         d3.select(this.el).select('#rightChunk')
           .insert('p', ':first-child')
@@ -38,12 +34,36 @@ let SettingsPanel = Backbone.View.extend({
       this.$el.find('#loginLinks').show();
     }
 
-    let actionItems = d3.select('#actionItems')
-      .selectAll('div.actionItem').data(this.actionItems);
-    actionItems.enter().append('div')
-      .attr('class', 'clickable actionItem');
-    actionItems.exit().remove();
-    actionItems.text(d => d.text)
+    let sideMenus = d3.select('#leftChunk').selectAll('div.sideMenu')
+      .data(this.sideMenu, d => d.title);
+    let sideMenusEnter = sideMenus.enter().append('div')
+      .attr('class', 'sideMenu');
+    sideMenus.exit().remove();
+
+    sideMenusEnter.append('h1');
+    sideMenus.selectAll('h1')
+      .text(d => d.title);
+
+    let menuItems = sideMenus.selectAll('div.menuItem')
+      .data(d => d.items, d2 => d2.text);
+    menuItems.enter().append('div')
+      .attr('class', 'menuItem');
+    menuItems.exit().remove();
+
+    menuItems.attr('class', d => {
+      let className = 'menuItem';
+      let clickable = typeof d.enabled === 'function' ? d.enabled() : d.enabled;
+      if (clickable === false) {
+        className += ' disabled';
+      } else {
+        className += ' clickable';
+      }
+      let focused = typeof d.focused === 'function' ? d.focused() : d.focused;
+      if (focused) {
+        className += ' focused';
+      }
+      return className;
+    }).text(d => d.text)
       .on('click', d => d.onclick);
   }
 });
