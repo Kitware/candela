@@ -78,15 +78,15 @@
 
 /* interaction state: node is hovered (will change selection) */
 .MatchingView.content .node.hovered rect.nodeBackground {
-  fill: $lightRolloverColor;
-  stroke: $darkRolloverColor;
+  fill: $matchingCreateLinkBackgroundColor;
+  stroke: $matchingCreateLinkColor;
 }
 .MatchingView.content .node.hovered > text {
-  fill: $darkRolloverColor;
+  fill: $matchingCreateLinkColor;
 }
 .MatchingView.content .node.hovered image {
-  -webkit-filter: imgColorFilter($darkRolloverColor);
-  filter: imgColorFilter($darkRolloverColor);
+  -webkit-filter: imgColorFilter($matchingCreateLinkColor);
+  filter: imgColorFilter($matchingCreateLinkColor);
 }
 
 /* interaction state: node can't be connected */
