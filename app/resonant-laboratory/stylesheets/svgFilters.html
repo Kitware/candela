@@ -15,6 +15,17 @@
       <feGaussianBlur result="blurOut" in="offOut" stdDeviation="30" />
       <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
     </filter>
+    <filter id="dropIntenseShadow" x="-100%" y="-100%" width="300%" height="300%">
+      <feOffset result="offOut" in="SourceAlpha" dx="0" dy="2" />
+      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="13" />
+      <feComponentTransfer in="blurOut" result="lightenOut">
+        <feFuncA type="linear" slope="3" intercept="0"/>
+        <feFuncR type="linear" slope="0" intercept="0"/>
+        <feFuncG type="linear" slope="0" intercept="0"/>
+        <feFuncB type="linear" slope="0" intercept="0"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" in2="lightenOut" mode="normal" />
+    </filter>
     <filter id="dropHalo" x="-50%" y="-50%" width="200%" height="200%">
       <feComponentTransfer in="SourceAlpha" result="color">
         <feFuncR type="linear" slope="0" intercept="1"/>

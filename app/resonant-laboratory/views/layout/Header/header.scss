@@ -37,8 +37,8 @@
 #Header #brandingIcons img:hover {
   /* Sneakiness here: we *remove* the color filter,
      so the native icon colors show through */
-  -webkit-filter: url(#dropHalo);
-  filter: url(#dropHalo);
+  -webkit-filter: url(#dropIntenseShadow);
+  filter: url(#dropIntenseShadow);
 }
 
 #Header #interfaceIcons {
