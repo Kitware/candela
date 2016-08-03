@@ -1,14 +1,37 @@
-<div class="largeDialog">
-  <img src="../../../images/close.svg" id="closeOverlay" />
-  <div id="pagingSettings">
-    <h2>Visualizing <span id="totalPages">...</span> items</h2>
-    <label for="limitInput">Set page size:</label>
-    <input type="number" id="limitInput"/>
-    <button id="limitButton">Apply</button>
+<div id="datasetSettings">
+  <div>
+    <label for="datasetName">Name:</label>
+    <input type="text" id="datasetName" value="Cars"/>
   </div>
-  <hr/>
-  <div id="activeFilters">
-    <h2>Active Filters</h2>
-    <p>There are no active filters.</p>
+  <div>
+    Size:
+    <span id="datasetSize">123 KB</span>
   </div>
+  <div>
+    Location:
+    <span id="datasetLocation">Alex/Public/Cars</span>
+  </div>
+  <div>
+    Access:
+    <input value="PrivateUser" id="privateVisibility" name="projectVisibility" type="radio">
+    <label for="privateVisibility">Private</label>
+    <input value="PublicUser" id="publicVisibility" name="projectVisibility" type="radio">
+    <label for="publicVisibility">Public</label>
+    <input value="PublicScratch" id="scratchVisibility" name="projectVisibility" type="radio">
+    <label for="scratchVisibility">Public Scratch Space</label>
+    <input value="PublicLibrary" id="libraryVisibility" name="projectVisibility" type="radio">
+    <label for="libraryVisibility">Library</label>
+  </div>
+</div>
+<hr/>
+<div id="pagingSettings">
+  <h2>Visualizing <span id="totalPages">...</span> items</h2>
+  <label for="limitInput">Set page size:</label>
+  <input type="number" id="limitInput"/>
+  <button id="limitButton">Apply</button>
+</div>
+<hr/>
+<div id="activeFilters">
+  <h2>Active Filters</h2>
+  <p>There are no active filters.</p>
 </div>

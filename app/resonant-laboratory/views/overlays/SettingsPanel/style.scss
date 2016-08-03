@@ -1,0 +1,25 @@
+#Overlay #mainChunk {
+  display: flex;
+  flex-basis: auto;
+}
+#Overlay #leftChunk,
+#Overlay #rightChunk {
+  display: flex;
+  flex-direction: column;
+}
+
+#Overlay #leftChunk {
+  flex-grow: 1;
+}
+#Overlay #divider {
+  flex-grow: 0;
+  border: 1px solid black;
+}
+#Overlay #rightChunk {
+  flex-grow: 2;
+}
+
+#Overlay .unclickable.circleButton:hover {
+  cursor: default;
+  border: 2px solid transparent;
+}
