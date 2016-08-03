@@ -1,19 +1,30 @@
 import SettingsPanel from '../SettingsPanel';
 // import d3 from 'd3';
 import myTemplate from './template.html';
+import './style.scss';
 
 let DatasetSettings = SettingsPanel.extend({
+  actionItems: [
+    {
+      text: 'Save a copy',
+      onclick: () => null
+    },
+    {
+      text: 'Delete dataset',
+      onclick: () => null
+    },
+    {
+      text: 'Remove from project',
+      onclick: () => null
+    },
+    {
+      text: 'Switch to a different dataset',
+      onclick: () => null
+    }
+  ],
   initialize: function () {
-    SettingsPanel.prototype.initialize.apply(this, [
-      'Dataset Settings',
-      'blurb',
-      [
-        {
-          text: 'Save a copy',
-          onclick: () => null
-        }
-      ]
-    ]);
+    SettingsPanel.prototype.initialize.apply(this,
+      ['Dataset Settings', null, this.actionItems]);
     this.listenTo(window.mainPage.project, 'rl:changeDatasets', () => {
       this.render();
     });
@@ -21,13 +32,14 @@ let DatasetSettings = SettingsPanel.extend({
   render: function () {
     // First the main container
     if (!this.addedTemplate) {
-      // SettingsPnale.render will set this.addedTemplate to true
+      // SettingsPanel.render will set this.addedTemplate to true
       SettingsPanel.prototype.render.apply(this, arguments);
       this.$el.find('#subclassContent').html(myTemplate);
     }
 
-    // Update the paging parameters
     let datasetObj = window.mainPage.project.getDataset(0);
+
+    // Update the paging parameters
     let limitInput = this.$el.find('#limitInput');
     limitInput.val(datasetObj.cache.page.limit);
     this.$el.find('#limitButton').on('click', () => {

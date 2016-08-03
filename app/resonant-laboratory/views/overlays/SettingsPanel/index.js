@@ -13,10 +13,14 @@ let SettingsPanel = Backbone.View.extend({
   render: function () {
     if (!this.addedTemplate) {
       let options = {
-        title: this.title,
-        blurb: this.blurb || ''
+        title: this.title
       };
       this.$el.html(Underscore.template(template)(options));
+      if (this.blurb) {
+        d3.select(this.el).select('#rightChunk')
+          .insert('p', ':first-child')
+          .text(this.blurb);
+      }
       this.addedTemplate = true;
     }
 
@@ -37,7 +41,7 @@ let SettingsPanel = Backbone.View.extend({
     let actionItems = d3.select('#actionItems')
       .selectAll('div.actionItem').data(this.actionItems);
     actionItems.enter().append('div')
-      .attr('class', 'actionItem');
+      .attr('class', 'clickable actionItem');
     actionItems.exit().remove();
     actionItems.text(d => d.text)
       .on('click', d => d.onclick);

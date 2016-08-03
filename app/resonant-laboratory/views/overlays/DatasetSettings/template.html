@@ -4,23 +4,37 @@
     <input type="text" id="datasetName" value="Cars"/>
   </div>
   <div>
-    Size:
+    <img src="../../../images/disk.svg"/>
+    <span>Size:</span>
     <span id="datasetSize">123 KB</span>
   </div>
   <div>
-    Location:
-    <span id="datasetLocation">Alex/Public/Cars</span>
+    <img src="../../../images/girder.svg"/>
+    <span>Location:</span>
+    <a href="#" id="datasetLocation">Alex/Public/Cars</a>
   </div>
   <div>
-    Access:
-    <input value="PrivateUser" id="privateVisibility" name="projectVisibility" type="radio">
-    <label for="privateVisibility">Private</label>
-    <input value="PublicUser" id="publicVisibility" name="projectVisibility" type="radio">
-    <label for="publicVisibility">Public</label>
-    <input value="PublicScratch" id="scratchVisibility" name="projectVisibility" type="radio">
-    <label for="scratchVisibility">Public Scratch Space</label>
-    <input value="PublicLibrary" id="libraryVisibility" name="projectVisibility" type="radio">
-    <label for="libraryVisibility">Library</label>
+    <img src="../../../images/public.svg"/>
+    <img src="../../../images/canEdit.svg"/>
+    <span>Access:</span>
+  </div>
+  <div class="visibilityRadios">
+    <span>
+      <input value="PrivateUser" id="privateVisibility" name="projectVisibility" type="radio">
+      <label for="privateVisibility">Private</label>
+    </span>
+    <span>
+      <input value="PublicUser" id="publicVisibility" name="projectVisibility" type="radio">
+      <label for="publicVisibility">Public</label>
+    </span>
+    <span>
+      <input value="PublicScratch" id="scratchVisibility" name="projectVisibility" type="radio">
+      <label for="scratchVisibility">Public Scratch Space</label>
+    </span>
+    <span>
+      <input value="PublicLibrary" id="libraryVisibility" name="projectVisibility" type="radio">
+      <label for="libraryVisibility">Library</label>
+    </span>
   </div>
 </div>
 <hr/>

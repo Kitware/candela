@@ -1,6 +1,7 @@
+@import '../../../stylesheets/colors.scss';
+
 #Overlay #mainChunk {
   display: flex;
-  flex-basis: auto;
 }
 #Overlay #leftChunk,
 #Overlay #rightChunk {
@@ -11,15 +12,20 @@
 #Overlay #leftChunk {
   flex-grow: 1;
 }
-#Overlay #divider {
+#Overlay .divider {
   flex-grow: 0;
-  border: 1px solid black;
 }
 #Overlay #rightChunk {
-  flex-grow: 2;
+  flex-grow: 3;
 }
 
-#Overlay .unclickable.circleButton:hover {
-  cursor: default;
-  border: 2px solid transparent;
+#Overlay #leftChunk .clickable {
+  cursor: pointer;
+  padding: 0.5em 0em;
+  line-height: 1.5em;
+}
+
+#Overlay #leftChunk .clickable:hover {
+  background-color: $menuRolloverColor;
+  color: $darkRolloverColor;
 }
