@@ -14,19 +14,27 @@ body {
   color: $darkTextColor;
 }
 
-h1, button, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6, button, input, input:after {
   font-family: "Josefin Sans", "Helvetica", "Arial", sans-serif;
 }
 h1 {
   font-weight: 900;
 }
-button, h2 {
+button, input[type="file"]:after, h2 {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 400;
 }
 button {
   font-size: 0.75em;
+}
+input:invalid {
+  color: $errorNotificationColor;
+  background-color: $errorNotificationBackgroundColor;
+}
+h3 {
+  margin-top: 1em;
+  margin-bottom: 0em;
 }
 
 hr {

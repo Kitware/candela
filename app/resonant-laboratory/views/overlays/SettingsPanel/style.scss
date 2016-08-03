@@ -1,6 +1,7 @@
+@import '../../../stylesheets/colors.scss';
+
 #Overlay #mainChunk {
   display: flex;
-  flex-basis: auto;
 }
 #Overlay #leftChunk,
 #Overlay #rightChunk {
@@ -9,17 +10,43 @@
 }
 
 #Overlay #leftChunk {
-  flex-grow: 1;
-}
-#Overlay #divider {
-  flex-grow: 0;
-  border: 1px solid black;
+  min-width: 14em;
 }
 #Overlay #rightChunk {
   flex-grow: 2;
 }
 
-#Overlay .unclickable.circleButton:hover {
+#Overlay #leftChunk .menuItem {
+  cursor: pointer;
+  padding: 0.5em 0em 0.5em 1em;
+  margin: 0em -1em;
+  line-height: 1.5em;
+}
+#Overlay #leftChunk .disabled.menuItem {
   cursor: default;
-  border: 2px solid transparent;
+  color: $disabledColor;
+}
+#Overlay #leftChunk .focused.menuItem {
+  background-color: $darkRolloverColor;
+  color: $lightRolloverColor;
+}
+#Overlay #leftChunk .clickable.menuItem:hover {
+  background-color: $menuRolloverColor;
+  color: $darkRolloverColor;
+}
+
+#Overlay #loginLinks {
+  position: absolute;
+  top: 1.5em;
+  right: 4em;
+}
+
+#Overlay div.circleButton img.badge {
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  right: 2.25em;
+  bottom: 3.25em;
+  -webkit-filter: imgColorFilter($warningIconColor);
+  filter: imgColorFilter($warningIconColor);
 }

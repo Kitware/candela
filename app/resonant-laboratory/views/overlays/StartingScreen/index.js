@@ -1,5 +1,4 @@
 import Backbone from 'backbone';
-import ProjectLibrary from '../ProjectLibrary';
 import myTemplate from './template.html';
 
 let StartingScreen = Backbone.View.extend({
@@ -43,10 +42,6 @@ let StartingScreen = Backbone.View.extend({
         window.mainPage.currentUser.authenticate(false);
       });
 
-      this.library = new ProjectLibrary({
-        el: '#libraryChunk'
-      });
-
       this.addedTemplate = true;
     }
 
@@ -57,8 +52,6 @@ let StartingScreen = Backbone.View.extend({
       this.$el.find('#loginLinks').show();
       this.$el.find('#logoutLinks').hide();
     }
-
-    this.library.render();
   }
 });
 

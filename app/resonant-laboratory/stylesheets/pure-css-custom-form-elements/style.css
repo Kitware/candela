@@ -52,12 +52,13 @@ textarea {
 /* ----------------------------------------------  Inputs, textareas and selects  ---------------------------------------------- */
 
 input[type="text"],
+input[type="url"],
 input[type="password"],
 textarea,
 select,
 div.styled,
 input[type="file"] {
-  width: 12em;
+  width: 24em;
   border-radius: 2px;
   border: solid 1px #ccc;
   padding: 0.4em;
@@ -75,6 +76,7 @@ input[type="file"]:after {
 }
 
 input[type="text"],
+input[type="url"],
 input[type="password"],
 textarea,
 input[type="file"] {
@@ -84,6 +86,7 @@ input[type="file"] {
 }
 
 .ie9 input[type="text"],
+.ie9 input[type="url"],
 .ie9 input[type="password"]{
   line-height: normal;
 }
@@ -139,7 +142,6 @@ input[type="file"] {
   -webkit-appearance: none;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  width: 40%;
   padding: 0;
 }
 
@@ -152,13 +154,14 @@ input[type=file]::-webkit-file-upload-button {
 }
 
 input[type="file"]:after {
-  content: 'Upload File';
+  content: 'Browse...';
   margin: 0 0 0 0.5em;
   display: inline-block;
   left: 100%;
   position: relative;
   background: white url(formelements-select.png) no-repeat center left;
-  padding: 0.3em 0.5em;
+  padding: 0.55em 1em 0.5em 1em;
+  font-size: 0.8em;
   border: solid 1px #ccc !important;
   -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);

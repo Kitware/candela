@@ -1,33 +1,129 @@
-<div class="largeDialog">
-  <img src="../../../images/close.svg" id="closeOverlay" />
+<details class="newDatasetSection">
+  <summary><h3>Upload a new Dataset</h3></summary>
+  <div>
+    <p>Supported formats:</p>
+    <ul>
+      <li>CSV</li>
+      <li>TSV</li>
+      <li>JSON</li>
+    </ul>
+  </div>
+  <div><input type="file" id="uploadFile" accept=".json,.csv,.tsv"></div>
+  <!--<div><details>
+  TODO: enable advanced settings
+    <summary>Advanced Settings</summary>
+    <div id="csvUploadControls" class="hideable">
+      <div>
+        <label for="uploadCsvDelimiter">Delimiter:</label>
+        <input id="uploadCsvDelimiter" type="text" value="," disabled/>
+      </div>
+      <div>
+        <label for="uploadCsvDoubleQuote">DoubleQuote:</label>
+        <input id="uploadCsvDoubleQuote" type="number" step="1" value="1" disabled/>
+      </div>
+      <div>
+        <label for="uploadCsvEscapeChar">EscapeChar:</label>
+        <input id="uploadCsvEscapeChar" type="text" value="" disabled/>
+      </div>
+      <div>
+        <label for="uploadCsvLineTerminator">LineTerminator:</label>
+        <input id="uploadCsvLineTerminator" type="text" value="\r\n" disabled/>
+      </div>
+      <div>
+        <label for="uploadCsvQuoteChar">QuoteChar:</label>
+        <input id="uploadCsvQuoteChar" type="text" value="&quot;" disabled/>
+      </div>
+      <div>
+        <label for="uploadCsvQuoting">Quoting:</label>
+        <input id="uploadCsvQuoting" type="number" step="1" value="0" disabled/>
+      </div>
+      <div>
+        <label for="uploadCsvSkipInitialSpace">SkipInitialSpace:</label>
+        <input id="uploadCsvSkipInitialSpace" type="number" step="1" value="0" disabled/>
+      </div>
+      <div>
+        <label for="uploadCsvStrict">Strict:</label>
+        <input id="uploadCsvStrict" type="number" step="1" value="0" disabled/>
+      </div>
+    </div>
+    <div id="jsonUploadControls" class="hideable">
+      <div>
+        <label for="uploadJsonPath">JSONPath:</label>
+        <input id="uploadJsonPath" type="text" value="$" disabled>
+      </div>
+    </div>
+    <div id="flatFileControls" class="hideable">
+      <span>Upload as:</span>
+      <input value="uploadAsFlatFile" id="uploadAsFlatFile" name="uploadAsFlatFile" type="radio">
+      <label for="uploadAsFlatFile">Flat File</label>
+      <input value="uploadAsMongodbCollection" id="uploadAsMongodbCollection" name="uploadAsMongodbCollection" type="radio">
+      <label for="uploadAsMongodbCollection">MongoDB Collection</label>
+    </div>
+  </details></div>-->
+  <div><button>Create Dataset</button></div>
+  <div>
+    <p>Want to upload something else?
+      <a href="http://www.kitware.com/company/contact_kitware.php"
+      target="_blank">Work with us</a> to develop something that meets your needs.
+    </p>
+  </div>
+</details>
 
-  <!--h1>Choose A Data File</h1>
-  <div class="circleset">
-    <div class="circleButton">
-      <img src="../../../images/light/paste.svg" />
-      <span>Paste data</span>
-    </div>
-    <div class="circleButton">
-      <img src="../../../images/light/computer.svg" />
-      <span>Use a file directly on your computer</span>
-    </div>
-    <div class="circleButton">
-      <img src="../../../images/light/upload.svg" />
-      <span>Upload a file</span>
-    </div>
-    <div class="circleButton">
-      <img src="../../../images/light/link.svg" />
-      <span>Link to a dataset</span>
-    </div>
-  </div-->
-  <h1 id="privateDatasetsHeader" class="hideable">Your Private Datasets</h1>
-  <div id="privateDatasets" class="hideable circleset">
-  </div>
-  <h1 id="publicDatasetsHeader" class="hideable">Your Public Datasets</h1>
-  <div id="publicDatasets" class="hideable circleset">
-  </div>
-  <h1 id="datasetLibraryHeader" class="hideable">Our data library</h1>
-  <div id="datasetLibrary" class="hideable circleset">
 
+<details class="newDatasetSection">
+  <summary><h3>Link to a new Dataset</h3></summary>
+  <div>
+    <p>Supported links:</p>
   </div>
-</div>
+  <div>
+    <ul>
+      <li>URL of an existing Girder item</li>
+      <li>A <a href=
+        "https://docs.mongodb.com/manual/reference/connection-string/"
+        target="_blank">mongodb database URL</a></li>
+    </ul>
+  </div>
+  <div><input type="url" id="uploadLink"></div>
+  <div id="mongoLinkControls" class="hideable">
+    <label for="uploadMongoCollectionName">Collection Name:</label>
+    <input type="text" id="uploadMongoCollectionName">
+  </div>
+  <div><button>Create Dataset</button></div>
+  <div>
+  <p>Want to link to something else?
+    <a href="http://www.kitware.com/company/contact_kitware.php"
+    target="_blank">Work with us</a> to develop something that meets your needs.
+  </p>
+  </div>
+</details>
+
+
+<details id="privateDatasetsSection" class="hideable">
+  <summary><h3>Your Private Datasets</h3></summary>
+  <p>Advanced access permissions can be set in the
+    <a id="girderLink">Girder interface</a>.</p>
+  <div id="privateDatasets" class="circleset"></div>
+</details>
+
+
+<details id="publicDatasetsSection" class="hideable">
+  <summary><h3>Your Public Datasets</h3></summary>
+  <p>Anyone can see these datasets.</p>
+  <div id="publicDatasets" class="circleset"></div>
+</details>
+
+
+<details id="scratchDatasetsSection" class="hideable">
+  <summary><h3>Your Datasets in the Public Scratch Space</h3></summary>
+  <p>Anyone can see or edit these datasets at any time.
+    <a id="loginLink2">Log in</a>
+    or <a id="registerLink2">Register</a> to take control of who can
+    see or edit these datasets.</p>
+  <div id="scratchDatasets" class="circleset"></div>
+</details>
+
+
+<details id="datasetLibrarySection" class="hideable">
+  <summary><h3>Public Dataset Library</h3></summary>
+  <div id="datasetLibrary" class="circleset"></div>
+</details>
