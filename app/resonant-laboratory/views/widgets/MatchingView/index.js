@@ -4,7 +4,7 @@ import jQuery from 'jquery';
 import myTemplate from './template.html';
 import Widget from '../Widget';
 import candela from '../../../../../src/candela';
-import './style.css';
+import './style.scss';
 
 import booleanIcon from '../../../images/boolean.svg';
 import integerIcon from '../../../images/integer.svg';
@@ -60,6 +60,16 @@ let MatchingView = Widget.extend({
           return Widget.spinnerIcon;
         } else {
           return Widget.warningIcon;
+        }
+      },
+      className: () => {
+        if (this.status === STATUS.OK) {
+          return 'okay';
+        } else if (this.status === STATUS.DATASETS_NOT_LOADED ||
+          this.status === STATUS.STALE_MAPPINGS) {
+          return 'loading';
+        } else {
+          return 'warning';
         }
       },
       title: () => {

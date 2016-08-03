@@ -1,3 +1,5 @@
+@import '../../../stylesheets/colors.scss';
+
 #NotificationLayer {
   z-index: 1112;
   position: absolute;
@@ -18,23 +20,23 @@
   width: 1em;
   height: 1em;
   cursor: pointer;
-  -webkit-filter: url(#recolorImageToffff33);
-  filter: url(#recolorImageToffff33);
+  -webkit-filter: imgColorFilter($notificationColor);
+  filter: imgColorFilter($notificationColor);
 }
 #NotificationLayer .notification .content {
   padding: 1em 2em 1em 1em;
-  background-color: rgba(255, 255, 204, 0.75);
-  border: 2px solid #ffff33;
+  background-color: rgba($notificationBackgroundColor, 0.75);
+  border: 2px solid $notificationColor;
   border-radius: 3px;
   text-align: right;
   width: auto;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  box-shadow: 0 5px 15px rgba($shadowColor,0.5);
 }
 #NotificationLayer .notification.error .content {
-  background-color: rgba(254, 217, 166, 0.75);
-  border: 2px solid #ff7f00;
+  background-color: rgba($errorNotificationBackgroundColor, 0.75);
+  border: 2px solid $errorNotificationColor;
 }
 #NotificationLayer .notification.error img.closeIcon {
-  -webkit-filter: url(#recolorImageToff7f00);
-  filter: url(#recolorImageToff7f00);
+  -webkit-filter: imgColorFilter($errorNotificationColor);
+  filter: imgColorFilter($errorNotificationColor);
 }

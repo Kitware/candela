@@ -1,7 +1,7 @@
 import d3 from 'd3';
 import Backbone from 'backbone';
 import template from './template.html';
-import './style.css';
+import './style.scss';
 
 let Menu = Backbone.View.extend({
   initialize: function (menuSpec) {

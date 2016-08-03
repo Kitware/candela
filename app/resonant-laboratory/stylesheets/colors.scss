@@ -1,0 +1,107 @@
+/*
+Current color scheme
+
+This scheme can be edited using this tool:
+http://paletton.com/#uid=72P0P0ksLro9iKfjZuGxXk0Oob9
+*/
+
+$White: #F7F7F7;
+$LightestGrey: #D9D9D9;
+$LightGrey: #BDBDBD;
+$Grey: #969696;
+$DarkGrey: #737373;
+$DarkestGrey: #525252;
+$Black: #252525;
+$LightestGreen: #A2E4A2;
+$LightGreen: #4AC44A;
+$Green: #12AF12;
+$DarkGreen: #008000;
+$DarkestGreen: #004700;
+$LightestBlue: #9AB2D1;
+$LightBlue: #456DA0;
+$Blue: #194D8F;
+$DarkBlue: #083269;
+$DarkestBlue: #021B3A;
+$LightestOrange: #FFE3B5;
+$LightOrange: #F4BA5C;
+$Orange: #DA8F16;
+$DarkOrange: #9F6300;
+$DarkestOrange: #593700;
+$LightestRed: #FFB5B5;
+$LightRed: #F45C5C;
+$Red: #DA1616;
+$DarkRed: #9F0000;
+$DarkestRed: #590000;
+
+/*
+Color meanings:
+*/
+
+$darkTextColor: $Black;
+$lightTextColor: $White;
+$linkTextColor: $Blue;
+
+$pageBackgroundColor: $LightGrey;
+$pageHeaderLightColor: $Black;
+$pageHeaderDarkColor: $Black;
+
+$panelHeaderDarkColor: $DarkBlue;
+$panelHeaderLightColor: $DarkBlue;
+$panelBackgroundColor: $White;
+
+$shadowColor: $Black;
+$separatorColor: $LightGrey;
+$disabledColor: $Grey;
+$lightDisabledColor: $LightestGrey;
+
+$defaultLightIconColor: $LightestGrey;
+$defaultDarkIconColor: $DarkGrey;
+$successIconColor: $DarkGreen;
+$warningIconColor: $Orange;
+$newInfoIconColor: $LightestGrey;
+$overriddenIconColor: $LightBlue;
+$watermarkColor: $LightestGrey;
+
+$lightRolloverColor: $White;
+$menuRolloverColor: $LightestGrey;
+$darkRolloverColor: $Black;
+
+$helpBubbleColor: $White;
+$oldHelpBubbleColor: $LightestGrey;
+$notificationColor: $Orange;
+$notificationBackgroundColor: $LightestOrange;
+$errorNotificationColor: $Red;
+$errorNotificationBackgroundColor: $LightestRed;
+
+$dataTableHeaderColor: $DarkBlue;
+$dataTableOddRowColor: $LightestBlue;
+
+$dataAxisColor: $Black;
+
+$dataOverviewColor: $DarkestGreen;
+$dataFilteredColor: $LightBlue;
+$dataCurrentPageColor: $Orange;
+
+$matchingNodeColor: $DarkestGrey;
+$matchingNodeBackgroundColor: $LightGrey;
+$matchingCreateLinkColor: $DarkGreen;
+$matchingCreateLinkBackgroundColor: $LightestGreen;
+$matchingExistingLinkColor: $DarkBlue;
+$matchingExistingLinkBackgroundColor: $LightestBlue;
+$matchingDeleteLinkColor: $DarkRed;
+$matchingDeleteLinkBackgroundColor: $LightestRed;
+
+$matchingSuccessColor: $DarkGreen;
+$matchingSuccessTextColor: $LightestGreen;
+$matchingWarningColor: $Orange;
+$matchingWarningTextColor: $LightestOrange;
+$matchingOptionalColor: $DarkBlue;
+$matchingOptionalTextColor: $LightestBlue;
+
+/*
+Function to get the ID of an SVG color-changing filter
+*/
+
+@function imgColorFilter($colorValue) {
+  @return url(#recolorImageTo + str-slice(inspect($colorValue), 2));
+}

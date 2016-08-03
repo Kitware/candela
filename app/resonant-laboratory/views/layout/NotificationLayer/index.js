@@ -2,7 +2,7 @@ import Underscore from 'underscore';
 import Backbone from 'backbone';
 import d3 from 'd3';
 import closeIcon from '../../../images/close.svg';
-import './style.css';
+import './style.scss';
 
 let ID = 0;
 

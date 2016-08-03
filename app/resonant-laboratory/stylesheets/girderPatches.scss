@@ -1,3 +1,5 @@
+@import './colors.scss';
+
 /*
   Girder's (and Bootstrap's) massive stylesheets interfere with
   Resonant Laboratory's styles in lots of places. Instead, while
@@ -17,7 +19,7 @@
 
 #Overlay button.close {
   position: absolute;
-  color: rgba(0,0,0,0);
+  color: transparent;
   background-image: url('../images/close.svg');
   top: 1em;
   right: 1em;
@@ -39,7 +41,7 @@
   line-height: 1em;
   cursor: pointer;
   border-radius: 4px;
-  color: #000;
+  color: $darkTextColor;
   font-family: "Josefin Sans", "Helvetica", "Arial", sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -85,7 +87,7 @@
 }
 
 #Overlay .g-validation-failed-message {
-  color: #e41a1c;
+  color: $errorNotificationColor;
 }
 
 #Overlay .modal-footer > *,
