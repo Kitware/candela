@@ -4,25 +4,29 @@ import myTemplate from './template.html';
 import './style.scss';
 
 let DatasetSettings = SettingsPanel.extend({
-  sideMenu: [
-    {
-      title: 'Dataset Settings',
-      items: [
-        {
-          text: 'Delete dataset',
-          onclick: () => null
-        },
-        {
-          text: 'Remove from project',
-          onclick: () => null
-        },
-        {
-          text: 'Switch to a different dataset',
-          onclick: () => null
-        }
-      ]
-    }
-  ],
+  getSideMenu: function () {
+    return [
+      {
+        title: 'Dataset Settings',
+        items: [
+          {
+            text: 'Delete dataset',
+            onclick: () => null
+          },
+          {
+            text: 'Remove from project',
+            onclick: () => null
+          },
+          {
+            text: 'Switch to a different dataset',
+            onclick: () => {
+              window.mainPage.overlay.render('DatasetLibrary');
+            }
+          }
+        ]
+      }
+    ];
+  },
   initialize: function (index) {
     this.index = index || 0;
     SettingsPanel.prototype.initialize.apply(this, arguments);
@@ -31,11 +35,10 @@ let DatasetSettings = SettingsPanel.extend({
     });
   },
   render: function () {
-    let addSubTemplate = !this.addedTemplate;
     SettingsPanel.prototype.render.apply(this, arguments);
-    if (addSubTemplate) {
-      // SettingsPanel.render will set this.addedTemplate to true
+    if (!this.addedSubTemplate) {
       this.$el.find('#subclassContent').html(myTemplate);
+      this.addedSubTemplate = true;
     }
 
     let datasetObj = window.mainPage.project.getDataset(this.index);

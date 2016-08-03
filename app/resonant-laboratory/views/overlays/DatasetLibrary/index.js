@@ -1,4 +1,5 @@
-import Backbone from 'backbone';
+import SettingsPanel from '../SettingsPanel';
+import DatasetSettings from '../DatasetSettings';
 import jQuery from 'jquery';
 import d3 from 'd3';
 import myTemplate from './template.html';
@@ -7,9 +8,27 @@ import privateImage from '../../../images/light/file_private.svg';
 import publicImage from '../../../images/light/file_public.svg';
 let girder = window.girder;
 
-let DatasetLibrary = Backbone.View.extend({
+let DatasetLibrary = DatasetSettings.extend({
+  getSideMenu: function () {
+    let sideMenu = DatasetSettings.prototype.getSideMenu.apply(this, arguments);
+    // Override parts of the menu item from DatasetSettings
+    sideMenu[0].items[2].focused = true;
+    sideMenu[0].items[2].onclick = () => {
+      window.mainPage.overlay.render('DatasetSettings');
+    };
+    return sideMenu;
+  },
+  initialize: function () {
+    DatasetSettings.prototype.initialize.apply(this, arguments);
+  },
   render: function () {
-    this.$el.html(myTemplate);
+    // We use our own subtemplate, so only call
+    // the grandparent superclass render function
+    SettingsPanel.prototype.render.apply(this, arguments);
+    if (!this.addedSubTemplate) {
+      this.$el.find('#subclassContent').html(myTemplate);
+      this.addedSubTemplate = true;
+    }
 
     // Start off with every section hidden
     // (I know, this is dumb, but girder's

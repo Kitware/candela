@@ -46,7 +46,8 @@
   margin: 0em 1em;
   min-height: 100%;
   border: none;
-  width: 1px;
+  min-width: 1px;
+  max-width: 1px;
   background-color: $separatorColor;
 }
 

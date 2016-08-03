@@ -10,13 +10,10 @@
 }
 
 #Overlay #leftChunk {
-  flex-grow: 1;
-}
-#Overlay .divider {
-  flex-grow: 0;
+  min-width: 14em;
 }
 #Overlay #rightChunk {
-  flex-grow: 3;
+  flex-grow: 2;
 }
 
 #Overlay #leftChunk .menuItem {

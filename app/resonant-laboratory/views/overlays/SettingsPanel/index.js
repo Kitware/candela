@@ -1,5 +1,4 @@
 import d3 from 'd3';
-import Underscore from 'underscore';
 import Backbone from 'backbone';
 import template from './template.html';
 import './style.scss';
@@ -35,7 +34,7 @@ let SettingsPanel = Backbone.View.extend({
     }
 
     let sideMenus = d3.select('#leftChunk').selectAll('div.sideMenu')
-      .data(this.sideMenu, d => d.title);
+      .data(this.getSideMenu(), d => d.title);
     let sideMenusEnter = sideMenus.enter().append('div')
       .attr('class', 'sideMenu');
     sideMenus.exit().remove();
@@ -64,7 +63,9 @@ let SettingsPanel = Backbone.View.extend({
       }
       return className;
     }).text(d => d.text)
-      .on('click', d => d.onclick);
+      .on('click', d => {
+        return d.onclick(d);
+      });
   }
 });
 
