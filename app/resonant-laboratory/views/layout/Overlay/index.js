@@ -13,6 +13,7 @@ import StartingScreen from '../../overlays/StartingScreen';
 import DatasetLibrary from '../../overlays/DatasetLibrary';
 import DatasetSettings from '../../overlays/DatasetSettings';
 import VisualizationLibrary from '../../overlays/VisualizationLibrary';
+import ProjectLibrary from '../../overlays/ProjectLibrary';
 import ProjectSettings from '../../overlays/ProjectSettings';
 import AboutResonantLab from '../../overlays/AboutResonantLab';
 
@@ -31,6 +32,7 @@ let VIEWS = {
   ResetPasswordView,
   RegisterView,
   AchievementLibrary,
+  ProjectLibrary,
   ProjectSettings,
   StartingScreen,
   DatasetLibrary,

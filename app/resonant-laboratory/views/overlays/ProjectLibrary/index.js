@@ -27,6 +27,7 @@ let ProjectLibrary = ProjectSettings.extend({
     return sideMenu;
   },
   render: function () {
+    ProjectSettings.prototype.updateBlurb.apply(this, []);
     // We use our own subtemplate, so only call
     // the grandparent superclass render function
     SettingsPanel.prototype.render.apply(this, arguments);

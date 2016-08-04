@@ -16,6 +16,11 @@
   -webkit-filter: imgColorFilter($defaultDarkIconColor);
   filter: imgColorFilter($defaultDarkIconColor);
 }
+#Overlay #projectSettings img.button:hover {
+  cursor: pointer;
+  -webkit-filter: imgColorFilter($darkRolloverColor);
+  filter: imgColorFilter($darkRolloverColor);
+}
 #Overlay #projectSettings .visibilityRadios {
   padding-left: 4.5em;
 }

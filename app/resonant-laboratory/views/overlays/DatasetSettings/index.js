@@ -45,10 +45,12 @@ let DatasetSettings = SettingsPanel.extend({
     // Update the paging parameters
     let limitInput = this.$el.find('#limitInput');
     limitInput.val(datasetObj.cache.page.limit);
-    this.$el.find('#limitButton').on('click', () => {
-      this.$el.find('#totalPages').text('...');
-      datasetObj.setLimit(parseInt(limitInput.val(), 10));
-    });
+    this.$el.find('#limitButton')
+      .off('click')
+      .on('click', () => {
+        this.$el.find('#totalPages').text('...');
+        datasetObj.setLimit(parseInt(limitInput.val(), 10));
+      });
     datasetObj.cache.filteredHistogram.then(histogram => {
       let count = Math.min(histogram.__passedFilters__[0].count,
         datasetObj.cache.page.limit);

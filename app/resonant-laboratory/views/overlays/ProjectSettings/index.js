@@ -28,6 +28,7 @@ let ProjectSettings = SettingsPanel.extend({
     SettingsPanel.prototype.initialize.apply(this, arguments);
     this.listenTo(window.mainPage, 'rl:changeProject', () => {
       this.attachProjectListeners();
+      this.render();
     });
     this.attachProjectListeners();
   },
@@ -93,15 +94,7 @@ let ProjectSettings = SettingsPanel.extend({
           {
             text: 'Copy a link to the project',
             onclick: () => {
-              if (window.copyTextToClipboard(window.location.href)) {
-                window.mainPage.notificationLayer.displayNotification(
-                  'Link successfully copied to clipboard');
-              } else {
-                window.mainPage.notificationLayer.displayNotification(
-                  'Sorry, couldn\'t copy the link for some reason.' +
-                  ' Try copying this page\'s URL from your browser\'s' +
-                  ' address bar instead.', 'error');
-              }
+              this.copyLink();
             },
             enable: () => {
               return !!window.mainPage.project;
@@ -134,14 +127,17 @@ let ProjectSettings = SettingsPanel.extend({
       });
     }
   },
-  render: function () {
+  updateBlurb: function () {
     if (!window.mainPage.project) {
       this.blurb = 'No project loaded.';
     } else {
       this.blurb = `A project connects datasets to visualizations.
- If your project is public, you can share your work simply by
- sharing its URL (only users with access will be able to see it).`;
+ If a project is public, you can share it simply with its URL.
+ Only users with access will be able to see it.`;
     }
+  },
+  render: function () {
+    this.updateBlurb();
 
     SettingsPanel.prototype.render.apply(this, arguments);
 
@@ -155,46 +151,19 @@ let ProjectSettings = SettingsPanel.extend({
       if (!this.addedSubTemplate) {
         this.$el.find('#subclassContent').html(myTemplate);
         this.addedSubTemplate = true;
-      }
 
-      // Project name
-      this.$el.find('#projectNameField')
-        .val(window.mainPage.project.get('name'));
-      this.$el.find('#projectNameField').on('keyup',
-        Underscore.debounce(function () {
-          // this refers to the DOM element
-          window.mainPage.project.rename(this.value);
-        }, 300));
+        // Only attach event listeners once
+        this.$el.find('#copyLinkIcon').on('click', () => {
+          this.copyLink();
+        });
 
-      // Project location
-      this.$el.find('#projectLocation')
-        .text(status.path)
-        .attr('href', 'girder#folder/' + window.mainPage.project.get('folderId'));
+        this.$el.find('#projectNameField').on('keyup',
+          Underscore.debounce(function () {
+            // this refers to the DOM element
+            window.mainPage.project.rename(this.value);
+          }, 300));
 
-      // Editability icon
-      if (status.editable) {
-        this.$el.find('#editabilityIcon')
-          .attr('src', canEditIcon)
-          .attr('title', 'You can edit this project');
-      } else {
-        this.$el.find('#editabilityIcon')
-          .attr('src', cantEditIcon)
-          .attr('title', 'You can\'t edit this project');
-      }
-
-      // Visibility icon
-      this.$el.find('#visibilityIcon')
-        .attr('src', visibilityIcons[status.visibility])
-        .attr('title', visibilityLabels[status.visibility]);
-
-      // Visibility radio buttons
-      this.$el.find('input[name="projectVisibility"][value="' + status.visibility + '"]')
-        .prop('checked', true);
-      if (window.mainPage.currentUser.isLoggedIn()) {
-        this.$el.find('#scratchVisibility, #libraryVisibility')
-          .prop('disabled', true);
         this.$el.find('#publicVisibility, #privateVisibility')
-          .prop('disabled', '')
           .on('change', function () {
             // this refers to the DOM element
             if (this.value === window.mainPage.project.status.visibility) {
@@ -226,10 +195,52 @@ let ProjectSettings = SettingsPanel.extend({
               window.mainPage.project.fetch();
             });
           });
+      }
+
+      // Update the dialog with the latest info
+      this.$el.find('#projectNameField')
+        .val(window.mainPage.project.get('name'));
+
+      this.$el.find('#projectLocation')
+        .text(status.path)
+        .attr('href', 'girder#folder/' + window.mainPage.project.get('folderId'));
+
+      if (status.editable) {
+        this.$el.find('#editabilityIcon')
+          .attr('src', canEditIcon)
+          .attr('title', 'You can edit this project');
+      } else {
+        this.$el.find('#editabilityIcon')
+          .attr('src', cantEditIcon)
+          .attr('title', 'You can\'t edit this project');
+      }
+
+      this.$el.find('#visibilityIcon')
+        .attr('src', visibilityIcons[status.visibility])
+        .attr('title', visibilityLabels[status.visibility]);
+
+      this.$el.find('input[name="projectVisibility"][value="' + status.visibility + '"]')
+        .prop('checked', true);
+      if (window.mainPage.currentUser.isLoggedIn()) {
+        this.$el.find('#scratchVisibility, #libraryVisibility')
+          .prop('disabled', true);
+        this.$el.find('#publicVisibility, #privateVisibility')
+          .prop('disabled', '');
       } else {
         this.$el.find('#scratchVisibility, #publicVisibility, #privateVisibility, #libraryVisibility')
           .prop('disabled', true);
       }
+    }
+  },
+  copyLink: function () {
+    if (window.copyTextToClipboard(window.location.href)) {
+      window.mainPage.notificationLayer.displayNotification(
+        'Link successfully copied to clipboard');
+    } else {
+      window.mainPage.notificationLayer.displayNotification(
+        'Sorry, couldn\'t copy the link for some reason.' +
+        ' Try copying this page\'s URL from your browser\'s' +
+        ' address bar instead.', 'error');
     }
   }
 });

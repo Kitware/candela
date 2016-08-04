@@ -1,6 +1,6 @@
-import d3 from 'd3';
+// import d3 from 'd3';
 import jQuery from 'jquery';
-import Underscore from 'underscore';
+// import Underscore from 'underscore';
 import Backbone from 'backbone';
 import myTemplate from './template.html';
 
@@ -40,7 +40,7 @@ let Header = Backbone.View.extend({
     this.listenTo(window.mainPage.currentUser, 'rl:login', this.render);
 
     this.listenTo(window.mainPage, 'rl:changeProject',
-      this.newProjectResponse);
+      this.attachProjectListeners);
 
     this.listenTo(window.mainPage.widgetPanels, 'rl:updateWidgetSpecs',
       this.render);
@@ -50,7 +50,7 @@ let Header = Backbone.View.extend({
     this.listenTo(window.mainPage.currentUser.preferences,
       'rl:levelUp', this.notifyLevelUp);
   },
-  newProjectResponse: function () {
+  attachProjectListeners: function () {
     if (window.mainPage.project) {
       this.listenTo(window.mainPage.project,
         'rl:changeDatasets', this.render);
@@ -63,7 +63,7 @@ let Header = Backbone.View.extend({
     }
     this.render();
   },
-  render: Underscore.debounce(function () {
+  render: function () {
     if (!this.templateAdded) {
       // Add the template and wire up all the default
       // button events
@@ -141,19 +141,21 @@ let Header = Backbone.View.extend({
 
       jQuery('#projectName').text(window.mainPage.project.get('name'));
 
+      /*
+      // TODO: When we support mutliple datasets / visualizations,
+      // we can use icons in the header to manage them.
+      // Uncomment this section to add them
+
       // Set up all the widget icons
       let widgetIcons = window.mainPage.project.getAllWidgetSpecs();
 
-      // TODO: Uncomment to prepend and append the buttons for adding
-      // additional datasets and/or visualizations
-      /*
+      // Insert / append the icons to add additional datasets / visualizations
       widgetIcons.unshift({
         widgetType: 'AddDataset'
       });
       widgetIcons.push({
         widgetType: 'AddVisualization'
       });
-      */
 
       let widgetButtons = d3.select(this.el).select('#projectIcons')
         .selectAll('img.headerButton').data(widgetIcons);
@@ -177,12 +179,13 @@ let Header = Backbone.View.extend({
           window.mainPage.widgetPanels.toggleWidget(d, true);
         }
       });
+      */
     } else {
       // We're in an empty state with no project loaded
       // (an overlay should be showing, so don't sweat the toolbar)
       jQuery('#projectHeader, #projectIcons').hide();
     }
-  }, 300),
+  },
   notifyLevelUp: function () {
     // TODO
     console.log('level up!');
