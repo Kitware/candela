@@ -35,7 +35,8 @@ let Project = MetadataItem.extend({
   initialize: function () {
     this.status = {
       editable: false,
-      location: null
+      visibility: null,
+      path: null
     };
 
     this.visDatasetPromises = {};
@@ -55,9 +56,9 @@ let Project = MetadataItem.extend({
       // as creating a new project
       this.fetch().then(() => {
         let notification = 'You are now working on a copy of this project in ';
-        if (this.status.location === 'PublicScratch') {
+        if (this.status.visibility === 'PublicScratch') {
           notification = 'the public scratch space. Log in to take ownership of this project.';
-        } else if (this.status.location === 'PrivateUser') {
+        } else if (this.status.visibility === 'PrivateUser') {
           notification += 'your Private folder.';
         } else {
           window.mainPage.trigger('rl:error', new Error('Project copied to an unknown location.'));

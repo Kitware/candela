@@ -80,7 +80,7 @@ let Header = Backbone.View.extend({
       jQuery('#helpButton').on('click', () => {
         window.mainPage.helpLayer.showTips(tips);
       });
-      jQuery('#projectLocationButton')
+      jQuery('#projectVisibilityButton')
         .on('click', () => {
           window.mainPage.overlay.render('ProjectSettings');
         });
@@ -131,12 +131,12 @@ let Header = Backbone.View.extend({
       jQuery('#projectHeader, #projectIcons').show();
 
       let projectStatus = window.mainPage.project.status;
-      if (projectStatus.location === null) {
-        jQuery('#projectLocationButton')
+      if (projectStatus.visibility === null) {
+        jQuery('#projectVisibilityButton')
           .attr('src', loadingIcon);
       } else {
-        jQuery('#projectLocationButton')
-          .attr('src', ICONS[projectStatus.location]);
+        jQuery('#projectVisibilityButton')
+          .attr('src', ICONS[projectStatus.visibility]);
       }
 
       jQuery('#projectName').text(window.mainPage.project.get('name'));

@@ -9,6 +9,12 @@ import publicImage from '../../../images/light/file_public.svg';
 let girder = window.girder;
 
 let DatasetLibrary = DatasetSettings.extend({
+  initialize: function () {
+    DatasetSettings.prototype.initialize.apply(this, arguments);
+    this.listenTo(window.mainPage.currentUser, 'rl:updateLibrary', () => {
+      this.render();
+    });
+  },
   getSideMenu: function () {
     let sideMenu = DatasetSettings.prototype.getSideMenu.apply(this, arguments);
     // Override parts of the menu item from DatasetSettings
@@ -17,9 +23,6 @@ let DatasetLibrary = DatasetSettings.extend({
       window.mainPage.overlay.render('DatasetSettings');
     };
     return sideMenu;
-  },
-  initialize: function () {
-    DatasetSettings.prototype.initialize.apply(this, arguments);
   },
   render: function () {
     // We use our own subtemplate, so only call
@@ -121,8 +124,9 @@ let DatasetLibrary = DatasetSettings.extend({
             // project with this dataset
             projectPromise = window.mainPage.newProject();
           }
-          projectPromise.then(() => {
-            window.mainPage.project.setDataset(d.get('_id'));
+          projectPromise.then(project => {
+            return project.setDataset(d.get('_id'));
+          }).then(() => {
             window.mainPage.widgetPanels.toggleWidget({
               hashName: 'DatasetView0'
             }, true);

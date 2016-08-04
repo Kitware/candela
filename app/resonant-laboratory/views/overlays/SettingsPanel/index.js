@@ -4,35 +4,40 @@ import template from './template.html';
 import './style.scss';
 
 let SettingsPanel = Backbone.View.extend({
-  initialize: function () {
-    this.blurb = this.blurb || '';
-    this.sideMenu = this.sideMenu || '';
-  },
   render: function () {
     if (!this.addedTemplate) {
       this.$el.html(template);
-      if (this.blurb) {
-        d3.select(this.el).select('#rightChunk')
-          .insert('p', ':first-child')
-          .text(this.blurb);
-      }
       this.addedTemplate = true;
     }
 
-    this.$el.find('a#loginLink').on('click', () => {
-      window.mainPage.overlay.render('LoginView');
-    });
+    // Sneaky way to add / remove / update the blurb
+    let blurbs = [];
+    if (this.blurb) {
+      blurbs.push(this.blurb);
+    }
+    let blurbElements = d3.select(this.el).select('#rightChunk')
+      .selectAll('p.blurb').data(blurbs, d => d);
+    blurbElements.enter().insert('p', ':first-child')
+      .attr('class', 'blurb');
+    blurbElements.exit().remove();
+    blurbElements.text(d => d);
 
-    this.$el.find('a#registerLink').on('click', () => {
-      window.mainPage.overlay.render('RegisterView');
-    });
-
+    // Hide / show login links + wire their events
     if (window.mainPage.currentUser.isLoggedIn()) {
       this.$el.find('#loginLinks').hide();
     } else {
       this.$el.find('#loginLinks').show();
+      this.$el.find('a#loginLink').on('click', () => {
+        window.mainPage.overlay.render('LoginView');
+      });
+
+      this.$el.find('a#registerLink').on('click', () => {
+        window.mainPage.overlay.render('RegisterView');
+      });
     }
 
+    // Render the side menu (this.getSideMenu() should be
+    // set by subclasses)
     let sideMenus = d3.select('#leftChunk').selectAll('div.sideMenu')
       .data(this.getSideMenu(), d => d.title);
     let sideMenusEnter = sideMenus.enter().append('div')
@@ -62,10 +67,11 @@ let SettingsPanel = Backbone.View.extend({
         className += ' focused';
       }
       return className;
-    }).text(d => d.text)
-      .on('click', d => {
-        return d.onclick(d);
-      });
+    }).text(d => {
+      return typeof d.text === 'function' ? d.text() : d.text;
+    }).on('click', d => {
+      return d.onclick(d);
+    });
   }
 });
 

@@ -4,6 +4,12 @@ import myTemplate from './template.html';
 import './style.scss';
 
 let DatasetSettings = SettingsPanel.extend({
+  initialize: function () {
+    SettingsPanel.prototype.initialize.apply(this, arguments);
+    this.listenTo(window.mainPage.project, 'rl:changeDatasets', () => {
+      this.render();
+    });
+  },
   getSideMenu: function () {
     return [
       {
@@ -27,13 +33,6 @@ let DatasetSettings = SettingsPanel.extend({
       }
     ];
   },
-  initialize: function (index) {
-    this.index = index || 0;
-    SettingsPanel.prototype.initialize.apply(this, arguments);
-    this.listenTo(window.mainPage.project, 'rl:changeDatasets', () => {
-      this.render();
-    });
-  },
   render: function () {
     SettingsPanel.prototype.render.apply(this, arguments);
     if (!this.addedSubTemplate) {
@@ -41,7 +40,7 @@ let DatasetSettings = SettingsPanel.extend({
       this.addedSubTemplate = true;
     }
 
-    let datasetObj = window.mainPage.project.getDataset(this.index);
+    let datasetObj = window.mainPage.project.getDataset(0);
 
     // Update the paging parameters
     let limitInput = this.$el.find('#limitInput');

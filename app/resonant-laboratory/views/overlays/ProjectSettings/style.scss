@@ -1,26 +1,21 @@
 @import '../../../stylesheets/colors.scss';
 
-#Overlay div.form > * {
+#Overlay #projectSettings > div {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  line-height: 2em;
+  margin: 0em -0.5em;
 }
-#Overlay div.form > div > * {
+#Overlay #projectSettings > div > * {
   margin: 0.5em;
 }
-#Overlay div.form button {
-  white-space: nowrap;
-}
-#Overlay #projectDetails {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-#Overlay #projectDetails img {
+#Overlay #projectSettings img {
+  width: 1.5em;
+  height: 1.5em;
   -webkit-filter: imgColorFilter($defaultDarkIconColor);
   filter: imgColorFilter($defaultDarkIconColor);
 }
-#Overlay div.unclickable.circleButton:hover {
-  cursor: default;
-  border: 2px solid transparent;
+#Overlay #projectSettings .visibilityRadios {
+  padding-left: 4.5em;
 }

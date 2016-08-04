@@ -198,7 +198,9 @@ let Overlay = Backbone.View.extend({
     // Close button:
     this.$el.find('#closeOverlay')
       .off('click.closeOverlay')
-      .on('click.closeOverlay', this.closeOverlay);
+      .on('click.closeOverlay', () => {
+        this.closeOverlay();
+      });
 
     // Clicking on the area outside the overlay:
     let self = this;
@@ -233,6 +235,14 @@ let Overlay = Backbone.View.extend({
     nofade = nofade || (template !== null && this.template !== null);
 
     if (template !== undefined && this.template !== template) {
+      // Remove any backbone event listeners on the previous
+      // view if they existing (without this, views can
+      // hang out in memory and reassert themselves
+      // when they should be destroyed)
+      if (this.view && this.view.stopListening) {
+        this.view.stopListening();
+      }
+
       // Because we're switching to a different overlay, save the setting
       // for the next time that we simply re-render
       this.template = template;
@@ -282,12 +292,17 @@ let Overlay = Backbone.View.extend({
           this.el.appendChild(this.view.el);
           this.view.render();
         } else if (template instanceof Backbone.View) {
-          // This is a View object already
+          // This is a View instance already
+
+          // TODO: we may need to let the instance know that it's being
+          // shown again; if it was previously shown, it will have
+          // lost all its event listeners when it was closed
           this.view = template;
           this.el.appendChild(this.view.el);
           this.view.render();
         } else if (VIEWS.hasOwnProperty(template)) {
-          // This is a named template
+          // This is a named template (the name of a view
+          // in views/layout/overlays)
           this.view = new VIEWS[template]({
             // Some girder views expect a parent, but
             // in this app, we just run them headless
@@ -298,7 +313,7 @@ let Overlay = Backbone.View.extend({
         } else {
           // Okay, this is a dynamically-generated overlay
           // (probably a widget help/info screen)... so
-          // the template string is the actual contents
+          // the template string contains the actual contents
           this.view = null;
           this.$el.html(template);
         }

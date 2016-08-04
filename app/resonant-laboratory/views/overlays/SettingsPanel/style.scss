@@ -34,3 +34,17 @@
   background-color: $menuRolloverColor;
   color: $darkRolloverColor;
 }
+
+#Overlay #loginLinks {
+  position: absolute;
+  top: 1.5em;
+  right: 4em;
+}
+
+#Overlay div.circleButton img.badge {
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  right: 2.25em;
+  bottom: 3.25em;
+}
