@@ -179,6 +179,14 @@ let Project = MetadataItem.extend({
       return MetadataItem.prototype.save.apply(this, arguments);
     }
   },
+  rename: function () {
+    // Renaming the project should trigger a fetch()
+    // so that the project's status gets updated
+    return MetadataItem.prototype.rename.apply(this, arguments)
+      .then(() => {
+        return this.fetch();
+      });
+  },
   getMeta: function (key) {
     let meta = MetadataItem.prototype.getMeta.apply(this, [key]);
 
