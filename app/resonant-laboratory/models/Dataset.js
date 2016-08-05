@@ -122,6 +122,20 @@ class DatasetCache {
       }
     }
   }
+  get status () {
+    if (!this.cachedPromises.status) {
+      this.cachedPromises.status = this.restRequest({
+        'path': 'anonymousAccess/info'
+      });
+    }
+    return this.cachedPromises.status;
+  }
+  set status (value) {
+    // Attempting to set the status simply invalidates it;
+    // always delete it and issue a new call to the server
+    // next time someone attempts to get it
+    delete this.cachedPromises.status;
+  }
   get schema () {
     // Do we have the schema already in our metadata,
     // and TODO: is it current (check the file's updated flag
@@ -741,6 +755,12 @@ let Dataset = MetadataItem.extend({
       let lastItem = filteredHistogram.__passedFilters__[0].count;
       this.setPage(lastItem, this.cache.page.limit);
     });
+  },
+  updateStatus: function () {
+    // Just invalidate the cached status; the new
+    // status will get retrieved lazily
+    this.cache.status = null;
+    this.trigger('rl:updateStatus');
   }
 });
 

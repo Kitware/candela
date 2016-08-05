@@ -28,7 +28,7 @@ button, input[type="file"]:after, h2 {
 button {
   font-size: 0.75em;
 }
-input:invalid {
+input.invalid {
   color: $errorNotificationColor;
   background-color: $errorNotificationBackgroundColor;
 }
