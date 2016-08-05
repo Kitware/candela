@@ -292,6 +292,15 @@ let Project = MetadataItem.extend({
     // Forward the event at the project level
     this.trigger('rl:changeDatasets');
   }, 50),
+  removeDataset: function (index = 0) {
+    let datasets = this.getMeta('datasets');
+    datasets.splice(index, 1);
+    this.setMeta('datasets', datasets);
+    return this.save().then(() => {
+      this.trigger('rl:changeDatasets');
+      return this.validateMatchings();
+    });
+  },
   setDataset: function (newDatasetId, index = 0) {
     let datasets = this.getMeta('datasets');
     let newDataset;
@@ -333,6 +342,15 @@ let Project = MetadataItem.extend({
       return this.validateMatchings();
     }));
     return Promise.all(promises);
+  },
+  removeVisualization: function (index = 0) {
+    let visualizations = this.getMeta('visualizations');
+    visualizations.splice(index, 1);
+    this.setMeta('visualizations', visualizations);
+    return this.save().then(() => {
+      this.trigger('rl:changeVisualizations');
+      return this.validateMatchings();
+    });
   },
   setVisualization: function (visName, index = 0) {
     let visualizations = this.getMeta('visualizations');

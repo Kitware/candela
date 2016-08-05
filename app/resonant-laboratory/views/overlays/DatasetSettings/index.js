@@ -45,12 +45,15 @@ let DatasetSettings = SettingsPanel.extend({
           {
             text: 'Delete dataset',
             onclick: () => null,
-            enable: () => { return !!(this.getDataset()); }
+            enabled: () => { return !!(this.getDataset()); }
           },
           {
             text: 'Remove from project',
-            onclick: () => null,
-            enable: () => { return !!(this.getDataset()); }
+            onclick: () => {
+              let index = this.getDataset().index;
+              window.mainPage.project.removeDataset(index);
+            },
+            enabled: () => { return !!(this.getDataset()); }
           },
           {
             text: () => {

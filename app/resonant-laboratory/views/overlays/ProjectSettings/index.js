@@ -43,7 +43,7 @@ let ProjectSettings = SettingsPanel.extend({
             onclick: () => {
               window.mainPage.project.create();
             },
-            enable: () => {
+            enabled: () => {
               return !!window.mainPage.project;
             }
           },
@@ -69,7 +69,7 @@ let ProjectSettings = SettingsPanel.extend({
                   }
                 });
             },
-            enable: () => {
+            enabled: () => {
               return window.mainPage.project &&
                 window.mainPage.project.status.editable &&
                 window.mainPage.currentUser.isLoggedIn();
@@ -97,7 +97,7 @@ let ProjectSettings = SettingsPanel.extend({
             onclick: () => {
               this.copyLink();
             },
-            enable: () => {
+            enabled: () => {
               return !!window.mainPage.project;
             }
           }
