@@ -1,0 +1,35 @@
+@import '../../../stylesheets/colors.scss';
+
+h3 {
+  display: inline-block;
+}
+
+#Overlay .newDatasetSection > div,
+#Overlay .newDatasetSection details > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  line-height: 2em;
+  margin: 0em -0.5em;
+}
+#Overlay .newDatasetSection > div > *,
+#Overlay .newDatasetSection details > div > * {
+  margin: 0.5em;
+}
+#Overlay .newDatasetSection ul {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: auto;
+  list-style-position: inside;
+  padding: 0em;
+}
+#Overlay .newDatasetSection li {
+  padding: 0em 0.5em;
+}
+#Overlay .newDatasetSection img {
+  width: 1.5em;
+  height: 1.5em;
+  -webkit-filter: imgColorFilter($defaultDarkIconColor);
+  filter: imgColorFilter($defaultDarkIconColor);
+}

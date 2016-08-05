@@ -1,12 +1,12 @@
 import SettingsPanel from '../SettingsPanel';
 import DatasetSettings from '../DatasetSettings';
-import jQuery from 'jquery';
 import d3 from 'd3';
 import myTemplate from './template.html';
 import libraryFileIcon from '../../../images/light/library.svg';
 import privateFileIcon from '../../../images/light/file_private.svg';
 import publicFileIcon from '../../../images/light/file_public.svg';
 import warningIcon from '../../../images/warning.svg';
+import './style.scss';
 let girder = window.girder;
 
 let DatasetLibrary = DatasetSettings.extend({
@@ -26,21 +26,22 @@ let DatasetLibrary = DatasetSettings.extend({
     return sideMenu;
   },
   render: function () {
+    DatasetSettings.prototype.updateBlurb.apply(this, []);
     // We use our own subtemplate, so only call
     // the grandparent superclass render function
     SettingsPanel.prototype.render.apply(this, arguments);
     if (!this.addedSubTemplate) {
       this.$el.find('#subclassContent').html(myTemplate);
 
-      jQuery('#girderLink').on('click', () => {
+      this.$el.find('#girderLink').on('click', () => {
         window.mainPage.router.openUserDirectoriesInGirder();
       });
 
-      jQuery('#loginLink2').on('click', () => {
+      this.$el.find('#loginLink2').on('click', () => {
         window.mainPage.overlay.render('LoginView');
       });
 
-      jQuery('#registerLink2').on('click', () => {
+      this.$el.find('#registerLink2').on('click', () => {
         window.mainPage.overlay.render('RegisterView');
       });
 
@@ -48,7 +49,7 @@ let DatasetLibrary = DatasetSettings.extend({
     }
 
     // Start off with every section hidden
-    jQuery('.hideable').hide();
+    this.$el.find('.hideable').hide();
 
     // Get the set of datasets in the public library
     new Promise((resolve, reject) => {
@@ -113,10 +114,7 @@ let DatasetLibrary = DatasetSettings.extend({
     });
 
     if (datasetModels.length > 0) {
-      jQuery('#' + divId).show();
-      jQuery('#' + divId + 'Divider').show();
-      jQuery('#' + divId + 'Header').show();
-      jQuery('#' + divId + 'Explanation').show();
+      this.$el.find('#' + divId + 'Section').show();
     }
 
     let libraryButtons = d3.select('#' + divId)

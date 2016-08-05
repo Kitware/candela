@@ -1,4 +1,3 @@
-import jQuery from 'jquery';
 import d3 from 'd3';
 import SettingsPanel from '../SettingsPanel';
 import ProjectSettings from '../ProjectSettings';
@@ -34,15 +33,15 @@ let ProjectLibrary = ProjectSettings.extend({
     if (!this.addedSubTemplate) {
       this.$el.find('#subclassContent').html(myTemplate);
 
-      jQuery('#girderLink').on('click', () => {
+      this.$el.find('#girderLink').on('click', () => {
         window.mainPage.router.openUserDirectoriesInGirder();
       });
 
-      jQuery('#loginLink2').on('click', () => {
+      this.$el.find('#loginLink2').on('click', () => {
         window.mainPage.overlay.render('LoginView');
       });
 
-      jQuery('#registerLink2').on('click', () => {
+      this.$el.find('#registerLink2').on('click', () => {
         window.mainPage.overlay.render('RegisterView');
       });
 
@@ -50,7 +49,7 @@ let ProjectLibrary = ProjectSettings.extend({
     }
 
     // Start off with every section hidden
-    jQuery('.hideable').hide();
+    this.$el.find('.hideable').hide();
 
     // Get the set of projects in the public library
     new Promise((resolve, reject) => {
@@ -138,10 +137,7 @@ let ProjectLibrary = ProjectSettings.extend({
     });
 
     if (projectModels.length > 0) {
-      jQuery('#' + divId).show();
-      jQuery('#' + divId + 'Divider').show();
-      jQuery('#' + divId + 'Header').show();
-      jQuery('#' + divId + 'Explanation').show();
+      this.$el.find('#' + divId + 'Section').show();
     }
 
     let libraryButtons = d3.select('#' + divId)
