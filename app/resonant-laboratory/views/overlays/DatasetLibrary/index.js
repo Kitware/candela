@@ -32,9 +32,68 @@ let DatasetLibrary = DatasetSettings.extend({
     };
     return sideMenu;
   },
-  renderForms: function () {
+  attachLibraryListeners: function () {
+    // Listeners for existing dataset sections
+    this.$el.find('#girderLink').on('click', () => {
+      window.mainPage.router.openUserDirectoriesInGirder();
+    });
+
+    this.$el.find('#loginLink2').on('click', () => {
+      window.mainPage.overlay.render('LoginView');
+    });
+
+    this.$el.find('#registerLink2').on('click', () => {
+      window.mainPage.overlay.render('RegisterView');
+    });
+
+    // Listeners for new datset sections
+    let self = this;
+    this.$el.find('#uploadFile').on('change', function () {
+      // this refers to the DOM element
+      if (this.files.length > 0) {
+        self.fileToUpload = Promise.resolve(this.files[0]);
+        // TODO: start sniffing the first bytes of the file using
+        // FileReader so that we can display LibreOffice-style
+        // CSV import controls, or a widget to construct a
+        // JSONPath selector
+      } else {
+        delete self.fileToUpload;
+      }
+      self.updateNewDatasetSections();
+    });
+
+    this.$el.find('#createLink').on('keyup', Underscore.debounce(function () {
+      // this refers to the DOM element
+      if (this.value) {
+        // Validate the girder item ID (TODO: support other link types)
+        self.linkToCreate = new Promise((resolve, reject) => {
+          girder.restRequest({
+            path: 'item/' + this.value,
+            type: 'GET',
+            error: reject
+          }).done(resolve).error(reject);
+        }).then(item => {
+          if (!item || item['_modelType'] !== 'item') {
+            return {
+              errorMessage: '"' + this.value + '" is not a valid Girder item ID'
+            };
+          } else {
+            return item;
+          }
+        }).catch(item => {
+          return {
+            errorMessage: '"' + this.value + '" is not a valid Girder item ID'
+          };
+        });
+      } else {
+        delete this.linkToCreate;
+      }
+      self.updateNewDatasetSections();
+    }, 600));
+  },
+  updateNewDatasetSections: function () {
     // Start out with all hideable form elements hidden
-    this.$el.find('.hideableForm').hide();
+    this.$el.find('.newDatasetHideable').hide();
 
     // Set up the upload interface
     // Start with the button disabled
@@ -98,75 +157,7 @@ let DatasetLibrary = DatasetSettings.extend({
       });
     }
   },
-  render: function () {
-    let self = this;
-    DatasetSettings.prototype.updateBlurb.apply(this, []);
-    // We use our own subtemplate, so only call
-    // the grandparent superclass render function
-    SettingsPanel.prototype.render.apply(this, arguments);
-    if (!this.addedSubTemplate) {
-      this.$el.find('#subclassContent').html(myTemplate);
-
-      this.$el.find('#girderLink').on('click', () => {
-        window.mainPage.router.openUserDirectoriesInGirder();
-      });
-
-      this.$el.find('#loginLink2').on('click', () => {
-        window.mainPage.overlay.render('LoginView');
-      });
-
-      this.$el.find('#registerLink2').on('click', () => {
-        window.mainPage.overlay.render('RegisterView');
-      });
-
-      this.$el.find('#uploadFile').on('change', function () {
-        // this refers to the DOM element
-        if (this.files.length > 0) {
-          self.fileToUpload = Promise.resolve(this.files[0]);
-          // TODO: start sniffing the first bytes of the file using
-          // FileReader so that we can display LibreOffice-style
-          // CSV import controls, or a widget to construct a
-          // JSONPath selector
-        } else {
-          delete self.fileToUpload;
-        }
-        self.renderForms();
-      });
-
-      this.$el.find('#createLink').on('keyup', Underscore.debounce(function () {
-        // this refers to the DOM element
-        if (this.value) {
-          // Validate the girder item ID (TODO: support other link types)
-          self.linkToCreate = new Promise((resolve, reject) => {
-            girder.restRequest({
-              path: 'item/' + this.value,
-              type: 'GET',
-              error: reject
-            }).done(resolve).error(reject);
-          }).then(item => {
-            if (!item || item['_modelType'] !== 'item') {
-              return {
-                errorMessage: '"' + this.value + '" is not a valid Girder item ID'
-              };
-            } else {
-              return item;
-            }
-          }).catch(item => {
-            return {
-              errorMessage: '"' + this.value + '" is not a valid Girder item ID'
-            };
-          });
-        } else {
-          delete this.linkToCreate;
-        }
-        self.renderForms();
-      }, 600));
-
-      this.addedSubTemplate = true;
-    }
-
-    this.renderForms();
-
+  updateExistingDatasetSections: function () {
     // Start off with every hideable section hidden
     this.$el.find('.hideable').hide();
 
@@ -214,6 +205,22 @@ let DatasetLibrary = DatasetSettings.extend({
       // TODO: get the set of scratch datasets
       // "belonging" to this user
     }
+  },
+  render: function () {
+    DatasetSettings.prototype.updateBlurb.apply(this, []);
+    // We use our own subtemplate, so only call
+    // the grandparent superclass render function
+    SettingsPanel.prototype.render.apply(this, arguments);
+    if (!this.addedSubTemplate) {
+      this.$el.find('#subclassContent').html(myTemplate);
+      this.addedSubTemplate = true;
+
+      // Only attach event listeners once
+      this.attachLibraryListeners();
+    }
+
+    this.updateNewDatasetSections();
+    this.updateExistingDatasetSections();
   },
   getFolderContents: function (folder, divId, icon) {
     let projects = new girder.collections.ItemCollection();
