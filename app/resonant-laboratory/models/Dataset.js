@@ -761,6 +761,18 @@ let Dataset = MetadataItem.extend({
     // status will get retrieved lazily
     this.cache.status = null;
     this.trigger('rl:updateStatus');
+  },
+  drop: function () {
+    this.dropped = true;
+  },
+  destroy: function () {
+    // Don't allow deletion of a dataset unless
+    // the dropped flag has already been set
+    if (this.dropped !== true) {
+      window.mainPage.trigger('rl:error', new Error('Cannot destroy an un-dropped dataset.'));
+    } else {
+      return MetadataItem.prototype.destroy.apply(this, arguments);
+    }
   }
 });
 

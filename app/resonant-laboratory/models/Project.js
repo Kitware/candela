@@ -294,7 +294,16 @@ let Project = MetadataItem.extend({
   }, 50),
   removeDataset: function (index = 0) {
     let datasets = this.getMeta('datasets');
-    datasets.splice(index, 1);
+    let datasetSpecs = datasets.splice(index, 1);
+    if (datasetSpecs.length > 0) {
+      let datasetId = datasetSpecs[0]['dataset'];
+      if (datasetId in window.mainPage.loadedDatasets) {
+        // Flag the dataset as dropped in case anything is
+        // still holding a reference to it
+        window.mainPage.loadedDatasets[datasetId].drop();
+        delete window.mainPage.loadedDatasets[datasetId];
+      }
+    }
     this.setMeta('datasets', datasets);
     return this.save().then(() => {
       this.trigger('rl:changeDatasets');

@@ -44,7 +44,13 @@ let DatasetSettings = SettingsPanel.extend({
         items: [
           {
             text: 'Delete dataset',
-            onclick: () => null,
+            onclick: () => {
+              let datasetObj = this.getDataset();
+              window.mainPage.project.removeDataset(datasetObj.index)
+                .then(() => {
+                  return datasetObj.destroy();
+                });
+            },
             enabled: () => { return !!(this.getDataset()); }
           },
           {

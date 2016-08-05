@@ -75,7 +75,10 @@ let SettingsPanel = Backbone.View.extend({
     }).text(d => {
       return typeof d.text === 'function' ? d.text() : d.text;
     }).on('click', d => {
-      return d.onclick(d);
+      let clickable = typeof d.enabled === 'function' ? d.enabled() : d.enabled;
+      if (clickable !== false) {
+        d.onclick(d);
+      }
     });
   }
 });
