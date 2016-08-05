@@ -50,23 +50,30 @@ let ProjectSettings = SettingsPanel.extend({
           {
             text: 'Delete',
             onclick: () => {
-              window.mainPage.project.destroy()
-                .then(() => {
-                  window.mainPage.switchProject(null);
-                })
-                .catch((errorObj) => {
-                  if (errorObj.statusText === 'Unauthorized') {
-                    if (window.mainPage.currentUser.isLoggedIn()) {
-                      window.mainPage.overlay.renderErrorScreen(`You don\'t
-      have the necessary permissions to delete that project.`);
-                    } else {
-                      window.mainPage.overlay.renderErrorScreen(`Sorry, you
-      can\'t delete projects unless you log in.`);
-                    }
-                  } else {
-                    // Something else happened
-                    window.mainPage.trigger('rl:error', errorObj);
-                  }
+              let currentOverlay = window.mainPage.overlay.template;
+              window.mainPage.overlay.confirmDialog('Are you sure you ' +
+                'want to delete the "' + window.mainPage.project.get('name') +
+                '" project?').then(() => {
+                  window.mainPage.project.destroy()
+                    .then(() => {
+                      window.mainPage.switchProject(null);
+                    })
+                    .catch((errorObj) => {
+                      if (errorObj.statusText === 'Unauthorized') {
+                        if (window.mainPage.currentUser.isLoggedIn()) {
+                          window.mainPage.overlay.renderErrorScreen(`You don\'t
+          have the necessary permissions to delete that project.`);
+                        } else {
+                          window.mainPage.overlay.renderErrorScreen(`Sorry, you
+          can\'t delete projects unless you log in.`);
+                        }
+                      } else {
+                        // Something else happened
+                        window.mainPage.trigger('rl:error', errorObj);
+                      }
+                    });
+                }).catch(() => {
+                  window.mainPage.overlay.render(currentOverlay);
                 });
             },
             enabled: () => {
