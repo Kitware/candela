@@ -46,9 +46,32 @@ let DatasetSettings = SettingsPanel.extend({
             text: 'Delete dataset',
             onclick: () => {
               let datasetObj = this.getDataset();
-              window.mainPage.project.removeDataset(datasetObj.index)
+              let currentOverlay = window.mainPage.overlay.template;
+              window.mainPage.overlay.confirmDialog('Are you sure you want ' +
+                'to delete the "' + datasetObj.get('name') + '" dataset?')
                 .then(() => {
-                  return datasetObj.destroy();
+                  window.mainPage.project.removeDataset(datasetObj.index)
+                    .then(() => {
+                      return datasetObj.destroy()
+                        .then(() => {
+                          window.mainPage.overlay.render(currentOverlay);
+                        }).catch((errorObj) => {
+                          if (errorObj.statusText === 'Unauthorized') {
+                            if (window.mainPage.currentUser.isLoggedIn()) {
+                              window.mainPage.overlay.renderErrorScreen(`You don\'t
+              have the necessary permissions to delete that dataset.`);
+                            } else {
+                              window.mainPage.overlay.renderErrorScreen(`Sorry, you
+              can\'t delete datasets unless you log in.`);
+                            }
+                          } else {
+                            // Something else happened
+                            window.mainPage.trigger('rl:error', errorObj);
+                          }
+                        });
+                    });
+                }).catch(() => {
+                  window.mainPage.overlay.render(currentOverlay);
                 });
             },
             enabled: () => { return !!(this.getDataset()); }
