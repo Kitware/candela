@@ -40,6 +40,7 @@ let DatasetSettings = SettingsPanel.extend({
     return [
       {
         title: 'Dataset Settings',
+        rootPanel: 'DatasetSettings',
         items: [
           {
             text: 'Delete dataset',

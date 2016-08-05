@@ -39,14 +39,19 @@ let SettingsPanel = Backbone.View.extend({
     // Render the side menu (this.getSideMenu() should be
     // set by subclasses)
     let sideMenus = d3.select('#leftChunk').selectAll('div.sideMenu')
-      .data(this.getSideMenu(), d => d.title);
+      .data(this.getSideMenu(), d => d.rootPanel);
     let sideMenusEnter = sideMenus.enter().append('div')
       .attr('class', 'sideMenu');
     sideMenus.exit().remove();
 
     sideMenusEnter.append('h1');
     sideMenus.selectAll('h1')
-      .text(d => d.title);
+      .text(d => d.title)
+      .on('click', d => {
+        // Clicking the title brings people back
+        // out of whatever submenu may have been focused
+        window.mainPage.overlay.render(d.rootPanel);
+      });
 
     let menuItems = sideMenus.selectAll('div.menuItem')
       .data(d => d.items, d2 => d2.text);

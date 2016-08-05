@@ -36,6 +36,7 @@ let ProjectSettings = SettingsPanel.extend({
     return [
       {
         title: 'Project Settings',
+        rootPanel: 'ProjectSettings',
         items: [
           {
             text: 'Save a copy',
