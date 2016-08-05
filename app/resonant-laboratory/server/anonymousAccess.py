@@ -253,6 +253,9 @@ class AnonymousAccess(Resource):
                 info['path'] += '?'
         info['path'] += '/' + item['name']
 
+        # Include the item's size
+        info['size'] = item.get('size', '?')
+
         return info
 
     @access.public
