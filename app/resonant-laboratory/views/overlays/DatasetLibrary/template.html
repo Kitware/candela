@@ -1,58 +1,28 @@
 <details class="newDatasetSection">
   <summary><h3>Upload a new Dataset</h3></summary>
-  <div>
-    <p>Supported formats:</p>
-    <ul>
+
+  <div><input type="file" id="uploadFile"></div>
+
+  <div id="uploadFileFormatHelp" class="hideableForm">
+    <p class="errorText">Supported formats:</p>
+    <ul class="errorText">
       <li>CSV</li>
       <li>TSV</li>
       <li>JSON</li>
     </ul>
+    <p>Want to upload something else?
+      <a href="http://www.kitware.com/company/contact_kitware.php"
+      target="_blank">Work with us</a> to develop something that better meets your needs.
+    </p>
   </div>
-  <div><input type="file" id="uploadFile" accept=".json,.csv,.tsv"></div>
   <!--<div><details>
   TODO: enable advanced settings
     <summary>Advanced Settings</summary>
-    <div id="csvUploadControls" class="hideable">
-      <div>
-        <label for="uploadCsvDelimiter">Delimiter:</label>
-        <input id="uploadCsvDelimiter" type="text" value="," disabled/>
-      </div>
-      <div>
-        <label for="uploadCsvDoubleQuote">DoubleQuote:</label>
-        <input id="uploadCsvDoubleQuote" type="number" step="1" value="1" disabled/>
-      </div>
-      <div>
-        <label for="uploadCsvEscapeChar">EscapeChar:</label>
-        <input id="uploadCsvEscapeChar" type="text" value="" disabled/>
-      </div>
-      <div>
-        <label for="uploadCsvLineTerminator">LineTerminator:</label>
-        <input id="uploadCsvLineTerminator" type="text" value="\r\n" disabled/>
-      </div>
-      <div>
-        <label for="uploadCsvQuoteChar">QuoteChar:</label>
-        <input id="uploadCsvQuoteChar" type="text" value="&quot;" disabled/>
-      </div>
-      <div>
-        <label for="uploadCsvQuoting">Quoting:</label>
-        <input id="uploadCsvQuoting" type="number" step="1" value="0" disabled/>
-      </div>
-      <div>
-        <label for="uploadCsvSkipInitialSpace">SkipInitialSpace:</label>
-        <input id="uploadCsvSkipInitialSpace" type="number" step="1" value="0" disabled/>
-      </div>
-      <div>
-        <label for="uploadCsvStrict">Strict:</label>
-        <input id="uploadCsvStrict" type="number" step="1" value="0" disabled/>
-      </div>
+    <div id="csvUploadControls" class="hideableForm">
     </div>
-    <div id="jsonUploadControls" class="hideable">
-      <div>
-        <label for="uploadJsonPath">JSONPath:</label>
-        <input id="uploadJsonPath" type="text" value="$" disabled>
-      </div>
+    <div id="jsonUploadControls" class="hideableForm">
     </div>
-    <div id="flatFileControls" class="hideable">
+    <div id="flatFileControls" class="hideableForm">
       <span>Upload as:</span>
       <input value="uploadAsFlatFile" id="uploadAsFlatFile" name="uploadAsFlatFile" type="radio">
       <label for="uploadAsFlatFile">Flat File</label>
@@ -60,40 +30,37 @@
       <label for="uploadAsMongodbCollection">MongoDB Collection</label>
     </div>
   </details></div>-->
-  <div><button>Create Dataset</button></div>
   <div>
-    <p>Want to upload something else?
-      <a href="http://www.kitware.com/company/contact_kitware.php"
-      target="_blank">Work with us</a> to develop something that meets your needs.
-    </p>
+    <button id="uploadButton">Upload Dataset</button>
+    <img id="uploadSpinner" src="../../../images/spinner.gif" class="hideableForm"/>
   </div>
 </details>
 
 
 <details class="newDatasetSection">
   <summary><h3>Link to a new Dataset</h3></summary>
-  <div>
-    <p>Supported links:</p>
+
+  <div><input type="text" id="createLink"></div>
+
+  <div id="badLinkHelp" class="hideableForm">
+    <p id="badLinkHelpText" class="errorText"></p>
   </div>
-  <div>
-    <ul>
-      <li>URL of an existing Girder item</li>
-      <li>A <a href=
-        "https://docs.mongodb.com/manual/reference/connection-string/"
-        target="_blank">mongodb database URL</a></li>
+  <div id="createLinkHelp" class="hideableForm">
+    <p class="errorText">Supported link types:</p>
+    <ul class="errorText">
+      <li>The ID of an existing Girder item</li>
     </ul>
+    <p>Want to link to something else?
+      <a href="http://www.kitware.com/company/contact_kitware.php"
+      target="_blank">Work with us</a> to develop something that better meets your needs.
+    </p>
   </div>
-  <div><input type="url" id="uploadLink"></div>
-  <div id="mongoLinkControls" class="hideable">
-    <label for="uploadMongoCollectionName">Collection Name:</label>
-    <input type="text" id="uploadMongoCollectionName">
-  </div>
-  <div><button>Create Dataset</button></div>
+
   <div>
-  <p>Want to link to something else?
-    <a href="http://www.kitware.com/company/contact_kitware.php"
-    target="_blank">Work with us</a> to develop something that meets your needs.
-  </p>
+    <button id="createLinkButton">Create Dataset Link</button>
+    <img id="linkSpinner" src="../../../images/spinner.gif" class="hideableForm"/>
+  </div>
+  <div>
   </div>
 </details>
 
