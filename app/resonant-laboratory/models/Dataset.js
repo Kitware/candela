@@ -85,7 +85,7 @@ class DatasetCache {
   }
   get page () {
     if (!this._page) {
-      this.page = {
+      this._page = {
         offset: 0,
         limit: 1000
       };
@@ -269,6 +269,15 @@ let Dataset = MetadataItem.extend({
     // its own non-Backbone cache class
     this.cache = new DatasetCache(this);
     this.dropped = false;
+  },
+  identifyAsDataset: function () {
+    return this.restRequest({
+      path: 'dataset',
+      method: 'POST'
+    }).then(resp => {
+      this.set(resp);
+      return resp;
+    });
   },
   save: function () {
     // It's possible for a dataset to be dropped from the project

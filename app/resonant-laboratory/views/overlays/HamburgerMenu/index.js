@@ -4,7 +4,13 @@ let HamburgerMenu = Menu.extend({
   initialize: function () {
     let items = [
       {
-        text: window.mainPage.project.get('name') + ' settings...',
+        text: () => {
+          if (window.mainPage.project) {
+            return window.mainPage.project.get('name') + ' settings...';
+          } else {
+            return 'No project open';
+          }
+        },
         onclick: () => {
           window.mainPage.overlay.render('ProjectSettings');
         }

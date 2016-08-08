@@ -7,20 +7,17 @@ let User = girder.models.UserModel.extend({
     this.preferences = new UserPreferences();
     this.listenTo(this, 'rl:logout', this.handleUpdate);
     this.listenTo(this, 'rl:login', this.handleUpdate);
-    this.authenticate();
   },
   addListeners: function () {
     this.preferences.addListeners();
   },
-  authenticate: function (login) {
+  authenticate: function (login, mainPage) {
     login = login !== false;
+    mainPage = mainPage || window.mainPage;
 
-    return new Promise((resolve, reject) => {
-      girder.restRequest({
-        path: 'user/authentication',
-        type: login ? 'GET' : 'DELETE',
-        error: reject
-      }).done(resolve).error(reject);
+    return mainPage.girderRequest({
+      path: 'user/authentication',
+      type: login ? 'GET' : 'DELETE'
     }).then(resp => {
       if (resp === null || login === false) {
         this.finishLogout();

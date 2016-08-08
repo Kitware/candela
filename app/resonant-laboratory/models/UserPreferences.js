@@ -1,6 +1,5 @@
 import MetadataItem from './MetadataItem';
 import { Set } from '../shims/SetOps.js';
-let girder = window.girder;
 
 let UserPreferences = MetadataItem.extend({
   /*
@@ -55,6 +54,40 @@ you move or delete this item, your preferences will be lost.`,
       this.adoptScratchProjects);
     this.listenTo(window.mainPage, 'rl:createProject',
       this.claimProject);
+    this.listenTo(window.mainPage, 'rl:changeProject',
+      this.addProjectListeners);
+    this.addProjectListeners();
+  },
+  addProjectListeners: function () {
+    if (window.mainPage.project) {
+      this.stopListening(window.mainPage.project, 'rl:swappedId');
+      this.listenTo(window.mainPage.project, 'rl:swappedId',
+        this.handleCopiedProject);
+      this.stopListening(window.mainPage.project, 'rl:swappedDatasetId');
+      this.listenTo(window.mainPage.project, 'rl:swappedDatasetId',
+        this.handleCopiedDataset);
+    }
+  },
+  handleCopiedProject: function () {
+    // Once we know the change in status (e.g. the ID can swap if a copy is
+    // made), display a notification about where the project was moved.
+    // Because we're now working on a copy, we should also fire the project
+    // creation event
+    window.mainPage.project.cache.status.then(status => {
+      let notification = 'You are now working on a copy of this project in ';
+      if (status.visibility === 'PublicScratch') {
+        notification = 'the public scratch space. Log in to take ownership of this project.';
+      } else if (status.visibility === 'PrivateUser') {
+        notification += 'your Private folder.';
+      } else {
+        window.mainPage.trigger('rl:error', new Error('Project copied to an unknown location.'));
+      }
+      window.mainPage.notificationLayer.displayNotification(notification);
+      window.mainPage.trigger('rl:createProject');
+    });
+  },
+  handleCopiedDataset: function () {
+    // TODO: display a notification, like the one for the copied project
   },
   claimProject: function () {
     if (!window.mainPage.currentUser.isLoggedIn()) {
@@ -90,15 +123,12 @@ you move or delete this item, your preferences will be lost.`,
 
     if (scratchProjects) {
       let attemptedAdoptions = JSON.parse(scratchProjects).length;
-      new Promise((resolve, reject) => {
-        girder.restRequest({
-          path: 'item/anonymousAccess/adoptScratchItems',
-          data: {
-            'ids': scratchProjects // already JSON.stringified
-          },
-          error: reject,
-          type: 'PUT'
-        }).done(resolve).error(reject);
+      window.mainPage.girderRequest({
+        path: 'item/anonymousAccess/adoptScratchItems',
+        data: {
+          'ids': scratchProjects // already JSON.stringified
+        },
+        type: 'PUT'
       }).then(successfulAdoptions => {
         // Now we need to adopt any datasets that these projects refer to
         let datasetIds = new Set();
@@ -120,15 +150,12 @@ you move or delete this item, your preferences will be lost.`,
         datasetIds = [...datasetIds];
         attemptedAdoptions = datasetIds.length;
 
-        new Promise((resolve, reject) => {
-          girder.restRequest({
-            path: 'item/anonymousAccess/adoptScratchItems',
-            data: {
-              'ids': JSON.stringify(datasetIds)
-            },
-            error: reject,
-            type: 'PUT'
-          });
+        window.mainPage.girderRequest({
+          path: 'item/anonymousAccess/adoptScratchItems',
+          data: {
+            'ids': JSON.stringify(datasetIds)
+          },
+          type: 'PUT'
         }).then(successfulAdoptions => {
           window.mainPage.notificationLayer.displayNotification(
             'Moved ' + successfulAdoptions.length + ' of ' +
@@ -141,7 +168,7 @@ you move or delete this item, your preferences will be lost.`,
           // project will (pretty much always) have just changed
           // as well
           if (window.mainPage.project) {
-            window.mainPage.project.fetch();
+            window.mainPage.project.updateStatus();
           }
         }).catch(() => {
           window.mainPage.notificationLayer.displayNotification(

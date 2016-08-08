@@ -29,11 +29,29 @@ let DatasetSettings = SettingsPanel.extend({
     // TODO: need to be more clever in initializing this dialog
     // when we have support for multiple datasets
     this.index = 0;
-    this.listenTo(this.getDataset(), 'rl:updateStatus', () => {
-      this.render();
+
+    this.listenTo(window.mainPage, 'rl:changeProject', () => {
+      this.attachProjectListeners();
     });
-    this.listenTo(window.mainPage.project, 'rl:changeDatasets', () => {
-      this.render();
+    this.attachProjectListeners();
+  },
+  attachProjectListeners: function () {
+    if (window.mainPage.project) {
+      this.stopListening(window.mainPage.project, 'rl:changeDatasets');
+      this.listenTo(window.mainPage.project, 'rl:changeDatasets', () => {
+        this.attachDatasetListeners();
+      });
+    }
+    this.render();
+  },
+  attachDatasetListeners: function () {
+    this.getDataset(this.index).then(datasetObj => {
+      if (datasetObj) {
+        this.stopListening(datasetObj, 'rl:updateStatus');
+        this.listenTo(datasetObj, 'rl:updateStatus', () => {
+          this.render();
+        });
+      }
     });
   },
   getSideMenu: function () {
@@ -44,50 +62,20 @@ let DatasetSettings = SettingsPanel.extend({
         items: [
           {
             text: 'Delete dataset',
-            onclick: () => {
-              let datasetObj = this.getDataset();
-              let currentOverlay = window.mainPage.overlay.template;
-              window.mainPage.overlay.confirmDialog('Are you sure you want ' +
-                'to delete the "' + datasetObj.get('name') + '" dataset?')
-                .then(() => {
-                  window.mainPage.project.removeDataset(datasetObj.index)
-                    .then(() => {
-                      return datasetObj.destroy()
-                        .then(() => {
-                          window.mainPage.overlay.render(currentOverlay);
-                        }).catch((errorObj) => {
-                          if (errorObj.statusText === 'Unauthorized') {
-                            if (window.mainPage.currentUser.isLoggedIn()) {
-                              window.mainPage.overlay.renderErrorScreen(`You don\'t
-              have the necessary permissions to delete that dataset.`);
-                            } else {
-                              window.mainPage.overlay.renderErrorScreen(`Sorry, you
-              can\'t delete datasets unless you log in.`);
-                            }
-                          } else {
-                            // Something else happened
-                            window.mainPage.trigger('rl:error', errorObj);
-                          }
-                        });
-                    });
-                }).catch(() => {
-                  window.mainPage.overlay.render(currentOverlay);
-                });
-            },
-            enabled: () => { return !!(this.getDataset()); }
+            onclick: () => { this.deleteDataset(); },
+            enabled: () => { return this.hasDataset(); }
           },
           {
             text: 'Remove from project',
             onclick: () => {
-              let index = this.getDataset().index;
-              window.mainPage.project.removeDataset(index);
+              window.mainPage.project.removeDataset(this.index);
             },
-            enabled: () => { return !!(this.getDataset()); }
+            enabled: () => { return this.hasDataset(); }
           },
           {
             text: () => {
               if (window.mainPage.project) {
-                if (window.mainPage.project.getDataset(this.index)) {
+                if (this.hasDataset()) {
                   return 'Switch to a different dataset';
                 } else {
                   return 'Add a dataset to the project';
@@ -104,15 +92,51 @@ let DatasetSettings = SettingsPanel.extend({
       }
     ];
   },
+  hasDataset: function () {
+    return window.mainPage.project &&
+      window.mainPage.project.hasDataset(this.index);
+  },
   getDataset: function () {
     if (window.mainPage.project) {
       return window.mainPage.project.getDataset(this.index);
     } else {
-      return undefined;
+      return Promise.resolve(null);
     }
   },
+  deleteDataset: function () {
+    let currentOverlay = window.mainPage.overlay.template;
+    this.getDataset(this.index).then(datasetObj => {
+      window.mainPage.overlay.confirmDialog('Are you sure you want ' +
+        'to delete the "' + datasetObj.get('name') + '" dataset?')
+        .then(() => {
+          // The user clicked OK
+          return window.mainPage.project.removeDataset(datasetObj.index)
+            .then(() => {
+              return datasetObj.destroy();
+            }).then(() => {
+              window.mainPage.overlay.render(currentOverlay);
+            }).catch((errorObj) => {
+              if (errorObj.statusText === 'Unauthorized') {
+                if (window.mainPage.currentUser.isLoggedIn()) {
+                  window.mainPage.overlay.renderErrorScreen(`You don\'t
+  have the necessary permissions to delete that dataset.`);
+                } else {
+                  window.mainPage.overlay.renderErrorScreen(`Sorry, you
+  can\'t delete datasets unless you log in.`);
+                }
+              } else {
+                // Something else happened
+                window.mainPage.trigger('rl:error', errorObj);
+              }
+            });
+        }).catch(() => {
+          // User clicked cancel
+          window.mainPage.overlay.render(currentOverlay);
+        });
+    });
+  },
   updateBlurb: function () {
-    if (!this.getDataset()) {
+    if (!(this.hasDataset())) {
       this.blurb = 'No dataset selected.';
     } else {
       delete this.blurb;
@@ -220,25 +244,25 @@ let DatasetSettings = SettingsPanel.extend({
     this.updateBlurb();
     SettingsPanel.prototype.render.apply(this, arguments);
 
-    let datasetObj = this.getDataset();
+    this.getDataset().then(datasetObj => {
+      if (!datasetObj) {
+        // Clear out the template; the blurb will suffice
+        this.addedSubTemplate = false;
+        this.$el.find('#subclassContent').html('');
+      } else {
+        if (!this.addedSubTemplate) {
+          this.$el.find('#subclassContent').html(myTemplate);
+          this.addedSubTemplate = true;
 
-    if (!datasetObj) {
-      // Clear out the template; the blurb will suffice
-      this.addedSubTemplate = false;
-      this.$el.find('#subclassContent').html('');
-    } else {
-      if (!this.addedSubTemplate) {
-        this.$el.find('#subclassContent').html(myTemplate);
-        this.addedSubTemplate = true;
+          // Only attach event listeners once
+          this.attachSettingsListeners(datasetObj);
+        }
 
-        // Only attach event listeners once
-        this.attachSettingsListeners(datasetObj);
+        this.updateMainSettings(datasetObj);
+        this.updatePageSettings(datasetObj);
+        this.updateFilterSettings(datasetObj);
       }
-
-      this.updateMainSettings(datasetObj);
-      this.updatePageSettings(datasetObj);
-      this.updateFilterSettings(datasetObj);
-    }
+    });
   }
 });
 

@@ -41,6 +41,7 @@ let Header = Backbone.View.extend({
 
     this.listenTo(window.mainPage, 'rl:changeProject',
       this.attachProjectListeners);
+    this.attachProjectListeners();
 
     this.listenTo(window.mainPage.widgetPanels, 'rl:updateWidgetSpecs',
       this.render);
@@ -52,12 +53,23 @@ let Header = Backbone.View.extend({
   },
   attachProjectListeners: function () {
     if (window.mainPage.project) {
+      this.stopListening(window.mainPage.project,
+        'rl:changeDatasets');
       this.listenTo(window.mainPage.project,
         'rl:changeDatasets', this.render);
+
+      this.stopListening(window.mainPage.project,
+        'rl:changeVisualizations');
       this.listenTo(window.mainPage.project,
         'rl:changeVisualizations', this.render);
+
+      this.stopListening(window.mainPage.project,
+        'rl:changeStatus');
       this.listenTo(window.mainPage.project,
         'rl:changeStatus', this.render);
+
+      this.stopListening(window.mainPage.project,
+        'rl:rename');
       this.listenTo(window.mainPage.project,
         'rl:rename', this.render);
     }
@@ -113,7 +125,7 @@ let Header = Backbone.View.extend({
       this.templateAdded = true;
     }
 
-    // Only make the icon yellow if there's a tip
+    // Only style the icon if there's a tip
     // that the user hasn't seen that is visible
     // on the screen
     let visibleTips = tips.filter(tip => {
@@ -130,15 +142,17 @@ let Header = Backbone.View.extend({
       // Render information about the project
       jQuery('#projectHeader, #projectIcons').show();
 
-      let projectStatus = window.mainPage.project.status;
-      if (projectStatus.visibility === null) {
-        jQuery('#projectVisibilityButton')
-          .attr('src', loadingIcon);
-      } else {
-        jQuery('#projectVisibilityButton')
-          .attr('src', ICONS[projectStatus.visibility]);
-      }
+      // Visibility button
+      jQuery('#projectVisibilityButton')
+        .attr('src', loadingIcon);
+      window.mainPage.project.cache.status.then(projectStatus => {
+        if (projectStatus.visibility !== null) {
+          jQuery('#projectVisibilityButton')
+            .attr('src', ICONS[projectStatus.visibility]);
+        }
+      });
 
+      // Project title
       jQuery('#projectName').text(window.mainPage.project.get('name'));
 
       /*

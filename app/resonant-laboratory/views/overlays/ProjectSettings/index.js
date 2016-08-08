@@ -28,7 +28,6 @@ let ProjectSettings = SettingsPanel.extend({
     SettingsPanel.prototype.initialize.apply(this, arguments);
     this.listenTo(window.mainPage, 'rl:changeProject', () => {
       this.attachProjectListeners();
-      this.render();
     });
     this.attachProjectListeners();
   },
@@ -58,7 +57,7 @@ let ProjectSettings = SettingsPanel.extend({
                     .then(() => {
                       window.mainPage.switchProject(null);
                     })
-                    .catch((errorObj) => {
+                    .catch(errorObj => {
                       if (errorObj.statusText === 'Unauthorized') {
                         if (window.mainPage.currentUser.isLoggedIn()) {
                           window.mainPage.overlay.renderErrorScreen(`You don\'t
@@ -78,7 +77,6 @@ let ProjectSettings = SettingsPanel.extend({
             },
             enabled: () => {
               return window.mainPage.project &&
-                window.mainPage.project.status.editable &&
                 window.mainPage.currentUser.isLoggedIn();
             }
           },
@@ -125,15 +123,17 @@ let ProjectSettings = SettingsPanel.extend({
   },
   attachProjectListeners: function () {
     if (window.mainPage.project) {
-      // Don't bother re-rendering this view until we have the new project's
-      // updated status
+      this.stopListening(window.mainPage.project, 'rl:changeStatus');
       this.listenTo(window.mainPage.project, 'rl:changeStatus', () => {
         this.render();
       });
+
+      this.stopListening(window.mainPage.project, 'rl:rename');
       this.listenTo(window.mainPage.project, 'rl:rename', () => {
         this.render();
       });
     }
+    this.render();
   },
   updateBlurb: function () {
     if (!window.mainPage.project) {
@@ -158,11 +158,6 @@ let ProjectSettings = SettingsPanel.extend({
     this.$el.find('#publicVisibility, #privateVisibility')
       .on('change', function () {
         // this refers to the DOM element
-        if (this.value === window.mainPage.project.status.visibility) {
-          // Don't do anything if the user isn't actually changing the
-          // project's location
-          return;
-        }
         /*
           The togglePublic endpoint is smart enough to do the right thing
           (except we need to give it a hint if the user is copying a library
@@ -175,45 +170,47 @@ let ProjectSettings = SettingsPanel.extend({
             makePublic: this.value === 'PublicUser'
           }
         }).then(() => {
-          window.mainPage.project.fetch();
+          window.mainPage.project.updateStatus();
         });
       });
   },
   updateSettings: function () {
     // Update the dialog with the latest info
-    let status = window.mainPage.project.status;
-    this.$el.find('#projectNameField')
-      .val(window.mainPage.project.get('name'));
+    window.mainPage.project.cache.status.then(status => {
+      this.$el.find('#projectNameField')
+        .val(window.mainPage.project.get('name'));
 
-    this.$el.find('#projectLocation')
-      .text(status.path)
-      .attr('href', 'girder#item/' + window.mainPage.project.getId());
+      this.$el.find('#projectLocation')
+        .text(status.path)
+        .attr('href', 'girder#item/' + window.mainPage.project.getId());
 
-    if (status.editable) {
-      this.$el.find('#editabilityIcon')
-        .attr('src', canEditIcon)
-        .attr('title', 'You can edit this project');
-    } else {
-      this.$el.find('#editabilityIcon')
-        .attr('src', cantEditIcon)
-        .attr('title', 'You can\'t edit this project');
-    }
+      if (status.editable) {
+        this.$el.find('#editabilityIcon')
+          .attr('src', canEditIcon)
+          .attr('title', 'You can edit this project');
+      } else {
+        this.$el.find('#editabilityIcon')
+          .attr('src', cantEditIcon)
+          .attr('title', 'You can\'t edit this project');
+      }
 
-    this.$el.find('#visibilityIcon')
-      .attr('src', visibilityIcons[status.visibility])
-      .attr('title', visibilityLabels[status.visibility]);
+      this.$el.find('#visibilityIcon')
+        .attr('src', visibilityIcons[status.visibility])
+        .attr('title', visibilityLabels[status.visibility]);
 
-    this.$el.find('input[name="projectVisibility"][value="' + status.visibility + '"]')
-      .prop('checked', true);
-    if (window.mainPage.currentUser.isLoggedIn()) {
-      this.$el.find('#scratchVisibility, #libraryVisibility')
-        .prop('disabled', true);
-      this.$el.find('#publicVisibility, #privateVisibility')
-        .prop('disabled', '');
-    } else {
-      this.$el.find('#scratchVisibility, #publicVisibility, #privateVisibility, #libraryVisibility')
-        .prop('disabled', true);
-    }
+      this.$el.find('input[name="projectVisibility"][value="' + status.visibility + '"]')
+        .prop('checked', true);
+
+      if (window.mainPage.currentUser.isLoggedIn()) {
+        this.$el.find('#scratchVisibility, #libraryVisibility')
+          .prop('disabled', true);
+        this.$el.find('#publicVisibility, #privateVisibility')
+          .prop('disabled', '');
+      } else {
+        this.$el.find('#scratchVisibility, #publicVisibility, #privateVisibility, #libraryVisibility')
+          .prop('disabled', true);
+      }
+    });
   },
   render: function () {
     this.updateBlurb();
