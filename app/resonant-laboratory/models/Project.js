@@ -1,4 +1,3 @@
-import Underscore from 'underscore';
 import MetadataItem from './MetadataItem';
 import Dataset from './Dataset';
 import binUtils from '../general_purpose/binUtils.js';
@@ -281,7 +280,7 @@ let Project = MetadataItem.extend({
       }
     }
   },
-  updateDatasetPage: Underscore.debounce(function (datasetObj) {
+  updateDatasetPage: function (datasetObj) {
     // Store the new page and filter info in the project metadata
     let datasets = this.getMeta('datasets');
     let dataSpec = datasets.find(d => d.dataset === datasetObj.getId());
@@ -291,7 +290,7 @@ let Project = MetadataItem.extend({
     this.save();
     // Forward the event at the project level
     this.trigger('rl:changeDatasets');
-  }, 50),
+  },
   removeDataset: function (index = 0) {
     let datasets = this.getMeta('datasets');
     let datasetSpecs = datasets.splice(index, 1);

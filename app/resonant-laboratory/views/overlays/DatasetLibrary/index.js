@@ -93,8 +93,19 @@ let DatasetLibrary = DatasetSettings.extend({
     }, 600));
 
     this.$el.find('#createLinkButton').on('click', () => {
-      // let itemId = this.$el.find('#createLink').val();
-      // TODO
+      let itemId = this.$el.find('#createLink').val();
+      window.mainPage.girderRequest({
+        path: 'item/' + itemId + '/dataset',
+        method: 'POST'
+      }).then(datasetItem => {
+        console.log(datasetItem);
+        window.mainPage.setDataset(itemId, this.index).then(() => {
+          window.mainPage.widgetPanels.toggleWidget({
+            hashName: 'DatasetView0'
+          }, true);
+          window.mainPage.overlay.closeOverlay();
+        });
+      });
     });
   },
   updateNewDatasetSections: function () {
@@ -287,22 +298,13 @@ let DatasetLibrary = DatasetSettings.extend({
 
     d3.select('#' + divId).selectAll('.circleButton')
       .on('click', d => {
-        let projectPromise;
-        if (window.mainPage.project) {
-          projectPromise = Promise.resolve(window.mainPage.project);
-        } else {
-          // No project is loaded, so create an empty
-          // project with this dataset
-          projectPromise = window.mainPage.newProject();
-        }
-        projectPromise.then(project => {
-          return project.setDataset(d.get('_id'));
-        }).then(() => {
-          window.mainPage.widgetPanels.toggleWidget({
-            hashName: 'DatasetView0'
-          }, true);
-          window.mainPage.overlay.closeOverlay();
-        });
+        window.mainPage.setDataset(d.get('_id'), this.index)
+          .then(() => {
+            window.mainPage.widgetPanels.toggleWidget({
+              hashName: 'DatasetView0'
+            }, true);
+            window.mainPage.overlay.closeOverlay();
+          });
       });
   }
 });

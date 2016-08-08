@@ -142,12 +142,13 @@ let MainPage = Backbone.View.extend({
     return this.project.create()
       .then(() => {
         this.trigger('rl:createProject');
-        this.project.fetch().then(() => {
+        return this.project.fetch().then(() => {
           this.trigger('rl:changeProject');
+          return this.project;
         });
       }).catch((err) => {
-        this.switchProject(null);
         this.trigger('rl:error', err);
+        return this.switchProject(null);
       });
   },
   switchProject: function (id) {
@@ -157,7 +158,7 @@ let MainPage = Backbone.View.extend({
     if (id === null) {
       this.project = null;
       this.trigger('rl:changeProject');
-      return new Promise(() => {});
+      return new Promise(() => null);
     } else {
       this.project = new Project({
         _id: id
@@ -165,11 +166,25 @@ let MainPage = Backbone.View.extend({
 
       return this.project.fetch().then(() => {
         this.trigger('rl:changeProject');
+        return this.project;
       }).catch((err) => {
-        this.switchProject(null);
         this.trigger('rl:error', err);
+        return this.switchProject(null);
       });
     }
+  },
+  setDataset: function (dataset, index) {
+    index = index || 0;
+
+    let projectPromise;
+    if (this.project) {
+      projectPromise = Promise.resolve(this.project);
+    } else {
+      projectPromise = this.newProject();
+    }
+    return projectPromise.then(() => {
+      return this.project.setDataset(dataset, index);
+    });
   },
   girderRequest: function (params, catchFunc) {
     let promise = new Promise((resolve, reject) => {
