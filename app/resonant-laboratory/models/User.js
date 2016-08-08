@@ -15,12 +15,9 @@ let User = girder.models.UserModel.extend({
   authenticate: function (login) {
     login = login !== false;
 
-    return new Promise((resolve, reject) => {
-      girder.restRequest({
-        path: 'user/authentication',
-        type: login ? 'GET' : 'DELETE',
-        error: reject
-      }).done(resolve).error(reject);
+    return window.mainPage.girderRequest({
+      path: 'user/authentication',
+      type: login ? 'GET' : 'DELETE'
     }).then(resp => {
       if (resp === null || login === false) {
         this.finishLogout();

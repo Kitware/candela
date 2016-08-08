@@ -62,16 +62,17 @@ let DatasetLibrary = DatasetSettings.extend({
       self.updateNewDatasetSections();
     });
 
+    this.$el.find('#uploadButton').on('click', () => {
+      window.alert('todo');
+    });
+
     this.$el.find('#createLink').on('keyup', Underscore.debounce(function () {
       // this refers to the DOM element
       if (this.value) {
         // Validate the girder item ID (TODO: support other link types)
-        self.linkToCreate = new Promise((resolve, reject) => {
-          girder.restRequest({
-            path: 'item/' + this.value,
-            type: 'GET',
-            error: reject
-          }).done(resolve).error(reject);
+        self.linkToCreate = window.mainPage.girderRequest({
+          path: 'item/' + this.value,
+          type: 'GET'
         }).then(item => {
           if (!item || item['_modelType'] !== 'item') {
             return {
@@ -90,6 +91,11 @@ let DatasetLibrary = DatasetSettings.extend({
       }
       self.updateNewDatasetSections();
     }, 600));
+
+    this.$el.find('#createLinkButton').on('click', () => {
+      // let itemId = this.$el.find('#createLink').val();
+      // TODO
+    });
   },
   updateNewDatasetSections: function () {
     // Start out with all hideable form elements hidden
@@ -162,12 +168,9 @@ let DatasetLibrary = DatasetSettings.extend({
     this.$el.find('.hideable').hide();
 
     // Get the set of datasets in the public library
-    new Promise((resolve, reject) => {
-      girder.restRequest({
-        path: 'resource/lookup?path=/collection/Resonant Laboratory Library/Data',
-        type: 'GET',
-        error: reject
-      }).done(resolve).error(reject);
+    window.mainPage.girderRequest({
+      path: 'resource/lookup?path=/collection/Resonant Laboratory Library/Data',
+      type: 'GET'
     }).then(folder => {
       this.getFolderContents(folder, 'datasetLibrary', libraryFileIcon);
     }).catch(() => {
@@ -177,24 +180,18 @@ let DatasetLibrary = DatasetSettings.extend({
       // The user is logged in
 
       // Get the set of the user's private datasets
-      new Promise((resolve, reject) => {
-        girder.restRequest({
-          path: 'folder/anonymousAccess/privateFolder',
-          type: 'GET',
-          error: reject
-        }).done(resolve).error(reject);
+      window.mainPage.girderRequest({
+        path: 'folder/anonymousAccess/privateFolder',
+        type: 'GET'
       }).then(folder => {
         this.getFolderContents(folder, 'privateDatasets', privateFileIcon);
       }).catch(() => {
       }); // fail silently
 
       // Get the set of the user's public projects
-      new Promise((resolve, reject) => {
-        girder.restRequest({
-          path: 'folder/anonymousAccess/publicFolder',
-          type: 'GET',
-          error: reject
-        }).done(resolve).error(reject);
+      window.mainPage.girderRequest({
+        path: 'folder/anonymousAccess/publicFolder',
+        type: 'GET'
       }).then(folder => {
         this.getFolderContents(folder, 'publicDatasets', publicFileIcon);
       }).catch(() => {

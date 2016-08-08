@@ -19,18 +19,16 @@ import './stylesheets/mainPage.scss';
 import './stylesheets/girderPatches.scss';
 
 // The API root is different
-window.girder.apiRoot = 'api/v1';
+let girder = window.girder;
+girder.apiRoot = 'api/v1';
 
 // Our main view that coordinates each big chunk
 let MainPage = Backbone.View.extend({
   initialize: function () {
     // Get the current app version
-    this.versionNumber = new Promise((resolve, reject) => {
-      window.girder.restRequest({
-        path: 'system/resonantLaboratoryVersion',
-        type: 'GET',
-        error: reject
-      }).done(resolve).error(reject);
+    this.versionNumber = this.girderRequest({
+      path: 'system/resonantLaboratoryVersion',
+      type: 'GET'
     });
 
     // Set up navigation
@@ -170,6 +168,12 @@ let MainPage = Backbone.View.extend({
         this.trigger('rl:error', err);
       });
     }
+  },
+  girderRequest: function (params) {
+    return new Promise((resolve, reject) => {
+      params.error = reject;
+      return girder.restRequest(params).done(resolve).error(reject);
+    });
   }
 });
 

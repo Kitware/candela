@@ -52,12 +52,9 @@ let ProjectLibrary = ProjectSettings.extend({
     this.$el.find('.hideable').hide();
 
     // Get the set of projects in the public library
-    new Promise((resolve, reject) => {
-      girder.restRequest({
-        path: 'resource/lookup?path=/collection/Resonant Laboratory Library/Projects',
-        type: 'GET',
-        error: reject
-      }).done(resolve).error(reject);
+    window.mainPage.girderRequest({
+      path: 'resource/lookup?path=/collection/Resonant Laboratory Library/Projects',
+      type: 'GET'
     }).then(folder => {
       this.getFolderContents(folder, 'projectLibrary', libraryFileIcon);
     }).catch(() => {
@@ -67,24 +64,18 @@ let ProjectLibrary = ProjectSettings.extend({
       // The user is logged in
 
       // Get the set of the user's private projects
-      new Promise((resolve, reject) => {
-        girder.restRequest({
-          path: 'folder/anonymousAccess/privateFolder',
-          type: 'GET',
-          error: reject
-        }).done(resolve).error(reject);
+      window.mainPage.girderRequest({
+        path: 'folder/anonymousAccess/privateFolder',
+        type: 'GET'
       }).then(folder => {
         this.getFolderContents(folder, 'privateProjects', privateFileIcon);
       }).catch(() => {
       }); // fail silently
 
       // Get the set of the user's public projects
-      new Promise((resolve, reject) => {
-        girder.restRequest({
-          path: 'folder/anonymousAccess/publicFolder',
-          type: 'GET',
-          error: reject
-        }).done(resolve).error(reject);
+      window.mainPage.girderRequest({
+        path: 'folder/anonymousAccess/publicFolder',
+        type: 'GET'
       }).then(folder => {
         this.getFolderContents(folder, 'publicProjects', publicFileIcon);
       }).catch(() => {
@@ -97,14 +88,13 @@ let ProjectLibrary = ProjectSettings.extend({
       if (ids !== null) {
         // Get the set of projects in the public scratch space
         // that this browser created
-        Promise.resolve(girder.restRequest({
+        window.mainPage.girderRequest({
           path: 'item/anonymousAccess/validateScratchItems',
           data: {
             ids: ids
           },
-          type: 'GET',
-          error: null
-        })).then(items => {
+          type: 'GET'
+        }).then(items => {
           // items may be a subset of the projects that we asked for
           // (a registered user - likely us - may have adopted our old
           // project, or the project could have been deleted... that's

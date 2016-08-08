@@ -90,15 +90,12 @@ you move or delete this item, your preferences will be lost.`,
 
     if (scratchProjects) {
       let attemptedAdoptions = JSON.parse(scratchProjects).length;
-      new Promise((resolve, reject) => {
-        girder.restRequest({
-          path: 'item/anonymousAccess/adoptScratchItems',
-          data: {
-            'ids': scratchProjects // already JSON.stringified
-          },
-          error: reject,
-          type: 'PUT'
-        }).done(resolve).error(reject);
+      window.mainPage.girderRequest({
+        path: 'item/anonymousAccess/adoptScratchItems',
+        data: {
+          'ids': scratchProjects // already JSON.stringified
+        },
+        type: 'PUT'
       }).then(successfulAdoptions => {
         // Now we need to adopt any datasets that these projects refer to
         let datasetIds = new Set();
@@ -120,15 +117,12 @@ you move or delete this item, your preferences will be lost.`,
         datasetIds = [...datasetIds];
         attemptedAdoptions = datasetIds.length;
 
-        new Promise((resolve, reject) => {
-          girder.restRequest({
-            path: 'item/anonymousAccess/adoptScratchItems',
-            data: {
-              'ids': JSON.stringify(datasetIds)
-            },
-            error: reject,
-            type: 'PUT'
-          });
+        window.mainPage.girderRequest({
+          path: 'item/anonymousAccess/adoptScratchItems',
+          data: {
+            'ids': JSON.stringify(datasetIds)
+          },
+          type: 'PUT'
         }).then(successfulAdoptions => {
           window.mainPage.notificationLayer.displayNotification(
             'Moved ' + successfulAdoptions.length + ' of ' +
