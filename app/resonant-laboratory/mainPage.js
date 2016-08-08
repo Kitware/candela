@@ -36,6 +36,8 @@ let MainPage = Backbone.View.extend({
 
     // Initial empty state (assume no logged in user)
     this.currentUser = new User();
+    // Attempt to log in (async result)
+    this.currentUser.authenticate(true, this);
 
     this.listenTo(this.currentUser, 'rlab:logout', () => {
       this.switchProject(null).then(() => {
@@ -169,11 +171,19 @@ let MainPage = Backbone.View.extend({
       });
     }
   },
-  girderRequest: function (params) {
-    return new Promise((resolve, reject) => {
+  girderRequest: function (params, catchFunc) {
+    let promise = new Promise((resolve, reject) => {
       params.error = reject;
       return girder.restRequest(params).done(resolve).error(reject);
     });
+    if (catchFunc) {
+      promise = promise.catch(catchFunc);
+    } else if (catchFunc !== null) {
+      promise.catch(err => {
+        this.trigger('rl:error', err);
+      });
+    }
+    return promise;
   }
 });
 
