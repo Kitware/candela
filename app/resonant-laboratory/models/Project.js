@@ -119,7 +119,7 @@ class ProjectCache {
         });
         if (changedDatasets) {
           // If our datasets changed, the matchings probably will too
-          return responsePromise.then(() => {
+          responsePromise.then(() => {
             this.model.checkAndSaveMatchings(['rl:changeDatasets']);
           });
         }
@@ -447,7 +447,9 @@ let Project = MetadataItem.extend({
     // 3. The data types are still compatible
     // 4. TODO: Other things we should check?
     // Trash any matchings that don't make sense anymore
-    return this.cache.loadedDatasets.then(loadedDatasets => {
+    return this.save().then(() => {
+      return this.cache.loadedDatasets;
+    }).then(loadedDatasets => {
       let indicesToTrash = [];
       for (let [index, matching] of meta.matchings.entries()) {
         if (meta.datasets.length <= matching.dataIndex ||
@@ -504,13 +506,11 @@ let Project = MetadataItem.extend({
       }
 
       this.setMeta(meta);
-      let responsePromise = this.save();
-      responsePromise.then(() => {
-        triggers.forEach(t => {
-          this.trigger(t);
-        });
+      return this.save();
+    }).then(() => {
+      triggers.forEach(t => {
+        this.trigger(t);
       });
-      return responsePromise;
     });
   },
   addMatching: function (matching) {

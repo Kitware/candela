@@ -215,7 +215,7 @@ let VisualizationView = Widget.extend({
       this.statusText.text = 'None selected';
       this.renderIndicators();
     }
-  }, 200)
+  }, 500)
 });
 
 export default VisualizationView;
