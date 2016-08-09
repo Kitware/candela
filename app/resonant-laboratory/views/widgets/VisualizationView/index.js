@@ -80,10 +80,15 @@ let VisualizationView = Widget.extend({
     this.status = STATUS.LOADING;
     this.vis = null;
 
-    this.listenTo(window.mainPage.project, 'rl:changeVisualizations',
-      this.render);
-    this.listenTo(window.mainPage.project, 'rl:changeMatchings',
-      this.render);
+    if (window.mainPage.project) {
+      this.stopListening(window.mainPage.project, 'rl:changeVisualizations');
+      this.listenTo(window.mainPage.project, 'rl:changeVisualizations',
+        this.render);
+
+      this.stopListening(window.mainPage.project, 'rl:changeMatchings');
+      this.listenTo(window.mainPage.project, 'rl:changeMatchings',
+        this.render);
+    }
   },
   renderInfoScreen: function () {
     window.mainPage.helpLayer.showTips(this.getDefaultTips());

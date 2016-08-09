@@ -99,9 +99,11 @@ let DatasetLibrary = DatasetSettings.extend({
         method: 'POST'
       }).then(datasetItem => {
         console.log(datasetItem);
-        window.mainPage.setDataset(itemId, this.index).then(() => {
+        window.mainPage.getProject().then(project => {
+          return project.setDataset(itemId, this.index);
+        }).then(() => {
           window.mainPage.widgetPanels.toggleWidget({
-            hashName: 'DatasetView0'
+            hashName: 'DatasetView' + this.index
           }, true);
           window.mainPage.overlay.closeOverlay();
         });
@@ -298,13 +300,14 @@ let DatasetLibrary = DatasetSettings.extend({
 
     d3.select('#' + divId).selectAll('.circleButton')
       .on('click', d => {
-        window.mainPage.setDataset(d.get('_id'), this.index)
-          .then(() => {
-            window.mainPage.widgetPanels.toggleWidget({
-              hashName: 'DatasetView0'
-            }, true);
-            window.mainPage.overlay.closeOverlay();
-          });
+        window.mainPage.getProject().then(project => {
+          return project.setDataset(d.get('_id'), this.index);
+        }).then(() => {
+          window.mainPage.widgetPanels.toggleWidget({
+            hashName: 'DatasetView' + this.index
+          }, true);
+          window.mainPage.overlay.closeOverlay();
+        });
       });
   }
 });

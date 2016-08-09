@@ -270,6 +270,15 @@ let Dataset = MetadataItem.extend({
     this.cache = new DatasetCache(this);
     this.dropped = false;
   },
+  identifyAsDataset: function () {
+    return this.restRequest({
+      path: 'dataset',
+      method: 'POST'
+    }).then(resp => {
+      this.set(resp);
+      return resp;
+    });
+  },
   save: function () {
     // It's possible for a dataset to be dropped from the project
     // but someone is still hanging on to a reference to this

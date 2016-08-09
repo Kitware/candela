@@ -1,7 +1,6 @@
 import MetadataItem from './MetadataItem';
 import Dataset from './Dataset';
 import binUtils from '../general_purpose/binUtils.js';
-import promiseDebounce from '../shims/promiseDebounce.js';
 import { Set } from '../shims/SetOps.js';
 import candela from '../../../src/candela';
 /*
@@ -16,6 +15,126 @@ import candela from '../../../src/candela';
     dataset and one visualization. Any more are ignored
     by the currently implemented views.
 */
+
+class ProjectCache {
+  constructor (model) {
+    this.model = model;
+    this.visDatasetPromises = {};
+  }
+  invalidate () {
+    this.status = null;
+    this.loadedDatasets = null;
+    this.visDatasetPromises = {};
+  }
+  get status () {
+    if (!this._status) {
+      if (!this.model.getId()) {
+        // This is a new project
+        this._status = Promise.resolve({
+          editable: false,
+          visibility: null,
+          path: null
+        });
+      } else {
+        this._status = this.model.restRequest({
+          'path': 'anonymousAccess/info'
+        });
+      }
+      this._status.then(() => {
+        this.model.trigger('rl:changeStatus');
+      });
+    }
+    return this._status;
+  }
+  set status (value) {
+    // The only reason to set the status is to signal
+    // that it's out of date
+    delete this._status;
+    this.model.trigger('rl:changeStatus');
+  }
+  get loadedDatasets () {
+    if (!this._loadedDatasets) {
+      this._loadedDatasets = {};
+    }
+    if (this._datasetCacheIsValid) {
+      return Promise.resolve(this._loadedDatasets);
+    } else {
+      // Update our list of loaded datasets to correspond to those
+      // listed in the project's metadata
+      return this.model.fetch().then(() => {
+        let changedDatasets = false;
+        let datasetPromises = [];
+        let newLoadedDatasets = {};
+
+        // Get the new list of datasets from project metadata
+        let datasetSpecs = this.model.getMeta('datasets');
+        datasetSpecs.forEach((datasetSpec, index) => {
+          let datasetObj;
+          if (datasetSpec.dataset in this._loadedDatasets) {
+            // We've already loaded this dataset; update its filter and
+            // paging parameters
+            datasetObj = this._loadedDatasets[datasetSpec.dataset];
+          } else {
+            // We haven't loaded this dataset yet; load it and
+            // attach some listeners
+            datasetObj = new Dataset({
+              _id: datasetSpec.dataset
+            });
+            this.model.listenToDataset(datasetObj);
+            changedDatasets = true;
+          }
+          // Update the filter and paging paramters from the
+          // project's metadata
+          if (datasetSpec.filter) {
+            datasetObj.cache.filter = datasetSpec.filter;
+          }
+          if (datasetSpec.page) {
+            datasetObj.cache.page = datasetSpec.page;
+          }
+          newLoadedDatasets[datasetSpec.dataset] = datasetObj;
+          datasetPromises.push(datasetObj.fetch());
+        });
+        // Now go through and discard any references to
+        // old datasets that we don't need anymore
+        Object.keys(this._loadedDatasets).forEach(datasetId => {
+          if (!(datasetId in newLoadedDatasets)) {
+            // Flag this dataset as one that isn't being used anymore
+            // in case anyone (e.g. a view) is still holding a reference
+            // to it, so that we don't accidentally try to save anything
+            // about it anymore
+            changedDatasets = true;
+            this._loadedDatasets[datasetId].dropped = true;
+            this._loadedDatasets[datasetId].stopListening();
+            this.model.ignoreDataset(this._loadedDatasets[datasetId]);
+            delete this._loadedDatasets[datasetId];
+          }
+        });
+        this._loadedDatasets = newLoadedDatasets;
+        this._datasetCacheIsValid = true;
+
+        // Return a promise that resolves when all the
+        // datasets have been fetched
+        let responsePromise = Promise.all(datasetPromises).then(() => {
+          return this._loadedDatasets;
+        });
+        if (changedDatasets) {
+          // If our datasets changed, fire off an event
+          responsePromise.then(() => {
+            this.model.trigger('rl:changeDatasets');
+          });
+        }
+        return responsePromise;
+      });
+    }
+  }
+  set loadedDatasets (value) {
+    // The only reason to set loadedDatasets is to signal
+    // that the cache is out of date
+    this._datasetCacheIsValid = false;
+    this.visDatasetPromises = {};
+    this.model.trigger('rl:changeDatasets');
+  }
+}
 
 let Project = MetadataItem.extend({
   defaults: () => {
@@ -32,44 +151,20 @@ let Project = MetadataItem.extend({
     };
   },
   initialize: function () {
-    this.status = {
-      editable: false,
-      visibility: null,
-      path: null
-    };
-
-    this.visDatasetPromises = {};
+    this.cache = new ProjectCache(this);
 
     this.listenTo(window.mainPage.currentUser, 'rl:login',
-      this.fetch);
+      this.cache.invalidate);
     this.listenTo(window.mainPage.currentUser, 'rl:logout',
-      this.fetch);
+      this.cache.invalidate);
     this.listenTo(window.mainPage, 'rl:changeProject',
-      this.fetch);
-    this.listenTo(this, 'rl:swappedId', () => {
-      // If the server makes a copy of this project
-      // for whatever reason, there's a good chance
-      // it will wind up with a different location /
-      // editability status. So we need to update the
-      // status, and it's essentially the same thing
-      // as creating a new project
-      this.fetch().then(() => {
-        let notification = 'You are now working on a copy of this project in ';
-        if (this.status.visibility === 'PublicScratch') {
-          notification = 'the public scratch space. Log in to take ownership of this project.';
-        } else if (this.status.visibility === 'PrivateUser') {
-          notification += 'your Private folder.';
-        } else {
-          window.mainPage.trigger('rl:error', new Error('Project copied to an unknown location.'));
-        }
-        window.mainPage.notificationLayer.displayNotification(notification);
-        window.mainPage.trigger('rl:createProject');
-      });
-    });
+      this.cache.invalidate);
     this.listenTo(window.mainPage.widgetPanels, 'rl:navigateWidgets',
       this.storePreferredWidgets);
-    this.listenTo(this, 'rl:changeDatasets', this.clearCoercedData);
-    this.listenTo(this, 'rl:changeMatchings', this.clearCoercedData);
+    this.listenTo(this, 'rl:changeDatasets', this.validateMatchings);
+  },
+  updateStatus: function () {
+    this.cache.status = null;
   },
   create: function () {
     let createPromise = MetadataItem.prototype.create.apply(this, arguments);
@@ -80,6 +175,7 @@ let Project = MetadataItem.extend({
         method: 'POST'
       }).then(resp => {
         this.set(resp);
+        return resp;
       });
     });
     createPromise.then(() => {
@@ -92,98 +188,20 @@ let Project = MetadataItem.extend({
     });
     return createPromise;
   },
-  fetch: promiseDebounce(function () {
-    let fetchPromise = MetadataItem.prototype.fetch.apply(this, arguments);
-
-    // Whenever we update the project metadata, we also want
-    // to update the information about where the project is stored
-    // and whether the user can edit it
-    let statusPromise = fetchPromise.then(() => {
-      return this.restRequest({
-        path: 'anonymousAccess/info',
-        type: 'GET'
-      }).then(resp => {
-        this.status = resp;
-        this.trigger('rl:changeStatus');
-      });
-    });
-
-    // Calling fetch() on a project should also call
-    // fetch() on all the project's datasets (and update which
-    // ones are stored in window.mainPage.loadedDatasets)
-    let datasetsPromise = fetchPromise.then(() => {
-      let datasetPromises = [];
-      let newLoadedDatasets = {};
-      let datasetSpecs = this.getMeta('datasets');
-      datasetSpecs.forEach((datasetSpec, index) => {
-        let dataset;
-        if (datasetSpec.dataset in window.mainPage.loadedDatasets) {
-          // We've already loaded this dataset; update its filter and
-          // paging parameters
-          dataset = window.mainPage.loadedDatasets[datasetSpec.dataset];
-        } else {
-          // We haven't loaded this dataset yet; load it and
-          // attach some listeners
-          dataset = new Dataset({
-            _id: datasetSpec.dataset
-          });
-          this.listenTo(dataset, 'rl:updatedSchema', this.updateDataSpec);
-          this.listenTo(dataset, 'rl:swappedId', oldId => {
-            this.swapDatasetId(dataset, oldId);
-          });
-          this.listenTo(dataset, 'rl:updatePage', () => {
-            this.updateDatasetPage(dataset);
-          });
-        }
-        if (datasetSpec.filter) {
-          dataset.cache.filter = datasetSpec.filter;
-        }
-        if (datasetSpec.page) {
-          dataset.cache.page = datasetSpec.page;
-        }
-        newLoadedDatasets[datasetSpec.dataset] = dataset;
-        datasetPromises.push(newLoadedDatasets[datasetSpec.dataset].fetch());
-      });
-      // Now go through and discard any references to
-      // old datasets that we don't need anymore
-      Object.keys(window.mainPage.loadedDatasets).forEach(datasetId => {
-        if (!(datasetId in newLoadedDatasets)) {
-          // Flag this dataset as one that isn't being used anymore
-          // in case anyone (e.g. a view) is still holding a reference
-          // to it, so that we don't accidentally try to save anything
-          // about it anymore
-          window.mainPage.loadedDatasets[datasetId].dropped = true;
-          window.mainPage.loadedDatasets[datasetId].stopListening();
-        }
-      });
-      window.mainPage.loadedDatasets = newLoadedDatasets;
-      return Promise.all(datasetPromises).then(() => {
-        this.trigger('rl:changeDatasets');
-      });
-    });
-
-    // Though we only return the main fetch response, the fetch isn't
-    // complete until the status and dataset promises have been resolved
-    return Promise.all([fetchPromise, statusPromise, datasetsPromise])
-      .then(responses => {
-        return responses[0];
-      });
-  }, 100),
   save: function () {
     // Prevent any lingering attempts to save the
     // project once the project has been closed
-    if (window.mainPage.project === null) {
+    if (window.mainPage.project !== this) {
       return Promise.resolve(null);
     } else {
       return MetadataItem.prototype.save.apply(this, arguments);
     }
   },
   rename: function () {
-    // Renaming the project should trigger a fetch()
-    // so that the project's status gets updated
+    // Renaming the project invalidates its status
     return MetadataItem.prototype.rename.apply(this, arguments)
       .then(() => {
-        return this.fetch();
+        this.updateStatus();
       });
   },
   getMeta: function (key) {
@@ -225,12 +243,18 @@ let Project = MetadataItem.extend({
     }
     return flatMeta;
   },
+  hasDataset: function (index) {
+    let datasets = this.getMeta('datasets');
+    return datasets && datasets.length > index;
+  },
   getDataset: function (index) {
-    let datasets = window.mainPage.project.getMeta('datasets');
+    let datasets = this.getMeta('datasets');
     if (datasets && datasets.length > 0) {
-      return window.mainPage.loadedDatasets[datasets[0].dataset];
+      return this.cache.loadedDatasets.then(loadedDatasets => {
+        return loadedDatasets[datasets[index].dataset];
+      });
     } else {
-      return undefined;
+      return Promise.resolve(null);
     }
   },
   getDatasetIds: function () {
@@ -238,47 +262,49 @@ let Project = MetadataItem.extend({
   },
   swapDatasetId: function (datasetObj, oldId) {
     let newId = datasetObj.getId();
-    if (newId in window.mainPage.loadedDatasets) {
-      // Another response from the server has already triggered this function
-      // and dealt with everything, so we don't have to worry about it.
-      return;
-    } else {
-      // Okay, this dataset has been moved, and we're the first to
-      // know about it.
-
-      // Update the projet metadata and the loadedDatasets cache
-      // to point to the new dataset
-      let datasets = this.getMeta('datasets');
-      let index = datasets.findIndex(d => d.dataset === oldId);
-      if (index !== -1 && oldId in window.mainPage.loadedDatasets) {
-        datasets[index] = {
-          dataset: newId,
-          filter: datasetObj.cache.filter,
-          page: datasetObj.cache.page
-        };
-        this.setMeta('datasets', datasets);
-        this.save();
-
-        window.mainPage.loadedDatasets[newId] = datasetObj;
-        delete window.mainPage.loadedDatasets[oldId];
-
-        // If the user is logged in, the dataset will have been copied
-        // to the user's private folder
-        let notification = 'You are now working with a copy of the ' +
-                           datasetObj.get('name') +
-                           ' dataset, stored in ';
-        if (window.mainPage.currentUser.isLoggedIn()) {
-          notification += 'your Private folder.';
-        } else {
-          notification += 'the public scratch space. Log in to take ownership of this dataset.';
-        }
-        window.mainPage.notificationLayer.displayNotification(notification);
+    this.cache.loadedDatasets.then(loadedDatasets => {
+      if (newId in loadedDatasets) {
+        // Another response from the server has already triggered this function
+        // and dealt with everything, so we don't have to worry about it.
+        return;
       } else {
-        window.mainPage.trigger('rl:error',
-          new Error('Couldn\'t update the reference to a scratch copy of the ' +
-                    datasetObj.get('name') + ' dataset.'));
+        // Okay, this dataset has been moved, and we're the first to
+        // know about it. Update the project metadata to point to the
+        // new dataset - this invalidates the loadedDatasets cache
+        let datasets = this.getMeta('datasets');
+        let index = datasets.findIndex(d => d.dataset === oldId);
+        if (index !== -1 && oldId in loadedDatasets) {
+          datasets[index] = {
+            dataset: newId,
+            filter: datasetObj.cache.filter,
+            page: datasetObj.cache.page
+          };
+          this.cache.loadedDatasets = null;
+          this.setMeta('datasets', datasets);
+          this.save().then(() => {
+            this.trigger('rl:swappedDatasetId');
+          });
+        } else {
+          window.mainPage.trigger('rl:error',
+            new Error('Couldn\'t update the reference to a copy of the ' +
+                      datasetObj.get('name') + ' dataset.'));
+        }
       }
-    }
+    });
+  },
+  listenToDataset: function (datasetObj) {
+    this.listenTo(datasetObj, 'rl:updatedSchema', this.updateDataSpec);
+    this.listenTo(datasetObj, 'rl:swappedId', oldId => {
+      this.swapDatasetId(datasetObj, oldId);
+    });
+    this.listenTo(datasetObj, 'rl:updatePage', () => {
+      this.updateDatasetPage(datasetObj);
+    });
+  },
+  ignoreDataset: function (datasetObj) {
+    this.stopListening(datasetObj, 'rl:updatedSchema');
+    this.stopListening(datasetObj, 'rl:swappedId');
+    this.stopListening(datasetObj, 'rl:updatePage');
   },
   updateDatasetPage: function (datasetObj) {
     // Store the new page and filter info in the project metadata
@@ -293,17 +319,9 @@ let Project = MetadataItem.extend({
   },
   removeDataset: function (index = 0) {
     let datasets = this.getMeta('datasets');
-    let datasetSpecs = datasets.splice(index, 1);
-    if (datasetSpecs.length > 0) {
-      let datasetId = datasetSpecs[0]['dataset'];
-      if (datasetId in window.mainPage.loadedDatasets) {
-        // Flag the dataset as dropped in case anything is
-        // still holding a reference to it
-        window.mainPage.loadedDatasets[datasetId].drop();
-        delete window.mainPage.loadedDatasets[datasetId];
-      }
-    }
+    datasets.splice(index, 1);
     this.setMeta('datasets', datasets);
+    this.cache.loadedDatasets = null;
     return this.save().then(() => {
       this.trigger('rl:changeDatasets');
       return this.validateMatchings();
@@ -311,32 +329,9 @@ let Project = MetadataItem.extend({
   },
   setDataset: function (newDatasetId, index = 0) {
     let datasets = this.getMeta('datasets');
-    let newDataset;
-
-    let promises = [];
-
-    if (newDatasetId in window.mainPage.loadedDatasets) {
-      newDataset = window.mainPage.loadedDatasets[newDatasetId];
-      promises.push(Promise.resolve(newDataset));
-    } else {
-      newDataset = new Dataset({
-        _id: newDatasetId
-      });
-      this.listenTo(newDataset, 'rl:updatedSchema', this.updateDataSpec);
-      this.listenTo(newDataset, 'rl:swappedId', oldId => {
-        this.swapDatasetId(newDataset, oldId);
-      });
-      this.listenTo(newDataset, 'rl:updatePage', () => {
-        this.updateDatasetPage(newDataset);
-      });
-      window.mainPage.loadedDatasets[newDatasetId] = newDataset;
-      promises.push(newDataset.fetch());
-    }
 
     let newDatasetDetails = {
-      dataset: newDatasetId,
-      filter: newDataset.cache.filter,
-      page: newDataset.cache.page
+      dataset: newDatasetId
     };
 
     if (index >= datasets.length) {
@@ -345,11 +340,12 @@ let Project = MetadataItem.extend({
       datasets[index] = newDatasetDetails;
     }
     this.setMeta('datasets', datasets);
-    promises.push(this.save().then(() => {
+    this.cache.loadedDatasets = null;
+    let responsePromise = this.save();
+    responsePromise.then(() => {
       this.trigger('rl:changeDatasets');
-      return this.validateMatchings();
-    }));
-    return Promise.all(promises);
+    });
+    return responsePromise;
   },
   removeVisualization: function (index = 0) {
     let visualizations = this.getMeta('visualizations');
@@ -370,7 +366,7 @@ let Project = MetadataItem.extend({
     if (index >= visualizations.length) {
       visualizations.push(newVisualizatoinDetails);
     } else {
-      delete this.visDatasetPromises[index];
+      delete this.cache.visDatasetPromises[index];
       visualizations[index] = newVisualizatoinDetails;
     }
     this.setMeta('visualizations', visualizations);
@@ -416,11 +412,11 @@ let Project = MetadataItem.extend({
   clearCoercedData: function () {
     // Invalidate our coerced dataset caches (TODO: may not
     // be necessary to invalidate all of them)
-    this.visDatasetPromises = {};
+    this.cache.visDatasetPromises = {};
   },
   shapeDataForVis: function (index = 0) {
-    if (index in this.visDatasetPromises) {
-      return this.visDatasetPromises[index];
+    if (index in this.cache.visDatasetPromises) {
+      return this.cache.visDatasetPromises[index];
     }
 
     let meta = this.getMeta();
@@ -430,37 +426,41 @@ let Project = MetadataItem.extend({
       return Promise.resolve([]);
     }
 
-    let datasetObj = this.getDataset(0);
     // TODO: when candela supports multiple datasets, include
     // all the datasets that the visualization connects to
-
-    this.visDatasetPromises[index] = datasetObj.cache.schema.then(schema => {
-      // Collect the attributes that are in use in this dataset,
-      // and figure out what we're coercing those attributes to
-      let fieldsInUse = {};
-      meta.matchings.forEach(matching => {
-        if (matching.visIndex === index && matching.dataIndex === 0) {
-          fieldsInUse[matching.dataAttribute] = datasetObj
-            .getAttributeType(schema, matching.dataAttribute);
-        }
-      });
-
-      return datasetObj.cache.currentDataPage.then(data => {
-        let coercedData = [];
-        data.forEach(item => {
-          let newItem = {};
-          Object.keys(item).forEach(attrName => {
-            if (attrName in fieldsInUse) {
-              newItem[attrName] = binUtils.coerceValue(
-                item[attrName], fieldsInUse[attrName]);
+    return this.getDataset(0).then(datasetObj => {
+      if (datasetObj === null) {
+        return [];
+      } else {
+        this.cache.visDatasetPromises[index] = datasetObj.cache.schema.then(schema => {
+          // Collect the attributes that are in use in this dataset,
+          // and figure out what we're coercing those attributes to
+          let fieldsInUse = {};
+          meta.matchings.forEach(matching => {
+            if (matching.visIndex === index && matching.dataIndex === 0) {
+              fieldsInUse[matching.dataAttribute] = datasetObj
+                .getAttributeType(schema, matching.dataAttribute);
             }
           });
-          coercedData.push(newItem);
+
+          return datasetObj.cache.currentDataPage.then(data => {
+            let coercedData = [];
+            data.forEach(item => {
+              let newItem = {};
+              Object.keys(item).forEach(attrName => {
+                if (attrName in fieldsInUse) {
+                  newItem[attrName] = binUtils.coerceValue(
+                    item[attrName], fieldsInUse[attrName]);
+                }
+              });
+              coercedData.push(newItem);
+            });
+            return coercedData;
+          });
         });
-        return coercedData;
-      });
+        return this.cache.visDatasetPromises[index];
+      }
     });
-    return this.visDatasetPromises[index];
   },
   updateDataSpec: function () {
     return this.validateMatchings().then(() => {
@@ -478,43 +478,52 @@ let Project = MetadataItem.extend({
     // 3. The data types are still compatible
     // 4. TODO: Other things we should check?
     // Trash any matchings that don't make sense anymore
-    let indicesToTrash = [];
-    for (let [index, matching] of meta.matchings.entries()) {
-      if (meta.datasets.length <= matching.dataIndex ||
-        meta.visualizations.length <= matching.visIndex) {
-        indicesToTrash.push(index);
-        continue;
+    return this.cache.loadedDatasets.then(loadedDatasets => {
+      let indicesToTrash = [];
+      for (let [index, matching] of meta.matchings.entries()) {
+        if (meta.datasets.length <= matching.dataIndex ||
+          meta.visualizations.length <= matching.visIndex) {
+          indicesToTrash.push(index);
+          continue;
+        }
+
+        let datasetSpec = meta.datasets[matching.dataIndex];
+        if (!datasetSpec || !datasetSpec.dataset) {
+          indicesToTrash.push(index);
+          continue;
+        }
+        let datasetObj = loadedDatasets[datasetSpec.dataset];
+        if (!datasetObj) {
+          indicesToTrash.push(index);
+          continue;
+        }
+
+        let dataType = datasetObj.getTypeSpec()
+          .attributes[matching.dataAttribute];
+        let visName = meta.visualizations[matching.visIndex].name;
+        let visSpec = candela.components[visName].options
+          .find(spec => spec.name === matching.visAttribute);
+
+        if (!dataType || !visSpec || !visSpec.domain || !visSpec.domain.fieldTypes) {
+          indicesToTrash.push(index);
+          continue;
+        }
+
+        if (visSpec.domain.fieldTypes.indexOf(dataType) === -1) {
+          indicesToTrash.push(index);
+        }
       }
 
-      let dataset = this.getDataset(matching.dataIndex);
-      if (!dataset) {
-        indicesToTrash.push(index);
-        continue;
+      for (let index of indicesToTrash.reverse()) {
+        meta.matchings.splice(index, 1);
       }
 
-      let dataType = dataset.getTypeSpec()
-        .attributes[matching.dataAttribute];
-      let visName = meta.visualizations[matching.visIndex].name;
-      let visSpec = candela.components[visName].options
-        .find(spec => spec.name === matching.visAttribute);
-
-      if (!dataType || !visSpec || !visSpec.domain || !visSpec.domain.fieldTypes) {
-        indicesToTrash.push(index);
-        continue;
-      }
-
-      if (visSpec.domain.fieldTypes.indexOf(dataType) === -1) {
-        indicesToTrash.push(index);
-      }
-    }
-
-    for (let index of indicesToTrash.reverse()) {
-      meta.matchings.splice(index, 1);
-    }
-
-    this.setMeta(meta);
-    return this.save().then(() => {
-      this.trigger('rl:changeMatchings');
+      this.setMeta(meta);
+      let responsePromise = this.save();
+      responsePromise.then(() => {
+        this.trigger('rl:changeMatchings');
+      });
+      return responsePromise;
     });
   },
   addMatching: function (matching) {
@@ -543,9 +552,11 @@ let Project = MetadataItem.extend({
     meta.matchings.push(matching);
 
     this.setMeta(meta);
-    return this.save().then(() => {
+    let responsePromise = this.save();
+    responsePromise.then(() => {
       this.trigger('rl:changeMatchings');
     });
+    return responsePromise;
   },
   removeMatching: function (matching) {
     let matchings = this.getMeta('matchings');
@@ -559,9 +570,11 @@ let Project = MetadataItem.extend({
     if (index !== -1) {
       matchings.splice(index, 1);
       this.setMeta('matchings', matchings);
-      return this.save().then(() => {
+      let responsePromise = this.save();
+      responsePromise.then(() => {
         this.trigger('rl:changeMatchings');
       });
+      return responsePromise;
     } else {
       return Promise.resolve();
     }

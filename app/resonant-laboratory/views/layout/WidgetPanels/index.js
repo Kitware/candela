@@ -112,8 +112,12 @@ let WidgetPanels = Backbone.View.extend({
     }
 
     // Finally, get all the widgets to render
-    // (don't tell them to render themselves
-    // until after the animation has finished)
+    // with a slight delay (so that they render
+    // to the correct size)
+    // TODO: these should be rendering offscreen
+    // when they're collapsed; we should precompute
+    // and pre-render each view so we don't have to
+    // wait for the animation to finish
     if (this.widgetsChanged === true) {
       this.widgetsChanged = false;
       window.setTimeout(() => {

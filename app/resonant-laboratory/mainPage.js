@@ -45,7 +45,7 @@ let MainPage = Backbone.View.extend({
       });
     });
 
-    // Start no datasets and no project
+    // Start with no datasets and no project
     this.loadedDatasets = {};
     this.project = null;
 
@@ -139,66 +139,63 @@ let MainPage = Backbone.View.extend({
   },
   newProject: function () {
     this.project = new Project();
-    return this.project.create()
+    let responsePromise = this.project.create()
       .then(() => {
-        this.trigger('rl:createProject');
-        return this.project.fetch().then(() => {
-          this.trigger('rl:changeProject');
-          return this.project;
-        });
-      }).catch((err) => {
-        this.trigger('rl:error', err);
-        return this.switchProject(null);
+        // We want to return the actual project object, not the fetched result
+        // from the server
+        return this.project;
       });
+    responsePromise.then(() => {
+      this.trigger('rl:createProject');
+      this.trigger('rl:changeProject');
+    }).catch(err => {
+      this.trigger('rl:error', err);
+    });
+    return responsePromise;
   },
   switchProject: function (id) {
     if (this.project) {
       this.project.stopListening();
     }
+    let responsePromise;
     if (id === null) {
       this.project = null;
-      this.trigger('rl:changeProject');
-      return new Promise(() => null);
+      responsePromise = Promise.resolve(null);
     } else {
       this.project = new Project({
         _id: id
       });
 
-      return this.project.fetch().then(() => {
-        this.trigger('rl:changeProject');
-        return this.project;
-      }).catch((err) => {
-        this.trigger('rl:error', err);
-        return this.switchProject(null);
-      });
+      responsePromise = this.project.fetch()
+        .then(() => {
+          // We want to return the actual project object, not the fetched result
+          // from the server
+          return this.project;
+        });
     }
-  },
-  setDataset: function (dataset, index) {
-    index = index || 0;
-
-    let projectPromise;
-    if (this.project) {
-      projectPromise = Promise.resolve(this.project);
-    } else {
-      projectPromise = this.newProject();
-    }
-    return projectPromise.then(() => {
-      return this.project.setDataset(dataset, index);
+    responsePromise.then(() => {
+      this.trigger('rl:changeProject');
+    }).catch((err) => {
+      this.trigger('rl:error', err);
     });
+    return responsePromise;
   },
-  girderRequest: function (params, catchFunc) {
-    let promise = new Promise((resolve, reject) => {
+  getProject: function () {
+    if (this.project) {
+      return Promise.resolve(this.project);
+    } else {
+      return this.newProject();
+    }
+  },
+  girderRequest: function (params) {
+    let responsePromise = new Promise((resolve, reject) => {
       params.error = reject;
       return girder.restRequest(params).done(resolve).error(reject);
     });
-    if (catchFunc) {
-      promise = promise.catch(catchFunc);
-    } else if (catchFunc !== null) {
-      promise.catch(err => {
-        this.trigger('rl:error', err);
-      });
-    }
-    return promise;
+    responsePromise.catch(err => {
+      this.trigger('rl:error', err);
+    });
+    return responsePromise;
   }
 });
 

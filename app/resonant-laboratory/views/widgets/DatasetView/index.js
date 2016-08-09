@@ -187,12 +187,15 @@ let DatasetView = Widget.extend({
     });
 
     this.listenTo(window.mainPage, 'rl:changeProject',
-      this.handleNewProject);
-    this.handleNewProject();
+      this.attachProjectListeners);
+    this.attachProjectListeners();
   },
-  handleNewProject: function () {
-    this.listenTo(window.mainPage.project, 'rl:changeDatasets',
-      this.render);
+  attachProjectListeners: function () {
+    if (window.mainPage.project) {
+      this.stopListening(window.mainPage.project, 'rl:changeDatasets');
+      this.listenTo(window.mainPage.project, 'rl:changeDatasets',
+        this.render);
+    }
 
     this.render();
   },
@@ -906,58 +909,64 @@ let DatasetView = Widget.extend({
 
     // Get the dataset in the project (if there is one)
     // TODO: get the dataset assigned to this widget
-    let datasetObj = window.mainPage.project &&
-      window.mainPage.project.getDataset(0);
-
-    if (!datasetObj) {
-      this.renderEmptyState();
-      this.status = STATUS.NO_DATA;
-      this.statusText.text = 'No file loaded';
-      this.renderIndicators();
+    let datasetPromise;
+    if (window.mainPage.project) {
+      datasetPromise = window.mainPage.project.getDataset(0);
     } else {
-      this.status = STATUS.LOADING;
-      this.statusText.text = 'Loading...';
-      this.renderIndicators();
+      datasetPromise = Promise.resolve(null);
+    }
 
-      Promise.all([datasetObj.cache.schema,
-                   datasetObj.cache.overviewHistogram,
-                   datasetObj.cache.filteredHistogram,
-                   datasetObj.cache.pageHistogram,
-                   datasetObj.cache.currentDataPage])
-        .then(datasetDetails => {
-          // For cleaner code, reshape the array
-          // of results into a dict
-          let results = {
-            datasetObj: datasetObj,
-            schema: datasetDetails[0],
-            overviewHistogram: datasetDetails[1],
-            filteredHistogram: datasetDetails[2],
-            pageHistogram: datasetDetails[3],
-            currentDataPage: datasetDetails[4]
-          };
-          if (datasetDetails.indexOf(null) !== -1) {
-            this.status = STATUS.CANT_LOAD;
-            this.statusText.text = 'ERROR';
-            this.renderIndicators();
-          } else if (results.schema.length === 0) {
-            // The schema has no attributes...
-            this.status = STATUS.NO_ATTRIBUTES;
-            this.statusText.text = 'ERROR';
-            this.renderIndicators();
-          } else {
-            this.status = STATUS.SUCCESS;
-            this.statusText.text = datasetObj.get('name');
-            this.renderIndicators();
-            if (widgetIsShowing) {
-              if (this.showTable) {
-                this.renderTable(results);
-              } else {
-                this.renderHistograms(results);
+    this.status = STATUS.LOADING;
+    this.statusText.text = 'Loading...';
+    this.renderIndicators();
+
+    datasetPromise.then(datasetObj => {
+      if (!datasetObj) {
+        this.renderEmptyState();
+        this.status = STATUS.NO_DATA;
+        this.statusText.text = 'No file loaded';
+        this.renderIndicators();
+      } else {
+        Promise.all([datasetObj.cache.schema,
+                     datasetObj.cache.overviewHistogram,
+                     datasetObj.cache.filteredHistogram,
+                     datasetObj.cache.pageHistogram,
+                     datasetObj.cache.currentDataPage])
+          .then(datasetDetails => {
+            // For cleaner code, reshape the array
+            // of results into a dict
+            let results = {
+              datasetObj: datasetObj,
+              schema: datasetDetails[0],
+              overviewHistogram: datasetDetails[1],
+              filteredHistogram: datasetDetails[2],
+              pageHistogram: datasetDetails[3],
+              currentDataPage: datasetDetails[4]
+            };
+            if (datasetDetails.indexOf(null) !== -1) {
+              this.status = STATUS.CANT_LOAD;
+              this.statusText.text = 'ERROR';
+              this.renderIndicators();
+            } else if (results.schema.length === 0) {
+              // The schema has no attributes...
+              this.status = STATUS.NO_ATTRIBUTES;
+              this.statusText.text = 'ERROR';
+              this.renderIndicators();
+            } else {
+              this.status = STATUS.SUCCESS;
+              this.statusText.text = datasetObj.get('name');
+              this.renderIndicators();
+              if (widgetIsShowing) {
+                if (this.showTable) {
+                  this.renderTable(results);
+                } else {
+                  this.renderHistograms(results);
+                }
               }
             }
-          }
-        });
-    }
+          });
+      }
+    });
   }, 300)
 });
 

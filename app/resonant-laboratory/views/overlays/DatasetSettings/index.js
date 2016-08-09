@@ -29,11 +29,29 @@ let DatasetSettings = SettingsPanel.extend({
     // TODO: need to be more clever in initializing this dialog
     // when we have support for multiple datasets
     this.index = 0;
-    this.listenTo(this.getDataset(), 'rl:updateStatus', () => {
-      this.render();
+
+    this.listenTo(window.mainPage, 'rl:changeProject', () => {
+      this.attachProjectListeners();
     });
-    this.listenTo(window.mainPage.project, 'rl:changeDatasets', () => {
-      this.render();
+    this.attachProjectListeners();
+  },
+  attachProjectListeners: function () {
+    if (window.mainPage.project) {
+      this.stopListening(window.mainPage.project, 'rl:changeDatasets');
+      this.listenTo(window.mainPage.project, 'rl:changeDatasets', () => {
+        this.attachDatasetListeners();
+      });
+    }
+    this.render();
+  },
+  attachDatasetListeners: function () {
+    this.getDataset().then(dataset => {
+      if (dataset) {
+        this.stopListening(dataset, 'rl:updateStatus');
+        this.listenTo(dataset, 'rl:updateStatus', () => {
+          this.render();
+        });
+      }
     });
   },
   getSideMenu: function () {
@@ -220,25 +238,25 @@ let DatasetSettings = SettingsPanel.extend({
     this.updateBlurb();
     SettingsPanel.prototype.render.apply(this, arguments);
 
-    let datasetObj = this.getDataset();
+    this.getDataset(0).then(datasetObj => {
+      if (!datasetObj) {
+        // Clear out the template; the blurb will suffice
+        this.addedSubTemplate = false;
+        this.$el.find('#subclassContent').html('');
+      } else {
+        if (!this.addedSubTemplate) {
+          this.$el.find('#subclassContent').html(myTemplate);
+          this.addedSubTemplate = true;
 
-    if (!datasetObj) {
-      // Clear out the template; the blurb will suffice
-      this.addedSubTemplate = false;
-      this.$el.find('#subclassContent').html('');
-    } else {
-      if (!this.addedSubTemplate) {
-        this.$el.find('#subclassContent').html(myTemplate);
-        this.addedSubTemplate = true;
+          // Only attach event listeners once
+          this.attachSettingsListeners(datasetObj);
+        }
 
-        // Only attach event listeners once
-        this.attachSettingsListeners(datasetObj);
+        this.updateMainSettings(datasetObj);
+        this.updatePageSettings(datasetObj);
+        this.updateFilterSettings(datasetObj);
       }
-
-      this.updateMainSettings(datasetObj);
-      this.updatePageSettings(datasetObj);
-      this.updateFilterSettings(datasetObj);
-    }
+    });
   }
 });
 
