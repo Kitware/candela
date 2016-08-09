@@ -118,9 +118,9 @@ class ProjectCache {
           return this._loadedDatasets;
         });
         if (changedDatasets) {
-          // If our datasets changed, fire off an event
-          responsePromise.then(() => {
-            this.model.trigger('rl:changeDatasets');
+          // If our datasets changed, the matchings probably will too
+          return responsePromise.then(() => {
+            this.model.checkAndSaveMatchings(['rl:changeDatasets']);
           });
         }
         return responsePromise;
@@ -132,7 +132,7 @@ class ProjectCache {
     // that the cache is out of date
     this._datasetCacheIsValid = false;
     this.visDatasetPromises = {};
-    this.model.trigger('rl:changeDatasets');
+    this.model.checkAndSaveMatchings(['rl:changeDatasets']);
   }
 }
 
@@ -161,7 +161,6 @@ let Project = MetadataItem.extend({
       this.cache.invalidate);
     this.listenTo(window.mainPage.widgetPanels, 'rl:navigateWidgets',
       this.storePreferredWidgets);
-    this.listenTo(this, 'rl:changeDatasets', this.validateMatchings);
   },
   updateStatus: function () {
     this.cache.status = null;
@@ -243,10 +242,6 @@ let Project = MetadataItem.extend({
     }
     return flatMeta;
   },
-  hasDataset: function (index) {
-    let datasets = this.getMeta('datasets');
-    return datasets && datasets.length > index;
-  },
   getDataset: function (index) {
     let datasets = this.getMeta('datasets');
     if (datasets && datasets.length > 0) {
@@ -293,7 +288,7 @@ let Project = MetadataItem.extend({
     });
   },
   listenToDataset: function (datasetObj) {
-    this.listenTo(datasetObj, 'rl:updatedSchema', this.updateDataSpec);
+    this.listenTo(datasetObj, 'rl:updatedSchema', this.checkAndSaveMatchings);
     this.listenTo(datasetObj, 'rl:swappedId', oldId => {
       this.swapDatasetId(datasetObj, oldId);
     });
@@ -313,19 +308,14 @@ let Project = MetadataItem.extend({
     dataSpec.page = datasetObj.cache.page;
     dataSpec.filter = datasetObj.cache.filter;
     this.setMeta('datasets', datasets);
-    this.save();
-    // Forward the event at the project level
-    this.trigger('rl:changeDatasets');
+    return this.checkAndSaveMatchings(['rl:changeDatasets']);
   },
   removeDataset: function (index = 0) {
     let datasets = this.getMeta('datasets');
     datasets.splice(index, 1);
     this.setMeta('datasets', datasets);
     this.cache.loadedDatasets = null;
-    return this.save().then(() => {
-      this.trigger('rl:changeDatasets');
-      return this.validateMatchings();
-    });
+    return this.checkAndSaveMatchings(['rl:changeDatasets']);
   },
   setDataset: function (newDatasetId, index = 0) {
     let datasets = this.getMeta('datasets');
@@ -341,20 +331,13 @@ let Project = MetadataItem.extend({
     }
     this.setMeta('datasets', datasets);
     this.cache.loadedDatasets = null;
-    let responsePromise = this.save();
-    responsePromise.then(() => {
-      this.trigger('rl:changeDatasets');
-    });
-    return responsePromise;
+    return this.checkAndSaveMatchings(['rl:changeDatasets']);
   },
   removeVisualization: function (index = 0) {
     let visualizations = this.getMeta('visualizations');
     visualizations.splice(index, 1);
     this.setMeta('visualizations', visualizations);
-    return this.save().then(() => {
-      this.trigger('rl:changeVisualizations');
-      return this.validateMatchings();
-    });
+    return this.checkAndSaveMatchings(['rl:changeVisualizations']);
   },
   setVisualization: function (visName, index = 0) {
     let visualizations = this.getMeta('visualizations');
@@ -370,10 +353,7 @@ let Project = MetadataItem.extend({
       visualizations[index] = newVisualizatoinDetails;
     }
     this.setMeta('visualizations', visualizations);
-    return this.save().then(() => {
-      this.trigger('rl:changeVisualizations');
-      return this.validateMatchings();
-    });
+    return this.checkAndSaveMatchings(['rl:changeVisualizations']);
   },
   getAssignedVisFields: function (index = 0) {
     let meta = this.getMeta();
@@ -408,11 +388,6 @@ let Project = MetadataItem.extend({
     let visDetails = meta.visualizations[index];
     // Copy the non-field options that are stored in the metadata
     return Object.assign({}, this.getAssignedVisFields(index), visDetails.options || {});
-  },
-  clearCoercedData: function () {
-    // Invalidate our coerced dataset caches (TODO: may not
-    // be necessary to invalidate all of them)
-    this.cache.visDatasetPromises = {};
   },
   shapeDataForVis: function (index = 0) {
     if (index in this.cache.visDatasetPromises) {
@@ -462,19 +437,13 @@ let Project = MetadataItem.extend({
       }
     });
   },
-  updateDataSpec: function () {
-    return this.validateMatchings().then(() => {
-      this.trigger('rl:changeDatasets');
-    });
-  },
-  validateMatchings: function () {
+  checkAndSaveMatchings: function (triggers) {
     let meta = this.getMeta();
+    triggers = triggers || [];
 
     // Go through all the matchings and make sure that:
-    // 1. The referenced dataset and visualization
-    //    are still in this project
-    // 2. The dataset and visualization still have
-    //    the named attribute
+    // 1. The referenced dataset and visualization are still in this project
+    // 2. The dataset and visualization still have the named attribute
     // 3. The data types are still compatible
     // 4. TODO: Other things we should check?
     // Trash any matchings that don't make sense anymore
@@ -518,10 +487,28 @@ let Project = MetadataItem.extend({
         meta.matchings.splice(index, 1);
       }
 
+      // If we deleted any invalid matchings, add the appropriate signal...
+      if (indicesToTrash.length > 0) {
+        if (triggers.indexOf('rl:changeMatchings') === -1) {
+          triggers.push('rl:changeMatchings');
+        }
+      }
+
+      if (triggers.indexOf('rl:changeMatchings') !== -1) {
+        // Clear the shaped data that relied on the old matchings.
+        // TODO: currently, reshaped chunks of data are indexed by dataset index
+        // (always zero until we support multiple datasets). A good optimization
+        // might be to hash caches differently (e.g. by page), and it may not
+        // always be necessary to throw them all away when the matchings change.
+        this.cache.visDatasetPromises = {};
+      }
+
       this.setMeta(meta);
       let responsePromise = this.save();
       responsePromise.then(() => {
-        this.trigger('rl:changeMatchings');
+        triggers.forEach(t => {
+          this.trigger(t);
+        });
       });
       return responsePromise;
     });
@@ -552,11 +539,7 @@ let Project = MetadataItem.extend({
     meta.matchings.push(matching);
 
     this.setMeta(meta);
-    let responsePromise = this.save();
-    responsePromise.then(() => {
-      this.trigger('rl:changeMatchings');
-    });
-    return responsePromise;
+    return this.checkAndSaveMatchings(['rl:changeMatchings']);
   },
   removeMatching: function (matching) {
     let matchings = this.getMeta('matchings');
@@ -570,11 +553,7 @@ let Project = MetadataItem.extend({
     if (index !== -1) {
       matchings.splice(index, 1);
       this.setMeta('matchings', matchings);
-      let responsePromise = this.save();
-      responsePromise.then(() => {
-        this.trigger('rl:changeMatchings');
-      });
-      return responsePromise;
+      return this.checkAndSaveMatchings(['rl:changeMatchings']);
     } else {
       return Promise.resolve();
     }
