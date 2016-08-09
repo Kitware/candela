@@ -243,14 +243,14 @@ let Project = MetadataItem.extend({
     return flatMeta;
   },
   getDataset: function (index) {
-    let datasets = this.getMeta('datasets');
-    if (datasets && datasets.length > 0) {
-      return this.cache.loadedDatasets.then(loadedDatasets => {
+    return this.cache.loadedDatasets.then(loadedDatasets => {
+      let datasets = this.getMeta('datasets');
+      if (datasets && datasets.length > index && datasets[index].dataset) {
         return loadedDatasets[datasets[index].dataset];
-      });
-    } else {
-      return Promise.resolve(null);
-    }
+      } else {
+        return null;
+      }
+    });
   },
   getDatasetIds: function () {
     return (this.getMeta('datasets') || []).map(d => d.dataset);

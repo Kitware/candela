@@ -45,10 +45,10 @@ let DatasetSettings = SettingsPanel.extend({
     this.render();
   },
   attachDatasetListeners: function () {
-    this.getDataset().then(dataset => {
-      if (dataset) {
-        this.stopListening(dataset, 'rl:updateStatus');
-        this.listenTo(dataset, 'rl:updateStatus', () => {
+    this.getDataset(this.index).then(datasetObj => {
+      if (datasetObj) {
+        this.stopListening(datasetObj, 'rl:updateStatus');
+        this.listenTo(datasetObj, 'rl:updateStatus', () => {
           this.render();
         });
       }
@@ -62,36 +62,7 @@ let DatasetSettings = SettingsPanel.extend({
         items: [
           {
             text: 'Delete dataset',
-            onclick: () => {
-              let datasetObj = this.getDataset();
-              let currentOverlay = window.mainPage.overlay.template;
-              window.mainPage.overlay.confirmDialog('Are you sure you want ' +
-                'to delete the "' + datasetObj.get('name') + '" dataset?')
-                .then(() => {
-                  window.mainPage.project.removeDataset(datasetObj.index)
-                    .then(() => {
-                      return datasetObj.destroy()
-                        .then(() => {
-                          window.mainPage.overlay.render(currentOverlay);
-                        }).catch((errorObj) => {
-                          if (errorObj.statusText === 'Unauthorized') {
-                            if (window.mainPage.currentUser.isLoggedIn()) {
-                              window.mainPage.overlay.renderErrorScreen(`You don\'t
-              have the necessary permissions to delete that dataset.`);
-                            } else {
-                              window.mainPage.overlay.renderErrorScreen(`Sorry, you
-              can\'t delete datasets unless you log in.`);
-                            }
-                          } else {
-                            // Something else happened
-                            window.mainPage.trigger('rl:error', errorObj);
-                          }
-                        });
-                    });
-                }).catch(() => {
-                  window.mainPage.overlay.render(currentOverlay);
-                });
-            },
+            onclick: () => { this.deleteDataset(); },
             enabled: () => { return !!(this.getDataset()); }
           },
           {
@@ -128,6 +99,38 @@ let DatasetSettings = SettingsPanel.extend({
     } else {
       return undefined;
     }
+  },
+  deleteDataset: function () {
+    let currentOverlay = window.mainPage.overlay.template;
+    this.getDataset(this.index).then(datasetObj => {
+      window.mainPage.overlay.confirmDialog('Are you sure you want ' +
+        'to delete the "' + datasetObj.get('name') + '" dataset?')
+        .then(() => {
+          // The user clicked OK
+          return window.mainPage.project.removeDataset(datasetObj.index)
+            .then(() => {
+              return datasetObj.destroy();
+            }).then(() => {
+              window.mainPage.overlay.render(currentOverlay);
+            }).catch((errorObj) => {
+              if (errorObj.statusText === 'Unauthorized') {
+                if (window.mainPage.currentUser.isLoggedIn()) {
+                  window.mainPage.overlay.renderErrorScreen(`You don\'t
+  have the necessary permissions to delete that dataset.`);
+                } else {
+                  window.mainPage.overlay.renderErrorScreen(`Sorry, you
+  can\'t delete datasets unless you log in.`);
+                }
+              } else {
+                // Something else happened
+                window.mainPage.trigger('rl:error', errorObj);
+              }
+            });
+        }).catch(() => {
+          // User clicked cancel
+          window.mainPage.overlay.render(currentOverlay);
+        });
+    });
   },
   updateBlurb: function () {
     if (!this.getDataset()) {
