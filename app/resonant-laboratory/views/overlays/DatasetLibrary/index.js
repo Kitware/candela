@@ -2,6 +2,7 @@ import Underscore from 'underscore';
 import d3 from 'd3';
 import SettingsPanel from '../SettingsPanel';
 import DatasetSettings from '../DatasetSettings';
+import UploadView from './UploadView';
 import myTemplate from './template.html';
 import libraryFileIcon from '../../../images/light/library.svg';
 import privateFileIcon from '../../../images/light/file_private.svg';
@@ -32,6 +33,23 @@ let DatasetLibrary = DatasetSettings.extend({
     };
     return sideMenu;
   },
+  createUploadSection: function () {
+    if (window.mainPage.currentUser.isLoggedIn()) {
+      this.uploadView = new UploadView({
+        // Some girder views expect a parent, but
+        // in this app, we just run them headless
+        parentView: null
+      });
+      this.$el.find('#uploadSection')[0]
+        .appendChild(this.uploadView.el);
+    } else {
+      this.$el.find('#uploadSection')
+        .append('<p>You must be <a class="loginLink2">logged in</a> to upload files');
+      this.$el.find('#loginLink2').on('click', () => {
+        window.mainPage.overlay.render('LoginView');
+      });
+    }
+  },
   attachLibraryListeners: function () {
     // Listeners for existing dataset sections
     this.$el.find('#girderLink').on('click', () => {
@@ -47,104 +65,65 @@ let DatasetLibrary = DatasetSettings.extend({
     });
 
     // Listeners for new datset sections
-    let self = this;
-    this.$el.find('#uploadFile').on('change', function () {
+    this.$el.find('#createLink').on('keyup', function () {
       // this refers to the DOM element
-      if (this.files.length > 0) {
-        self.fileToUpload = Promise.resolve(this.files[0]);
-        // TODO: start sniffing the first bytes of the file using
-        // FileReader so that we can display LibreOffice-style
-        // CSV import controls, or a widget to construct a
-        // JSONPath selector
-      } else {
-        delete self.fileToUpload;
-      }
-      self.updateNewDatasetSections();
+      // Validate the girder item ID (TODO: support other link types)
+      this.validateGirderId(this.value);
     });
-
-    this.$el.find('#uploadButton').on('click', () => {
-      window.alert('todo');
-    });
-
-    this.$el.find('#createLink').on('keyup', Underscore.debounce(function () {
-      // this refers to the DOM element
-      if (this.value) {
-        // Validate the girder item ID (TODO: support other link types)
-        self.linkToCreate = window.mainPage.girderRequest({
-          path: 'item/' + this.value,
-          type: 'GET'
-        }).then(item => {
-          if (!item || item['_modelType'] !== 'item') {
-            return {
-              errorMessage: '"' + this.value + '" is not a valid Girder item ID'
-            };
-          } else {
-            return item;
-          }
-        }).catch(item => {
-          return {
-            errorMessage: '"' + this.value + '" is not a valid Girder item ID'
-          };
-        });
-      } else {
-        delete this.linkToCreate;
-      }
-      self.updateNewDatasetSections();
-    }, 600));
 
     this.$el.find('#createLinkButton').on('click', () => {
       let itemId = this.$el.find('#createLink').val();
-      window.mainPage.girderRequest({
-        path: 'item/' + itemId + '/dataset',
-        method: 'POST'
-      }).then(datasetItem => {
-        window.mainPage.getProject().then(project => {
-          return project.setDataset(itemId, this.index);
-        }).then(() => {
-          window.mainPage.widgetPanels.toggleWidget({
-            hashName: 'DatasetView' + this.index
-          }, true);
-          window.mainPage.overlay.closeOverlay();
-        });
+      this.createGirderLink(itemId);
+    });
+  },
+  startUpload: function () {
+    console.log(this.$el.find('#uploadFile'));
+  },
+  createGirderLink: function (itemId) {
+    window.mainPage.girderRequest({
+      path: 'item/' + itemId + '/dataset',
+      method: 'POST'
+    }).then(datasetItem => {
+      window.mainPage.getProject().then(project => {
+        return project.setDataset(itemId, this.index);
+      }).then(() => {
+        window.mainPage.widgetPanels.toggleWidget({
+          hashName: 'DatasetView' + this.index
+        }, true);
+        window.mainPage.overlay.closeOverlay();
       });
     });
   },
+  validateGirderId: Underscore.debounce(function (itemId) {
+    if (itemId) {
+      this.linkToCreate = window.mainPage.girderRequest({
+        path: 'item/' + itemId,
+        type: 'GET'
+      }).then(item => {
+        if (!item || item['_modelType'] !== 'item') {
+          return {
+            errorMessage: '"' + this.value + '" is not a valid Girder item ID'
+          };
+        } else {
+          return item;
+        }
+      }).catch(item => {
+        return {
+          errorMessage: '"' + this.value + '" is not a valid Girder item ID'
+        };
+      });
+    } else {
+      delete this.linkToCreate;
+    }
+    this.updateNewDatasetSections();
+  }, 600),
   updateNewDatasetSections: function () {
     // Start out with all hideable form elements hidden
     this.$el.find('.newDatasetHideable').hide();
 
-    // Set up the upload interface
-    // Start with the button disabled
-    this.$el.find('#uploadButton').prop('disabled', true);
-    if (this.fileToUpload) {
-      // Show the spinner while we wait for file sniffing to finish
-      // (TODO: currently we don't do any sniffing, so
-      // this should resolve immediately)
-      this.$el.find('#uploadSpinner').show();
-
-      this.fileToUpload.then(fileObj => {
-        this.$el.find('#uploadSpinner').hide();
-        let readyToUpload = false;
-        if (fileObj.type in SUPPORTED_FORMATS) {
-          readyToUpload = true;
-          // TODO: show the appropriate advanced settings section
-          // and perform additional validation
-          this.$el.find('#' + SUPPORTED_FORMATS[fileObj.type] +
-            'UploadControls').show();
-          this.$el.find('#uploadFile').removeClass('invalid');
-        } else {
-          this.$el.find('#uploadFile').addClass('invalid');
-          this.$el.find('#uploadFileFormatHelp').show();
-        }
-        this.$el.find('#uploadButton')
-          .prop('disabled', !readyToUpload);
-      }).catch(fileObj => {
-        this.$el.find('#uploadSpinner').hide();
-        this.$el.find('#uploadFile').addClass('invalid');
-        // TODO: if file sniffing fails, show a more
-        // relevant error message
-        this.$el.find('#uploadFileFormatHelp').show();
-      });
+    // Update the upload interface
+    if (this.uploadView) {
+      this.uploadView.render();
     }
 
     // Set up the link interface
@@ -223,6 +202,9 @@ let DatasetLibrary = DatasetSettings.extend({
     if (!this.addedSubTemplate) {
       this.$el.find('#subclassContent').html(myTemplate);
       this.addedSubTemplate = true;
+
+      // Only add the upload view from Girder once
+      this.createUploadSection();
 
       // Only attach event listeners once
       this.attachLibraryListeners();

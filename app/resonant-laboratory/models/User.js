@@ -5,6 +5,7 @@ let User = girder.models.UserModel.extend({
   initialize: function () {
     this.loggedIn = false;
     this.preferences = new UserPreferences();
+    this.updatePrivateFolder();
     this.listenTo(this, 'rl:logout', this.handleUpdate);
     this.listenTo(this, 'rl:login', this.handleUpdate);
   },
@@ -69,6 +70,18 @@ let User = girder.models.UserModel.extend({
           window.mainPage.trigger('rl:error', errorObj);
         });
     }
+    this.updatePrivateFolder();
+  },
+  updatePrivateFolder: function () {
+    this.privateFolder = null;
+    new Promise((resolve, reject) => {
+      return girder.restRequest({
+        path: '/folder/anonymousAccess/privateFolder',
+        error: reject
+      }).done(resolve).error(reject);
+    }).then(folder => {
+      this.privateFolder = new girder.models.FolderModel(folder);
+    });
   },
   isLoggedIn: function () {
     return this.loggedIn;
