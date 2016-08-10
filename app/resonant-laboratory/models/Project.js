@@ -242,6 +242,10 @@ let Project = MetadataItem.extend({
     }
     return flatMeta;
   },
+  hasDataset: function (index) {
+    let datasets = this.getMeta('datasets');
+    return datasets && datasets.length > index;
+  },
   getDataset: function (index) {
     return this.cache.loadedDatasets.then(loadedDatasets => {
       let datasets = this.getMeta('datasets');

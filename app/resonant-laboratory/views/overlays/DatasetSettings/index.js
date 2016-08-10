@@ -63,20 +63,19 @@ let DatasetSettings = SettingsPanel.extend({
           {
             text: 'Delete dataset',
             onclick: () => { this.deleteDataset(); },
-            enabled: () => { return !!(this.getDataset()); }
+            enabled: () => { return this.hasDataset(); }
           },
           {
             text: 'Remove from project',
             onclick: () => {
-              let index = this.getDataset().index;
-              window.mainPage.project.removeDataset(index);
+              window.mainPage.project.removeDataset(this.index);
             },
-            enabled: () => { return !!(this.getDataset()); }
+            enabled: () => { return this.hasDataset(); }
           },
           {
             text: () => {
               if (window.mainPage.project) {
-                if (window.mainPage.project.getDataset(this.index)) {
+                if (this.hasDataset()) {
                   return 'Switch to a different dataset';
                 } else {
                   return 'Add a dataset to the project';
@@ -93,11 +92,15 @@ let DatasetSettings = SettingsPanel.extend({
       }
     ];
   },
+  hasDataset: function () {
+    return window.mainPage.project &&
+      window.mainPage.project.hasDataset(this.index);
+  },
   getDataset: function () {
     if (window.mainPage.project) {
       return window.mainPage.project.getDataset(this.index);
     } else {
-      return undefined;
+      return Promise.resolve(null);
     }
   },
   deleteDataset: function () {
@@ -133,7 +136,7 @@ let DatasetSettings = SettingsPanel.extend({
     });
   },
   updateBlurb: function () {
-    if (!this.getDataset()) {
+    if (!(this.hasDataset())) {
       this.blurb = 'No dataset selected.';
     } else {
       delete this.blurb;
@@ -241,7 +244,7 @@ let DatasetSettings = SettingsPanel.extend({
     this.updateBlurb();
     SettingsPanel.prototype.render.apply(this, arguments);
 
-    this.getDataset(0).then(datasetObj => {
+    this.getDataset().then(datasetObj => {
       if (!datasetObj) {
         // Clear out the template; the blurb will suffice
         this.addedSubTemplate = false;

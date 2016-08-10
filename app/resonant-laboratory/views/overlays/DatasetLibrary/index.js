@@ -98,7 +98,6 @@ let DatasetLibrary = DatasetSettings.extend({
         path: 'item/' + itemId + '/dataset',
         method: 'POST'
       }).then(datasetItem => {
-        console.log(datasetItem);
         window.mainPage.getProject().then(project => {
           return project.setDataset(itemId, this.index);
         }).then(() => {
