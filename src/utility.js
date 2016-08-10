@@ -18,9 +18,9 @@ export let warningValue = (value, warning, fail, lower_is_better) => {
     lower_is_better = (warning < fail);
   }
   if (lower_is_better) {
-    return (value <= warning);
-  } else {
     return (value >= warning);
+  } else {
+    return (value <= warning);
   }
 };
 
