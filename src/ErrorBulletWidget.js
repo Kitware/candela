@@ -4,8 +4,7 @@ import d3 from 'd3';
 import nv from 'nvd3';
 import $ from 'jquery';
 
-import colors from './colors.js';
-import { failValue, warningValue, computeColor } from './utility.js';
+import { computeColor } from './utility.js';
 
 export let ErrorBulletWidget = Backbone.View.extend({
 

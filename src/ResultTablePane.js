@@ -3,7 +3,7 @@ import _ from 'underscore';
 import $ from 'jquery';
 
 import { ValueWidget } from './ValueWidget';
-import { failValue, warningValue, sanitizeSelector } from './utility.js';
+import { sanitizeSelector } from './utility.js';
 
 import tablePane from '../templates/tablePane';
 
