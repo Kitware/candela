@@ -41,6 +41,7 @@ let DatasetSettings = SettingsPanel.extend({
       this.listenTo(window.mainPage.project, 'rl:changeDatasets', () => {
         this.attachDatasetListeners();
       });
+      this.attachDatasetListeners();
     }
     this.render();
   },
@@ -53,6 +54,7 @@ let DatasetSettings = SettingsPanel.extend({
         });
       }
     });
+    this.render();
   },
   getSideMenu: function () {
     return [
@@ -63,19 +65,19 @@ let DatasetSettings = SettingsPanel.extend({
           {
             text: 'Delete dataset',
             onclick: () => { this.deleteDataset(); },
-            enabled: () => { return this.hasDataset(); }
+            enabled: () => { return !!this.getDatasetId(); }
           },
           {
             text: 'Remove from project',
             onclick: () => {
               window.mainPage.project.removeDataset(this.index);
             },
-            enabled: () => { return this.hasDataset(); }
+            enabled: () => { return !!this.getDatasetId(); }
           },
           {
             text: () => {
               if (window.mainPage.project) {
-                if (this.hasDataset()) {
+                if (this.getDatasetId()) {
                   return 'Switch to a different dataset';
                 } else {
                   return 'Add a dataset to the project';
@@ -92,9 +94,9 @@ let DatasetSettings = SettingsPanel.extend({
       }
     ];
   },
-  hasDataset: function () {
+  getDatasetId: function () {
     return window.mainPage.project &&
-      window.mainPage.project.hasDataset(this.index);
+      window.mainPage.project.getDatasetId(this.index);
   },
   getDataset: function () {
     if (window.mainPage.project) {
@@ -136,7 +138,7 @@ let DatasetSettings = SettingsPanel.extend({
     });
   },
   updateBlurb: function () {
-    if (!(this.hasDataset())) {
+    if (!(this.getDatasetId())) {
       this.blurb = 'No dataset selected.';
     } else {
       delete this.blurb;
@@ -204,11 +206,11 @@ let DatasetSettings = SettingsPanel.extend({
       if (status.editable) {
         this.$el.find('#editabilityIcon')
           .attr('src', canEditIcon)
-          .attr('title', 'You can edit this project');
+          .attr('title', 'You can edit this dataset');
       } else {
         this.$el.find('#editabilityIcon')
           .attr('src', cantEditIcon)
-          .attr('title', 'You can\'t edit this project');
+          .attr('title', 'You can\'t edit this dataset');
       }
 
       this.$el.find('#visibilityIcon')

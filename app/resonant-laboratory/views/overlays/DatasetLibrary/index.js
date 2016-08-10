@@ -250,7 +250,7 @@ let DatasetLibrary = DatasetSettings.extend({
     libraryButtons.exit().remove();
     libraryButtons.attr('class', (d) => {
       if (window.mainPage.project &&
-        d.id === window.mainPage.project.getId()) {
+        d.id === window.mainPage.project.getDatasetId(this.index)) {
         return 'current circleButton';
       } else {
         return 'circleButton';
