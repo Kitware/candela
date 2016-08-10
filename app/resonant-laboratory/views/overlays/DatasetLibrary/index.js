@@ -11,12 +11,6 @@ import warningIcon from '../../../images/warning.svg';
 import './style.scss';
 let girder = window.girder;
 
-const SUPPORTED_FORMATS = {
-  'text/csv': 'csv',
-  'text/tsv': 'csv',
-  'text/json': 'json'
-};
-
 let DatasetLibrary = DatasetSettings.extend({
   initialize: function () {
     DatasetSettings.prototype.initialize.apply(this, arguments);
@@ -38,10 +32,16 @@ let DatasetLibrary = DatasetSettings.extend({
       this.uploadView = new UploadView({
         // Some girder views expect a parent, but
         // in this app, we just run them headless
-        parentView: null
+        parentView: null,
+        // Similar to girder's views, we want the
+        // child to have access to this parent view
+        // (but this has nothing to do with girder's
+        // registerChild business)
+        datasetLibrary: this
       });
       this.$el.find('#uploadSection')[0]
         .appendChild(this.uploadView.el);
+      this.uploadView.delegateEvents();
     } else {
       this.$el.find('#uploadSection')
         .append('<p>You must be <a class="loginLink2">logged in</a> to upload files');
@@ -153,6 +153,12 @@ let DatasetLibrary = DatasetSettings.extend({
         }
       });
     }
+  },
+  showFileTypeWarning: function () {
+    this.$el.find('#uploadFileFormatHelp').show();
+  },
+  hideFileTypeWarning: function () {
+    this.$el.find('#uploadFileFormatHelp').hide();
   },
   updateExistingDatasetSections: function () {
     // Start off with every hideable section hidden

@@ -1,7 +1,13 @@
+@import '../../../stylesheets/colors.scss';
+
+#Overlay #uploadSection > div {
+  position: relative;
+  width: 100%;
+}
 #Overlay #uploadSection .hide {
   display: none;
 }
-#Overlay .g-dialog-subtitle .icon-folder-open {
+#Overlay #uploadSection .g-dialog-subtitle .icon-folder-open {
   content: url('../../../images/private.svg');
   width: 1.5em;
   height: 1.5em;
@@ -9,8 +15,29 @@
   position: relative;
   top: 0.25em;
 }
-#Overlay .g-drop-zone {
+#Overlay #uploadSection .g-drop-zone {
   cursor: pointer;
-  padding: 1em 3em;
+  padding: 1em;
+  text-align: center;
   border: 1px dashed black;
+}
+#Overlay #uploadSection .progress {
+  height: 1em;
+  width: 100%;
+  background-color: $matchingSuccessColor;
+}
+#Overlay #uploadSection .progress-bar {
+  height: 1em;
+  background-color: $matchingSuccessTextColor;
+}
+#Overlay #uploadSection .g-current-progress-message,
+#Overlay #uploadSection .g-progress-current {
+  /*
+  For now, we only support uploading one file at a time,
+  so hide the redundant progress bar
+  */
+  display: none;
+}
+#Overlay #uploadSection button {
+
 }
