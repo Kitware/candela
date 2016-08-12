@@ -176,8 +176,10 @@ def getDatasets():
                 datasets[item]['metadata'] = metadata
             else:
                 fileSize = os.stat(filePath).st_size
-                if (fileSize > int(args.databaseThreshold)) or os.path.splitext(fileName)[1] == '.json':
+                if fileSize > int(args.databaseThreshold):
                     datasets[item]['collections'][fileName] = filePath
+                elif os.path.splitext(fileName)[1] == '.json':
+                    datasets[item]['files'][fileName] = filePath
                 else:
                     datasets[item]['files'][fileName] = filePath
 
