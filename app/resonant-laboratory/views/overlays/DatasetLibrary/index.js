@@ -51,6 +51,8 @@ let DatasetLibrary = DatasetSettings.extend({
     }
   },
   attachLibraryListeners: function () {
+    let self = this;
+
     // Listeners for existing dataset sections
     this.$el.find('#girderLink').on('click', () => {
       window.mainPage.router.openUserDirectoriesInGirder();
@@ -68,7 +70,7 @@ let DatasetLibrary = DatasetSettings.extend({
     this.$el.find('#createLink').on('keyup', function () {
       // this refers to the DOM element
       // Validate the girder item ID (TODO: support other link types)
-      this.validateGirderId(this.value);
+      self.validateGirderId(this.value);
     });
 
     this.$el.find('#createLinkButton').on('click', () => {

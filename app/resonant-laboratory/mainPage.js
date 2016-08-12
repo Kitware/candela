@@ -192,9 +192,6 @@ let MainPage = Backbone.View.extend({
       params.error = reject;
       return girder.restRequest(params).done(resolve).error(reject);
     });
-    responsePromise.catch(err => {
-      this.trigger('rl:error', err);
-    });
     return responsePromise;
   }
 });
