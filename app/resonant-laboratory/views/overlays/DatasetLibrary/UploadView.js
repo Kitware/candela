@@ -41,10 +41,10 @@ let UploadView = girder.views.UploadWidget.extend({
     if (this.files.length > 0) {
       let ext = this.files[0].type;
       if (!ext && this.files[0].name.indexOf('.') !== -1) {
-        ext = this.files[0].name.split('.').slice(-1).toLowerCase();
+        ext = this.files[0].name.split('.').slice(-1)[0].toLowerCase();
       }
       if (ext && ext in SUPPORTED_FORMATS) {
-        fileType = SUPPORTED_FORMATS[fileType];
+        fileType = SUPPORTED_FORMATS[ext];
       }
     }
     if (fileType) {
