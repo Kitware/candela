@@ -1,0 +1,22 @@
+[
+  {
+    "operator": "=",
+    "operands": [
+      {
+        "identifier": "negative_pi",
+        "type": null
+      },
+      -3.14159
+    ]
+  },
+  {
+    "operator": "=",
+    "operands": [
+      {
+        "identifier": "negative_pi_indiana",
+        "type": null
+      },
+      -3
+    ]
+  }
+]

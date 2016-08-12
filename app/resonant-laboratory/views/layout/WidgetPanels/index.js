@@ -3,8 +3,10 @@ import Backbone from 'backbone';
 import jQuery from 'jquery';
 import d3 from 'd3';
 
-import './accordionhorz.css';
-import './style.css';
+import emptyStateTemplate from './emptyState.html';
+import './emptyStyle.scss';
+import './accordionhorz.scss';
+import './style.scss';
 
 import WidgetPanel from './WidgetPanel.js';
 import SetOps, { Set } from '../../../shims/SetOps.js';
@@ -99,20 +101,23 @@ let WidgetPanels = Backbone.View.extend({
       .css('width', style);
 
     // Are all the widgets closed (and no overlay is showing)?
-    if (expandedSections === 0 &&
-      window.mainPage.overlay.template === null) {
-      // Show the empty state image
-      jQuery('#EmptyState')
+    if (expandedSections === 0) {
+      // Show the empty state stuff
+      jQuery('.emptyState')
         .css('left', (1.5 + 2.5 * collapsedSections) + 'em')
-        .show();
+        .html(emptyStateTemplate);
     } else {
-      // Hide the empty state image
-      jQuery('#EmptyState').hide();
+      // Hide the empty state stuff
+      jQuery('.emptyState').html('');
     }
 
     // Finally, get all the widgets to render
-    // (don't tell them to render themselves
-    // until after the animation has finished)
+    // with a slight delay (so that they render
+    // to the correct size)
+    // TODO: these should be rendering offscreen
+    // when they're collapsed; we should precompute
+    // and pre-render each view so we don't have to
+    // wait for the animation to finish
     if (this.widgetsChanged === true) {
       this.widgetsChanged = false;
       window.setTimeout(() => {

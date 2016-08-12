@@ -5,6 +5,11 @@ import libImage from '../../../images/light/library.svg';
 import candela from './../../../../../src/candela';
 
 let VisualizationLibrary = Backbone.View.extend({
+  initialize: function () {
+    // TODO: need to be more clever in initializing this dialog
+    // when we have support for multiple visualizations
+    this.index = 0;
+  },
   render: function () {
     this.$el.html(myTemplate);
 
@@ -41,20 +46,12 @@ let VisualizationLibrary = Backbone.View.extend({
     libraryButtons.selectAll('span')
       .text(d => d.name);
 
-    d3.select('div.libraryInterface').selectAll('.circleButton')
+    d3.select('div.largeDialog').selectAll('.circleButton')
       .on('click', d => {
-        let projectPromise;
-        if (window.mainPage.project) {
-          projectPromise = Promise.resolve(window.mainPage.project);
-        } else {
-          // No project is loaded, so create an empty
-          // project with this visualization
-          projectPromise = window.mainPage.newProject();
-        }
-        projectPromise.then(() => {
-          window.mainPage.project.setVisualization(d.name);
+        window.mainPage.getProject().then(project => {
+          project.setVisualization(d.name, this.index);
           window.mainPage.widgetPanels.toggleWidget({
-            hashName: 'VisualizationView0'
+            hashName: 'VisualizationView' + this.index
           }, true);
           window.mainPage.overlay.closeOverlay();
         });

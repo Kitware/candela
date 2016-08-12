@@ -1,95 +1,38 @@
 <svg width="0" height="0" xmlns="http://www.w3.org/2000/svg" version="1.1">
   <defs>
-    <!-- Sneaky way to recolor icons without making separate images:
-    intercept = Math.pow(parseInt(hexvalue, 16) / 255, 2) -->
-    <!-- CSS stylesheets can reference these simply with
+    <!-- CSS stylesheets can reference filters in here simply with
     filter: url(#recolorImageTo333333);
-
-    CB Colors:
-    #e41a1c
-    #377eb8
-    #4daf4a
-    #984ea3
-    #ff7f00
-    #ffff33
-    #a65628
-    #f781bf
+    (note that mainPage.js populates this with lots of colors in
+    addition to dropShadow)
     -->
-    <filter id="recolorImageToWhite">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="1" />
-        <feFuncG type="linear" slope="0" intercept="1" />
-        <feFuncB type="linear" slope="0" intercept="1" />
-      </feComponentTransfer>
-    </filter>
-    <filter id="recolorImageTocccccc">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="0.64000000000000001" />
-        <feFuncG type="linear" slope="0" intercept="0.64000000000000001" />
-        <feFuncB type="linear" slope="0" intercept="0.64000000000000001" />
-      </feComponentTransfer>
-    </filter>
-    <filter id="recolorImageTo333333">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="0.04000000000000001" />
-        <feFuncG type="linear" slope="0" intercept="0.04000000000000001" />
-        <feFuncB type="linear" slope="0" intercept="0.04000000000000001" />
-      </feComponentTransfer>
-    </filter>
-    <filter id="recolorImageToBlack">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="0" />
-        <feFuncG type="linear" slope="0" intercept="0" />
-        <feFuncB type="linear" slope="0" intercept="0" />
-      </feComponentTransfer>
-    </filter>
-    <filter id="recolorImageToe41a1c">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="0.799446366782007" />
-        <feFuncG type="linear" slope="0" intercept="0.010396001537870049" />
-        <feFuncB type="linear" slope="0" intercept="0.012056901191849288" />
-      </feComponentTransfer>
-    </filter>
-    <filter id="recolorImageTo377eb8">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="0.0465205690119185" />
-        <feFuncG type="linear" slope="0" intercept="0.24415224913494812" />
-        <feFuncB type="linear" slope="0" intercept="0.5206612841214917" />
-      </feComponentTransfer>
-    </filter>
-    <filter id="recolorImageTo4daf4a">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="0.09118031526336023" />
-        <feFuncG type="linear" slope="0" intercept="0.47097270280661285" />
-        <feFuncB type="linear" slope="0" intercept="0.08421376393694734" />
-      </feComponentTransfer>
-    </filter>
-    <filter id="recolorImageTo984ea3">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="0.3553094963475586" />
-        <feFuncG type="linear" slope="0" intercept="0.09356401384083046" />
-        <feFuncB type="linear" slope="0" intercept="0.4085966935793925" />
-      </feComponentTransfer>
-    </filter>
-    <filter id="recolorImageToff7f00">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="1" />
-        <feFuncG type="linear" slope="0" intercept="0.24804306036139948" />
-        <feFuncB type="linear" slope="0" intercept="0" />
-      </feComponentTransfer>
-    </filter>
-    <filter id="recolorImageToffff33">
-      <feComponentTransfer in="SourceAlpha" result="color">
-        <feFuncR type="linear" slope="0" intercept="1" />
-        <feFuncG type="linear" slope="0" intercept="1" />
-        <feFuncB type="linear" slope="0" intercept="0.04000000000000001" />
-      </feComponentTransfer>
-    </filter>
-    <!-- TODO: brown and pink -->
-
-    <!-- Similarly-accessible effect: drop shadow -->
     <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
       <feOffset result="offOut" in="SourceAlpha" dx="0" dy="5" />
+      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="15" />
+      <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+    </filter>
+    <filter id="dropSoftShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feOffset result="offOut" in="SourceAlpha" dx="5" dy="15" />
+      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="30" />
+      <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+    </filter>
+    <filter id="dropIntenseShadow" x="-100%" y="-100%" width="300%" height="300%">
+      <feOffset result="offOut" in="SourceAlpha" dx="0" dy="2" />
+      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="13" />
+      <feComponentTransfer in="blurOut" result="lightenOut">
+        <feFuncA type="linear" slope="3" intercept="0"/>
+        <feFuncR type="linear" slope="0" intercept="0"/>
+        <feFuncG type="linear" slope="0" intercept="0"/>
+        <feFuncB type="linear" slope="0" intercept="0"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" in2="lightenOut" mode="normal" />
+    </filter>
+    <filter id="dropHalo" x="-50%" y="-50%" width="200%" height="200%">
+      <feComponentTransfer in="SourceAlpha" result="color">
+        <feFuncR type="linear" slope="0" intercept="1"/>
+        <feFuncG type="linear" slope="0" intercept="1"/>
+        <feFuncB type="linear" slope="0" intercept="1"/>
+      </feComponentTransfer>
+      <feOffset result="offOut" in="color" dx="0" dy="5" />
       <feGaussianBlur result="blurOut" in="offOut" stdDeviation="15" />
       <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
     </filter>

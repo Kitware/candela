@@ -13,6 +13,7 @@ import StartingScreen from '../../overlays/StartingScreen';
 import DatasetLibrary from '../../overlays/DatasetLibrary';
 import DatasetSettings from '../../overlays/DatasetSettings';
 import VisualizationLibrary from '../../overlays/VisualizationLibrary';
+import ProjectLibrary from '../../overlays/ProjectLibrary';
 import ProjectSettings from '../../overlays/ProjectSettings';
 import AboutResonantLab from '../../overlays/AboutResonantLab';
 
@@ -22,12 +23,16 @@ import userErrorTemplate from './userErrorTemplate.html';
 import successTemplate from './successTemplate.html';
 import loadingTemplate from './loadingTemplate.html';
 
+import alertTemplate from './alertTemplate.html';
+import confirmTemplate from './confirmTemplate.html';
+
 let VIEWS = {
   HamburgerMenu,
   LoginView,
   ResetPasswordView,
   RegisterView,
   AchievementLibrary,
+  ProjectLibrary,
   ProjectSettings,
   StartingScreen,
   DatasetLibrary,
@@ -36,7 +41,7 @@ let VIEWS = {
   AboutResonantLab
 };
 
-import './style.css';
+import './style.scss';
 
 let Overlay = Backbone.View.extend({
   initialize: function () {
@@ -118,19 +123,67 @@ let Overlay = Backbone.View.extend({
     return Underscore.template(template)(options);
   },
   renderLoadingScreen: function (message) {
-    this.render(this.getScreen(loadingTemplate, message));
+    this.render(this.getScreen(loadingTemplate, message), false, () => {
+      this.$el.find('#okButton').on('click', this.closeOverlay);
+    });
   },
   renderErrorScreen: function (message) {
-    this.render(this.getScreen(errorTemplate, message));
+    this.render(this.getScreen(errorTemplate, message), false,
+      () => {
+        this.$el.find('#okButton').on('click', () => {
+          window.mainPage.switchProject(null)
+            .then(() => {
+              window.mainPage.overlay.render('StartingScreen');
+            });
+        });
+      });
   },
   renderUserErrorScreen: function (message) {
-    this.render(this.getScreen(userErrorTemplate, message));
+    this.render(this.getScreen(userErrorTemplate, message), false, () => {
+      this.$el.find('#okButton').on('click', this.closeOverlay);
+    });
   },
   renderReallyBadErrorScreen: function (message, details) {
-    this.render(this.getScreen(reallyBadErrorTemplate, message, details));
+    this.render(this.getScreen(reallyBadErrorTemplate, message, details), false,
+      () => {
+        this.$el.find('#okButton').on('click', () => {
+          window.mainPage.switchProject(null)
+            .then(() => {
+              window.mainPage.overlay.render('StartingScreen');
+            });
+        });
+      });
   },
   renderSuccessScreen: function (message) {
-    this.render(this.getScreen(successTemplate, message));
+    this.render(this.getScreen(successTemplate, message), false, () => {
+      this.$el.find('#okButton').on('click', this.closeOverlay);
+    });
+  },
+  alertDialog: function (message) {
+    this.render(this.getScreen(alertTemplate, message), false, () => {
+      this.$el.find('#okButton').on('click', this.closeOverlay);
+    });
+  },
+  confirmDialog: function (message) {
+    let forceResolve, forceReject;
+
+    let waiter = new Promise((resolve, reject) => {
+      forceResolve = resolve;
+      forceReject = reject;
+    });
+
+    this.render(this.getScreen(confirmTemplate, message), false, () => {
+      this.$el.find('#okButton').on('click', () => {
+        this.closeOverlay();
+        forceResolve();
+      });
+      this.$el.find('#cancelButton').on('click', () => {
+        this.closeOverlay();
+        forceReject();
+      });
+    });
+
+    return waiter;
   },
   closeOverlay: function () {
     // If we don't have a project, jump straight to the
@@ -147,7 +200,9 @@ let Overlay = Backbone.View.extend({
     // Close button:
     this.$el.find('#closeOverlay')
       .off('click.closeOverlay')
-      .on('click.closeOverlay', this.closeOverlay);
+      .on('click.closeOverlay', () => {
+        this.closeOverlay();
+      });
 
     // Clicking on the area outside the overlay:
     let self = this;
@@ -177,11 +232,19 @@ let Overlay = Backbone.View.extend({
     this.$el.off('click.closeOverlay');
     jQuery(window).off('keyup.closeOverlay');
   },
-  render: Underscore.debounce(function (template, nofade) {
+  render: Underscore.debounce(function (template, nofade, callback) {
     // Don't fade if we're just switching between overlays
     nofade = nofade || (template !== null && this.template !== null);
 
     if (template !== undefined && this.template !== template) {
+      // Remove any backbone event listeners on the previous
+      // view if they existing (without this, views can
+      // hang out in memory and reassert themselves
+      // when they should be destroyed)
+      if (this.view && this.view.stopListening) {
+        this.view.stopListening();
+      }
+
       // Because we're switching to a different overlay, save the setting
       // for the next time that we simply re-render
       this.template = template;
@@ -231,12 +294,17 @@ let Overlay = Backbone.View.extend({
           this.el.appendChild(this.view.el);
           this.view.render();
         } else if (template instanceof Backbone.View) {
-          // This is a View object already
+          // This is a View instance already
+
+          // TODO: we may need to let the instance know that it's being
+          // shown again; if it was previously shown, it will have
+          // lost all its event listeners when it was closed
           this.view = template;
           this.el.appendChild(this.view.el);
           this.view.render();
         } else if (VIEWS.hasOwnProperty(template)) {
-          // This is a named template
+          // This is a named template (the name of a view
+          // in views/layout/overlays)
           this.view = new VIEWS[template]({
             // Some girder views expect a parent, but
             // in this app, we just run them headless
@@ -247,7 +315,7 @@ let Overlay = Backbone.View.extend({
         } else {
           // Okay, this is a dynamically-generated overlay
           // (probably a widget help/info screen)... so
-          // the template string is the actual contents
+          // the template string contains the actual contents
           this.view = null;
           this.$el.html(template);
         }
@@ -276,6 +344,10 @@ let Overlay = Backbone.View.extend({
           this.addCloseListeners();
         }
       }
+    }
+
+    if (callback !== undefined) {
+      callback();
     }
   }, 300)
 });

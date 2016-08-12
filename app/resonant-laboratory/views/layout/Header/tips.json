@@ -1,6 +1,6 @@
 [
   {
-    "selector": "#projectLocationButton",
+    "selector": "#projectVisibilityButton",
     "message": "Change who can see the project you're working on"
   },
   {

@@ -38,6 +38,15 @@ let VisualizationView = Widget.extend({
           return Widget.warningIcon;
         }
       },
+      className: () => {
+        if (this.status === STATUS.LOADING) {
+          return 'loading';
+        } else if (this.status === STATUS.OK) {
+          return 'okay';
+        } else {
+          return 'warning';
+        }
+      },
       title: () => {
         if (this.status === STATUS.LOADING) {
           return 'The visualization hasn\'t finished loading yet';
@@ -71,10 +80,15 @@ let VisualizationView = Widget.extend({
     this.status = STATUS.LOADING;
     this.vis = null;
 
-    this.listenTo(window.mainPage.project, 'rl:changeVisualizations',
-      this.render);
-    this.listenTo(window.mainPage.project, 'rl:changeMatchings',
-      this.render);
+    if (window.mainPage.project) {
+      this.stopListening(window.mainPage.project, 'rl:changeVisualizations');
+      this.listenTo(window.mainPage.project, 'rl:changeVisualizations',
+        this.render);
+
+      this.stopListening(window.mainPage.project, 'rl:changeMatchings');
+      this.listenTo(window.mainPage.project, 'rl:changeMatchings',
+        this.render);
+    }
   },
   renderInfoScreen: function () {
     window.mainPage.helpLayer.showTips(this.getDefaultTips());
@@ -201,7 +215,7 @@ let VisualizationView = Widget.extend({
       this.statusText.text = 'None selected';
       this.renderIndicators();
     }
-  }, 200)
+  }, 500)
 });
 
 export default VisualizationView;

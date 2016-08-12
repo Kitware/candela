@@ -2,15 +2,16 @@ import Underscore from 'underscore';
 import d3 from 'd3';
 import jQuery from 'jquery';
 import ComboScale from './comboScale.js';
+import Dataset from '../../../models/Dataset.js';
 import Widget from '../Widget';
 import Menu from '../../overlays/Menu';
 import myTemplate from './template.html';
 import histogramTemplate from './histogramTemplate.html';
 import rewrap from '../../../shims/svgTextWrap.js';
 import makeValidId from '../../../shims/makeValidId.js';
-import './style.css';
-import './tablePreview.css';
-import './histogramPreview.css';
+import './style.scss';
+import './tablePreview.scss';
+import './histogramPreview.scss';
 
 import seekFirst from '../../../images/seekFirst.svg';
 import seekPrev from '../../../images/seekPrev.svg';
@@ -30,6 +31,7 @@ import categorical from '../../../images/categorical.svg';
 import ordinal from '../../../images/ordinal.svg';
 import check from '../../../images/check.svg';
 import ex from '../../../images/ex.svg';
+import dash from '../../../images/dash.svg';
 
 let ICONS = {
   seekFirst,
@@ -49,7 +51,8 @@ let ICONS = {
   categorical,
   ordinal,
   check,
-  ex
+  ex,
+  dash
 };
 
 let STATUS = {
@@ -63,55 +66,55 @@ let STATUS = {
 let TYPE_MENU_ITEMS = [
   {
     text: 'Autodetect',
-    dataType: null
+    value: null
   },
   null,
   {
     icon: ICONS.boolean,
     text: 'Boolean',
-    dataType: 'boolean'
+    value: 'boolean'
   },
   {
     icon: ICONS.integer,
     text: 'Integer',
-    dataType: 'integer'
+    value: 'integer'
   },
   {
     icon: ICONS.number,
     text: 'Number',
-    dataType: 'number'
+    value: 'number'
   },
   {
     icon: ICONS.date,
     text: 'Date',
-    dataType: 'date'
+    value: 'date'
   },
   {
     icon: ICONS.string,
     text: 'String',
-    dataType: 'string'
+    value: 'string'
   },
   {
     icon: ICONS.object,
     text: 'Object (no type coercion)',
-    dataType: 'object'
+    value: 'object'
   }
 ];
 let INTERPRETATION_MENU_ITEMS = [
   {
     text: 'Autodetect',
-    interpretation: null
+    value: null
   },
   null,
   {
     icon: ICONS.categorical,
     text: 'Categorical',
-    interpretation: 'categorical'
+    value: 'categorical'
   },
   {
     icon: ICONS.ordinal,
     text: 'Ordinal',
-    interpretation: 'ordinal'
+    value: 'ordinal'
   }
 ];
 
@@ -160,6 +163,15 @@ let DatasetView = Widget.extend({
           return Widget.warningIcon;
         }
       },
+      className: () => {
+        if (this.status === STATUS.LOADING) {
+          return 'loading';
+        } else if (this.status === STATUS.SUCCESS) {
+          return 'okay';
+        } else {
+          return 'warning';
+        }
+      },
       title: () => {
         if (this.status === STATUS.LOADING) {
           return 'The dataset hasn\'t finished loading yet';
@@ -175,12 +187,15 @@ let DatasetView = Widget.extend({
     });
 
     this.listenTo(window.mainPage, 'rl:changeProject',
-      this.handleNewProject);
-    this.handleNewProject();
+      this.attachProjectListeners);
+    this.attachProjectListeners();
   },
-  handleNewProject: function () {
-    this.listenTo(window.mainPage.project, 'rl:changeDatasets',
-      this.render);
+  attachProjectListeners: function () {
+    if (window.mainPage.project) {
+      this.stopListening(window.mainPage.project, 'rl:changeDatasets');
+      this.listenTo(window.mainPage.project, 'rl:changeDatasets',
+        this.render);
+    }
 
     this.render();
   },
@@ -416,36 +431,59 @@ let DatasetView = Widget.extend({
         height: height
       });
   },
+  attachMenuToButton: function (element, attrName, datasetDetails,
+    items, auto, current, isAuto, successFunc) {
+    d3.select(element).on('click', () => {
+      // Construct the menu
+      items[0].icon = ICONS[auto];
+      items.forEach(menuItem => {
+        if (menuItem !== null) {
+          menuItem.checked = (menuItem.value === null && isAuto) ||
+            (menuItem.value === current && !isAuto);
+          menuItem.onclick = () => {
+            if (menuItem.value === current) {
+              // No change was made; just close the menu
+              window.mainPage.overlay.render(null);
+              return;
+            }
+            let filteredState = datasetDetails.datasetObj.getFilteredState(attrName);
+            if (filteredState === Dataset.FILTER_STATES.NO_FILTERS) {
+              // Go ahead and set the attribute right away
+              successFunc(menuItem.value);
+              window.mainPage.overlay.render(null);
+            } else {
+              // Confirm that the user wants to clear filters first
+              let promiseObj = window.mainPage.overlay.confirmDialog(
+                'This will clear the filters on ' + attrName +
+                '. Are you sure you want to proceed?');
+              promiseObj.then(() => {
+                // The user clicked OK
+                successFunc(menuItem.value);
+              }, () => {}); // Do nothing if the user clicks cancel
+            }
+          };
+        }
+      });
+      window.mainPage.overlay.render(new Menu({
+        targetElement: element,
+        items: items
+      }));
+    });
+  },
   setupDataTypeMenu: function (element, attrName, datasetDetails) {
     let autoAttrType = datasetDetails.datasetObj
       .autoDetectAttributeType(datasetDetails.schema, attrName);
     let attrType = datasetDetails.datasetObj
       .getAttributeType(datasetDetails.schema, attrName);
     let isAuto = !(datasetDetails.schema[attrName].hasOwnProperty('coerceToType'));
-    let filterStyle = isAuto ? null : 'url(#recolorImageTo377eb8)';
+    let buttonClass = isAuto ? 'dataTypeMenuIcon button' : 'overridden dataTypeMenuIcon button';
     d3.select(element)
       .attr('src', ICONS[attrType])
-      .style({
-        '-webkit-filter': filterStyle,
-        'filter': filterStyle
-      }).on('click', () => {
-        // Construct the type menu
-        TYPE_MENU_ITEMS[0].icon = ICONS[autoAttrType];
-        TYPE_MENU_ITEMS.forEach(menuItem => {
-          if (menuItem !== null) {
-            menuItem.checked = (menuItem.dataType === null && isAuto) ||
-              (menuItem.dataType === attrType && !isAuto);
-            menuItem.onclick = () => {
-              datasetDetails.datasetObj
-                .setAttributeType(attrName, menuItem.dataType);
-              window.mainPage.overlay.render(null);
-            };
-          }
-        });
-        window.mainPage.overlay.render(new Menu({
-          targetElement: element,
-          items: TYPE_MENU_ITEMS
-        }));
+      .attr('class', buttonClass);
+    this.attachMenuToButton(element, attrName, datasetDetails,
+      TYPE_MENU_ITEMS, autoAttrType, attrType, isAuto,
+      (newDataType) => {
+        datasetDetails.datasetObj.setAttributeType(attrName, newDataType);
       });
   },
   setupInterpretationMenu: function (element, attrName, datasetDetails) {
@@ -454,30 +492,14 @@ let DatasetView = Widget.extend({
     let interpretation = datasetDetails.datasetObj
       .getAttributeInterpretation(datasetDetails.schema, attrName);
     let isAuto = !(datasetDetails.schema[attrName].hasOwnProperty('interpretation'));
-    let filterStyle = isAuto ? null : 'url(#recolorImageTo377eb8)';
+    let buttonClass = isAuto ? 'interpretationMenuIcon button' : 'overridden interpretationMenuIcon button';
     d3.select(element)
       .attr('src', ICONS[interpretation])
-      .style({
-        '-webkit-filter': filterStyle,
-        'filter': filterStyle
-      }).on('click', () => {
-        // Construct the type menu
-        INTERPRETATION_MENU_ITEMS[0].icon = ICONS[autoInterpretation];
-        INTERPRETATION_MENU_ITEMS.forEach(menuItem => {
-          if (menuItem !== null) {
-            menuItem.checked = (menuItem.interpretation === null && isAuto) ||
-              (menuItem.interpretation === interpretation && !isAuto);
-            menuItem.onclick = () => {
-              datasetDetails.datasetObj
-                .setAttributeInterpretation(attrName, menuItem.interpretation);
-              window.mainPage.overlay.render(null);
-            };
-          }
-        });
-        window.mainPage.overlay.render(new Menu({
-          targetElement: element,
-          items: INTERPRETATION_MENU_ITEMS
-        }));
+      .attr('class', buttonClass);
+    this.attachMenuToButton(element, attrName, datasetDetails,
+      INTERPRETATION_MENU_ITEMS, autoInterpretation, interpretation, isAuto,
+      (newInterpretation) => {
+        datasetDetails.datasetObj.setAttributeInterpretation(attrName, newInterpretation);
       });
   },
   renderIndividualHistogram: function (element, attrName, datasetDetails) {
@@ -496,15 +518,27 @@ let DatasetView = Widget.extend({
     let height = scale.height + topPadding;
 
     // Draw the y axis
+    let yScale = d3.scale.linear()
+      .domain([0, scale.yMax])
+      .range([height, topPadding]);
     let yAxis = d3.svg.axis()
-      .scale(d3.scale.linear()
-        .domain([0, scale.yMax])
-        .range([height, topPadding]))
+      .scale(yScale)
       .orient('left')
-      .ticks(4);
-    svg.select('.yAxis')
+      .ticks(Math.min(4, scale.yMax))
+      .tickFormat(d3.format('s'));
+    let yAxisObj = svg.select('.yAxis')
       .attr('transform', 'translate(' + scale.leftAxisPadding + ',0)')
       .call(yAxis);
+
+    // Move the special buttons into place and attach their events
+    svg.select('.selectAllBins')
+      .attr('transform', 'translate(' +
+        (scale.leftAxisPadding - 0.5 * this.layout.emSize) + ',' +
+        (height + this.layout.emSize) + ')');
+    svg.select('.selectAll')
+      .on('click', () => {
+        datasetDetails.datasetObj.clearFilters(attrName);
+      });
 
     // Draw the bin groups
     let labels = datasetDetails.overviewHistogram[attrName].map(d => d.label);
@@ -517,7 +551,7 @@ let DatasetView = Widget.extend({
     // Move the bins horizontally
     bins.attr('transform', d => {
       let binNo = scale.labelToBin(d, 'overview');
-      return 'translate(' + scale.binForward(binNo) + ',' + topPadding + ')';
+      return 'translate(' + scale.binToPosition(binNo) + ',' + topPadding + ')';
     });
 
     // Draw one bar for each bin
@@ -529,25 +563,55 @@ let DatasetView = Widget.extend({
       .attr('class', 'page');
 
     // Update each bar
-    bins.selectAll('rect.overview')
-      .each(function (d) {
-        // this refers to the DOM element
-        d3.select(this).attr(scale.getBinRect(d, 'overview'));
-      });
-    bins.selectAll('rect.filtered')
-      .each(function (d) {
-        // this refers to the DOM element
-        d3.select(this).attr(scale.getBinRect(d, 'filtered'));
-      });
-    bins.selectAll('rect.page')
-      .each(function (d) {
-        // this refers to the DOM element
-        d3.select(this).attr(scale.getBinRect(d, 'page'));
-      });
+    function drawBars () {
+      bins.selectAll('rect.overview')
+        .each(function (d) {
+          // this refers to the DOM element
+          d3.select(this).attr(scale.getBinRect(d, 'overview'));
+        });
+      bins.selectAll('rect.filtered')
+        .each(function (d) {
+          // this refers to the DOM element
+          d3.select(this).attr(scale.getBinRect(d, 'filtered'));
+        });
+      bins.selectAll('rect.page')
+        .each(function (d) {
+          // this refers to the DOM element
+          d3.select(this).attr(scale.getBinRect(d, 'page'));
+        });
+    }
+    drawBars();
+
+    // Add the scale adjustment knob (needs a distinct scale instance)
+    let knobScale = yScale.copy();
+    let knob = svg.select('.yAxisKnob')
+      .attr('transform', 'translate(' + scale.leftAxisPadding + ',' +
+        knobScale(scale.yMax) + ')');
+    knob.call(d3.behavior.drag()
+      .origin(() => {
+        return { x: 0, y: knobScale(scale.yMax) };
+      }).on('drag', () => {
+        // the yMax setter automagically prevents bad values...
+        scale.yMax = knobScale.invert(d3.event.y);
+
+        // update everything that cares about the y scale:
+        // the knob
+        knob.attr('transform', 'translate(' + scale.leftAxisPadding + ',' +
+          knobScale(scale.yMax) + ')');
+        // the axis
+        yScale.domain([0, scale.yMax]);
+        yAxis.scale(yScale)
+          .ticks(Math.min(4, scale.yMax));
+        yAxisObj.call(yAxis);
+        // and the bars
+        drawBars();
+      }).on('dragstart', () => {
+        svg.style('cursor', 'ns-resize');
+      }).on('dragend', () => {
+        svg.style('cursor', null);
+      }));
 
     // Add an include / exclude button for each bin
-    // TODO: uncomment when we support filtering
-    /*
     binsEnter.append('image')
       .attr('class', 'button')
       .attr({
@@ -557,12 +621,55 @@ let DatasetView = Widget.extend({
         height: this.layout.emSize
       });
     bins.selectAll('image.button')
-      .attr('xlink:href', ICONS.check);
-    height += 2 * this.layout.emSize;
-    */
+      .each(function (d) {
+        // this refers to the DOM element
+        let bin = scale.labelToBin(d, 'overview');
+        bin = datasetDetails.overviewHistogram[attrName][bin];
+        let status = datasetDetails.datasetObj.getBinStatus(
+          datasetDetails.schema, attrName, bin);
 
-    // Add each bin label
-    let maxLabelHeight = 0;
+        // To add / remove ranges, we might need to provide a comparison
+        // function (undefined will just do default comparisons)
+        let comparator;
+        if (datasetDetails.datasetObj.getAttributeType(
+            datasetDetails.schema, attrName) === 'string') {
+          comparator = (a, b) => a.localeCompare(b);
+        }
+
+        d3.select(this)
+          .attr('xlink:href', () => {
+            if (status === Dataset.BIN_STATES.INCLUDED) {
+              return ICONS.check;
+            } else if (status === Dataset.BIN_STATES.EXCLUDED) {
+              return ICONS.ex;
+            } else {
+              return ICONS.dash;
+            }
+          }).on('click', d => {
+            if (status === Dataset.BIN_STATES.INCLUDED) {
+              // Remove this bin
+              if ('lowBound' in bin && 'highBound' in bin) {
+                datasetDetails.datasetObj.removeRange(
+                  attrName, bin.lowBound, bin.highBound, comparator);
+              } else {
+                datasetDetails.datasetObj.removeValue(attrName, bin.label);
+              }
+            } else {
+              // Add this bin
+              if ('lowBound' in bin && 'highBound' in bin) {
+                datasetDetails.datasetObj.includeRange(
+                  attrName, bin.lowBound, bin.highBound, comparator);
+              } else {
+                datasetDetails.datasetObj.includeValue(attrName, bin.label);
+              }
+            }
+          });
+      });
+    height += 2 * this.layout.emSize;
+
+    // Add each bin label, and compute the total needed height
+    let maxLabelHeight = svg.select('.selectAllBins').select('text')
+      .node().getComputedTextLength();
     binsEnter.append('text');
     bins.selectAll('text')
       .text(d => d)
@@ -592,9 +699,16 @@ let DatasetView = Widget.extend({
 
     let attributeSections = container.selectAll('.attributeSection')
       .data(attributeOrder, d => d);
-    let attributeSectionsEnter = attributeSections.enter().append('div')
-      .attr('class', 'attributeSection');
+    let attributeSectionsEnter = attributeSections.enter().append('div');
     attributeSections.exit().remove();
+    attributeSections.attr('class', d => {
+      let filteredState = datasetDetails.datasetObj.getFilteredState(d);
+      if (filteredState === Dataset.FILTER_STATES.EXCLUDED) {
+        return 'excluded attributeSection';
+      } else {
+        return 'attributeSection';
+      }
+    });
 
     // Add a container for the stuff in the header (the stuff
     // that is shown while collapsed)
@@ -622,11 +736,7 @@ let DatasetView = Widget.extend({
         }
       });
 
-    // Checkbox that indicates:
-    // - checked: the attribute is included, with no (non-custom) filters
-    // - indeterminate: the attribute is included, with filters
-    // - unchecked: the attribute is excluded
-    // TODO: uncomment when we support filtering
+    // Checkbox that indicates whether to include the attribute in the output
     /*
     sectionTitlesEnter.append('input')
       .attr('type', 'checkbox')
@@ -636,18 +746,16 @@ let DatasetView = Widget.extend({
       .each(function (d) {
         // this refers to the DOM element
         let filteredState = datasetDetails.datasetObj.getFilteredState(d);
-        if (filteredState === Dataset.FILTER_STATES.NO_FILTERS) {
-          this.checked = true;
-          this.indeterminate = false;
-        } else if (filteredState === Dataset.FILTER_STATES.FILTERED) {
-          this.checked = true;
-          this.indeterminate = true;
-        } else {  // filteredState === Dataset.FILTER_STATES.EXCLUDED
-          this.checked = false;
-          this.indeterminate = false;
+        this.checked = filteredState !== Dataset.FILTER_STATES.EXCLUDED;
+      }).on('change', function (d) {
+        // this refers to the DOM element
+        if (this.checked) {
+          datasetDetails.datasetObj.includeAttribute(d);
+        } else {
+          datasetDetails.datasetObj.excludeAttribute(d);
         }
       });
-      */
+    */
 
     // Label for the header
     sectionTitlesEnter.append('label');
@@ -801,58 +909,64 @@ let DatasetView = Widget.extend({
 
     // Get the dataset in the project (if there is one)
     // TODO: get the dataset assigned to this widget
-    let datasetObj = window.mainPage.project &&
-      window.mainPage.project.getDataset(0);
-
-    if (!datasetObj) {
-      this.renderEmptyState();
-      this.status = STATUS.NO_DATA;
-      this.statusText.text = 'No file loaded';
-      this.renderIndicators();
+    let datasetPromise;
+    if (window.mainPage.project) {
+      datasetPromise = window.mainPage.project.getDataset(0);
     } else {
-      this.status = STATUS.LOADING;
-      this.statusText.text = 'Loading...';
-      this.renderIndicators();
+      datasetPromise = Promise.resolve(null);
+    }
 
-      Promise.all([datasetObj.cache.schema,
-                   datasetObj.cache.overviewHistogram,
-                   datasetObj.cache.filteredHistogram,
-                   datasetObj.cache.pageHistogram,
-                   datasetObj.cache.currentDataPage])
-        .then(datasetDetails => {
-          // For cleaner code, reshape the array
-          // of results into a dict
-          let results = {
-            datasetObj: datasetObj,
-            schema: datasetDetails[0],
-            overviewHistogram: datasetDetails[1],
-            filteredHistogram: datasetDetails[2],
-            pageHistogram: datasetDetails[3],
-            currentDataPage: datasetDetails[4]
-          };
-          if (datasetDetails.indexOf(null) !== -1) {
-            this.status = STATUS.CANT_LOAD;
-            this.statusText.text = 'ERROR';
-            this.renderIndicators();
-          } else if (results.schema.length === 0) {
-            // The schema has no attributes...
-            this.status = STATUS.NO_ATTRIBUTES;
-            this.statusText.text = 'ERROR';
-            this.renderIndicators();
-          } else {
-            this.status = STATUS.SUCCESS;
-            this.statusText.text = datasetObj.get('name');
-            this.renderIndicators();
-            if (widgetIsShowing) {
-              if (this.showTable) {
-                this.renderTable(results);
-              } else {
-                this.renderHistograms(results);
+    this.status = STATUS.LOADING;
+    this.statusText.text = 'Loading...';
+    this.renderIndicators();
+
+    datasetPromise.then(datasetObj => {
+      if (!datasetObj) {
+        this.renderEmptyState();
+        this.status = STATUS.NO_DATA;
+        this.statusText.text = 'No file loaded';
+        this.renderIndicators();
+      } else {
+        Promise.all([datasetObj.cache.schema,
+                     datasetObj.cache.overviewHistogram,
+                     datasetObj.cache.filteredHistogram,
+                     datasetObj.cache.pageHistogram,
+                     datasetObj.cache.currentDataPage])
+          .then(datasetDetails => {
+            // For cleaner code, reshape the array
+            // of results into a dict
+            let results = {
+              datasetObj: datasetObj,
+              schema: datasetDetails[0],
+              overviewHistogram: datasetDetails[1],
+              filteredHistogram: datasetDetails[2],
+              pageHistogram: datasetDetails[3],
+              currentDataPage: datasetDetails[4]
+            };
+            if (datasetDetails.indexOf(null) !== -1) {
+              this.status = STATUS.CANT_LOAD;
+              this.statusText.text = 'ERROR';
+              this.renderIndicators();
+            } else if (results.schema.length === 0) {
+              // The schema has no attributes...
+              this.status = STATUS.NO_ATTRIBUTES;
+              this.statusText.text = 'ERROR';
+              this.renderIndicators();
+            } else {
+              this.status = STATUS.SUCCESS;
+              this.statusText.text = datasetObj.get('name');
+              this.renderIndicators();
+              if (widgetIsShowing) {
+                if (this.showTable) {
+                  this.renderTable(results);
+                } else {
+                  this.renderHistograms(results);
+                }
               }
             }
-          }
-        });
-    }
+          });
+      }
+    });
   }, 300)
 });
 

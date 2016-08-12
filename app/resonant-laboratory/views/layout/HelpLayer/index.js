@@ -4,7 +4,7 @@ import d3 from 'd3';
 import rewrap from '../../../shims/svgTextWrap.js';
 import dictCompare from '../../../shims/dictCompare.js';
 import template from './template.html';
-import './style.css';
+import './style.scss';
 
 function arrowGenerator (edge) {
   let arrowAngle = Math.PI / 4;

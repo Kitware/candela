@@ -62,16 +62,31 @@ value_list
   / "" { return []; }
 
 identifier
-  = chars:([^ ()]*) { return chars.join(''); }
+  = chars:([^ ():]*) type:("::" type)? { return {identifier: chars.join(''), type: type ? type[1] : null}; }
   / string
 
+type
+  = "number" / "integer" / "boolean" / "date" / "string"
+
 value
-  = value:[0-9]+ frac:('.'[0-9]*) { return parseFloat(value.join('') + '.' + frac[1].join('')); }
-  / value:[0-9]+ { return parseInt(value.join('')); }
+  = number
   / string
+  / boolean
+
+number
+  = negate:'-'? value:[0-9]+ frac:(('.'[0-9]*)?) {
+    negate = negate ? -1 : 1;
+    var intpart = value.join('');
+    frac = frac ? '.' + frac[1].join('') : '';
+
+    return negate * parseFloat(intpart + frac);
+  }
 
 string
   = '"' chars:([^\r\n"]*) '"' { return chars.join(''); }
   / "'" chars:([^\r\n']*) "'" { return chars.join(''); }
+
+boolean
+  = value:("true" / "false") { return value === "true"; }
  _
   = [ \t\n\r]*

@@ -1,35 +1,54 @@
+@import '../../../stylesheets/colors.scss';
+
 #Overlay {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.35);
+  background-color: rgba($shadowColor,0.35);
   z-index: 1108;
   overflow: auto;
 }
 
 #Overlay .modal-dialog,
-#Overlay div.libraryInterface,
+#Overlay div.largeDialog,
+#Overlay div.smallDialog,
 #Overlay div.hint {
-  background-color: white;
-  border: 1px solid rgba(0,0,0,0.2);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  background-color: $panelBackgroundColor;
+  border: 1px solid rgba($shadowColor,0.2);
+  box-shadow: 0 5px 15px rgba($shadowColor,0.5);
   min-height: 15em;
 }
 
-#Overlay div.libraryInterface {
+#Overlay div.largeDialog {
   position: relative;
   max-width: 50em;
   margin: 5em auto 5em auto;
   padding: 1em 2em 2em 3em;
 }
 
-#Overlay .libraryInterface hr {
+#Overlay div.smallDialog {
   position: relative;
-  left: -3em;
-  width: calc(100% + 5em);
+  max-width: 30em;
+  min-height: initial;
+  margin: 10em auto auto auto;
+  padding: 1em 2em 2em 3em;
+}
+
+#Overlay .largeDialog hr {
+  position: relative;
+  width: 100%;
   border: none;
   height: 1px;
-  background-color: #e5e5e5;
+  background-color: $separatorColor;
+}
+#Overlay .largeDialog .divider {
+  position: relative;
+  margin: 0em 1em;
+  min-height: 100%;
+  border: none;
+  min-width: 1px;
+  max-width: 1px;
+  background-color: $separatorColor;
 }
 
 #Overlay div.hint {
@@ -46,9 +65,16 @@
 
 #Overlay img.headerIcon {
   float: right;
-  height: 16em;
-  margin-right: -1em;
-  margin-left: 1em;
+  height: 10em;
+  margin: 2em;
+}
+#Overlay img.headerIcon.warning {
+  -webkit-filter: imgColorFilter($warningIconColor);
+  filter: imgColorFilter($warningIconColor);
+}
+#Overlay img.headerIcon.success {
+  -webkit-filter: imgColorFilter($successIconColor);
+  filter: imgColorFilter($successIconColor);
 }
 
 #Overlay div.circleset {
@@ -72,13 +98,13 @@
   padding: 1em;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid rgba(0,0,0,0);
+  border: 2px solid transparent;
 }
 #Overlay div.current.circleButton {
-  background-color: #ccc;
+  background-color: $backgroundRolloverColor;
 }
 #Overlay div.circleButton:hover {
-  border: 2px solid #ccc;
+  border: 2px solid $darkRolloverColor;
 }
 
 #Overlay div.circleButton img {

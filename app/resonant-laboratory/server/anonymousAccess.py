@@ -213,20 +213,22 @@ class AnonymousAccess(Resource):
         if user is None:
             user = anonUser
 
+        # Figure out the visibility of the item
         folder = self.model('folder').load(
             item['folderId'], user=user,
             level=AccessType.READ, exc=True)
 
         if item['baseParentType'] == 'user':
             if item['baseParentId'] == anonUser['_id']:
-                info['location'] = 'PublicScratch'
+                info['visibility'] = 'PublicScratch'
             elif folder.get('public', False) is True:
-                info['location'] = 'PublicUser'
+                info['visibility'] = 'PublicUser'
             else:
-                info['location'] = 'PrivateUser'
+                info['visibility'] = 'PrivateUser'
         else:
-            info['location'] = 'PublicLibrary'
+            info['visibility'] = 'PublicLibrary'
 
+        # Figure out the editability of the item
         try:
             self.model('item').load(item['_id'],
                                     level=AccessType.WRITE,
@@ -235,6 +237,24 @@ class AnonymousAccess(Resource):
             info['editable'] = True
         except AccessException:
             info['editable'] = False
+
+        # Construct a string representation of the
+        # path to the item
+        path = self.model('item').parentsToRoot(item, user)
+        info['path'] = ''
+        for resource in path:
+            obj = resource['object']
+            info['path'] += '/'
+            if 'name' in obj:
+                info['path'] += obj['name']
+            elif 'firstName' in obj and 'lastName' in obj:
+                info['path'] += obj['firstName'] + ' ' + obj['lastName']
+            else:
+                info['path'] += '?'
+        info['path'] += '/' + item['name']
+
+        # Include the item's size
+        info['size'] = item.get('size', '?')
 
         return info
 

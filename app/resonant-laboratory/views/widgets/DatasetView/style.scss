@@ -1,0 +1,44 @@
+@import '../../../stylesheets/colors.scss';
+
+.DatasetView.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.DatasetView.content #datasetOverview {
+  width: calc(100% - 2em);
+  font-weight: 900;
+  padding: 1em;
+}
+.DatasetView.content img.button,
+.DatasetView.content image.button {
+  -webkit-filter: imgColorFilter($defaultDarkIconColor);
+  filter: imgColorFilter($defaultDarkIconColor);
+}
+.DatasetView.content img.button.overridden,
+.DatasetView.content image.button.overridden {
+  -webkit-filter: imgColorFilter($overriddenIconColor);
+  filter: imgColorFilter($overriddenIconColor);
+}
+.DatasetView.content img.button:hover,
+.DatasetView.content image.button:hover {
+  cursor: pointer;
+  -webkit-filter: imgColorFilter($darkRolloverColor);
+  filter: imgColorFilter($darkRolloverColor);
+}
+.DatasetView.content img.button.disabled,
+.DatasetView.content image.button.disabled {
+  cursor: default;
+  -webkit-filter: imgColorFilter($disabledColor);
+  filter: imgColorFilter($disabledColor);
+}
+
+.DatasetView.content .overview {
+  fill: $dataOverviewColor;
+}
+.DatasetView.content .filtered {
+  fill: $dataFilteredColor;
+}
+.DatasetView.content .page {
+  fill: $dataCurrentPageColor;
+}

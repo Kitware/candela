@@ -19,7 +19,7 @@ function newTspan (textElement) {
 function extractWords (element) {
   let words = [];
   // Pull out all the childNodes and split them into words
-  element.childNodes.forEach(chunk => {
+  Array.from(element.childNodes).forEach(chunk => {
     if (chunk.nodeType === window.Node.TEXT_NODE) {
       // This is an actual text node; split into real words
       chunk.textContent.split(/\s+/).forEach(word => {
@@ -89,7 +89,7 @@ export default function rewrap (textElement, pxWidth, emLeading) {
   });
 
   // Second pass: line up each row appropriately
-  textElement.childNodes.forEach((tspan, index) => {
+  Array.from(textElement.childNodes).forEach((tspan, index) => {
     if (index === 0) {
       // Don't move the first line anywhere
       tspan.setAttribute('dx', '0px');

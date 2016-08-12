@@ -26,8 +26,8 @@ class ComboScale {
     this.coerceToType = datasetDetails.datasetObj.getAttributeType(
       datasetDetails.schema, attrName);
     this.overviewHistogram = datasetDetails.overviewHistogram[attrName];
-    this.filteredHistogram = datasetDetails.filteredHistogram[attrName];
-    this.pageHistogram = datasetDetails.pageHistogram[attrName];
+    this.filteredHistogram = datasetDetails.filteredHistogram[attrName] || [];
+    this.pageHistogram = datasetDetails.pageHistogram[attrName] || [];
 
     this.dividerIndex = undefined;
     this.dividerPosition = undefined;
@@ -67,10 +67,10 @@ class ComboScale {
       this.overviewLabelLookup[bin.label] = index;
       this.realYmax = Math.max(this.realYmax, bin.count);
     });
-    datasetDetails.filteredHistogram[attrName].forEach((bin, index) => {
+    this.filteredHistogram.forEach((bin, index) => {
       this.filteredLabelLookup[bin.label] = index;
     });
-    datasetDetails.pageHistogram[attrName].forEach((bin, index) => {
+    this.pageHistogram.forEach((bin, index) => {
       this.pageLabelLookup[bin.label] = index;
     });
 
@@ -93,7 +93,7 @@ class ComboScale {
     }
     this.dividerPosition = this.leftAxisPadding + this.barSize * (0.5 + this.ordinalBinCount);
   }
-  binForward (binNo) {
+  binToPosition (binNo) {
     // Given a bin number, calculate the center of its bar
     if (binNo < this.dividerIndex) {
       // Ordinal bin
@@ -103,7 +103,7 @@ class ComboScale {
       return this.dividerPosition + this.barSize * (1.5 * (binNo - this.dividerIndex) + 0.75);
     }
   }
-  binInverse (position) {
+  positionToBin (position) {
     // Given a screen position, calculate the closest bin number
     if (position < this.dividerPosition) {
       // Ordinal bin
@@ -113,25 +113,6 @@ class ComboScale {
       // Categorical bin
       position -= this.dividerPosition + 0.75 * this.barSize;
       return Math.round(position / (1.5 * this.categoricalBinCount));
-    }
-  }
-  valueToBin (value) {
-    // Given a value, calculate the bin number
-    // WARNING: similar logic exists in server/foreignCode/histogram_map.js
-    // changes here should also be adapted there.
-    if (value in this.categoricalLookup) {
-      return this.categoricalLookup[value];
-    } else {
-      if (this.coerceToType === 'integer' || this.coerceToType === 'number') {
-        return Math.floor(this.ordinalBinCount *
-          (value - this.lowBound) / (this.highBound - this.lowBound));
-      } else if (this.coerceToType === 'string') {
-        // TODO: ordinal binning of strings (lexographic)
-        return 0;
-      } else if (this.coerceToType === 'date') {
-        // TODO: ordinal binning of dates
-        return 0;
-      }
     }
   }
   labelToBin (value, histogram) {
@@ -185,7 +166,7 @@ class ComboScale {
     return this.customYmax === null ? this.realYmax : this.customYmax;
   }
   set yMax (value) {
-    this.customYmax = value;
+    this.customYmax = Math.max(1, Math.min(this.realYmax, value));
   }
 }
 export default ComboScale;

@@ -54,11 +54,9 @@ let Widget = Backbone.View.extend({
     this.panel.renderIndicators();
   },
   render: function () {
-    // Don't render if there's no project or if our WidgetPanel
-    // hasn't given us a legitimate element in the
-    // document yet
-    if (!window.mainPage.project ||
-      document.getElementById(this.$el.attr('id')) !== this.el) {
+    // Don't render if our WidgetPanel hasn't given us a legitimate element in
+    // the document yet
+    if (document.getElementById(this.$el.attr('id')) !== this.el) {
       return false;
     } else {
       return true;
