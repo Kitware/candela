@@ -857,7 +857,7 @@ in order to connect them together.`);
       }).on('click', d => {
         this.clickEdge(d);
       });
-    edges.selectAll('title')
+    edges.select('title')
       .text(d => {
         if (d.mode === EDGE_MODES.ESTABLISHED || d.mode === EDGE_MODES.ESTABLISHED_SELECTED) {
           return 'Click to disconnect';
