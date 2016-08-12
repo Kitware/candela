@@ -1,33 +1,49 @@
 Resonant Laboratory Text
 ========================
 
-This file outlines most of the user-facing text in Resonant Laboratory.
+This file outlines the user-facing text in Resonant Laboratory.
 
 *TODO: Ideally, we should convert this file into some kind of `en.json` file that the app actually uses for its text content (will make internationalization much easier).*
 
 # Message Dialog Boxes
 ## About Dialog
-TODO: The [template](../views/overlays/AboutResonantLab/template.html) definitely needs more text!
+Resonant Laboratory
+
+- Resonant Laboratory is a tool developed by Kitware, Inc. to help users build and share visualizations without needing to write code.  
+- TODO: better marketing schpeel...
 
 ## Success Screens
-Here is the [template](../views/layout/Overlay/successTemplate.html), and these are the messages that can go in the template:
+#### Possible Messages:
 - The dataset appears to have loaded correctly.
 - You've wired up all the connections that the visualization needs. Well done!
 - The visualization appears to be functioning correctly.
 
+#### Always show:
+- If something actually isn't working as it should, let us know [here](#). We want to get any problems fixed as soon as possible.
+- Is there something that this should be doing, but it's not? Do you have an idea for how this could be improved? If so, we'd love to work with you to build a [custom solution](#) that better fits your needs.
+
 ## Loading Screens
-Here's the [template](../views/layout/Overlay/loadingTemplate.html), and these are the messages:
+#### Possible Messages:
 - Still accessing this project's datasets...
 - Still accessing this project's matching settings...
 - Still attempting to render the visualization...
 
+#### Always show:
+- If you think it should have finished by now, please let us know [here](#). If something is broken, we want to get it fixed as soon as possible.
+- Or, it's totally possible that you're doing something awesome that we didn't anticipate (like using a huge dataset). If so, we'd love to work with you to build a [custom solution](#) that better fits your needs.
+
 ## User Error Screens
-The idea behind this screen is the user still needs to do something for something to work (the user should be able to fix these on their own). Here's the [template](../views/layout/Overlay/userErrorTemplate.html), and these are the messages, broken down by panels:
+*The idea behind this screen is the user still needs to do something for something to work (the user should be able to fix these on their own). These are the possible messages, broken down by panels:*
 
 #### Dataset panel
 - You have not chosen a dataset yet. Click [here](#) to choose one.
 - There was a problem parsing the data; you\'ll probably need to [edit](#) or [reshape](#) the data in order to use it.
 - There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to [edit](#) or [reshape](#) the data in order to use it.
+
+#### Dataset settings dialog
+- You don\'t have the necessary permissions to delete that project.
+- Sorry, you can\'t delete projects unless you [log in](#).
+- The dataset could not be loaded; there is a good chance that there is a permissions problem.
 
 #### Matching panel
 - You need to choose both a Dataset and a Visualization in order to connect them together.
@@ -37,14 +53,15 @@ The idea behind this screen is the user still needs to do something for somethin
 - You have not chosen a visualization yet. Click [here](#) to choose one.
 - This visualization needs more data matchings. Make sure there are no orange warning triangles in the Matching panel.
 
-## Regular Error Screens
-The idea behind these screens is that some kind of error has happened, but it's one that we know about, and it's supposed to happen (the user may or may not be able to fix these on their own). Here's the [template](../views/layout/Overlay/errorTemplate.html), and these are the messages:
-- You don\'t have the necessary permissions to delete that project.
-- Sorry, you can\'t delete projects unless you [log in](#).
-- The dataset could not be loaded; there is a good chance that there is a permissions problem.
+#### Always show:
+- If it's not clear how to fix this, or if something else is wrong, let us know [here](#). We want to get any problems fixed as soon as possible.
+- Or, maybe it's not a bug, but a design problem. Is there something that this should be doing, but it's not? Do you have an idea for how this could be improved? If so, we'd love to work with you to build a [custom solution](#) that better fits your needs.
 
 ## System Failure Screens
-The idea behind these screens is something really bad happened—something that we didn't anticipate. So we have a [template](../views/layout/Overlay/reallyBadErrorTemplate.html), but the messages and details will probably be really cryptic.
+*The idea behind these screens is something really bad happened—something that we didn't anticipate. So we have some default text, but we can't predict the message itself. It and its details will probably be really cryptic.*
+#### Always show:
+- I've made a huge mistake... (flaming banana stand icon)
+- This is a problem we didn't anticipate. Please let us know that this happened [here](#).
 
 # Control Dialog Boxes
 These dialog boxes are a little more complex than simple messages.
@@ -142,10 +159,10 @@ These dialog boxes are a little more complex than simple messages.
     - Public Projects Library
 
 # Menus and Buttons
-TODO: These are short, and they shouldn't be hard to find... but an `en.json` file should still have entries for them.
+*TODO: These are short, and they shouldn't be hard to find... but an `en.json` file should still have entries for them.*
 
 # Empty State
-TODO: We don't have much here yet; things like the matching panel should also have helpful text / maybe a legend to help orient the user and motivate them to try things.
+*TODO: We don't have much here yet; things like the matching panel should also have helpful text / maybe a legend to help orient the user and motivate them to try things.*
 - Try one of these buttons or bars to get started.
 - Need a hand? Try the ? buttons.
 
@@ -160,7 +177,7 @@ These show up as little notifications in the bottom corner that the user can clo
 - Could not restore datasets from when you were logged out
 - Could not restore projects from when you were logged out
 - Link successfully copied to clipboard
-- Sorry, couldn\'t copy the link for some reason. Try copying this page\'s URL from your browser\'s address bar instead.
+- Sorry, couldn't copy the link for some reason. Try copying this page's URL from your browser's address bar instead.
 
 # Tips
 When the user clicks one of the question mark buttons, these messages show up in bubbles with an arrow pointing to somewhere on the screen:
@@ -177,14 +194,14 @@ When the user clicks one of the question mark buttons, these messages show up in
 - Dataset filter and paging settings
 - Click to select a different dataset
 - There are no required visual encodings
-- # of the minimum required # connections have been established
+- \# of the minimum required \# connections have been established
 - Click to select a different visualization
 - (TODO: this list is incomplete)
 
 # Dataset Overview
 These are the ways that the overview is explained:
-- Visualizing all # items in the dataset.
-- Visualizing items # - # of # total items.
-- Visualizing # items of the # total items in the dataset.
-- Visualizing items # - # of # filtered items. There are # total items
+- Visualizing all \# items in the dataset.
+- Visualizing items \# - \# of \# total items.
+- Visualizing \# items of the \# total items in the dataset.
+- Visualizing items \# - \# of \# filtered items. There are \# total items
 in the dataset (ignoring filters).

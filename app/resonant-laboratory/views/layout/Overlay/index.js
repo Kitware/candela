@@ -18,7 +18,6 @@ import ProjectSettings from '../../overlays/ProjectSettings';
 import AboutResonantLab from '../../overlays/AboutResonantLab';
 
 import reallyBadErrorTemplate from './reallyBadErrorTemplate.html';
-import errorTemplate from './errorTemplate.html';
 import userErrorTemplate from './userErrorTemplate.html';
 import successTemplate from './successTemplate.html';
 import loadingTemplate from './loadingTemplate.html';
@@ -126,17 +125,6 @@ let Overlay = Backbone.View.extend({
     this.render(this.getScreen(loadingTemplate, message), false, () => {
       this.$el.find('#okButton').on('click', this.closeOverlay);
     });
-  },
-  renderErrorScreen: function (message) {
-    this.render(this.getScreen(errorTemplate, message), false,
-      () => {
-        this.$el.find('#okButton').on('click', () => {
-          window.mainPage.switchProject(null)
-            .then(() => {
-              window.mainPage.overlay.render('StartingScreen');
-            });
-        });
-      });
   },
   renderUserErrorScreen: function (message) {
     this.render(this.getScreen(userErrorTemplate, message), false, () => {
