@@ -1,14 +1,68 @@
-<div class="largeDialog">
-  <img src="../../../images/close.svg" id="closeOverlay" />
-  <div id="pagingSettings">
-    <h2>Visualizing <span id="totalPages">...</span> items</h2>
-    <label for="limitInput">Set page size:</label>
-    <input type="number" id="limitInput"/>
-    <button id="limitButton">Apply</button>
+<div id="datasetSettings">
+  <div>
+    <label for="datasetName">Name:</label>
+    <input type="text" id="datasetName"/>
+    <img id="datasetSettingsSpinner" src="../../../images/spinner.gif"/>
   </div>
-  <hr/>
-  <div id="activeFilters">
-    <h2>Active Filters</h2>
-    <p>There are no active filters.</p>
+  <div>
+    <img src="../../../images/disk.svg"/>
+    <span>Size:</span>
+    <span id="datasetSize"></span>
   </div>
+  <div>
+    <img src="../../../images/girder.svg"/>
+    <span>Girder Location:</span>
+    <a id="datasetLocation" target="_blank"></a>
+  </div>
+  <div>
+    <img id="visibilityIcon" src="../../../images/public.svg"/>
+    <img id="editabilityIcon" src="../../../images/canEdit.svg"/>
+    <span>Access:</span>
+  </div>
+  <div class="visibilityRadios">
+    <span>
+      <input value="PrivateUser" id="privateVisibility" name="projectVisibility" type="radio">
+      <label for="privateVisibility">Private</label>
+    </span>
+    <span>
+      <input value="PublicUser" id="publicVisibility" name="projectVisibility" type="radio">
+      <label for="publicVisibility">Public</label>
+    </span>
+    <span>
+      <input value="PublicScratch" id="scratchVisibility" name="projectVisibility" type="radio">
+      <label for="scratchVisibility">Public Scratch Space</label>
+    </span>
+    <span>
+      <input value="PublicLibrary" id="libraryVisibility" name="projectVisibility" type="radio">
+      <label for="libraryVisibility">Library</label>
+    </span>
+  </div>
+</div>
+<!--<hr/>
+TODO: enable dataset parsing settings that let us tweak
+the stuff that the server auto-inferred (e.g. CSV delimiters,
+JSONPath, etc)
+<div id="csvUploadControls" class="hideableForm">
+</div>
+<div id="jsonUploadControls" class="hideableForm">
+</div>
+<div id="flatFileControls" class="hideableForm">
+  <span>Upload as:</span>
+  <input value="uploadAsFlatFile" id="uploadAsFlatFile" name="uploadAsFlatFile" type="radio">
+  <label for="uploadAsFlatFile">Flat File</label>
+  <input value="uploadAsMongodbCollection" id="uploadAsMongodbCollection" name="uploadAsMongodbCollection" type="radio">
+  <label for="uploadAsMongodbCollection">MongoDB Collection</label>
+</div>-->
+
+<hr/>
+<div id="pagingSettings">
+  <h2>Visualizing <span id="totalPages">...</span> items</h2>
+  <label for="limitInput">Set page size:</label>
+  <input type="number" id="limitInput"/>
+  <button id="limitButton">Apply</button>
+</div>
+<hr/>
+<div id="activeFilters">
+  <h2>Active Filters</h2>
+  <p>There are no active filters.</p>
 </div>

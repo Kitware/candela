@@ -5,22 +5,20 @@ let User = girder.models.UserModel.extend({
   initialize: function () {
     this.loggedIn = false;
     this.preferences = new UserPreferences();
+    this.updatePrivateFolder();
     this.listenTo(this, 'rl:logout', this.handleUpdate);
     this.listenTo(this, 'rl:login', this.handleUpdate);
-    this.authenticate();
   },
   addListeners: function () {
     this.preferences.addListeners();
   },
-  authenticate: function (login) {
+  authenticate: function (login, mainPage) {
     login = login !== false;
+    mainPage = mainPage || window.mainPage;
 
-    return new Promise((resolve, reject) => {
-      girder.restRequest({
-        path: 'user/authentication',
-        type: login ? 'GET' : 'DELETE',
-        error: reject
-      }).done(resolve).error(reject);
+    return mainPage.girderRequest({
+      path: 'user/authentication',
+      type: login ? 'GET' : 'DELETE'
     }).then(resp => {
       if (resp === null || login === false) {
         this.finishLogout();
@@ -72,6 +70,18 @@ let User = girder.models.UserModel.extend({
           window.mainPage.trigger('rl:error', errorObj);
         });
     }
+    this.updatePrivateFolder();
+  },
+  updatePrivateFolder: function () {
+    this.privateFolder = null;
+    new Promise((resolve, reject) => {
+      return girder.restRequest({
+        path: '/folder/anonymousAccess/privateFolder',
+        error: reject
+      }).done(resolve).error(reject);
+    }).then(folder => {
+      this.privateFolder = new girder.models.FolderModel(folder);
+    });
   },
   isLoggedIn: function () {
     return this.loggedIn;

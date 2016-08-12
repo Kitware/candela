@@ -36,10 +36,18 @@
 
 #Overlay .largeDialog hr {
   position: relative;
-  left: -3em;
-  width: calc(100% + 5em);
+  width: 100%;
   border: none;
   height: 1px;
+  background-color: $separatorColor;
+}
+#Overlay .largeDialog .divider {
+  position: relative;
+  margin: 0em 1em;
+  min-height: 100%;
+  border: none;
+  min-width: 1px;
+  max-width: 1px;
   background-color: $separatorColor;
 }
 
@@ -93,7 +101,7 @@
   border: 2px solid transparent;
 }
 #Overlay div.current.circleButton {
-  background-color: $lightRolloverColor;
+  background-color: $backgroundRolloverColor;
 }
 #Overlay div.circleButton:hover {
   border: 2px solid $darkRolloverColor;

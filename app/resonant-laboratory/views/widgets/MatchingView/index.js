@@ -99,10 +99,13 @@ let MatchingView = Widget.extend({
     this.$el.html('');
     this.status = STATUS.NOTHING_TO_MAP;
 
-    this.listenTo(window.mainPage.project, 'rl:changeMatchings', () => {
-      this.selection = null;
-      this.render();
-    });
+    if (window.mainPage.project) {
+      this.stopListening(window.mainPage.project, 'rl:changeMatchings');
+      this.listenTo(window.mainPage.project, 'rl:changeMatchings', () => {
+        this.selection = null;
+        this.render();
+      });
+    }
   },
   renderInfoScreen: function () {
     window.mainPage.helpLayer.showTips(this.getTips());
@@ -158,8 +161,8 @@ in order to connect them together.`);
       return this.graph.satisfiedConnections === this.graph.requiredConnections;
     }
   },
-  updateGraph: function () {
-    if (!window.mainPage.project) {
+  updateGraph: function (loadedDatasets) {
+    if (!loadedDatasets) {
       this.graph = null;
       return;
     }
@@ -173,7 +176,7 @@ in order to connect them together.`);
 
     if (meta.datasets) {
       meta.datasets.forEach(d => {
-        let datasetObj = window.mainPage.loadedDatasets[d.dataset];
+        let datasetObj = loadedDatasets[d.dataset];
         if (datasetObj) {
           specs.data.push(datasetObj.getTypeSpec());
         }
@@ -868,138 +871,146 @@ in order to connect them together.`);
 
     // Construct a graph from each of the specs
     // (and the currently selected node)
-    this.updateGraph();
-
-    // Add our template if it's not already there
-    // (or if we simply want to clear the widget)
-    if (this.$el.find('svg').length === 0 || this.graph === null) {
-      this.$el.html(myTemplate);
-      // Add the function to deselect everything when
-      // the canvas is clicked
-      d3.select(this.el).select('svg')
-        .on('click', () => {
-          this.selection = null;
-          this.render();
-        });
-    }
-
-    // Update our little indicator to describe the matching
-    if (this.graph === null || this.graph.requiredConnections === 0) {
-      this.status = STATUS.NOTHING_TO_MAP;
-      this.statusText.text = '--';
-      this.statusText.title = 'There are no required visual encodings';
+    let datasetsPromise;
+    if (!window.mainPage.project) {
+      datasetsPromise = Promise.resolve(null);
     } else {
-      this.statusText.text = this.graph.satisfiedConnections + ' / ' + this.graph.requiredConnections;
-      this.statusText.title = this.graph.satisfiedConnections + ' of the minimum required ' +
-        this.graph.requiredConnections + ' connections have been established';
-      if (this.graph.satisfiedConnections < this.graph.requiredConnections) {
-        this.status = STATUS.NOT_ENOUGH_MAPPINGS;
+      datasetsPromise = window.mainPage.project.cache.loadedDatasets;
+    }
+    datasetsPromise.then(loadedDatasets => {
+      this.updateGraph(loadedDatasets);
+
+      // Add our template if it's not already there
+      // (or if we simply want to clear the widget)
+      if (this.$el.find('svg').length === 0 || this.graph === null) {
+        this.$el.html(myTemplate);
+        // Add the function to deselect everything when
+        // the canvas is clicked
+        d3.select(this.el).select('svg')
+          .on('click', () => {
+            this.selection = null;
+            this.render();
+          });
+      }
+
+      // Update our little indicator to describe the matching
+      if (this.graph === null || this.graph.requiredConnections === 0) {
+        this.status = STATUS.NOTHING_TO_MAP;
+        this.statusText.text = '--';
+        this.statusText.title = 'There are no required visual encodings';
       } else {
-        this.status = STATUS.OK;
+        this.statusText.text = this.graph.satisfiedConnections + ' / ' + this.graph.requiredConnections;
+        this.statusText.title = this.graph.satisfiedConnections + ' of the minimum required ' +
+          this.graph.requiredConnections + ' connections have been established';
+        if (this.graph.satisfiedConnections < this.graph.requiredConnections) {
+          this.status = STATUS.NOT_ENOUGH_MAPPINGS;
+        } else {
+          this.status = STATUS.OK;
+        }
       }
-    }
-    this.renderIndicators();
+      this.renderIndicators();
 
-    if (this.graph === null || !widgetIsShowing) {
-      // We don't need to actually draw the interface;
-      // only the indicators are important
-      this.layout = null;
-      return;
-    }
-
-    // Okay, let's figure out the layout
-    this.layout = {
-      emSize: parseFloat(this.$el.css('font-size'))
-    };
-
-    this.layout.dataNodeHeight = 1.5 * this.layout.emSize;
-    this.layout.visNodeHeight = 3.0 * this.layout.emSize;
-
-    // Temporarily force the scroll bars so we
-    // account for their size
-    this.$el.css('overflow', 'scroll');
-    this.layout.width = this.el.clientWidth;
-    this.layout.height = this.el.clientHeight;
-    this.layout.visHeight = 1.5 * this.layout.visNodeHeight * (this.graph.visNodes.length + 2);
-    this.layout.dataHeight = 1.5 * this.layout.dataNodeHeight * (this.graph.dataNodes.length + 2);
-    this.$el.css('overflow', '');
-
-    this.layout.fullHeight = Math.max(this.layout.height,
-                                      this.layout.visHeight,
-                                      this.layout.dataHeight);
-
-    this.$el.find('svg')
-      .attr({
-        width: this.layout.width,
-        height: this.layout.fullHeight
-      });
-
-    // Okay, we've figured out the size of our canvas.
-    // Next up: how to lay things out vertically?
-
-    // Just spread the data nodes out to fill the whole space
-    this.layout.yDataScale = d3.scale.linear()
-      .domain([-1, this.graph.dataNodes.length])
-      .range([0, this.layout.fullHeight]);
-
-    // We want the vis nodes to move to wherever
-    // the user has scrolled
-    let scrollTop = this.$el.scrollTop();
-    if (this.layout.visHeight >= this.layout.height) {
-      // We may want to adjust the top if the vis nodes
-      // actually take up more space than can be seen;
-      // first try to center the nodes on the screen
-      scrollTop -= (this.layout.visHeight - this.layout.height) / 2;
-      // ... and make sure we're not out of scrollable range
-      if (scrollTop + this.layout.visHeight >= this.layout.fullHeight) {
-        scrollTop = this.layout.fullHeight - this.layout.visHeight;
+      if (this.graph === null || !widgetIsShowing) {
+        // We don't need to actually draw the interface;
+        // only the indicators are important
+        this.layout = null;
+        return;
       }
-      if (scrollTop < 0) {
-        scrollTop = 0;
+
+      // Okay, let's figure out the layout
+      this.layout = {
+        emSize: parseFloat(this.$el.css('font-size'))
+      };
+
+      this.layout.dataNodeHeight = 1.5 * this.layout.emSize;
+      this.layout.visNodeHeight = 3.0 * this.layout.emSize;
+
+      // Temporarily force the scroll bars so we
+      // account for their size
+      this.$el.css('overflow', 'scroll');
+      this.layout.width = this.el.clientWidth;
+      this.layout.height = this.el.clientHeight;
+      this.layout.visHeight = 1.5 * this.layout.visNodeHeight * (this.graph.visNodes.length + 2);
+      this.layout.dataHeight = 1.5 * this.layout.dataNodeHeight * (this.graph.dataNodes.length + 2);
+      this.$el.css('overflow', '');
+
+      this.layout.fullHeight = Math.max(this.layout.height,
+                                        this.layout.visHeight,
+                                        this.layout.dataHeight);
+
+      this.$el.find('svg')
+        .attr({
+          width: this.layout.width,
+          height: this.layout.fullHeight
+        });
+
+      // Okay, we've figured out the size of our canvas.
+      // Next up: how to lay things out vertically?
+
+      // Just spread the data nodes out to fill the whole space
+      this.layout.yDataScale = d3.scale.linear()
+        .domain([-1, this.graph.dataNodes.length])
+        .range([0, this.layout.fullHeight]);
+
+      // We want the vis nodes to move to wherever
+      // the user has scrolled
+      let scrollTop = this.$el.scrollTop();
+      if (this.layout.visHeight >= this.layout.height) {
+        // We may want to adjust the top if the vis nodes
+        // actually take up more space than can be seen;
+        // first try to center the nodes on the screen
+        scrollTop -= (this.layout.visHeight - this.layout.height) / 2;
+        // ... and make sure we're not out of scrollable range
+        if (scrollTop + this.layout.visHeight >= this.layout.fullHeight) {
+          scrollTop = this.layout.fullHeight - this.layout.visHeight;
+        }
+        if (scrollTop < 0) {
+          scrollTop = 0;
+        }
+      } else {
+        // Okay, there's actually more space than we need.
+        // Center the vis nodes in the visible space
+        scrollTop += (this.layout.height - this.layout.visHeight) / 2;
       }
-    } else {
-      // Okay, there's actually more space than we need.
-      // Center the vis nodes in the visible space
-      scrollTop += (this.layout.height - this.layout.visHeight) / 2;
-    }
 
-    this.layout.yVisScale = d3.scale.linear()
-      .domain([-1, this.graph.visNodes.length])
-      .range([scrollTop, scrollTop + this.layout.visHeight]);
+      this.layout.yVisScale = d3.scale.linear()
+        .domain([-1, this.graph.visNodes.length])
+        .range([scrollTop, scrollTop + this.layout.visHeight]);
 
-    // Horizontal layout actually depends largely on the contents
-    // of each cell, so we need to render the nodes first
-    suggestions = this.renderVisNodes();
-    this.layout.visX = suggestions.xPosition;
-    this.layout.visWidth = suggestions.idealWidth;
-    this.layout.visWidth = Math.max(suggestions.minWidth, this.layout.visWidth);
-    this.layout.visWidth = Math.min(suggestions.maxWidth, this.layout.visWidth);
+      // Horizontal layout actually depends largely on the contents
+      // of each cell, so we need to render the nodes first
+      suggestions = this.renderVisNodes();
+      this.layout.visX = suggestions.xPosition;
+      this.layout.visWidth = suggestions.idealWidth;
+      this.layout.visWidth = Math.max(suggestions.minWidth, this.layout.visWidth);
+      this.layout.visWidth = Math.min(suggestions.maxWidth, this.layout.visWidth);
 
-    let suggestions = this.renderDataNodes();
-    this.layout.dataX = suggestions.xPosition;
-    this.layout.dataWidth = suggestions.idealWidth;
-    this.layout.dataWidth = Math.min(suggestions.maxWidth, this.layout.dataWidth);
+      let suggestions = this.renderDataNodes();
+      this.layout.dataX = suggestions.xPosition;
+      this.layout.dataWidth = suggestions.idealWidth;
+      this.layout.dataWidth = Math.min(suggestions.maxWidth, this.layout.dataWidth);
 
-    let spaceBetween = this.layout.visX - (this.layout.dataWidth + this.layout.dataX);
-    if (spaceBetween < 7 * this.layout.emSize) {
-      // There's very little space; shrink the data nodes
-      this.layout.dataWidth = Math.min(this.layout.dataWidth, this.layout.visX -
-        this.layout.dataX - 7 * this.layout.emSize);
-      // ... but make sure that at least the icon shows up
-      this.layout.dataWidth = Math.max(suggestions.minWidth, this.layout.dataWidth);
-    } else if (spaceBetween > 20 * this.layout.emSize) {
-      // There's a ton of space between; move everything closer together
-      let delta = (spaceBetween - 20 * this.layout.emSize) / 2;
-      this.layout.dataX += delta;
-      this.layout.visX -= delta;
-    }
+      let spaceBetween = this.layout.visX - (this.layout.dataWidth + this.layout.dataX);
+      if (spaceBetween < 7 * this.layout.emSize) {
+        // There's very little space; shrink the data nodes
+        this.layout.dataWidth = Math.min(this.layout.dataWidth, this.layout.visX -
+          this.layout.dataX - 7 * this.layout.emSize);
+        // ... but make sure that at least the icon shows up
+        this.layout.dataWidth = Math.max(suggestions.minWidth, this.layout.dataWidth);
+      } else if (spaceBetween > 20 * this.layout.emSize) {
+        // There's a ton of space between; move everything closer together
+        let delta = (spaceBetween - 20 * this.layout.emSize) / 2;
+        this.layout.dataX += delta;
+        this.layout.visX -= delta;
+      }
 
-    // Now we can update all the nodes with their new positions
-    this.positionNodes();
+      // Now we can update all the nodes with their new positions
+      this.positionNodes();
 
-    // Finally, with all the nodes in position, we can draw the
-    // edges between them
-    this.renderEdges();
+      // Finally, with all the nodes in position, we can draw the
+      // edges between them
+      this.renderEdges();
+    });
   }, 200)
 });
 

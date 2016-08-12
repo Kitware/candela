@@ -139,8 +139,6 @@ let MetadataItem = girder.models.ItemModel.extend({
         this.trigger('rl:swappedId', oldId);
       }
       return resp;
-    }).catch(errorObj => {
-      window.mainPage.trigger('rl:error', errorObj);
     });
   },
   sync: function (method, model, options) {
@@ -217,7 +215,14 @@ let MetadataItem = girder.models.ItemModel.extend({
           rlab: this.getFlatMeta()
         }),
         type: 'POST'
-      }, options);
+      }, options).then(resp => {
+        // In case the server did extra stuff while saving,
+        // make sure that we're up to date
+        this.set(resp, {
+          silent: true
+        });
+        return resp;
+      });
     } else if (method === 'read') {
       if (this.getId() === undefined) {
         // If we haven't yet identified the id, look for it

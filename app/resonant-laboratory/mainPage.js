@@ -19,18 +19,16 @@ import './stylesheets/mainPage.scss';
 import './stylesheets/girderPatches.scss';
 
 // The API root is different
-window.girder.apiRoot = 'api/v1';
+let girder = window.girder;
+girder.apiRoot = 'api/v1';
 
 // Our main view that coordinates each big chunk
 let MainPage = Backbone.View.extend({
   initialize: function () {
     // Get the current app version
-    this.versionNumber = new Promise((resolve, reject) => {
-      window.girder.restRequest({
-        path: 'system/resonantLaboratoryVersion',
-        type: 'GET',
-        error: reject
-      }).done(resolve).error(reject);
+    this.versionNumber = this.girderRequest({
+      path: 'system/resonantLaboratoryVersion',
+      type: 'GET'
     });
 
     // Set up navigation
@@ -38,6 +36,8 @@ let MainPage = Backbone.View.extend({
 
     // Initial empty state (assume no logged in user)
     this.currentUser = new User();
+    // Attempt to log in (async result)
+    this.currentUser.authenticate(true, this);
 
     this.listenTo(this.currentUser, 'rlab:logout', () => {
       this.switchProject(null).then(() => {
@@ -45,7 +45,7 @@ let MainPage = Backbone.View.extend({
       });
     });
 
-    // Start no datasets and no project
+    // Start with no datasets and no project
     this.loadedDatasets = {};
     this.project = null;
 
@@ -139,37 +139,60 @@ let MainPage = Backbone.View.extend({
   },
   newProject: function () {
     this.project = new Project();
-    return this.project.create()
+    let responsePromise = this.project.create()
       .then(() => {
-        this.trigger('rl:createProject');
-        this.project.fetch().then(() => {
-          this.trigger('rl:changeProject');
-        });
-      }).catch((err) => {
-        this.switchProject(null);
-        this.trigger('rl:error', err);
+        // We want to return the actual project object, not the fetched result
+        // from the server
+        return this.project;
       });
+    responsePromise.then(() => {
+      this.trigger('rl:createProject');
+      this.trigger('rl:changeProject');
+    }).catch(err => {
+      this.trigger('rl:error', err);
+    });
+    return responsePromise;
   },
   switchProject: function (id) {
     if (this.project) {
       this.project.stopListening();
     }
+    let responsePromise;
     if (id === null) {
       this.project = null;
-      this.trigger('rl:changeProject');
-      return new Promise(() => {});
+      responsePromise = Promise.resolve(null);
     } else {
       this.project = new Project({
         _id: id
       });
 
-      return this.project.fetch().then(() => {
-        this.trigger('rl:changeProject');
-      }).catch((err) => {
-        this.switchProject(null);
-        this.trigger('rl:error', err);
-      });
+      responsePromise = this.project.fetch()
+        .then(() => {
+          // We want to return the actual project object, not the fetched result
+          // from the server
+          return this.project;
+        });
     }
+    responsePromise.then(() => {
+      this.trigger('rl:changeProject');
+    }).catch((err) => {
+      this.trigger('rl:error', err);
+    });
+    return responsePromise;
+  },
+  getProject: function () {
+    if (this.project) {
+      return Promise.resolve(this.project);
+    } else {
+      return this.newProject();
+    }
+  },
+  girderRequest: function (params) {
+    let responsePromise = new Promise((resolve, reject) => {
+      params.error = reject;
+      return girder.restRequest(params).done(resolve).error(reject);
+    });
+    return responsePromise;
   }
 });
 

@@ -85,7 +85,7 @@ class DatasetCache {
   }
   get page () {
     if (!this._page) {
-      this.page = {
+      this._page = {
         offset: 0,
         limit: 1000
       };
@@ -121,6 +121,20 @@ class DatasetCache {
         });
       }
     }
+  }
+  get status () {
+    if (!this.cachedPromises.status) {
+      this.cachedPromises.status = this.restRequest({
+        'path': 'anonymousAccess/info'
+      });
+    }
+    return this.cachedPromises.status;
+  }
+  set status (value) {
+    // Attempting to set the status simply invalidates it;
+    // always delete it and issue a new call to the server
+    // next time someone attempts to get it
+    delete this.cachedPromises.status;
   }
   get schema () {
     // Do we have the schema already in our metadata,
@@ -255,6 +269,15 @@ let Dataset = MetadataItem.extend({
     // its own non-Backbone cache class
     this.cache = new DatasetCache(this);
     this.dropped = false;
+  },
+  identifyAsDataset: function () {
+    return this.restRequest({
+      path: 'dataset',
+      method: 'POST'
+    }).then(resp => {
+      this.set(resp);
+      return resp;
+    });
   },
   save: function () {
     // It's possible for a dataset to be dropped from the project
@@ -741,6 +764,24 @@ let Dataset = MetadataItem.extend({
       let lastItem = filteredHistogram.__passedFilters__[0].count;
       this.setPage(lastItem, this.cache.page.limit);
     });
+  },
+  updateStatus: function () {
+    // Just invalidate the cached status; the new
+    // status will get retrieved lazily
+    this.cache.status = null;
+    this.trigger('rl:updateStatus');
+  },
+  drop: function () {
+    this.dropped = true;
+  },
+  destroy: function () {
+    // Don't allow deletion of a dataset unless
+    // the dropped flag has already been set
+    if (this.dropped !== true) {
+      window.mainPage.trigger('rl:error', new Error('Cannot destroy an un-dropped dataset.'));
+    } else {
+      return MetadataItem.prototype.destroy.apply(this, arguments);
+    }
   }
 });
 

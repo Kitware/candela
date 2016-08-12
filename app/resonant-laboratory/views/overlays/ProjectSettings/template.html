@@ -1,69 +1,35 @@
-<div class="largeDialog">
-  <img src="../../../images/close.svg" id="closeOverlay" />
-
-  <div id="loginLinks">
-    For more control, <a id="registerLink">Register</a> or <a id="loginLink">Log In</a>
+<div id="projectSettings">
+  <div>
+    <img id="copyLinkIcon" class="button" src="../../../images/copyLink.svg" title="Copy a link to this project"/>
+    <label for="projectNameField">Name:</label>
+    <input type="text" id="projectNameField"/>
   </div>
-
-  <h1 id="projectSettingsHeader">
-    Project Settings
-  </h1>
-  <div id="projectSettings">
-    <p>A project connects datasets to visualizations. If your project is public, you can share your work simply by sharing its URL (only users with access will be able to see it).</p>
-
-    <div class="form">
-      <div>
-        <label>Name:</label>
-        <input id="projectNameField" type="text" />
-        <button id="saveAsButton">Save A Copy</button>
-        <button id="deleteButton">Delete</button>
-        <button id="newButton">New Empty Project</button>
-      </div>
-      
-      <div>
-        <input value="PrivateUser" id="privateVisibility" name="projectVisibility" type="radio">
-        <label for="privateVisibility">Private</label>
-        <input value="PublicUser" id="publicVisibility" name="projectVisibility" type="radio">
-        <label for="publicVisibility">Public</label>
-        <input value="PublicScratch" id="scratchVisibility" name="projectVisibility" type="radio">
-        <label for="scratchVisibility">Public Scratch Space</label>
-        <input value="PublicLibrary" id="libraryVisibility" name="projectVisibility" type="radio">
-        <label for="libraryVisibility">Library</label>
-      </div>
-      
-      <div id="projectDetails">
-        <div class="unclickable circleButton">
-          <img id="visibilityIcon"/>
-          <label id="visibilityLabel"></label>
-        </div>
-
-        <div class="unclickable circleButton">
-          <img id="editabilityIcon"/>
-          <label id="editabilityLabel"></label>
-        </div>
-
-        <div class="circleButton" id="girderButton">
-          <img src="../../../images/girder.svg" />
-          <label>Show in Girder</label>
-        </div>
-
-        <div class="circleButton" id="copyLinkButton">
-          <img src="../../../images/copyLink.svg" />
-          <label>Copy a link</label>
-        </div>
-      </div>
-    </div>
+  <div>
+    <img src="../../../images/girder.svg"/>
+    <span>Girder Location:</span>
+    <a id="projectLocation" target="_blank"></a>
   </div>
-  <div id="libraryChunk">
-
+  <div>
+    <img id="visibilityIcon" src="../../../images/public.svg"/>
+    <img id="editabilityIcon" src="../../../images/canEdit.svg"/>
+    <span>Access:</span>
+  </div>
+  <div class="visibilityRadios">
+    <span>
+      <input value="PrivateUser" id="privateVisibility" name="projectVisibility" type="radio">
+      <label for="privateVisibility">Private</label>
+    </span>
+    <span>
+      <input value="PublicUser" id="publicVisibility" name="projectVisibility" type="radio">
+      <label for="publicVisibility">Public</label>
+    </span>
+    <span>
+      <input value="PublicScratch" id="scratchVisibility" name="projectVisibility" type="radio">
+      <label for="scratchVisibility">Public Scratch Space</label>
+    </span>
+    <span>
+      <input value="PublicLibrary" id="libraryVisibility" name="projectVisibility" type="radio">
+      <label for="libraryVisibility">Library</label>
+    </span>
   </div>
 </div>
-
-<style type="text/css">
-  #loginLinks {
-    position: absolute;
-    top: 1.5em;
-    right: 4em;
-  }
-
-</style>
