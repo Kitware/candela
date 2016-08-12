@@ -100,6 +100,8 @@ let Overlay = Backbone.View.extend({
       message = errorObj.responseJSON.message;
     } else if (errorObj.message) {
       message = errorObj.message;
+    } else if (typeof errorObj === 'string') {
+      message = errorObj;
     } else {
       // Fallback if I can't tell what it is
       message = 'Unknown error; maybe the console contains some clues';
@@ -146,7 +148,7 @@ let Overlay = Backbone.View.extend({
   renderReallyBadErrorScreen: function (message, details) {
     this.render(this.getScreen(reallyBadErrorTemplate, message, details), false,
       () => {
-        this.$el.find('#okButton').on('click', () => {
+        this.$el.find('#okButton, #closeOverlay').on('click', () => {
           window.mainPage.switchProject(null)
             .then(() => {
               window.mainPage.overlay.render('StartingScreen');
