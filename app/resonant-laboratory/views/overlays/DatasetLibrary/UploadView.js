@@ -4,7 +4,7 @@ let girder = window.girder;
 const SUPPORTED_FORMATS = {
   'text/csv': 'csv',
   'text/tsv': 'csv',
-  'text/json': 'json'
+  'application/json': 'json'
 };
 
 let UploadView = girder.views.UploadWidget.extend({
