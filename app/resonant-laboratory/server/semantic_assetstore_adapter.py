@@ -76,11 +76,14 @@ def json_stream(base_stream, offset, limit, filterFunc, outputType):
             if limit is not None and emit_count == limit:
                 break
 
-            if skip_count < offset and filterFunc(obj):
-                skip_count += 1
+            obj = convert_floats(obj)
+
+            if not filterFunc(obj):
                 continue
 
-            obj = convert_floats(obj)
+            if skip_count < offset:
+                skip_count += 1
+                continue
 
             if outputType == 'csv':
                 raise RuntimeError('no csv output for json_stream')
