@@ -32,7 +32,7 @@ let ICONS = {
 
 import tips from './tips.json';
 
-import './header.css';
+import './header.scss';
 
 let Header = Backbone.View.extend({
   addListeners: function () {
@@ -68,6 +68,9 @@ let Header = Backbone.View.extend({
       // Add the template and wire up all the default
       // button events
       this.$el.html(myTemplate);
+      jQuery('#aboutResLabHeaderButton').on('click', () => {
+        window.mainPage.overlay.render('AboutResonantLab');
+      });
       jQuery('#hamburgerButton').on('click', () => {
         window.mainPage.overlay.render('HamburgerMenu');
       });

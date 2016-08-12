@@ -1,8 +1,10 @@
+@import '../../../stylesheets/colors.scss';
+
 .menu {
   position: absolute;
-  background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  background-color: $panelBackgroundColor;
+  border: 1px solid rgba($shadowColor, 0.2);
+  box-shadow: 0 6px 12px rgba($shadowColor, 0.175);
   border-radius: 4px;
 }
 .menu.withChecks {
@@ -14,7 +16,7 @@
   width: 100%;
   border: none;
   height: 1px;
-  background-color: #e5e5e5;
+  background-color: $separatorColor;
   margin: 0px;
 }
 
@@ -36,6 +38,8 @@
   position: absolute;
   left: 0.5em;
   top: calc(50% - 0.75em);
+  -webkit-filter: imgColorFilter($overriddenIconColor);
+  filter: imgColorFilter($overriddenIconColor);
 }
 .menu div.menuItem.separator {
   padding: 0px;
@@ -43,14 +47,22 @@
 }
 
 .menu div.menuItem:hover {
-  background-color: #eee;
+  background-color: $menuRolloverColor;
+  color: $darkRolloverColor;
   cursor: pointer;
 }
 
-.menu img.icon {
+.menu div.menuItem img.icon {
   vertical-align: middle;
   width: 1.5em;
   height: 1.5em;
+  -webkit-filter: imgColorFilter($defaultDarkIconColor);
+  filter: imgColorFilter($defaultDarkIconColor);
+}
+
+.menu div.menuItem:hover img.icon {
+  -webkit-filter: imgColorFilter($darkRolloverColor);
+  filter: imgColorFilter($darkRolloverColor);
 }
 
 .menu p {

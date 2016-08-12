@@ -1,3 +1,5 @@
+@import '../../../stylesheets/colors.scss';
+
 #HelpLayer svg {
   position: absolute;
   z-index: 1110;
@@ -11,7 +13,7 @@
   pointer-events: initial;
 }
 #HelpLayer #helpLayerMask {
-  fill: rgba(0,0,0,0.35);
+  fill: rgba($shadowColor,0.35);
   stroke: none;
 }
 #HelpLayer #arrow,
@@ -22,44 +24,26 @@
 #HelpLayer #arrow {
   fill: none;
 }
-#HelpLayer #gotIt rect,
+#HelpLayer #gotIt rect {
+  fill: $panelBackgroundColor;
+}
 #HelpLayer.old #bubble circle {
-  fill: white;
+  fill: $oldHelpBubbleColor;
 }
 #HelpLayer.new #bubble circle {
-  fill: #ffffcc;
+  fill: $helpBubbleColor;
 }
 #HelpLayer.old #arrow {
   stroke-width: 2px;
-  stroke: white;
+  stroke: $oldHelpBubbleColor;
 }
 #HelpLayer #gotIt rect,
 #HelpLayer.old #bubble circle {
   stroke-width: 1px;
-  stroke: rgba(0,0,0,0.2);
+  stroke: rgba($shadowColor,0.2);
 }
 #HelpLayer.new #arrow,
 #HelpLayer.new #bubble circle {
   stroke-width: 2px;
-  stroke: #ffff33;
+  stroke: $helpBubbleColor;
 }
-/*#HelpLayer #gotIt {
-  position: absolute;
-  bottom: 2em;
-  right: 2em;
-  z-index: 1111;
-  padding: 1em;
-  background-color: white;
-  border: 1px solid rgba(0,0,0,0.2);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-}
-#HelpLayer #gotIt > div {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5em;
-  align-items: center;
-}
-#HelpLayer #gotIt > div > * {
-  margin-left: 0.25em;
-  margin-right: 0.25em;
-}*/

@@ -9,9 +9,9 @@ import myTemplate from './template.html';
 import histogramTemplate from './histogramTemplate.html';
 import rewrap from '../../../shims/svgTextWrap.js';
 import makeValidId from '../../../shims/makeValidId.js';
-import './style.css';
-import './tablePreview.css';
-import './histogramPreview.css';
+import './style.scss';
+import './tablePreview.scss';
+import './histogramPreview.scss';
 
 import seekFirst from '../../../images/seekFirst.svg';
 import seekPrev from '../../../images/seekPrev.svg';
@@ -161,6 +161,15 @@ let DatasetView = Widget.extend({
           return Widget.okayIcon;
         } else {
           return Widget.warningIcon;
+        }
+      },
+      className: () => {
+        if (this.status === STATUS.LOADING) {
+          return 'loading';
+        } else if (this.status === STATUS.SUCCESS) {
+          return 'okay';
+        } else {
+          return 'warning';
         }
       },
       title: () => {
@@ -464,13 +473,10 @@ let DatasetView = Widget.extend({
     let attrType = datasetDetails.datasetObj
       .getAttributeType(datasetDetails.schema, attrName);
     let isAuto = !(datasetDetails.schema[attrName].hasOwnProperty('coerceToType'));
-    let filterStyle = isAuto ? null : 'url(#recolorImageTo377eb8)';
+    let buttonClass = isAuto ? 'dataTypeMenuIcon button' : 'overridden dataTypeMenuIcon button';
     d3.select(element)
       .attr('src', ICONS[attrType])
-      .style({
-        '-webkit-filter': filterStyle,
-        'filter': filterStyle
-      });
+      .attr('class', buttonClass);
     this.attachMenuToButton(element, attrName, datasetDetails,
       TYPE_MENU_ITEMS, autoAttrType, attrType, isAuto,
       (newDataType) => {
@@ -483,13 +489,10 @@ let DatasetView = Widget.extend({
     let interpretation = datasetDetails.datasetObj
       .getAttributeInterpretation(datasetDetails.schema, attrName);
     let isAuto = !(datasetDetails.schema[attrName].hasOwnProperty('interpretation'));
-    let filterStyle = isAuto ? null : 'url(#recolorImageTo377eb8)';
+    let buttonClass = isAuto ? 'interpretationMenuIcon button' : 'overridden interpretationMenuIcon button';
     d3.select(element)
       .attr('src', ICONS[interpretation])
-      .style({
-        '-webkit-filter': filterStyle,
-        'filter': filterStyle
-      });
+      .attr('class', buttonClass);
     this.attachMenuToButton(element, attrName, datasetDetails,
       INTERPRETATION_MENU_ITEMS, autoInterpretation, interpretation, isAuto,
       (newInterpretation) => {

@@ -38,6 +38,15 @@ let VisualizationView = Widget.extend({
           return Widget.warningIcon;
         }
       },
+      className: () => {
+        if (this.status === STATUS.LOADING) {
+          return 'loading';
+        } else if (this.status === STATUS.OK) {
+          return 'okay';
+        } else {
+          return 'warning';
+        }
+      },
       title: () => {
         if (this.status === STATUS.LOADING) {
           return 'The visualization hasn\'t finished loading yet';

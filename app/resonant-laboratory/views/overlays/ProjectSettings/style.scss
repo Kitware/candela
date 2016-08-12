@@ -1,3 +1,5 @@
+@import '../../../stylesheets/colors.scss';
+
 #Overlay div.form > * {
   display: flex;
   flex-wrap: wrap;
@@ -14,7 +16,11 @@
   flex-wrap: wrap;
   justify-content: space-between;
 }
+#Overlay #projectDetails img {
+  -webkit-filter: imgColorFilter($defaultDarkIconColor);
+  filter: imgColorFilter($defaultDarkIconColor);
+}
 #Overlay div.unclickable.circleButton:hover {
   cursor: default;
-  border: 2px solid rgba(0,0,0,0);
+  border: 2px solid transparent;
 }
