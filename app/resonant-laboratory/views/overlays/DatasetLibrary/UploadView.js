@@ -2,6 +2,9 @@ import './uploadStyle.scss';
 let girder = window.girder;
 
 const SUPPORTED_FORMATS = {
+  'csv': 'csv',
+  'tsv': 'csv',
+  'json': 'json',
   'text/csv': 'csv',
   'text/tsv': 'csv',
   'application/json': 'json'
@@ -36,7 +39,13 @@ let UploadView = girder.views.UploadWidget.extend({
   validateFiles: function () {
     let fileType = null;
     if (this.files.length > 0) {
-      fileType = SUPPORTED_FORMATS[this.files[0].type];
+      let ext = this.files[0].type;
+      if (!ext && this.files[0].name.indexOf('.') !== -1) {
+        ext = this.files[0].name.split('.').slice(-1).toLowerCase();
+      }
+      if (ext && ext in SUPPORTED_FORMATS) {
+        fileType = SUPPORTED_FORMATS[fileType];
+      }
     }
     if (fileType) {
       this.datasetLibrary.hideFileTypeWarning();
