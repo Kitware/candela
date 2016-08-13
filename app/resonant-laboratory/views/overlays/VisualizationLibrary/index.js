@@ -39,11 +39,11 @@ let VisualizationLibrary = Backbone.View.extend({
     libraryButtons.exit().remove();
 
     libraryButtonsEnter.append('img');
-    libraryButtons.selectAll('img')
+    libraryButtons.select('img')
       .attr('src', libImage);
 
     libraryButtonsEnter.append('span');
-    libraryButtons.selectAll('span')
+    libraryButtons.select('span')
       .text(d => d.name);
 
     d3.select('div.largeDialog').selectAll('.circleButton')
