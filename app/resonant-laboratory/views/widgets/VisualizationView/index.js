@@ -65,9 +65,18 @@ let VisualizationView = Widget.extend({
       src: shareIcon,
       title: 'Export',
       onclick: () => {
-        window.mainPage.overlay.render(new ExportView({
-          model: new backbone.Model({vis: this.vis})
-        }));
+        if (this.vis) {
+          window.mainPage.overlay.render(new ExportView({
+            model: new backbone.Model({vis: this.vis})
+          }));
+        }
+      },
+      className: () => {
+        if (this.vis) {
+          return null;
+        } else {
+          return 'disabled';
+        }
       }
     });
 
