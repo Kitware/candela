@@ -21,6 +21,11 @@ function coerceValue (value, coerceToType) {
   } else if (coerceToType === 'string') {
     value = String(value);
   } else if (coerceToType === 'date') {
+    if (typeof value === 'number' && value < 3000 && value > 999) {
+      // Semi-smart coercion; values between 999 and 3000 are likely
+      // years, so convert them to strings first
+      value = String(value);
+    }
     value = new Date(value);
     // TODO: apply smarter date coercion in the vein of the stuff below
     /*
@@ -57,7 +62,7 @@ function formatDate (dateObj, levels) {
   } else if (levels.date === true) {
     dateString = dateObj.toLocaleDateString();
   } else {
-    dateString = Math.abs(dateObj.getFullYear());
+    dateString = String(Math.abs(dateObj.getFullYear()));
   }
   if (levels.era === true && dateObj.getFullYear() < 0) {
     dateString += ' BCE';
