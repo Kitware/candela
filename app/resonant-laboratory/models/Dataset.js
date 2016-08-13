@@ -1,3 +1,4 @@
+import d3 from 'd3';
 import MetadataItem from './MetadataItem';
 import { parseToAst } from '../querylang';
 import RangeSet from '../shims/rangeSet.js';
@@ -185,7 +186,10 @@ class DatasetCache {
             binSettings: JSON.stringify(this.model.getBinSettings(schema)),
             cache: false
           }
-        }, 'rl:loadedHistogram');
+        });
+      }).then(this.model.improveHistogramLabels);
+      this.cachedPromises.overviewHistogram.then(() => {
+        this.model.trigger('rl:loadedHistogram');
       });
     }
     return this.cachedPromises.overviewHistogram;
@@ -201,7 +205,10 @@ class DatasetCache {
             filter: this.model.formatFilterExpression(schema),
             cache: false
           }
-        }, 'rl:loadedHistogram');
+        });
+      }).then(this.model.improveHistogramLabels);
+      this.cachedPromises.filteredHistogram.then(() => {
+        this.model.trigger('rl:loadedHistogram');
       });
     }
     return this.cachedPromises.filteredHistogram;
@@ -219,7 +226,10 @@ class DatasetCache {
             offset: this.page.offset
             // Don't cache the page histograms on the server
           }
-        }, 'rl:loadedHistogram');
+        });
+      }).then(this.model.improveHistogramLabels);
+      this.cachedPromises.pageHistogram.then(() => {
+        this.model.trigger('rl:loadedHistogram');
       });
     }
     return this.cachedPromises.pageHistogram;
@@ -239,24 +249,21 @@ class DatasetCache {
               filter: this.model.getFilterAstTree(schema)
             })
           }
-        }, 'rl:loadedData');
+        });
+      });
+      this.cachedPromises.currentDataPage.then(() => {
+        this.model.trigger('rl:loadedData');
       });
     }
     return this.cachedPromises.currentDataPage;
   }
-  restRequest (parameters, successEvent) {
+  restRequest (parameters) {
     if (!this.model.getId()) {
       // We still haven't synced our basic info with the
       // server yet... so leave the value as null
       return null;
     } else {
-      let promise = this.model.restRequest(parameters);
-      if (successEvent) {
-        promise.then(() => {
-          this.model.trigger(successEvent);
-        });
-      }
-      return promise;
+      return this.model.restRequest(parameters);
     }
   }
 }
@@ -332,6 +339,26 @@ let Dataset = MetadataItem.extend({
       // auto-detect the data type
       return this.autoDetectAttributeType(schema, attrName);
     }
+  },
+  improveHistogramLabels: function (histogram) {
+    let formatter = d3.format('0.3s');
+    Object.keys(histogram).forEach(attrName => {
+      histogram[attrName].forEach((bin, index) => {
+        if (typeof bin.lowBound === 'number' &&
+            typeof bin.highBound === 'number') {
+          // binUtils.js doesn't have access to D3's superior number formatting
+          // abilities, so we patch on slightly better human-readable labels
+          bin.label = '[' + formatter(bin.lowBound) + ' - ' +
+            formatter(bin.highBound);
+          if (index === histogram[attrName].length - 1) {
+            bin.label += ']';
+          } else {
+            bin.label += ')';
+          }
+        }
+      });
+    });
+    return histogram;
   },
   getBinSettings: function (schema) {
     let binSettings = {};

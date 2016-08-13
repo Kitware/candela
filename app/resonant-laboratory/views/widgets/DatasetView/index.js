@@ -525,7 +525,7 @@ let DatasetView = Widget.extend({
       .scale(yScale)
       .orient('left')
       .ticks(Math.min(4, scale.yMax))
-      .tickFormat(d3.format('s'));
+      .tickFormat(d3.format('0.3s'));
     let yAxisObj = svg.select('.yAxis')
       .attr('transform', 'translate(' + scale.leftAxisPadding + ',0)')
       .call(yAxis);
