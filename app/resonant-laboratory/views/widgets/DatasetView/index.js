@@ -541,7 +541,7 @@ let DatasetView = Widget.extend({
       });
 
     // Draw the bin groups
-    let labels = datasetDetails.overviewHistogram[attrName].map(d => d.label);
+    let labels = scale.overviewHistogram.map(d => d.label);
     let bins = svg.select('.bins').selectAll('.bin')
       .data(labels, d => d);
     let binsEnter = bins.enter().append('g')
