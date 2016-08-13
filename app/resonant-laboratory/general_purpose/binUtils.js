@@ -130,7 +130,7 @@ function createBins (coerceToType, numBins, lowBound, highBound, locale) {
       // that trims these (plus some boundary logic to keep
       // one 9 if it's 9s, and ignore the last digit that
       // could be anything)
-      bin.label = bin.label.replace(/(9?)[09]{5}[09]+\d/g, '$1');
+      bin.label = bin.label.replace(/(\.\d*9?)[09]{5}[09]+\d/g, '$1');
       lookup[bin.label] = bins.length;
       bins.push(bin);
     }
