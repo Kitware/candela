@@ -20,7 +20,7 @@ import './stylesheets/girderPatches.scss';
 
 // The API root is different
 let girder = window.girder;
-girder.apiRoot = 'api/v1';
+girder.apiRoot = '../api/v1';
 
 // Our main view that coordinates each big chunk
 let MainPage = Backbone.View.extend({
