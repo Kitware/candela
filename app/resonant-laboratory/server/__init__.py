@@ -5,6 +5,7 @@ from girder.utility.assetstore_utilities import setAssetstoreAdapter
 from girder.utility.filesystem_assetstore_adapter import FilesystemAssetstoreAdapter
 from girder.utility.gridfs_assetstore_adapter import GridFsAssetstoreAdapter
 from girder.plugins.database_assetstore.assetstore import DatabaseAssetstoreAdapter
+from girder.utility.plugin_utilities import registerPluginWebroot
 from semantic_assetstore_adapter import semantic_access
 from anonymousAccess import AnonymousAccess
 from versioning import Versioning
@@ -35,6 +36,7 @@ def load(info):
 
     # Move girder app to /girder, serve sumo app from /
     app = info['apiRoot'].resonantLaboratoryapp = ResonantLaboratory(info)
+    registerPluginWebroot(app, info)
 
     (
         info['serverRoot'],
