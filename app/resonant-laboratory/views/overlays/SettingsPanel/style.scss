@@ -37,6 +37,11 @@
   background-color: $backgroundRolloverColor;
   color: $darkRolloverColor;
 }
+#Overlay #rightChunk {
+  position: relative;
+  top: 1em;
+  padding-bottom: 1em;
+}
 
 #Overlay #loginLinks {
   position: absolute;
