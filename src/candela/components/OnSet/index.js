@@ -1,8 +1,9 @@
 import d3 from 'd3';
 import dl from 'datalib';
 import onset from 'onset';
+import VisComponent from '../../VisComponent';
 
-export default class OnSet {
+export default class OnSet extends VisComponent {
   static get options () {
     return [
       {
@@ -44,7 +45,7 @@ export default class OnSet {
   }
 
   constructor (el, options) {
-    this.el = el;
+    super(el);
     this.options = options;
   }
 
