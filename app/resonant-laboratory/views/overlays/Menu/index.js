@@ -22,26 +22,26 @@ let Menu = Backbone.View.extend({
     menuItems.exit().remove();
 
     // Make sure that only items with icons have img.icon elements
-    menuItems.selectAll('img.icon')
+    menuItems.select('img.icon')
       .filter(d => d === null || !d.icon)
       .remove();
     menuItemsEnter.filter(d => d !== null && d.icon)
       .append('img')
       .attr('class', 'icon');
-    menuItems.selectAll('img.icon')
+    menuItems.select('img.icon')
       .attr('src', d => typeof d.icon === 'function' ? d.icon() : d.icon);
 
     // Make sure that only items with text have p elements
-    menuItems.selectAll('p')
+    menuItems.select('p')
       .filter(d => d === null || !d.text)
       .remove();
     menuItemsEnter.filter(d => d !== null && d.text)
       .append('p');
-    menuItems.selectAll('p')
+    menuItems.select('p')
       .text(d => typeof d.text === 'function' ? d.text() : d.text);
 
     // Make sure that only separators have hr elements
-    menuItems.selectAll('hr')
+    menuItems.select('hr')
       .filter(d => d !== null)
       .remove();
     menuItemsEnter.filter(d => d === null)

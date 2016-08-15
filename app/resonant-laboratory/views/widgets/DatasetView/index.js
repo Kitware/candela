@@ -387,16 +387,16 @@ let DatasetView = Widget.extend({
     let d3Element = d3.select(labelElement[0]);
 
     // Update the values in the label
-    d3Element.selectAll('tspan.overview')
+    d3Element.select('tspan.overview')
       .text(overviewCount);
-    d3Element.selectAll('tspan.filtered')
+    d3Element.select('tspan.filtered')
       .text(filteredCount);
     if (hasPaging) {
       // Use base 1 for the page text labels
-      d3Element.selectAll('tspan.page')
+      d3Element.select('tspan.page')
         .text((pageOffset + 1) + ' - ' + (pageOffset + pageCount));
     } else {
-      d3Element.selectAll('tspan.page')
+      d3Element.select('tspan.page')
         .text(filteredCount);
     }
 
@@ -541,7 +541,7 @@ let DatasetView = Widget.extend({
       });
 
     // Draw the bin groups
-    let labels = datasetDetails.overviewHistogram[attrName].map(d => d.label);
+    let labels = scale.overviewHistogram.map(d => d.label);
     let bins = svg.select('.bins').selectAll('.bin')
       .data(labels, d => d);
     let binsEnter = bins.enter().append('g')
@@ -564,17 +564,17 @@ let DatasetView = Widget.extend({
 
     // Update each bar
     function drawBars () {
-      bins.selectAll('rect.overview')
+      bins.select('rect.overview')
         .each(function (d) {
           // this refers to the DOM element
           d3.select(this).attr(scale.getBinRect(d, 'overview'));
         });
-      bins.selectAll('rect.filtered')
+      bins.select('rect.filtered')
         .each(function (d) {
           // this refers to the DOM element
           d3.select(this).attr(scale.getBinRect(d, 'filtered'));
         });
-      bins.selectAll('rect.page')
+      bins.select('rect.page')
         .each(function (d) {
           // this refers to the DOM element
           d3.select(this).attr(scale.getBinRect(d, 'page'));
@@ -620,7 +620,7 @@ let DatasetView = Widget.extend({
         width: this.layout.emSize,
         height: this.layout.emSize
       });
-    bins.selectAll('image.button')
+    bins.select('image.button')
       .each(function (d) {
         // this refers to the DOM element
         let bin = scale.labelToBin(d, 'overview');
@@ -671,7 +671,7 @@ let DatasetView = Widget.extend({
     let maxLabelHeight = svg.select('.selectAllBins').select('text')
       .node().getComputedTextLength();
     binsEnter.append('text');
-    bins.selectAll('text')
+    bins.select('text')
       .text(d => d)
       .attr('transform', 'rotate(90) translate(' + height + ',' +
         (0.35 * this.layout.emSize) + ')')
@@ -716,14 +716,14 @@ let DatasetView = Widget.extend({
       .attr('class', 'header');
     let sectionTitlesEnter = sectionHeadersEnter.append('div')
       .attr('class', 'title');
-    let sectionTitles = attributeSections.selectAll('.header')
-      .selectAll('.title');
+    let sectionTitles = attributeSections.select('.header')
+      .select('.title');
 
     // Add an arrow to collapse the section
     sectionTitlesEnter.append('input')
       .attr('type', 'checkbox')
       .attr('class', 'expander');
-    sectionTitles.selectAll('input.expander')
+    sectionTitles.select('input.expander')
       .on('change', function (d) {
         // this refers to the DOM element
         let contentElement = self.$el.find('#' + makeValidId(d + '_histogramContent'));
@@ -741,7 +741,7 @@ let DatasetView = Widget.extend({
     sectionTitlesEnter.append('input')
       .attr('type', 'checkbox')
       .attr('class', 'filteredState');
-    sectionTitles.selectAll('input.filteredState')
+    sectionTitles.select('input.filteredState')
       .attr('id', d => d + '_checkbox')
       .each(function (d) {
         // this refers to the DOM element
@@ -759,25 +759,25 @@ let DatasetView = Widget.extend({
 
     // Label for the header
     sectionTitlesEnter.append('label');
-    sectionTitles.selectAll('label')
+    sectionTitles.select('label')
       .text(d => d)
       .attr('for', d => d + '_checkbox');
 
     // Type and interpretation icons / menus
     let sectionButtonsEnter = sectionHeadersEnter.append('div')
       .attr('class', 'buttons');
-    let sectionButtons = attributeSections.selectAll('.header')
-      .selectAll('.buttons');
+    let sectionButtons = attributeSections.select('.header')
+      .select('.buttons');
     sectionButtonsEnter.append('img')
       .attr('class', 'dataTypeMenuIcon button');
-    sectionButtons.selectAll('img.dataTypeMenuIcon').each(function (d) {
+    sectionButtons.select('img.dataTypeMenuIcon').each(function (d) {
       // this refers to the DOM element
       self.setupDataTypeMenu(this, d, datasetDetails);
     });
 
     sectionButtonsEnter.append('img')
       .attr('class', 'interpretationMenuIcon button');
-    sectionButtons.selectAll('img.interpretationMenuIcon').each(function (d) {
+    sectionButtons.select('img.interpretationMenuIcon').each(function (d) {
       // this refers to the DOM element
       self.setupInterpretationMenu(this, d, datasetDetails);
     });
@@ -785,12 +785,12 @@ let DatasetView = Widget.extend({
     // Now for the actual histgoram content (that gets collapsed)
     let contentsEnter = attributeSectionsEnter.append('div')
       .attr('class', 'collapsed content');
-    let contents = attributeSections.selectAll('.content')
+    let contents = attributeSections.select('.content')
       .attr('id', d => makeValidId(d + '_histogramContent'));
 
     contentsEnter.append('svg')
       .html(histogramTemplate);
-    contents.selectAll('svg').each(function (d) {
+    contents.select('svg').each(function (d) {
       // this refers to the DOM element
       self.renderIndividualHistogram(this, d, datasetDetails);
     });
@@ -818,12 +818,12 @@ let DatasetView = Widget.extend({
 
     headersEnter.append('div').attr('class', 'headerText');
 
-    headers.selectAll('div.headerText').text(d => d);
-    headers.selectAll('img.dataTypeMenuIcon').each(function (d) {
+    headers.select('div.headerText').text(d => d);
+    headers.select('img.dataTypeMenuIcon').each(function (d) {
       // this refers to the DOM element
       self.setupDataTypeMenu(this, d, datasetDetails);
     });
-    headers.selectAll('img.interpretationMenuIcon').each(function (d) {
+    headers.select('img.interpretationMenuIcon').each(function (d) {
       // this refers to the DOM element
       self.setupInterpretationMenu(this, d, datasetDetails);
     });

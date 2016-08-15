@@ -261,14 +261,14 @@ let DatasetLibrary = DatasetSettings.extend({
 
     libraryButtonsEnter.append('img')
       .attr('class', 'projectGlyph');
-    libraryButtons.selectAll('img.projectGlyph')
+    libraryButtons.select('img.projectGlyph')
       .attr('src', icon);
 
     libraryButtonsEnter.append('img')
       .attr('class', 'badge')
       .style('display', 'none');
     window.mainPage.versionNumber.then(appVersion => {
-      libraryButtons.selectAll('img.badge')
+      libraryButtons.select('img.badge')
         .attr('src', warningIcon)
         .style('display', d => {
           if (d.attributes.meta.rlab.versionNumber === appVersion) {
@@ -284,7 +284,7 @@ let DatasetLibrary = DatasetSettings.extend({
     });
 
     libraryButtonsEnter.append('span');
-    libraryButtons.selectAll('span')
+    libraryButtons.select('span')
       .text(d => d.name());
 
     d3.select('#' + divId).selectAll('.circleButton')

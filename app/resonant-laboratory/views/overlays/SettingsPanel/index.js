@@ -45,7 +45,7 @@ let SettingsPanel = Backbone.View.extend({
     sideMenus.exit().remove();
 
     sideMenusEnter.append('h1');
-    sideMenus.selectAll('h1')
+    sideMenus.select('h1')
       .text(d => d.title)
       .on('click', d => {
         // Clicking the title brings people back

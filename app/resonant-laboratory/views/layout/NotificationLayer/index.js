@@ -73,7 +73,7 @@ let NotificationLayer = Backbone.View.extend({
       .style('opacity', '0.0')
       .remove();
 
-    sections.selectAll('div.content')
+    sections.select('div.content')
       .html(d => d.value.template)
       .on('mousemove', d => {
         this.restartNotificationTimer(d.key);
