@@ -197,7 +197,7 @@ let DatasetSettings = SettingsPanel.extend({
         .val(datasetObj.get('name'));
 
       this.$el.find('#datasetSize')
-        .text(d3.format('s')(status.size).toUpperCase() + 'B');
+        .text(d3.format('0.3s')(status.size).toUpperCase() + 'B');
 
       this.$el.find('#datasetLocation')
         .text(status.path)

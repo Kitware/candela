@@ -21,6 +21,11 @@ function coerceValue (value, coerceToType) {
   } else if (coerceToType === 'string') {
     value = String(value);
   } else if (coerceToType === 'date') {
+    if (typeof value === 'number' && value < 3000 && value > 999) {
+      // Semi-smart coercion; values between 999 and 3000 are likely
+      // years, so convert them to strings first
+      value = String(value);
+    }
     value = new Date(value);
     // TODO: apply smarter date coercion in the vein of the stuff below
     /*
@@ -57,7 +62,7 @@ function formatDate (dateObj, levels) {
   } else if (levels.date === true) {
     dateString = dateObj.toLocaleDateString();
   } else {
-    dateString = Math.abs(dateObj.getFullYear());
+    dateString = String(Math.abs(dateObj.getFullYear()));
   }
   if (levels.era === true && dateObj.getFullYear() < 0) {
     dateString += ' BCE';
@@ -130,7 +135,7 @@ function createBins (coerceToType, numBins, lowBound, highBound, locale) {
       // that trims these (plus some boundary logic to keep
       // one 9 if it's 9s, and ignore the last digit that
       // could be anything)
-      bin.label = bin.label.replace(/(9?)[09]{5}[09]+\d/g, '$1');
+      bin.label = bin.label.replace(/(\.\d*9?)[09]{5}[09]+\d/g, '$1');
       lookup[bin.label] = bins.length;
       bins.push(bin);
     }
