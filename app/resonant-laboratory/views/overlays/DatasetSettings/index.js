@@ -240,7 +240,21 @@ let DatasetSettings = SettingsPanel.extend({
     });
   },
   updateFilterSettings: function (datasetObj) {
-    // TODO: list active filters
+    let standardFilterList = datasetObj.listStandardFilterExpressions();
+    // TODO: custom filter expressions
+    if (standardFilterList.length === 0) {
+      this.$el.find('#filterBlurb').text('There are no active filters.');
+    } else {
+      this.$el.find('#filterBlurb').text(`The following filters
+are active, joined by an AND operator:`);
+    }
+
+    let standardFilters = d3.select(this.el).select('#activeFilters')
+      .selectAll('pre.standardFilter').data(standardFilterList);
+    standardFilters.enter().append('pre')
+      .attr('class', 'standardFilter');
+    standardFilters.exit().remove();
+    standardFilters.text(d => d);
   },
   render: function () {
     this.updateBlurb();
