@@ -12,7 +12,7 @@ using the `virtualenv` described in the girder setup instructions.
 3. Install the [database_assetstore plugin](https://github.com/OpenGeoscience/girder_db_items):
 
   ```bash
-  git clone https://github.com/OpenGeoscience/girder_db_items.git database_assetstore
+  git clone -b db-as-assetstore https://github.com/OpenGeoscience/girder_db_items.git database_assetstore
   cd database_assetstore
   npm install
   cd ..
