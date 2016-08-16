@@ -1,3 +1,4 @@
+import cherrypy
 import os
 from girder.api.rest import Resource
 from girder.constants import AssetstoreType
@@ -13,10 +14,9 @@ from datasetItem import DatasetItem
 from projectItem import ProjectItem
 
 
+@cherrypy.config(**{'tools.staticdir.on': True,
+                    'tools.staticdir.index': 'index.html'})
 class ResonantLaboratory(Resource):
-    _cp_config = {'tools.staticdir.on': True,
-                  'tools.staticdir.index': 'index.html'}
-
     def __init__(self, info):
         super(ResonantLaboratory, self).__init__()
         self.resourceName = 'resonantLaboratoryapp'
@@ -30,9 +30,7 @@ class ResonantLaboratory(Resource):
 
 def load(info):
     ResonantLaboratory._cp_config['tools.staticdir.dir'] = os.path.join(
-        os.path.relpath(info['pluginRootDir'],
-                        info['config']['/']['tools.staticdir.root']),
-        'web_client')
+        info['pluginRootDir'], 'web_client')
 
     # Move girder app to /girder, serve sumo app from /
     app = ResonantLaboratory(info)
