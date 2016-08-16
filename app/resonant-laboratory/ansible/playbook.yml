@@ -66,7 +66,7 @@
       git:
         repo: https://github.com/Kitware/candela
         dest: candela
-        version: 30789c9efa3bc0dbb6bcdb861d93f3000f2683fb
+        version: 5c17f10d754778e7ea291f1f24c290d997e4dec8
 
     - name: Install Candela node requirements
       command: npm i
