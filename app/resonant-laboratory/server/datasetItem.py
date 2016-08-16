@@ -207,14 +207,20 @@ class DatasetItem(Resource):
         fileObj = None
         if 'fileId' in rlab:
             fileObj = self.model('file').load(rlab['fileId'], user=user)
-            exts = fileObj.get('exts', [])
-            mimeType = fileObj.get('mimeType', '').lower()
-            if 'json' in exts or 'json' in mimeType:
-                rlab['format'] = 'json'
-            elif 'csv' in exts or 'tsv' in exts or 'csv' in mimeType or 'tsv' in mimeType:
+            if getDbInfoForFile(fileObj) is not None:
+                # All database info is returned internally as CSV.
+                # TODO: this will change soon!
                 rlab['format'] = 'csv'
+                params['dialect'] = '{}'    # use default parsing settings
             else:
-                raise RestException('Could not determine file format')
+                exts = fileObj.get('exts', [])
+                mimeType = fileObj.get('mimeType', '').lower()
+                if 'json' in exts or 'json' in mimeType:
+                    rlab['format'] = 'json'
+                elif 'csv' in exts or 'tsv' in exts or 'csv' in mimeType or 'tsv' in mimeType:
+                    rlab['format'] = 'csv'
+                else:
+                    raise RestException('Could not determine file format')
 
         # Format details
         if rlab['format'] == 'json':
