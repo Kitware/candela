@@ -108,6 +108,7 @@
   "dependencies": {
     "LineUpJS": "git+https://github.com/Caleydo/lineup.js#0cd7f3f2ad06c498c09612daf5f3e2a36c07536d",
     "UpSet": "git+https://github.com/VCG/upset#6e8b7a172443dd6b4f4324d1a3368287e9e9c089",
+    "onset": "git+https://github.com/Kitware/setvis#238c57a0bc2d37feb898d7ec630f481529bd528b",
     "brace": "^0.7.0",
     "d3": "^3.5.14",
     "datalib": "^1.6.3",
