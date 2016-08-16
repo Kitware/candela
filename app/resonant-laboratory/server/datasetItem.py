@@ -22,6 +22,7 @@ from girder.api.rest import Resource, RestException, loadmodel
 from girder.constants import AccessType
 from girder.plugins.database_assetstore.dbs.mongo import MongoConnector
 from girder_worker.format import get_csv_reader
+from girder.plugins.database_assetstore.assetstore import getDbInfoForFile
 
 
 TRUE_VALUES = set([True, 'true', 1, 'True'])
@@ -48,13 +49,11 @@ class DatasetItem(Resource):
 
         self.sniffSampleSize = 131072    # 128K
 
-    def getMongoCollection(self, fileInfo, assetstoreInfo):
-        uri = assetstoreInfo['database']['uri']
-        uri = uri[:uri.rfind('/')]  # strip off the assetstore db name
-        dbName = fileInfo['databaseMetadata']['database']
-        tableName = fileInfo['databaseMetadata']['table']
-        connection = MongoClient(uri)
-        return connection[dbName][tableName]
+    def getMongoCollection(self, dbInfo):
+        url = dbInfo['url']
+        url = url[:url.rfind('/')]  # strip off the assetstore db name
+        connection = MongoClient(url)
+        return connection[dbInfo['database']][dbInfo['table']]
 
     def mongoMapReduce(self, mapScript, reduceScript, collection, params):
         # Convert our AST filter expression to a mongo filter
@@ -138,19 +137,19 @@ class DatasetItem(Resource):
 
         # Figure out what kind of assetstore the file is in
         fileInfo = self.model('file').load(item['meta']['rlab']['fileId'],
-                                           level=AccessType.WRITE,
+                                           level=AccessType.READ,
                                            user=user,
                                            exc=True)
-        assetstoreinfo = self.model('assetstore').load(fileInfo['assetstoreId'])
+        dbInfo = getDbInfoForFile(fileInfo)
 
         # Okay, figure out how/where we want to run our mapreduce code
-        if assetstoreinfo['type'] == 'database':
-            if assetstoreinfo['database']['dbtype'] == 'mongo':
-                collection = self.getMongoCollection(fileInfo, assetstoreinfo)
+        if dbInfo is not None:
+            if dbInfo['type'] == 'mongo':
+                collection = self.getMongoCollection(dbInfo)
                 result = self.mongoMapReduce(mapScript, reduceScript, collection, params)
             else:
                 raise RestException('MapReduce for ' +
-                                    assetstoreinfo['database']['dbtype'] +
+                                    dbInfo['type'] +
                                     ' databases is not yet supported')
         else:
             result = self.mapReduceViaDownload(item, user, mapScript, reduceScript, params)
