@@ -3,6 +3,9 @@
 #Overlay #mainChunk {
   display: flex;
 }
+#Overlay .largeDialog summary h3 {
+  display: inline-block;
+}
 #Overlay #leftChunk,
 #Overlay #rightChunk {
   display: flex;

@@ -174,6 +174,8 @@ class DatasetCache {
             this.model.trigger('rl:updatedSchema');
             return newSchema;
           });
+        }).catch(() => {
+          return null;
         });
       }
     }
@@ -190,7 +192,9 @@ class DatasetCache {
             cache: false
           }
         });
-      }).then(this.model.postProcessHistogram);
+      }).then(this.model.postProcessHistogram).catch(() => {
+        return null;
+      });
       this.cachedPromises.overviewHistogram.then(() => {
         this.model.trigger('rl:loadedHistogram');
       });
@@ -209,7 +213,9 @@ class DatasetCache {
             cache: false
           }
         });
-      }).then(this.model.postProcessHistogram);
+      }).then(this.model.postProcessHistogram).catch(() => {
+        return null;
+      });
       this.cachedPromises.filteredHistogram.then(() => {
         this.model.trigger('rl:loadedHistogram');
       });
@@ -230,7 +236,9 @@ class DatasetCache {
             // Don't cache the page histograms on the server
           }
         });
-      }).then(this.model.postProcessHistogram);
+      }).then(this.model.postProcessHistogram).catch(() => {
+        return null;
+      });
       this.cachedPromises.pageHistogram.then(() => {
         this.model.trigger('rl:loadedHistogram');
       });
@@ -253,6 +261,8 @@ class DatasetCache {
             })
           }
         });
+      }).catch(() => {
+        return null;
       });
       this.cachedPromises.currentDataPage.then(() => {
         this.model.trigger('rl:loadedData');
