@@ -3,3 +3,5 @@ web_client/lib/
 *.pyc
 *.ai
 *.pdf
+.vagrant
+ansible/playbook.retry
