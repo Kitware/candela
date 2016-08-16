@@ -344,6 +344,17 @@ def attachMetadata(datasets, datasetIdLookup, projects, projectIdLookup):
                  (datasetMetaCount, projectMetaCount))
 
 
+def cacheBasicInfo(datasets):
+    for datasetId in datasetIdLookup.itervalues():
+        # Hit the endpoint that infers the schema of the dataset
+        gc.sendRestRequest('POST', 'item/' + datasetId + '/dataset/inferSchema')
+        # Hit the endpoint that caches an overview histogram of the dataset
+        # (with default attribute interpretations)
+        gc.sendRestRequest('POST', 'item/' + datasetId + '/dataset/getHistograms',
+                           parameters={'cache': True})
+    printMessage('Cached basic info in all datasets')
+
+
 if __name__ == '__main__':
     args = getArguments()
     gc = authenticate(args)
@@ -370,5 +381,8 @@ if __name__ == '__main__':
 
     # Hit the appropriate endpoints and attach metadata where it exists
     attachMetadata(datasets, datasetIdLookup, projects, projectIdLookup)
+
+    # Cache initial information such as the dataset schema and overview histograms
+    cacheBasicInfo(datasets)
 
     print 'Done!'
