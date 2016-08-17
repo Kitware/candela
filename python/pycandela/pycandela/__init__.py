@@ -1,6 +1,12 @@
 import IPython.core.displaypub as displaypub
 import json
+import DataFrame from pandas
 
+class DataFrameEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, DataFrame):
+            return obj.to_records()
+        return json.JSONEncoder.default(self, obj)
 
 def publish_display_data(data):
     try:
@@ -14,7 +20,7 @@ def component(name, options):
 require(['candela'], function (candela) {
     new candela.components['%s'](element.get(0), %s)
 });
-""" % (name, json.dumps(options)))
+""" % (name, json.dumps(options, cls=DataFrameEncoder)))
 
     publish_display_data({'application/javascript': js})
 
