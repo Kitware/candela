@@ -22,6 +22,7 @@ from girder.api.rest import Resource, RestException, loadmodel
 from girder.constants import AccessType
 from girder.plugins.database_assetstore.dbs.mongo import MongoConnector
 from girder_worker.format import get_csv_reader
+from girder.plugins.database_assetstore.assetstore import getDbInfoForFile
 
 
 TRUE_VALUES = set([True, 'true', 1, 'True'])
@@ -48,13 +49,11 @@ class DatasetItem(Resource):
 
         self.sniffSampleSize = 131072    # 128K
 
-    def getMongoCollection(self, fileInfo, assetstoreInfo):
-        uri = assetstoreInfo['database']['uri']
-        uri = uri[:uri.rfind('/')]  # strip off the assetstore db name
-        dbName = fileInfo['databaseMetadata']['database']
-        tableName = fileInfo['databaseMetadata']['table']
-        connection = MongoClient(uri)
-        return connection[dbName][tableName]
+    def getMongoCollection(self, dbInfo):
+        url = dbInfo['url']
+        url = url[:url.rfind('/')]  # strip off the assetstore db name
+        connection = MongoClient(url)
+        return connection[dbInfo['database']][dbInfo['table']]
 
     def mongoMapReduce(self, mapScript, reduceScript, collection, params):
         # Convert our AST filter expression to a mongo filter
@@ -105,7 +104,10 @@ class DatasetItem(Resource):
             extraParameters['filter'] = params['filter']
         extraParameters = json.dumps(extraParameters)
 
-        fileObj = self.model('file').load(item['meta']['rlab']['fileId'], user=user)
+        fileObj = self.model('file').load(item['meta']['rlab']['fileId'],
+                                          level=AccessType.READ,
+                                          user=user,
+                                          exc=True)
         stream = self.model('file').download(fileObj, headers=False, extraParameters=extraParameters)
 
         # Because we already used the offset and limit params in the download endpoint,
@@ -138,19 +140,19 @@ class DatasetItem(Resource):
 
         # Figure out what kind of assetstore the file is in
         fileInfo = self.model('file').load(item['meta']['rlab']['fileId'],
-                                           level=AccessType.WRITE,
+                                           level=AccessType.READ,
                                            user=user,
                                            exc=True)
-        assetstoreinfo = self.model('assetstore').load(fileInfo['assetstoreId'])
+        dbInfo = getDbInfoForFile(fileInfo)
 
         # Okay, figure out how/where we want to run our mapreduce code
-        if assetstoreinfo['type'] == 'database':
-            if assetstoreinfo['database']['dbtype'] == 'mongo':
-                collection = self.getMongoCollection(fileInfo, assetstoreinfo)
+        if dbInfo is not None:
+            if dbInfo['type'] == 'mongo':
+                collection = self.getMongoCollection(dbInfo)
                 result = self.mongoMapReduce(mapScript, reduceScript, collection, params)
             else:
                 raise RestException('MapReduce for ' +
-                                    assetstoreinfo['database']['dbtype'] +
+                                    dbInfo['type'] +
                                     ' databases is not yet supported')
         else:
             result = self.mapReduceViaDownload(item, user, mapScript, reduceScript, params)
@@ -208,14 +210,20 @@ class DatasetItem(Resource):
         fileObj = None
         if 'fileId' in rlab:
             fileObj = self.model('file').load(rlab['fileId'], user=user)
-            exts = fileObj.get('exts', [])
-            mimeType = fileObj.get('mimeType', '').lower()
-            if 'json' in exts or 'json' in mimeType:
-                rlab['format'] = 'json'
-            elif 'csv' in exts or 'tsv' in exts or 'csv' in mimeType or 'tsv' in mimeType:
+            if getDbInfoForFile(fileObj) is not None:
+                # All database info is returned internally as CSV.
+                # TODO: this will change soon!
                 rlab['format'] = 'csv'
+                params['dialect'] = '{}'    # use default parsing settings
             else:
-                raise RestException('Could not determine file format')
+                exts = fileObj.get('exts', [])
+                mimeType = fileObj.get('mimeType', '').lower()
+                if 'json' in exts or 'json' in mimeType:
+                    rlab['format'] = 'json'
+                elif 'csv' in exts or 'tsv' in exts or 'csv' in mimeType or 'tsv' in mimeType:
+                    rlab['format'] = 'csv'
+                else:
+                    raise RestException('Could not determine file format')
 
         # Format details
         if rlab['format'] == 'json':
@@ -340,6 +348,8 @@ class DatasetItem(Resource):
         if params['filter'] is not None:
             params['filter'] = json.loads(params['filter'])
         params['limit'] = params.get('limit', None)
+        if params['limit'] == 0:
+            params['limit'] = None
         params['offset'] = params.get('offset', 0)
 
         binSettings = json.loads(params.get('binSettings', '{}'))

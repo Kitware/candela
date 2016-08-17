@@ -95,6 +95,16 @@ let MetadataItem = girder.models.ItemModel.extend({
       */
     }
 
+    // Ignore authentication errors; we still want the user to
+    // be able to function in a logged-out state
+    promiseObj = promiseObj.catch(errObj => {
+      if (errObj.status === 401) {
+        return {};
+      } else {
+        throw errObj;
+      }
+    });
+
     // beforeSuccess is a function that should
     // be called before options.success
     beforeSuccess = beforeSuccess || (d => d);

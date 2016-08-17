@@ -208,7 +208,7 @@ let DatasetView = Widget.extend({
     } else if (this.status === STATUS.SUCCESS) {
       window.mainPage.overlay.renderSuccessScreen('The dataset appears to have loaded correctly.');
     } else if (this.status === STATUS.CANT_LOAD) {
-      window.mainPage.overlay.renderErrorScreen('The dataset could not be loaded; there is a good chance that there is a permissions problem.');
+      window.mainPage.overlay.renderUserErrorScreen('The dataset could not be loaded! You might want to check whether you have the necessary permissions.');
     } else if (this.status === STATUS.CANT_PARSE) {
       window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data; you\'ll probably need to <a>edit</a> or <a>reshape</a> the data in order to use it.');
     } else if (this.status === STATUS.NO_ATTRIBUTES) {

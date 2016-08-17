@@ -42,10 +42,17 @@ let DatasetLibrary = DatasetSettings.extend({
       this.$el.find('#uploadSection')[0]
         .appendChild(this.uploadView.el);
       this.uploadView.delegateEvents();
+
+      this.$el.find('#linkSection').show();
+      this.$el.find('#loggedOutLinkSection').hide();
     } else {
       this.$el.find('#uploadSection')
-        .append('<p>You must be <a class="loginLink2">logged in</a> to upload files');
-      this.$el.find('#loginLink2').on('click', () => {
+        .append('<p>You must be <a class="loginLink">logged in</a> to upload files');
+
+      this.$el.find('#linkSection').hide();
+      this.$el.find('#loggedOutLinkSection').show();
+
+      this.$el.find('.loginLink').on('click', () => {
         window.mainPage.overlay.render('LoginView');
       });
     }

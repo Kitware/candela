@@ -2,7 +2,7 @@
 
 counter += 1;
 if (counter >= params.offset &&
-    (params.limit === 0 || counter < params.offset + params.limit)) {
+    (!(params.limit) || counter < params.offset + params.limit)) {
   var dataRow = this;
   emit('__passedFilters__', {
     histogram: [{

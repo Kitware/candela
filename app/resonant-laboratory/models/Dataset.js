@@ -46,6 +46,9 @@ class DatasetCache {
   set cachedPromises (value) {
     this._cachedPromises = value;
   }
+  clear () {
+    this.cachedPromises = {};
+  }
   get filter () {
     if (!this._filter) {
       this._filter = {
@@ -171,6 +174,8 @@ class DatasetCache {
             this.model.trigger('rl:updatedSchema');
             return newSchema;
           });
+        }).catch(() => {
+          return null;
         });
       }
     }
@@ -187,7 +192,9 @@ class DatasetCache {
             cache: false
           }
         });
-      }).then(this.model.improveHistogramLabels);
+      }).then(this.model.postProcessHistogram).catch(() => {
+        return null;
+      });
       this.cachedPromises.overviewHistogram.then(() => {
         this.model.trigger('rl:loadedHistogram');
       });
@@ -206,7 +213,9 @@ class DatasetCache {
             cache: false
           }
         });
-      }).then(this.model.improveHistogramLabels);
+      }).then(this.model.postProcessHistogram).catch(() => {
+        return null;
+      });
       this.cachedPromises.filteredHistogram.then(() => {
         this.model.trigger('rl:loadedHistogram');
       });
@@ -227,7 +236,9 @@ class DatasetCache {
             // Don't cache the page histograms on the server
           }
         });
-      }).then(this.model.improveHistogramLabels);
+      }).then(this.model.postProcessHistogram).catch(() => {
+        return null;
+      });
       this.cachedPromises.pageHistogram.then(() => {
         this.model.trigger('rl:loadedHistogram');
       });
@@ -250,6 +261,8 @@ class DatasetCache {
             })
           }
         });
+      }).catch(() => {
+        return null;
       });
       this.cachedPromises.currentDataPage.then(() => {
         this.model.trigger('rl:loadedData');
@@ -276,6 +289,10 @@ let Dataset = MetadataItem.extend({
     // its own non-Backbone cache class
     this.cache = new DatasetCache(this);
     this.dropped = false;
+
+    this.listenTo(this, 'rl:swappedId', () => {
+      this.handleSwappedId();
+    });
   },
   identifyAsDataset: function () {
     return this.restRequest({
@@ -340,8 +357,16 @@ let Dataset = MetadataItem.extend({
       return this.autoDetectAttributeType(schema, attrName);
     }
   },
-  improveHistogramLabels: function (histogram) {
+  handleSwappedId: function () {
+    this.cache.clear();
+  },
+  postProcessHistogram: function (histogram) {
     let formatter = d3.format('0.3s');
+    // If the user is logged out, we'll sometimes get an
+    // empty histogram back
+    if (!('__passedFilters__' in histogram)) {
+      return null;
+    }
     Object.keys(histogram).forEach(attrName => {
       histogram[attrName].forEach((bin, index) => {
         if (typeof bin.lowBound === 'number' &&

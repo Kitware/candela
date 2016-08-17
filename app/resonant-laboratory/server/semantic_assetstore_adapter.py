@@ -215,15 +215,16 @@ def semantic_access(Cls, offset_limit=True):
 
         def downloadFile(self, file, offset=0, headers=True, endByte=None,
                          contentDisposition=None, extraParameters=None, **kwargs):
-            dataOffset = limit = 0
+            dataOffset = 0
+            dataLimit = None
 
             if extraParameters is not None:
                 extraParameters = json.loads(extraParameters)
                 extraParameters['format'] = 'csv'
                 dataOffset = extraParameters.get('offset', 0)
-                limit = extraParameters.get('limit', None)
+                dataLimit = extraParameters.get('limit', None)
                 extraParameters['offset'] = 0
-                extraParameters['limit'] = 0
+                extraParameters['limit'] = None
 
             # Get the parent class's stream.
             base_stream = super(NewCls, self).downloadFile(file, offset, headers, endByte, contentDisposition, json.dumps(extraParameters), **kwargs)
@@ -258,9 +259,9 @@ def semantic_access(Cls, offset_limit=True):
 
             fileType = extraParameters.get('fileType', 'csv')
             if fileType == 'csv':
-                return csv_stream(base_stream, dataOffset, limit, filterFunc, outputType)
+                return csv_stream(base_stream, dataOffset, dataLimit, filterFunc, outputType)
             elif fileType == 'json':
-                return json_stream(base_stream, dataOffset, limit, filterFunc, outputType)
+                return json_stream(base_stream, dataOffset, dataLimit, filterFunc, outputType)
             else:
                 raise RuntimeError('illegal fileType: %s' % (fileType))
 

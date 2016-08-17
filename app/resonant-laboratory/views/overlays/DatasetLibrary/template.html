@@ -22,27 +22,30 @@
 <details class="newDatasetSection">
   <summary><h3>Link to a new Dataset</h3></summary>
 
-  <div><input type="text" id="createLink"></div>
+  <div id="linkSection">
+    <div><input type="text" id="createLink"></div>
 
-  <div id="badLinkHelp" class="newDatasetHideable">
-    <p id="badLinkHelpText" class="errorText"></p>
-  </div>
-  <div id="createLinkHelp" class="newDatasetHideable">
-    <p class="errorText">Supported link types:</p>
-    <ul class="errorText">
-      <li>The ID of an existing Girder item</li>
-    </ul>
-    <p>Want to link to something else?
-      <a href="http://www.kitware.com/company/contact_kitware.php"
-      target="_blank">Work with us</a> to develop something that better meets your needs.
-    </p>
-  </div>
+    <div id="badLinkHelp" class="newDatasetHideable">
+      <p id="badLinkHelpText" class="errorText"></p>
+    </div>
+    <div id="createLinkHelp" class="newDatasetHideable">
+      <p class="errorText">Supported link types:</p>
+      <ul class="errorText">
+        <li>The ID of an existing Girder item</li>
+      </ul>
+      <p>Want to link to something else?
+        <a href="http://www.kitware.com/company/contact_kitware.php"
+        target="_blank">Work with us</a> to develop something that better meets your needs.
+      </p>
+    </div>
 
-  <div>
-    <button id="createLinkButton">Create Dataset Link</button>
-    <img id="linkSpinner" src="../../../images/spinner.gif" class="newDatasetHideable"/>
+    <div>
+      <button id="createLinkButton">Create Dataset Link</button>
+      <img id="linkSpinner" src="../../../images/spinner.gif" class="newDatasetHideable"/>
+    </div>
   </div>
-  <div>
+  <div id="loggedOutLinkSection">
+    <p>You must be <a class="loginLink">logged in</a> to link files
   </div>
 </details>
 
