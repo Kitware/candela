@@ -267,6 +267,10 @@ are active, joined by an AND operator:`);
 
         // Only attach event listeners once
         this.attachSettingsListeners(datasetObj);
+
+        // Because we debounce rendering, we need to add
+        // the close listeners ourselves
+        window.mainPage.overlay.addCloseListeners();
       }
       if (!datasetObj) {
         // The blurb will suffice
