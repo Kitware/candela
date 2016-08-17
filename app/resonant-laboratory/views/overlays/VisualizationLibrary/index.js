@@ -53,6 +53,10 @@ let VisualizationLibrary = Backbone.View.extend({
           window.mainPage.widgetPanels.toggleWidget({
             hashName: 'VisualizationView' + this.index
           }, true);
+          // TODO: Remove this next line when the visualization library is
+          // adapted to the new settings panel style; swapping to a different
+          // visualization shouldn't close the settings dialog (but it SHOULD
+          // close in the current design)
           window.mainPage.overlay.closeOverlay();
         });
       });

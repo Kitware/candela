@@ -256,30 +256,34 @@ are active, joined by an AND operator:`);
     standardFilters.exit().remove();
     standardFilters.text(d => d);
   },
-  render: function () {
+  render: Underscore.debounce(function () {
     this.updateBlurb();
     SettingsPanel.prototype.render.apply(this, arguments);
 
     this.getDataset().then(datasetObj => {
-      if (!datasetObj) {
-        // Clear out the template; the blurb will suffice
-        this.addedSubTemplate = false;
-        this.$el.find('#subclassContent').html('');
-      } else {
-        if (!this.addedSubTemplate) {
-          this.$el.find('#subclassContent').html(myTemplate);
-          this.addedSubTemplate = true;
+      if (!this.addedSubTemplate) {
+        this.$el.find('#subclassContent').html(myTemplate);
+        this.addedSubTemplate = true;
 
-          // Only attach event listeners once
-          this.attachSettingsListeners(datasetObj);
-        }
+        // Only attach event listeners once
+        this.attachSettingsListeners(datasetObj);
+
+        // Because we debounce rendering, we need to add
+        // the close listeners ourselves
+        window.mainPage.overlay.addCloseListeners();
+      }
+      if (!datasetObj) {
+        // The blurb will suffice
+        this.$el.find('#subclassContent').hide('');
+      } else {
+        this.$el.find('#subclassContent').show();
 
         this.updateMainSettings(datasetObj);
         this.updatePageSettings(datasetObj);
         this.updateFilterSettings(datasetObj);
       }
     });
-  }
+  }, 200)
 });
 
 export default DatasetSettings;

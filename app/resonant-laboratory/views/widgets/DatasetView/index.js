@@ -309,7 +309,7 @@ let DatasetView = Widget.extend({
       .data(barData, d => d.segment);
     bars.enter().append('rect');
     bars.attr('x', d => pageScale(d.start))
-      .attr('width', d => pageScale(d.count + d.start) - pageScale(d.start))
+      .attr('width', d => Math.max(pageScale(d.count + d.start) - pageScale(d.start), 0))
       .attr('height', this.layout.emSize)
       .attr('class', d => d.segment + ' bar');
   },
@@ -324,8 +324,8 @@ let DatasetView = Widget.extend({
     let hasPaging = pageCount < filteredCount;
 
     // How much horizontal space do we have (factor in padding)?
-    let width = this.el.getBoundingClientRect().width -
-      2 * this.layout.emSize;
+    let width = Math.max(this.el.getBoundingClientRect().width -
+      2 * this.layout.emSize, 0);
 
     // We start by assuming we are going to be 6ems tall
     let height = 6 * this.layout.emSize;

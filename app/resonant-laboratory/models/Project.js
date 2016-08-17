@@ -166,17 +166,17 @@ let Project = MetadataItem.extend({
     this.cache.status = null;
   },
   create: function () {
-    let createPromise = MetadataItem.prototype.create.apply(this, arguments);
-    createPromise.then(() => {
-      // Hit the endpoint that identifies the item as a project
-      return this.restRequest({
-        path: 'project',
-        method: 'POST'
-      }).then(resp => {
-        this.set(resp);
-        return resp;
+    let createPromise = MetadataItem.prototype.create
+      .apply(this, arguments).then(() => {
+        // Hit the endpoint that identifies the item as a project
+        return this.restRequest({
+          path: 'project',
+          method: 'POST'
+        }).then(resp => {
+          this.set(resp);
+          return resp;
+        });
       });
-    });
     createPromise.then(() => {
       // Flag this project as "ours" (esp. for the case when
       // the user is logged out, store the project item info
@@ -446,7 +446,6 @@ let Project = MetadataItem.extend({
     });
   },
   checkAndSaveMatchings: function (triggers) {
-    let meta = this.getMeta();
     triggers = triggers || [];
 
     // Go through all the matchings and make sure that:
@@ -458,6 +457,7 @@ let Project = MetadataItem.extend({
     return this.save().then(() => {
       return this.cache.loadedDatasets;
     }).then(loadedDatasets => {
+      let meta = this.getMeta();
       let indicesToTrash = [];
       for (let [index, matching] of meta.matchings.entries()) {
         if (meta.datasets.length <= matching.dataIndex ||
@@ -622,9 +622,8 @@ let Project = MetadataItem.extend({
     return result;
   },
   storePreferredWidgets: function () {
-    this.setMeta('preferredWidgets',
-      window.mainPage.widgetPanels.expandedWidgets);
-    return this.save();
+    // this.setMeta('preferredWidgets', window.mainPage.widgetPanels.expandedWidgets);
+    // return this.save();
   }
 });
 

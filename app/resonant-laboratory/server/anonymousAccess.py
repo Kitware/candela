@@ -363,8 +363,7 @@ class AnonymousAccess(Resource):
 
         item['meta'] = metadata
 
-        self.model('item').updateItem(item)
-
+        item = self.model('item').updateItem(item)
         return item
 
     @access.public

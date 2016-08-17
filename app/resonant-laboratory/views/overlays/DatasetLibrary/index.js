@@ -124,9 +124,9 @@ let DatasetLibrary = DatasetSettings.extend({
     } else {
       delete this.linkToCreate;
     }
-    this.updateNewDatasetSections();
+    this.updateStaticSections();
   }, 600),
-  updateNewDatasetSections: function () {
+  updateStaticSections: function () {
     // Start out with all hideable form elements hidden
     this.$el.find('.newDatasetHideable').hide();
 
@@ -169,10 +169,7 @@ let DatasetLibrary = DatasetSettings.extend({
   hideFileTypeWarning: function () {
     this.$el.find('#uploadFileFormatHelp').hide();
   },
-  updateExistingDatasetSections: function () {
-    // Start off with every hideable section hidden
-    this.$el.find('.hideable').hide();
-
+  updateDynamicSections: function () {
     // Get the set of datasets in the public library
     window.mainPage.girderRequest({
       path: 'resource/lookup?path=/collection/Resonant Laboratory Library/Data',
@@ -209,7 +206,7 @@ let DatasetLibrary = DatasetSettings.extend({
       // "belonging" to this user
     }
   },
-  render: function () {
+  render: Underscore.debounce(function () {
     DatasetSettings.prototype.updateBlurb.apply(this, []);
     // We use our own subtemplate, so only call
     // the grandparent superclass render function
@@ -223,11 +220,18 @@ let DatasetLibrary = DatasetSettings.extend({
 
       // Only attach event listeners once
       this.attachLibraryListeners();
+
+      // Because we debounce rendering, we need to add
+      // the close listeners ourselves
+      window.mainPage.overlay.addCloseListeners();
+
+      // Start off with every hideable section hidden
+      this.$el.find('.hideable').hide();
     }
 
-    this.updateNewDatasetSections();
-    this.updateExistingDatasetSections();
-  },
+    this.updateStaticSections();
+    this.updateDynamicSections();
+  }, 200),
   getFolderContents: function (folder, divId, icon) {
     let projects = new girder.collections.ItemCollection();
     projects.altUrl = 'item';
@@ -302,8 +306,8 @@ let DatasetLibrary = DatasetSettings.extend({
           window.mainPage.widgetPanels.toggleWidget({
             hashName: 'DatasetView' + this.index
           }, true);
-          window.mainPage.overlay.closeOverlay();
         });
+        window.mainPage.overlay.closeOverlay();
       });
   }
 });
