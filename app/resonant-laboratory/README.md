@@ -42,9 +42,9 @@ using the `virtualenv` described in the girder setup instructions.
 
 1. Start girder:
 
-  ```bash
-  girder-server
-  ```
+   ```bash
+   girder-server
+   ```
 
 2. Register an admin account at [localhost:8080](http://localhost:8080)
 
