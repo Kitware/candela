@@ -307,6 +307,7 @@ let DatasetLibrary = DatasetSettings.extend({
             hashName: 'DatasetView' + this.index
           }, true);
         });
+        window.mainPage.overlay.closeOverlay();
       });
   }
 });
