@@ -17,8 +17,9 @@ def publish_display_data(data):
 
 def component(name, options):
     js = ("""
+var outputElement = element;
 require(['candela'], function (candela) {
-    var vis = new candela.components['%s'](element.get(0), %s);
+    var vis = new candela.components['%s'](outputElement.get(0), %s);
     vis.render();
 });
 """ % (name, json.dumps(options, cls=DataFrameEncoder)))
