@@ -104,7 +104,10 @@ class DatasetItem(Resource):
             extraParameters['filter'] = params['filter']
         extraParameters = json.dumps(extraParameters)
 
-        fileObj = self.model('file').load(item['meta']['rlab']['fileId'], user=user)
+        fileObj = self.model('file').load(item['meta']['rlab']['fileId'],
+                                          level=AccessType.READ,
+                                          user=user,
+                                          exc=True)
         stream = self.model('file').download(fileObj, headers=False, extraParameters=extraParameters)
 
         # Because we already used the offset and limit params in the download endpoint,
