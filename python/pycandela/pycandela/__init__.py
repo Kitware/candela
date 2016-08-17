@@ -33,11 +33,12 @@ require.config({
     }
 });
 
+var outputElement = element;
 require(['candela'], function (candela) {
     if (candela) {
-        element.append('<div>Candela loaded successfully.</div>');
+        outputElement.append('<div>Candela loaded successfully.</div>');
     } else {
-        element.append('<div>Error loading Candela.</div>');
+        outputElement.append('<div>Error loading Candela.</div>');
     }
 });
 """
