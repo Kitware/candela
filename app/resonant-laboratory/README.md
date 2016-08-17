@@ -52,8 +52,8 @@ using the `virtualenv` described in the girder setup instructions.
 
 4. Restart Girder
 
-Resonant Laboratory will replace the Girder interface at [localhost:8080](http://localhost:8080). It should give you an
-error telling you that no assetstores have been configured.
+   Resonant Laboratory will replace the Girder interface at [localhost:8080](http://localhost:8080). It should give you an
+   error telling you that no assetstores have been configured.
 
 5. Access the girder interface again, this time at [localhost:8080/girder](http://localhost:8080/girder). Navigate to
 Admin console -> Assetstores
