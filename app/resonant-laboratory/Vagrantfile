@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
     vb.memory = 8192
   end
 
-  host_port = ENV["GIRDER_HOST_PORT"] || 8080
+  host_port = ENV["RESLAB_HOST_PORT"] || 8080
 
   config.vm.network "forwarded_port", guest: 8080, host: host_port
 
