@@ -166,17 +166,17 @@ let Project = MetadataItem.extend({
     this.cache.status = null;
   },
   create: function () {
-    let createPromise = MetadataItem.prototype.create.apply(this, arguments);
-    createPromise.then(() => {
-      // Hit the endpoint that identifies the item as a project
-      return this.restRequest({
-        path: 'project',
-        method: 'POST'
-      }).then(resp => {
-        this.set(resp);
-        return resp;
+    let createPromise = MetadataItem.prototype.create
+      .apply(this, arguments).then(() => {
+        // Hit the endpoint that identifies the item as a project
+        return this.restRequest({
+          path: 'project',
+          method: 'POST'
+        }).then(resp => {
+          this.set(resp);
+          return resp;
+        });
       });
-    });
     createPromise.then(() => {
       // Flag this project as "ours" (esp. for the case when
       // the user is logged out, store the project item info
