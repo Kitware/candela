@@ -29,7 +29,7 @@ def init():
     js = """
 require.config({
     paths: {
-        candela: 'http://kitware.github.io/candela/candela-0.2.0-2a0302fd'
+        candela: 'http://kitware.github.io/candela/candela-0.2.0-81be44f6'
     }
 });
 
