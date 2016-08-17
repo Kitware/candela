@@ -77,21 +77,21 @@ For now, `.csv` and `.json` files can to be uploaded via girder's interface to t
 
 In addition to flat files, Resonant Laboratory also supports connecting to mongo databases. For example, a mongo collection could be added from a `json` file this way:
 
-  ```bash
-  mongoimport --db test --collection gapminder --drop --file gapminder.json --jsonArray
-  ```
+```bash
+mongoimport --db test --collection gapminder --drop --file gapminder.json --jsonArray
+```
 
 or to load a `csv` file:
 
-  ```bash
-  mongoimport --db test --collection cars --drop --file gapminder.csv --type csv --headerline
-  ```
+```bash
+mongoimport --db test --collection cars --drop --file gapminder.csv --type csv --headerline
+```
 
 Then an item should be created in the user's public or private directory to represent this database (in this case, probably named "gapminder"). To connect the item to the database, issue a `POST` request to `/item/{id}/database`:
 
-  ```
-  {"url":"localhost:27017","database":"test","collection":"gapminder","type":"mongo"}
-  ```
+```
+{"url":"localhost:27017","database":"test","collection":"gapminder","type":"mongo"}
+```
 
 Of course, after connecting the girder item to the database, you also still need to hit the `/item/{id}/dataset` endpoint to indicate that it is also a dataset intended for Resonant Laboratory.
 
@@ -101,19 +101,19 @@ There are several build steps before changes to the code will
 be visible in the browser. The Girder server has an option
 to recognize internal changes without necessitating a restart:
 
-  ```bash
-  girder-server --testing
-  ```
+```bash
+girder-server --testing
+```
 
 We've also augmented webpack's `--watch` mode, so that it automatically triggers
 girder's grunt build step when you change code in resonant-laboratory. To
 use it:
 
-  ```bash
-  export GIRDER_PATH=path/to/girder
-  cd path/to/candela/app/resonant-laboratory
-  webpack --watch
-  ```
+```bash
+export GIRDER_PATH=path/to/girder
+cd path/to/candela/app/resonant-laboratory
+webpack --watch
+```
 
 ## Installation via Ansible
 
