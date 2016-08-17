@@ -831,7 +831,7 @@ in order to connect them together.`);
     edgesEnter.append('title');
 
     // Animate any existing edges before we add new ones
-    edges.select('path').transition().duration(function (d) {
+    edges.selectAll('path').transition().duration(function (d) {
       // Animate any already-existing edges
       // (this refers to the DOM element)
       if (jQuery(this).hasClass('update')) {

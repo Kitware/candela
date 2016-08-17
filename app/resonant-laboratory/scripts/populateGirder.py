@@ -16,6 +16,8 @@ def getArguments():
         or databases (any changes to the existing library will be lost)''')
     parser.add_argument('-u', dest='username', default='admin',
                         help='The administrator username (default: "admin")')
+    parser.add_argument('-p', dest='password', default=None,
+                        help='The administrator password; if not given, will be prompted at runtime (optional)')
     parser.add_argument('-a', dest='apiUrl',
                         default='http://localhost:8080/api/v1',
                         help='The url of the Girder instance\'s API endpoint.')
@@ -41,8 +43,11 @@ def printMessage(message):
 
 
 def authenticate(args):
-    print 'Enter the password for Girder user "' + args.username + '":'
-    password = getpass.getpass()
+    if args.password is None:
+        print 'Enter the password for Girder user "' + args.username + '":'
+        password = getpass.getpass()
+    else:
+        password = args.password
 
     gc = girder_client.GirderClient(apiUrl=args.apiUrl)
     try:
