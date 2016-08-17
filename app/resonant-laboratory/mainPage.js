@@ -141,8 +141,8 @@ let MainPage = Backbone.View.extend({
     this.project = new Project();
     let responsePromise = this.project.create()
       .then(() => {
-        // We want to return the actual project object, not the fetched result
-        // from the server
+        // We want to return the actual project object, not the fetched JSON
+        // result from the server
         return this.project;
       });
     responsePromise.then(() => {

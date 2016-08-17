@@ -622,9 +622,8 @@ let Project = MetadataItem.extend({
     return result;
   },
   storePreferredWidgets: function () {
-    this.setMeta('preferredWidgets',
-      window.mainPage.widgetPanels.expandedWidgets);
-    return this.save();
+    // this.setMeta('preferredWidgets', window.mainPage.widgetPanels.expandedWidgets);
+    // return this.save();
   }
 });
 
