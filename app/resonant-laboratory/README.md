@@ -2,6 +2,9 @@
 
 Choose your own visualization adventure.
 
+To use, you have two choices: [build and install
+yourself](#installation-from-source) or [use Ansible](#installation-via-ansible)
+
 ## Installation from Source
 
 1. [Install Girder prerequisites](http://girder.readthedocs.org/en/latest/prerequisites.html).
@@ -111,3 +114,37 @@ use it:
   cd path/to/candela/app/resonant-laboratory
   webpack --watch
   ```
+
+## Installation via Ansible
+
+Resonant Laboratory comes with an Ansible deployment strategy as well. To use
+it, you will need Ansible 2.0:
+
+```shell
+pip install ansible==2.0
+```
+
+Next, clone this repository:
+
+```shell
+git clone https://github.com/Kitware/candela
+```
+
+Move into the `candela/app/resonant-laboratory` directory, and then create the
+Vagrant box with
+
+```shell
+vagrant up
+```
+
+This will configure, provision, and launch a virtual machine, which will set up
+Girder, the example datasets, and Resonant Laboratory itself, and forward
+Resonant Laboratory to port 8080 on your local machine. Then you can use
+Resonant Laboratory by visiting http://localhost:8080.
+
+If port 8080 is being used for another purpose on your local machine already,
+you can use the `RESLAB_HOST_PORT` environment variable to set a different one:
+
+```shell
+RESLAB_HOST_PORT=9090 vagrant up
+```
