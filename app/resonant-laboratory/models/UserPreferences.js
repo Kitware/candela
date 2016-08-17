@@ -52,8 +52,10 @@ you move or delete this item, your preferences will be lost.`,
   addListeners: function () {
     this.listenTo(window.mainPage.currentUser, 'rl:login',
       this.adoptScratchProjects);
+    this.stopListening(window.mainPage, 'rl:createProject');
     this.listenTo(window.mainPage, 'rl:createProject',
       this.claimProject);
+    this.stopListening(window.mainPage, 'rl:changeProject');
     this.listenTo(window.mainPage, 'rl:changeProject',
       this.addProjectListeners);
     this.addProjectListeners();
