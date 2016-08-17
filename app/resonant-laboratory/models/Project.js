@@ -446,7 +446,6 @@ let Project = MetadataItem.extend({
     });
   },
   checkAndSaveMatchings: function (triggers) {
-    let meta = this.getMeta();
     triggers = triggers || [];
 
     // Go through all the matchings and make sure that:
@@ -458,6 +457,7 @@ let Project = MetadataItem.extend({
     return this.save().then(() => {
       return this.cache.loadedDatasets;
     }).then(loadedDatasets => {
+      let meta = this.getMeta();
       let indicesToTrash = [];
       for (let [index, matching] of meta.matchings.entries()) {
         if (meta.datasets.length <= matching.dataIndex ||
