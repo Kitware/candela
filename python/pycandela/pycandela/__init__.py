@@ -5,7 +5,7 @@ from pandas import DataFrame
 class DataFrameEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, DataFrame):
-            return obj.to_records()
+            return obj.to_dict(orient='records')
         return json.JSONEncoder.default(self, obj)
 
 def publish_display_data(data):
@@ -17,11 +17,12 @@ def publish_display_data(data):
 
 def component(name, options):
     js = ("""
-var outputElement = element;
-require(['candela'], function (candela) {
-    var vis = new candela.components['%s'](outputElement.get(0), %s);
-    vis.render();
-});
+(function (el) {
+    require(['candela'], function (candela) {
+        var vis = new candela.components['%s'](el.get(0), %s);
+        vis.render();
+    });
+})(element);
 """ % (name, json.dumps(options, cls=DataFrameEncoder)))
 
     publish_display_data({'application/javascript': js})
@@ -35,14 +36,15 @@ require.config({
     }
 });
 
-var outputElement = element;
-require(['candela'], function (candela) {
-    if (candela) {
-        outputElement.append('<div>Candela loaded successfully.</div>');
-    } else {
-        outputElement.append('<div>Error loading Candela.</div>');
-    }
-});
+(function (el) {
+    require(['candela'], function (candela) {
+        if (candela) {
+            el.append('<div>Candela loaded successfully.</div>');
+        } else {
+            el.append('<div>Error loading Candela.</div>');
+        }
+    });
+})(element);
 """
 
     publish_display_data({'application/javascript': js})
