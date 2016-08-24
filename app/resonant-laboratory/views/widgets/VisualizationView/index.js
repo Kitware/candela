@@ -192,6 +192,7 @@ let VisualizationView = Widget.extend({
           if (!successfullyUpdated) {
             // Nuke the vis and start fresh
             this.$el.html(myTemplate);
+            this.$el.find('#noVisualizationState').hide();
             try {
               this.vis.component = new candela.components[this.vis.spec.name](
                 '#' + this.spec.hashName + 'Container .visualization', options);

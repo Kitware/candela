@@ -217,7 +217,7 @@ let DatasetView = Widget.extend({
   },
   renderEmptyState: function () {
     this.$el.find('#datasetOverview, #tablePreview, #histogramPreview').hide();
-    this.$el.find('#emptyDatasetState').show();
+    this.$el.find('#noDatasetState').show();
   },
   renderFilterPie: function (overviewCount, filteredCount, pageOffset, pageCount, radius) {
     // Draw a pie using the left square of space
@@ -689,7 +689,7 @@ let DatasetView = Widget.extend({
   renderHistograms: function (datasetDetails) {
     let self = this;
 
-    this.$el.find('#emptyDatasetState, #tablePreview').hide();
+    this.$el.find('#noDatasetState, #tablePreview').hide();
     this.$el.find('#datasetOverview, #histogramPreview').show();
     this.renderOverview(datasetDetails);
 
@@ -798,7 +798,7 @@ let DatasetView = Widget.extend({
   renderTable: function (datasetDetails) {
     let self = this;
 
-    this.$el.find('#emptyDatasetState, #histogramPreview').hide();
+    this.$el.find('#noDatasetState, #histogramPreview').hide();
     this.$el.find('#datasetOverview, #tablePreview').show();
     this.renderOverview(datasetDetails);
 

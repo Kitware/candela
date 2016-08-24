@@ -36,3 +36,7 @@
   -webkit-filter: url(#dropSoftShadow);
   filter: url(#dropSoftShadow);
 }
+#WidgetPanels .content .emptyStateHelper {
+  -webkit-filter: imgColorFilter($lightDisabledColor);
+  filter: imgColorFilter($lightDisabledColor);
+}

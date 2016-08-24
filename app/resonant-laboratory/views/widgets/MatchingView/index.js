@@ -910,13 +910,6 @@ in order to connect them together.`);
       }
       this.renderIndicators();
 
-      if (this.graph === null || !widgetIsShowing) {
-        // We don't need to actually draw the interface;
-        // only the indicators are important
-        this.layout = null;
-        return;
-      }
-
       // Okay, let's figure out the layout
       this.layout = {
         emSize: parseFloat(this.$el.css('font-size'))
@@ -924,15 +917,43 @@ in order to connect them together.`);
 
       this.layout.dataNodeHeight = 1.5 * this.layout.emSize;
       this.layout.visNodeHeight = 3.0 * this.layout.emSize;
-
       // Temporarily force the scroll bars so we
       // account for their size
       this.$el.css('overflow', 'scroll');
       this.layout.width = this.el.clientWidth;
       this.layout.height = this.el.clientHeight;
+      this.$el.css('overflow', '');
+
+      // Update whether to show our empty state / helper images
+      if (widgetIsShowing) {
+        if (this.graph === null || this.graph.dataNodes.length === 0) {
+          this.$el.find('#matchingNoDatasetState').show();
+          this.$el.find('#matchingNoVisualizationState').css('max-width', '');
+        } else {
+          this.$el.find('#matchingNoDatasetState').hide();
+          this.$el.find('#matchingNoVisualizationState').css('max-width',
+            Math.min(20 * this.layout.emSize, this.layout.width / 2));
+        }
+        if (this.graph === null || this.graph.visNodes.length === 0) {
+          this.$el.find('#matchingNoVisualizationState').show();
+          this.$el.find('#matchingNoDatasetState').css('max-width', '');
+        } else {
+          this.$el.find('#matchingNoVisualizationState').hide();
+          this.$el.find('#matchingNoDatasetState').css('max-width',
+            Math.min(20 * this.layout.emSize, this.layout.width / 2));
+        }
+      }
+
+      if (this.graph === null || !widgetIsShowing) {
+        // We don't need to actually draw the rest of
+        // the interface; only the indicators are important
+        this.layout = null;
+        return;
+      }
+
+      // Finish figuring out how much space we have to play with
       this.layout.visHeight = 1.5 * this.layout.visNodeHeight * (this.graph.visNodes.length + 2);
       this.layout.dataHeight = 1.5 * this.layout.dataNodeHeight * (this.graph.dataNodes.length + 2);
-      this.$el.css('overflow', '');
 
       this.layout.fullHeight = Math.max(this.layout.height,
                                         this.layout.visHeight,
