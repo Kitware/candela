@@ -220,6 +220,10 @@ let VisualizationView = Widget.extend({
       });
     } else {
       this.$el.html(myTemplate);
+      // Add listener to empty state image
+      this.$el.find('#noVisualizationState').on('click', () => {
+        window.mainPage.overlay.render('VisualizationLibrary');
+      });
       this.vis = null;
       this.status = STATUS.NO_VIS_SELECTED;
       this.statusText.text = 'None selected';

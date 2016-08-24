@@ -887,6 +887,10 @@ let DatasetView = Widget.extend({
 
     if (!this.addedTemplate) {
       this.$el.html(myTemplate);
+      // Add listener to empty state image
+      this.$el.find('#noDatasetState').on('click', () => {
+        window.mainPage.overlay.render('DatasetLibrary');
+      });
       // Add the seek icons (webpack has trouble with detecting xlink:href)
       Object.keys(ICONS).forEach(key => {
         d3.select(this.el).select('image#' + key)

@@ -884,6 +884,13 @@ in order to connect them together.`);
       // (or if we simply want to clear the widget)
       if (this.$el.find('svg').length === 0 || this.graph === null) {
         this.$el.html(myTemplate);
+        // Add listener to empty state images
+        this.$el.find('#matchingNoDatasetState').on('click', () => {
+          window.mainPage.overlay.render('DatasetLibrary');
+        });
+        this.$el.find('#matchingNoVisualizationState').on('click', () => {
+          window.mainPage.overlay.render('VisualizationLibrary');
+        });
         // Add the function to deselect everything when
         // the canvas is clicked
         d3.select(this.el).select('svg')

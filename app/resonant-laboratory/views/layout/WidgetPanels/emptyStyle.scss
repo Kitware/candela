@@ -5,10 +5,16 @@
   top: 1.5em;
   right: 1.5em;
   height: calc(100vh - 6em);
-  color: $darkTextColor;
 }
 #WidgetPanels .emptyState > div {
   width: 20em;
+}
+#WidgetPanels .emptyState #PiecesHint,
+#WidgetPanels .emptyState #QuestionHint {
+  color: $watermarkLightColor;
+  font-size: 1.25em;
+  font-weight: 900;
+  max-width: 350px;
 }
 #WidgetPanels .emptyState #QuestionHint {
   position: absolute;
@@ -19,8 +25,8 @@
 #WidgetPanels .emptyState #QuestionHint img {
   width: 1em;
   height: 1em;
-  -webkit-filter: imgColorFilter($defaultDarkIconColor);
-  filter: imgColorFilter($defaultDarkIconColor);
+  -webkit-filter: imgColorFilter($watermarkLightColor);
+  filter: imgColorFilter($watermarkLightColor);
 }
 #WidgetPanels .emptyState .watermark {
   position: absolute;
@@ -33,10 +39,15 @@
   filter: imgColorFilter($watermarkColor);
 }
 #WidgetPanels .emptyState .watermark:hover {
-  -webkit-filter: url(#dropSoftShadow);
-  filter: url(#dropSoftShadow);
+  -webkit-filter: none;
+  filter: none;
 }
 #WidgetPanels .content .emptyStateHelper {
   -webkit-filter: imgColorFilter($lightDisabledColor);
   filter: imgColorFilter($lightDisabledColor);
+  cursor: pointer;
+}
+#WidgetPanels .content .emptyStateHelper:hover {
+  -webkit-filter: imgColorFilter($darkRolloverColor);
+  filter: imgColorFilter($darkRolloverColor);
 }
