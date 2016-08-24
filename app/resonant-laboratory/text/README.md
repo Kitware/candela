@@ -104,7 +104,7 @@ These dialog boxes are a little more complex than simple messages.
         - JSON
 
       Want to upload something else? [Work with us](#) to develop something that better meets your needs.
-  - Link to a new Dataset
+  - Use a Girder Dataset
     - Error message:
 
       "< some funky input >" is not a valid Girder item ID.
