@@ -681,16 +681,9 @@ in order to connect them together.`);
         let cy = bounds.height / 2 - 0.65 * self.layout.emSize;
         let r = radius + 0.5 * self.layout.emSize;
         let backgroundPath = 'M0,' + (cy - r);
-        if (!d.optional && d.establishedConnections === 0) {
-          // Draw an equilateral triangle if the requirements are not satisfied
-          backgroundPath += 'L' + 0.866 * r + ',' + (cy + r / 2); // 0.866 = sqrt(3)/2 = cos 30
-          backgroundPath += 'L' + (-0.866 * r) + ',' + (cy + r / 2);
-          backgroundPath += 'Z';
-        } else {
-          // Otherwise draw a circle
-          backgroundPath += 'A' + r + ',' + r + ',0,0,0,0,' + (cy + r);
-          backgroundPath += 'A' + r + ',' + r + ',0,0,0,0,' + (cy - r);
-        }
+        // Draw a circle
+        backgroundPath += 'A' + r + ',' + r + ',0,0,0,0,' + (cy + r);
+        backgroundPath += 'A' + r + ',' + r + ',0,0,0,0,' + (cy - r);
         jQuery(this.parentNode).find('path.statsBackground')
           .attr('d', backgroundPath);
 
