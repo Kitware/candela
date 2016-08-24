@@ -548,21 +548,21 @@ in order to connect them together.`);
 
     // main tooltip (for the whole node)
     enteringNodes.append('title').attr('class', 'nodeTitle');
-    nodes.selectAll('title.nodeTitle')
+    nodes.select('title.nodeTitle')
       .text(d => d.attrName + ' (' + d.type + ')');
 
     // background rect
     enteringNodes.append('rect')
       .attr('class', 'nodeBackground');
-    nodes.selectAll('rect.nodeBackground')
+    nodes.select('rect.nodeBackground')
       .attr('height', this.layout.dataNodeHeight)
       .attr('y', -this.layout.dataNodeHeight / 2);
 
     // icon representing the data type (and its tooltip)
     enteringNodes.append('image').append('title');
-    nodes.selectAll('image')
+    nodes.select('image')
       .attr('xlink:href', d => ICONS[d.type]);
-    nodes.selectAll('image').selectAll('title')
+    nodes.select('image').selectAll('title')
       .text(d => d.attrName + ' is being interpreted as a ' + d.type + '.' +
         '\nYou can change this in the Dataset widget');
 
@@ -573,7 +573,7 @@ in order to connect them together.`);
         y: '0.35em',
         x: '1.25em'
       });
-    nodes.selectAll('text.label').each(function (d) {
+    nodes.select('text.label').each(function (d) {
       // this refers to the DOM element
       let label = d.attrName;
       this.textContent = label;
@@ -617,7 +617,7 @@ in order to connect them together.`);
 
     // main tooltip (for the whole node)
     enteringNodes.append('title').attr('class', 'nodeTitle');
-    nodes.selectAll('title.nodeTitle')
+    nodes.select('title.nodeTitle')
       .text(d => {
         let tooltip = d.attrName + ': ' +
           d.establishedConnections + ' / ';
@@ -635,7 +635,7 @@ in order to connect them together.`);
     // background rect
     enteringNodes.append('rect')
       .attr('class', 'nodeBackground');
-    nodes.selectAll('rect.nodeBackground')
+    nodes.select('rect.nodeBackground')
       .attr('height', d => this.layout.visNodeHeight)
       .attr('y', d => -this.layout.visNodeHeight / 2);
 
@@ -649,7 +649,7 @@ in order to connect them together.`);
     enteringStats.append('title');
     // its text
     enteringStats.append('text');
-    let stats = nodes.selectAll('g.connectionStats')
+    let stats = nodes.select('g.connectionStats')
       .attr('text-anchor', 'middle')
       .attr('class', d => {
         let classString = 'connectionStats ';
@@ -662,7 +662,7 @@ in order to connect them together.`);
         }
         return classString;
       });
-    stats.selectAll('text')
+    stats.select('text')
       .each(function (d) {
         // this refers to the DOM element
         let stats = d.establishedConnections + '/';
@@ -701,7 +701,7 @@ in order to connect them together.`);
           self.layout.width - self.layout.emSize - radius -
           widthSuggestions.minWidth);
       });
-    stats.selectAll('title')
+    stats.select('title')
       .text(d => {
         let tooltip = d.establishedConnections + ' out of ';
         if (isFinite(d.possibleConnections)) {
@@ -720,19 +720,19 @@ in order to connect them together.`);
     // (also create their tooltips)
     enteringNodes.append('g')
       .attr('class', 'typeIcons');
-    let typeIcons = nodes.selectAll('g.typeIcons').selectAll('image')
+    let typeIcons = nodes.select('g.typeIcons').selectAll('image')
       .data(d => d.type); // For vis nodes, d.type is an array, not a string
     typeIcons.enter().append('image').append('title');
     typeIcons.attr('xlink:href', d => ICONS[d])
       .attr('x', (d, i) => (1.25 * i) + 'em');
-    typeIcons.selectAll('title')
+    typeIcons.select('title')
       .text(d => 'Compatible with ' + d + ' data attributes');
 
     // vis encoding name
     enteringNodes.append('text')
       .attr('class', 'label')
       .attr('y', '-0.25em');
-    nodes.selectAll('text.label').each(function (d) {
+    nodes.select('text.label').each(function (d) {
       // this refers to the DOM element
       let label = d.attrName;
       this.textContent = label;
@@ -768,7 +768,7 @@ in order to connect them together.`);
     });
 
     // Set the size of each rectangle appropriately
-    nodes.selectAll('rect.nodeBackground')
+    nodes.select('rect.nodeBackground')
       .attr('width', d => {
         if (d.side === 'vis') {
           return this.layout.visWidth + 0.5 * this.layout.emSize;
@@ -778,12 +778,12 @@ in order to connect them together.`);
       }).attr('x', '-0.25em');
 
     // Anchor the stats bubble to the right
-    nodes.selectAll('g.connectionStats')
+    nodes.select('g.connectionStats')
       .attr('transform', 'translate(' + (this.layout.visWidth + 0.25 * this.layout.emSize) +
                          ',' + 1.125 * this.layout.emSize + ')');
 
     // Shrink the text labels so that they fit
-    nodes.selectAll('text.label').each(function (d) {
+    nodes.select('text.label').each(function (d) {
       // this refers to the DOM element
       let label = d.attrName;
       this.textContent = label;
@@ -857,7 +857,7 @@ in order to connect them together.`);
       }).on('click', d => {
         this.clickEdge(d);
       });
-    edges.selectAll('title')
+    edges.select('title')
       .text(d => {
         if (d.mode === EDGE_MODES.ESTABLISHED || d.mode === EDGE_MODES.ESTABLISHED_SELECTED) {
           return 'Click to disconnect';

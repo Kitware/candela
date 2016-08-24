@@ -8,6 +8,7 @@ import Heatmap from './Heatmap';
 import Histogram from './Histogram';
 import LineChart from './LineChart';
 import LineUp from './LineUp';
+import OnSet from './OnSet';
 import ParallelCoordinates from './ParallelCoordinates';
 import ScatterPlot from './ScatterPlot';
 import ScatterPlotMatrix from './ScatterPlotMatrix';
@@ -25,6 +26,7 @@ export default {
   Histogram,
   LineChart,
   LineUp,
+  OnSet,
   ParallelCoordinates,
   ScatterPlot,
   ScatterPlotMatrix,

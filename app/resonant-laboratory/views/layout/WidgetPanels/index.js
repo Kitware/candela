@@ -51,7 +51,8 @@ let WidgetPanels = Backbone.View.extend({
     this.render();
   },
   setWidgets: function (newWidgets) {
-    this.expandedWidgets = newWidgets;
+    this.expandedWidgets = SetOps.intersection(newWidgets,
+      new Set(this.widgetSpecs.map(spec => spec.hashName)));
     this.widgetsChanged = true;
     this.render();
   },

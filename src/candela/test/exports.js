@@ -13,6 +13,7 @@ const componentList = [
   'Histogram',
   'LineChart',
   'LineUp',
+  'OnSet',
   'ParallelCoordinates',
   'ScatterPlot',
   'ScatterPlotMatrix',

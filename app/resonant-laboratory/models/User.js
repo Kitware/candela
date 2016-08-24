@@ -74,14 +74,16 @@ let User = girder.models.UserModel.extend({
   },
   updatePrivateFolder: function () {
     this.privateFolder = null;
-    new Promise((resolve, reject) => {
-      return girder.restRequest({
-        path: '/folder/anonymousAccess/privateFolder',
-        error: reject
-      }).done(resolve).error(reject);
-    }).then(folder => {
-      this.privateFolder = new girder.models.FolderModel(folder);
-    });
+    if (this.isLoggedIn()) {
+      new Promise((resolve, reject) => {
+        return girder.restRequest({
+          path: '/folder/anonymousAccess/privateFolder',
+          error: reject
+        }).done(resolve).error(reject);
+      }).then(folder => {
+        this.privateFolder = new girder.models.FolderModel(folder);
+      });
+    }
   },
   isLoggedIn: function () {
     return this.loggedIn;

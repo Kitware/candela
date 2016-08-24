@@ -141,8 +141,8 @@ let MainPage = Backbone.View.extend({
     this.project = new Project();
     let responsePromise = this.project.create()
       .then(() => {
-        // We want to return the actual project object, not the fetched result
-        // from the server
+        // We want to return the actual project object, not the fetched JSON
+        // result from the server
         return this.project;
       });
     responsePromise.then(() => {
@@ -191,9 +191,6 @@ let MainPage = Backbone.View.extend({
     let responsePromise = new Promise((resolve, reject) => {
       params.error = reject;
       return girder.restRequest(params).done(resolve).error(reject);
-    });
-    responsePromise.catch(err => {
-      this.trigger('rl:error', err);
     });
     return responsePromise;
   }

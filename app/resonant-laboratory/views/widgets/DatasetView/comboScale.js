@@ -25,7 +25,7 @@ class ComboScale {
   update (attrName, datasetDetails, idealWidth) {
     this.coerceToType = datasetDetails.datasetObj.getAttributeType(
       datasetDetails.schema, attrName);
-    this.overviewHistogram = datasetDetails.overviewHistogram[attrName];
+    this.overviewHistogram = datasetDetails.overviewHistogram[attrName] || [];
     this.filteredHistogram = datasetDetails.filteredHistogram[attrName] || [];
     this.pageHistogram = datasetDetails.pageHistogram[attrName] || [];
 

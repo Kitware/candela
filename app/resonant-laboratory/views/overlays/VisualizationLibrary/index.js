@@ -39,11 +39,11 @@ let VisualizationLibrary = Backbone.View.extend({
     libraryButtons.exit().remove();
 
     libraryButtonsEnter.append('img');
-    libraryButtons.selectAll('img')
+    libraryButtons.select('img')
       .attr('src', libImage);
 
     libraryButtonsEnter.append('span');
-    libraryButtons.selectAll('span')
+    libraryButtons.select('span')
       .text(d => d.name);
 
     d3.select('div.largeDialog').selectAll('.circleButton')
@@ -53,6 +53,10 @@ let VisualizationLibrary = Backbone.View.extend({
           window.mainPage.widgetPanels.toggleWidget({
             hashName: 'VisualizationView' + this.index
           }, true);
+          // TODO: Remove this next line when the visualization library is
+          // adapted to the new settings panel style; swapping to a different
+          // visualization shouldn't close the settings dialog (but it SHOULD
+          // close in the current design)
           window.mainPage.overlay.closeOverlay();
         });
       });

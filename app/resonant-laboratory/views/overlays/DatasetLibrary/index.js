@@ -42,15 +42,24 @@ let DatasetLibrary = DatasetSettings.extend({
       this.$el.find('#uploadSection')[0]
         .appendChild(this.uploadView.el);
       this.uploadView.delegateEvents();
+
+      this.$el.find('#linkSection').show();
+      this.$el.find('#loggedOutLinkSection').hide();
     } else {
       this.$el.find('#uploadSection')
-        .append('<p>You must be <a class="loginLink2">logged in</a> to upload files');
-      this.$el.find('#loginLink2').on('click', () => {
+        .append('<p>You must be <a class="loginLink">logged in</a> to upload files');
+
+      this.$el.find('#linkSection').hide();
+      this.$el.find('#loggedOutLinkSection').show();
+
+      this.$el.find('.loginLink').on('click', () => {
         window.mainPage.overlay.render('LoginView');
       });
     }
   },
   attachLibraryListeners: function () {
+    let self = this;
+
     // Listeners for existing dataset sections
     this.$el.find('#girderLink').on('click', () => {
       window.mainPage.router.openUserDirectoriesInGirder();
@@ -68,7 +77,7 @@ let DatasetLibrary = DatasetSettings.extend({
     this.$el.find('#createLink').on('keyup', function () {
       // this refers to the DOM element
       // Validate the girder item ID (TODO: support other link types)
-      this.validateGirderId(this.value);
+      self.validateGirderId(this.value);
     });
 
     this.$el.find('#createLinkButton').on('click', () => {
@@ -115,9 +124,9 @@ let DatasetLibrary = DatasetSettings.extend({
     } else {
       delete this.linkToCreate;
     }
-    this.updateNewDatasetSections();
+    this.updateStaticSections();
   }, 600),
-  updateNewDatasetSections: function () {
+  updateStaticSections: function () {
     // Start out with all hideable form elements hidden
     this.$el.find('.newDatasetHideable').hide();
 
@@ -160,10 +169,7 @@ let DatasetLibrary = DatasetSettings.extend({
   hideFileTypeWarning: function () {
     this.$el.find('#uploadFileFormatHelp').hide();
   },
-  updateExistingDatasetSections: function () {
-    // Start off with every hideable section hidden
-    this.$el.find('.hideable').hide();
-
+  updateDynamicSections: function () {
     // Get the set of datasets in the public library
     window.mainPage.girderRequest({
       path: 'resource/lookup?path=/collection/Resonant Laboratory Library/Data',
@@ -200,7 +206,7 @@ let DatasetLibrary = DatasetSettings.extend({
       // "belonging" to this user
     }
   },
-  render: function () {
+  render: Underscore.debounce(function () {
     DatasetSettings.prototype.updateBlurb.apply(this, []);
     // We use our own subtemplate, so only call
     // the grandparent superclass render function
@@ -214,11 +220,18 @@ let DatasetLibrary = DatasetSettings.extend({
 
       // Only attach event listeners once
       this.attachLibraryListeners();
+
+      // Because we debounce rendering, we need to add
+      // the close listeners ourselves
+      window.mainPage.overlay.addCloseListeners();
+
+      // Start off with every hideable section hidden
+      this.$el.find('.hideable').hide();
     }
 
-    this.updateNewDatasetSections();
-    this.updateExistingDatasetSections();
-  },
+    this.updateStaticSections();
+    this.updateDynamicSections();
+  }, 200),
   getFolderContents: function (folder, divId, icon) {
     let projects = new girder.collections.ItemCollection();
     projects.altUrl = 'item';
@@ -259,14 +272,14 @@ let DatasetLibrary = DatasetSettings.extend({
 
     libraryButtonsEnter.append('img')
       .attr('class', 'projectGlyph');
-    libraryButtons.selectAll('img.projectGlyph')
+    libraryButtons.select('img.projectGlyph')
       .attr('src', icon);
 
     libraryButtonsEnter.append('img')
       .attr('class', 'badge')
       .style('display', 'none');
     window.mainPage.versionNumber.then(appVersion => {
-      libraryButtons.selectAll('img.badge')
+      libraryButtons.select('img.badge')
         .attr('src', warningIcon)
         .style('display', d => {
           if (d.attributes.meta.rlab.versionNumber === appVersion) {
@@ -282,7 +295,7 @@ let DatasetLibrary = DatasetSettings.extend({
     });
 
     libraryButtonsEnter.append('span');
-    libraryButtons.selectAll('span')
+    libraryButtons.select('span')
       .text(d => d.name());
 
     d3.select('#' + divId).selectAll('.circleButton')
@@ -293,8 +306,8 @@ let DatasetLibrary = DatasetSettings.extend({
           window.mainPage.widgetPanels.toggleWidget({
             hashName: 'DatasetView' + this.index
           }, true);
-          window.mainPage.overlay.closeOverlay();
         });
+        window.mainPage.overlay.closeOverlay();
       });
   }
 });

@@ -16,6 +16,8 @@ def getArguments():
         or databases (any changes to the existing library will be lost)''')
     parser.add_argument('-u', dest='username', default='admin',
                         help='The administrator username (default: "admin")')
+    parser.add_argument('-p', dest='password', default=None,
+                        help='The administrator password; if not given, will be prompted at runtime (optional)')
     parser.add_argument('-a', dest='apiUrl',
                         default='http://localhost:8080/api/v1',
                         help='The url of the Girder instance\'s API endpoint.')
@@ -41,8 +43,11 @@ def printMessage(message):
 
 
 def authenticate(args):
-    print 'Enter the password for Girder user "' + args.username + '":'
-    password = getpass.getpass()
+    if args.password is None:
+        print 'Enter the password for Girder user "' + args.username + '":'
+        password = getpass.getpass()
+    else:
+        password = args.password
 
     gc = girder_client.GirderClient(apiUrl=args.apiUrl)
     try:
@@ -176,8 +181,10 @@ def getDatasets():
                 datasets[item]['metadata'] = metadata
             else:
                 fileSize = os.stat(filePath).st_size
-                if (fileSize > int(args.databaseThreshold)) or os.path.splitext(fileName)[1] == '.json':
+                if fileSize > int(args.databaseThreshold):
                     datasets[item]['collections'][fileName] = filePath
+                elif os.path.splitext(fileName)[1] == '.json':
+                    datasets[item]['files'][fileName] = filePath
                 else:
                     datasets[item]['files'][fileName] = filePath
 
@@ -342,6 +349,17 @@ def attachMetadata(datasets, datasetIdLookup, projects, projectIdLookup):
                  (datasetMetaCount, projectMetaCount))
 
 
+def cacheBasicInfo(datasets):
+    for datasetId in datasetIdLookup.itervalues():
+        # Hit the endpoint that infers the schema of the dataset
+        gc.sendRestRequest('POST', 'item/' + datasetId + '/dataset/inferSchema')
+        # Hit the endpoint that caches an overview histogram of the dataset
+        # (with default attribute interpretations)
+        gc.sendRestRequest('POST', 'item/' + datasetId + '/dataset/getHistograms',
+                           parameters={'cache': True})
+    printMessage('Cached basic info in all datasets')
+
+
 if __name__ == '__main__':
     args = getArguments()
     gc = authenticate(args)
@@ -368,5 +386,8 @@ if __name__ == '__main__':
 
     # Hit the appropriate endpoints and attach metadata where it exists
     attachMetadata(datasets, datasetIdLookup, projects, projectIdLookup)
+
+    # Cache initial information such as the dataset schema and overview histograms
+    cacheBasicInfo(datasets)
 
     print 'Done!'

@@ -197,7 +197,7 @@ let DatasetSettings = SettingsPanel.extend({
         .val(datasetObj.get('name'));
 
       this.$el.find('#datasetSize')
-        .text(d3.format('s')(status.size).toUpperCase() + 'B');
+        .text(d3.format('0.3s')(status.size).toUpperCase() + 'B');
 
       this.$el.find('#datasetLocation')
         .text(status.path)
@@ -240,32 +240,50 @@ let DatasetSettings = SettingsPanel.extend({
     });
   },
   updateFilterSettings: function (datasetObj) {
-    // TODO: list active filters
+    let standardFilterList = datasetObj.listStandardFilterExpressions();
+    // TODO: custom filter expressions
+    if (standardFilterList.length === 0) {
+      this.$el.find('#filterBlurb').text('There are no active filters.');
+    } else {
+      this.$el.find('#filterBlurb').text(`The following filters
+are active, joined by an AND operator:`);
+    }
+
+    let standardFilters = d3.select(this.el).select('#activeFilters')
+      .selectAll('pre.standardFilter').data(standardFilterList);
+    standardFilters.enter().append('pre')
+      .attr('class', 'standardFilter');
+    standardFilters.exit().remove();
+    standardFilters.text(d => d);
   },
-  render: function () {
+  render: Underscore.debounce(function () {
     this.updateBlurb();
     SettingsPanel.prototype.render.apply(this, arguments);
 
     this.getDataset().then(datasetObj => {
-      if (!datasetObj) {
-        // Clear out the template; the blurb will suffice
-        this.addedSubTemplate = false;
-        this.$el.find('#subclassContent').html('');
-      } else {
-        if (!this.addedSubTemplate) {
-          this.$el.find('#subclassContent').html(myTemplate);
-          this.addedSubTemplate = true;
+      if (!this.addedSubTemplate) {
+        this.$el.find('#subclassContent').html(myTemplate);
+        this.addedSubTemplate = true;
 
-          // Only attach event listeners once
-          this.attachSettingsListeners(datasetObj);
-        }
+        // Only attach event listeners once
+        this.attachSettingsListeners(datasetObj);
+
+        // Because we debounce rendering, we need to add
+        // the close listeners ourselves
+        window.mainPage.overlay.addCloseListeners();
+      }
+      if (!datasetObj) {
+        // The blurb will suffice
+        this.$el.find('#subclassContent').hide('');
+      } else {
+        this.$el.find('#subclassContent').show();
 
         this.updateMainSettings(datasetObj);
         this.updatePageSettings(datasetObj);
         this.updateFilterSettings(datasetObj);
       }
     });
-  }
+  }, 200)
 });
 
 export default DatasetSettings;
