@@ -34,6 +34,14 @@ $DarkRed: #9F0000;
 $DarkestRed: #590000;
 
 /*
+Blue-green scheme for the histogram colors
+*/
+
+$SeaGreen: #A8DDB5;
+$SeaBlueGreen: #4EB3D3;
+$SeaBlue: #08589E;
+
+/*
 Color meanings:
 */
 
@@ -78,9 +86,9 @@ $dataTableOddRowColor: $LightestBlue;
 
 $dataAxisColor: $Black;
 
-$dataOverviewColor: $DarkestGreen;
-$dataFilteredColor: $LightBlue;
-$dataCurrentPageColor: $Orange;
+$dataOverviewColor: $SeaGreen;
+$dataFilteredColor: $SeaBlueGreen;
+$dataCurrentPageColor: $SeaBlue;
 
 $matchingNodeColor: $DarkestGrey;
 $matchingNodeBackgroundColor: $LightGrey;
