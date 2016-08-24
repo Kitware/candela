@@ -108,9 +108,9 @@ let VisualizationView = Widget.extend({
     } else if (this.status === STATUS.OK) {
       window.mainPage.overlay.renderSuccessScreen('The visualization appears to be functioning correctly.');
     } else if (this.status === STATUS.NO_VIS_SELECTED) {
-      window.mainPage.overlay.renderUserErrorScreen('You have not chosen a visualization yet. Click <a onclick="window.mainPage.overlay.render(\'VisualizationLibrary\')"> here</a> to choose one.');
+      window.mainPage.overlay.renderUserErrorScreen('You have not <a onclick="window.mainPage.overlay.render(\'VisualizationLibrary\')">chosen a visualization</a> yet.');
     } else if (this.status === STATUS.NOT_ENOUGH_MAPPINGS) {
-      window.mainPage.overlay.renderUserErrorScreen('This visualization needs more data matchings. Make sure there are no orange warning triangles in the Matching panel.');
+      window.mainPage.overlay.renderUserErrorScreen('This visualization needs more data matchings. Make sure there are no orange circles in the Matching panel.');
     } else if (this.status === STATUS.FAILED_RENDER) {
       window.mainPage.overlay.renderReallyBadErrorScreen('There was a failure in attempting to render the visualization. There may be some hints in the developer console.');
     }

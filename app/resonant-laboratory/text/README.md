@@ -19,7 +19,7 @@ Resonant Laboratory
 - The visualization appears to be functioning correctly.
 
 #### Always show:
-- If something actually isn't working as it should, let us know [here](#). We want to get any problems fixed as soon as possible.
+- If something actually isn't working as it should, please [let us know](#). We want to get any problems fixed as soon as possible.
 - Is there something that this should be doing, but it's not? Do you have an idea for how this could be improved? If so, we'd love to work with you to build a [custom solution](#) that better fits your needs.
 
 ## Loading Screens
@@ -29,16 +29,16 @@ Resonant Laboratory
 - Still attempting to render the visualization...
 
 #### Always show:
-- If you think it should have finished by now, please let us know [here](#). If something is broken, we want to get it fixed as soon as possible.
+- If you think it should have finished by now, please [let us know](#). If something is broken, we want to get it fixed as soon as possible.
 - Or, it's totally possible that you're doing something awesome that we didn't anticipate (like using a huge dataset). If so, we'd love to work with you to build a [custom solution](#) that better fits your needs.
 
 ## User Error Screens
 *The idea behind this screen is the user still needs to do something for something to work (the user should be able to fix these on their own). These are the possible messages, broken down by panels:*
 
 #### Dataset panel
-- You have not chosen a dataset yet. Click [here](#) to choose one.
-- There was a problem parsing the data; you\'ll probably need to [edit](#) or [reshape](#) the data in order to use it.
-- There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to [edit](#) or [reshape](#) the data in order to use it.
+- You have not [chosen a dataset](#) yet.
+- There was a problem parsing the data; you\'ll probably need to reshape the data in order to use it.
+- There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to reshape the data in order to use it.
 
 #### Dataset settings dialog
 - You don\'t have the necessary permissions to delete that project.
@@ -50,18 +50,18 @@ Resonant Laboratory
 - The visualization needs more connections to data in order to display anything.
 
 #### Visualization panel
-- You have not chosen a visualization yet. Click [here](#) to choose one.
-- This visualization needs more data matchings. Make sure there are no orange warning triangles in the Matching panel.
+- You have not [chosen a visualization](#) yet.
+- This visualization needs more data matchings. Make sure there are no orange circles in the Matching panel.
 
 #### Always show:
-- If it's not clear how to fix this, or if something else is wrong, let us know [here](#). We want to get any problems fixed as soon as possible.
+- If it's not clear how to fix this, or if something else is wrong, [let us know](#). We want to get any problems fixed as soon as possible.
 - Or, maybe it's not a bug, but a design problem. Is there something that this should be doing, but it's not? Do you have an idea for how this could be improved? If so, we'd love to work with you to build a [custom solution](#) that better fits your needs.
 
 ## System Failure Screens
 *The idea behind these screens is something really bad happened—something that we didn't anticipate. So we have some default text, but we can't predict the message itself. It and its details will probably be really cryptic.*
 #### Always show:
 - I've made a huge mistake... (flaming banana stand icon)
-- This is a problem we didn't anticipate. Please let us know that this happened [here](#).
+- This is a problem we didn't anticipate. Please [let us know](#) that this happened.
 
 # Control Dialog Boxes
 These dialog boxes are a little more complex than simple messages.

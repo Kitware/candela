@@ -204,15 +204,15 @@ let DatasetView = Widget.extend({
   },
   renderHelpScreen: function () {
     if (this.status === STATUS.NO_DATA) {
-      window.mainPage.overlay.renderUserErrorScreen('You have not chosen a dataset yet. Click <a onclick="window.mainPage.overlay.render(\'DatasetLibrary\')">here</a> to choose one.');
+      window.mainPage.overlay.renderUserErrorScreen('You have not <a onclick="window.mainPage.overlay.render(\'DatasetLibrary\')">chosen a dataset</a> yet.');
     } else if (this.status === STATUS.SUCCESS) {
       window.mainPage.overlay.renderSuccessScreen('The dataset appears to have loaded correctly.');
     } else if (this.status === STATUS.CANT_LOAD) {
       window.mainPage.overlay.renderUserErrorScreen('The dataset could not be loaded! You might want to check whether you have the necessary permissions.');
     } else if (this.status === STATUS.CANT_PARSE) {
-      window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data; you\'ll probably need to <a>edit</a> or <a>reshape</a> the data in order to use it.');
+      window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data; you\'ll probably need to reshape the data in order to use it.');
     } else if (this.status === STATUS.NO_ATTRIBUTES) {
-      window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to <a>edit</a> or <a>reshape</a> the data in order to use it.');
+      window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to reshape the data in order to use it.');
     }
   },
   renderEmptyState: function () {
