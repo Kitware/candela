@@ -31,8 +31,8 @@
 #WidgetPanels .emptyState .watermark {
   position: absolute;
   top: calc(50% - 4em);
-  left: calc(50% - 4em);
-  width: 8em;
+  left: calc(50% - 16em);
+  width: 32em;
   height: 8em;
   cursor: pointer;
   -webkit-filter: imgColorFilter($watermarkColor);
