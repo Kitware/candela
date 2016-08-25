@@ -53,8 +53,10 @@ let StartingScreen = Backbone.View.extend({
 
     if (window.mainPage.project) {
       this.$el.find('#closeOverlay').show();
+      window.mainPage.overlay.addCloseListeners();
     } else {
       this.$el.find('#closeOverlay').hide();
+      window.mainPage.overlay.removeCloseListeners();
     }
 
     if (window.mainPage.currentUser.isLoggedIn()) {

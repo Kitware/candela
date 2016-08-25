@@ -15,7 +15,6 @@ import DatasetSettings from '../../overlays/DatasetSettings';
 import VisualizationLibrary from '../../overlays/VisualizationLibrary';
 import ProjectLibrary from '../../overlays/ProjectLibrary';
 import ProjectSettings from '../../overlays/ProjectSettings';
-import AboutResonantLab from '../../overlays/AboutResonantLab';
 
 import reallyBadErrorTemplate from './reallyBadErrorTemplate.html';
 import userErrorTemplate from './userErrorTemplate.html';
@@ -36,8 +35,7 @@ let VIEWS = {
   StartingScreen,
   DatasetLibrary,
   DatasetSettings,
-  VisualizationLibrary,
-  AboutResonantLab
+  VisualizationLibrary
 };
 
 import './style.scss';
