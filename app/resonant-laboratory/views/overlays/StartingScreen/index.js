@@ -1,5 +1,6 @@
 import Backbone from 'backbone';
 import myTemplate from './template.html';
+import './style.scss';
 
 let StartingScreen = Backbone.View.extend({
   initialize: function () {

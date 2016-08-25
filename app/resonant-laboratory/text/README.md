@@ -6,11 +6,31 @@ This file outlines the user-facing text in Resonant Laboratory.
 *TODO: Ideally, we should convert this file into some kind of `en.json` file that the app actually uses for its text content (will make internationalization much easier).*
 
 # Message Dialog Boxes
-## About Dialog
-Resonant Laboratory
+## Splash / About Dialog
 
-- Resonant Laboratory is a tool developed by Kitware, Inc. to help users build and share visualizations without needing to write code.  
-- TODO: better marketing schpeel...
+Resonant Laboratory is a tool developed by Kitware, Inc. to help users
+build and share visualizations without needing to write code.
+This tool focuses on doing one thing, and doing it well: given a
+reasonably clean dataset, connect it to a visualization. Its
+architecture is designed to be flexible to a diverse array of dataset inputs, as well
+as new, state-of-the-art visualizations. However, we believe that problems
+like data reshaping and the process of designing custom visualizations
+are best dealt with elsewhere.
+
+If you have those needs, check out other [Resonant applications](#) that we are developing to address these issues
+independently. The Resonant platform includes both general solutions like
+Resonant Laboratory, as well as highly specialized solutions developed for
+our partners and customers.
+
+Resonant Laboratory is brought to you by [Kitware](#), a leader in
+innovative, open-source solutions to today's scientific computing and data
+analytics challenges.
+
+If something isn't working as it should, please [let us know](#). We want to get any problems fixed as soon as possible.
+Is there something that this should be doing, but it's not? Do you have
+an idea for how this could be improved? If so, we'd love to work with you
+to build a [custom solution](#) that better fits your needs.
+
 
 ## Success Screens
 #### Possible Messages:
