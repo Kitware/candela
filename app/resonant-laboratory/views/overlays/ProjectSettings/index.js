@@ -60,10 +60,10 @@ let ProjectSettings = SettingsPanel.extend({
                     .catch(errorObj => {
                       if (errorObj.statusText === 'Unauthorized') {
                         if (window.mainPage.currentUser.isLoggedIn()) {
-                          window.mainPage.overlay.renderErrorScreen(`You don\'t
+                          window.mainPage.overlay.renderUserErrorScreen(`You don\'t
           have the necessary permissions to delete that project.`);
                         } else {
-                          window.mainPage.overlay.renderErrorScreen(`Sorry, you
+                          window.mainPage.overlay.renderUserErrorScreen(`Sorry, you
           can\'t delete projects unless you log in.`);
                         }
                       } else {

@@ -24,11 +24,11 @@
 #Overlay #uploadSection .progress {
   height: 1em;
   width: 100%;
-  background-color: $matchingSuccessColor;
+  background-color: $matchingSuccessTextColor;
 }
 #Overlay #uploadSection .progress-bar {
   height: 1em;
-  background-color: $matchingSuccessTextColor;
+  background-color: $matchingSuccessColor;
 }
 #Overlay #uploadSection .g-current-progress-message,
 #Overlay #uploadSection .g-progress-current {

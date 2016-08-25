@@ -204,20 +204,20 @@ let DatasetView = Widget.extend({
   },
   renderHelpScreen: function () {
     if (this.status === STATUS.NO_DATA) {
-      window.mainPage.overlay.renderUserErrorScreen('You have not chosen a dataset yet. Click <a onclick="window.mainPage.overlay.render(\'DatasetLibrary\')">here</a> to choose one.');
+      window.mainPage.overlay.renderUserErrorScreen('You have not <a onclick="window.mainPage.overlay.render(\'DatasetLibrary\')">chosen a dataset</a> yet.');
     } else if (this.status === STATUS.SUCCESS) {
       window.mainPage.overlay.renderSuccessScreen('The dataset appears to have loaded correctly.');
     } else if (this.status === STATUS.CANT_LOAD) {
       window.mainPage.overlay.renderUserErrorScreen('The dataset could not be loaded! You might want to check whether you have the necessary permissions.');
     } else if (this.status === STATUS.CANT_PARSE) {
-      window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data; you\'ll probably need to <a>edit</a> or <a>reshape</a> the data in order to use it.');
+      window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data; you\'ll probably need to reshape the data in order to use it.');
     } else if (this.status === STATUS.NO_ATTRIBUTES) {
-      window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to <a>edit</a> or <a>reshape</a> the data in order to use it.');
+      window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to reshape the data in order to use it.');
     }
   },
   renderEmptyState: function () {
     this.$el.find('#datasetOverview, #tablePreview, #histogramPreview').hide();
-    this.$el.find('#emptyDatasetState').show();
+    this.$el.find('#noDatasetState').show();
   },
   renderFilterPie: function (overviewCount, filteredCount, pageOffset, pageCount, radius) {
     // Draw a pie using the left square of space
@@ -689,7 +689,7 @@ let DatasetView = Widget.extend({
   renderHistograms: function (datasetDetails) {
     let self = this;
 
-    this.$el.find('#emptyDatasetState, #tablePreview').hide();
+    this.$el.find('#noDatasetState, #tablePreview').hide();
     this.$el.find('#datasetOverview, #histogramPreview').show();
     this.renderOverview(datasetDetails);
 
@@ -798,7 +798,7 @@ let DatasetView = Widget.extend({
   renderTable: function (datasetDetails) {
     let self = this;
 
-    this.$el.find('#emptyDatasetState, #histogramPreview').hide();
+    this.$el.find('#noDatasetState, #histogramPreview').hide();
     this.$el.find('#datasetOverview, #tablePreview').show();
     this.renderOverview(datasetDetails);
 
@@ -887,6 +887,10 @@ let DatasetView = Widget.extend({
 
     if (!this.addedTemplate) {
       this.$el.html(myTemplate);
+      // Add listener to empty state image
+      this.$el.find('#noDatasetState').on('click', () => {
+        window.mainPage.overlay.render('DatasetLibrary');
+      });
       // Add the seek icons (webpack has trouble with detecting xlink:href)
       Object.keys(ICONS).forEach(key => {
         d3.select(this.el).select('image#' + key)

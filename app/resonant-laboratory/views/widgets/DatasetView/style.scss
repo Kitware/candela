@@ -33,6 +33,14 @@
   filter: imgColorFilter($disabledColor);
 }
 
+.DatasetView.content #noDatasetState {
+  position: absolute;
+  top: 0em;
+  right: 0em;
+  margin: 1em;
+  max-width: 20em;
+}
+
 .DatasetView.content .overview {
   fill: $dataOverviewColor;
 }

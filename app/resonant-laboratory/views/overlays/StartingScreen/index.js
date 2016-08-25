@@ -1,10 +1,12 @@
 import Backbone from 'backbone';
 import myTemplate from './template.html';
+import './style.scss';
 
 let StartingScreen = Backbone.View.extend({
   initialize: function () {
     this.listenTo(window.mainPage.currentUser, 'rl:login', this.render);
     this.listenTo(window.mainPage.currentUser, 'rl:logout', this.render);
+    this.listenTo(window.mainPage, 'rl:changeProject', this.render);
   },
   render: function () {
     if (!this.addedTemplate) {
@@ -25,9 +27,13 @@ let StartingScreen = Backbone.View.extend({
       this.$el.find('#emptyProjectButton').on('click', () => {
         window.mainPage.newProject()
           .then(() => {
-            window.mainPage.overlay.closeOverlay();
             window.mainPage.widgetPanels.closeWidgets();
+            window.mainPage.overlay.closeOverlay();
           });
+      });
+
+      this.$el.find('#openProjectButton').on('click', () => {
+        window.mainPage.overlay.render('ProjectLibrary');
       });
 
       this.$el.find('a#loginLink').on('click', () => {
@@ -43,6 +49,14 @@ let StartingScreen = Backbone.View.extend({
       });
 
       this.addedTemplate = true;
+    }
+
+    if (window.mainPage.project) {
+      this.$el.find('#closeOverlay').show();
+      window.mainPage.overlay.addCloseListeners();
+    } else {
+      this.$el.find('#closeOverlay').hide();
+      window.mainPage.overlay.removeCloseListeners();
     }
 
     if (window.mainPage.currentUser.isLoggedIn()) {

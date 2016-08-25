@@ -120,10 +120,10 @@ let DatasetSettings = SettingsPanel.extend({
             }).catch((errorObj) => {
               if (errorObj.statusText === 'Unauthorized') {
                 if (window.mainPage.currentUser.isLoggedIn()) {
-                  window.mainPage.overlay.renderErrorScreen(`You don\'t
+                  window.mainPage.overlay.renderUserErrorScreen(`You don\'t
   have the necessary permissions to delete that dataset.`);
                 } else {
-                  window.mainPage.overlay.renderErrorScreen(`Sorry, you
+                  window.mainPage.overlay.renderUserErrorScreen(`Sorry, you
   can\'t delete datasets unless you log in.`);
                 }
               } else {

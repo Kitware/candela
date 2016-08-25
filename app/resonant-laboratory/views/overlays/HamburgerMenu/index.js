@@ -23,13 +23,6 @@ let HamburgerMenu = Menu.extend({
           });
         }
       },
-      null,
-      {
-        text: 'About Resonant Laboratory...',
-        onclick: () => {
-          window.mainPage.overlay.render('AboutResonantLab');
-        }
-      },
       null
     ];
 

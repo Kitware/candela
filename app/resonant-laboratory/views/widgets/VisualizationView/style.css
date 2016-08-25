@@ -1,6 +1,13 @@
 .VisualizationView.content {
   overflow:hidden;
 }
+.VisualizationView.content #noVisualizationState {
+  position: absolute;
+  top: 0em;
+  right: 0em;
+  margin: 1em;
+  max-width: 20em;
+}
 .VisualizationView.content .visualization {
   position: absolute;
   left: 0px;

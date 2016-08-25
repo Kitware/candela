@@ -81,7 +81,7 @@ let Header = Backbone.View.extend({
       // button events
       this.$el.html(myTemplate);
       jQuery('#aboutResLabHeaderButton').on('click', () => {
-        window.mainPage.overlay.render('AboutResonantLab');
+        window.mainPage.overlay.render('StartingScreen');
       });
       jQuery('#hamburgerButton').on('click', () => {
         window.mainPage.overlay.render('HamburgerMenu');

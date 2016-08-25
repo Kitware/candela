@@ -681,16 +681,9 @@ in order to connect them together.`);
         let cy = bounds.height / 2 - 0.65 * self.layout.emSize;
         let r = radius + 0.5 * self.layout.emSize;
         let backgroundPath = 'M0,' + (cy - r);
-        if (!d.optional && d.establishedConnections === 0) {
-          // Draw an equilateral triangle if the requirements are not satisfied
-          backgroundPath += 'L' + 0.866 * r + ',' + (cy + r / 2); // 0.866 = sqrt(3)/2 = cos 30
-          backgroundPath += 'L' + (-0.866 * r) + ',' + (cy + r / 2);
-          backgroundPath += 'Z';
-        } else {
-          // Otherwise draw a circle
-          backgroundPath += 'A' + r + ',' + r + ',0,0,0,0,' + (cy + r);
-          backgroundPath += 'A' + r + ',' + r + ',0,0,0,0,' + (cy - r);
-        }
+        // Draw a circle
+        backgroundPath += 'A' + r + ',' + r + ',0,0,0,0,' + (cy + r);
+        backgroundPath += 'A' + r + ',' + r + ',0,0,0,0,' + (cy - r);
         jQuery(this.parentNode).find('path.statsBackground')
           .attr('d', backgroundPath);
 
@@ -884,6 +877,13 @@ in order to connect them together.`);
       // (or if we simply want to clear the widget)
       if (this.$el.find('svg').length === 0 || this.graph === null) {
         this.$el.html(myTemplate);
+        // Add listener to empty state images
+        this.$el.find('#matchingNoDatasetState').on('click', () => {
+          window.mainPage.overlay.render('DatasetLibrary');
+        });
+        this.$el.find('#matchingNoVisualizationState').on('click', () => {
+          window.mainPage.overlay.render('VisualizationLibrary');
+        });
         // Add the function to deselect everything when
         // the canvas is clicked
         d3.select(this.el).select('svg')
@@ -910,13 +910,6 @@ in order to connect them together.`);
       }
       this.renderIndicators();
 
-      if (this.graph === null || !widgetIsShowing) {
-        // We don't need to actually draw the interface;
-        // only the indicators are important
-        this.layout = null;
-        return;
-      }
-
       // Okay, let's figure out the layout
       this.layout = {
         emSize: parseFloat(this.$el.css('font-size'))
@@ -924,15 +917,43 @@ in order to connect them together.`);
 
       this.layout.dataNodeHeight = 1.5 * this.layout.emSize;
       this.layout.visNodeHeight = 3.0 * this.layout.emSize;
-
       // Temporarily force the scroll bars so we
       // account for their size
       this.$el.css('overflow', 'scroll');
       this.layout.width = this.el.clientWidth;
       this.layout.height = this.el.clientHeight;
+      this.$el.css('overflow', '');
+
+      // Update whether to show our empty state / helper images
+      if (widgetIsShowing) {
+        if (this.graph === null || this.graph.dataNodes.length === 0) {
+          this.$el.find('#matchingNoDatasetState').show();
+          this.$el.find('#matchingNoVisualizationState').css('max-width', '');
+        } else {
+          this.$el.find('#matchingNoDatasetState').hide();
+          this.$el.find('#matchingNoVisualizationState').css('max-width',
+            Math.min(20 * this.layout.emSize, this.layout.width / 2));
+        }
+        if (this.graph === null || this.graph.visNodes.length === 0) {
+          this.$el.find('#matchingNoVisualizationState').show();
+          this.$el.find('#matchingNoDatasetState').css('max-width', '');
+        } else {
+          this.$el.find('#matchingNoVisualizationState').hide();
+          this.$el.find('#matchingNoDatasetState').css('max-width',
+            Math.min(20 * this.layout.emSize, this.layout.width / 2));
+        }
+      }
+
+      if (this.graph === null || !widgetIsShowing) {
+        // We don't need to actually draw the rest of
+        // the interface; only the indicators are important
+        this.layout = null;
+        return;
+      }
+
+      // Finish figuring out how much space we have to play with
       this.layout.visHeight = 1.5 * this.layout.visNodeHeight * (this.graph.visNodes.length + 2);
       this.layout.dataHeight = 1.5 * this.layout.dataNodeHeight * (this.graph.dataNodes.length + 2);
-      this.$el.css('overflow', '');
 
       this.layout.fullHeight = Math.max(this.layout.height,
                                         this.layout.visHeight,

@@ -30,9 +30,9 @@
 #Header #brandingIcons img {
   -webkit-filter: imgColorFilter($defaultLightIconColor);
   filter: imgColorFilter($defaultLightIconColor);
-  width: 2em;
+  width: 10em;
   height: 2em;
-  margin: 0.25;
+  margin: 0.25em;
 }
 #Header #brandingIcons img:hover {
   /* Sneakiness here: we *remove* the color filter,

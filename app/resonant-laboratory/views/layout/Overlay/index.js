@@ -15,10 +15,8 @@ import DatasetSettings from '../../overlays/DatasetSettings';
 import VisualizationLibrary from '../../overlays/VisualizationLibrary';
 import ProjectLibrary from '../../overlays/ProjectLibrary';
 import ProjectSettings from '../../overlays/ProjectSettings';
-import AboutResonantLab from '../../overlays/AboutResonantLab';
 
 import reallyBadErrorTemplate from './reallyBadErrorTemplate.html';
-import errorTemplate from './errorTemplate.html';
 import userErrorTemplate from './userErrorTemplate.html';
 import successTemplate from './successTemplate.html';
 import loadingTemplate from './loadingTemplate.html';
@@ -37,8 +35,7 @@ let VIEWS = {
   StartingScreen,
   DatasetLibrary,
   DatasetSettings,
-  VisualizationLibrary,
-  AboutResonantLab
+  VisualizationLibrary
 };
 
 import './style.scss';
@@ -120,7 +117,7 @@ let Overlay = Backbone.View.extend({
       message: message,
       details: details || '',
       bugReportLink: 'https://github.com/Kitware/candela/issues',
-      consultingLink: 'http://www.kitware.com/company/contact_kitware.php'
+      consultingLink: 'http://www.kitware.com/products/consulting.html'
     };
     return Underscore.template(template)(options);
   },
@@ -128,17 +125,6 @@ let Overlay = Backbone.View.extend({
     this.render(this.getScreen(loadingTemplate, message), false, () => {
       this.$el.find('#okButton').on('click', this.closeOverlay);
     });
-  },
-  renderErrorScreen: function (message) {
-    this.render(this.getScreen(errorTemplate, message), false,
-      () => {
-        this.$el.find('#okButton').on('click', () => {
-          window.mainPage.switchProject(null)
-            .then(() => {
-              window.mainPage.overlay.render('StartingScreen');
-            });
-        });
-      });
   },
   renderUserErrorScreen: function (message) {
     this.render(this.getScreen(userErrorTemplate, message), false, () => {
