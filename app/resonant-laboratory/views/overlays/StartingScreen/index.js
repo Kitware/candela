@@ -27,8 +27,8 @@ let StartingScreen = Backbone.View.extend({
       this.$el.find('#emptyProjectButton').on('click', () => {
         window.mainPage.newProject()
           .then(() => {
-            window.mainPage.overlay.closeOverlay();
             window.mainPage.widgetPanels.closeWidgets();
+            window.mainPage.overlay.closeOverlay();
           });
       });
 

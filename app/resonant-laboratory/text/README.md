@@ -8,7 +8,7 @@ This file outlines the user-facing text in Resonant Laboratory.
 # Message Dialog Boxes
 ## Splash / About Dialog
 
-Resonant Laboratory is a tool developed by Kitware, Inc. to help users
+Resonant Laboratory is a beta tool under active development by Kitware, Inc. to help users
 build and share visualizations without needing to write code.
 This tool focuses on doing one thing, and doing it well: given a
 reasonably clean dataset, connect it to a visualization. Its
@@ -25,6 +25,9 @@ our partners and customers.
 Resonant Laboratory is brought to you by [Kitware](#), a leader in
 innovative, open-source solutions to today's scientific computing and data
 analytics challenges.
+
+Resonant Laboratory is an open source project, released under the Apache
+v2 License. The source code is available [on Github](#).
 
 If something isn't working as it should, please [let us know](#). We want to get any problems fixed as soon as possible.
 Is there something that this should be doing, but it's not? Do you have

@@ -117,7 +117,7 @@ let Overlay = Backbone.View.extend({
       message: message,
       details: details || '',
       bugReportLink: 'https://github.com/Kitware/candela/issues',
-      consultingLink: 'http://www.kitware.com/company/contact_kitware.php'
+      consultingLink: 'http://www.kitware.com/products/consulting.html'
     };
     return Underscore.template(template)(options);
   },
