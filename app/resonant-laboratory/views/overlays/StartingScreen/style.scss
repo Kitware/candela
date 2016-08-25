@@ -1,14 +1,14 @@
 @import '../../../stylesheets/colors.scss';
 
 #Overlay #StartingScreen {
-    position: absolute;
-    left: 1em;
-    top: 1em;
-    right: 1em;
-    min-height: 100%;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50em;
+    height: 38em;
     background-color: $panelBackgroundColor;
     display: flex;
-    padding: 1em 1em 3em 1em;
+    padding: 1em;
     border: 1px solid rgba($shadowColor,0.2);
     box-shadow: 0 5px 15px rgba($shadowColor,0.5);
 }
@@ -38,6 +38,7 @@
     flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
+    margin-top: 2em;
 }
 
 #Overlay #StartingScreen #welcomeSection #textWall {
