@@ -6,6 +6,7 @@ let StartingScreen = Backbone.View.extend({
   initialize: function () {
     this.listenTo(window.mainPage.currentUser, 'rl:login', this.render);
     this.listenTo(window.mainPage.currentUser, 'rl:logout', this.render);
+    this.listenTo(window.mainPage, 'rl:changeProject', this.render);
   },
   render: function () {
     if (!this.addedTemplate) {
@@ -31,6 +32,10 @@ let StartingScreen = Backbone.View.extend({
           });
       });
 
+      this.$el.find('#openProjectButton').on('click', () => {
+        window.mainPage.overlay.render('ProjectLibrary');
+      });
+
       this.$el.find('a#loginLink').on('click', () => {
         window.mainPage.overlay.render('LoginView');
       });
@@ -44,6 +49,12 @@ let StartingScreen = Backbone.View.extend({
       });
 
       this.addedTemplate = true;
+    }
+
+    if (window.mainPage.project) {
+      this.$el.find('#closeOverlay').show();
+    } else {
+      this.$el.find('#closeOverlay').hide();
     }
 
     if (window.mainPage.currentUser.isLoggedIn()) {

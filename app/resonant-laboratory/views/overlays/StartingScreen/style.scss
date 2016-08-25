@@ -5,8 +5,7 @@
     left: 1em;
     top: 1em;
     right: 1em;
-    bottom: 1em;
-    min-height: 30em;
+    min-height: 100%;
     background-color: $panelBackgroundColor;
     display: flex;
     padding: 1em 1em 3em 1em;
@@ -16,8 +15,8 @@
 #Overlay #StartingScreen #loginLinks,
 #Overlay #StartingScreen #logoutLinks {
     position: absolute;
-    top: 1em;
-    right: 1em;
+    top: 1.5em;
+    right: 4em;
 }
 
 #Overlay #StartingScreen #newProjectButtons {
@@ -26,8 +25,8 @@
 }
 
 #Overlay #StartingScreen #logo {
-    position: absolute;
-    left: calc(50% - 10em);
+    position: relative;
+    left: -1em;
     width: 20em;
     height: 4em;
 }
@@ -38,13 +37,10 @@
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 #Overlay #StartingScreen #welcomeSection #textWall {
-    position: absolute;
-    min-width: 34em;
-    left: calc(50% - 17em);
-    top: 5em;
 }
 
 #Overlay #StartingScreen #welcomeSection .textChunk {
