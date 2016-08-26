@@ -164,11 +164,10 @@ let VisualizationView = Widget.extend({
       // Okay, now ask the project if it has any new data for
       // us (changing the matchings, editing the data, or grabbing
       // a new dataset will invalidate the parsed cache).
-      if (widgetIsShowing) {
-        this.vis.component.render();
-      }
       this.status = STATUS.LOADING;
       this.statusText.text = 'Loading...';
+      this.$el.find('#spinnerWatermark').show();
+      this.$el.find('#visualization, #noVisualizationState').hide();
       this.renderIndicators();
       window.mainPage.project.shapeDataForVis().then(data => {
         widgetIsShowing = this.isTargeted();
@@ -192,7 +191,6 @@ let VisualizationView = Widget.extend({
           if (!successfullyUpdated) {
             // Nuke the vis and start fresh
             this.$el.html(myTemplate);
-            this.$el.find('#noVisualizationState').hide();
             try {
               this.vis.component = new candela.components[this.vis.spec.name](
                 '#' + this.spec.hashName + 'Container .visualization', options);
@@ -206,6 +204,8 @@ let VisualizationView = Widget.extend({
             }
           }
           this.vis.component.render();
+          this.$el.find('#spinnerWatermark, #noVisualizationState').hide();
+          this.$el.find('#visualization').show();
         }
         // Okay, finally change the status if there aren't enough mappings
         // (for now, the empty state is the partially-rendered visualization...
@@ -220,6 +220,7 @@ let VisualizationView = Widget.extend({
       });
     } else {
       this.$el.html(myTemplate);
+      this.$el.find('#spinnerWatermark, #visualization').hide();
       // Add listener to empty state image
       this.$el.find('#noVisualizationState').on('click', () => {
         window.mainPage.overlay.render('VisualizationLibrary');

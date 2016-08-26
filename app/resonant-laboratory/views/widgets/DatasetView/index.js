@@ -215,10 +215,6 @@ let DatasetView = Widget.extend({
       window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to reshape the data in order to use it.');
     }
   },
-  renderEmptyState: function () {
-    this.$el.find('#datasetOverview, #tablePreview, #histogramPreview').hide();
-    this.$el.find('#noDatasetState').show();
-  },
   renderFilterPie: function (overviewCount, filteredCount, pageOffset, pageCount, radius) {
     // Draw a pie using the left square of space
     // I know, eww: a pie. But in this case,
@@ -922,10 +918,14 @@ let DatasetView = Widget.extend({
 
     this.status = STATUS.LOADING;
     this.statusText.text = 'Loading...';
+    this.$el.find('#datasetOverview, #tablePreview, #histogramPreview, #noDatasetState').hide();
+    this.$el.find('#spinnerWatermark').show();
     this.renderIndicators();
 
     datasetPromise.then(datasetObj => {
       if (!datasetObj) {
+        this.$el.find('#spinnerWatermark').hide();
+        this.$el.find('#noDatasetState').show();
         this.renderEmptyState();
         this.status = STATUS.NO_DATA;
         this.statusText.text = 'No file loaded';
@@ -968,6 +968,8 @@ let DatasetView = Widget.extend({
                 }
               }
             }
+            this.$el.find('#spinnerWatermark').hide();
+            this.$el.find('#datasetOverview, #tablePreview, #histogramPreview').show();
           });
       }
     });

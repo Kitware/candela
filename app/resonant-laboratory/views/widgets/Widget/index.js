@@ -6,6 +6,7 @@ import warningIcon from '../../../images/warning.svg';
 import infoIcon from '../../../images/info.svg';
 import swapIcon from '../../../images/swap.svg';
 import settingsIcon from '../../../images/gear.svg';
+import './style.scss';
 
 let Widget = Backbone.View.extend({
   initialize: function (spec) {
