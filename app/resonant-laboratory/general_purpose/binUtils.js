@@ -19,7 +19,11 @@ function coerceValue (value, coerceToType) {
   } else if (coerceToType === 'number') {
     value = parseFloat(value);
   } else if (coerceToType === 'string') {
-    value = String(value);
+    if (value && value.str) {
+      value = value.str;
+    } else {
+      value = String(value);
+    }
   } else if (coerceToType === 'date') {
     if (typeof value === 'number' && value < 3000 && value > 999) {
       // Semi-smart coercion; values between 999 and 3000 are likely
@@ -68,6 +72,22 @@ function formatDate (dateObj, levels) {
     dateString += ' BCE';
   }
   return dateString;
+}
+
+function extractValue (attrName, dataItem) {
+  // Find the value specified by the chain (e.g. meta.clinical.age)
+  var o = dataItem;
+  var attrChain = attrName.split('.');
+  var i;
+  for (i = 0; i < attrChain.length; i += 1) {
+    if (o.hasOwnProperty(attrChain[i])) {
+      o = o[attrChain[i]];
+    } else {
+      o = undefined;
+      break;
+    }
+  }
+  return o;
 }
 
 function createBins (coerceToType, numBins, lowBound, highBound, locale) {
@@ -320,5 +340,6 @@ function findBinLabel (value, coerceToType, lowBound, highBound, specialBins, or
 var es6exports = { // eslint-disable-line no-unused-vars
   coerceValue: coerceValue,
   createBins: createBins,
-  findBinLabel: findBinLabel
+  findBinLabel: findBinLabel,
+  extractValue: extractValue
 };
