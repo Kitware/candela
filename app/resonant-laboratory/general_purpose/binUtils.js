@@ -19,7 +19,11 @@ function coerceValue (value, coerceToType) {
   } else if (coerceToType === 'number') {
     value = parseFloat(value);
   } else if (coerceToType === 'string') {
-    value = String(value);
+    if (value && value.str) {
+      value = value.str;
+    } else {
+      value = String(value);
+    }
   } else if (coerceToType === 'date') {
     if (typeof value === 'number' && value < 3000 && value > 999) {
       // Semi-smart coercion; values between 999 and 3000 are likely
