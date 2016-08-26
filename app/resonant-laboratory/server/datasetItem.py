@@ -98,7 +98,9 @@ class DatasetItem(Resource):
 
         extraParameters = {
             'fileType': item['meta']['rlab']['format'],
-            'outputType': 'jsonlines'
+            'outputType': 'jsonlines',
+            'limit': params['limit'],
+            'offset': params['offset']
         }
         if 'filter' in params and params['filter'] is not None:
             extraParameters['filter'] = params['filter']
@@ -108,12 +110,14 @@ class DatasetItem(Resource):
                                           level=AccessType.READ,
                                           user=user,
                                           exc=True)
-        stream = self.model('file').download(fileObj, headers=False, extraParameters=extraParameters)
+        stream = self.model('file').download(fileObj,
+                                             headers=False,
+                                             extraParameters=extraParameters)
 
         # Because we already used the offset and limit params in the download endpoint,
         # the mapReduce code should run on the full result
         params['offset'] = 0
-        params['limit'] = 0
+        params['limit'] = None
 
         # Stitch together the code for running via PyExecJS
         paramsCode = json.dumps(params, indent=2, separators=(',', ': '))
@@ -347,10 +351,10 @@ class DatasetItem(Resource):
         params['filter'] = params.get('filter', None)
         if params['filter'] is not None:
             params['filter'] = json.loads(params['filter'])
-        params['limit'] = params.get('limit', None)
+        params['limit'] = int(params.get('limit', 0))
         if params['limit'] == 0:
             params['limit'] = None
-        params['offset'] = params.get('offset', 0)
+        params['offset'] = int(params.get('offset', 0))
 
         binSettings = json.loads(params.get('binSettings', '{}'))
         for attrName, attrSchema in item['meta']['rlab']['schema'].iteritems():
