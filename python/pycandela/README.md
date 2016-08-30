@@ -1,29 +1,8 @@
-# Candela in Jupyter
+# pycandela
 
-To start a Jupyter environment that supports Candela, navigate to this directory
-from a Candela git checkout, then perform:
+pycandela makes Candela visualizations accessible from Jupyter notebooks.
 
-```
-pip install jupyter
-jupyter-notebook
-```
+To install, simply `pip install pycandela`.
 
-Within a notebook, run the following cells:
-
-```python
-import pycandela
-pycandela.init()
-```
-
-```python
-import json
-data = json.load(open('../examples/data/iris.json'))
-```
-
-```python
-pycandela.component('ScatterPlotMatrix', {
-    'data': data,
-    'color': 'species',
-    'fields': ['sepalLength', 'sepalWidth', 'petalLength', 'petalWidth']
-})
-```
+Examples:
+* [Iris](http://nbviewer.jupyter.org/github/Kitware/candela/blob/master/python/pycandela/examples/Iris.ipynb) (<a href="https://raw.githubusercontent.com/Kitware/candela/master/python/pycandela/examples/Iris.ipynb" download="Iris.ipynb">download notebook</a>)
