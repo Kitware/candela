@@ -1,3 +1,5 @@
+import { keys, type } from 'datalib';
+
 export function getElementSize (el) {
   const style = window.getComputedStyle(el, null);
   const width = window.parseInt(style.getPropertyValue('width'));
@@ -30,4 +32,13 @@ export function minmax (data) {
   }
 
   return range;
+}
+
+export function inferAll (data) {
+  let fields = keys(data[0]);
+  let types = {};
+  for (let i = 0; i < fields.length; i += 1) {
+    types[fields[i]] = type.infer(data, '[' + fields[i] + ']');
+  }
+  return types;
 }

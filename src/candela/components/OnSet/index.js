@@ -1,5 +1,5 @@
 import d3 from 'd3';
-import dl from 'datalib';
+import { unique } from 'datalib';
 import onset from 'onset';
 import VisComponent from '../../VisComponent';
 
@@ -79,7 +79,7 @@ export default class OnSet extends VisComponent {
     // A set is defined by records sharing a field value.
     if (this.options.fields) {
       this.options.fields.forEach(field => {
-        let distinct = dl.unique(this.options.data, d => d[field]);
+        let distinct = unique(this.options.data, d => d[field]);
         this.options.data.forEach((d, i) => {
           distinct.forEach(v => {
             if (v === d[field]) {
