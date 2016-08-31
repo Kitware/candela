@@ -19,5 +19,6 @@ Vagrant.configure("2") do |config|
     }
 
     ansible.playbook = "ansible/playbook.yml"
+    ansible.extra_vars = Hash[ENV['ANSIBLE_EXTRA_VARS'].split(/\s+/).map{|w| w.split("=")}]
   end
 end
