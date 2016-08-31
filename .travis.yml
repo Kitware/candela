@@ -15,14 +15,17 @@ addons:
             - libgif-dev
 
 before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
+    - export DISPLAY=:99.0
+    - sh -e /etc/init.d/xvfb start
 
-install: pip install --user girder-client 'requests[security]'
+install:
+    - pip install --user girder-client 'requests[security]'
+    - pip install --user flake8
 
 script:
     - npm install
     - npm run lint
+    - npm run lint:pycandela
     - npm run build
     - npm run build:examples
     - npm run test:unit

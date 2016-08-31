@@ -12,6 +12,7 @@
     "test:laboratory:unit:raw": "for t in `ls build/resonant-laboratory/*.tests.js`; do node $t; done",
     "dist": "script/prepare_lineup.sh && webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
     "lint": "semistandard | snazzy",
+    "lint:pycandela": "flake8 --config python/pycandela/flake8.cfg python/pycandela",
     "test": "echo 'Please use \"npm run test:unit\", \"npm run test:image\", or \"npm run test:all\"' && false",
     "test:all": "result=true; npm run test:unit || result=false; npm run test:image || result=false; ${result}",
     "test:all:raw": "result=true; npm run test:unit:raw || result=false; npm run test:image:raw || result=false; ${result}",
