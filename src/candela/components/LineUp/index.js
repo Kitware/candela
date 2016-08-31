@@ -2,6 +2,7 @@ import $ from 'jquery';
 import datalib from 'datalib';
 import d3 from 'd3';
 import VisComponent from '../../VisComponent';
+import { inferAll } from '../../util';
 import LineUpJS from 'LineUpJS/src/main.js';
 import 'LineUpJS/dist/style.css';
 import './index.styl';
@@ -258,7 +259,7 @@ export default class LineUp extends VisComponent {
       label: 'Combined',
       children: []
     };
-    let attributes = datalib.type.all(data);
+    let attributes = inferAll(data);
     /* If fields was specified, use them in order (if they exist as data
      * attributes).  If fields was not specified, use the data attributes. */
     let fields = this.options.fields ? this.options.fields : Object.keys(attributes);

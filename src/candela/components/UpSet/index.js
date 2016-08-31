@@ -1,6 +1,7 @@
 import d3 from 'd3';
-import dl from 'datalib';
+import { unique } from 'datalib';
 import VisComponent from '../../VisComponent';
+import { inferAll } from '../../util';
 import * as upset from 'UpSet';
 import template from './template.html';
 
@@ -100,7 +101,7 @@ export default class UpSet extends VisComponent {
     // A set is defined by records sharing a field value.
     if (this.options.fields) {
       this.options.fields.forEach(field => {
-        let distinct = dl.unique(this.options.data, d => d[field]);
+        let distinct = unique(this.options.data, d => d[field]);
         distinct.forEach(v => header.push(field + ' ' + v));
         this.options.data.forEach((d, i) => {
           distinct.forEach(v => {
@@ -123,7 +124,7 @@ export default class UpSet extends VisComponent {
     // Add metadata fields.
     if (this.options.metadata) {
       if (!this.options.data.__types__) {
-        dl.read(this.options.data, {parse: 'auto'});
+        this.options.data.__types__ = inferAll(this.options.data);
       }
       const upsetTypeMap = {
         string: 'string',

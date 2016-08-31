@@ -1,8 +1,8 @@
 import d3 from 'd3';
 import vg from 'vega';
-import dl from 'datalib';
+import { isArray, isString } from 'datalib';
 import axisTemplate from './axis.json';
-import { getElementSize } from '..';
+import { getElementSize, inferAll } from '..';
 
 let getNestedRec = function (spec, parts) {
   if (spec === undefined || parts.length === 0) {
@@ -119,7 +119,7 @@ let templateFunctions = {
 
   length: function (args, options, scope) {
     let a = transform(args[0], options, scope);
-    if (dl.isArray(a) || dl.isString(a)) {
+    if (isArray(a) || isString(a)) {
       return a.length;
     }
     return 0;
@@ -214,7 +214,7 @@ let templateFunctions = {
     let opt = transform(args[0], options, scope);
     if (opt.data && Array.isArray(opt.data) && opt.field) {
       if (!opt.data.__types__) {
-        dl.read(opt.data, {parse: 'auto'});
+        opt.data.__types__ = inferAll(opt.data);
       }
       let type = opt.data.__types__[opt.field];
       if (type === 'string') {
