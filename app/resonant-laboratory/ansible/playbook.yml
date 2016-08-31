@@ -2,6 +2,19 @@
 - hosts: all
   become_user: root
   become_method: sudo
+  vars:
+    adminuser_firstname: Admin
+    adminuser_lastname: User
+    adminuser_login: admin
+    adminuser_password: adminadmin
+    adminuser_email: admin@example.com
+
+    storage: /home/vagrant
+
+    girder_revision: 6bda1a7b65bea1c11187cdeb136877739693f466
+    database_assetstore_revision: a530c9546d3ac4f50ec4519ef6c7bb348e2b4bc7
+    candela_revision: 5c17f10d754778e7ea291f1f24c290d997e4dec8
+    girder_client_revision: 6bda1a7b65bea1c11187cdeb136877739693f466
 
   tasks:
     - name: Add Mongo repository key
@@ -47,71 +60,71 @@
     - name: Clone Girder repository
       git:
         repo: https://github.com/girder/girder
-        dest: girder
-        version: 6bda1a7b65bea1c11187cdeb136877739693f466
+        dest: "{{ storage }}/girder"
+        version: "{{ girder_revision }}"
 
     - name: Clone Girder DB Items repository
       git:
         repo: https://github.com/OpenGeoscience/girder_db_items
-        dest: girder/plugins/database_assetstore
-        version: a530c9546d3ac4f50ec4519ef6c7bb348e2b4bc7
+        dest: "{{ storage }}/girder/plugins/database_assetstore"
+        version: "{{ database_assetstore_revision }}"
 
     - name: Install Girder DB Items requirements
       become: yes
       command: pip install -r requirements.txt
       args:
-        chdir: girder/plugins/database_assetstore
+        chdir: "{{ storage }}/girder/plugins/database_assetstore"
 
     - name: Clone Candela repository
       git:
         repo: https://github.com/Kitware/candela
-        dest: candela
-        version: 5c17f10d754778e7ea291f1f24c290d997e4dec8
+        dest: "{{ storage }}/candela"
+        version: "{{ candela_revision }}"
 
     - name: Install Candela node requirements
       command: npm i
       args:
-        chdir: candela
+        chdir: "{{ storage }}/candela"
         creates: node_modules
 
     - name: Install Candela python requirements
       become: yes
       command: pip install -r requirements.txt
       args:
-        chdir: candela/app/resonant-laboratory
+        chdir: "{{ storage }}/candela/app/resonant-laboratory"
 
     - name: Install girder-client
       become: yes
-      command: pip install -e git+https://github.com/girder/girder.git@6bda1a7b65bea1c11187cdeb136877739693f466#egg=girder
+      command: pip install -e git+https://github.com/girder/girder.git@{{ girder_client_revision }}#egg=girder
 
     - name: Build Candela
       command: npm run build
       args:
-        chdir: candela
+        chdir: "{{ storage }}/candela"
         creates: build/candela/candela.js
 
     - name: Link Resonant Laboratory into Girder plugin directory
       file:
-        src: ~/candela/app/resonant-laboratory
-        dest: ~/girder/plugins/resonant-laboratory
+        src: "{{ storage }}/candela/app/resonant-laboratory"
+        dest: "{{ storage }}/girder/plugins/resonant-laboratory"
         state: link
 
     - name: Install Girder node requirements
       command: npm i
       args:
-        chdir: girder
+        chdir: "{{ storage }}/girder"
         creates: node_modules
 
     - name: Install Girder Python requirements
       become: yes
       command: pip install -r requirements.txt
       args:
-        chdir: girder
+        chdir: "{{ storage }}/girder"
 
     - name: Build Girder
       command: ./node_modules/.bin/grunt
       args:
-        chdir: girder
+        chdir: "{{ storage }}/girder"
 
     - name: Start MongoDB
       service:
@@ -121,7 +134,7 @@
     - name: Install girder_client
       become: yes
       pip:
-        chdir: /home/vagrant/girder/clients/python
+        chdir: "{{ storage }}/girder/clients/python"
         extra_args: -e
         name: .
 
@@ -149,19 +162,19 @@
       girder:
         port: 8080
         user:
-          firstName: Admin
-          lastName: User
-          login: admin
-          password: adminadmin
-          email: admin@example.com
+          firstName: "{{ adminuser_firstname }}"
+          lastName: "{{ adminuser_lastname }}"
+          login: "{{ adminuser_login }}"
+          password: "{{ adminuser_password }}"
+          email: "{{ adminuser_email }}"
           admin: yes
         state: present
 
     - name: Activate Girder plugins
       girder:
         port: 8080
-        username: admin
-        password: adminadmin
+        username: "{{ adminuser_login }}"
+        password: "{{ adminuser_password }}"
         plugins:
           - resonant-laboratory
           - database_assetstore
@@ -170,8 +183,8 @@
     - name: Restart Girder
       girder:
         port: 8080
-        username: admin
-        password: adminadmin
+        username: "{{ adminuser_login }}"
+        password: "{{ adminuser_password }}"
         put:
           path: system/restart
 
@@ -183,20 +196,20 @@
     - name: Create filesystem assetstore
       girder:
         port: 8080
-        username: admin
-        password: adminadmin
+        username: "{{ adminuser_login }}"
+        password: "{{ adminuser_password }}"
         assetstore:
           name: Filesystem Assetstore
           type: filesystem
-          root: /opt/girder
+          root: "{{ storage }}/assetstore/girder"
           current: true
         state: present
 
     - name: Create database assetstore
       girder:
         port: 8080
-        username: admin
-        password: adminadmin
+        username: "{{ adminuser_login }}"
+        password: "{{ adminuser_password }}"
         assetstore:
           name: Resonant Laboratory Database Assetstore
           type: database
@@ -205,6 +218,6 @@
         state: present
     
     - name: Upload example data to Girder
-      command: python populateGirder.py -p adminadmin
+      command: python populateGirder.py -p {{ adminuser_password }}
       args:
-        chdir: ~/candela/app/resonant-laboratory/scripts
+        chdir: "{{ storage }}/candela/app/resonant-laboratory/scripts"
