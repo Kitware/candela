@@ -149,6 +149,41 @@ you can use the `RESLAB_HOST_PORT` environment variable to set a different one:
 RESLAB_HOST_PORT=9090 vagrant up
 ```
 
+You can also supply some Ansible ["extra
+variables"](http://docs.ansible.com/ansible/playbooks_variables.html#passing-variables-on-the-command-line)
+to Vagrant via the `ANSIBLE_EXTRA_VARS` environment variable:
+
+```shell
+ANSIBLE_EXTRA_VARS="adminuser_login=root adminuser_password=hunter2" vagrant up
+```
+
+in case you want to change the default values of the following variables used
+during the provisioning process:
+
+- `adminuser_firstname` - administrator account's first name (default:
+  **Admin**)
+- `adminuser_lastname` - administrator account's last name (default: **User**)
+- `adminuser_login` - administrator account's username (default: **admin**)
+- `adminuser_password` - administrator account's password (default:
+  **adminadmin**)
+- `adminuser_email` - administrator account's email address (default:
+  **admin@example.com**)
+- `storage` - the path on disk in which to store the build inputs such as Git
+  clones and Girder resources (default: **/home/vagrant**)
+- `girder_revision` - the git checkout hash to use to build Girder (default:
+  **6bda1a7b65bea1c11187cdeb136877739693f466**)
+- `girder_client_revision` - the git checkout hash to use to install Girder
+  Client (default: **6bda1a7b65bea1c11187cdeb136877739693f466**)
+- `database_assetstore_revision` - the git checkout hash to use for the database
+  assetstore Girder plugin (default:
+**a530c9546d3ac4f50ec4519ef6c7bb348e2b4bc7**)
+- `candela_revision` - the git checkout hash to use to build Candela and
+  Resonant Laboratory (default: **5c17f10d754778e7ea291f1f24c290d997e4dec8**)
+
+The most important of these may be `adminuser_password`; changing this option at
+provisioning time allows you to keep administrator access to the underlying
+Girder instance secure.
+
 ## Guide to the server-side code
 
 ### Endpoints
