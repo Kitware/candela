@@ -1,4 +1,4 @@
-HTMLWidgets.widget({
+window.HTMLWidgets.widget({
   name: 'candela',
   type: 'output',
   factory: function (el, width, height) {
