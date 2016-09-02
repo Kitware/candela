@@ -138,10 +138,10 @@
         extra_args: -e
         name: .
 
-    - name: Install Girder as a service
+    - name: Instantiate girder.conf template on server
       become: yes
-      copy:
-        src: girder.conf
+      template:
+        src: girder.conf.template
         dest: /etc/init/girder.conf
         mode: 644
         owner: root
