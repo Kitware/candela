@@ -34,7 +34,7 @@ except ImportError:
     HAS_GIRDER_CLIENT = False
 
 
-__version__ = "0.2.5"
+__version__ = "0.3.0"
 
 DOCUMENTATION = '''
 ---
@@ -1646,6 +1646,9 @@ class GirderClientModule(GirderClient):
         # Check if hdfs plugin is available,  enable it if it isn't
         pass
 
+    def __validate_database_assetstore(self, *args, **kwargs):
+        pass
+
     def assetstore(self, name, type, root=None, db=None, mongohost=None,
                    replicaset='', bucket=None, prefix='', accessKeyId=None,
                    secret=None, service='s3.amazonaws.com', host=None,
@@ -1723,7 +1726,7 @@ class GirderClientModule(GirderClient):
                 updateable = ["root", "mongohost", "replicaset", "bucket",
                               "prefix", "db", "accessKeyId", "secret",
                               "service", "host", "port", "path", "user",
-                              "webHdfsPort", "current"]
+                              "webHdfsPort", "current", "dbtype", "dburi"]
 
                 # tuples of (key,  value) for fields that can be updated
                 # in the assetstore
@@ -1737,7 +1740,7 @@ class GirderClientModule(GirderClient):
                                      for k in updateable
                                      if k in argument_hash[type].keys())
 
-                # if arg_hash_items not a proper subset of assetstore_items
+                # if arg_hash_items not a subset of assetstore_items
                 if not arg_hash_items <= assetstore_items:
                     # Update
                     ret = self.put("assetstore/%s" % id,
