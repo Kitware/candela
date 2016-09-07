@@ -2,6 +2,7 @@
 - hosts: all
   become_user: root
   become_method: sudo
+  gather_facts: false
   vars:
     adminuser_firstname: Admin
     adminuser_lastname: User
@@ -9,12 +10,16 @@
     adminuser_password: adminadmin
     adminuser_email: admin@example.com
 
-    storage: /home/vagrant
+    storage: /home/ubuntu
 
     girder_revision: 6bda1a7b65bea1c11187cdeb136877739693f466
     database_assetstore_revision: a530c9546d3ac4f50ec4519ef6c7bb348e2b4bc7
     candela_revision: 5c17f10d754778e7ea291f1f24c290d997e4dec8
     girder_client_revision: 6bda1a7b65bea1c11187cdeb136877739693f466
+
+  pre_tasks:
+    - name: Install Python2
+      raw: sudo apt-get -y install python-minimal
 
   tasks:
     - name: Add Mongo repository key
@@ -23,7 +28,7 @@
 
     - name: Set Mongo package list
       become: yes
-      shell: echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+      shell: echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list
 
     - name: Pull in latest Node package files
       become: yes
@@ -126,7 +131,16 @@
       args:
         chdir: "{{ storage }}/girder"
 
+    - name: Copy MongoDB unit file to server
+      become: yes
+      copy:
+        src: xenial/mongod.service
+        dest: /etc/systemd/system/
+        mode: 644
+        owner: root
+
     - name: Start MongoDB
+      become: yes
       service:
         name: mongod
         state: started
@@ -141,8 +155,8 @@
     - name: Instantiate girder.conf template on server
       become: yes
       template:
-        src: girder.conf.template
-        dest: /etc/init/girder.conf
+        src: xenial/girder.service.template
+        dest: /etc/systemd/system/girder.service
         mode: 644
         owner: root
 
