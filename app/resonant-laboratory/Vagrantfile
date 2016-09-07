@@ -18,7 +18,7 @@ Vagrant.configure("2") do |config|
       "all" => ['reslab']
     }
 
-    ansible.playbook = "ansible/playbook.yml"
+    ansible.playbook = "ansible/playbook-trusty.yml"
     Extra_vars = ENV['ANSIBLE_EXTRA_VARS']
     if !Extra_vars.nil? && !Extra_vars.empty?
       ansible.extra_vars = Hash[ENV['ANSIBLE_EXTRA_VARS'].split(/\s+/).map{|w| w.split("=")}]
