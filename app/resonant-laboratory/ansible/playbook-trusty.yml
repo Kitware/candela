@@ -115,6 +115,11 @@
         chdir: "{{ storage }}/girder"
         creates: node_modules
 
+    - name: Run Girder grunt init step
+      command: ./node_modules/.bin/grunt init
+      args:
+        chdir: "{{ storage }}/girder"
+
     - name: Install Girder Python requirements
       become: yes
       command: pip install -r requirements.txt
