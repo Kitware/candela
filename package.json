@@ -34,7 +34,8 @@
       "src/external",
       "app/resonant-laboratory/web_client/lib",
       "dist",
-      "built"
+      "built",
+      "R/candela/inst/htmlwidgets/lib"
     ]
   },
   "repository": {
