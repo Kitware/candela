@@ -8,6 +8,7 @@
     "build:examples": "webpack --config config/webpack-examples.config.js",
     "build:laboratory": "cd app/resonant-laboratory && webpack",
     "build:laboratory:tests": "webpack --config ./app/resonant-laboratory/webpack-testing.config.js",
+    "build:docs": "sphinx-build -b html docs/ build/docs/",
     "test:laboratory:unit": "npm run test:laboratory:unit:raw | tap-spec",
     "test:laboratory:unit:raw": "for t in `ls build/resonant-laboratory/*.tests.js`; do node $t; done",
     "dist": "script/prepare_lineup.sh && webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
@@ -26,7 +27,8 @@
     "cover": "karma start config/karma-coverage.conf.js",
     "cover:report": "http-server coverage/html -p ${PORT-3000}",
     "codecov": "cat coverage/lcov/lcov.info | codecov",
-    "examples": "http-server build -p ${PORT-3000}"
+    "examples": "http-server build -p ${PORT-3000}",
+    "docs": "npm run build:docs && http-server build/docs -p ${PORT-3000}"
   },
   "semistandard": {
     "ignore": [
