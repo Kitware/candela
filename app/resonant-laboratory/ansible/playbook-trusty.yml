@@ -132,12 +132,12 @@
         name: mongod
         state: started
 
-    - name: Install girder_client
-      become: yes
-      pip:
-        chdir: "{{ storage }}/girder/clients/python"
-        extra_args: -e
-        name: .
+    #- name: Install girder_client
+      #become: yes
+      #pip:
+        #chdir: "{{ storage }}/girder/clients/python"
+        #extra_args: -e
+        #name: .
 
     - name: Instantiate girder.conf template on server
       become: yes
@@ -218,17 +218,9 @@
           dburi: mongodb://localhost:27017/reslab
         state: present
 
-    - name: Create a directory for girder-client
-      become: yes
-      file:
-        path: "{{ storage }}/girder-client"
-        state: directory
-
     - name: Install girder-client
       become: yes
-      command: pip install -e git+https://github.com/girder/girder.git@{{ girder_client_revision }}#egg=girder
-      args:
-        chdir: "{{ storage }}/girder-client"
+      command: pip install girder-client
     
     - name: Upload example data to Girder
       command: python populateGirder.py -p {{ adminuser_password }}
