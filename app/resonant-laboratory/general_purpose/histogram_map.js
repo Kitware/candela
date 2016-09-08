@@ -1,4 +1,4 @@
-/* globals emit, params, coerceValue, findBinLabel, counter:true */
+/* globals emit, params, coerceValue, extractValue, findBinLabel, counter:true */
 
 counter += 1;
 if (counter >= params.offset &&
@@ -13,8 +13,8 @@ if (counter >= params.offset &&
   var attrName;
   for (attrName in dataRow) {
     if (dataRow.hasOwnProperty(attrName)) {
-      var value = coerceValue(dataRow[attrName],
-        params.binSettings[attrName].coerceToType);
+      var value = extractValue(attrName, dataRow);
+      value = coerceValue(value, params.binSettings[attrName].coerceToType);
       emit(attrName, {
         histogram: [{
           count: 1,

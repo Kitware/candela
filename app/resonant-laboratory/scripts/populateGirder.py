@@ -70,15 +70,6 @@ def getCurrentAssetstoreId(gc):
         return assetstores[0]['_id'], assetstores[0]['name']
 
 
-def useAssetstore(gc, assetstoreId, assetstoreName):
-    gc.sendRestRequest('PUT',
-                       'assetstore/' + assetstoreId,
-                       {
-                           'current': True,
-                           'name': assetstoreName
-                       })
-
-
 def getDBassetstore(gc, specificId):
     # Get the database assetstore Id and hostname+port
     if specificId is None:
@@ -103,24 +94,6 @@ def getDBassetstore(gc, specificId):
     printMessage(message)
 
     return assetstoreId, assetstoreHost
-
-
-def getFSassetstore(gc):
-    # Get the Filesystem assetstore Id, and make sure it is current
-    assetstores = gc.sendRestRequest('GET', 'assetstore/', {})
-    assetstores = filter(lambda x: x['current'] is True, assetstores)
-
-    if len(assetstores) == 0 or assetstores[0]['type'] != 0:
-        print 'There must be a current Filesystem assetstore to upload flat files'
-        sys.exit(1)
-    assetstore = assetstores[0]
-
-    assetstoreId = assetstore['_id']
-
-    message = 'Using Filesystem assetstore ' + assetstoreId
-    printMessage(message)
-
-    return assetstoreId
 
 
 def getLibraryCollection(gc):
@@ -377,7 +350,7 @@ if __name__ == '__main__':
                                                            collectionId)
 
     # Now for the regular files
-    fsAssetstoreId = getFSassetstore(gc)
+    fsAssetstoreId = getCurrentAssetstoreId(gc)
     datasetIdLookup.update(uploadFlatFiles(dataFolderId, datasets))
 
     # Set up the projects

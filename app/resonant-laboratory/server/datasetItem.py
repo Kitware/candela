@@ -266,14 +266,6 @@ class DatasetItem(Resource):
         metadata['rlab'] = rlab
         item['meta'] = metadata
 
-        # Calling setupDataset invalidates the schema and any cached histograms
-        if 'schema' in item['meta']['rlab']:
-            del item['meta']['rlab']['schema']
-        if 'lastUpdated' in item['meta']['rlab']:
-            del item['meta']['rlab']['lastUpdated']
-        if 'histogramCaches' in item['meta']['rlab']:
-            del item['meta']['rlab']['histogramCaches']
-
         return self.model('item').updateItem(item)
 
     @access.public
@@ -525,14 +517,9 @@ class DatasetItem(Resource):
         histogram = self.mapReduce(item, mapScript, reduceScript, params)
 
         # We have to clean up the histogram wrappers (mongodb can't return
-        # an array from reduce functions). While we're at it, add the
-        # lowBound / highBound details to each ordinal bin
+        # an array from reduce functions).
         for attrName, wrappedHistogram in histogram.iteritems():
             histogram[attrName] = wrappedHistogram['histogram']
-            if attrName in binSettings and 'ordinalBins' in binSettings[attrName]:
-                for binIndex, binObj in enumerate(binSettings[attrName]['ordinalBins']):
-                    histogram[attrName][binIndex]['lowBound'] = binObj['lowBound']
-                    histogram[attrName][binIndex]['highBound'] = binObj['highBound']
 
         if '__passedFilters__' not in histogram:
             # This will only happen if there's a count of zero;

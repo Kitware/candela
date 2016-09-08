@@ -1,144 +1,16 @@
 {
   "schema": {
-    "_id": {
-      "boolean": {
-        "count": 150,
-        "native": false
-      },
-      "object": {
-        "count": 150,
-        "native": true
-      },
-      "string": {
-        "count": 150,
-        "native": false
-      }
-    },
     "petalLength": {
-      "boolean": {
-        "count": 150,
-        "native": false
-      },
-      "coerceToType": "number",
-      "date": {
-        "count": 150,
-        "highBound": "1970-01-01T00:00:00.006000+00:00",
-        "lowBound": "1970-01-01T00:00:00.001000+00:00",
-        "native": false
-      },
-      "integer": {
-        "count": 13,
-        "highBound": 6,
-        "lowBound": 1,
-        "native": true
-      },
-      "number": {
-        "count": 137,
-        "highBound": 6.9,
-        "lowBound": 1.1,
-        "native": true
-      },
-      "string": {
-        "count": 150,
-        "native": false
-      }
+      "coerceToType": "number"
     },
     "petalWidth": {
-      "boolean": {
-        "count": 150,
-        "native": false
-      },
-      "coerceToType": "number",
-      "date": {
-        "count": 150,
-        "highBound": "1970-01-01T00:00:00.002000+00:00",
-        "lowBound": "1970-01-01T00:00:00+00:00",
-        "native": false
-      },
-      "integer": {
-        "count": 13,
-        "highBound": 2,
-        "lowBound": 1,
-        "native": true
-      },
-      "number": {
-        "count": 137,
-        "highBound": 2.5,
-        "lowBound": 0.1,
-        "native": true
-      },
-      "string": {
-        "count": 150,
-        "native": false
-      }
+      "coerceToType": "number"
     },
     "sepalLength": {
-      "boolean": {
-        "count": 150,
-        "native": false
-      },
-      "coerceToType": "number",
-      "date": {
-        "count": 150,
-        "highBound": "1970-01-01T00:00:00.007000+00:00",
-        "lowBound": "1970-01-01T00:00:00.004000+00:00",
-        "native": false
-      },
-      "integer": {
-        "count": 17,
-        "highBound": 7,
-        "lowBound": 5,
-        "native": true
-      },
-      "number": {
-        "count": 133,
-        "highBound": 7.9,
-        "lowBound": 4.3,
-        "native": true
-      },
-      "string": {
-        "count": 150,
-        "native": false
-      }
+      "coerceToType": "number"
     },
     "sepalWidth": {
-      "boolean": {
-        "count": 150,
-        "native": false
-      },
-      "coerceToType": "number",
-      "date": {
-        "count": 150,
-        "highBound": "1970-01-01T00:00:00.004000+00:00",
-        "lowBound": "1970-01-01T00:00:00.002000+00:00",
-        "native": false
-      },
-      "integer": {
-        "count": 28,
-        "highBound": 4,
-        "lowBound": 2,
-        "native": true
-      },
-      "number": {
-        "count": 122,
-        "highBound": 4.4,
-        "lowBound": 2.2,
-        "native": true
-      },
-      "string": {
-        "count": 150,
-        "native": false
-      }
-    },
-    "species": {
-      "boolean": {
-        "count": 150,
-        "native": false
-      },
-      "string": {
-        "count": 150,
-        "native": true
-      }
+      "coerceToType": "number"
     }
   }
 }
