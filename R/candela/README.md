@@ -1,14 +1,12 @@
 # Candela R htmlwidgets package
 
-## Install from Git checkout
+## Installation from GitHub
 
-To use the Candela R integration, open [RStudio](https://www.rstudio.com/),
-navigate to this directory in the Files tab, and select Set As Working Directory
-from the More menu. Then execute:
+From [RStudio](https://www.rstudio.com/):
 
 ```
 install.packages('devtools')
-devtools::install()
+devtools::install_github('Kitware/candela', subdir='R/candela')
 library(candela)
 ```
 
@@ -28,3 +26,17 @@ The following Candela htmlwidgets examples are published to
 * [Cars UpSet](http://rpubs.com/jeffbaumes/cars-upset)
 * [Cars OnSet](http://rpubs.com/jeffbaumes/cars-onset)
 * [Iris LineUp](http://rpubs.com/jeffbaumes/iris-lineup)
+
+## Development install
+
+If you are developing or testing changes to the Candela R integration
+from a cloned version of the Candela repository,
+navigate to the `candela/R/candela` directory in the Files tab in
+[RStudio](https://www.rstudio.com/) and select Set As Working Directory
+from the More menu. Then run:
+
+```
+install.packages('devtools')
+devtools::install()
+library(candela)
+```
