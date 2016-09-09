@@ -16,6 +16,7 @@ import cherrypy
 from pymongo import MongoClient
 from anonymousAccess import loadAnonymousItem
 from querylang import astToMongo
+from pluginDir import pluginDir
 from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
@@ -26,13 +27,6 @@ from girder.plugins.database_assetstore.assetstore import getDbInfoForFile
 
 
 TRUE_VALUES = set([True, 'true', 1, 'True'])
-
-def pluginDir():
-    me = inspect.stack()[0][1]
-    mydir = os.path.dirname(me)
-    pluginDir = os.path.join(mydir, '..')
-
-    return os.path.abspath(pluginDir)
 
 class DatasetItem(Resource):
     def __init__(self, app):
