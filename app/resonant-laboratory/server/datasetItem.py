@@ -99,8 +99,8 @@ class DatasetItem(Resource):
         extraParameters = {
             'fileType': item['meta']['rlab']['format'],
             'outputType': 'jsonlines',
-            'limit': params['limit'],
-            'offset': params['offset']
+            'limit': params.get('limit', None),
+            'offset': params.get('offset', 0)
         }
         if 'filter' in params and params['filter'] is not None:
             extraParameters['filter'] = params['filter']
