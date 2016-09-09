@@ -200,7 +200,13 @@ def createMongoCollections(args, host, datasets, dbId, parentId):
         'table': json.dumps(collectionNames),
         'parentType': 'collection'
     }
-    gc.sendRestRequest('PUT', 'database_assetstore/' + dbId + '/import', parameters)
+    if (len(collectionNames) > 0):
+        gc.sendRestRequest('PUT', 'database_assetstore/' + dbId + '/import', parameters)
+    else:
+        # We don't actually have any mongo collections... make a fake folder as if we did
+        del parameters['table']
+        parameters['name'] = args.dbName
+        gc.sendRestRequest('POST', 'folder', parameters)
 
     # This will create a folder named args.dbName inside the
     # Resonant Laboratory library collection; we want to rename that
@@ -341,6 +347,7 @@ if __name__ == '__main__':
     # Set up the datasets
     datasets = getDatasets()
     datasetIdLookup = {}
+
     # Mongo datasets first
     dbAssetstoreId, dbAssetstoreHost = getDBassetstore(gc, args.dbAssetstoreId)
     dataFolderId, datasetIdLookup = createMongoCollections(args,
