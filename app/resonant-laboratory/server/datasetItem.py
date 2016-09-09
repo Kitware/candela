@@ -27,6 +27,12 @@ from girder.plugins.database_assetstore.assetstore import getDbInfoForFile
 
 TRUE_VALUES = set([True, 'true', 1, 'True'])
 
+def pluginDir():
+    me = inspect.stack()[0][1]
+    mydir = os.path.dirname(me)
+    pluginDir = os.path.join(mydir, '..')
+
+    return os.path.abspath(pluginDir)
 
 class DatasetItem(Resource):
     def __init__(self, app):
@@ -34,8 +40,7 @@ class DatasetItem(Resource):
         self.app = app
 
         # Load up the external foreign code snippets
-        codePath = subprocess.check_output(['girder-install', 'plugin-path']).strip()
-        codePath = os.path.join(codePath, 'resonant-laboratory/general_purpose')
+        codePath = os.path.join(pluginDir(), 'general_purpose')
 
         self.foreignCode = {}
 
