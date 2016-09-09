@@ -1,5 +1,6 @@
 import os
 import subprocess
+from pluginDir import pluginDir
 from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
@@ -19,9 +20,7 @@ class Versioning(Resource):
         try:
             # Try to figure out what git branch we're on... TODO: if this fails
             # for whatever reason, return the actual version number instead
-            currentPath = subprocess.check_output(['girder-install', 'plugin-path']).strip()
-            cwd = os.path.join(currentPath, 'resonant-laboratory')
-            statusText = subprocess.check_output(['git', 'status'], cwd=cwd)
+            statusText = subprocess.check_output(['git', 'status'], cwd=pluginDir())
             branch = statusText.split('\n')[0].replace('On branch ', '')
             if branch == 'master' or branch == 'release' or branch == '':
                 return 'master'

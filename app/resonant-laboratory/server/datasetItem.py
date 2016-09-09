@@ -16,6 +16,7 @@ import cherrypy
 from pymongo import MongoClient
 from anonymousAccess import loadAnonymousItem
 from querylang import astToMongo
+from pluginDir import pluginDir
 from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
@@ -27,15 +28,13 @@ from girder.plugins.database_assetstore.assetstore import getDbInfoForFile
 
 TRUE_VALUES = set([True, 'true', 1, 'True'])
 
-
 class DatasetItem(Resource):
     def __init__(self, app):
         super(Resource, self).__init__()
         self.app = app
 
         # Load up the external foreign code snippets
-        codePath = subprocess.check_output(['girder-install', 'plugin-path']).strip()
-        codePath = os.path.join(codePath, 'resonant-laboratory/general_purpose')
+        codePath = os.path.join(pluginDir(), 'general_purpose')
 
         self.foreignCode = {}
 
