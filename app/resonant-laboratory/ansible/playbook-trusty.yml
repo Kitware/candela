@@ -152,6 +152,18 @@
         port: 8080
         delay: 1
 
+    - name: Install requirements for girder_client
+      become: yes
+      command: pip install -r requirements.txt
+      args:
+        chdir: "{{ storage }}/girder/clients/python"
+
+    - name: Install girder_client
+      become: yes
+      command: pip install -e .
+      args:
+        chdir: "{{ storage }}/girder/clients/python"
+
     - name: Create Girder admin user
       girder:
         port: 8080
