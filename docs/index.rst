@@ -17,6 +17,15 @@ Getting started
 Quick start - JavaScript
 ------------------------
 
+1. Enter the following in a text file named ``index.html``:
+
+   .. literalinclude:: static/index.html
+      :language: html
+      :linenos:
+
+2. Open ``index.html`` to display the resulting visualization in your
+   browser.
+
 Quick start - Python
 --------------------
 
@@ -58,48 +67,38 @@ Diving deeper
 
 .. _here: http://docs.python-guide.org/en/latest/starting/install/win/
 
-Using Candela
-=============
-
 .. toctree::
     :maxdepth: 2
+    :caption: Using Candela
 
     installation
     versioning
 
 .. _tutorials:
 
-Tutorials
-=========
-
 .. toctree::
     :maxdepth: 2
+    :caption: Tutorials
 
     tutorials/iris
 
-The Candela API
-===============
-
 .. toctree::
     :maxdepth: 2
+    :caption: API documentation
 
     candela-js
     candela-py
     candela-r
 
-Candela components
-==================
-
 .. toctree::
     :maxdepth: 2
+    :caption: Components
 
     components/scatterplot
 
-Information for developers
-==========================
-
 .. toctree::
     :maxdepth: 2
+    :caption: Developer documentation
 
     coding-style-guide
     releasing-candela
