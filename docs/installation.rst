@@ -54,7 +54,7 @@ You may need to run this command as the superuser, using ``sudo`` or similar.
 Building and installing from source
 ===================================
 
-Before any of these source installations, you will need to issue this git
+Before any of these source installations, you will need to issue this Git
 command to clone the Candela repository: ::
 
     git clone git://github.com/Kitware/candela.git
@@ -100,8 +100,9 @@ The output will create a built Candela package in ``build/candela/candela.js``.
 
 Watch the output for any errors.  In most cases, an error will halt the
 process, displaying a message to indicate what happened.  If you need any help
-deciphering any such errors, drop us a note on [GitHub issues](https://github.com/Kitware/candela/issues/new)
-or on [Gitter](https://gitter.im/Kitware/candela) chat.
+deciphering any such errors, drop us a note on
+`GitHub issues <https://github.com/Kitware/candela/issues/new>`_
+or on `Gitter <https://gitter.im/Kitware/candela>`_ chat.
 
 **4. View the examples**
 
@@ -194,8 +195,8 @@ R - from a Git checkout
 
 **2. Change the working directory**
 
-Navigate to the ``candela/R/candela`` directory in the Files tab in
-RStudio and select Set As Working Directory from the More menu.
+From RStudio, navigate to the ``candela/R/candela`` directory in the Files
+tab and select Set As Working Directory from the More menu.
 
 **3. Install the Candela package** ::
 

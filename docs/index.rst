@@ -67,7 +67,7 @@ Quick start - Python
 Quick start - R
 ---------------
 
-1. Download and install [RStudio](https://www.rstudio.com/).
+1. Download and install `RStudio <https://www.rstudio.com/>`_.
 
 2. Run the following commands to install Candela: ::
 
@@ -112,6 +112,8 @@ Diving deeper
     candela-py
     candela-r
 
+.. _components_list:
+
 .. toctree::
     :maxdepth: 2
     :caption: Components
@@ -125,9 +127,4 @@ Diving deeper
     coding-style-guide
     releasing-candela
     developing-components
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`search`
+    testing
