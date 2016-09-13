@@ -1,13 +1,21 @@
-.. Candela documentation master file, created by
-   sphinx-quickstart on Thu Apr 11 11:42:23 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+===============
+    Candela
+===============
 
-==============================================================================
- Candela
-==============================================================================
+Candela is an open-source suite of interoperable web visualization
+components for `Kitware <http://www.kitware.com>`_'s `Resonant <http://resonant.kitware.com>`_ platform.
+Candela focuses on making scalable, rich visualizations available
+with a normalized API for use in real-world data science applications.
+Integrated components include:
 
-Candela is
+* `LineUp <http://www.caleydo.org/tools/lineup/>`_ dynamic ranking by the Harvard University `Visual Computing Group`_ and the `Caleydo`_ project.
+* `UpSet <http://www.caleydo.org/tools/upset/>`_ set visualization by the Harvard University `Visual Computing Group`_ and the `Caleydo`_ project.
+* `OnSet <http://www.cc.gatech.edu/gvu/ii/setvis/>`_ set visualization by the Georgia Institute of Technology `Information Interfaces Group <http://www.cc.gatech.edu/gvu/ii/>`_.
+* `Vega <https://vega.github.io/vega/>`_ visualizations by the University of Washington `Interactive Data Lab <http://idl.cs.washington.edu/>`_.
+
+.. _Visual Computing Group: http://vcg.seas.harvard.edu/
+
+.. _Caleydo: http://www.caleydo.org/
 
 .. _quickstart:
 
@@ -23,8 +31,7 @@ Quick start - JavaScript
       :language: html
       :linenos:
 
-2. Open ``index.html`` to display the resulting visualization in your
-   browser.
+2. Open ``index.html`` in your browser to display the resulting visualization.
 
 Quick start - Python
 --------------------
@@ -57,11 +64,23 @@ Quick start - Python
 Quick start - R
 ---------------
 
+1. Download and install [RStudio](https://www.rstudio.com/).
+
+2. Run the following commands to install Candela: ::
+
+    install.packages('devtools')
+    devtools::install_github('Kitware/candela', subdir='R/candela')
+    library(candela)
+
+3. Issue this command to display a scatter plot of the ``mtcars`` dataset: ::
+
+    candela('ScatterPlot', data=mtcars, x='mpg', y='wt', color='disp')
+
 Diving deeper
 -------------
 
 * To learn how to use Candela, see :ref:`iris` and the other
-  :ref:`tutorials <tutorials>`.
+  :ref:`tutorials <tutorial_list>`.
 * To learn how to create your own Candela components, see
   :ref:`developing-components`.
 
@@ -74,7 +93,7 @@ Diving deeper
     installation
     versioning
 
-.. _tutorials:
+.. _tutorial_list:
 
 .. toctree::
     :maxdepth: 2
