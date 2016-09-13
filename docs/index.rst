@@ -56,10 +56,13 @@ Quick start - Python
    followed by Shift-Enter to execute the cell and display the visualization: ::
 
     import requests
-    data = requests.get('https://raw.githubusercontent.com/vega/vega-datasets/gh-pages/data/iris.json').json()
+    data = requests.get(
+        'https://raw.githubusercontent.com/vega/vega-datasets/gh-pages/data/iris.json'
+    ).json()
 
     import pycandela
-    pycandela.components.ScatterPlot(data=df, color='species', x='sepalLength', y='sepalWidth')
+    pycandela.components.ScatterPlot(
+        data=df, color='species', x='sepalLength', y='sepalWidth')
 
 Quick start - R
 ---------------
@@ -70,10 +73,10 @@ Quick start - R
 
     install.packages('devtools')
     devtools::install_github('Kitware/candela', subdir='R/candela')
+
+3. Issue these commands to display a scatter plot of the ``mtcars`` dataset: ::
+
     library(candela)
-
-3. Issue this command to display a scatter plot of the ``mtcars`` dataset: ::
-
     candela('ScatterPlot', data=mtcars, x='mpg', y='wt', color='disp')
 
 Diving deeper

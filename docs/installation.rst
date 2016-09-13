@@ -54,8 +54,19 @@ You may need to run this command as the superuser, using ``sudo`` or similar.
 Building and installing from source
 ===================================
 
-Building the JavaScript library (required)
-------------------------------------------
+Before any of these source installations, you will need to issue this git
+command to clone the Candela repository: ::
+
+    git clone git://github.com/Kitware/candela.git
+
+This will create a directory  named ``candela`` containing the source code.  Use
+``cd`` to move into this directory: ::
+
+    cd candela
+
+
+JavaScript
+----------
 
 Candela is developed on `GitHub <https://github.com/Kitware/candela>`_.  If you
 wish to contribute code, or simply want the very latest development version, you
@@ -66,22 +77,11 @@ can download, build, and install from GitHub, following these steps:
 To build Candela from source, you will need to install the following software:
 
 * Git
-* Python 2.7
-* Virtualenv 12.0
 * Node.js
+* npm
+* cairo (``brew install cairo`` on macOS)
 
-**2. Check out the Candela source code**
-
-Issue this git command to clone the Candela repository: ::
-
-    git clone git://github.com/Kitware/candela.git
-
-This will create a directory  named ``candela`` containing the source code.  Use
-``cd`` to move into this directory: ::
-
-    cd candela
-
-**3. Install Node dependencies**
+**2. Install Node dependencies**
 
 Issue this command to install the necessary Node dependencies via the Node
 Package Manager (NPM): ::
@@ -90,7 +90,7 @@ Package Manager (NPM): ::
 
 The packages will be installed to a directory named ``node_modules``.
 
-**4. Begin the build process**
+**3. Begin the build process**
 
 Issue this command to kick off the Grunt build process: ::
 
@@ -103,7 +103,7 @@ process, displaying a message to indicate what happened.  If you need any help
 deciphering any such errors, drop us a note on [GitHub issues](https://github.com/Kitware/candela/issues/new)
 or on [Gitter](https://gitter.im/Kitware/candela) chat.
 
-**5. View the examples**
+**4. View the examples**
 
 Candela contains several examples used for testing, which also may be useful
 for learning the variety of visualizations available in Candela. To build
@@ -115,7 +115,7 @@ To view the examples, run: ::
 
     npm run examples
 
-**6. Run the test suites**
+**5. Run the test suites**
 
 Candela comes with a battery of tests.  To run these, you can
 invoke the Grunt test task as follows: ::
@@ -123,7 +123,7 @@ invoke the Grunt test task as follows: ::
     npm run test:all
 
 This runs both the unit and image tests.  Each test suite can be run on its
-own, with::
+own, with: ::
 
     npm run test:unit
 
@@ -133,14 +133,78 @@ and::
 
 Each of these produces a summary report on the command line.
 
-Using the Python library from a Git checkout
---------------------------------------------
-TBD
+Python
+------
 
-Installing the R library using ``install_github``
--------------------------------------------------
-TBD
+**1. Install software dependencies**
 
-Using the R library from a Git checkout
----------------------------------------
-TBD
+To use Candela from Python you will need Python 2.7 and ``pip``.
+
+From the source directory, install additional package dependencies with: ::
+
+    pip install -r requirements-dev.txt
+
+**2. Install the library locally** ::
+
+    pip install -e .
+
+**3. Test the installation**
+
+Issue this command to start Jupyter notebook server in your browser: ::
+
+    jupyter-notebook
+
+Create a notebook from the New menu and enter the following in a cell,
+followed by Shift-Enter to execute the cell and display the visualization: ::
+
+    import requests
+    data = requests.get(
+        'https://raw.githubusercontent.com/vega/vega-datasets/gh-pages/data/iris.json'
+    ).json()
+
+    import pycandela
+    pycandela.components.ScatterPlot(
+        data=df, color='species', x='sepalLength', y='sepalWidth')
+
+
+R - using ``install_github``
+----------------------------
+
+This procedure will install Candela directly from GitHub, which does not require
+a Git checkout of Candela.
+
+**1. Install** `R Studio <https://www.rstudio.com/>`_
+
+**2. Install the Candela package** ::
+
+    install.packages('devtools')
+    devtools::install_github('Kitware/candela', subdir='R/candela')
+
+**3. Test the installation**
+
+The following will create a scatter plot of the ``mtcars`` dataset: ::
+
+    library(candela)
+    candela('ScatterPlot', data=mtcars, x='mpg', y='wt', color='disp')
+
+R - from a Git checkout
+-----------------------
+
+**1. Install** `R Studio <https://www.rstudio.com/>`_
+
+**2. Change the working directory**
+
+Navigate to the ``candela/R/candela`` directory in the Files tab in
+RStudio and select Set As Working Directory from the More menu.
+
+**3. Install the Candela package** ::
+
+    install.packages('devtools')
+    devtools::install()
+
+**4. Test the installation**
+
+The following will create a scatter plot of the ``mtcars`` dataset: ::
+
+    library(candela)
+    candela('ScatterPlot', data=mtcars, x='mpg', y='wt', color='disp')

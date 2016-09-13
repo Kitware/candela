@@ -1,5 +1,5 @@
 =================================
-    Creating Candela Releases
+    Creating Candela releases
 =================================
 
 Candela is developed on GitHub using the `Git Flow
@@ -12,7 +12,7 @@ This page documents the careful steps to take in creating a new release, meaning
 that a new commit is made on ``master``, and a package is uploaded to the Python
 Package Index.
 
-Release Procedure
+Release procedure
 =================
 
 Suppose for the sake of example that the last release's version number is *1.1*.

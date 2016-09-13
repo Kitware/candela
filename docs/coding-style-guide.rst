@@ -1,5 +1,6 @@
 ===============================
-    Coding Style Guidelines
+    Coding style guidelines
 ===============================
 
-We follow semi-standard for all JavaScript code.
+We follow `semistandard <https://github.com/Flet/semistandard>`_ for all
+JavaScript code.
