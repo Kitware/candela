@@ -2,19 +2,17 @@
     Candela R API
 =====================
 
-The Candela R library is ... TBD
+The Candela R library enables the use of interactive Candela visualizations
+from `R Studio <https://www.rstudio.com/>`_ by exposing Candela as
+`htmlwidgets <http://www.htmlwidgets.org/>`_.
 
-.. function:: candela.bar([context, ]msg[, lvl=loglevel])
+.. function:: candela(name, ...)
 
-    Writes a message `msg` to the log file.  The optional `context` is a
-    descriptive tag that will be prepended to the message within the log file
-    (defaulting to "TANGELO" if omitted).  Common context tags used internally
-    in Tangelo include "TANGELO" (to describe startup/shutdown activities), and
-    "ENGINE" (which describes actions being taken by CherryPy).  This function
-    may be useful for debugging or otherwise tracking a service's activities as
-    it runs.  The optional logging level ``lvl`` is one of the python logging
-    constants.  By default, ``logging.INFO`` is used.
+    Creates a widget representing the Candela visualization specified by
+    the given options. `name` is the name of the Candela component,
+    such as ``"ScatterPlot"``. For a full list of components and their options,
+    see :ref:`components_list`.
 
-    Generally you should use one of the variants of this function listed below,
-    but if you want to write a logging message in the terminal's default color,
-    you can use this function, specifying the log level you need.
+    If a data frame is passed as an option, it is automatically converted
+    to a list of records of the form ``[{"a": 1, "b": "foo"}, {"a": 2, "b": "baz"}]``
+    before being sent to the Candela visualization.
