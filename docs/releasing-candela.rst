@@ -2,199 +2,76 @@
     Creating Candela releases
 =================================
 
-Candela is developed on GitHub using the `Git Flow
-<http://nvie.com/posts/a-successful-git-branching-model/>`_ work style.  The
-main development branch is named ``develop``, while all commits on ``master``
-correspond to tagged releases.  Topic, hotfix, and release branches are all used
-as described in the discussion in the link above.
+To perform a new release of Candela, please follow these steps. This assumes
+that the code on ``master`` is ready to be turned into a new release (i.e., it
+passes all tests and includes all new functionality desired for the new
+release). In this example, we will pretend that the new release version number
+will be 1.2.0.
 
-This page documents the careful steps to take in creating a new release, meaning
-that a new commit is made on ``master``, and a package is uploaded to the Python
-Package Index.
+1. Create a new release branch, named ``release-1.2.0``: ::
 
-Release procedure
-=================
+    git checkout -b release-1.2.0 master
 
-Suppose for the sake of example that the last release's version number is *1.1*.
-The following procedure will produce a new release of Candela:
+2. Bump the version number to 1.2.0 by editing ``package.json``. Make a commit
+   with the commit message "Bump version number for release" and push the
+   branch: ::
 
-**1. Merge all topic branches to develop.** Be sure that ``develop`` contains
-the code from which you wish to create the new release.
+    vim package.json
+    git commit -am 'Bump version number for release'
+    git push -u origin release-1.2.0
 
-**2. Create a release branch.** A release branch needs to be created off of
-develop:
+3. Make a new local branch to save your spot in the commit tree here. Be sure
+   your checkout remains on ``release-1.2.0``. You can do this with: ::
 
-.. code-block:: shell
+    git branch save-point
 
-    git checkout -b release-1.2 develop
+4. Build the distribution files by using the "production" NPM script: ::
 
-Note that the version number mentioned in the branch name is the version number
-of the release being created.
+    npm run build:production
 
-**3. Bump the version number.** Edit the file ``package.json`` in the top level
-of the repository, updating the version number to *1.2.0*.  Be sure to use the
-*major.minor.patch* format.
+   This will create a ``dist`` directory containing two JavaScript files, a
+   regular and a minified version.
 
-Also edit ``js/tests/tangelo-version.js``, ``tests/tangelo-version.py``, and
-``tests/commandline-version.py`` to bump the version numbers there manually (in
-each file, the expected version string is contained in a variable named
-``expected``).  This is done by hand to ensure that the version tests are
-deployed correctly for step 6 below.
+5. Commit the production files and push again. ::
 
-Finally, edit the file ``CHANGELOG.md`` in the root of the codebase.  Change the
-``[Unreleased] - [unreleased]`` line near the top of the file to something like
-``[1.2.0] - 2014-12-18``.  Look over the specified changes.  Edit these if
-necessary, making sure that the list is up to date.
+    git add dist
+    git commit -m 'Add production files for release'
+    git push
 
-**4. Build Tangelo.** Issue the following commands to create a fresh build of
-Tangelo from scratch:
+6. Create a pull request from the release-1.2.0 branch. **Make sure you base the
+   PR against the** ``release`` **branch, not against** ``master`` **.**
 
-.. code-block:: shell
+7. Wait for an "LGTM" message, and then merge the pull request and delete the
+   release-1.2.0 branch.
 
-    grunt clean:all
-    npm install
-    grunt
+8. Check out the ``release`` branch, pull, tag a release, push, and then delete the
+   ``release-1.2.0`` branch. ::
 
-This should result in a virtual environment with a newly built Tangelo.  Bumping
-the version number in the previous step means that Grunt should have also
-updated the version string in all parts of the code that require it.
-
-**5. Commit.** Make a commit on the release branch containing the version number
-update:
-
-.. code-block:: shell
-
-    git commit -am "Bumping version number for release"
-
-then launch Tangelo with
-
-.. code-block:: shell
-
-    ./venv/bin/tangelo --examples
-
-and visit http://localhost:8080/plugin/tangelo/version to verify the version
-number there.  Finally, load up any of the examples that uses *tangelo.js*
-(e.g., http://localhost:8080/plugin/vis/examples/barchart), and, in the console,
-issue ``tangelo.version()`` to verify the clientside version number as well.
-
-**6. Run the tests.**
-
-Issue this command to verify that the client and server side tests all pass:
-
-.. code-block:: shell
-
-    grunt test
-
-If any tests fail, fix the root causes, making commits and retesting as you go.
-In particular, the tests regarding Tangelo version numbers will fail if the
-version number bump or build process did not work properly for any reason.
-
-**7. Merge into master.** Switch to the ``master`` branch and merge the release
-branch into it:
-
-.. code-block:: shell
-
-    git checkout master
-    git merge --no-ff release-1.2
-
-Do not omit the ``--no-ff`` flag!  You can use the default merge commit message.
-
-If you run into merge conflicts, carefully fix them and conclude the merge, then
-make sure to run the tests again.
-
-**8. Tag the release.** Create a tag for the release as follows:
-
-.. code-block:: shell
-
-    git tag -a v1.2
-
-Use a commit message like "Release v1.2".  Be sure to push the tag so it becomes
-visible to GitHub:
-
-.. code-block:: shell
-
+    git checkout release
+    git pull
+    git tag v1.2.0
     git push --tags
+    git branch -d release-1.2.0
 
-**9. Upload the package to PyPI.**  Unpack the built package file, and then use
-the ``upload`` option to ``setup.py``:
+9. Publish the new package to NPM. You will need to log in with your NPM
+   credentials first. ::
 
-.. code-block:: shell
+    npm login
+    npm publish
 
-    cd sdist
-    tar xzvf tangelo-1.2.0.tar.gz
-    ../venv/bin/python setup.py sdist upload
+10. Merge the ``save-point`` branch into ``master`` (do not use a fast-forward
+    merge, since this is a special type of commit to prepare master for development
+    with a new version number, rather than adding any new functionality), push,
+    then delete ``save-point``. **Be sure you are not merging**
+    ``release-1.2`` **or** ``release`` **into master; we do not want the
+    distribution files to enter the mainline development branch.** ::
 
-**10. Merge into develop.** The changes made on the release branch must be
-merged back into ``develop`` as well, so that development may continue there:
+      git checkout master
+      git merge save-point
+      git branch -d save-point
+      git push
 
-.. code-block:: shell
-
-    git checkout develop
-    git merge release-1.2
-
-This is one of the few times you should not use the ``--no-ff`` flag.  We want
-both ``master`` and ``develop`` to thread through the release branch to simplify
-the graph view of the release.  After the next step, this leaves both ``master``
-and ``develop`` one commit ahead of the same, prepared release branch point.
-
-**11. Bump the version number again.**  The version number on the ``develop``
-branch needs to be changed again, to add a *-dev* suffix.  In our example, the
-version number will now be *1.2.0-dev*.  This entails editing ``package.json``
-once more, as well as ``js/tests/tangelo-version.js``,
-``tests/tangelo-version.py``, and ``tests/commandline-version.py``.
-
-Also edit ``CHANGELOG.md`` again, reproducing a skeleton of a new changes
-section, copying the following::
-
-    ## [Unreleased] - [unreleased]
-    ### Added
-
-    ### Changed
-
-    ### Deprecated
-
-    ### Removed
-
-    ### Fixed
-
-    ### Security
-
-This will allow developers to update the appropriate section easily whenever a
-topic branch is merged to ``develop``.
-
-**12. Test again.**  Run the tests one more time, to verify that the version
-number bump happened correctly, and to catch anything weird that may have
-happened as well.
-
-**13. Commit.** Commit the change so that ``develop`` is ready to go:
-
-.. code-block:: shell
-
-    git commit -am "Bumping version number"
-
-**14. Push.** Push both ``develop`` and ``master`` to origin to bring the local
-and remote branches up to date.
-
-**15. Update the documentation.** Log into https://readthedocs.org, go to the
-Tangelo documentation panel, go to the "version" link, and activate the
-documentation for v1.2.  Log out and verify that the new documentation appears
-at https://tangelo.readthedocs.org.
-
-Summary
-=======
-
-You now have
-
-* a new Tangelo package on PyPI.  Installing with ``pip install tangelo`` will
-  install the new version to the system.
-
-* a new, tagged commit on ``master`` that corresponds exactly to the new
-  release, and the new package in PyPI.  Anyone who checks this out and builds
-  it will have the same Tangelo they would have if installing via ``pip`` as
-  above.
-
-* a new commit on ``develop`` representing a starting point for further
-  development.  Be sure to create topic branches off of ``develop`` to implement
-  new features and bugfixes.
-
-* documentation for the new version, live on Read The Docs.
+This concludes the release process. You will have a new, tagged release
+published, with a corresponding commit on the ``release`` branch, while
+``master`` will have the package version number updated, ready for further
+development.
