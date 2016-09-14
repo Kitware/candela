@@ -213,6 +213,8 @@ let DatasetView = Widget.extend({
       window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data; you\'ll probably need to reshape the data in order to use it.');
     } else if (this.status === STATUS.NO_ATTRIBUTES) {
       window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to reshape the data in order to use it.');
+    } else if (this.status === STATUS.LOADING) {
+      window.mainPage.overlay.renderLoadingScreen('The dataset is still loading.');
     }
   },
   renderFilterPie: function (overviewCount, filteredCount, pageOffset, pageCount, radius) {

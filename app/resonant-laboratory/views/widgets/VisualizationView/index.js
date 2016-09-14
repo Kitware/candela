@@ -113,6 +113,8 @@ let VisualizationView = Widget.extend({
       window.mainPage.overlay.renderUserErrorScreen('This visualization needs more data matchings. Make sure there are no orange circles in the Matching panel.');
     } else if (this.status === STATUS.FAILED_RENDER) {
       window.mainPage.overlay.renderReallyBadErrorScreen('There was a failure in attempting to render the visualization. There may be some hints in the developer console.');
+    } else if (this.status === STATUS.LOADING) {
+      window.mainPage.overlay.renderLoadingScreen('The visualization is still loading.');
     }
   },
   render: Underscore.debounce(function () {
