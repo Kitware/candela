@@ -926,7 +926,6 @@ let DatasetView = Widget.extend({
       if (!datasetObj) {
         this.$el.find('#spinnerWatermark').hide();
         this.$el.find('#noDatasetState').show();
-        this.renderEmptyState();
         this.status = STATUS.NO_DATA;
         this.statusText.text = 'No file loaded';
         this.renderIndicators();
