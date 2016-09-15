@@ -128,3 +128,4 @@ Diving deeper
     releasing-candela
     developing-components
     testing
+    vega-templates

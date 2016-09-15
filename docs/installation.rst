@@ -134,16 +134,26 @@ and::
 
 Each of these produces a summary report on the command line.
 
+**6. Build the documentation**
+
+Candela uses `Sphinx <http://www.sphinx-doc.org/>`_ documentation hosted on
+`ReadTheDocs <https://candela.readthedocs.io/>`_.
+To build the documentation locally, first install the required Python dependencies: ::
+
+    pip install -r requirements-dev.txt
+
+When the installation completes, issue this command: ::
+
+    npm run docs
+
+The documentation will be hosted at `http://localhost:3000 <http://localhost:3000>`_.
+
 Python
 ------
 
 **1. Install software dependencies**
 
 To use Candela from Python you will need Python 2.7 and ``pip``.
-
-From the source directory, install additional package dependencies with: ::
-
-    pip install -r requirements-dev.txt
 
 **2. Install the library locally** ::
 
