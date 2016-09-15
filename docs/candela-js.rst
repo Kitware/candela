@@ -22,6 +22,8 @@ width and height of the component in pixels.
 Field matchings
 ===============
 
+.. _axis scales:
+
 Axis scales
 -----------
 
@@ -33,6 +35,8 @@ such as evenly-spaced values for string fields and a continuous-ranged axis for
 numeric and date fields. Visualizations showing continuous-ranged axes
 often allow pan and zoom of the axis by dragging and scrolling in the
 visualization area.
+
+.. _color scales:
 
 Color scales
 ------------
@@ -49,6 +53,8 @@ a smooth color gradient from low to high values.
 
 Data types
 ==========
+
+.. _table:
 
 Table
 -----
