@@ -118,6 +118,11 @@ Diving deeper
     :maxdepth: 2
     :caption: Components
 
+    components/barchart
+    components/boxplot
+    components/bulletchart
+    components/ganttchart
+    components/geo
     components/scatterplot
 
 .. toctree::

@@ -1,21 +1,20 @@
-===================
-    ScatterPlot
-===================
+================
+    BarChart
+================
 
-A scatterplot. This visualization will plot values at specified **x** and **y**
-positions. Additional fields may determine the **color**, **size**, and **shape**
-of the plotted points.
+A bar chart. The **x** field should contain a distinct value for each bar, while
+the **y** field will correspond to the height of each bar.
 
 Example
 =======
 
 .. raw:: html
 
-    <div id="scatterplot-example"></div>
+    <div id="barchart-example"></div>
     <script type="text/javascript" >
-        var el = document.getElementById('scatterplot-example'), data = [];
+        var el = document.getElementById('barchart-example'), data = [];
         for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
-        var vis = new candela.components.ScatterPlot(el, {
+        var vis = new candela.components.BarChart(el, {
             data: data, x: 'a', y: 'b',
             width: 700, height: 400});
         vis.render();
@@ -25,7 +24,7 @@ Example
 
 .. code-block:: js
 
-    import ScatterPlot from candela.components.ScatterPlot
+    import BarChart from candela.components.BarChart
 
     let el = document.createElement('div');
     document.body.appendChild(el);
@@ -33,7 +32,7 @@ Example
     let data = [];
     for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
 
-    let vis = new ScatterPlot(el, {data: data, x: 'a', y: 'b'});
+    let vis = new BarChart(el, {data: data, x: 'a', y: 'b'});
     vis.render();
 
 **ES5**
@@ -46,7 +45,7 @@ Example
     var data = [];
     for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
 
-    var vis = new candela.components.ScatterPlot(el, {data: data, x: 'a', y: 'b'});
+    var vis = new candela.components.BarChart(el, {data: data, x: 'a', y: 'b'});
     vis.render();
 
 **Python**
@@ -57,7 +56,7 @@ Example
 
     data = [{'a': d, 'b': d} for d in range(10)]
 
-    candela.ScatterPlot(data=data, x='a', y='b')
+    candela.BarChart(data=data, x='a', y='b')
 
 **R**
 
@@ -65,7 +64,7 @@ Example
 
     library(candela)
 
-    candela('ScatterPlot', data=mtcars, x='mpg', y='wt', color='disp')
+    candela('BarChart', data=mtcars, x='mpg', y='wt', color='disp')
 
 Options
 =======
@@ -74,19 +73,13 @@ data (:ref:`Table <table>`)
     The data table.
 
 x (String)
-    The x axis field. Must contain numeric data. See :ref:`axis scales`.
+    The x axis (bar position) field. Must contain numeric data. See :ref:`axis scales`.
 
 y (String)
-    The y axis field. Must contain numeric data. See :ref:`axis scales`.
-
-size (String)
-    The field used to size the points.
-
-shape (String)
-    The field used to determine the shape of each point.
+    The y axis (bar height) field. Must contain numeric data. See :ref:`axis scales`.
 
 color (String)
-    The field used to color the points. See :ref:`color scales`.
+    The field used to color the bars. See :ref:`color scales`.
 
 hover (Array of String)
     The fields to display on hover.

@@ -1,0 +1,216 @@
+===========
+    Geo
+===========
+
+A geospatial chart using `GeoJS <https://geojs.readthedocs.io>`_.
+
+Example
+=======
+
+.. raw:: html
+
+    <div id="geo-example" style="width: 700px; height: 700px"></div>
+    <script type="text/javascript" >
+        var el = document.getElementById('geo-example');
+        var data = [
+          {id: 0, lat: 41.702, lng: -87.644},
+          {id: 1, lat: 41.617, lng: -87.693},
+          {id: 2, lat: 41.715, lng: -87.712}
+        ];
+        var vis = new candela.components.Geo(el, {
+          map: {
+            zoom: 10,
+            center: { x: -87.6194, y: 41.867516 }
+          },
+          layers: [
+            {
+              type: 'osm'
+            },
+            {
+              type: 'feature',
+              features: [
+                {
+                  type: 'point',
+                  data: data,
+                  x: 'lng',
+                  y: 'lat'
+                }
+              ]
+            }
+          ]
+        });
+        vis.render();
+    </script>
+
+**ES6/Webpack**
+
+.. code-block:: js
+
+    import Geo from candela.components.Geo
+
+    let el = document.createElement('div');
+    document.body.appendChild(el);
+
+    let data = [
+      {id: 0, lat: 41.702, lng: -87.644},
+      {id: 1, lat: 41.617, lng: -87.693},
+      {id: 2, lat: 41.715, lng: -87.712}
+    ];
+    let vis = new Geo(el, {
+      map: {
+        zoom: 10,
+        center: { x: -87.6194, y: 41.867516 }
+      },
+      layers: [
+        {
+          type: 'osm'
+        },
+        {
+          type: 'feature',
+          features: [
+            {
+              type: 'point',
+              data: data,
+              x: 'lng',
+              y: 'lat'
+            }
+          ]
+        }
+      ]
+    });
+    vis.render();
+
+**ES5**
+
+.. code-block:: js
+
+    var el = document.createElement('div')
+    document.body.appendChild(el);
+
+    var data = [
+      {id: 0, lat: 41.702, lng: -87.644},
+      {id: 1, lat: 41.617, lng: -87.693},
+      {id: 2, lat: 41.715, lng: -87.712}
+    ];
+    var vis = new candela.components.Geo(el, {
+      map: {
+        zoom: 10,
+        center: { x: -87.6194, y: 41.867516 }
+      },
+      layers: [
+        {
+          type: 'osm'
+        },
+        {
+          type: 'feature',
+          features: [
+            {
+              type: 'point',
+              data: data,
+              x: 'lng',
+              y: 'lat'
+            }
+          ]
+        }
+      ]
+    });
+    vis.render();
+
+**Python**
+
+.. code-block:: python
+
+    import candela
+
+    data = [
+        dict(id=0, lat=41.702, lng=-87.644),
+        dict(id=1, lat=41.617, lng=-87.693),
+        dict(id=2, lat=41.715, lng=-87.712)
+    ];
+
+    candela.Geo(
+        map=dict(
+            zoom=10,
+            center=dict(x=-87.6194, y=41.867516)
+        ),
+        layers=[
+            dict(type='osm'),
+            dict(
+                type='feature',
+                features=[
+                    dict(type='point', data=data, x='lng', y='lat')
+                ]
+            )
+        ]
+    );
+
+**R**
+
+.. code-block:: r
+
+    library(candela)
+
+    data = list(
+      list(id=0, lat=41.702, lng=-87.644),
+      list(id=1, lat=41.617, lng=-87.693),
+      list(id=2, lat=41.715, lng=-87.712)
+    );
+
+    candela('Geo',
+      map=list(
+        zoom=10,
+        center=list(x=-87.6194, y=41.867516)
+      ),
+      layers=list(
+        list(type='osm'),
+        list(
+          type='feature',
+          features=list(
+            list(type='point', data=data, x='lng', y='lat')
+          )
+        )
+      )
+    );
+
+Options
+=======
+
+map (Object)
+    Key-value pairs describing `GeoJS map options <http://opengeoscience.github.io/geojs/apidocs/geo.map.html>`_.
+
+layers (Array of :ref:`Layer <layer>`)
+    The layers of the map.
+
+
+.. _layer:
+
+Layer specification
+===================
+
+A layer contains key-value pairs describing
+`GeoJS layer options <http://opengeoscience.github.io/geojs/apidocs/geo.layer.html>`_.
+These options are passed through to GeoJS, with the exception of the ``"features"``
+option for a layer with ``type`` set to ``"feature"``. In this case, the
+``"features"`` option is an array of :ref:`Feature specifications <feature>`.
+
+.. _feature:
+
+Feature specification
+=====================
+
+Each feature is an object with the following properties:
+
+name (String)
+    The name of the feature.
+
+type (String)
+    The feature type (currently supported: ``"point"``).
+
+data (:ref:`Table <table>`)
+    The data table.
+
+x (String)
+    The field to use for the feature's ``x`` coordinate.
+
+y (String)
+    The field to use for the feature's ``y`` coordinate.
