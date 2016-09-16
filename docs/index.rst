@@ -104,14 +104,6 @@ Diving deeper
 
     tutorials/iris
 
-.. toctree::
-    :maxdepth: 2
-    :caption: API documentation
-
-    candela-js
-    candela-py
-    candela-r
-
 .. _components_list:
 
 .. toctree::
@@ -127,6 +119,14 @@ Diving deeper
     components/heatmap
     components/histogram
     components/scatterplot
+
+.. toctree::
+    :maxdepth: 2
+    :caption: API documentation
+
+    candela-js
+    candela-py
+    candela-r
 
 .. toctree::
     :maxdepth: 2
