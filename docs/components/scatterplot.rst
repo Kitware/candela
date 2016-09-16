@@ -6,11 +6,20 @@ A scatterplot. This visualization will plot values at specified **x** and **y**
 positions. Additional fields may determine the **color**, **size**, and **shape**
 of the plotted points.
 
-* **el** is the DOM element that will contain the visualization.
+Example
+=======
 
-* **options** is an object with the following fields:
+.. raw:: html
 
-Example:
+    <div id="scatterplot-example"></div>
+    <script type="text/javascript" >
+        var el = document.getElementById('scatterplot-example'), data = [];
+        for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
+        var vis = new candela.components.ScatterPlot(el, {
+            data: data, x: 'a', y: 'b',
+            width: 700, height: 400});
+        vis.render();
+    </script>
 
 **ES2015/Webpack**
 
@@ -18,18 +27,26 @@ Example:
 
     import ScatterPlot from candela.components.ScatterPlot
 
-    var el = document.createElement('div');
+    let el = document.createElement('div');
     document.body.appendChild(el);
-    var vis = new ScatterPlot(el, {data: [{a:1,b:1},{a:2,b:2}], x: 'a', y: 'b'});
+
+    let data = [];
+    for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
+
+    let vis = new ScatterPlot(el, {data: data, x: 'a', y: 'b'});
     vis.render();
 
 **ES5**
 
 .. code-block:: js
 
-    var el = document.createElement('div');
+    var el = document.createElement('div')
     document.body.appendChild(el);
-    var vis = new candela.components.ScatterPlot(el, {data: [{a:1,b:1},{a:2,b:2}], x: 'a', y: 'b'});
+
+    var data = [];
+    for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
+
+    var vis = new candela.components.ScatterPlot(el, {data: data, x: 'a', y: 'b'});
     vis.render();
 
 **Python**
@@ -37,24 +54,21 @@ Example:
 .. code-block:: python
 
     import candela
-    candela.ScatterPlot(data=list(dict(a=1,b=1),dict(a=2,b=2)), x='a', y='b')
+
+    data = [{'a': d, 'b': d} for d in range(10)]
+
+    candela.ScatterPlot(data=data, x='a', y='b')
 
 **R**
 
 .. code-block:: r
 
     library(candela)
+
     candela('ScatterPlot', data=mtcars, x='mpg', y='wt', color='disp')
 
-
-width (Number)
-    Width of the chart in pixels. See :ref:`sizing`.
-
-height (Number)
-    Height of the chart in pixels. See :ref:`sizing`.
-
-renderer (String)
-    Whether to render in "svg" or "canvas" mode (default "canvas").
+Options
+=======
 
 data (:ref:`Table <table>`)
     The data table.
@@ -76,3 +90,12 @@ color (String)
 
 hover (Array of String)
     The fields to display on hover.
+
+width (Number)
+    Width of the chart in pixels. See :ref:`sizing`.
+
+height (Number)
+    Height of the chart in pixels. See :ref:`sizing`.
+
+renderer (String)
+    Whether to render in ``"svg"`` or ``"canvas"`` mode (default ``"canvas"``).
