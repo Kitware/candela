@@ -13,9 +13,9 @@ Example
     <script type="text/javascript" >
         var el = document.getElementById('geo-example');
         var data = [
-          {id: 0, lat: 41.702, lng: -87.644},
-          {id: 1, lat: 41.617, lng: -87.693},
-          {id: 2, lat: 41.715, lng: -87.712}
+          {lat: 41.702, lng: -87.644},
+          {lat: 41.617, lng: -87.693},
+          {lat: 41.715, lng: -87.712}
         ];
         var vis = new candela.components.Geo(el, {
           map: {
@@ -52,9 +52,9 @@ Example
     document.body.appendChild(el);
 
     let data = [
-      {id: 0, lat: 41.702, lng: -87.644},
-      {id: 1, lat: 41.617, lng: -87.693},
-      {id: 2, lat: 41.715, lng: -87.712}
+      {lat: 41.702, lng: -87.644},
+      {lat: 41.617, lng: -87.693},
+      {lat: 41.715, lng: -87.712}
     ];
     let vis = new Geo(el, {
       map: {
@@ -88,9 +88,9 @@ Example
     document.body.appendChild(el);
 
     var data = [
-      {id: 0, lat: 41.702, lng: -87.644},
-      {id: 1, lat: 41.617, lng: -87.693},
-      {id: 2, lat: 41.715, lng: -87.712}
+      {lat: 41.702, lng: -87.644},
+      {lat: 41.617, lng: -87.693},
+      {lat: 41.715, lng: -87.712}
     ];
     var vis = new candela.components.Geo(el, {
       map: {
@@ -123,10 +123,10 @@ Example
     import candela
 
     data = [
-        dict(id=0, lat=41.702, lng=-87.644),
-        dict(id=1, lat=41.617, lng=-87.693),
-        dict(id=2, lat=41.715, lng=-87.712)
-    ];
+        dict(lat=41.702, lng=-87.644),
+        dict(lat=41.617, lng=-87.693),
+        dict(lat=41.715, lng=-87.712)
+    ]
 
     candela.Geo(
         map=dict(
@@ -142,7 +142,7 @@ Example
                 ]
             )
         ]
-    );
+    )
 
 **R**
 
@@ -151,10 +151,9 @@ Example
     library(candela)
 
     data = list(
-      list(id=0, lat=41.702, lng=-87.644),
-      list(id=1, lat=41.617, lng=-87.693),
-      list(id=2, lat=41.715, lng=-87.712)
-    );
+      list(lat=41.702, lng=-87.644),
+      list(lat=41.617, lng=-87.693),
+      list(lat=41.715, lng=-87.712))
 
     candela('Geo',
       map=list(
@@ -170,7 +169,7 @@ Example
           )
         )
       )
-    );
+    )
 
 Options
 =======

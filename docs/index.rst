@@ -123,6 +123,7 @@ Diving deeper
     components/bulletchart
     components/ganttchart
     components/geo
+    components/geodots
     components/scatterplot
 
 .. toctree::
