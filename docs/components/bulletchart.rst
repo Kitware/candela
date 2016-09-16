@@ -80,7 +80,7 @@ Example
 
     import candela
 
-    candela.BulletChart(
+    candela.components.BulletChart(
         value=0.8,
         title='My measurement',
         subtitle='... it is really important',

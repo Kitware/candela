@@ -58,7 +58,7 @@ Example
 
     data = [{'a': d, 'b': d} for d in range(10)]
 
-    candela.BoxPlot(data=data, fields=['a', 'b'])
+    candela.components.BoxPlot(data=data, fields=['a', 'b'])
 
 **R**
 

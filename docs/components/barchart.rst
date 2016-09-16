@@ -56,7 +56,7 @@ Example
 
     data = [{'a': d, 'b': d} for d in range(10)]
 
-    candela.BarChart(data=data, x='a', y='b')
+    candela.components.BarChart(data=data, x='a', y='b')
 
 **R**
 

@@ -124,6 +124,8 @@ Diving deeper
     components/ganttchart
     components/geo
     components/geodots
+    components/heatmap
+    components/histogram
     components/scatterplot
 
 .. toctree::

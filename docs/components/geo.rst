@@ -128,7 +128,7 @@ Example
         dict(lat=41.715, lng=-87.712)
     ]
 
-    candela.Geo(
+    candela.components.Geo(
         map=dict(
             zoom=10,
             center=dict(x=-87.6194, y=41.867516)

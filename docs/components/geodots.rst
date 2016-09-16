@@ -91,7 +91,7 @@ Example
         dict(lat=41.715, lng=-87.712, a=25)
     ]
 
-    candela.GeoDots(
+    candela.components.GeoDots(
         zoom=10,
         center=dict(longitude=-87.6194, latitude=41.867516),
         data=data,

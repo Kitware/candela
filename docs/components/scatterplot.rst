@@ -13,8 +13,11 @@ Example
 
     <div id="scatterplot-example"></div>
     <script type="text/javascript" >
-        var el = document.getElementById('scatterplot-example'), data = [];
+        var el = document.getElementById('scatterplot-example');
+
+        var data = [];
         for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
+
         var vis = new candela.components.ScatterPlot(el, {
             data: data, x: 'a', y: 'b',
             width: 700, height: 400});
@@ -33,7 +36,10 @@ Example
     let data = [];
     for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
 
-    let vis = new ScatterPlot(el, {data: data, x: 'a', y: 'b'});
+    let vis = new ScatterPlot(el, {
+      data: data, x: 'a', y: 'b',
+      width: 700, height: 400
+    });
     vis.render();
 
 **ES5**
@@ -46,7 +52,10 @@ Example
     var data = [];
     for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
 
-    var vis = new candela.components.ScatterPlot(el, {data: data, x: 'a', y: 'b'});
+    var vis = new candela.components.ScatterPlot(el, {
+      data: data, x: 'a', y: 'b',
+      width: 700, height: 400
+    });
     vis.render();
 
 **Python**
@@ -57,7 +66,8 @@ Example
 
     data = [{'a': d, 'b': d} for d in range(10)]
 
-    candela.ScatterPlot(data=data, x='a', y='b')
+    candela.components.ScatterPlot(
+        data=data, x='a', y='b', width=700, height=400)
 
 **R**
 
