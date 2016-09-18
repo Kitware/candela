@@ -2,16 +2,29 @@
     Candela
 ===============
 
-Candela is an open-source suite of interoperable web visualization
-components for `Kitware <http://www.kitware.com>`_'s `Resonant <http://resonant.kitware.com>`_ platform.
-Candela focuses on making scalable, rich visualizations available
-with a normalized API for use in real-world data science applications.
-Integrated components include:
+Candela is an open-source suite of interoperable web visualization components
+for `Kitware <http://www.kitware.com>`_'s `Resonant
+<http://resonant.kitware.com>`_ platform. Candela focuses on making scalable,
+rich visualizations available with a normalized API for use in real-world data
+science applications. Integrated components include:
 
-* `LineUp <http://www.caleydo.org/tools/lineup/>`_ dynamic ranking by the Harvard University `Visual Computing Group`_ and the `Caleydo`_ project.
-* `UpSet <http://www.caleydo.org/tools/upset/>`_ set visualization by the Harvard University `Visual Computing Group`_ and the `Caleydo`_ project.
-* `OnSet <http://www.cc.gatech.edu/gvu/ii/setvis/>`_ set visualization by the Georgia Institute of Technology `Information Interfaces Group <http://www.cc.gatech.edu/gvu/ii/>`_.
-* `Vega <https://vega.github.io/vega/>`_ visualizations by the University of Washington `Interactive Data Lab <http://idl.cs.washington.edu/>`_.
+* :ref:`lineup_comp` component: `LineUp <http://www.caleydo.org/tools/lineup/>`_ dynamic ranking by the
+  Harvard University `Visual Computing Group`_ and the `Caleydo`_ project.
+
+* :ref:`upset_comp` component: `UpSet <http://www.caleydo.org/tools/upset/>`_ set visualization by the
+  Harvard University `Visual Computing Group`_ and the `Caleydo`_ project.
+
+* :ref:`onset_comp` component: `OnSet <http://www.cc.gatech.edu/gvu/ii/setvis/>`_ set visualization by the
+  Georgia Institute of Technology `Information Interfaces Group
+  <http://www.cc.gatech.edu/gvu/ii/>`_.
+
+* `Vega <https://vega.github.io/vega/>`_ visualizations by the University of
+  Washington `Interactive Data Lab <http://idl.cs.washington.edu/>`_. Example
+  component: :ref:`scatterplot`.
+
+* `GeoJS <https://geojs.readthedocs.io>`_ geospatial visualizations by `Kitware
+  <http://www.kitware.com>`_'s `Resonant <http://resonant.kitware.com>`_
+  platform. Example component: :ref:`geodots`.
 
 .. _Visual Computing Group: http://vcg.seas.harvard.edu/
 
@@ -79,14 +92,6 @@ Quick start - R
     library(candela)
     candela('ScatterPlot', data=mtcars, x='mpg', y='wt', color='disp')
 
-Diving deeper
--------------
-
-* To learn how to use Candela, see :ref:`iris` and the other
-  :ref:`tutorials <tutorial_list>`.
-* To learn how to create your own Candela components, see
-  :ref:`developing-components`.
-
 .. _here: http://docs.python-guide.org/en/latest/starting/install/win/
 
 .. toctree::
@@ -96,18 +101,10 @@ Diving deeper
     installation
     versioning
 
-.. _tutorial_list:
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Tutorials
-
-    tutorials/iris
-
 .. _components_list:
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     :caption: Components
 
     components/barchart
@@ -118,7 +115,13 @@ Diving deeper
     components/geodots
     components/heatmap
     components/histogram
+    components/linechart
+    components/lineup
+    components/onset
     components/scatterplot
+    components/scatterplotmatrix
+    components/survivalplot
+    components/upset
 
 .. toctree::
     :maxdepth: 2
@@ -134,6 +137,5 @@ Diving deeper
 
     coding-style-guide
     releasing-candela
-    developing-components
     testing
     vega-templates

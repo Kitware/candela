@@ -1,27 +1,24 @@
-.. _scatterplot:
+=================
+    LineChart
+=================
 
-===================
-    ScatterPlot
-===================
-
-A scatterplot. This visualization will plot values at specified **x** and **y**
-positions. Additional fields may determine the **color**, **size**, and **shape**
-of the plotted points.
+A line chart. The chart plots a line for each specified **y** field
+against a single **x** field.
 
 Example
 =======
 
 .. raw:: html
 
-    <div id="scatterplot-example"></div>
+    <div id="linechart-example"></div>
     <script type="text/javascript" >
-      var el = document.getElementById('scatterplot-example');
+      var el = document.getElementById('linechart-example');
 
       var data = [];
       for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
 
-      var vis = new candela.components.ScatterPlot(el, {
-        data: data, x: 'a', y: 'b',
+      var vis = new candela.components.LineChart(el, {
+        data: data, x: 'a', y: ['b'],
         width: 700, height: 400});
       vis.render();
     </script>
@@ -30,7 +27,7 @@ Example
 
 .. code-block:: js
 
-    import ScatterPlot from candela.components.ScatterPlot
+    import LineChart from candela.components.LineChart
 
     let el = document.createElement('div');
     document.body.appendChild(el);
@@ -38,8 +35,8 @@ Example
     let data = [];
     for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
 
-    let vis = new ScatterPlot(el, {
-      data: data, x: 'a', y: 'b',
+    let vis = new LineChart(el, {
+      data: data, x: 'a', y: ['b'],
       width: 700, height: 400
     });
     vis.render();
@@ -54,8 +51,8 @@ Example
     var data = [];
     for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
 
-    var vis = new candela.components.ScatterPlot(el, {
-      data: data, x: 'a', y: 'b',
+    var vis = new candela.components.LineChart(el, {
+      data: data, x: 'a', y: ['b'],
       width: 700, height: 400
     });
     vis.render();
@@ -68,8 +65,8 @@ Example
 
     data = [{'a': d, 'b': d} for d in range(10)]
 
-    candela.components.ScatterPlot(
-        data=data, x='a', y='b', width=700, height=400)
+    candela.components.LineChart(
+        data=data, x='a', y=['b'], width=700, height=400)
 
 **R**
 
@@ -77,7 +74,7 @@ Example
 
     library(candela)
 
-    candela('ScatterPlot', data=mtcars, x='mpg', y='wt', color='disp')
+    candela('LineChart', data=mtcars, x='mpg', y=list('wt'), color='disp')
 
 Options
 =======
@@ -86,19 +83,12 @@ data (:ref:`Table <table>`)
     The data table.
 
 x (String)
-    The x axis field. Must contain numeric data. See :ref:`axis scales`.
+    The field containing x-coordinates for the lines. The field must contain
+    date or numeric data. See :ref:`axis scales`.
 
-y (String)
-    The y axis field. Must contain numeric data. See :ref:`axis scales`.
-
-size (String)
-    The field used to size the points.
-
-shape (String)
-    The field used to determine the shape of each point.
-
-color (String)
-    The field used to color the points. See :ref:`color scales`.
+y (Array of String)
+    The fields containing y-coordinates for the lines. The fields must contain
+    date or numeric data. See :ref:`axis scales`.
 
 hover (Array of String)
     The fields to display on hover.
