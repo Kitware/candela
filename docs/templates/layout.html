@@ -1,0 +1,21 @@
+{% extends "!layout.html" %}
+
+{%- block extrahead %}
+    <script src="//kitware.github.io/candela/candela-0.2.0-81be44f6.js"></script>
+    <style>
+    /* This is a hack because Candela currently leaks global CSS. */
+    /* We should able to remove this when that issue is resolved. */
+    ul, ol, dl {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+    }
+    /* For a LineUp style that would use absolute position. */
+    div.lu {
+        position: static !important;
+    }
+    /* For an OnSet style that would use absolute position. */
+    .onset-body #wrapper {
+        position: static !important;
+    }
+    </style>
+{% endblock %}
