@@ -10,6 +10,6 @@ respawn
 respawn limit 20 5
 
 script
-    PYTHONPATH=${PYTHONPATH}:/home/vagrant/girder exec /usr/bin/python -m girder > /dev/null 2>&1
+    PYTHONPATH=${PYTHONPATH}:{{ storage }}/girder exec /usr/bin/python -m girder > /dev/null 2>&1
 
 end script

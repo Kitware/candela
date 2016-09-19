@@ -1,0 +1,7 @@
+[Unit]
+Description=Girder
+After=network.target
+
+[Service]
+Environment="PYTHONPATH=${PYTHONPATH}:{{ storage }}/girder"
+ExecStart=/usr/bin/python -m girder

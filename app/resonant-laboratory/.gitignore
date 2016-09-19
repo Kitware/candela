@@ -4,4 +4,4 @@ web_client/lib/
 *.ai
 *.pdf
 .vagrant
-ansible/playbook.retry
+ansible/playbook*.retry
