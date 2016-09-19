@@ -13,7 +13,7 @@
 
     girder_revision: 12e12f17a7a8ec99330c16234e19a14435b1a034
     database_assetstore_revision: a530c9546d3ac4f50ec4519ef6c7bb348e2b4bc7
-    candela_revision: 9dbdf3473eb4576d119c42d28d16cf1cbb928a7a
+    candela_revision: fdc03d3a0fc24b0b2828b474cd9474856d8f0fae
     girder_client_revision: 6bda1a7b65bea1c11187cdeb136877739693f466
 
   tasks:
