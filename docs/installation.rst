@@ -92,7 +92,7 @@ The packages will be installed to a directory named ``node_modules``.
 
 **3. Begin the build process**
 
-Issue this command to kick off the Grunt build process: ::
+Issue this command to kick off the build process: ::
 
     npm run build
 
@@ -119,7 +119,7 @@ To view the examples, run: ::
 **5. Run the test suites**
 
 Candela comes with a battery of tests.  To run these, you can
-invoke the Grunt test task as follows: ::
+invoke the test task as follows: ::
 
     npm run test:all
 
