@@ -34,7 +34,7 @@ def load(info):
 
     # Move girder app to /girder, serve sumo app from /
     app = ResonantLaboratory(info)
-    registerPluginWebroot(app, info)
+    registerPluginWebroot(app, info['name'])
 
     # Expose versioning endpoint
     info['apiRoot'].system.route('GET', ('resonantLaboratoryVersion', ),
