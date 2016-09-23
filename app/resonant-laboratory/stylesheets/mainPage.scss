@@ -6,16 +6,14 @@ body {
   -ms-user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
-  /* awkward font stack that attempts to approximate Girder's...
-  (they cheat and just use Helvetica Neue) */
-  font-family: "Josefin Sans", "Helvetica", "Arial", sans-serif;
+  font-family: "Source Sans Pro", "Helvetica", "Arial", sans-serif;
   font-weight: 400;
   background-color: $pageBackgroundColor;
   color: $darkTextColor;
 }
 
 h1, h2, h3, h4, h5, h6, button, input, input:after {
-  font-family: "Josefin Sans", "Helvetica", "Arial", sans-serif;
+  font-family: "Source Sans Pro", "Helvetica", "Arial", sans-serif;
 }
 h1 {
   font-weight: 900;
