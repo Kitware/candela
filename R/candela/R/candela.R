@@ -2,13 +2,24 @@
 #'
 #' Interoperable web visualization components.
 #'
+#' @param name The name of the Candela component to initialize.
+#'   See details.
+#' @param width,height Must be a valid CSS unit (like \code{'100\%'},
+#'   \code{'400px'}, \code{'auto'}) or a number, which will be coerced to a
+#'   string and have \code{'px'} appended.
+#' @param \ldots Additional parameters for the specific Candela component.
+#'   See details.
+#'
+#' @details See \url{https://candela.readthedocs.io/en/latest/#components} for
+#'   component list and parameters.
+#'
 #' @import htmlwidgets
 #'
 #' @export
-candela <- function(name, width = NULL, height = NULL, elementId = NULL, ...) {
+candela <- function(name, width = NULL, height = NULL, ...) {
 
   # forward options using x
-  x = list(
+  x <- list(
     name = name,
     options = list(...)
   )
@@ -21,8 +32,7 @@ candela <- function(name, width = NULL, height = NULL, elementId = NULL, ...) {
     x,
     width = width,
     height = height,
-    package = 'candela',
-    elementId = elementId
+    package = 'candela'
   )
 }
 
@@ -43,13 +53,15 @@ candela <- function(name, width = NULL, height = NULL, elementId = NULL, ...) {
 #' @name candela-shiny
 #'
 #' @export
-candelaOutput <- function(outputId, width = '100%', height = '400px'){
-  htmlwidgets::shinyWidgetOutput(outputId, 'candela', width, height, package = 'candela')
+candelaOutput <- function(outputId, width = '100%', height = '400px'){ # nolint
+  htmlwidgets::shinyWidgetOutput(outputId, 'candela', width, height, package = 'candela') # nolint
 }
 
 #' @rdname candela-shiny
 #' @export
-renderCandela <- function(expr, env = parent.frame(), quoted = FALSE) {
-  if (!quoted) { expr <- substitute(expr) } # force quoted
-  htmlwidgets::shinyRenderWidget(expr, candelaOutput, env, quoted = TRUE)
+renderCandela <- function(expr, env = parent.frame(), quoted = FALSE) { # nolint
+  if (!quoted) {
+    expr <- substitute(expr)
+  } # force quoted
+  htmlwidgets::shinyRenderWidget(expr, candelaOutput, env, quoted = TRUE) # nolint
 }
