@@ -75,10 +75,11 @@ you move or delete this item, your preferences will be lost.`,
     // made), display a notification about where the project was moved.
     // Because we're now working on a copy, we should also fire the project
     // creation event
+    window.mainPage.project.updateStatus();
     window.mainPage.project.cache.status.then(status => {
       let notification = 'You are now working on a copy of this project in ';
       if (status.visibility === 'PublicScratch') {
-        notification = 'the public scratch space. Log in to take ownership of this project.';
+        notification += 'the public scratch space. Log in to take ownership of this project.';
       } else if (status.visibility === 'PrivateUser') {
         notification += 'your Private folder.';
       } else {
