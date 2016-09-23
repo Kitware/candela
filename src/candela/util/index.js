@@ -1,4 +1,4 @@
-import { keys, type } from 'datalib';
+import { keys, type, read as dlread } from 'datalib';
 
 export function getElementSize (el) {
   const style = window.getComputedStyle(el, null);
@@ -34,6 +34,8 @@ export function minmax (data) {
   return range;
 }
 
+// Version of datalib.type.inferAll() that handles fields
+// with nested periods
 export function inferAll (data) {
   let fields = keys(data[0]);
   let types = {};
@@ -41,4 +43,11 @@ export function inferAll (data) {
     types[fields[i]] = type.infer(data, '[' + fields[i] + ']');
   }
   return types;
+}
+
+// Version of datalib.read() that uses our inferAll() to handle
+// fields with nested periods
+export function read (data) {
+  data.__types__ = inferAll(data);
+  dlread(data, {parse: data.__types__});
 }
