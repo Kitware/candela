@@ -1,6 +1,6 @@
 Package: candela
 Title: Candela HTMLWidget
-Version: 0.0.0.9000
+Version: 0.2.0
 Authors@R: person("Jeffrey", "Baumes", email = "jeff.baumes@kitware.com", role = c("aut", "cre"))
 Description: Candela is an open-source suite of interoperable web visualization
     components for Kitware's Resonant platform. Candela focuses on making rich
