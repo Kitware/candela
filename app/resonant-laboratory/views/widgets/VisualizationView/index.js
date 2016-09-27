@@ -168,7 +168,6 @@ let VisualizationView = Widget.extend({
       // a new dataset will invalidate the parsed cache).
       this.status = STATUS.LOADING;
       this.statusText.text = 'Loading...';
-      this.$el.find('#spinnerWatermark').show();
       this.$el.find('#visualization, #noVisualizationState').hide();
       this.renderIndicators();
       window.mainPage.project.shapeDataForVis().then(data => {
@@ -206,7 +205,7 @@ let VisualizationView = Widget.extend({
             }
           }
           this.vis.component.render();
-          this.$el.find('#spinnerWatermark, #noVisualizationState').hide();
+          this.$el.find('#noVisualizationState').hide();
           this.$el.find('#visualization').show();
         }
         // Okay, finally change the status if there aren't enough mappings
@@ -222,7 +221,6 @@ let VisualizationView = Widget.extend({
       });
     } else {
       this.$el.html(myTemplate);
-      this.$el.find('#spinnerWatermark, #visualization').hide();
       // Add listener to empty state image
       this.$el.find('#noVisualizationState').on('click', () => {
         window.mainPage.overlay.render('VisualizationLibrary');
