@@ -49,6 +49,8 @@ if (binSettings.ordinalBins) {
     binLookup[bin.label] = histogram.length;
     histogram.push({
       label: bin.label,
+      lowBound: bin.lowBound,
+      highBound: bin.highBound,
       count: 0
     });
   });

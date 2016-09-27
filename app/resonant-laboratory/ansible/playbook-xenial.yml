@@ -1,0 +1,237 @@
+---
+- hosts: all
+  become_user: root
+  become_method: sudo
+  gather_facts: false
+  vars:
+    adminuser_firstname: Admin
+    adminuser_lastname: User
+    adminuser_login: admin
+    adminuser_password: adminadmin
+    adminuser_email: admin@example.com
+
+    storage: /home/ubuntu
+
+    girder_revision: 6bda1a7b65bea1c11187cdeb136877739693f466
+    database_assetstore_revision: a530c9546d3ac4f50ec4519ef6c7bb348e2b4bc7
+    candela_revision: 5c17f10d754778e7ea291f1f24c290d997e4dec8
+    girder_client_revision: 6bda1a7b65bea1c11187cdeb136877739693f466
+
+  pre_tasks:
+    - name: Install Python2
+      raw: sudo apt-get -y install python-minimal
+
+  tasks:
+    - name: Add Mongo repository key
+      become: yes
+      shell: apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+
+    - name: Set Mongo package list
+      become: yes
+      shell: echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+
+    - name: Pull in latest Node package files
+      become: yes
+      shell: curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+
+    - name: Ensure APT packages are installed
+      become: yes
+      apt:
+        name:
+          - python
+          - python-dev
+          - git
+          - nodejs
+          - mongodb-org
+          - libcairo2-dev
+          - libjpeg8-dev
+          - libpango1.0-dev
+          - libgif-dev
+          - libffi-dev
+          - build-essential
+          - g++
+          - postgresql
+          - postgresql-contrib
+          - libpq-dev
+
+    - name: Update pip
+      become: yes
+      shell: curl https://bootstrap.pypa.io/get-pip.py | python
+
+    - name: Update NPM to latest version
+      become: yes
+      command: npm i -g npm
+
+    - name: Clone Girder repository
+      git:
+        repo: https://github.com/girder/girder
+        dest: "{{ storage }}/girder"
+        version: "{{ girder_revision }}"
+
+    - name: Clone Girder DB Items repository
+      git:
+        repo: https://github.com/OpenGeoscience/girder_db_items
+        dest: "{{ storage }}/girder/plugins/database_assetstore"
+        version: "{{ database_assetstore_revision }}"
+
+    - name: Install Girder DB Items requirements
+      become: yes
+      command: pip install -r requirements.txt
+      args:
+        chdir: "{{ storage }}/girder/plugins/database_assetstore"
+
+    - name: Clone Candela repository
+      git:
+        repo: https://github.com/Kitware/candela
+        dest: "{{ storage }}/candela"
+        version: "{{ candela_revision }}"
+
+    - name: Install Candela node requirements
+      command: npm i
+      args:
+        chdir: "{{ storage }}/candela"
+        creates: node_modules
+
+    - name: Install Candela python requirements
+      become: yes
+      command: pip install -r requirements.txt
+      args:
+        chdir: "{{ storage }}/candela/app/resonant-laboratory"
+
+    - name: Install girder-client
+      become: yes
+      command: pip install -e git+https://github.com/girder/girder.git@{{ girder_client_revision }}#egg=girder
+
+    - name: Build Candela
+      command: npm run build
+      args:
+        chdir: "{{ storage }}/candela"
+        creates: build/candela/candela.js
+
+    - name: Link Resonant Laboratory into Girder plugin directory
+      file:
+        src: "{{ storage }}/candela/app/resonant-laboratory"
+        dest: "{{ storage }}/girder/plugins/resonant-laboratory"
+        state: link
+
+    - name: Install Girder node requirements
+      command: npm i
+      args:
+        chdir: "{{ storage }}/girder"
+        creates: node_modules
+
+    - name: Install Girder Python requirements
+      become: yes
+      command: pip install -r requirements.txt
+      args:
+        chdir: "{{ storage }}/girder"
+
+    - name: Build Girder
+      command: ./node_modules/.bin/grunt
+      args:
+        chdir: "{{ storage }}/girder"
+
+    - name: Copy MongoDB unit file to server
+      become: yes
+      copy:
+        src: xenial/mongod.service
+        dest: /etc/systemd/system/
+        mode: 644
+        owner: root
+
+    - name: Start MongoDB
+      become: yes
+      service:
+        name: mongod
+        state: started
+
+    - name: Install girder_client
+      become: yes
+      pip:
+        chdir: "{{ storage }}/girder/clients/python"
+        extra_args: -e
+        name: .
+
+    - name: Instantiate girder.conf template on server
+      become: yes
+      template:
+        src: xenial/girder.service.template
+        dest: /etc/systemd/system/girder.service
+        mode: 644
+        owner: root
+
+    - name: Start Girder
+      become: yes
+      service:
+        name: girder
+        state: started
+        enabled: yes
+
+    - name: Wait for Girder to start
+      wait_for:
+        port: 8080
+        delay: 1
+
+    - name: Create Girder admin user
+      girder:
+        port: 8080
+        user:
+          firstName: "{{ adminuser_firstname }}"
+          lastName: "{{ adminuser_lastname }}"
+          login: "{{ adminuser_login }}"
+          password: "{{ adminuser_password }}"
+          email: "{{ adminuser_email }}"
+          admin: yes
+        state: present
+
+    - name: Activate Girder plugins
+      girder:
+        port: 8080
+        username: "{{ adminuser_login }}"
+        password: "{{ adminuser_password }}"
+        plugins:
+          - resonant-laboratory
+          - database_assetstore
+        state: present
+
+    - name: Restart Girder
+      girder:
+        port: 8080
+        username: "{{ adminuser_login }}"
+        password: "{{ adminuser_password }}"
+        put:
+          path: system/restart
+
+    - name: Wait for Girder to restart
+      wait_for:
+        port: 8080
+        delay: 5
+
+    - name: Create filesystem assetstore
+      girder:
+        port: 8080
+        username: "{{ adminuser_login }}"
+        password: "{{ adminuser_password }}"
+        assetstore:
+          name: Filesystem Assetstore
+          type: filesystem
+          root: "{{ storage }}/assetstore/girder"
+          current: true
+        state: present
+
+    - name: Create database assetstore
+      girder:
+        port: 8080
+        username: "{{ adminuser_login }}"
+        password: "{{ adminuser_password }}"
+        assetstore:
+          name: Resonant Laboratory Database Assetstore
+          type: database
+          dbtype: mongo
+          dburi: mongodb://localhost:27017/reslab
+        state: present
+    
+    - name: Upload example data to Girder
+      command: python populateGirder.py -p {{ adminuser_password }}
+      args:
+        chdir: "{{ storage }}/candela/app/resonant-laboratory/scripts"

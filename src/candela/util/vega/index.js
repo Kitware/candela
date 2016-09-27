@@ -206,7 +206,7 @@ let templateFunctions = {
       type: 'linear',
       zero: false,
       domain: {data: params.data, field: params.field},
-      range: ['#dfd', 'green']
+      range: ['#df2709', '#2709df']
     };
   },
 

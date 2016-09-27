@@ -398,10 +398,6 @@ let Project = MetadataItem.extend({
     return Object.assign({}, this.getAssignedVisFields(index), visDetails.options || {});
   },
   shapeDataForVis: function (index = 0) {
-    if (index in this.cache.visDatasetPromises) {
-      return this.cache.visDatasetPromises[index];
-    }
-
     let meta = this.getMeta();
     if (meta.datasets.length <= index) {
       // The indicated dataset isn't loaded yet...

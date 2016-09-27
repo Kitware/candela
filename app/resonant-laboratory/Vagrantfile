@@ -1,5 +1,10 @@
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/trusty64"
+  box = ENV['ANSIBLE_BOX']
+  if box.nil? || box.empty?
+    box = "trusty"
+  end
+
+  config.vm.box = "ubuntu/#{box}64"
 
   config.vm.provider "virtualbox" do |vb|
     vb.memory = 8192
@@ -13,11 +18,16 @@ Vagrant.configure("2") do |config|
 
   # Run Ansible from the Vagrant Host
   config.vm.provision "ansible" do |ansible|
-    ansible.verbose = "vvvv"
+    ansible.verbose = ""
     ansible.groups = {
       "all" => ['reslab']
     }
 
-    ansible.playbook = "ansible/playbook.yml"
+    ansible.playbook = "ansible/playbook-#{box}.yml"
+
+    Extra_vars = ENV['ANSIBLE_EXTRA_VARS']
+    if !Extra_vars.nil? && !Extra_vars.empty?
+      ansible.extra_vars = Hash[ENV['ANSIBLE_EXTRA_VARS'].split(/\s+/).map{|w| w.split("=")}]
+    end
   end
 end
