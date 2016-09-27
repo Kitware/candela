@@ -178,44 +178,43 @@ followed by Shift-Enter to execute the cell and display the visualization: ::
         data=df, color='species', x='sepalLength', y='sepalWidth')
 
 
-R - using ``install_github``
-----------------------------
+R - using ``install_github`` or Git checkout
+--------------------------------------------
 
-This procedure will install Candela directly from GitHub, which does not require
-a Git checkout of Candela.
+This procedure will install Candela either directly from GitHub
+or from a local Git checkout of Candela.
 
-**1. Install** `R Studio <https://www.rstudio.com/>`_
+**1. Install** `R <https://www.r-project.org/>`_ **, and optionally** `RStudio <https://www.rstudio.com/>`_
 
-**2. Install the Candela package** ::
+**2. Install the Candela package**
+
+To install directly from GitHub: ::
 
     install.packages('devtools')
-    devtools::install_github('Kitware/candela', subdir='R/candela')
+    devtools::install_github('Kitware/candela', subdir='R/candela', dependencies = TRUE)
+
+To install from a Git checkout, set your working directory to the Git checkout
+then install and check the installation. ``check()`` will run tests and perform
+other package checks. ::
+
+    setwd('/path/to/candela/R/candela')
+    install.packages('devtools')
+    devtools::install(dependencies = TRUE)
+    devtools::check()
 
 **3. Test the installation**
 
-The following will create a scatter plot of the ``mtcars`` dataset: ::
+The following will create a scatter plot of the ``mtcars`` dataset and save it to ``out.html``: ::
 
     library(candela)
-    candela('ScatterPlot', data=mtcars, x='mpg', y='wt', color='disp')
+    w <- candela('ScatterPlot', data=mtcars, x='mpg', y='wt', color='disp')
+    htmlwidgets::saveWidget(w, 'out.html')
 
-R - from a Git checkout
------------------------
+From RStudio, the visualization will appear in the application when you
+refer to a visualization without assigning it to a variable: ::
 
-**1. Install** `R Studio <https://www.rstudio.com/>`_
+    w
 
-**2. Change the working directory**
-
-From RStudio, navigate to the ``candela/R/candela`` directory in the Files
-tab and select Set As Working Directory from the More menu.
-
-**3. Install the Candela package** ::
-
-    install.packages('devtools')
-    devtools::install()
-
-**4. Test the installation**
-
-The following will create a scatter plot of the ``mtcars`` dataset: ::
-
-    library(candela)
-    candela('ScatterPlot', data=mtcars, x='mpg', y='wt', color='disp')
+**Note:** ``saveWidget`` requires an installation of Pandoc when run outside of
+RStudio. See the `installation instructions
+<https://github.com/rstudio/rmarkdown/blob/master/PANDOC.md>`_ to install.

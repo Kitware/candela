@@ -2,4 +2,4 @@ dependencies:
  - name: candela
    version: 0.2.0
    src: htmlwidgets/lib/candela-0.2.0
-   script: candela-0.2.0-81be44f6.js
+   script: candela-0.2.0.js
