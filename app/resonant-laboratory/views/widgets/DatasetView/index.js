@@ -920,7 +920,6 @@ let DatasetView = Widget.extend({
 
     this.status = STATUS.LOADING;
     this.statusText.text = 'Loading...';
-    this.$el.find('#datasetOverview, #tablePreview, #histogramPreview, #noDatasetState').hide();
     this.renderIndicators();
 
     datasetPromise.then(datasetObj => {
