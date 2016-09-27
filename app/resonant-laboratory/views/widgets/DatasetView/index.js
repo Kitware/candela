@@ -921,12 +921,10 @@ let DatasetView = Widget.extend({
     this.status = STATUS.LOADING;
     this.statusText.text = 'Loading...';
     this.$el.find('#datasetOverview, #tablePreview, #histogramPreview, #noDatasetState').hide();
-    this.$el.find('#spinnerWatermark').show();
     this.renderIndicators();
 
     datasetPromise.then(datasetObj => {
       if (!datasetObj) {
-        this.$el.find('#spinnerWatermark').hide();
         this.$el.find('#noDatasetState').show();
         this.status = STATUS.NO_DATA;
         this.statusText.text = 'No file loaded';
@@ -969,7 +967,6 @@ let DatasetView = Widget.extend({
                 }
               }
             }
-            this.$el.find('#spinnerWatermark').hide();
             this.$el.find('#datasetOverview, #tablePreview, #histogramPreview').show();
           });
       }
