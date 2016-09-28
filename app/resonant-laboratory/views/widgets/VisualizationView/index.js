@@ -113,6 +113,8 @@ let VisualizationView = Widget.extend({
       window.mainPage.overlay.renderUserErrorScreen('This visualization needs more data matchings. Make sure there are no orange circles in the Matching panel.');
     } else if (this.status === STATUS.FAILED_RENDER) {
       window.mainPage.overlay.renderReallyBadErrorScreen('There was a failure in attempting to render the visualization. There may be some hints in the developer console.');
+    } else if (this.status === STATUS.LOADING) {
+      window.mainPage.overlay.renderLoadingScreen('The visualization is still loading.');
     }
   },
   render: Underscore.debounce(function () {
@@ -164,11 +166,9 @@ let VisualizationView = Widget.extend({
       // Okay, now ask the project if it has any new data for
       // us (changing the matchings, editing the data, or grabbing
       // a new dataset will invalidate the parsed cache).
-      if (widgetIsShowing) {
-        this.vis.component.render();
-      }
       this.status = STATUS.LOADING;
       this.statusText.text = 'Loading...';
+      this.$el.find('#visualization, #noVisualizationState').hide();
       this.renderIndicators();
       window.mainPage.project.shapeDataForVis().then(data => {
         widgetIsShowing = this.isTargeted();
@@ -192,7 +192,6 @@ let VisualizationView = Widget.extend({
           if (!successfullyUpdated) {
             // Nuke the vis and start fresh
             this.$el.html(myTemplate);
-            this.$el.find('#noVisualizationState').hide();
             try {
               this.vis.component = new candela.components[this.vis.spec.name](
                 '#' + this.spec.hashName + 'Container .visualization', options);
@@ -206,6 +205,8 @@ let VisualizationView = Widget.extend({
             }
           }
           this.vis.component.render();
+          this.$el.find('#noVisualizationState').hide();
+          this.$el.find('#visualization').show();
         }
         // Okay, finally change the status if there aren't enough mappings
         // (for now, the empty state is the partially-rendered visualization...

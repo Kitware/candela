@@ -353,6 +353,12 @@ let Dataset = MetadataItem.extend({
   },
   postProcessHistogram: function (histogram) {
     let formatter = d3.format('0.3s');
+    let formatValue = value => {
+      // 0.3s is *almost* perfect for our needs, except when
+      // the values are nice round numbers... so chew off any
+      // unnecessary zeros
+      return formatter(value).replace(/\.*0+$/, '');
+    };
     // If the user is logged out, we'll sometimes get an
     // empty histogram back
     if (!('__passedFilters__' in histogram)) {
@@ -364,8 +370,8 @@ let Dataset = MetadataItem.extend({
             typeof bin.highBound === 'number') {
           // binUtils.js doesn't have access to D3's superior number formatting
           // abilities, so we patch on slightly better human-readable labels
-          bin.label = '[' + formatter(bin.lowBound) + ' - ' +
-            formatter(bin.highBound);
+          bin.label = '[' + formatValue(bin.lowBound) + ' - ' +
+            formatValue(bin.highBound);
           if (index === histogram[attrName].length - 1) {
             bin.label += ']';
           } else {

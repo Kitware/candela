@@ -100,6 +100,10 @@ let MatchingView = Widget.extend({
     this.status = STATUS.NOTHING_TO_MAP;
 
     if (window.mainPage.project) {
+      this.stopListening(window.mainPage.project, 'rl:changeDatasets');
+      this.listenTo(window.mainPage.project, 'rl:changeDatasets',
+        this.render);
+
       this.stopListening(window.mainPage.project, 'rl:changeMatchings');
       this.listenTo(window.mainPage.project, 'rl:changeMatchings', () => {
         this.selection = null;
@@ -129,6 +133,8 @@ Still accessing this project's matching settings...`);
       window.mainPage.overlay.renderUserErrorScreen(`
 You need to choose both a Dataset and a Visualization
 in order to connect them together.`);
+    } else if (this.status === STATUS.LOADING) {
+      window.mainPage.overlay.renderLoadingScreen('Still loading needed information.');
     }
   },
   getTips: function () {

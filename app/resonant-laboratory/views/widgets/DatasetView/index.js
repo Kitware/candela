@@ -213,11 +213,9 @@ let DatasetView = Widget.extend({
       window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data; you\'ll probably need to reshape the data in order to use it.');
     } else if (this.status === STATUS.NO_ATTRIBUTES) {
       window.mainPage.overlay.renderUserErrorScreen('There was a problem parsing the data. Specifically, we\'re having trouble understanding the dataset attributes (usually column headers); you\'ll probably need to reshape the data in order to use it.');
+    } else if (this.status === STATUS.LOADING) {
+      window.mainPage.overlay.renderLoadingScreen('The dataset is still loading.');
     }
-  },
-  renderEmptyState: function () {
-    this.$el.find('#datasetOverview, #tablePreview, #histogramPreview').hide();
-    this.$el.find('#noDatasetState').show();
   },
   renderFilterPie: function (overviewCount, filteredCount, pageOffset, pageCount, radius) {
     // Draw a pie using the left square of space
@@ -525,7 +523,7 @@ let DatasetView = Widget.extend({
       .scale(yScale)
       .orient('left')
       .ticks(Math.min(4, scale.yMax))
-      .tickFormat(d3.format('0.3s'));
+      .tickFormat(d3.format('s'));
     let yAxisObj = svg.select('.yAxis')
       .attr('transform', 'translate(' + scale.leftAxisPadding + ',0)')
       .call(yAxis);
@@ -926,7 +924,7 @@ let DatasetView = Widget.extend({
 
     datasetPromise.then(datasetObj => {
       if (!datasetObj) {
-        this.renderEmptyState();
+        this.$el.find('#noDatasetState').show();
         this.status = STATUS.NO_DATA;
         this.statusText.text = 'No file loaded';
         this.renderIndicators();
