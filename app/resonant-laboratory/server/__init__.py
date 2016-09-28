@@ -1,3 +1,4 @@
+import cherrypy
 import os
 from girder.api.rest import Resource
 from girder.constants import AssetstoreType
@@ -5,6 +6,7 @@ from girder.utility.assetstore_utilities import setAssetstoreAdapter
 from girder.utility.filesystem_assetstore_adapter import FilesystemAssetstoreAdapter
 from girder.utility.gridfs_assetstore_adapter import GridFsAssetstoreAdapter
 from girder.plugins.database_assetstore.assetstore import DatabaseAssetstoreAdapter
+from girder.utility.plugin_utilities import registerPluginWebroot
 from semantic_assetstore_adapter import semantic_access
 from anonymousAccess import AnonymousAccess
 from versioning import Versioning
@@ -12,10 +14,9 @@ from datasetItem import DatasetItem
 from projectItem import ProjectItem
 
 
+@cherrypy.config(**{'tools.staticdir.on': True,
+                    'tools.staticdir.index': 'index.html'})
 class ResonantLaboratory(Resource):
-    _cp_config = {'tools.staticdir.on': True,
-                  'tools.staticdir.index': 'index.html'}
-
     def __init__(self, info):
         super(ResonantLaboratory, self).__init__()
         self.resourceName = 'resonantLaboratoryapp'
@@ -29,22 +30,11 @@ class ResonantLaboratory(Resource):
 
 def load(info):
     ResonantLaboratory._cp_config['tools.staticdir.dir'] = os.path.join(
-        os.path.relpath(info['pluginRootDir'],
-                        info['config']['/']['tools.staticdir.root']),
-        'web_client')
+        info['pluginRootDir'], 'web_client')
 
     # Move girder app to /girder, serve sumo app from /
-    app = info['apiRoot'].resonantLaboratoryapp = ResonantLaboratory(info)
-
-    (
-        info['serverRoot'],
-        info['serverRoot'].girder
-    ) = (
-        info['apiRoot'].resonantLaboratoryapp,
-        info['serverRoot']
-    )
-
-    info['serverRoot'].api = info['serverRoot'].girder.api
+    app = ResonantLaboratory(info)
+    registerPluginWebroot(app, info['name'])
 
     # Expose versioning endpoint
     info['apiRoot'].system.route('GET', ('resonantLaboratoryVersion', ),
