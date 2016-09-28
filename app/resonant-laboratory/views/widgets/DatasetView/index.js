@@ -966,7 +966,6 @@ let DatasetView = Widget.extend({
                 }
               }
             }
-            this.$el.find('#datasetOverview, #tablePreview, #histogramPreview').show();
           });
       }
     });
