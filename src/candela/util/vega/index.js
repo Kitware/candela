@@ -2,7 +2,7 @@ import d3 from 'd3';
 import vg from 'vega';
 import { isArray, isString } from 'datalib';
 import axisTemplate from './axis.json';
-import { getElementSize, inferAll, read } from '..';
+import { getElementSize, read } from '..';
 
 let getNestedRec = function (spec, parts) {
   if (spec === undefined || parts.length === 0) {
