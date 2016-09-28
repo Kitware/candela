@@ -1,4 +1,4 @@
-# Resonant Laboratory
+# Resonant Lab
 
 Choose your own visualization adventure.
 
@@ -29,13 +29,13 @@ using the `virtualenv` described in the girder setup instructions.
   cd candela
   npm install
   npm run build
-  npm run build:laboratory
+  npm run build:lab
   ```
 
 5. Install the plugin using `girder-install`:
 
   ```bash
-  girder-install plugin -s app/resonant-laboratory
+  girder-install plugin -s app/resonantlab
   ```
 
 ### Setup: First Run
@@ -48,11 +48,11 @@ using the `virtualenv` described in the girder setup instructions.
 
 2. Register an admin account at [localhost:8080](http://localhost:8080)
 
-3. Go to Admin console -> Plugins to enable the Resonant Laboratory plugin
+3. Go to Admin console -> Plugins to enable the Resonant Lab plugin
 
 4. Restart Girder
 
-   Resonant Laboratory will replace the Girder interface at [localhost:8080](http://localhost:8080). It should give you an
+   Resonant Lab will replace the Girder interface at [localhost:8080](http://localhost:8080). It should give you an
    error telling you that no assetstores have been configured.
 
 5. Access the girder interface again, this time at [localhost:8080/girder](http://localhost:8080/girder). Navigate to
@@ -73,9 +73,9 @@ Admin console -> Assetstores
 
 ### Adding datasets
 
-For now, `.csv` and `.json` files can to be uploaded via girder's interface to the user's public or private directories. Once a file has been uploaded, you should issue a `POST` request to `/item/{id}/dataset` so that Resonant Laboratory will know that it's a dataset.
+For now, `.csv` and `.json` files can to be uploaded via girder's interface to the user's public or private directories. Once a file has been uploaded, you should issue a `POST` request to `/item/{id}/dataset` so that Resonant Lab will know that it's a dataset.
 
-In addition to flat files, Resonant Laboratory also supports connecting to mongo databases. For example, a mongo collection could be added from a `json` file this way:
+In addition to flat files, Resonant Lab also supports connecting to mongo databases. For example, a mongo collection could be added from a `json` file this way:
 
 ```bash
 mongoimport --db test --collection gapminder --drop --file gapminder.json --jsonArray
@@ -93,7 +93,7 @@ Then an item should be created in the user's public or private directory to repr
 {"url":"localhost:27017","database":"test","collection":"gapminder","type":"mongo"}
 ```
 
-Of course, after connecting the girder item to the database, you also still need to hit the `/item/{id}/dataset` endpoint to indicate that it is also a dataset intended for Resonant Laboratory.
+Of course, after connecting the girder item to the database, you also still need to hit the `/item/{id}/dataset` endpoint to indicate that it is also a dataset intended for Resonant Lab.
 
 ### Development
 
@@ -106,18 +106,18 @@ girder-server --testing
 ```
 
 We've also augmented webpack's `--watch` mode, so that it automatically triggers
-girder's grunt build step when you change code in resonant-laboratory. To
+girder's grunt build step when you change code in resonantlab. To
 use it:
 
 ```bash
 export GIRDER_PATH=path/to/girder
-cd path/to/candela/app/resonant-laboratory
+cd path/to/candela/app/resonantlab
 webpack --watch
 ```
 
 ## Installation via Ansible
 
-Resonant Laboratory comes with an Ansible deployment strategy as well. To use
+Resonant Lab comes with an Ansible deployment strategy as well. To use
 it, you will need Ansible 2.0:
 
 ```shell
@@ -130,7 +130,7 @@ Next, clone this repository:
 git clone https://github.com/Kitware/candela
 ```
 
-Move into the `candela/app/resonant-laboratory` directory, and then create the
+Move into the `candela/app/resonantlab` directory, and then create the
 Vagrant box with
 
 ```shell
@@ -138,9 +138,9 @@ vagrant up
 ```
 
 This will configure, provision, and launch a virtual machine, which will set up
-Girder, the example datasets, and Resonant Laboratory itself, and forward
-Resonant Laboratory to port 8080 on your local machine. Then you can use
-Resonant Laboratory by visiting http://localhost:8080.
+Girder, the example datasets, and Resonant Lab itself, and forward
+Resonant Lab to port 8080 on your local machine. Then you can use
+Resonant Lab by visiting http://localhost:8080.
 
 If port 8080 is being used for another purpose on your local machine already,
 you can use the `RESLAB_HOST_PORT` environment variable to set a different one:
@@ -178,7 +178,7 @@ during the provisioning process:
   assetstore Girder plugin (default:
 **a530c9546d3ac4f50ec4519ef6c7bb348e2b4bc7**)
 - `candela_revision` - the git checkout hash to use to build Candela and
-  Resonant Laboratory (default: **5c17f10d754778e7ea291f1f24c290d997e4dec8**)
+  Resonant Lab (default: **5c17f10d754778e7ea291f1f24c290d997e4dec8**)
 
 The most important of these may be `adminuser_password`; changing this option at
 provisioning time allows you to keep administrator access to the underlying
@@ -187,8 +187,8 @@ Girder instance secure.
 ## Guide to the server-side code
 
 ### Endpoints
-Resonant Laboratory introduces several endpoints for:
-- supporting anonymous access to items (largely abstracted away from Resonant Laboratory; it shouldn't be hard to roll this into its own Girder plugin)
+Resonant Lab introduces several endpoints for:
+- supporting anonymous access to items (largely abstracted away from Resonant Lab; it shouldn't be hard to roll this into its own Girder plugin)
 - setting up datasets and projects
 - inferring the schema of a dataset
 - calculating a histogram of all the attributes in a dataset in one pass
@@ -210,16 +210,16 @@ Some of the javascript is a little messy to make it compatible with mongodb's `i
 In addition to cleaning the code, there are many potential optimizations, and possible places for improvements are flagged inline with `TODO` comments. For debugging convenience, we've disabled all the caching of mapreduce results, but this can be enabled with a single flag in the client side REST calls.
 
 ## Guide to the client-side model code
-With the exception of `User.js`, each model in Resonant Laboratory corresponds to an item in Girder, but they don't follow Girder's client-side pattern for models. Instead, they try to behave like real Backbone models that support things like `.save()`.
+With the exception of `User.js`, each model in Resonant Lab corresponds to an item in Girder, but they don't follow Girder's client-side pattern for models. Instead, they try to behave like real Backbone models that support things like `.save()`.
 
-Because Girder breaks saving metadata, and also because we namespace all Resonant Laboratory metadata under a `rlab` metadata key, there are `setMeta()` and `getMeta()` convenience functions on each of these models that behave like Backbone's `get()` and `set()`.
+Because Girder breaks saving metadata, and also because we namespace all Resonant Lab metadata under a `rlab` metadata key, there are `setMeta()` and `getMeta()` convenience functions on each of these models that behave like Backbone's `get()` and `set()`.
 
 ### Datasets and Projects
 The two most important models are `Dataset.js` and `Project.js`. These are documented in README.json files that detail how the metadata is structured and what each piece does.
 
-One of the big complications in Resonant Laboratory's code has to do with the fact that projects and datasets may not always exist—consequently, all the views have to listen to the `mainPage.js` for changes in whatever project is open, and when that happens, reattach listeners to the new project. Dataset-specific views sometimes do a second round of this for individual datasets; they also have to listen for changes in what datasets have been added to projects, and reattach listeners to the datasets when they're added.
+One of the big complications in Resonant Lab's code has to do with the fact that projects and datasets may not always exist—consequently, all the views have to listen to the `mainPage.js` for changes in whatever project is open, and when that happens, reattach listeners to the new project. Dataset-specific views sometimes do a second round of this for individual datasets; they also have to listen for changes in what datasets have been added to projects, and reattach listeners to the datasets when they're added.
 
-It might make more sense to give projects a Backbone Collection of datasets (early versions of Resonant Laboratory tried this, but it proved unwieldy). Currently, changes in datasets are generalized under a `rl:changeDatasets` event that the project model forwards to all views—it's kind of inefficient, but this cleans up the code a bit.
+It might make more sense to give projects a Backbone Collection of datasets (early versions of Resonant Lab tried this, but it proved unwieldy). Currently, changes in datasets are generalized under a `rl:changeDatasets` event that the project model forwards to all views—it's kind of inefficient, but this cleans up the code a bit.
 
 ### UserPreferences
 Rather than store user-specific information right in the User model, we decided early on to store user preferences as a distinct item in the User's private directory. This should have a lot of benefits, like letting the user know (and change/delete!) exactly what information we are storing about them.
@@ -266,18 +266,18 @@ Each of these are named views in `views/layout/overlay`; you can show one simply
 The VisualizationLibrary doesn't yet fit in this structure, but it shouldn't be hard to imagine how it could.
 
 ### `views/widgets`
-These draw the contents of the panels, and inherit from `Widget/index.js`. They're each kind of bulky, and could probably use breaking the contents up into subviews (e.g., in porting the DatasetView to MSKCC, I broke the histograms up into separate views—but I haven't gotten around to this in Resonant Laboratory yet).
+These draw the contents of the panels, and inherit from `Widget/index.js`. They're each kind of bulky, and could probably use breaking the contents up into subviews (e.g., in porting the DatasetView to MSKCC, I broke the histograms up into separate views—but I haven't gotten around to this in Resonant Lab yet).
 
 To understand what's going on in each `initialize()` function, it's probably worth looking at the `Widget/index.js` code—`this.icons` and `this.statusText` are special variables that the views can use to control what gets displayed in their header bar.
 
 ## Oddities to watch out for
 
 ### Broken Backbone Models, Anonymous Access
-Because Girder breaks Backbone model syncing (especially for metadata), Resonant Laboratory attempts to patch Backbone's native `save()`-style behavior. For specifics, see the comments in `models/MetadataItem.js`.
+Because Girder breaks Backbone model syncing (especially for metadata), Resonant Lab attempts to patch Backbone's native `save()`-style behavior. For specifics, see the comments in `models/MetadataItem.js`.
 
 The only thing that anonymous access introduces on the client side that is a little weird is when the user tries to `save()` an item, but doesn’t have write access (e.g. they’re logged out). The server honors the `save()` request, but saves to a copy... meaning that, from the client’s perspective, the item model’s ID will get swapped out from underneath it. `MetadataItem.js` tries to make this ID swap seamless as far as Backbone is concerned, but it also emits a special `‘rl:swappedId’` event because other parts of the client code likely use IDs for things.
 
 ### Events and Promises
-Perhaps the most confusing / hard-to-debug parts of the code will involve the way we use Backbone events and promises. Generally speaking, the code uses Backbone events for client-side-only signaling. All Resonant Laboratory backbone events are prefixed with `rl:`.
+Perhaps the most confusing / hard-to-debug parts of the code will involve the way we use Backbone events and promises. Generally speaking, the code uses Backbone events for client-side-only signaling. All Resonant Lab backbone events are prefixed with `rl:`.
 
 Data that is dependent on server communication is usually accessed via a combination of ES6 promises and getters / setters. The two main places this happens are `models/Dataset.js` and `models/Project.js`—each has a `cache` object, independent from the Backbone model, with properties that are lazily evaluated (e.g. `window.mainPage.project.status.then(...)` will either resolve immediately, or send the request to the server if necessary). Indicating the need for an update is then as simple as invalidating the cache, and emitting the appropriate Backbone signals (ideally, we should refactor this so that `change:value` signals get emitted automatically).

@@ -206,7 +206,7 @@ class StreamFile(object):
 def semantic_access(Cls, offset_limit=True):
     allowed_outputtypes = ['csv', 'json', 'jsonlines']
 
-    module = 'resonant-laboratory.semantic-filesystem-assetstore-adapter'
+    module = 'resonant-lab.semantic-filesystem-assetstore-adapter'
 
     class NewCls(Cls):
         def __init__(self, *args, **kwargs):

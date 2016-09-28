@@ -8,15 +8,15 @@ module.exports = function (grunt) {
   // Fail if grunt is executed here.
   if (path.resolve(__dirname) === path.resolve(process.cwd())) {
     grunt.fail.fatal(
-      "To build Resonant Laboratory, run grunt from Girder's root directory");
+      "To build Resonant Lab, run grunt from Girder's root directory");
   }
 
-  var pluginPath = path.resolve(grunt.config.get('pluginDir'), 'resonant-laboratory');
+  var pluginPath = path.resolve(grunt.config.get('pluginDir'), 'resonantlab');
   var packageJson = path.resolve(pluginPath, 'package.json');
 
   grunt.config.merge({
     shell: {
-      'resonant-laboratory-npm': {
+      'resonantlab-npm': {
         /*
         * TODO(opadron): remove the true part once webpack 2 finally
         *                comes out of beta
@@ -30,14 +30,14 @@ module.exports = function (grunt) {
     },
 
     watch: {
-      'plugin-resonant-laboratory-npm': {
+      'plugin-resonantlab-npm': {
         files: [packageJson],
-        tasks: ['shell:resonant-laboratory-npm']
+        tasks: ['shell:resonantlab-npm']
       }
     },
 
     init: {
-      'shell:resonant-laboratory-npm': { dependencies: [] }
+      'shell:resonantlab-npm': { dependencies: [] }
     }
   });
 
@@ -54,7 +54,7 @@ module.exports = function (grunt) {
 
   grunt.config.merge({
     shell: {
-      'resonant-laboratory-webpack': {
+      'resonantlab-webpack': {
         command: ['../../node_modules/webpack/bin/webpack.js',
         '--bail',
         '--display-error-details'].join(' '),
@@ -65,17 +65,17 @@ module.exports = function (grunt) {
     },
 
     watch: {
-      'plugin-resonant-laboratory-webpack': {
+      'plugin-resonantlab-webpack': {
         files: [path.join(pluginPath, 'web-external', 'src', '**', '*'),
         path.join(pluginPath, 'Gruntfile.js'),
         path.join(pluginPath, 'webpack.config.js')],
-        tasks: ['shell:resonant-laboratory-webpack'],
+        tasks: ['shell:resonantlab-webpack'],
         options: { spawn: false }
       }
     },
 
     default: {
-      'shell:resonant-laboratory-webpack': { dependencies: [] }
+      'shell:resonantlab-webpack': { dependencies: [] }
     }
   });
 };

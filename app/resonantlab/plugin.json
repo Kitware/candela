@@ -1,6 +1,6 @@
 {
-  "name": "Resonant Laboratory",
-  "description": "Resonant Laboratory",
+  "name": "Resonant Lab",
+  "description": "Resonant Lab",
   "version": "0.1.0",
   "grunt": {
     "autobuild": false,

@@ -9,7 +9,7 @@ from girder.api.rest import Resource, RestException, loadmodel
 class Versioning(Resource):
     @access.public
     @describeRoute(
-        Description('Get Resonant Laboratory\'s current version number.')
+        Description('Get Resonant Lab\'s current version number.')
         .notes(' Note that, for now, this actually will return the current branch name. ' +
                'In the future, this will return a number if the branch is "master", ' +
                '"release", or there is no git branch information (see issue #255)')

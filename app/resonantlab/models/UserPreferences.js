@@ -9,9 +9,9 @@ let UserPreferences = MetadataItem.extend({
   */
   defaults: () => {
     return {
-      name: 'Resonant Laboratory Preferences',
+      name: 'Resonant Lab Preferences',
       description: `
-Contains your preferences for the Resonant Laboratory application. If
+Contains your preferences for the Resonant Lab application. If
 you move or delete this item, your preferences will be lost.`,
       meta: {
         rlab: {

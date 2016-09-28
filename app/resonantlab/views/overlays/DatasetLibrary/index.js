@@ -172,7 +172,7 @@ let DatasetLibrary = DatasetSettings.extend({
   updateDynamicSections: function () {
     // Get the set of datasets in the public library
     window.mainPage.girderRequest({
-      path: 'resource/lookup?path=/collection/Resonant Laboratory Library/Data',
+      path: 'resource/lookup?path=/collection/Resonant Lab Library/Data',
       type: 'GET'
     }).then(folder => {
       this.getFolderContents(folder, 'datasetLibrary', libraryFileIcon);
@@ -290,7 +290,7 @@ let DatasetLibrary = DatasetSettings.extend({
         })
         .attr('title', d => {
           return 'This dataset was created with version ' + d.attributes.meta.rlab.versionNumber +
-            ' of Resonant Laboratory.\nYou are currently using version ' + appVersion;
+            ' of Resonant Lab.\nYou are currently using version ' + appVersion;
         });
     });
 

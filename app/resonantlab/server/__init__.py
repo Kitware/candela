@@ -12,13 +12,13 @@ from datasetItem import DatasetItem
 from projectItem import ProjectItem
 
 
-class ResonantLaboratory(Resource):
+class ResonantLab(Resource):
     _cp_config = {'tools.staticdir.on': True,
                   'tools.staticdir.index': 'index.html'}
 
     def __init__(self, info):
-        super(ResonantLaboratory, self).__init__()
-        self.resourceName = 'resonantLaboratoryapp'
+        super(ResonantLab, self).__init__()
+        self.resourceName = 'resonantLabapp'
 
         self.info = info
         self.versioning = Versioning()
@@ -28,26 +28,26 @@ class ResonantLaboratory(Resource):
 
 
 def load(info):
-    ResonantLaboratory._cp_config['tools.staticdir.dir'] = os.path.join(
+    ResonantLab._cp_config['tools.staticdir.dir'] = os.path.join(
         os.path.relpath(info['pluginRootDir'],
                         info['config']['/']['tools.staticdir.root']),
         'web_client')
 
     # Move girder app to /girder, serve sumo app from /
-    app = info['apiRoot'].resonantLaboratoryapp = ResonantLaboratory(info)
+    app = info['apiRoot'].resonantLabapp = ResonantLab(info)
 
     (
         info['serverRoot'],
         info['serverRoot'].girder
     ) = (
-        info['apiRoot'].resonantLaboratoryapp,
+        info['apiRoot'].resonantLabapp,
         info['serverRoot']
     )
 
     info['serverRoot'].api = info['serverRoot'].girder.api
 
     # Expose versioning endpoint
-    info['apiRoot'].system.route('GET', ('resonantLaboratoryVersion', ),
+    info['apiRoot'].system.route('GET', ('resonantLabVersion', ),
                                  app.versioning.versionNumber)
 
     # Expose anonymous access endpoints

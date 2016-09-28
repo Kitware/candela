@@ -3,11 +3,11 @@ var webpack = require('webpack');
 /*globals module*/
 module.exports = {
   entry: {
-    'query-test': './app/resonant-laboratory/querylang/test/query.js',
-    'rangeSet-test': './app/resonant-laboratory/shims/test/rangeSet.js'
+    'query-test': './app/resonantlab/querylang/test/query.js',
+    'rangeSet-test': './app/resonantlab/shims/test/rangeSet.js'
   },
   output: {
-    path: './build/resonant-laboratory',
+    path: './build/resonantlab',
     filename: '[name].tests.js'
   },
   plugins: [

@@ -1,14 +1,14 @@
-Resonant Laboratory Text
-========================
+Resonant Lab Text
+=================
 
-This file outlines the user-facing text in Resonant Laboratory.
+This file outlines the user-facing text in Resonant Lab.
 
 *TODO: Ideally, we should convert this file into some kind of `en.json` file that the app actually uses for its text content (will make internationalization much easier).*
 
 # Message Dialog Boxes
 ## Splash / About Dialog
 
-Resonant Laboratory is a beta tool under active development by Kitware, Inc. to help users
+Resonant Lab is a beta tool under active development by Kitware, Inc. to help users
 build and share visualizations without needing to write code.
 This tool focuses on doing one thing, and doing it well: given a
 reasonably clean dataset, connect it to a visualization. Its
@@ -19,14 +19,14 @@ are best dealt with elsewhere.
 
 If you have those needs, check out other [Resonant applications](#) that we are developing to address these issues
 independently. The Resonant platform includes both general solutions like
-Resonant Laboratory, as well as highly specialized solutions developed for
+Resonant Lab, as well as highly specialized solutions developed for
 our partners and customers.
 
-Resonant Laboratory is brought to you by [Kitware](#), a leader in
+Resonant Lab is brought to you by [Kitware](#), a leader in
 innovative, open-source solutions to today's scientific computing and data
 analytics challenges.
 
-Resonant Laboratory is an open source project, released under the Apache
+Resonant Lab is an open source project, released under the Apache
 v2 License. The source code is available [on Github](#).
 
 If something isn't working as it should, please [let us know](#). We want to get any problems fixed as soon as possible.

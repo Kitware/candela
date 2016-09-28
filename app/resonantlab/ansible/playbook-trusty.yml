@@ -91,7 +91,7 @@
       become: yes
       command: pip install -r requirements.txt
       args:
-        chdir: "{{ storage }}/candela/app/resonant-laboratory"
+        chdir: "{{ storage }}/candela/app/resonantlab"
 
     - name: Build Candela
       command: npm run build
@@ -99,10 +99,10 @@
         chdir: "{{ storage }}/candela"
         creates: build/candela/candela.js
 
-    - name: Link Resonant Laboratory into Girder plugin directory
+    - name: Link Resonant Lab into Girder plugin directory
       file:
-        src: "{{ storage }}/candela/app/resonant-laboratory"
-        dest: "{{ storage }}/girder/plugins/resonant-laboratory"
+        src: "{{ storage }}/candela/app/resonantlab"
+        dest: "{{ storage }}/girder/plugins/resonantlab"
         state: link
 
     - name: Install Girder node requirements
@@ -182,7 +182,7 @@
         username: "{{ adminuser_login }}"
         password: "{{ adminuser_password }}"
         plugins:
-          - resonant-laboratory
+          - resonantlab
           - database_assetstore
         state: present
 
@@ -217,7 +217,7 @@
         username: "{{ adminuser_login }}"
         password: "{{ adminuser_password }}"
         assetstore:
-          name: Resonant Laboratory Database Assetstore
+          name: Resonant Lab Database Assetstore
           type: database
           dbtype: mongo
           dburi: mongodb://localhost:27017/reslab
@@ -230,4 +230,4 @@
     - name: Upload example data to Girder
       command: python populateGirder.py -p {{ adminuser_password }}
       args:
-        chdir: "{{ storage }}/candela/app/resonant-laboratory/scripts"
+        chdir: "{{ storage }}/candela/app/resonantlab/scripts"

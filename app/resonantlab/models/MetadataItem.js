@@ -33,7 +33,7 @@ let girder = window.girder;
      space (the server endpoints handle most of this
      logic)
 
-  3. Namespace Resonant Laboratory's specific metadata
+  3. Namespace Resonant Lab's specific metadata
      under an 'rlab' key so that it plays nicely with other
      girder-based projects
 */

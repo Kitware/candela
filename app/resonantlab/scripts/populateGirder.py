@@ -10,8 +10,8 @@ import subprocess
 
 def getArguments():
     parser = argparse.ArgumentParser(description='''Populate a girder installation
-        with the public library (datasets and projects) for Resonant Laboratory.
-        This script will delete the existing Resonant Laboratory Library collection,
+        with the public library (datasets and projects) for Resonant Lab.
+        This script will delete the existing Resonant Lab Library collection,
         so running it multiple times won't result in duplicate installations, files,
         or databases (any changes to the existing library will be lost)''')
     parser.add_argument('-u', dest='username', default='admin',
@@ -25,7 +25,7 @@ def getArguments():
                         help='If a file exceeds this threshold (in bytes), upload it as a ' +
                         'mongo database collection instead of a flat file.')
     parser.add_argument('-n', dest='dbName',
-                        default='resonantLaboratoryLibrary',
+                        default='resonantLabLibrary',
                         help='The name of the database to use for larger files.')
     parser.add_argument('-d', dest='dbAssetstoreId', default=None,
                         help='The Id of the database assetstore. If not specified,' +
@@ -97,25 +97,25 @@ def getDBassetstore(gc, specificId):
 
 
 def getLibraryCollection(gc):
-    # Get or create the Resonant Laboratory Library collection
+    # Get or create the Resonant Lab Library collection
     message = ''
     collection = gc.sendRestRequest('GET', 'collection',
-                                    {'text': 'Resonant Laboratory Library'})
+                                    {'text': 'Resonant Lab Library'})
 
-    # Trash the existing Resonant Laboratory Library collection
+    # Trash the existing Resonant Lab Library collection
     if (len(collection) == 0):
-        message = 'No "Resonant Laboratory Library" collection to clean.\n'
+        message = 'No "Resonant Lab Library" collection to clean.\n'
     else:
         gc.sendRestRequest('DELETE', 'collection/' + collection[0]['_id'])
-        message = 'Deleted "Resonant Laboratory Library" collection.\n'
+        message = 'Deleted "Resonant Lab Library" collection.\n'
         collection = []
 
     # Create a new collection
     collection = gc.sendRestRequest('POST', 'collection',
-                                    {'name': 'Resonant Laboratory Library',
+                                    {'name': 'Resonant Lab Library',
                                      'description': 'The public library for' +
                                                     ' the Resonant ' +
-                                                    'Laboratory Application',
+                                                    'Lab Application',
                                      'public': True})
     message += 'Created collection '
     collectionId = collection['_id']
@@ -209,7 +209,7 @@ def createMongoCollections(args, host, datasets, dbId, parentId):
         gc.sendRestRequest('POST', 'folder', parameters)
 
     # This will create a folder named args.dbName inside the
-    # Resonant Laboratory library collection; we want to rename that
+    # Resonant Lab library collection; we want to rename that
     # folder to "Data"
     parameters = {
         'parentType': 'collection',

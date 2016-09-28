@@ -27,7 +27,7 @@ let MainPage = Backbone.View.extend({
   initialize: function () {
     // Get the current app version
     this.versionNumber = this.girderRequest({
-      path: 'system/resonantLaboratoryVersion',
+      path: 'system/resonantLabVersion',
       type: 'GET'
     });
 

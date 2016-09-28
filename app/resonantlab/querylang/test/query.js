@@ -61,32 +61,32 @@ function test_expressions (t, exprs, baseline_path) {
 }
 
 test('Negative number parsing', t => {
-  test_expressions(t, negative_expression, './app/resonant-laboratory/server/test/negative-ast-baselines.json');
+  test_expressions(t, negative_expression, './app/resonantlab/server/test/negative-ast-baselines.json');
   t.end();
 });
 
 test('Operator expression parsing', t => {
-  test_expressions(t, operator_expression, './app/resonant-laboratory/server/test/operator-ast-baselines.json');
+  test_expressions(t, operator_expression, './app/resonantlab/server/test/operator-ast-baselines.json');
   t.end();
 });
 
 test('Conjunction expression parsing', t => {
-  test_expressions(t, conjunction_expression, './app/resonant-laboratory/server/test/conjunction-ast-baselines.json');
+  test_expressions(t, conjunction_expression, './app/resonantlab/server/test/conjunction-ast-baselines.json');
   t.end();
 });
 
 test('Disjunction expression parsing', t => {
-  test_expressions(t, disjunction_expression, './app/resonant-laboratory/server/test/disjunction-ast-baselines.json');
+  test_expressions(t, disjunction_expression, './app/resonantlab/server/test/disjunction-ast-baselines.json');
   t.end();
 });
 
 test('Not expression parsing', t => {
-  test_expressions(t, not_expression, './app/resonant-laboratory/server/test/not-ast-baselines.json');
+  test_expressions(t, not_expression, './app/resonantlab/server/test/not-ast-baselines.json');
   t.end();
 });
 
 test('Typed expression parsing', t => {
-  test_expressions(t, typed_expression, './app/resonant-laboratory/server/test/typed-ast-baselines.json');
+  test_expressions(t, typed_expression, './app/resonantlab/server/test/typed-ast-baselines.json');
   t.end();
 });
 
