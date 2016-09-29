@@ -31,7 +31,7 @@ npm install
 npm run build
 ```
 
-# [Resonant Laboratory application](https://github.com/Kitware/candela/blob/master/app/resonant-laboratory/README.md)
+# [Resonant Lab application](https://github.com/Kitware/candela/blob/master/app/resonantlab/README.md)
 
 # Release Process
 

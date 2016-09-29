@@ -6,11 +6,11 @@
   "scripts": {
     "build": "script/prepare_lineup.sh && webpack --config config/webpack.config.js",
     "build:examples": "webpack --config config/webpack-examples.config.js",
-    "build:laboratory": "cd app/resonant-laboratory && webpack",
-    "build:laboratory:tests": "webpack --config ./app/resonant-laboratory/webpack-testing.config.js",
+    "build:resonantlab": "cd app/resonantlab && webpack",
+    "build:resonantlab:tests": "webpack --config ./app/resonantlab/webpack-testing.config.js",
     "build:docs": "sphinx-build -a -b html docs/ build/docs/",
-    "test:laboratory:unit": "npm run test:laboratory:unit:raw | tap-spec",
-    "test:laboratory:unit:raw": "for t in `ls build/resonant-laboratory/*.tests.js`; do node $t; done",
+    "test:resonantlab:unit": "npm run test:resonantlab:unit:raw | tap-spec",
+    "test:resonantlab:unit:raw": "for t in `ls build/resonantlab/*.tests.js`; do node $t; done",
     "dist": "script/prepare_lineup.sh && webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
     "lint": "semistandard | snazzy",
     "lint:pycandela": "flake8 --config python/pycandela/flake8.cfg python/pycandela",
@@ -34,7 +34,7 @@
     "ignore": [
       "config",
       "src/external",
-      "app/resonant-laboratory/web_client/lib",
+      "app/resonantlab/web_client/lib",
       "dist",
       "built",
       "R/candela/inst/htmlwidgets/lib"
