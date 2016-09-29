@@ -2,7 +2,7 @@ import d3 from 'd3';
 import vg from 'vega';
 import { isArray, isString } from 'datalib';
 import axisTemplate from './axis.json';
-import { getElementSize, inferAll } from '..';
+import { getElementSize, read } from '..';
 
 let getNestedRec = function (spec, parts) {
   if (spec === undefined || parts.length === 0) {
@@ -214,7 +214,7 @@ let templateFunctions = {
     let opt = transform(args[0], options, scope);
     if (opt.data && Array.isArray(opt.data) && opt.field) {
       if (!opt.data.__types__) {
-        opt.data.__types__ = inferAll(opt.data);
+        read(opt.data);
       }
       let type = opt.data.__types__[opt.field];
       if (type === 'string') {
