@@ -15,10 +15,7 @@ using the `virtualenv` described in the girder setup instructions.
 3. Install the [database_assetstore plugin](https://github.com/OpenGeoscience/girder_db_items):
 
   ```bash
-  git clone -b db-as-assetstore https://github.com/OpenGeoscience/girder_db_items.git database_assetstore
-  cd database_assetstore
-  npm install
-  cd ..
+  git clone https://github.com/OpenGeoscience/girder_db_items.git database_assetstore
   girder-install plugin -s database_assetstore
   ```
 
@@ -29,7 +26,7 @@ using the `virtualenv` described in the girder setup instructions.
   cd candela
   npm install
   npm run build
-  npm run build:lab
+  npm run build:resonantlab
   ```
 
 5. Install the plugin using `girder-install`:
