@@ -1,0 +1,134 @@
+{
+  "_comment": "In Girder, a dataset item's metadata might look something like:",
+
+  "meta": {
+    "flow": {
+      "format": "csv",
+      "type": "table"
+    },
+
+    "_comment": "
+      Assuming the dataset is used in BOTH flow and Resonant Lab,
+      it would have both a 'flow' metadata object, and an 'rlab'
+      metadata object. The 'format' field is similar to flow's, but slightly
+      different (will be 'csv', 'json', or 'mongodb.collection'), and Resonant
+      Lab has no use for 'type' (would always be 'table')
+    ",
+
+    "rlab": {
+      "format": "csv",
+      "type": "table",
+
+      "itemType": "dataset",
+      "versionNumber": "master",
+
+      "fileId": "575ab70eed27aa2cacfcc753",
+      "jsonPath": "$",
+      "dialect": {
+        "_comment": "
+          Only CSV datasets will have 'dialect' fields, and only JSON
+          datasets will have the 'jsonSelector' field. The jsonSelector
+          field points to which list in the JSON file corresponds to
+          the actual dataset. 'dialect', of course, stores the results
+          of python's csv.Sniffer().
+
+          These fields are cached here not only for convenience /
+          persistence, but also so that an advanced user could tweak
+          them (e.g. if csv.Sniffer() doesn't correctly infer the format
+          of the CSV file)
+
+          Only file-based datasets will have the fileId field; usually,
+          the fileId will simply point to the file inside the item. However,
+          this allows an item to refer to the data in another item, without
+          copying the whole dataset (e.g. a different user has a large file
+          that the current user wants to use, but the current user wants to
+          adjust the type coercion settings... an empty item can be created
+          that is simply a view into that other dataset).
+        ",
+        "delimiter": ",",
+        "doublequote": true,
+        "lineterminator": "\r\n",
+        "quotechar": "\"",
+        "skipinitialspace": false
+      },
+
+      "lastUpdated": "1986-12-08T04:43:12-07:00",
+      "_comment": "
+        lastUpdated is compared to girder's 'updated' field
+        to determine if the actual data may have changed. If girder indicates
+        a more recent change, all metadata below this comment is invalidated, and
+        automatically refreshed (with the partial exception of 'schema'; any
+        explicit user settings, such as coerceToType or interpretation are
+        preserved, but the stats are updated)
+      ",
+
+      "schema": {
+        "Fertility": {
+          "coerceToType": "integer",
+          "interpretation": "ordinal",
+
+          "_comment": "
+            coerceToType and interpretation are only stored in metadata when the user
+            has explicitly made a type coercion or interpretation decision. Otherwise,
+            these properties are inferred automatically on the fly
+          ",
+
+          "string": {
+            "native": true,
+            "count": 1234,
+            "lowBound": "0",
+            "highBound": "8"
+          },
+          "integer": {
+            "native": false,
+            "count": 1000,
+            "lowBound": 0,
+            "highBound": 8
+          },
+          "_comment2": "
+            These stats refer to the *potential* count and low/high values if
+            all Fertility values are coerced to 'string' or 'number'.
+            The 'native' flag indicates that at least one value in
+            the dataset is stored natively as that type (only really relevant
+            for databases and flat JSON files. With CSV, they'll always be
+            natively stored as strings).
+          "
+        }
+      },
+      "histogramCaches": {
+        "_comment": "
+          Histograms are computed for all attributes at the same
+          time across an entire dataset (so that only one file pass /
+          db table scan is necessary). The results can be cached here,
+          keyed by the MD5 hash of the parameters that were sent to
+          /item/{id}/getHistograms
+
+          (the parameters include filters and paging information,
+           or the lack thereof)
+        ",
+        "69f295908dd7e4929b33938e8f8ad5ff" : {
+          "Fertility": [
+            {
+              "label": "[0, 1)",
+              "count": 234,
+              "lowBound": 0,
+              "highBound": 1
+            },
+            {
+              "label": "[1, 2)",
+              "count": 345,
+              "lowBound": 1,
+              "highBound": 2
+            },
+            {
+              "label": "[2, 3]",
+              "count": 145,
+              "lowBound": 2,
+              "highBound": 3
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -10,5 +10,5 @@ npm-debug.log
 *-diff.png
 *-test.png
 .ipynb_checkpoints
-app/resonant-laboratory/scripts/core/*
-app/resonant-laboratory/querylang/query.js
+app/resonantlab/scripts/core/*
+app/resonantlab/querylang/query.js
