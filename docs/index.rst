@@ -2,7 +2,7 @@
     Candela
 ===============
 
-Candela is an open-source suite of interoperable web visualization components
+Candela is an `open-source suite <https://github.com/Kitware/candela>`_ of interoperable web visualization components
 for `Kitware <http://www.kitware.com>`_'s `Resonant
 <http://resonant.kitware.com>`_ platform. Candela focuses on making scalable,
 rich visualizations available with a normalized API for use in real-world data
