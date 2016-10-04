@@ -32,7 +32,7 @@ let ExportView = Backbone.View.extend({
         download.click();
         window.mainPage.overlay.closeOverlay();
       } else {
-        vis.component.serialize().then(value => {
+        vis.component.serialize(format).then(value => {
           download.setAttribute('href', value);
           download.click();
           window.mainPage.overlay.closeOverlay();
