@@ -36,4 +36,5 @@ script:
     - npm run codecov
 
 after_success:
+    - npm run dist
     - npm run semantic-release
