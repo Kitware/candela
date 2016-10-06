@@ -23,25 +23,13 @@ Example
         vis.render();
     </script>
 
-**ES6/Webpack**
+**JavaScript**
 
-.. code-block:: js
+.. code-block:: html
 
-    import LineUp from candela.components.LineUp
-
-    let el = document.createElement('div');
-    document.body.appendChild(el);
-
-    let data = [];
-    for (var d = 0; d < 10; d += 1) data.push({a: d, b: 10 - d, name: d});
-
-    let vis = new LineUp(el, {data: data, fields: ['a', 'b']});
-    vis.render();
-
-**ES5**
-
-.. code-block:: js
-
+    <body>
+    <script src="http://kitware.github.io/candela/candela-0.2.0-81be44f6.js"></script>
+    <script>
     var el = document.createElement('div')
     document.body.appendChild(el);
 
@@ -51,6 +39,8 @@ Example
     var vis = new candela.components.LineUp(el, {
       data: data, fields: ['a', 'b']});
     vis.render();
+    </script>
+    </body>
 
 **Python**
 

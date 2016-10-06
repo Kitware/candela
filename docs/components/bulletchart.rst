@@ -53,10 +53,13 @@ Example
     });
     vis.render();
 
-**ES5**
+**JavaScript**
 
-.. code-block:: js
+.. code-block:: html
 
+    <body>
+    <script src="http://kitware.github.io/candela/candela-0.2.0-81be44f6.js"></script>
+    <script>
     var el = document.createElement('div')
     document.body.appendChild(el);
 
@@ -73,6 +76,8 @@ Example
       height: 100
     });
     vis.render();
+    </script>
+    </body>
 
 **Python**
 
