@@ -1,6 +1,6 @@
 {
   "name": "candela",
-  "version": "0.3.0",
+  "version": "0.0.0-semantically-released",
   "description": "Visualization components for the web",
   "main": "dist/candela.js",
   "scripts": {
@@ -28,7 +28,8 @@
     "cover:report": "http-server coverage/html -p ${PORT-3000}",
     "codecov": "cat coverage/lcov/lcov.info | codecov",
     "examples": "http-server build -p ${PORT-3000}",
-    "docs": "npm run build:docs && http-server build/docs -p ${PORT-3000}"
+    "docs": "npm run build:docs && http-server build/docs -p ${PORT-3000}",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "semistandard": {
     "ignore": [
@@ -42,7 +43,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:kitware/candela.git"
+    "url": "https://github.com/kitware/candela.git"
   },
   "author": "Roni Choudhury",
   "license": "Apache-2.0",
@@ -107,7 +108,8 @@
     "tape-catch": "^1.0.6",
     "telegraph-events": "^1.0.3",
     "url-loader": "^0.5.7",
-    "webpack": "^1.12.12"
+    "webpack": "^1.12.12",
+    "semantic-release": "^4.3.5"
   },
   "dependencies": {
     "LineUpJS": "git+https://github.com/Caleydo/lineup.js#0cd7f3f2ad06c498c09612daf5f3e2a36c07536d",
