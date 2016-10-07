@@ -16,6 +16,8 @@
     candela_revision: e1988c2391cf3da9b54812149976bf1b2629cac3
     girder_client_revision: 6bda1a7b65bea1c11187cdeb136877739693f466
 
+    google_analytics_key: ""
+
   tasks:
     - name: Add Mongo repository key
       become: yes
@@ -126,6 +128,8 @@
       command: ./node_modules/.bin/grunt
       args:
         chdir: "{{ storage }}/girder"
+      environment:
+        GOOGLE_ANALYTICS_KEY: "{{ google_analytics_key }}"
 
     - name: Start MongoDB
       service:
