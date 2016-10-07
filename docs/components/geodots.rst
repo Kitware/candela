@@ -38,7 +38,7 @@ Example
 .. code-block:: html
 
     <body>
-    <script src="http://kitware.github.io/candela/candela-0.2.0-81be44f6.js"></script>
+    <script src="//unpkg.com/candela"></script>
     <script>
     var el = document.createElement('div')
     el.style.width = '500px';
