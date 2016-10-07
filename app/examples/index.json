@@ -4,6 +4,10 @@
     "link": "scatter"
   },
   {
+    "title": "Scatter Plot (solid dots)",
+    "link": "scatter-solid"
+  },
+  {
     "title": "Line Chart",
     "link": "line"
   },
