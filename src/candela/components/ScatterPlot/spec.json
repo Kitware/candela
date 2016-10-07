@@ -12,6 +12,9 @@
     ["xAxis.title", ["@get", "x"]],
     ["yAxis.title", ["@get", "y"]],
 
+    // Default to (almost) transparent symbols.
+    ["opacity", 0.01],
+
     ["padding", "strict"]
 ],
   [
@@ -238,7 +241,7 @@
                     "stroke": {"scale": "color", "field": "color"},
                     "shape": {"scale": "shape", "field": "shape"},
                     "fill": {"scale": "color", "field": "color"},
-                    "fillOpacity": {"value": 0.01},
+                    "fillOpacity": {"value": ["@get", "opacity"]},
                     "strokeWidth": {"value": 2},
                     "size": {"scale": "size", "field": "size"}
                   }
