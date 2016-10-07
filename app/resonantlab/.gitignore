@@ -5,3 +5,4 @@ web_client/lib/
 *.pdf
 .vagrant
 ansible/playbook*.retry
+ga.js
