@@ -99,6 +99,7 @@
     "sass-loader": "^3.2.0",
     "sass-variable-loader": "0.0.4",
     "script-loader": "^0.6.1",
+    "semantic-release": "^4.3.5",
     "semistandard": "^7.0.5",
     "snazzy": "^4.0.0",
     "strip-json-comments": "^2.0.1",
@@ -111,8 +112,7 @@
     "tape-catch": "^1.0.6",
     "telegraph-events": "^1.0.3",
     "url-loader": "^0.5.7",
-    "webpack": "^1.12.12",
-    "semantic-release": "^4.3.5"
+    "webpack": "^1.12.12"
   },
   "dependencies": {
     "LineUpJS": "git+https://github.com/Caleydo/lineup.js#0cd7f3f2ad06c498c09612daf5f3e2a36c07536d",
