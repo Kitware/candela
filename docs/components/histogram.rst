@@ -34,18 +34,23 @@ Example
     <body>
     <script src="//unpkg.com/candela"></script>
     <script>
-    var el = document.createElement('div')
-    document.body.appendChild(el);
+      var el = document.createElement('div')
+      document.body.appendChild(el);
 
-    var data = [];
-    for (var d = 0; d < 1000; d += 1) {
-      data.push({a: Math.sqrt(-2*Math.log(Math.random()))*Math.cos(2*Math.PI*Math.random())});
-    }
+      var data = [];
+      for (var d = 0; d < 1000; d += 1) {
+        data.push({
+          a: Math.sqrt(-2*Math.log(Math.random()))*Math.cos(2*Math.PI*Math.random())
+        });
+      }
 
-    var vis = new candela.components.Histogram(el, {
-      data: data, bin: 'a',
-      width: 700, height: 400});
-    vis.render();
+      var vis = new candela.components.Histogram(el, {
+        data: data,
+        bin: 'a',
+        width: 700,
+        height: 400
+      });
+      vis.render();
     </script>
     </body>
 

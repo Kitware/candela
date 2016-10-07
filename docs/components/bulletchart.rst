@@ -37,22 +37,22 @@ Example
     <body>
     <script src="//unpkg.com/candela"></script>
     <script>
-    var el = document.createElement('div')
-    document.body.appendChild(el);
+      var el = document.createElement('div')
+      document.body.appendChild(el);
 
-    var vis = new candela.components.BulletChart(el, {
-      value: 0.8,
-      title: 'My measurement',
-      subtitle: '... it is really important',
-      ranges: [
-        { min: 0, max: 0.2, foreground: 'gray', background: 'red' },
-        { min: 0.2, max: 0.7, foreground: 'gray', background: 'yellow' },
-        { min: 0.7, max: 1, foreground: 'gray', background: 'green' }
-      ],
-      width: 700,
-      height: 100
-    });
-    vis.render();
+      var vis = new candela.components.BulletChart(el, {
+        value: 0.8,
+        title: 'My measurement',
+        subtitle: '... it is really important',
+        ranges: [
+          { min: 0, max: 0.2, foreground: 'gray', background: 'red' },
+          { min: 0.2, max: 0.7, foreground: 'gray', background: 'yellow' },
+          { min: 0.7, max: 1, foreground: 'gray', background: 'green' }
+        ],
+        width: 700,
+        height: 100
+      });
+      vis.render();
     </script>
     </body>
 

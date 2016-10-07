@@ -29,14 +29,22 @@ Example
     <body>
     <script src="//unpkg.com/candela"></script>
     <script>
-    var el = document.createElement('div')
-    document.body.appendChild(el);
+      var el = document.createElement('div')
+      document.body.appendChild(el);
 
-    var data = [];
-    for (var d = 0; d < 10; d += 1) data.push({a: d, b: d/2 + 7});
+      var data = [];
+      for (var d = 0; d < 10; d += 1) {
+        data.push({
+          a: d,
+          b: d/2 + 7
+        });
+      }
 
-    var vis = new candela.components.BoxPlot(el, {data: data, fields: ['a', 'b']});
-    vis.render();
+      var vis = new candela.components.BoxPlot(el, {
+        data: data,
+        fields: ['a', 'b']
+      });
+      vis.render();
     </script>
     </body>
 
