@@ -30,51 +30,32 @@ Example
       vis.render();
     </script>
 
-**ES6/Webpack**
+**JavaScript**
 
-.. code-block:: js
+.. code-block:: html
 
-    import GanttChart from candela.components.GanttChart
+    <body>
+    <script src="//unpkg.com/candela"></script>
+    <script>
+      var el = document.createElement('div')
+      document.body.appendChild(el);
 
-    let el = document.createElement('div');
-    document.body.appendChild(el);
-
-    let data = [
-      {name: 'Do this', level: 1, start: 0, end: 5},
-      {name: 'This part 1', level: 2, start: 0, end: 3},
-      {name: 'This part 2', level: 2, start: 3, end: 5},
-      {name: 'Then that', level: 1, start: 5, end: 15},
-      {name: 'That part 1', level: 2, start: 5, end: 10},
-      {name: 'That part 2', level: 2, start: 10, end: 15}
-    ];
-    let vis = new GanttChart(el, {
-      data: data, label: 'name',
-      start: 'start', end: 'end', level: 'level',
-      width: 700, height: 200
-    });
-    vis.render();
-
-**ES5**
-
-.. code-block:: js
-
-    var el = document.createElement('div')
-    document.body.appendChild(el);
-
-    var data = [
-      {name: 'Do this', level: 1, start: 0, end: 5},
-      {name: 'This part 1', level: 2, start: 0, end: 3},
-      {name: 'This part 2', level: 2, start: 3, end: 5},
-      {name: 'Then that', level: 1, start: 5, end: 15},
-      {name: 'That part 1', level: 2, start: 5, end: 10},
-      {name: 'That part 2', level: 2, start: 10, end: 15}
-    ];
-    var vis = new candela.components.GanttChart(el, {
-      data: data, label: 'name',
-      start: 'start', end: 'end', level: 'level',
-      width: 700, height: 200
-    });
-    vis.render();
+      var data = [
+        {name: 'Do this', level: 1, start: 0, end: 5},
+        {name: 'This part 1', level: 2, start: 0, end: 3},
+        {name: 'This part 2', level: 2, start: 3, end: 5},
+        {name: 'Then that', level: 1, start: 5, end: 15},
+        {name: 'That part 1', level: 2, start: 5, end: 10},
+        {name: 'That part 2', level: 2, start: 10, end: 15}
+      ];
+      var vis = new candela.components.GanttChart(el, {
+        data: data, label: 'name',
+        start: 'start', end: 'end', level: 'level',
+        width: 700, height: 200
+      });
+      vis.render();
+    </script>
+    </body>
 
 **Python**
 

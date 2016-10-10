@@ -12,41 +12,40 @@ Example
 
     <div id="barchart-example"></div>
     <script type="text/javascript" >
-        var el = document.getElementById('barchart-example'), data = [];
-        for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
-        var vis = new candela.components.BarChart(el, {
-            data: data, x: 'a', y: 'b',
-            width: 700, height: 400});
-        vis.render();
+      var el = document.getElementById('barchart-example'), data = [];
+      for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
+      var vis = new candela.components.BarChart(el, {
+        data: data, x: 'a', y: 'b',
+        width: 700, height: 400});
+      vis.render();
     </script>
 
-**ES6/Webpack**
+**JavaScript**
 
-.. code-block:: js
+.. code-block:: html
 
-    import BarChart from candela.components.BarChart
+    <body>
+    <script src="//unpkg.com/candela"></script>
+    <script>
+      var el = document.createElement('div')
+      document.body.appendChild(el);
 
-    let el = document.createElement('div');
-    document.body.appendChild(el);
+      var data = [];
+      for (var d = 0; d < 10; d += 1) {
+        data.push({
+          a: d,
+          b: d
+        });
+      }
 
-    let data = [];
-    for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
-
-    let vis = new BarChart(el, {data: data, x: 'a', y: 'b'});
-    vis.render();
-
-**ES5**
-
-.. code-block:: js
-
-    var el = document.createElement('div')
-    document.body.appendChild(el);
-
-    var data = [];
-    for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
-
-    var vis = new candela.components.BarChart(el, {data: data, x: 'a', y: 'b'});
-    vis.render();
+      var vis = new candela.components.BarChart(el, {
+        data: data,
+        x: 'a',
+        y: 'b'
+      });
+      vis.render();
+    </script>
+    </body>
 
 **Python**
 

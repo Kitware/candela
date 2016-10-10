@@ -25,37 +25,35 @@ Example
         vis.render();
     </script>
 
-**ES6/Webpack**
+**JavaScript**
 
-.. code-block:: js
+.. code-block:: html
 
-    import Heatmap from candela.components.Heatmap
+    <body>
+    <script src="//unpkg.com/candela"></script>
+    <script>
+      var el = document.createElement('div')
+      document.body.appendChild(el);
 
-    let el = document.createElement('div');
-    document.body.appendChild(el);
+      var data = [];
+      for (var d = 0; d < 10; d += 1) {
+        data.push({
+          a: d,
+          b: 10 - d,
+          name: d
+        });
+      }
 
-    let data = [];
-    for (var d = 0; d < 10; d += 1) data.push({a: d, b: 10 - d, name: d});
-
-    let vis = new Heatmap(el, {
-      data: data, fields: ['a', 'b'], id: 'name',
-      width: 700, height: 400});
-    vis.render();
-
-**ES5**
-
-.. code-block:: js
-
-    var el = document.createElement('div')
-    document.body.appendChild(el);
-
-    var data = [];
-    for (var d = 0; d < 10; d += 1) data.push({a: d, b: 10 - d, name: d});
-
-    var vis = new candela.components.Heatmap(el, {
-      data: data, fields: ['a', 'b'], id: 'name',
-      width: 700, height: 400});
-    vis.render();
+      var vis = new candela.components.Heatmap(el, {
+        data: data,
+        fields: ['a', 'b'],
+        id: 'name',
+        width: 700,
+        height: 400
+      });
+      vis.render();
+    </script>
+    </body>
 
 **Python**
 

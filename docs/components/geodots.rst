@@ -33,53 +33,38 @@ Example
         vis.render();
     </script>
 
-**ES6/Webpack**
+**JavaScript**
 
-.. code-block:: js
+.. code-block:: html
 
-    import GeoDots from candela.components.GeoDots
+    <body>
+    <script src="//unpkg.com/candela"></script>
+    <script>
+     var el = document.createElement('div')
+     el.style.width = '500px';
+     el.style.height = '500px';
+     document.body.appendChild(el);
 
-    let el = document.createElement('div');
-    document.body.appendChild(el);
-
-    let data = [
-      {lat: 41.702, lng: -87.644, a: 5},
-      {lat: 41.617, lng: -87.693, a: 15},
-      {lat: 41.715, lng: -87.712, a: 25}
-    ];
-    let vis = new GeoDots(el, {
-      zoom: 10,
-      center: { longitude: -87.6194, latitude: 41.867516 },
-      data: data,
-      latitude: 'lat',
-      longitude: 'lng',
-      size: 'a',
-      color: 'a'
-    });
-    vis.render();
-
-**ES5**
-
-.. code-block:: js
-
-    var el = document.createElement('div')
-    document.body.appendChild(el);
-
-    var data = [
-      {lat: 41.702, lng: -87.644, a: 5},
-      {lat: 41.617, lng: -87.693, a: 15},
-      {lat: 41.715, lng: -87.712, a: 25}
-    ];
-    var vis = new candela.components.GeoDots(el, {
-      zoom: 10,
-      center: { longitude: -87.6194, latitude: 41.867516 },
-      data: data,
-      latitude: 'lat',
-      longitude: 'lng',
-      size: 'a',
-      color: 'a'
-    });
-    vis.render();
+     var data = [
+       {lat: 41.702, lng: -87.644, a: 5},
+       {lat: 41.617, lng: -87.693, a: 15},
+       {lat: 41.715, lng: -87.712, a: 25}
+     ];
+     var vis = new candela.components.GeoDots(el, {
+       zoom: 10,
+       center: {
+         longitude: -87.6194,
+         latitude: 41.867516
+       },
+       data: data,
+       latitude: 'lat',
+       longitude: 'lng',
+       size: 'a',
+       color: 'a'
+     });
+     vis.render();
+    </script>
+    </body>
 
 **Python**
 

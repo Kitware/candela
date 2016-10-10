@@ -23,34 +23,32 @@ Example
         vis.render();
     </script>
 
-**ES6/Webpack**
+**JavaScript**
 
-.. code-block:: js
+.. code-block:: html
 
-    import ScatterPlotMatrix from candela.components.ScatterPlotMatrix
+    <body>
+    <script src="//unpkg.com/candela"></script>
+    <script>
+      var el = document.createElement('div')
+      document.body.appendChild(el);
 
-    let el = document.createElement('div');
-    document.body.appendChild(el);
+      var data = [];
+      for (var d = 0; d < 10; d += 1) {
+        data.push({
+          a: d,
+          b: 10 - d,
+          name: d
+        });
+      }
 
-    let data = [];
-    for (var d = 0; d < 10; d += 1) data.push({a: d, b: 10 - d, name: d});
-
-    let vis = new ScatterPlotMatrix(el, {data: data, fields: ['a', 'b']});
-    vis.render();
-
-**ES5**
-
-.. code-block:: js
-
-    var el = document.createElement('div')
-    document.body.appendChild(el);
-
-    var data = [];
-    for (var d = 0; d < 10; d += 1) data.push({a: d, b: 10 - d, name: d});
-
-    var vis = new candela.components.ScatterPlotMatrix(el, {
-      data: data, fields: ['a', 'b']});
-    vis.render();
+      var vis = new candela.components.ScatterPlotMatrix(el, {
+        data: data,
+        fields: ['a', 'b']
+      });
+      vis.render();
+    </script>
+    </body>
 
 **Python**
 

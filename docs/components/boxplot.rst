@@ -15,40 +15,38 @@ Example
     <div id="boxplot-example"></div>
     <script type="text/javascript" >
         var el = document.getElementById('boxplot-example'), data = [];
-        for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
+        for (var d = 0; d < 10; d += 1) data.push({a: d, b: d/2 + 7});
         var vis = new candela.components.BoxPlot(el, {
             data: data, fields: ['a', 'b'],
             width: 700, height: 400});
         vis.render();
     </script>
 
-**ES6/Webpack**
+**JavaScript**
 
-.. code-block:: js
+.. code-block:: html
 
-    import BoxPlot from candela.components.BoxPlot
+    <body>
+    <script src="//unpkg.com/candela"></script>
+    <script>
+      var el = document.createElement('div')
+      document.body.appendChild(el);
 
-    let el = document.createElement('div');
-    document.body.appendChild(el);
+      var data = [];
+      for (var d = 0; d < 10; d += 1) {
+        data.push({
+          a: d,
+          b: d/2 + 7
+        });
+      }
 
-    let data = [];
-    for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
-
-    let vis = new BoxPlot(el, {data: data, fields: ['a', 'b']});
-    vis.render();
-
-**ES5**
-
-.. code-block:: js
-
-    var el = document.createElement('div')
-    document.body.appendChild(el);
-
-    var data = [];
-    for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
-
-    var vis = new candela.components.BoxPlot(el, {data: data, fields: ['a', 'b']});
-    vis.render();
+      var vis = new candela.components.BoxPlot(el, {
+        data: data,
+        fields: ['a', 'b']
+      });
+      vis.render();
+    </script>
+    </body>
 
 **Python**
 
@@ -56,7 +54,7 @@ Example
 
     import candela
 
-    data = [{'a': d, 'b': d} for d in range(10)]
+    data = [{'a': d, 'b': d/2 + 7} for d in range(10)]
 
     candela.components.BoxPlot(data=data, fields=['a', 'b'])
 

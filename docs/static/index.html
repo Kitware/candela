@@ -1,20 +1,22 @@
 <body>
 <div id="vis"></div>
-<script src="http://kitware.github.io/candela/candela-0.2.0-81be44f6.js"></script>
+<script src="//unpkg.com/candela"></script>
 <script>
 
-var data = [
+  var data = [
     {x: 1, y: 3},
     {x: 2, y: 4},
     {x: 2, y: 3},
     {x: 0, y: 1}
-];
+  ];
 
-var el = document.getElementById('vis');
-var vis = new candela.components.ScatterPlot(el, {
-  data: data, x: 'x', y: 'y'
-});
-vis.render();
+  var el = document.getElementById('vis');
+  var vis = new candela.components.ScatterPlot(el, {
+    data: data,
+    x: 'x',
+    y: 'y'
+  });
+  vis.render();
 
 </script>
 </body>

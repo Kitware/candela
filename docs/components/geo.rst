@@ -42,79 +42,51 @@ Example
         vis.render();
     </script>
 
-**ES6/Webpack**
+**JavaScript**
 
-.. code-block:: js
+.. code-block:: html
 
-    import Geo from candela.components.Geo
+    <body>
+    <script src="//unpkg.com/candela"></script>
+    <script>
+      var el = document.createElement('div')
+      el.style.width = '500px';
+      el.style.height = '500px';
+      document.body.appendChild(el);
 
-    let el = document.createElement('div');
-    document.body.appendChild(el);
-
-    let data = [
-      {lat: 41.702, lng: -87.644},
-      {lat: 41.617, lng: -87.693},
-      {lat: 41.715, lng: -87.712}
-    ];
-    let vis = new Geo(el, {
-      map: {
-        zoom: 10,
-        center: { x: -87.6194, y: 41.867516 }
-      },
-      layers: [
-        {
-          type: 'osm'
+      var data = [
+        {lat: 41.702, lng: -87.644},
+        {lat: 41.617, lng: -87.693},
+        {lat: 41.715, lng: -87.712}
+      ];
+      var vis = new candela.components.Geo(el, {
+        map: {
+          zoom: 10,
+          center: {
+            x: -87.6194,
+            y: 41.867516
+          }
         },
-        {
-          type: 'feature',
-          features: [
-            {
-              type: 'point',
-              data: data,
-              x: 'lng',
-              y: 'lat'
-            }
-          ]
-        }
-      ]
-    });
-    vis.render();
-
-**ES5**
-
-.. code-block:: js
-
-    var el = document.createElement('div')
-    document.body.appendChild(el);
-
-    var data = [
-      {lat: 41.702, lng: -87.644},
-      {lat: 41.617, lng: -87.693},
-      {lat: 41.715, lng: -87.712}
-    ];
-    var vis = new candela.components.Geo(el, {
-      map: {
-        zoom: 10,
-        center: { x: -87.6194, y: 41.867516 }
-      },
-      layers: [
-        {
-          type: 'osm'
-        },
-        {
-          type: 'feature',
-          features: [
-            {
-              type: 'point',
-              data: data,
-              x: 'lng',
-              y: 'lat'
-            }
-          ]
-        }
-      ]
-    });
-    vis.render();
+        layers: [
+          {
+            type: 'osm'
+          },
+          {
+            type: 'feature',
+            features: [
+              {
+                type: 'point',
+                data: data,
+                x: 'lng',
+                y: 'lat'
+              }
+            ]
+          }
+        ]
+      });
+      vis.render();
+    </script>
+    </body>
 
 **Python**
 
