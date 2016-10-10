@@ -1,9 +1,24 @@
+var fs = require('fs');
 var webpack = require('webpack');
 var GruntWatchPlugin = require('./grunt-watch-plugin.js');
 
+var entry = ['./mainPage.js'];
+
+var gaKey = process.env.GOOGLE_ANALYTICS_KEY;
+if (gaKey) {
+  var gaTemplate = fs.readFileSync('gaTemplate.js', {
+    encoding: 'utf-8'
+  });
+
+  var gaText = gaTemplate.replace('${GOOGLE_ANALYTICS_KEY}', gaKey);
+  fs.writeFileSync('ga.js', gaText);
+
+  entry.push('./ga.js');
+}
+
 /*globals module*/
 module.exports = {
-  entry: './mainPage.js',
+  entry: entry,
   output: {
     path: 'web_client/lib',
     filename: 'webpack_bundle.js'

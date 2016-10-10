@@ -35,6 +35,8 @@
     "ignore": [
       "config",
       "src/external",
+      "app/resonantlab/gaTemplate.js",
+      "app/resonantlab/ga.js",
       "app/resonantlab/web_client/lib",
       "dist",
       "built",
