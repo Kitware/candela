@@ -13,8 +13,9 @@ _component_list = []
 js = """
 require.config({
     paths: {
-        candela: 'http://kitware.github.io/candela/candela-0.2.0-81be44f6'
-    }
+        candela: 'https://unpkg.com/candela/dist/candela'
+    },
+    urlArgs: null
 });
 
 (function (el) {
