@@ -10,10 +10,6 @@ We recommend the following checklist of ways you can help:
      documentation is unclear or can be improved in some way, please let us
      know.
 
-   * Ask us a question on the [Candela user mailing list](). The mailing list
-     is a good place to discuss problems you may run into that are not addressed
-     in documentation, and that aren't quite issues to file on GitHub.
-
    * Submit a feature request or bug report on the [Candela issue
      tracker](https://github.com/Kitware/candela/issues).
 
