@@ -29,7 +29,8 @@
     "codecov": "cat coverage/lcov/lcov.info | codecov",
     "examples": "http-server build -p ${PORT-3000}",
     "docs": "npm run build:docs && http-server build/docs -p ${PORT-3000}",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "commitmsg": "validate-commit-msg"
   },
   "semistandard": {
     "ignore": [
@@ -61,6 +62,7 @@
     "callsite": "^1.0.0",
     "clean-webpack-plugin": "^0.1.7",
     "codecov.io": "^0.1.6",
+    "conventional-commit-types": "^2.1.0",
     "copy-webpack-plugin": "^1.1.1",
     "css-loader": "^0.23.1",
     "cz-conventional-changelog": "^1.2.0",
@@ -76,6 +78,7 @@
     "html-loader": "^0.4.3",
     "html-webpack-plugin": "^2.9.0",
     "http-server": "^0.9.0",
+    "husky": "^0.11.8",
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
     "javascript-detect-element-resize": "^0.5.3",
@@ -99,6 +102,7 @@
     "sass-loader": "^3.2.0",
     "sass-variable-loader": "0.0.4",
     "script-loader": "^0.6.1",
+    "semantic-release": "^4.3.5",
     "semistandard": "^7.0.5",
     "snazzy": "^4.0.0",
     "strip-json-comments": "^2.0.1",
@@ -111,8 +115,8 @@
     "tape-catch": "^1.0.6",
     "telegraph-events": "^1.0.3",
     "url-loader": "^0.5.7",
-    "webpack": "^1.12.12",
-    "semantic-release": "^4.3.5"
+    "validate-commit-msg": "^2.8.2",
+    "webpack": "^1.12.12"
   },
   "dependencies": {
     "LineUpJS": "git+https://github.com/Caleydo/lineup.js#0cd7f3f2ad06c498c09612daf5f3e2a36c07536d",
@@ -131,6 +135,9 @@
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
+    },
+    "validate-commit-msg": {
+      "helpMessage": "This project is commitizen-friendly.\nLearn more at https://commitizen.github.io/cz-cli/https://commitizen.github.io/cz-cli/\nTo try again, you can say \"git commit -t .git/COMMIT_EDITMSG\".\nOr, you can use git-cz to make your commits."
     }
   }
 }
