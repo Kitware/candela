@@ -46,6 +46,13 @@ let VisualizationLibrary = Backbone.View.extend({
     libraryButtons.select('span')
       .text(d => d.name);
 
+    libraryButtonsEnter.append('a');
+    libraryButtons.select('a')
+      .attr('href', d => 'https://candela.readthedocs.io/en/latest/components/' + d.name.toLowerCase() + '.html')
+      .attr('target', '_blank')
+      .text('info')
+      .on('click', () => d3.event.stopPropagation());
+
     d3.select('div.largeDialog').selectAll('.circleButton')
       .on('click', d => {
         window.mainPage.getProject().then(project => {
