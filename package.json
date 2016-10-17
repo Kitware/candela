@@ -29,6 +29,7 @@
     "codecov": "cat coverage/lcov/lcov.info | codecov",
     "examples": "http-server build -p ${PORT-3000}",
     "docs": "npm run build:docs && http-server build/docs -p ${PORT-3000}",
+    "commit": "git-cz",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "commitmsg": "validate-commit-msg"
   },
@@ -62,6 +63,7 @@
     "callsite": "^1.0.0",
     "clean-webpack-plugin": "^0.1.7",
     "codecov.io": "^0.1.6",
+    "commitizen": "^2.8.6",
     "conventional-commit-types": "^2.1.0",
     "copy-webpack-plugin": "^1.1.1",
     "css-loader": "^0.23.1",
