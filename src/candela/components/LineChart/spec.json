@@ -7,6 +7,7 @@
 
     // Default to showing the x and y fields on hover.
     ["hover", ["@merge", [["@get", "x"]], ["@get", "y"]]],
+    ["hoverSize", 20],
 
     // Default axis titles to x and y field names.
     ["xAxis.title", ["@get", "x"]],
@@ -165,6 +166,61 @@
                     "strokeWidth": {"value": 2}
                   }
                 }
+              },
+              {
+                "type": "symbol",
+                "from": {"data": "data"},
+                "properties": {
+                  "update": {
+                    "x": {"scale": "x", "field": "x"},
+                    "y": {"scale": "y", "field": "y"},
+                    "stroke": {"scale": "color", "field": "color"},
+                    "shape": {"value": "circle"},
+                    "fill": {"scale": "color", "field": "color"},
+                    "opacity": {"value": 0},
+                    "strokeWidth": {"value": 2},
+                    "size": {"value": ["@get", "hoverSize"]}
+                  }
+                }
+              },
+              {
+                "type": "group",
+                "marks": [
+                  "@map",
+                  ["@get", "hover"],
+                  "h",
+                  {
+                    "type": "text",
+                    "properties": {
+                      "enter": {
+                        "align": {"value": "center"},
+                        "fill": {"value": "#333"}
+                      },
+                      "update": {
+                        "x": {"scale": "x", "signal": "d.x"},
+                        "y": {"scale": "y", "signal": "d.y", "offset": ["@add", -15, ["@mult", -15, ["@get", "index"]]]},
+                        "text": {
+                          "template": [
+                            "@join", "",
+                            [["@get", "h"], ": ", "{{d['", ["@get", "h"], "']}}"]
+                          ]
+                        },
+                        "fillOpacity": {
+                          "rule": [
+                            {
+                              "predicate": {
+                                "name": "tooltip",
+                                "id": {"value": null}
+                              },
+                              "value": 0
+                            },
+                            {"value": 1}
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
               }
             ]
           }

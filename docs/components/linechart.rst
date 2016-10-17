@@ -94,5 +94,9 @@ width (Number)
 height (Number)
     Height of the chart in pixels. See :ref:`sizing`.
 
+hoverSize (Number)
+    Displays the hover value when the pointer is within this number of pixels
+    (default 20).
+
 renderer (String)
     Whether to render in ``"svg"`` or ``"canvas"`` mode (default ``"canvas"``).
