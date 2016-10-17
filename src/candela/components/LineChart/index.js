@@ -29,6 +29,17 @@ export default class LineChart extends VegaChart(VisComponent, spec) {
           from: 'data',
           fieldTypes: ['date', 'number', 'integer', 'boolean']
         }
+      },
+      {
+        name: 'hover',
+        type: 'string_list',
+        format: 'string_list',
+        optional: true,
+        domain: {
+          mode: 'field',
+          from: 'data',
+          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+        }
       }
     ];
   }
