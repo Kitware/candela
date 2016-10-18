@@ -58,12 +58,12 @@ Example
 
 .. code-block:: python
 
-    import candela
+    import pycandela
     from random import normalvariate as nv
 
     data = [{'a': nv(0, 1)} for d in range(1000)]
 
-    candela.Histogram(data=data, bin='a', width=700, height=400)
+    pycandela.components.Histogram(data=data, bin='a', width=700, height=400)
 
 **R**
 

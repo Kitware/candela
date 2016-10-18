@@ -52,11 +52,11 @@ Example
 
 .. code-block:: python
 
-    import candela
+    import pycandela
 
     data = [{'a': d, 'b': d/2 + 7} for d in range(10)]
 
-    candela.components.BoxPlot(data=data, fields=['a', 'b'])
+    pycandela.components.BoxPlot(data=data, fields=['a', 'b'])
 
 **R**
 

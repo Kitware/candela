@@ -60,9 +60,9 @@ Example
 
 .. code-block:: python
 
-    import candela
+    import pycandela
 
-    candela.components.BulletChart(
+    pycandela.components.BulletChart(
         value=0.8,
         title='My measurement',
         subtitle='... it is really important',

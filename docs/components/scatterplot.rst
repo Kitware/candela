@@ -59,11 +59,11 @@ Example
 
 .. code-block:: python
 
-    import candela
+    import pycandela
 
     data = [{'a': d, 'b': d} for d in range(10)]
 
-    candela.components.ScatterPlot(
+    pycandela.components.ScatterPlot(
         data=data, x='a', y='b', width=700, height=400)
 
 **R**

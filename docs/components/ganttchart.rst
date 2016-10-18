@@ -61,7 +61,7 @@ Example
 
 .. code-block:: python
 
-    import candela
+    import pycandela
 
     data = [
         dict(name='Do this', level=1, start=0, end=5),
@@ -71,7 +71,7 @@ Example
         dict(name='That part 1', level=2, start=5, end=10),
         dict(name='That part 2', level=2, start=10, end=15)
     ];
-    candela.components.GanttChart(
+    pycandela.components.GanttChart(
         data=data, label='name',
         start='start', end='end', level='level',
         width=700, height=200

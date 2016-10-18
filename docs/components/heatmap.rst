@@ -59,11 +59,11 @@ Example
 
 .. code-block:: python
 
-    import candela
+    import pycandela
 
     data = [{'a': d, 'b': 10 - d, 'name': d} for d in range(10)]
 
-    candela.components.Heatmap(
+    pycandela.components.Heatmap(
         data=data, fields=['a', 'b'], id='name', width=700, height=400)
 
 **R**

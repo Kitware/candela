@@ -70,7 +70,7 @@ Example
 
 .. code-block:: python
 
-    import candela
+    import pycandela
 
     data = [
         dict(lat=41.702, lng=-87.644, a=5),
@@ -78,7 +78,7 @@ Example
         dict(lat=41.715, lng=-87.712, a=25)
     ]
 
-    candela.components.GeoDots(
+    pycandela.components.GeoDots(
         zoom=10,
         center=dict(longitude=-87.6194, latitude=41.867516),
         data=data,

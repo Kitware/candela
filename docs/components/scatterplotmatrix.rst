@@ -54,11 +54,11 @@ Example
 
 .. code-block:: python
 
-    import candela
+    import pycandela
 
     data = [{'a': d, 'b': 10 - d, 'name': d} for d in range(10)]
 
-    candela.components.ScatterPlotMatrix(data=data, fields=['a', 'b'])
+    pycandela.components.ScatterPlotMatrix(data=data, fields=['a', 'b'])
 
 **R**
 
