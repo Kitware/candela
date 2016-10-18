@@ -59,6 +59,12 @@ export default class GeoDots extends VisComponent {
   constructor (el, options) {
     super(el);
 
+    let width = options.width || 600;
+    let height = options.height || 600;
+
+    el.style.width = width + 'px';
+    el.style.height = height + 'px';
+
     let sizeTransform = 5;
     if (options.size) {
       const range = minmax(options.data.map(d => d[options.size]));

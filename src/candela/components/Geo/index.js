@@ -2,8 +2,14 @@ import geojs from 'geojs/geo.js';
 import VisComponent from '../../VisComponent';
 
 export default class Geo extends VisComponent {
-  constructor (el, {map = {}, layers = []}) {
+  constructor (el, {map = {}, layers = [], width, height}) {
     super(el);
+
+    width = width || map.width || 600;
+    height = height || map.height || 600;
+
+    el.style.width = width + 'px';
+    el.style.height = height + 'px';
 
     // Construct a GeoJS map object based on the requested options.
     this.plot = geojs.map(Object.assign({
