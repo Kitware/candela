@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='pycandela',
-    version='0.2.0',
+    version='0.3.0',
     description='Jupyter interface for Candela visualization components',
     author='Kitware, Inc.',
     author_email='kitware@kitware.com',
