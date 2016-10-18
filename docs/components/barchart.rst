@@ -51,11 +51,11 @@ Example
 
 .. code-block:: python
 
-    import candela
+    import pycandela
 
     data = [{'a': d, 'b': d} for d in range(10)]
 
-    candela.components.BarChart(data=data, x='a', y='b')
+    pycandela.components.BarChart(data=data, x='a', y='b')
 
 **R**
 

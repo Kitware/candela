@@ -75,7 +75,7 @@ Quick start - Python
 
     import pycandela
     pycandela.components.ScatterPlot(
-        data=df, color='species', x='sepalLength', y='sepalWidth')
+        data=data, color='species', x='sepalLength', y='sepalWidth')
 
 Quick start - R
 ---------------

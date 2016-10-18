@@ -92,7 +92,7 @@ Example
 
 .. code-block:: python
 
-    import candela
+    import pycandela
 
     data = [
         dict(lat=41.702, lng=-87.644),
@@ -100,7 +100,7 @@ Example
         dict(lat=41.715, lng=-87.712)
     ]
 
-    candela.components.Geo(
+    pycandela.components.Geo(
         map=dict(
             zoom=10,
             center=dict(x=-87.6194, y=41.867516)

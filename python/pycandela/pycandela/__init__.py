@@ -10,15 +10,21 @@ except NameError:
 
 _component_list = []
 
-js = """
-require.config({
-    paths: {
-        candela: 'https://unpkg.com/candela/dist/candela'
-    },
-    urlArgs: null
-});
+_require_config = """
+    if (!window.__pycandela_config) {
+        require.config({
+            paths: {
+                candela: 'https://unpkg.com/candela/dist/candela'
+            },
+            urlArgs: null
+        });
+        window.__pycandela_config = true;
+    }
+"""
 
-(function (el) {
+
+def init():
+    init_js = _require_config + """
     require(['candela'], function (candela) {
         var components = [];
         for (var comp in candela.components) {
@@ -31,12 +37,11 @@ require.config({
         kernel.execute('__pycandela._component_list = ' +
             JSON.stringify(components));
     }, function (error) {
-        el.append('<pre>' + error + '</pre>');
+        element.append('<pre>' + error + '</pre>');
     });
-})(element);
-"""
+    """
 
-publish_display_data({'application/javascript': js})
+    publish_display_data({'application/javascript': init_js})
 
 
 class DataFrameEncoder(json.JSONEncoder):
@@ -53,14 +58,18 @@ class Component(object):
 
     def _ipython_display_(self):
         js = ("""
-            (function (el) {
+            var render = function () {
+                %s
                 require(['candela'], function (candela) {
                     var comp = candela.components['%s'];
-                    var vis = new comp(el.get(0), %s);
+                    var vis = new comp(element.get(0), %s);
                     vis.render();
                 });
-            })(element);
-            """ % (self.name, json.dumps(self.options, cls=DataFrameEncoder)))
+            };
+            render();
+            """ % (_require_config, self.name,
+                   json.dumps(self.options, cls=DataFrameEncoder)))
+
         publish_display_data({'application/javascript': js})
 
     def display(self):
@@ -72,10 +81,8 @@ class ComponentAccessor(object):
         return _component_list
 
     def __getattr__(self, name):
-        if name not in _component_list:
-            raise AttributeError(
-                "'" + type(self).__name__ +
-                "' class has no attribute '" + name + "'")
         return partial(Component, name)
 
 components = ComponentAccessor()
+
+init()

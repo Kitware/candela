@@ -56,11 +56,11 @@ Example
 
 .. code-block:: python
 
-    import candela
+    import pycandela
 
     data = [{'a': d, 'b': d} for d in range(10)]
 
-    candela.components.LineChart(
+    pycandela.components.LineChart(
         data=data, x='a', y=['b'], width=700, height=400)
 
 **R**
