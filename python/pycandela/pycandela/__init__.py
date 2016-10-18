@@ -15,6 +15,12 @@ _require_config = """
         require.config({
             paths: {
                 candela: 'https://unpkg.com/candela/dist/candela'
+
+                // To test unreleased candela: comment above, uncomment below,
+                // start jupyter-notebook from base of candela checkout,
+                // and navigate to python/pycandela before creating notebook.
+
+                // candela: '/files/build/candela/candela'
             },
             urlArgs: null
         });
