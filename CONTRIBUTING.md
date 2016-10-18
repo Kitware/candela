@@ -150,6 +150,12 @@ of things. Installing it is relatively easy:
 After installation succeeds, you can use `git cz` as a drop-in replacement for
 `git commit`, with the exact same options and flags you are used to.
 
+If you don't want to install Commitizen globally on your system this way, you
+can use an NPM script to run it out of Candela's `node_modules` directory by
+saying `npm run commit` instead. To pass arguments along to `git-cz`, supply
+them after a double dash; e.g., `npm run commit -- -a` to commit all changes in
+the working tree.
+
 ### Commit message validation and retrying failed commits
 
 The Candela repository has built-in validation for commit messages. If you
