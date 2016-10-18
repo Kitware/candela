@@ -11,7 +11,7 @@ test('LineUp component', t => {
   $('body').append($('<div/>').attr({id: 'elem'}).css({width: 800, height: 600}));
   t.ok(LineUp, 'LineUp exists');
   t.ok(LineUp.options, 'LineUp options exists');
-  let lu = new LineUp('#elem', {
+  let lu = new LineUp(document.getElementById('elem'), {
     data: [
       {a: 1, b: 2, c: 'a', d: true},
       {a: 3, b: 4, c: 'b', d: false},
