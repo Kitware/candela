@@ -3,7 +3,7 @@ import $ from 'jquery';
 import d3 from 'd3';
 import nv from 'nvd3';
 
-import { StatusBarWidget } from './StatusBarWidget';
+import StatusBarWidget from './StatusBarWidget';
 import { ErrorBulletWidget } from './ErrorBulletWidget';
 import { deArray, failValue, warningValue } from './utility.js';
 
@@ -11,9 +11,11 @@ import infoPane from './templates/infoPane.jade';
 import VisComponent from '../../VisComponent';
 
 class InfoPane extends VisComponent {
-  constructor (el, settings) {
+  constructor (el, statusBarEl, settings) {
     super(el);
     this.$el = $(this.el);
+
+    this.statusBarEl = statusBarEl;
 
     this.name = settings.name || 'Ground Truth';
     this.branch = settings.branch || 'master';
@@ -136,7 +138,7 @@ class InfoPane extends VisComponent {
       }, this);
     }, this));
 
-    let statusBar = new StatusBarWidget({
+    let statusBar = new StatusBarWidget(this.statusBarEl, {
       numSuccess: this.numSuccess,
       numBad: this.numBad,
       numFail: this.numFail,
