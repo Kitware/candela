@@ -49,6 +49,13 @@ export default class LineUp extends VisComponent {
 
   constructor (el, options) {
     super(el);
+
+    let width = options.width || 800;
+    let height = options.height || 600;
+
+    el.style.width = width + 'px';
+    el.style.height = height + 'px';
+
     this.options = options;
     this.lineUpConfig = {
       interaction: {
