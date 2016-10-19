@@ -7,7 +7,7 @@ require('./styles/main.styl');
 
 import InfoPane from './InfoPane';
 import TrendPane from './TrendPane';
-import { ResultTablePane } from './ResultTablePane';
+import ResultTablePane from './ResultTablePane';
 import TopInfoBar from './TopInfoBar';
 import { sanitizeSelector, deArray } from './utility.js';
 
@@ -158,16 +158,16 @@ class TrackerDash extends VisComponent {
     this.topInfoBar = new TopInfoBar(this.$el.find('.top-info-bar').get(0), this.trackData);
     this.infoPane = new InfoPane(this.$el.find('.info-pane').get(0), this.trackData);
     this.trendPane = new TrendPane(this.$el.find('.trend-pane').get(0), this.trackData);
+    this.resultPane = new ResultTablePane(this.$el.find('.result-table-pane').get(0), this.trackData);
 
     this.render();
   }
 
   render () {
-    let resultPane = new ResultTablePane(this.trackData);
     this.topInfoBar.render();
     this.infoPane.render();
     this.trendPane.render();
-    resultPane.render();
+    this.resultPane.render();
   }
 }
 
