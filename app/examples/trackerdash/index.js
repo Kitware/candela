@@ -373,4 +373,4 @@ if (qParams) {
     }
   }
 }
-var app = new TrackerDash(appSettings);
+var app = new TrackerDash(document.body, appSettings);

@@ -1,4 +1,4 @@
-import Backbone from 'backbone';
+import $ from 'jquery';
 import _ from 'underscore';
 
 require('bootstrap-webpack');
@@ -12,6 +12,8 @@ import { TopInfoBar } from './TopInfoBar';
 import { sanitizeSelector, deArray } from './utility.js';
 
 import layout from './templates/layout.jade';
+
+import VisComponent from '../../VisComponent';
 
 //  Calculate an percentile value from an array of numbers sorted in numerically
 //  increasing order, p should be a ratio percentile, e.g. 50th percentile is p
@@ -95,10 +97,12 @@ const sanitizeAggregateThreshold = (aggTrend) => {
   return aggTrend;
 }
 
-let TrackerDash = Backbone.View.extend({
-  el: 'body',
+class TrackerDash extends VisComponent {
+  constructor (el, settings) {
+    super(el);
 
-  initialize: function (settings) {
+    this.$el = $(this.el);
+
     // Perform all the data munging at the outset so that it is consistent as it
     // gets passed down throughout the application.
 
@@ -150,9 +154,9 @@ let TrackerDash = Backbone.View.extend({
     this.trackData = settings;
     delete this.trackData.el;
     this.render();
-  },
+  }
 
-  render: function () {
+  render () {
     this.$el.html(layout());
     let topInfoBar = new TopInfoBar(this.trackData);
     let infoPane = new InfoPane(this.trackData);
@@ -163,7 +167,6 @@ let TrackerDash = Backbone.View.extend({
     trendPane.render();
     resultPane.render();
   }
-
-});
+}
 
 export default TrackerDash;
