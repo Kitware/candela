@@ -1,4 +1,3 @@
-import Backbone from 'backbone';
 import _ from 'underscore';
 import $ from 'jquery';
 import d3 from 'd3';
@@ -9,11 +8,13 @@ import { ErrorBulletWidget } from './ErrorBulletWidget';
 import { deArray, failValue, warningValue } from './utility.js';
 
 import infoPane from './templates/infoPane.jade';
+import VisComponent from '../../VisComponent';
 
-export let InfoPane = Backbone.View.extend({
-  el: '.info-pane',
+class InfoPane extends VisComponent {
+  constructor (el, settings) {
+    super(el);
+    this.$el = $(this.el);
 
-  initialize: function (settings) {
     this.name = settings.name || 'Ground Truth';
     this.branch = settings.branch || 'master';
     this.day = settings.day || this.getToday();
@@ -46,9 +47,9 @@ export let InfoPane = Backbone.View.extend({
         }
       }
     }, this));
-  },
+  }
 
-  getToday: function () {
+  getToday () {
     var today = new Date();
     var dd = today.getDate();
     var mm = today.getMonth() + 1;  // January is 0!
@@ -63,9 +64,9 @@ export let InfoPane = Backbone.View.extend({
     }
 
     return yyyy + '/' + mm + '/' + dd;
-  },
+  }
 
-  render: function () {
+  render () {
       // Test if any of the aggregate trends have spark line historical data.
       var sparklinesExist = (_.find(this.aggTrends, function (trend) {
         return trend.history && trend.history.length > 1;
@@ -143,4 +144,6 @@ export let InfoPane = Backbone.View.extend({
     });
     statusBar.render();
   }
-});
+}
+
+export default InfoPane;
