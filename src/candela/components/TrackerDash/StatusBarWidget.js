@@ -1,22 +1,23 @@
-import Backbone from 'backbone';
 import _ from 'underscore';
 import $ from 'jquery';
 import d3 from 'd3';
 
 import statusBarWidget from './templates/statusBarWidget.jade';
+import VisComponent from '../../VisComponent';
 
-export let StatusBarWidget = Backbone.View.extend({
-  el: '.status-bar-widget',
+class StatusBarWidget extends VisComponent {
+  constructor (el, settings) {
+    super(el);
+    this.$el = $(this.el);
 
-  initialize: function (settings) {
     this.numSuccess = settings.numSuccess || 0;
     this.numBad = settings.numBad || 0;
     this.numFail = settings.numFail || 0;
     this.numIncomplete = settings.numIncomplete || 0;
     $(window).on('resize', _.bind(this.createChart, this));
-  },
+  }
 
-  createChart: function () {
+  createChart () {
     var total = this.numSuccess + this.numBad + this.numFail + this.numIncomplete;
     if (total <= 0) {
       return;
@@ -58,10 +59,12 @@ export let StatusBarWidget = Backbone.View.extend({
       .attr('height', '100%')
       .attr('class', 'incomplete');
 
-  },
+  }
 
-  render: function () {
+  render () {
     this.$el.html(statusBarWidget());
     this.createChart();
   }
-});
+}
+
+export default StatusBarWidget;

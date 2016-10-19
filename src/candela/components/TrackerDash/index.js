@@ -156,7 +156,7 @@ class TrackerDash extends VisComponent {
 
     this.$el.html(layout());
     this.topInfoBar = new TopInfoBar(this.$el.find('.top-info-bar').get(0), this.trackData);
-    this.infoPane = new InfoPane(this.$el.find('.info-pane').get(0), this.trackData);
+    this.infoPane = new InfoPane(this.$el.find('.info-pane').get(0), this.$el.find('.status-bar-widget').get(0), this.trackData);
     this.trendPane = new TrendPane(this.$el.find('.trend-pane').get(0), this.trackData);
     this.resultPane = new ResultTablePane(this.$el.find('.result-table-pane').get(0), this.trackData);
 
