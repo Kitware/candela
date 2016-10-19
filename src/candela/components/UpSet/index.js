@@ -1,7 +1,6 @@
 import d3 from 'd3';
-import { unique } from 'datalib';
+import { unique, read } from 'datalib';
 import VisComponent from '../../VisComponent';
-import { read } from '../../util';
 import * as upset from 'UpSet';
 import template from './template.html';
 
@@ -124,7 +123,7 @@ export default class UpSet extends VisComponent {
     // Add metadata fields.
     if (this.options.metadata) {
       if (!this.options.data.__types__) {
-        read(this.options.data);
+        read(this.options.data, {parse: 'auto'});
       }
       const upsetTypeMap = {
         string: 'string',

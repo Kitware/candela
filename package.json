@@ -126,7 +126,7 @@
     "onset": "git+https://github.com/Kitware/setvis#506bfccff63b0c8f5c39a81d299ed310e5e8fbff",
     "brace": "^0.7.0",
     "d3": "^3.5.14",
-    "datalib": "^1.6.3",
+    "datalib": "^1.7.3",
     "font-awesome": "^4.4.0",
     "font-awesome-webpack": "^0.0.4",
     "jquery": "^2.2.0",
