@@ -6,7 +6,7 @@ import d3 from 'd3';
 
 import { deArray } from './utility.js';
 
-import trendPane from '../templates/trendPane';
+import trendPane from './templates/trendPane.jade';
 
 export let TrendPane = Backbone.View.extend({
   el: '.trend-pane',

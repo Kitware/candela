@@ -8,7 +8,7 @@ import { StatusBarWidget } from './StatusBarWidget';
 import { ErrorBulletWidget } from './ErrorBulletWidget';
 import { deArray, failValue, warningValue } from './utility.js';
 
-import infoPane from '../templates/infoPane';
+import infoPane from './templates/infoPane.jade';
 
 export let InfoPane = Backbone.View.extend({
   el: '.info-pane',

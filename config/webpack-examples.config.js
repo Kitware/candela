@@ -115,6 +115,10 @@ module.exports = {
       {
         test: /\.json$/,
         loaders: ['json-loader', 'strip-json-comments-loader']
+      },
+      {
+        test: /bootstrap\/js\//,
+        loader: 'imports?jQuery=jquery'
       }
     ]
   }

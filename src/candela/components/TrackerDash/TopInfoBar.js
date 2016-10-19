@@ -1,6 +1,6 @@
 import Backbone from 'backbone';
 
-import topInfoBar from '../templates/topInfoBar';
+import topInfoBar from './templates/topInfoBar.jade';
 
 export let TopInfoBar = Backbone.View.extend({
   el: '.top-info-bar',

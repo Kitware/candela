@@ -3,7 +3,7 @@ import _ from 'underscore';
 import $ from 'jquery';
 import d3 from 'd3';
 
-import statusBarWidget from '../templates/statusBarWidget';
+import statusBarWidget from './templates/statusBarWidget.jade';
 
 export let StatusBarWidget = Backbone.View.extend({
   el: '.status-bar-widget',

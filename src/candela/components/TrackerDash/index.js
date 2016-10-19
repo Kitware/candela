@@ -3,7 +3,7 @@ import _ from 'underscore';
 
 require('bootstrap-webpack');
 require('nvd3/build/nv.d3.min.css');
-require('../styles/main.styl');
+require('./styles/main.styl');
 
 import { InfoPane } from './InfoPane';
 import { TrendPane } from './TrendPane';
@@ -11,9 +11,9 @@ import { ResultTablePane } from './ResultTablePane';
 import { TopInfoBar } from './TopInfoBar';
 import { sanitizeSelector, deArray } from './utility.js';
 
-import layout from '../templates/layout';
+import layout from './templates/layout.jade';
 
-export let dash = Backbone.View.extend({
+let dash = Backbone.View.extend({
   el: 'body',
 
   initialize: function (settings) {
@@ -172,3 +172,5 @@ export let dash = Backbone.View.extend({
   }
 
 });
+
+export default dash;

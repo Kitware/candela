@@ -5,7 +5,7 @@ import $ from 'jquery';
 import { ValueWidget } from './ValueWidget';
 import { sanitizeSelector } from './utility.js';
 
-import tablePane from '../templates/tablePane';
+import tablePane from './templates/tablePane.jade';
 
 export let ResultTablePane = Backbone.View.extend({
   el: '.result-table-pane',
