@@ -5,7 +5,7 @@ require('bootstrap-webpack');
 require('nvd3/build/nv.d3.min.css');
 require('./styles/main.styl');
 
-import { InfoPane } from './InfoPane';
+import InfoPane from './InfoPane';
 import { TrendPane } from './TrendPane';
 import { ResultTablePane } from './ResultTablePane';
 import TopInfoBar from './TopInfoBar';
@@ -156,16 +156,16 @@ class TrackerDash extends VisComponent {
 
     this.$el.html(layout());
     this.topInfoBar = new TopInfoBar(this.$el.find('.top-info-bar').get(0), this.trackData);
+    this.infoPane = new InfoPane(this.$el.find('.info-pane').get(0), this.trackData);
 
     this.render();
   }
 
   render () {
-    let infoPane = new InfoPane(this.trackData);
     let trendPane = new TrendPane(this.trackData);
     let resultPane = new ResultTablePane(this.trackData);
     this.topInfoBar.render();
-    infoPane.render();
+    this.infoPane.render();
     trendPane.render();
     resultPane.render();
   }
