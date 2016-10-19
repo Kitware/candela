@@ -1,4 +1,3 @@
-import Backbone from 'backbone';
 import _ from 'underscore';
 import $ from 'jquery';
 import nv from 'nvd3';
@@ -7,17 +6,19 @@ import d3 from 'd3';
 import { deArray } from './utility.js';
 
 import trendPane from './templates/trendPane.jade';
+import VisComponent from '../../VisComponent';
 
-export let TrendPane = Backbone.View.extend({
-  el: '.trend-pane',
+class TrendPane extends VisComponent {
+  constructor (el, settings) {
+    super(el);
+    this.$el = $(this.el);
 
-  initialize: function (settings) {
     this.bins = settings.bins || 10;
     this.trendMap = settings.trendMap;
     this.hists = this._calculateHistograms(settings.trendValuesByDataset, settings.histogram_max_x);
-  },
+  }
 
-  _calculateHistograms: function (trends, maxX) {
+  _calculateHistograms (trends, maxX) {
     const bins = this.bins;
     const byTrend = _.groupBy(trends, 'trend');
 
@@ -73,9 +74,9 @@ export let TrendPane = Backbone.View.extend({
         this.xLabels[this.xLabels.length - 1] = 'Beyond';
     }
     return hists;
-  },
+  }
 
-  getChartData: function () {
+  getChartData () {
     // Prepare the data for plotting
     let plotData = [];
     const trends = _.keys(this.hists);
@@ -89,9 +90,9 @@ export let TrendPane = Backbone.View.extend({
       plotData.push(curData);
     }
     return plotData;
-  },
+  }
 
-  createChart: function () {
+  createChart () {
     nv.addGraph({
       generate: _.bind(function () {
         let parent = $('.trend-pane');
@@ -127,10 +128,12 @@ export let TrendPane = Backbone.View.extend({
         });
       }
     });
-  },
+  }
 
-  render: function () {
+  render () {
     this.$el.html(trendPane());
     this.createChart();
   }
-});
+}
+
+export default TrendPane;
