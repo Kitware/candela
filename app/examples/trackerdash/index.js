@@ -1,5 +1,5 @@
 import html from './index.jade';
-import dash from '../../../src/candela/components/TrackerDash';
+import TrackerDash from '../../../src/candela/components/TrackerDash';
 
 document.write(html());
 
@@ -373,4 +373,4 @@ if (qParams) {
     }
   }
 }
-var app = new dash(appSettings);
+var app = new TrackerDash(appSettings);

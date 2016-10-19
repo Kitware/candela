@@ -13,101 +13,94 @@ import { sanitizeSelector, deArray } from './utility.js';
 
 import layout from './templates/layout.jade';
 
-let dash = Backbone.View.extend({
+//  Calculate an percentile value from an array of numbers sorted in numerically
+//  increasing order, p should be a ratio percentile, e.g. 50th percentile is p
+//  = 0.5.
+const calcPercentile = (arr, p) => {
+  if (arr.length === 0) return 0;
+  if (typeof p !== 'number') throw new TypeError('p must be a number');
+  if (p <= 0) return arr[0];
+  if (p >= 1) return arr[arr.length - 1];
+
+  let index = Math.round(p * arr.length) - 1;
+  // Ind may be below 0, in this case the closest value is the 0th index.
+  index = index < 0 ? 0 : index;
+  return arr[index];
+}
+
+// Synthesize aggregate metrics from the supplied trend values, which will
+// result in a percentile value per trend if an aggregate metric isn't already
+// supplied for the trend.
+const synthesizeMissingAggTrends = (aggTrends, trendMap, trendValuesByDataset, percentile) => {
+  const byTrend = _.groupBy(trendValuesByDataset, 'trend');
+  const trends = _.keys(byTrend);
+  if (!aggTrends) {
+    aggTrends = [];
+  }
+  const aggTrendsByTrendName = _.indexBy(aggTrends, 'trend_name');
+  for (let i = 0; i < trends.length; ++i) {
+    if (!_.has(aggTrendsByTrendName, trends[i])) {
+      let aggTrend = _.clone(trendMap[trends[i]]);
+      let trendVals = _.chain(byTrend[aggTrend.name])
+        .pluck('current')
+        .map((value) => {
+          return deArray(value, d3.median);
+        })
+      // '+' converts values to numeric for a numeric sort.
+        .sortBy((num) => { return +num; })
+        .value();
+      aggTrend.history = [calcPercentile(trendVals, percentile / 100)];
+      aggTrend.title = 'Default of ' + percentile + ' percentile key metric value (' + aggTrend.name + '), No saved aggregate metrics for trend';
+      aggTrend.synth = true;
+      aggTrends.push(aggTrend);
+    }
+  }
+  return aggTrends;
+}
+
+// Creates a valid display_name and id_selector per trend, create a mouseover
+// title property, and determines if the threshold is correctly defined.
+const sanitizeTrend = (trend) => {
+  if (!trend.abbreviation) {
+    trend.display_name = trend.name;
+    if (!trend.title) {
+      trend.title = 'No abbreviation defined';
+    }
+  } else {
+    trend.display_name = trend.abbreviation;
+    if (!trend.title) {
+      trend.title = trend.name;
+    }
+  }
+  if (!_.has(trend, 'warning') || !_.has(trend, 'fail')) {
+    trend.incompleteThreshold = true;
+    trend.title += ' & Incomplete threshold definition';
+  }
+  trend.id_selector = sanitizeSelector(trend.display_name);
+  return trend;
+}
+
+/**
+ * Ensures that an aggregate metric has a max value set, as a fallback
+ * it will be set to the last value in the history.
+ */
+const sanitizeAggregateThreshold = (aggTrend) => {
+  if (_.isNaN(parseFloat(aggTrend.max))) {
+    aggTrend.max = aggTrend.history[aggTrend.history.length-1];
+    if (!aggTrend.incompleteThreshold) {
+      aggTrend.incompleteThreshold = true;
+      aggTrend.title += ' & Incomplete threshold definition';
+    }
+  }
+  return aggTrend;
+}
+
+let TrackerDash = Backbone.View.extend({
   el: 'body',
 
   initialize: function (settings) {
-    /**
-     * Calculate an percentile value from an array of numbers sorted in
-     * numerically increasing order, p should be a ratio percentile,
-     * e.g. 50th percentile is p = 0.5.
-     */
-    function calcPercentile (arr, p) {
-      if (arr.length === 0) return 0;
-      if (typeof p !== 'number') throw new TypeError('p must be a number');
-      if (p <= 0) return arr[0];
-      if (p >= 1) return arr[arr.length - 1];
-
-      let index = Math.round(p * arr.length) - 1;
-      // Ind may be below 0, in this case the closest value is the 0th index.
-      index = index < 0 ? 0 : index;
-      return arr[index];
-    }
-
-    /**
-     * Synthesize aggregate metrics from the supplied trend values, which will
-     * result in a percentile value per trend if an aggregate metric isn't
-     * already supplied for the trend.
-     */
-    function synthesizeMissingAggTrends (aggTrends, trendMap, trendValuesByDataset, percentile) {
-      const byTrend = _.groupBy(trendValuesByDataset, 'trend');
-      const trends = _.keys(byTrend);
-      if (!aggTrends) {
-          aggTrends = [];
-      }
-      const aggTrendsByTrendName = _.indexBy(aggTrends, 'trend_name');
-      for (let i = 0; i < trends.length; ++i) {
-        if (!_.has(aggTrendsByTrendName, trends[i])) {
-          let aggTrend = _.clone(trendMap[trends[i]]);
-          let trendVals = _.chain(byTrend[aggTrend.name])
-                           .pluck('current')
-                           .map((value) => {
-                               return deArray(value, d3.median);
-                           })
-                           // '+' converts values to numeric for a numeric sort.
-                           .sortBy((num) => { return +num; })
-                           .value();
-          aggTrend.history = [calcPercentile(trendVals, percentile / 100)];
-          aggTrend.title = 'Default of ' + percentile + ' percentile key metric value (' + aggTrend.name + '), No saved aggregate metrics for trend';
-          aggTrend.synth = true;
-          aggTrends.push(aggTrend);
-        }
-      }
-      return aggTrends;
-    }
-
-    /**
-     * Creates a valid display_name and id_selector per trend,
-     * create a mouseover title property, and determines if the threshold
-     * is correctly defined.
-     */
-    function sanitizeTrend (trend) {
-      if (!trend.abbreviation) {
-        trend.display_name = trend.name;
-        if (!trend.title) {
-          trend.title = 'No abbreviation defined';
-        }
-      } else {
-        trend.display_name = trend.abbreviation;
-        if (!trend.title) {
-          trend.title = trend.name;
-        }
-      }
-      if (!_.has(trend, 'warning') || !_.has(trend, 'fail')) {
-        trend.incompleteThreshold = true;
-        trend.title += ' & Incomplete threshold definition';
-      }
-      trend.id_selector = sanitizeSelector(trend.display_name);
-      return trend;
-    }
-
-    /**
-     * Ensures that an aggregate metric has a max value set, as a fallback
-     * it will be set to the last value in the history.
-     */
-    function sanitizeAggregateThreshold (aggTrend) {
-      if (_.isNaN(parseFloat(aggTrend.max))) {
-        aggTrend.max = aggTrend.history[aggTrend.history.length-1];
-        if (!aggTrend.incompleteThreshold) {
-          aggTrend.incompleteThreshold = true;
-          aggTrend.title += ' & Incomplete threshold definition';
-        }
-      }
-      return aggTrend;
-    }
-
-    // Perform all the data munging at the outset so that it is consistent
-    // as it gets passed down throughout the application.
+    // Perform all the data munging at the outset so that it is consistent as it
+    // gets passed down throughout the application.
 
     if (!settings.trends) {
         settings.trends = [];
@@ -173,4 +166,4 @@ let dash = Backbone.View.extend({
 
 });
 
-export default dash;
+export default TrackerDash;
