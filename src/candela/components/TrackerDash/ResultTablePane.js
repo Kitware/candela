@@ -1,4 +1,3 @@
-import Backbone from 'backbone';
 import _ from 'underscore';
 import $ from 'jquery';
 
@@ -6,11 +5,13 @@ import { ValueWidget } from './ValueWidget';
 import { sanitizeSelector } from './utility.js';
 
 import tablePane from './templates/tablePane.jade';
+import VisComponent from '../../VisComponent';
 
-export let ResultTablePane = Backbone.View.extend({
-  el: '.result-table-pane',
+class ResultTablePane extends VisComponent {
+  constructor (el, settings) {
+    super(el);
+    this.$el = $(this.el);
 
-  initialize: function (settings) {
     this.results = settings.trendValuesByDataset;
     this.trends = settings.trends;
     this.trendMap = settings.trendMap;
@@ -26,9 +27,9 @@ export let ResultTablePane = Backbone.View.extend({
       dataset: true,
       order: 1
     };
-  },
+  }
 
-  render: function () {
+  render () {
     if (this.results === undefined) {
       return;
     }
@@ -148,4 +149,6 @@ export let ResultTablePane = Backbone.View.extend({
 
     }, this));
   }
-});
+}
+
+export default ResultTablePane;
