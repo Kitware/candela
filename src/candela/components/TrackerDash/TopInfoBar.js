@@ -1,19 +1,21 @@
-import Backbone from 'backbone';
+import $ from 'jquery';
 
 import topInfoBar from './templates/topInfoBar.jade';
+import VisComponent from '../../VisComponent';
 
-export let TopInfoBar = Backbone.View.extend({
-  el: '.top-info-bar',
+class TopInfoBar extends VisComponent {
+  constructor (el, settings) {
+    super(el);
+    this.$el = $(this.el);
 
-  initialize: function (settings) {
     this.name = settings.name || 'Ground Truth';
     this.branch = settings.branch || 'No branch set';
     this.day = settings.day || this.getToday();
     this.submissionUuid = settings.submission_uuid;
     this.helpLink = settings.help_link || 'https://github.com/Trailmix/RedwoodInternal/wiki/Midas-for-Metrics-Based-Testing#performance-dashboards';
-  },
+  }
 
-  render: function () {
+  render () {
     this.$el.html(topInfoBar({
       name: this.name,
       branch: this.branch,
@@ -22,5 +24,6 @@ export let TopInfoBar = Backbone.View.extend({
       helpLink: this.helpLink
     }));
   }
+}
 
-});
+export default TopInfoBar;
