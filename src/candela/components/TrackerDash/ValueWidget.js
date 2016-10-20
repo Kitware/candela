@@ -8,19 +8,19 @@ class ValueWidget extends VisComponent {
 
     this.settings = settings;
     if (Array.isArray(settings.result.current)) {
-        if (settings.result.current.length > 1) {
-            this.type = BoxAndWhiskerWidget;
-        } else {
-            settings.result.current = settings.result.current[0];
-            this.type = ErrorBulletWidget;
-        }
+      if (settings.result.current.length > 1) {
+        this.Type = BoxAndWhiskerWidget;
+      } else {
+        settings.result.current = settings.result.current[0];
+        this.Type = ErrorBulletWidget;
+      }
     } else {
-      this.type = ErrorBulletWidget;
+      this.Type = ErrorBulletWidget;
     }
   }
 
   render () {
-    let widget = new this.type(this.el, this.settings);
+    let widget = new this.Type(this.el, this.settings);
     widget.render();
   }
 }

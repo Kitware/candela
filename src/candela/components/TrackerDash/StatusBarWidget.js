@@ -58,7 +58,6 @@ class StatusBarWidget extends VisComponent {
       .attr('width', unitWidth * this.numIncomplete)
       .attr('height', '100%')
       .attr('class', 'incomplete');
-
   }
 
   render () {

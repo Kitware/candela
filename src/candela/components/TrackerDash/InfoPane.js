@@ -69,10 +69,10 @@ class InfoPane extends VisComponent {
   }
 
   render () {
-      // Test if any of the aggregate trends have spark line historical data.
-      var sparklinesExist = (_.find(this.aggTrends, function (trend) {
-        return trend.history && trend.history.length > 1;
-      }, this)) !== undefined;
+    // Test if any of the aggregate trends have spark line historical data.
+    var sparklinesExist = (_.find(this.aggTrends, function (trend) {
+      return trend.history && trend.history.length > 1;
+    }, this)) !== undefined;
     this.$el.html(infoPane({
       name: this.name,
       branch: this.branch,
@@ -130,9 +130,9 @@ class InfoPane extends VisComponent {
         let dotSelector = '#' + trend.id_selector + '-aggregate-dot';
         if (!trend.incompleteThreshold) {
           if (failValue(current, trend.warning, trend.fail)) {
-              $(dotSelector).attr('class', 'fail');
+            $(dotSelector).attr('class', 'fail');
           } else if (warningValue(current, trend.warning, trend.fail)) {
-              $(dotSelector).attr('class', 'bad');
+            $(dotSelector).attr('class', 'bad');
           }
         }
       }, this);
@@ -142,7 +142,7 @@ class InfoPane extends VisComponent {
       numSuccess: this.numSuccess,
       numBad: this.numBad,
       numFail: this.numFail,
-      numIncomplete: this.numIncomplete,
+      numIncomplete: this.numIncomplete
     });
     statusBar.render();
   }

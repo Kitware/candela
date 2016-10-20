@@ -71,7 +71,7 @@ class TrendPane extends VisComponent {
       return value.toFixed(1);
     });
     if (maxXSet) {
-        this.xLabels[this.xLabels.length - 1] = 'Beyond';
+      this.xLabels[this.xLabels.length - 1] = 'Beyond';
     }
     return hists;
   }

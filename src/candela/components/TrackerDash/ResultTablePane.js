@@ -1,5 +1,6 @@
 import _ from 'underscore';
 import $ from 'jquery';
+import * as d3 from 'd3';
 
 import ValueWidget from './ValueWidget';
 import { sanitizeSelector } from './utility.js';
@@ -43,9 +44,9 @@ class ResultTablePane extends VisComponent {
         resultsByDatasetIdThenTrend[result.dataset_id_selector] = {};
       }
       if (Array.isArray(result.current)) {
-         resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = d3.median(result.current);
+        resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = d3.median(result.current);
       } else {
-          resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = result.current;
+        resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = result.current;
       }
     }, this));
 
@@ -56,19 +57,19 @@ class ResultTablePane extends VisComponent {
           var trendA = resultsByDatasetIdThenTrend[a.dataset_id_selector][this.sortOrder.trend];
           var trendB = resultsByDatasetIdThenTrend[b.dataset_id_selector][this.sortOrder.trend];
           if (trendB === undefined) {
-              return -1;
+            return -1;
           }
           if (trendA === undefined) {
-              return 1;
+            return 1;
           }
           return this.sortOrder.order * (trendA - trendB);
         }, this);
       } else {
         return _.bind(function (a, b) {
           if (this.sortOrder.order > 0) {
-              return a.dataset.localeCompare(b.dataset);
+            return a.dataset.localeCompare(b.dataset);
           } else {
-              return b.dataset.localeCompare(a.dataset);
+            return b.dataset.localeCompare(a.dataset);
           }
         }, this);
       }
@@ -145,8 +146,6 @@ class ResultTablePane extends VisComponent {
         };
         this.render();
       }, this));
-
-
     }, this));
   }
 }

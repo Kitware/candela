@@ -16,96 +16,96 @@ var betaGroundTruthSettings = {
     {
       dataset: 'dataset0.jpg',
       trend: 'ALGA RMSE Euclidean Distance',
-      current: 0.1,
+      current: 0.1
     },
     {
       dataset: 'dataset0.jpg',
       trend: 'ALGC RMSE Euclidean Distance',
       // ALGC RMSE values are strings to elicit alpha sorting order bug.
       // With the bug, the median is 215, with the fix, it is 5.
-      current: '215',
+      current: '215'
     },
     {
       dataset: 'dataset0.jpg',
       trend: 'ALGASBR RMSE Euclidean Distance',
-      current: 0.3,
+      current: 0.3
     },
     {
       dataset: 'dataset0.jpg',
       trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
-      current: 0.25,
+      current: 0.25
     },
     {
       dataset: 'dataset0.jpg',
       trend: 'ALGD-ONLINE RMSE Euclidean Distance',
-      current: 0.15,
+      current: 0.15
     },
     {
       dataset: 'dataset1',
       trend: 'ALGA RMSE Euclidean Distance',
-      current: 0.2,
+      current: 0.2
     },
     {
       dataset: 'dataset1',
       trend: 'ALGC RMSE Euclidean Distance',
-      current: '1',
+      current: '1'
     },
     {
       dataset: 'dataset1',
       trend: 'ALGASBR RMSE Euclidean Distance',
-      current: 0.2,
+      current: 0.2
     },
     {
       dataset: 'dataset1',
       trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
-      current: 0.10,
+      current: 0.10
     },
     {
       dataset: 'dataset1',
       trend: 'ALGD-ONLINE RMSE Euclidean Distance',
-      current: 0.12,
+      current: 0.12
     },
     {
       dataset: 'dataset2',
       trend: 'ALGA RMSE Euclidean Distance',
-      current: 0.5,
+      current: 0.5
     },
     {
       dataset: 'dataset2',
       trend: 'ALGC RMSE Euclidean Distance',
-      current: '5',
+      current: '5'
     },
     {
       dataset: 'dataset2',
       trend: 'ALGASBR RMSE Euclidean Distance',
-      current: 0.3,
+      current: 0.3
     },
     {
       dataset: 'dataset2',
       trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
-      current: 0.22,
+      current: 0.22
     },
     {
       dataset: 'dataset2',
       trend: 'ALGD-ONLINE RMSE Euclidean Distance',
-      current: 0.18,
+      current: 0.18
     },
     {
       dataset: 'dataset3',
       trend: 'ALGA RMSE Euclidean Distance',
-      current: 0.8,
+      current: 0.8
     },
     {
       dataset: 'dataset3',
       trend: 'ALGC RMSE Euclidean Distance',
-      current: '6',
+      current: '6'
     },
     // Omit ALGASBR dataset3
     {
       dataset: 'dataset3',
-        trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
-        current: 27,
-        callback: function () { console.log('dataset3-algd-offline'); }
+      trend: 'ALGD-OFFLINE RMSE Euclidean Distance',
+      current: 27,
+      callback: function () { console.log('dataset3-algd-offline'); }
     },
     {
       dataset: 'dataset3',
@@ -260,46 +260,49 @@ var imageProcessingSettings = {
       trend: 'RANSAC Recall',
       current: 0.35
     }],
-  trends: [{
-    name: 'KEYPOINT-MATCHING Precision',
-    abbreviation: 'Matching Precision',
-    lower_is_better: false,
-    warning: 0.75,
-    fail: 0.5,
-    max: 1,
-  },
+  trends: [
+    {
+      name: 'KEYPOINT-MATCHING Precision',
+      abbreviation: 'Matching Precision',
+      lower_is_better: false,
+      warning: 0.75,
+      fail: 0.5,
+      max: 1
+    },
     {
       name: 'KEYPOINT-MATCHING Recall',
       abbreviation: 'Matching Recall',
       lower_is_better: false,
       warning: 0.75,
       fail: 0.5,
-      max: 1.0,
+      max: 1.0
     },
     {
       name: 'RANSAC Precision',
       lower_is_better: false,
       warning: 0.5,
       fail: 0.25,
-      max: 1.0,
+      max: 1.0
     },
     {
       name: 'RANSAC Recall',
       lower_is_better: false,
       warning: 0.75,
       fail: 0.5,
+      max: 1.0
+    }
+  ],
+  agg_trends: [
+    {
+      trend_name: 'KEYPOINT-MATCHING Precision',
+      lower_is_better: false,
+      name: 'KEYPOINT-MATCHING Precision',
+      abbreviation: 'Matching Precision',
+      warning: 0.75,
+      fail: 0.5,
       max: 1.0,
-    }],
-  agg_trends: [{
-    trend_name: 'KEYPOINT-MATCHING Precision',
-    lower_is_better: false,
-    name: 'KEYPOINT-MATCHING Precision',
-    abbreviation: 'Matching Precision',
-    warning: 0.75,
-    fail: 0.5,
-    max: 1.0,
-    history: [0.4, 0.5, 0.6, 0.8, 0.6, 0.75, 0.85]
-  },
+      history: [0.4, 0.5, 0.6, 0.8, 0.6, 0.75, 0.85]
+    },
     {
       trend_name: 'KEYPOINT-MATCHING Recall',
       lower_is_better: false,
@@ -328,23 +331,24 @@ var imageProcessingSettings = {
       fail: 0.5,
       max: 1.0,
       history: [0.7, 0.7, 0.86, 0.92, 0.7, 0.72, 0.35]
-    }]
+    }
+  ]
 };
 
 // Ground truth dataset is default.
 var appSettings = betaGroundTruthSettings;
-var qParams = location.search;
+var qParams = window.location.search;
 if (qParams) {
   qParams = qParams.split('?')[1].split('&');
-  for (var i = 0; i < qParams.length; i++) {
+  for (let i = 0; i < qParams.length; i++) {
     if (qParams[i] === 'imageProcessing') {
       // Replace with imageProcessing dataset.
-      var appSettings = imageProcessingSettings;
+      appSettings = imageProcessingSettings;
     }
   }
   // Perform two separate loops since we set appSettings
   // above, which is modified below.
-  for (var i = 0; i < qParams.length; i++) {
+  for (let i = 0; i < qParams.length; i++) {
     if (qParams[i] === 'omitAggTrends') {
       delete appSettings['agg_trends'];
     }
@@ -352,25 +356,17 @@ if (qParams) {
       delete appSettings['trends'];
     }
     if (qParams[i] === 'multipleValues') {
-      appSettings['trendValuesByDataset'][0]['current'] =
-        [0.1, 0.2, 0.3, 0.5, 0.9, 0.1, 0.5, 0.3, 5.0];
-      appSettings['trendValuesByDataset'][1]['current'] =
-        [0.1, 0.2, 0.3, 0.5, 0.9, 0.1, 0.5, 0.3, 2.0];
-      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length-1]['current'] =
-        [20, 20, 20, 30, 20, 21, 22, 23, 25];
-      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length-2]['current'] =
-        [120, 220, 220, 330, 202, 2100, 220, 11, 333];
-      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length-3]['current'] =
-        [0.1, 0.52, 0.3];
-      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length-3]['current'] =
-        [0.1, 3.2, 0.3];
-      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length-8]['current'] =
-        [0.1, 8.2, 10.3];
-      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length-13]['current'] =
-        [0.1, 0.2, 0.3];
-      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length-11]['current'] =
-        [99.9];
+      appSettings['trendValuesByDataset'][0]['current'] = [0.1, 0.2, 0.3, 0.5, 0.9, 0.1, 0.5, 0.3, 5.0];
+      appSettings['trendValuesByDataset'][1]['current'] = [0.1, 0.2, 0.3, 0.5, 0.9, 0.1, 0.5, 0.3, 2.0];
+      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length - 1]['current'] = [20, 20, 20, 30, 20, 21, 22, 23, 25];
+      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length - 2]['current'] = [120, 220, 220, 330, 202, 2100, 220, 11, 333];
+      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length - 3]['current'] = [0.1, 0.52, 0.3];
+      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length - 3]['current'] = [0.1, 3.2, 0.3];
+      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length - 8]['current'] = [0.1, 8.2, 10.3];
+      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length - 13]['current'] = [0.1, 0.2, 0.3];
+      appSettings['trendValuesByDataset'][appSettings['trendValuesByDataset'].length - 11]['current'] = [99.9];
     }
   }
 }
 var app = new TrackerDash(document.body, appSettings);
+app.render();
