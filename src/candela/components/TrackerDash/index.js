@@ -41,10 +41,10 @@ const synthesizeMissingAggTrends = (aggTrends, trendMap, trendValuesByDataset, p
     aggTrends = [];
   }
   const aggTrendsByTrendName = _.indexBy(aggTrends, 'trend_name');
-  for (let i = 0; i < trends.length; ++i) {
+  for (let i = 0; i < trends.length; i++) {
     if (!_.has(aggTrendsByTrendName, trends[i])) {
-      let aggTrend = _.clone(trendMap[trends[i]]);
-      let trendVals = _.chain(byTrend[aggTrend.name])
+      const aggTrend = _.clone(trendMap[trends[i]]);
+      const trendVals = _.chain(byTrend[aggTrend.name])
         .pluck('current')
         .map((value) => {
           return deArray(value, d3.median);
@@ -119,8 +119,8 @@ class TrackerDash extends VisComponent {
     // the max as the max input value for that trend.
     _.each(settings.trendValuesByDataset, function (trendValue) {
       if (!_.has(settings.trendMap, trendValue.trend)) {
-        let current = deArray(trendValue.current, d3.median);
-        var syntheticTrend = sanitizeTrend({
+        const current = deArray(trendValue.current, d3.median);
+        const syntheticTrend = sanitizeTrend({
           name: trendValue.trend,
           synth: true,
           max: current
@@ -128,8 +128,8 @@ class TrackerDash extends VisComponent {
         settings.trendMap[syntheticTrend.name] = syntheticTrend;
         settings.trends.push(syntheticTrend);
       } else {
-        let current = deArray(trendValue.current, d3.median);
-        var trend = settings.trendMap[trendValue.trend];
+        const current = deArray(trendValue.current, d3.median);
+        const trend = settings.trendMap[trendValue.trend];
         if (trend.synth && trend.max < current) {
           trend.max = current;
         }
@@ -144,8 +144,8 @@ class TrackerDash extends VisComponent {
     });
 
     // Generate aggregate trends if needed.
-    var percentile = 50.0;
-    var aggTrends = synthesizeMissingAggTrends(settings.agg_trends, settings.trendMap, settings.trendValuesByDataset, percentile);
+    const percentile = 50.0;
+    const aggTrends = synthesizeMissingAggTrends(settings.agg_trends, settings.trendMap, settings.trendValuesByDataset, percentile);
     settings.aggTrends = _.chain(aggTrends)
       .map(sanitizeTrend)
       .map(sanitizeAggregateThreshold)

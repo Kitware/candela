@@ -38,8 +38,8 @@ class InfoPane extends VisComponent {
       if (settings.trendMap[dataset.trend].incompleteThreshold) {
         this.numIncomplete++;
       } else {
-        var failTrend = settings.trendMap[dataset.trend].fail;
-        var warningTrend = settings.trendMap[dataset.trend].warning;
+        let failTrend = settings.trendMap[dataset.trend].fail;
+        let warningTrend = settings.trendMap[dataset.trend].warning;
         if (failValue(current, warningTrend, failTrend)) {
           this.numFail++;
         } else if (warningValue(current, warningTrend, failTrend)) {
@@ -52,25 +52,25 @@ class InfoPane extends VisComponent {
   }
 
   getToday () {
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth() + 1;  // January is 0!
-    var yyyy = today.getFullYear();
+    const today = new Date();
+    let dd = today.getDate();
+    let mm = today.getMonth() + 1;  // January is 0!
+    const yyyy = today.getFullYear();
 
     if (dd < 10) {
-      dd = '0' + dd;
+      dd = `0${dd}`;
     }
 
     if (mm < 10) {
-      mm = '0' + mm;
+      mm = `0${mm}`;
     }
 
-    return yyyy + '/' + mm + '/' + dd;
+    return `${yyyy}/${mm}/${dd}`;
   }
 
   render () {
     // Test if any of the aggregate trends have spark line historical data.
-    var sparklinesExist = (_.find(this.aggTrends, function (trend) {
+    const sparklinesExist = (_.find(this.aggTrends, function (trend) {
       return trend.history && trend.history.length > 1;
     }, this)) !== undefined;
     this.$el.html(infoPane({

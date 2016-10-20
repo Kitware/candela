@@ -34,7 +34,7 @@ class ResultTablePane extends VisComponent {
     if (this.results === undefined) {
       return;
     }
-    var resultsByDatasetIdThenTrend = {};
+    const resultsByDatasetIdThenTrend = {};
     _.each(this.results, _.bind(function (result) {
       result.dataset_id_selector = sanitizeSelector(result.dataset);
       this.datasetMap[result.dataset_id_selector] = this.datasetMap[result.dataset];
@@ -54,8 +54,8 @@ class ResultTablePane extends VisComponent {
       if (!this.sortOrder.dataset) {
         return _.bind(function (a, b) {
           // Sort all datasets by the selected trend column and direction
-          var trendA = resultsByDatasetIdThenTrend[a.dataset_id_selector][this.sortOrder.trend];
-          var trendB = resultsByDatasetIdThenTrend[b.dataset_id_selector][this.sortOrder.trend];
+          const trendA = resultsByDatasetIdThenTrend[a.dataset_id_selector][this.sortOrder.trend];
+          const trendB = resultsByDatasetIdThenTrend[b.dataset_id_selector][this.sortOrder.trend];
           if (trendB === undefined) {
             return -1;
           }
@@ -76,7 +76,7 @@ class ResultTablePane extends VisComponent {
     }, this))());
 
     // The order of the datasets determines the order the rows are printed.
-    var resultsByDatasetId = _.groupBy(this.results, function (result) {
+    const resultsByDatasetId = _.groupBy(this.results, function (result) {
       return result.dataset_id_selector;
     });
 
@@ -90,8 +90,8 @@ class ResultTablePane extends VisComponent {
       sortOrder: this.sortOrder
     })).promise().done(_.bind(function () {
       _.each(this.results, function (result) {
-        var trend = this.trendMap[result.trend];
-        var resultDivSelector = `#${result.dataset_id_selector}-${trend.id_selector}`;
+        const trend = this.trendMap[result.trend];
+        const resultDivSelector = `#${result.dataset_id_selector}-${trend.id_selector}`;
         // Render value widgets.
         const el = $(`${resultDivSelector}-valueWidget-svg`).get(0);
         let valueWidget = new ValueWidget(el, {
