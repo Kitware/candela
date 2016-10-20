@@ -4,7 +4,7 @@ import d3 from 'd3';
 import nv from 'nvd3';
 
 import StatusBarWidget from './StatusBarWidget';
-import { ErrorBulletWidget } from './ErrorBulletWidget';
+import ErrorBulletWidget from './ErrorBulletWidget';
 import { deArray, failValue, warningValue } from './utility.js';
 
 import infoPane from './templates/infoPane.jade';
@@ -120,8 +120,8 @@ class InfoPane extends VisComponent {
         }
         let current = trend.history[trend.history.length - 1];
         current = deArray(current, d3.median);
-        this.aggBullets[trend.id_selector] = new ErrorBulletWidget({
-          el: '#' + trend.id_selector + '-aggregate-bullet',
+        const el = $(`#${trend.id_selector}-aggregate-bullet`).get(0);
+        this.aggBullets[trend.id_selector] = new ErrorBulletWidget(el, {
           result: {
             current: Math.round(current * 10000) / 10000
           },

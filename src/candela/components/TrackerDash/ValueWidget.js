@@ -1,11 +1,11 @@
-import Backbone from 'backbone';
+import ErrorBulletWidget from './ErrorBulletWidget';
+import BoxAndWhiskerWidget from './BoxAndWhiskerWidget';
+import VisComponent from '../../VisComponent';
 
-import { ErrorBulletWidget } from './ErrorBulletWidget';
-import { BoxAndWhiskerWidget } from './BoxAndWhiskerWidget';
+class ValueWidget extends VisComponent {
+  constructor (el, settings) {
+    super(el);
 
-export let ValueWidget = Backbone.View.extend({
-
-  initialize: function (settings) {
     this.settings = settings;
     if (Array.isArray(settings.result.current)) {
         if (settings.result.current.length > 1) {
@@ -17,11 +17,12 @@ export let ValueWidget = Backbone.View.extend({
     } else {
       this.type = ErrorBulletWidget;
     }
-  },
-
-  render: function () {
-    let widget = new this.type(this.settings);
-    widget.render();
   }
 
-});
+  render () {
+    let widget = new this.type(this.el, this.settings);
+    widget.render();
+  }
+}
+
+export default ValueWidget;

@@ -1,14 +1,15 @@
-import Backbone from 'backbone';
 import _ from 'underscore';
 import d3 from 'd3';
 import nv from 'nvd3';
 import $ from 'jquery';
 
 import { computeColor } from './utility.js';
+import VisComponent from '../../VisComponent';
 
-export let ErrorBulletWidget = Backbone.View.extend({
+class ErrorBulletWidget extends VisComponent {
+  constructor (el, settings) {
+    super(el);
 
-  initialize: function (settings) {
     this.result = settings.result;
     this.trend = settings.trend;
     if (this.result === undefined) {
@@ -17,22 +18,23 @@ export let ErrorBulletWidget = Backbone.View.extend({
     if (this.trend === undefined) {
       console.error('No trend passed to error bullet.');
     }
-  },
+  }
 
-  chartData: function () {
+  chartData () {
     return {
       ranges: this.trend.incompleteThreshold ? [0, 0, this.trend.max] : [this.trend.warning, this.trend.fail, this.trend.max],
       measures: [Math.round(Math.min(this.result.current, this.trend.max) * 10000) / 10000]
     };
-  },
+  }
 
-  render: function () {
+  render () {
     nv.addGraph({
       generate: _.bind(function () {
         let chart = nv.models.bulletChart()
           .margin({top: 5, right: 20, bottom: 20, left: 10});
         chart.color(computeColor(this.trend, this.result.current));
-        d3.select('[id=\'' + this.el.id + '-svg\']')
+        // d3.select('[id=\'' + this.el.id + '-svg\']')
+        d3.select(this.el)
           .datum(this.chartData())
           .call(chart);
         chart.bullet.dispatch.on('elementMouseover.tooltip', null);
@@ -48,12 +50,12 @@ export let ErrorBulletWidget = Backbone.View.extend({
       }, this),
       callback: _.bind(function (graph) {
         nv.utils.windowResize(_.bind(function () {
-          let parent = $('#' + this.el.id);
+          let parent = $(this.el.parentNode);
           let width = parent.width();
           let height = parent.height();
           graph.width(width).height(height);
 
-          d3.select('[id=\'' + this.el.id + '-svg\']')
+          d3.select(this.el)
             .attr('width', width)
             .attr('height', height)
             .transition().duration(0)
@@ -62,5 +64,6 @@ export let ErrorBulletWidget = Backbone.View.extend({
       }, this)
     });
   }
+}
 
-});
+export default ErrorBulletWidget;

@@ -1,4 +1,3 @@
-import Backbone from 'backbone';
 import _ from 'underscore';
 import d3 from 'd3';
 import nv from 'nvd3';
@@ -7,10 +6,12 @@ import $ from 'jquery';
 import colors from './colors.js';
 import { failValue, warningValue,
          standardRound, computeColor } from './utility.js';
+import VisComponent from '../../VisComponent';
 
-export let BoxAndWhiskerWidget = Backbone.View.extend({
+class BoxAndWhiskerWidget extends VisComponent {
+  constructor (el, settings) {
+    super(el);
 
-  initialize: function (settings) {
     this.showScales = settings.showScales !== false;
     this.current = settings.result.current;
     this.trend = settings.trend;
@@ -18,17 +19,18 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
     this.median = d3.median(this.currentValues);
     this.outOfBounds = this.median <= 0 || this.median >= this.trend.max;
     $(window).resize(_.bind(this.render, this));
-  },
+  }
 
-  chartData: function () {},
+  chartData () {}
 
-  render: function () {
+  render () {
 
     const toolTipDiv = d3.select("body").append("div")
       .attr("class", "tdash-tooltip")
       .style("opacity", 0);
 
-    let svg = d3.select('[id=\'' + this.el.id + '-svg\']')
+    // let svg = d3.select('[id=\'' + this.el.id + '-svg\']')
+    let svg = d3.select(this.el)
      .html("")
      .attr("width", "100%")
      .attr("height", "100%");
@@ -204,5 +206,6 @@ export let BoxAndWhiskerWidget = Backbone.View.extend({
       });
 
   }
+}
 
-});
+export default BoxAndWhiskerWidget;
