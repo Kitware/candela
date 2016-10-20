@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import _ from 'underscore';
+import * as d3 from 'd3';
 
 require('bootstrap-webpack');
 require('nvd3/build/nv.d3.min.css');
@@ -28,7 +29,7 @@ const calcPercentile = (arr, p) => {
   // Ind may be below 0, in this case the closest value is the 0th index.
   index = index < 0 ? 0 : index;
   return arr[index];
-}
+};
 
 // Synthesize aggregate metrics from the supplied trend values, which will
 // result in a percentile value per trend if an aggregate metric isn't already
@@ -58,7 +59,7 @@ const synthesizeMissingAggTrends = (aggTrends, trendMap, trendValuesByDataset, p
     }
   }
   return aggTrends;
-}
+};
 
 // Creates a valid display_name and id_selector per trend, create a mouseover
 // title property, and determines if the threshold is correctly defined.
@@ -80,7 +81,7 @@ const sanitizeTrend = (trend) => {
   }
   trend.id_selector = sanitizeSelector(trend.display_name);
   return trend;
-}
+};
 
 /**
  * Ensures that an aggregate metric has a max value set, as a fallback
@@ -88,14 +89,14 @@ const sanitizeTrend = (trend) => {
  */
 const sanitizeAggregateThreshold = (aggTrend) => {
   if (_.isNaN(parseFloat(aggTrend.max))) {
-    aggTrend.max = aggTrend.history[aggTrend.history.length-1];
+    aggTrend.max = aggTrend.history[aggTrend.history.length - 1];
     if (!aggTrend.incompleteThreshold) {
       aggTrend.incompleteThreshold = true;
       aggTrend.title += ' & Incomplete threshold definition';
     }
   }
   return aggTrend;
-}
+};
 
 class TrackerDash extends VisComponent {
   constructor (el, settings) {
@@ -107,7 +108,7 @@ class TrackerDash extends VisComponent {
     // gets passed down throughout the application.
 
     if (!settings.trends) {
-        settings.trends = [];
+      settings.trends = [];
     }
     // trendMap maps full trend name to a sanitized trend object.
     settings.trendMap = {};
@@ -139,17 +140,17 @@ class TrackerDash extends VisComponent {
     settings.trends = _.sortBy(settings.trends, 'display_name');
     // Order the individual trend dataset values by trend display_name.
     settings.trendValuesByDataset = _.sortBy(settings.trendValuesByDataset, function (val) {
-        return settings.trendMap[val.trend].display_name;
+      return settings.trendMap[val.trend].display_name;
     });
 
     // Generate aggregate trends if needed.
     var percentile = 50.0;
     var aggTrends = synthesizeMissingAggTrends(settings.agg_trends, settings.trendMap, settings.trendValuesByDataset, percentile);
     settings.aggTrends = _.chain(aggTrends)
-                          .map(sanitizeTrend)
-                          .map(sanitizeAggregateThreshold)
-                          .sortBy('display_name')
-                          .value();
+      .map(sanitizeTrend)
+      .map(sanitizeAggregateThreshold)
+      .sortBy('display_name')
+      .value();
 
     this.trackData = settings;
     delete this.trackData.el;
