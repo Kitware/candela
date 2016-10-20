@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import $ from 'jquery';
 
-import { ValueWidget } from './ValueWidget';
+import ValueWidget from './ValueWidget';
 import { sanitizeSelector } from './utility.js';
 
 import tablePane from './templates/tablePane.jade';
@@ -90,10 +90,10 @@ class ResultTablePane extends VisComponent {
     })).promise().done(_.bind(function () {
       _.each(this.results, function (result) {
         var trend = this.trendMap[result.trend];
-        var resultDivSelector = '#' + result.dataset_id_selector + '-' + trend.id_selector;
+        var resultDivSelector = `#${result.dataset_id_selector}-${trend.id_selector}`;
         // Render value widgets.
-        let valueWidget = new ValueWidget({
-          el: resultDivSelector + '-valueWidget',
+        const el = $(`${resultDivSelector}-valueWidget-svg`).get(0);
+        let valueWidget = new ValueWidget(el, {
           result: result,
           trend: trend
         });
