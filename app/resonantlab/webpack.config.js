@@ -2,7 +2,7 @@ var fs = require('fs');
 var webpack = require('webpack');
 var GruntWatchPlugin = require('./grunt-watch-plugin.js');
 
-var entry = ['./mainPage.js'];
+var entry = ['babel-polyfill', './mainPage.js'];
 
 var gaKey = process.env.GOOGLE_ANALYTICS_KEY;
 if (gaKey) {
