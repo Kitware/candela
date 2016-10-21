@@ -1,5 +1,6 @@
 import Backbone from 'backbone';
 import d3 from 'd3';
+import is from 'is_js';
 
 import Router from './Router';
 import User from './models/User';
@@ -89,6 +90,10 @@ let MainPage = Backbone.View.extend({
     this.overlay.render();
     this.helpLayer.render();
     this.notificationLayer.render();
+
+    if (!is.chrome()) {
+      this.notificationLayer.displayNotification('Warning: This application works best in Chrome. Functionality may be limited in this browser.');
+    }
   },
   generateFilters: function () {
     let svg = d3.select('#SvgFilters');
