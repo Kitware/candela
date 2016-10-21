@@ -26,7 +26,6 @@ class BoxAndWhiskerWidget extends VisComponent {
       .attr('class', 'tdash-tooltip')
       .style('opacity', 0);
 
-    // let svg = d3.select('[id=\'' + this.el.id + '-svg\']')
     let svg = d3.select(this.el)
      .html('')
      .attr('width', '100%')
@@ -41,7 +40,8 @@ class BoxAndWhiskerWidget extends VisComponent {
     const w = svg[0][0].clientWidth - margin.left - margin.right;
     const h = svg[0][0].clientHeight - margin.top - margin.bottom;
 
-    svg.attr('style', 'padding-left: ' + margin.left + '; padding-right: ' + margin.right);
+    svg.style('padding-left', margin.left)
+      .style('padding-right', margin.right);
 
     const q1 = d3.quantile(this.currentValues, 0.25);
     const q3 = d3.quantile(this.currentValues, 0.75);
@@ -105,12 +105,12 @@ class BoxAndWhiskerWidget extends VisComponent {
       }
       let toolTipHtml = '<table style="border-collapse: separate; border-spacing: 10px 2px;">';
       _.each(cells, function (cell) {
-        toolTipHtml += '<tr><td>' + cell[0] + '</td><td>' + cell[1] + '</td></tr>';
+        toolTipHtml += `<tr><td>${cell[0]}</td><td>${cell[1]}</td></tr>`;
       });
       toolTipHtml += '</table>';
       toolTipDiv.html(toolTipHtml)
-        .style('left', (d3.event.pageX) + 'px')
-        .style('top', (d3.event.pageY - 28) + 'px');
+        .style('left', `${d3.event.pageX}px`)
+        .style('top', `${d3.event.pageY - 28}px`);
     })
       .on('mouseout', (d) => {
         toolTipDiv.transition()
