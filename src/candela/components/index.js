@@ -13,6 +13,7 @@ import ParallelCoordinates from './ParallelCoordinates';
 import ScatterPlot from './ScatterPlot';
 import ScatterPlotMatrix from './ScatterPlotMatrix';
 import SurvivalPlot from './SurvivalPlot';
+import TrackerDash from './TrackerDash';
 import UpSet from './UpSet';
 
 export default {
@@ -31,5 +32,6 @@ export default {
   ScatterPlot,
   ScatterPlotMatrix,
   SurvivalPlot,
+  TrackerDash,
   UpSet
 };
