@@ -92,9 +92,7 @@ let MainPage = Backbone.View.extend({
     this.notificationLayer.render();
 
     if (!is.chrome()) {
-      this.notificationLayer.displayNotification(
-        'Warning: This application works best in Chrome. ' +
-        'Functionality may be limited in this browser.');
+      this.notificationLayer.displayNotification('Warning: This application works best in Chrome. Functionality may be limited in this browser.');
     }
   },
   generateFilters: function () {
