@@ -162,7 +162,7 @@ let ProjectLibrary = ProjectSettings.extend({
           if (d.attributes.meta.rlab.versionNumber === appVersion) {
             return 'none';
           } else {
-            return 'block';
+            return 'none';
           }
         })
         .attr('title', d => {
