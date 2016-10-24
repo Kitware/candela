@@ -1,8 +1,9 @@
+import os
 import subprocess
 from pluginDir import pluginDir
 from girder.api import access
 from girder.api.describe import Description, describeRoute
-from girder.api.rest import Resource
+from girder.api.rest import Resource, RestException, loadmodel
 
 
 class Versioning(Resource):
@@ -15,13 +16,7 @@ class Versioning(Resource):
         .errorResponse()
     )
     def versionNumber(self, params):
-        return 'master'
-
         # TODO: instead of "master", return (and use) actual version numbers
-        #
-        # TODO: remove this logic altogether. A semver/semantic-release kind of
-        # automated release cycle should eliminate most of the need for this
-        # versioning scheme.
         try:
             # Try to figure out what git branch we're on... TODO: if this fails
             # for whatever reason, return the actual version number instead
