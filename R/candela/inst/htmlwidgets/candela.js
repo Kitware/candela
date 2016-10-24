@@ -8,7 +8,6 @@ window.HTMLWidgets.widget({
       renderValue: function (x) {
         var render = function () {
           if (window.candela) {
-            console.log(JSON.stringify(x));
             visualization = new window.candela.components[x.name](el, x.options);
             visualization.render();
           } else {
@@ -18,7 +17,7 @@ window.HTMLWidgets.widget({
         render();
       },
       resize: function (width, height) {
-        // TODO: code to re-render the widget with a new size
+        visualization.render();
       }
     };
   }
