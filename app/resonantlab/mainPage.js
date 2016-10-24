@@ -1,3 +1,5 @@
+import 'babel-polyfill';
+
 import Backbone from 'backbone';
 import d3 from 'd3';
 import is from 'is_js';
