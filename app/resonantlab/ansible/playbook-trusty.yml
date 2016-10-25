@@ -19,13 +19,8 @@
     google_analytics_key: ""
 
   tasks:
-    - name: Add Mongo repository key
-      become: yes
-      shell: apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+    - include: mongo.yml
 
-    - name: Set Mongo package list
-      become: yes
-      shell: echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list
 
     - name: Pull in latest Node package files
       become: yes
@@ -39,7 +34,6 @@
           - python-dev
           - git
           - nodejs
-          - mongodb-org
           - libcairo2-dev
           - libjpeg8-dev
           - libpango1.0-dev
@@ -130,11 +124,6 @@
         chdir: "{{ storage }}/girder"
       environment:
         GOOGLE_ANALYTICS_KEY: "{{ google_analytics_key }}"
-
-    - name: Start MongoDB
-      service:
-        name: mongod
-        state: started
 
     - name: Instantiate girder.conf template on server
       become: yes
