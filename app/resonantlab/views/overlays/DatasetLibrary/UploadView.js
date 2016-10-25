@@ -7,6 +7,7 @@ const SUPPORTED_FORMATS = {
   'json': 'json',
   'text/csv': 'csv',
   'text/tsv': 'csv',
+  'application/vnd.ms-excel': 'csv',
   'application/json': 'json'
 };
 
