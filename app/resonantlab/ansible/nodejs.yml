@@ -1,0 +1,13 @@
+- name: Pull in latest Node package files
+  become: yes
+  shell: curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+
+- name: Install NodeJS package
+  become: yes
+  apt:
+    name:
+      - nodejs
+
+- name: Update NPM to latest version
+  become: yes
+  command: npm i -g npm

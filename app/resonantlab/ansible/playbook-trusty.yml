@@ -20,11 +20,7 @@
 
   tasks:
     - include: mongo.yml
-
-
-    - name: Pull in latest Node package files
-      become: yes
-      shell: curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+    - include: nodejs.yml
 
     - name: Ensure APT packages are installed
       become: yes
@@ -33,7 +29,6 @@
           - python
           - python-dev
           - git
-          - nodejs
           - libcairo2-dev
           - libjpeg8-dev
           - libpango1.0-dev
@@ -48,10 +43,6 @@
     - name: Update pip
       become: yes
       shell: curl https://bootstrap.pypa.io/get-pip.py | python
-
-    - name: Update NPM to latest version
-      become: yes
-      command: npm i -g npm
 
     - name: Clone Girder repository
       git:
