@@ -3,7 +3,7 @@
   become_user: root
   become_method: sudo
   vars_files:
-    - vars.yml
+    - ../vars.yml
 
   roles:
     - role: girder.girder

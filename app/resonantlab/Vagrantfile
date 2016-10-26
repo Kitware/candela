@@ -23,8 +23,8 @@ Vagrant.configure("2") do |config|
       "all" => ['reslab']
     }
 
-    ansible.playbook = "ansible/playbook-#{box}.yml"
-    ansible.galaxy_role_file = "ansible/requirements.yml"
+    ansible.playbook = "ansible/#{box}/site.yml"
+    ansible.galaxy_role_file = "ansible/#{box}/requirements.yml"
 
     Extra_vars = ENV['ANSIBLE_EXTRA_VARS']
     if !Extra_vars.nil? && !Extra_vars.empty?
