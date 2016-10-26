@@ -52,15 +52,14 @@
         dest: "{{ storage }}/database_assetstore"
         version: "{{ database_assetstore_revision }}"
 
-    - name: Install DB Items plugins
-      command: "{{ girder_venv }}/bin/girder-install plugin -s {{ storage }}/database_assetstore"
-
     - name: Clone Candela repository
       git:
         repo: https://github.com/Kitware/candela
         dest: "{{ storage }}/candela"
         version: "{{ candela_revision }}"
 
+    # TODO: remove this task and the one after it after setting up Resonant Lab
+    # to pull candela.js from node_modules for use in the HTML export.
     - name: Install Candela node requirements
       command: npm install
       args:
@@ -73,11 +72,8 @@
         chdir: "{{ storage }}/candela"
         creates: build/candela/candela.js
 
-    # TODO: use --dev flag here to avoid having to install the dev dependencies
-    # by hand above (after setting up Resonant Lab to pull candela.js from
-    # node_modules for use in the HTML export).
-    - name: Install Resonant Lab plugin
-      command: "{{ girder_venv }}/bin/girder-install plugin -s {{ storage }}/candela/app/resonantlab"
+    - name: Install plugins
+      command: "{{ girder_venv }}/bin/girder-install plugin -s --dev {{ storage }}/database_assetstore {{ storage }}/candela/app/resonantlab"
       environment:
         GOOGLE_ANALYTICS_KEY: "{{ google_analytics_key }}"
 
