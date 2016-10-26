@@ -2,22 +2,8 @@
 - hosts: all
   become_user: root
   become_method: sudo
-  vars:
-    adminuser_firstname: Admin
-    adminuser_lastname: User
-    adminuser_login: admin
-    adminuser_password: adminadmin
-    adminuser_email: admin@example.com
-
-    storage: /home/vagrant
-    girder_venv: "{{ storage }}/venv"
-
-    girder_revision: 12e12f17a7a8ec99330c16234e19a14435b1a034
-    database_assetstore_revision: a530c9546d3ac4f50ec4519ef6c7bb348e2b4bc7
-    candela_revision: f823873ab1c11feba09779f82fcb4325b72d33ff
-    girder_client_revision: 6bda1a7b65bea1c11187cdeb136877739693f466
-
-    google_analytics_key: ""
+  vars_files:
+    - vars.yml
 
   roles:
     - role: girder.girder
