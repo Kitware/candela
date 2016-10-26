@@ -10,6 +10,7 @@
     adminuser_email: admin@example.com
 
     storage: /home/vagrant
+    girder_venv: "{{ storage }}/venv"
 
     girder_revision: 12e12f17a7a8ec99330c16234e19a14435b1a034
     database_assetstore_revision: a530c9546d3ac4f50ec4519ef6c7bb348e2b4bc7
@@ -18,9 +19,14 @@
 
     google_analytics_key: ""
 
-  tasks:
+  roles:
+    - role: girder.girder
+      girder_path: "{{ storage }}/girder"
+      girder_virtualenv: "{{ girder_venv }}"
+      girder_version: "{{ girder_revision }}"
+
+  post_tasks:
     - include: mongo.yml
-    - include: nodejs.yml
 
     - name: Ensure APT packages are installed
       become: yes
@@ -40,27 +46,14 @@
           - postgresql-contrib
           - libpq-dev
 
-    - name: Update pip
-      become: yes
-      shell: curl https://bootstrap.pypa.io/get-pip.py | python
-
-    - name: Clone Girder repository
-      git:
-        repo: https://github.com/girder/girder
-        dest: "{{ storage }}/girder"
-        version: "{{ girder_revision }}"
-
     - name: Clone Girder DB Items repository
       git:
         repo: https://github.com/OpenGeoscience/girder_db_items
-        dest: "{{ storage }}/girder/plugins/database_assetstore"
+        dest: "{{ storage }}/database_assetstore"
         version: "{{ database_assetstore_revision }}"
 
-    - name: Install Girder DB Items requirements
-      become: yes
-      command: pip install -r requirements.txt
-      args:
-        chdir: "{{ storage }}/girder/plugins/database_assetstore"
+    - name: Install DB Items plugins
+      command: "{{ girder_venv }}/bin/girder-install plugin -s {{ storage }}/database_assetstore"
 
     - name: Clone Candela repository
       git:
@@ -69,16 +62,10 @@
         version: "{{ candela_revision }}"
 
     - name: Install Candela node requirements
-      command: npm i
+      command: npm install
       args:
         chdir: "{{ storage }}/candela"
         creates: node_modules
-
-    - name: Install Candela python requirements
-      become: yes
-      command: pip install -r requirements.txt
-      args:
-        chdir: "{{ storage }}/candela/app/resonantlab"
 
     - name: Build Candela
       command: npm run build
@@ -86,65 +73,17 @@
         chdir: "{{ storage }}/candela"
         creates: build/candela/candela.js
 
-    - name: Link Resonant Lab into Girder plugin directory
-      file:
-        src: "{{ storage }}/candela/app/resonantlab"
-        dest: "{{ storage }}/girder/plugins/resonantlab"
-        state: link
-
-    - name: Install Girder node requirements
-      command: npm i
-      args:
-        chdir: "{{ storage }}/girder"
-        creates: node_modules
-
-    - name: Run Girder grunt init step
-      command: ./node_modules/.bin/grunt init
-      args:
-        chdir: "{{ storage }}/girder"
-
-    - name: Install Girder Python requirements
-      become: yes
-      command: pip install -r requirements.txt
-      args:
-        chdir: "{{ storage }}/girder"
-
-    - name: Build Girder
-      command: ./node_modules/.bin/grunt
-      args:
-        chdir: "{{ storage }}/girder"
+    # TODO: use --dev flag here to avoid having to install the dev dependencies
+    # by hand above (after setting up Resonant Lab to pull candela.js from
+    # node_modules for use in the HTML export).
+    - name: Install Resonant Lab plugin
+      command: "{{ girder_venv }}/bin/girder-install plugin -s {{ storage }}/candela/app/resonantlab"
       environment:
         GOOGLE_ANALYTICS_KEY: "{{ google_analytics_key }}"
 
-    - name: Instantiate girder.conf template on server
-      become: yes
-      template:
-        src: trusty/girder.conf.template
-        dest: /etc/init/girder.conf
-        mode: 644
-        owner: root
-
-    - name: Start Girder
-      become: yes
-      service:
-        name: girder
-        state: started
-        enabled: yes
-
-    - name: Wait for Girder to start
-      wait_for:
-        port: 8080
-        delay: 1
-
-    - name: Install requirements for girder_client
-      become: yes
-      command: pip install -r requirements.txt
-      args:
-        chdir: "{{ storage }}/girder/clients/python"
-
     - name: Install girder_client
       become: yes
-      command: pip install -e .
+      command: "pip install -e ."
       args:
         chdir: "{{ storage }}/girder/clients/python"
 
@@ -207,11 +146,7 @@
           dburi: mongodb://localhost:27017/reslab
         state: present
 
-    - name: Install girder-client
-      become: yes
-      command: pip install girder-client
-    
     - name: Upload example data to Girder
-      command: python populateGirder.py -p {{ adminuser_password }}
+      command: "python populateGirder.py -p {{ adminuser_password }}"
       args:
         chdir: "{{ storage }}/candela/app/resonantlab/scripts"
