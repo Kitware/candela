@@ -2,9 +2,8 @@
   "name": "Resonant Lab",
   "description": "Resonant Lab",
   "version": "0.1.0",
-  "grunt": {
-    "autobuild": false,
-    "file": "Gruntfile.js"
+  "npm": {
+    "file": "package.json"
   },
   "dependencies": ["database_assetstore"]
 }

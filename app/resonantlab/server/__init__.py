@@ -5,6 +5,7 @@ from girder.utility.assetstore_utilities import setAssetstoreAdapter
 from girder.utility.filesystem_assetstore_adapter import FilesystemAssetstoreAdapter
 from girder.utility.gridfs_assetstore_adapter import GridFsAssetstoreAdapter
 from girder.plugins.database_assetstore.assetstore import DatabaseAssetstoreAdapter
+from girder.utility.plugin_utilities import registerPluginWebroot
 from semantic_assetstore_adapter import semantic_access
 from anonymousAccess import AnonymousAccess
 from versioning import Versioning
@@ -28,23 +29,11 @@ class ResonantLab(Resource):
 
 
 def load(info):
-    ResonantLab._cp_config['tools.staticdir.dir'] = os.path.join(
-        os.path.relpath(info['pluginRootDir'],
-                        info['config']['/']['tools.staticdir.root']),
-        'web_client')
+    ResonantLab._cp_config['tools.staticdir.dir'] = os.path.join(info['pluginRootDir'], 'web_client')
 
-    # Move girder app to /girder, serve sumo app from /
+    # Instantiate ResonantLab app and register the plugin with Girder.
     app = info['apiRoot'].resonantLabapp = ResonantLab(info)
-
-    (
-        info['serverRoot'],
-        info['serverRoot'].girder
-    ) = (
-        info['apiRoot'].resonantLabapp,
-        info['serverRoot']
-    )
-
-    info['serverRoot'].api = info['serverRoot'].girder.api
+    registerPluginWebroot(app, info['name'])
 
     # Expose versioning endpoint
     info['apiRoot'].system.route('GET', ('resonantLabVersion', ),
