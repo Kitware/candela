@@ -5,5 +5,8 @@
   "npm": {
     "file": "package.json"
   },
+  "webpack": {
+    "configHelper": "webpack.helper.js"
+  },
   "dependencies": ["database_assetstore"]
 }

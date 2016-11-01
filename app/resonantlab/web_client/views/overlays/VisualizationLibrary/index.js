@@ -2,7 +2,7 @@ import Backbone from 'node/backbone';
 import d3 from 'node/d3';
 import myTemplate from './template.html';
 import libImage from '../../../images/light/library.svg';
-import candela from './../../../../../src/candela';
+import candela from '../../../../../../src/candela';
 
 let VisualizationLibrary = Backbone.View.extend({
   initialize: function () {

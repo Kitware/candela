@@ -2,7 +2,7 @@ import Underscore from 'node/underscore';
 import backbone from 'node/backbone';
 import Widget from '../Widget';
 import myTemplate from './template.html';
-import candela from '../../../../../src/candela';
+import candela from '../../../../../../src/candela';
 import shareIcon from '../../../images/share.svg';
 import ExportView from '../../overlays/ExportView';
 import './style.css';

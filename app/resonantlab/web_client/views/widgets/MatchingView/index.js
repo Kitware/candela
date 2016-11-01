@@ -3,7 +3,7 @@ import d3 from 'node/d3';
 import jQuery from 'node/jquery';
 import myTemplate from './template.html';
 import Widget from '../Widget';
-import candela from '../../../../../src/candela';
+import candela from '../../../../../../src/candela';
 import './style.scss';
 
 import booleanIcon from '../../../images/boolean.svg';
