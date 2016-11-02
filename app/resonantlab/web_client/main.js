@@ -21,9 +21,7 @@ import './stylesheets/pure-css-custom-form-elements/style.css';
 import './stylesheets/mainPage.scss';
 import './stylesheets/girderPatches.scss';
 
-// The API root is different
-let girder = window.girder;
-girder.apiRoot = 'api/v1';
+import { restRequest } from 'girder/rest';
 
 // Our main view that coordinates each big chunk
 let MainPage = Backbone.View.extend({
@@ -197,7 +195,7 @@ let MainPage = Backbone.View.extend({
   girderRequest: function (params) {
     let responsePromise = new Promise((resolve, reject) => {
       params.error = reject;
-      return girder.restRequest(params).done(resolve).error(reject);
+      return restRequest(params).done(resolve).error(reject);
     });
     return responsePromise;
   }

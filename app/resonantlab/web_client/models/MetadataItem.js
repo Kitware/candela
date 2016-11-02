@@ -1,5 +1,7 @@
 import jQuery from 'node/jquery';
-let girder = window.girder;
+
+import ItemModel from 'girder/models/ItemModel';
+import { restRequest } from 'girder/rest';
 
 /*
   This class is meant to:
@@ -41,7 +43,7 @@ let girder = window.girder;
 function MetadataSyncError () {}
 MetadataSyncError.prototype = new Error();
 
-let MetadataItem = girder.models.ItemModel.extend({
+let MetadataItem = ItemModel.extend({
   // idAttribute: '_id',
   wrapInPromise: function (executor, options, beforeSuccess, callbacks) {
     /*
@@ -136,7 +138,7 @@ let MetadataItem = girder.models.ItemModel.extend({
     return this.wrapInPromise((resolve, reject) => {
       requestParameters.path = 'item/' + this.getId() + '/' + requestParameters.path;
       requestParameters.error = reject;
-      return girder.restRequest(requestParameters).done(resolve).error(reject);
+      return restRequest(requestParameters).done(resolve).error(reject);
     }, options, resp => {
       if (resp.hasOwnProperty('__copiedItemId__')) {
         // The id of the item changed in the process (e.g. a copy of
@@ -172,7 +174,7 @@ let MetadataItem = girder.models.ItemModel.extend({
         if (!this.get('name')) {
           reject(new MetadataSyncError('Item must have a name to be created'));
         }
-        girder.restRequest({
+        restRequest({
           path: 'item/anonymousAccess/scratchItem',
           data: {
             name: this.get('name'),
@@ -239,7 +241,7 @@ let MetadataItem = girder.models.ItemModel.extend({
         // in the Private folder by item name / create
         // an item there if it doesn't exist
         return this.wrapInPromise((resolve, reject) => {
-          girder.restRequest({
+          restRequest({
             path: 'item/anonymousAccess/privateItem',
             data: {
               name: this.get('name') || 'Untitled Item',
@@ -259,7 +261,7 @@ let MetadataItem = girder.models.ItemModel.extend({
         // Otherwise, just go with the default girder behavior
         return this.wrapInPromise((resolve, reject) => {
           try {
-            resolve(girder.models.ItemModel.prototype.fetch.apply(this));
+            resolve(ItemModel.prototype.fetch.apply(this));
           } catch (errorObj) {
             reject(errorObj);
           }
@@ -273,7 +275,7 @@ let MetadataItem = girder.models.ItemModel.extend({
       // so just use the default girder behavior
       let promise = this.wrapInPromise((resolve, reject) => {
         try {
-          resolve(girder.models.ItemModel.prototype.destroy.apply(this));
+          resolve(ItemModel.prototype.destroy.apply(this));
         } catch (errorObj) {
           reject(errorObj);
         }

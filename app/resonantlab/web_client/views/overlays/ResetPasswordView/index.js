@@ -1,13 +1,14 @@
-let girder = window.girder;
+import GirderResetPasswordView from 'girder/views/layout/ResetPasswordView';
+import girderEvents from 'girder/events';
 
-let ResetPasswordView = girder.views.ResetPasswordView.extend({
+let ResetPasswordView = GirderResetPasswordView.extend({
   initialize: function () {
     window.mainPage.overlay.addCloseListeners();
-    this.listenToOnce(girder.events, 'g:alert',
+    this.listenToOnce(girderEvents, 'g:alert',
       window.mainPage.overlay.closeOverlay);
   },
   render: function () {
-    girder.views.ResetPasswordView.prototype.render.apply(this, arguments);
+    GirderResetPasswordView.prototype.render.apply(this, arguments);
 
     this.$el.find('button.close, .modal-footer > a')
       .on('click', window.mainPage.overlay.closeOverlay);

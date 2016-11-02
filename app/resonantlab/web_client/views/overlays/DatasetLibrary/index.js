@@ -9,7 +9,8 @@ import privateFileIcon from '../../../images/light/file_private.svg';
 import publicFileIcon from '../../../images/light/file_public.svg';
 import warningIcon from '../../../images/warning.svg';
 import './style.scss';
-let girder = window.girder;
+
+import ItemCollection from 'girder/collections/ItemCollection';
 
 let DatasetLibrary = DatasetSettings.extend({
   initialize: function () {
@@ -233,7 +234,7 @@ let DatasetLibrary = DatasetSettings.extend({
     this.updateDynamicSections();
   }, 200),
   getFolderContents: function (folder, divId, icon) {
-    let projects = new girder.collections.ItemCollection();
+    let projects = new ItemCollection();
     projects.altUrl = 'item';
     projects.pageLimit = 100;
     projects.fetch({

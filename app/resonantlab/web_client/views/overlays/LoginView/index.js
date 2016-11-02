@@ -1,16 +1,16 @@
-// let girder = window.girder;
-import GirderLoginView from 'girder/views/layout/LoginView.js';
+import GirderLoginView from 'girder/views/layout/LoginView';
+import girderEvents from 'girder/events';
 
 let LoginView = GirderLoginView.extend({
   initialize: function () {
     window.mainPage.overlay.addCloseListeners();
-    this.listenToOnce(girder.events, 'g:login.success', () => {
+    this.listenToOnce(girderEvents, 'g:login.success', () => {
       window.mainPage.currentUser.authenticate()
         .then(window.mainPage.overlay.closeOverlay);
     });
   },
   render: function () {
-    girder.views.LoginView.prototype.render.apply(this, arguments);
+    GirderLoginView.prototype.render.apply(this, arguments);
 
     this.$el.find('button.close, .modal-footer > a')
       .on('click', window.mainPage.overlay.closeOverlay);

@@ -7,7 +7,8 @@ import privateFileIcon from '../../../images/light/file_private.svg';
 import publicFileIcon from '../../../images/light/file_public.svg';
 import scratchFileIcon from '../../../images/light/file_scratch.svg';
 import warningIcon from '../../../images/warning.svg';
-let girder = window.girder;
+
+import ItemCollection from 'girder/collections/ItemCollection';
 
 let ProjectLibrary = ProjectSettings.extend({
   initialize: function () {
@@ -103,14 +104,14 @@ let ProjectLibrary = ProjectSettings.extend({
           window.mainPage.currentUser.preferences.updateScratchProjects(items);
 
           // Show the set of items to the user
-          this.renderProjects(new girder.collections.ItemCollection(items),
+          this.renderProjects(new ItemCollection(items),
             'scratchProjects', scratchFileIcon);
         });
       }
     }
   },
   getFolderContents: function (folder, divId, icon) {
-    let projects = new girder.collections.ItemCollection();
+    let projects = new ItemCollection();
     projects.altUrl = 'item';
     projects.pageLimit = 100;
     projects.fetch({

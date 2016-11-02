@@ -1,7 +1,11 @@
 import UserPreferences from './UserPreferences';
-let girder = window.girder;
 
-let User = girder.models.UserModel.extend({
+import UserModel from 'girder/models/UserModel';
+import FolderModel from 'girder/models/FolderModel';
+import girderEvents from 'girder/events';
+import { restRequest } from 'girder/rest';
+
+let User = UserModel.extend({
   initialize: function () {
     this.loggedIn = false;
     this.preferences = new UserPreferences();
@@ -29,7 +33,7 @@ let User = girder.models.UserModel.extend({
         }).set(resp.user);
         this.authToken = resp.authToken;
         this.trigger('rl:login');
-        girder.events.trigger('g:login');
+        girderEvents.trigger('g:login');
       }
     }).catch(errorObj => {
       if (errorObj.statusText === 'Unauthorized') {
@@ -54,7 +58,7 @@ let User = girder.models.UserModel.extend({
         .then(() => {
           this.trigger('rl:logout');
           // Girder uses g:login for both log in and log out
-          girder.events.trigger('g:login');
+          girderEvents.trigger('g:login');
         });
     }
   },
@@ -76,12 +80,12 @@ let User = girder.models.UserModel.extend({
     this.privateFolder = null;
     if (this.isLoggedIn()) {
       new Promise((resolve, reject) => {
-        return girder.restRequest({
+        return restRequest({
           path: '/folder/anonymousAccess/privateFolder',
           error: reject
         }).done(resolve).error(reject);
       }).then(folder => {
-        this.privateFolder = new girder.models.FolderModel(folder);
+        this.privateFolder = new FolderModel(folder);
       });
     }
   },

@@ -1,5 +1,6 @@
 import './uploadStyle.scss';
-let girder = window.girder;
+
+import UploadWidget from 'girder/views/widgets/UploadWidget';
 
 const SUPPORTED_FORMATS = {
   'csv': 'csv',
@@ -11,12 +12,12 @@ const SUPPORTED_FORMATS = {
   'application/json': 'json'
 };
 
-let UploadView = girder.views.UploadWidget.extend({
+let UploadView = UploadWidget.extend({
   initialize: function (options) {
     options.folder = window.mainPage.currentUser.privateFolder;
     options.modal = false;
     options.title = null;
-    girder.views.UploadWidget.prototype.initialize.apply(this, [options]);
+    UploadWidget.prototype.initialize.apply(this, [options]);
     this.datasetLibrary = options.datasetLibrary;
 
     this.listenTo(this, 'g:filesChanged', () => {
@@ -28,7 +29,7 @@ let UploadView = girder.views.UploadWidget.extend({
     this.enableUploadButton = false;
   },
   render: function () {
-    girder.views.UploadWidget.prototype.render.apply(this, arguments);
+    UploadWidget.prototype.render.apply(this, arguments);
 
     // For now, only support uploading one file at a time
     this.$el.find('#g-files').prop('multiple', false);
