@@ -34,7 +34,7 @@ class DatasetItem(Resource):
         self.app = app
 
         # Load up the external foreign code snippets
-        codePath = os.path.join(pluginDir(), 'web_client', 'general_purpose')
+        codePath = os.path.join(pluginDir(), 'web_external', 'general_purpose')
 
         self.foreignCode = {}
 

@@ -29,7 +29,7 @@ var helper = function (data, config) {
     new webpack.NormalModuleReplacementPlugin(/font-awesome-webpack/, require.resolve(path.resolve(data.pluginDir, 'font-awesome-webpack-shim.js')))
   ]);
 
-  var pluginSourceDir = path.resolve(data.pluginDir, 'web_client');
+  var pluginSourceDir = path.resolve(data.pluginDir, 'web_external');
 
   config.module = config.module || {};
   config.module.loaders = [
@@ -37,7 +37,7 @@ var helper = function (data, config) {
       test: /\.jpe?g$|\.gif$|\.png$|\.woff$|\.wav$|\.mp3$|\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$|\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
       include: [
         pluginSourceDir,
-        /candela\/app\/resonantlab\/web_client/,
+        /candela\/app\/resonantlab\/web_external/,
         /node_modules/,
         /node_modules_resonantlab/,
         /src\/candela/
@@ -49,7 +49,7 @@ var helper = function (data, config) {
       include: [
         pluginSourceDir,
         data.nodeDir,
-        /candela\/app\/resonantlab\/web_client/
+        /candela\/app\/resonantlab\/web_external/
       ],
       loaders: ['style-loader', 'css-loader', 'sass-loader']
     },
@@ -57,7 +57,7 @@ var helper = function (data, config) {
       test: /\.styl$/,
       include: [
         pluginSourceDir,
-        /app\/resonantlab\/web_client/,
+        /app\/resonantlab\/web_external/,
         /src\/candela/
       ],
       loaders: ['style-loader', 'css-loader', 'stylus-loader']
@@ -66,7 +66,7 @@ var helper = function (data, config) {
       test: /\.css$/,
       include: [
         pluginSourceDir,
-        /candela\/app\/resonantlab\/web_client/
+        /candela\/app\/resonantlab\/web_external/
       ],
       loader: 'style-loader!css-loader'
     },
@@ -75,7 +75,7 @@ var helper = function (data, config) {
       include: [
         pluginSourceDir,
         /src\/candela/,
-        /candela\/app\/resonantlab\/web_client/
+        /candela\/app\/resonantlab\/web_external/
       ],
       loader: 'html-loader?attrs=img:src image:xlink:href'
     },
@@ -83,7 +83,7 @@ var helper = function (data, config) {
       test: /\.pegjs$/,
       include: [
         pluginSourceDir,
-        /candela\/app\/resonantlab\/web_client/
+        /candela\/app\/resonantlab\/web_external/
       ],
       loader: 'pegjs-loader'
     },
@@ -92,7 +92,7 @@ var helper = function (data, config) {
       include: [
         pluginSourceDir,
         data.nodeDir,
-        /candela\/app\/resonantlab\/web_client/
+        /candela\/app\/resonantlab\/web_external/
       ],
       loaders: ['json-loader', 'strip-json-comments-loader']
     },
@@ -100,7 +100,7 @@ var helper = function (data, config) {
       test: /\.jade$/,
       include: [
         pluginSourceDir,
-        /candela\/app\/resonantlab\/web_client/
+        /candela\/app\/resonantlab\/web_external/
       ],
       loaders: ['jade-loader']
     },
@@ -108,7 +108,7 @@ var helper = function (data, config) {
       test: /general_purpose\/.*\.js$/,
       include: [
         pluginSourceDir,
-        /candela\/app\/resonantlab\/web_client/
+        /candela\/app\/resonantlab\/web_external/
       ],
       exclude: [
         /node_modules/,
@@ -120,12 +120,12 @@ var helper = function (data, config) {
       test: /\.js$/,
       include: [
         pluginSourceDir,
-        /candela\/app\/resonantlab\/web_client/
+        /candela\/app\/resonantlab\/web_external/
       ],
       exclude: [
         /node_modules/,
         /node_modules_resonantlab/,
-        /web_client/,
+        /general_purpose/,
         /build/
       ],
       loader: 'babel-loader',

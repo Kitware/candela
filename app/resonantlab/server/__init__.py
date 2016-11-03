@@ -29,7 +29,7 @@ class ResonantLab(Resource):
 
 
 def load(info):
-    ResonantLab._cp_config['tools.staticdir.dir'] = os.path.join(info['pluginRootDir'], 'web_client')
+    ResonantLab._cp_config['tools.staticdir.dir'] = os.path.join(info['pluginRootDir'], 'web_external')
 
     # Instantiate ResonantLab app and register the plugin with Girder.
     app = info['apiRoot'].resonantLabapp = ResonantLab(info)

@@ -6,7 +6,8 @@
     "file": "package.json"
   },
   "webpack": {
-    "configHelper": "webpack.helper.js"
+    "configHelper": "webpack.helper.js",
+    "main": "web_external/main.js"
   },
   "dependencies": ["database_assetstore"]
 }
