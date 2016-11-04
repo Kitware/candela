@@ -1,5 +1,5 @@
 import Underscore from 'node/underscore';
-import backbone from 'backbone';
+import backbone from 'node/backbone';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 import candela from '../../../../../../src/candela';

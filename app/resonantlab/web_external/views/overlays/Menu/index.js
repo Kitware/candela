@@ -1,5 +1,5 @@
 import d3 from 'node/d3';
-import Backbone from 'backbone';
+import Backbone from 'node/backbone';
 import template from './template.html';
 import './style.scss';
 

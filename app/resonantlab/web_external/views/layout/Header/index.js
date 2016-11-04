@@ -1,7 +1,7 @@
 // import d3 from 'node/d3';
 import jQuery from 'node/jquery';
 // import Underscore from 'node/underscore';
-import Backbone from 'backbone';
+import Backbone from 'node/backbone';
 import myTemplate from './template.html';
 
 import loadingIcon from '../../../images/spinner.gif';

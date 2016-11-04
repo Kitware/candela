@@ -3,7 +3,7 @@ import 'node/babel-polyfill';
 // This is here solely to break a circular import bug in Webpack 2 beta.
 import UserModel from 'girder/models/UserModel';
 
-import Backbone from 'backbone';
+import Backbone from 'node/backbone';
 import d3 from 'node/d3';
 import is from 'node/is_js';
 

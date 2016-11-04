@@ -1,4 +1,4 @@
-import Backbone from 'backbone';
+import Backbone from 'node/backbone';
 import myTemplate from './template.html';
 import './style.scss';
 

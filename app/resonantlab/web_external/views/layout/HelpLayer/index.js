@@ -1,4 +1,4 @@
-import Backbone from 'backbone';
+import Backbone from 'node/backbone';
 import jQuery from 'node/jquery';
 import d3 from 'node/d3';
 import rewrap from '../../../shims/svgTextWrap.js';

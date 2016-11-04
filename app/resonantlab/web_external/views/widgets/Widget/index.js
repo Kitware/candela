@@ -1,4 +1,4 @@
-import Backbone from 'backbone';
+import Backbone from 'node/backbone';
 
 import okayIcon from '../../../images/okay.svg';
 import spinnerIcon from '../../../images/spinner.gif';

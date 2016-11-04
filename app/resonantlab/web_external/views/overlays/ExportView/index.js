@@ -1,4 +1,4 @@
-import Backbone from 'backbone';
+import Backbone from 'node/backbone';
 import closeIcon from '../../../images/close.svg';
 import downloadIcon from '../../../images/light/download.svg';
 import myTemplate from './template.jade';
