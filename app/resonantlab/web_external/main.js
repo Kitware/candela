@@ -1,5 +1,7 @@
 import 'node/babel-polyfill';
 
+// import UserModel from 'girder/models/UserModel';
+
 import Backbone from 'backbone';
 import d3 from 'node/d3';
 import is from 'node/is_js';
