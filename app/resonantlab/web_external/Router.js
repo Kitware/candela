@@ -1,4 +1,4 @@
-import Backbone from 'node/backbone';
+import Backbone from 'backbone';
 import SetOps, {Set} from './shims/SetOps';
 import 'node/jquery-deparam';
 

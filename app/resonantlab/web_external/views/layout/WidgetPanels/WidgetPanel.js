@@ -1,4 +1,4 @@
-import Backbone from 'node/backbone';
+import Backbone from 'backbone';
 import d3 from 'node/d3';
 
 // All widgets that are available

@@ -1,5 +1,5 @@
 import Underscore from 'node/underscore';
-import Backbone from 'node/backbone';
+import Backbone from 'backbone';
 import d3 from 'node/d3';
 import closeIcon from '../../../images/close.svg';
 import './style.scss';
