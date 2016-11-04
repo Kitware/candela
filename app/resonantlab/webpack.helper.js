@@ -3,7 +3,7 @@ var fs = require('fs');
 
 var webpack = require('webpack');
 
-var helper = function (data, config) {
+var helper = function (config, data) {
   var pluginPath = function (relpath) {
     return path.resolve(data.pluginDir, relpath);
   };
