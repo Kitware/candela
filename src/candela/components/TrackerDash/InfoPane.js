@@ -120,7 +120,7 @@ class InfoPane extends VisComponent {
         }
         let current = trend.history[trend.history.length - 1];
         current = deArray(current, d3.median);
-        const el = $(`#${trend.id_selector}-aggregate-bullet`).get(0);
+        const el = $(`#${trend.id_selector}-aggregate-bullet-svg`).get(0);
         this.aggBullets[trend.id_selector] = new ErrorBulletWidget(el, {
           result: {
             current: Math.round(current * 10000) / 10000
