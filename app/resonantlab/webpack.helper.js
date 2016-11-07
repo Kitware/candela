@@ -23,9 +23,6 @@ var helper = function (config, data) {
   }
 
   config.plugins = (config.plugins || []).concat([
-    new webpack.ProvidePlugin({
-      vg: 'vega'
-    }),
     new webpack.NormalModuleReplacementPlugin(/font-awesome-webpack/, require.resolve(path.resolve(data.pluginDir, 'font-awesome-webpack-shim.js')))
   ]);
 
