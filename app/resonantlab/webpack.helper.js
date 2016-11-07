@@ -92,6 +92,7 @@ var helper = function (config, data) {
       include: [
         pluginSourceDir,
         data.nodeDir,
+        /src\/candela/,
         /candela\/app\/resonantlab\/web_external/
       ],
       loaders: ['json-loader', 'strip-json-comments-loader']
