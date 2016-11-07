@@ -546,7 +546,9 @@ in order to connect them together.`);
         self.hoverNode(d, this);
       }).on('mouseout', d => {
         // Clear any highlights
-        this.$el.find('.hovered').removeClass('hovered');
+        d3.select(this.el)
+          .selectAll('.hovered')
+          .classed('hovered', false);
       }).on('click', d => {
         this.clickNode(d);
       });
@@ -615,7 +617,10 @@ in order to connect them together.`);
         self.hoverNode(d, this);
       }).on('mouseout', d => {
         // Clear any highlights
-        this.$el.find('.hovered').removeClass('hovered');
+        d3.select(this.el)
+          .selectAll('.hovered')
+          .classed('hovered', false);
+        // this.$el.find('.hovered').removeClass('hovered');
       }).on('click', d => {
         this.clickNode(d);
       });
@@ -851,8 +856,13 @@ in order to connect them together.`);
         self.hoverEdge(d, this);
       }).on('mouseout', d => {
         // Clear any highlights
-        this.$el.find('.hovered').removeClass('hovered');
-        this.$el.find('.disconnectable').removeClass('disconnectable');
+        d3.select(this.el)
+          .selectAll('.hovered')
+          .classed('hovered', false);
+
+        d3.select(this.el)
+          .selectAll('.disconnectable')
+          .classed('disconnectable', false);
       }).on('click', d => {
         this.clickEdge(d);
       });

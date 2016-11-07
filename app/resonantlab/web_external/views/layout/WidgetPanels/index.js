@@ -1,6 +1,6 @@
 import Underscore from 'node/underscore';
 import Backbone from 'node/backbone';
-import jQuery from 'node/jquery';
+import jQuery from 'jquery';
 import d3 from 'node/d3';
 
 import emptyStateTemplate from './emptyState.html';
