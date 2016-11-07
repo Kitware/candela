@@ -1,4 +1,4 @@
-import d3 from 'node/d3';
+import d3 from 'girder_plugins/resonantlab/node/d3';
 import SettingsPanel from '../SettingsPanel';
 import ProjectSettings from '../ProjectSettings';
 import myTemplate from './template.html';

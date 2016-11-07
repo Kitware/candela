@@ -1,5 +1,5 @@
-import Backbone from 'node/backbone';
-import d3 from 'node/d3';
+import Backbone from 'girder_plugins/resonantlab/node/backbone';
+import d3 from 'girder_plugins/resonantlab/node/d3';
 
 // All widgets that are available
 // TODO: When webpack supports it, this would be

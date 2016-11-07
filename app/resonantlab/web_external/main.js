@@ -1,11 +1,11 @@
-import 'node/babel-polyfill';
+import 'girder_plugins/resonantlab/node/babel-polyfill';
 
 // This is here solely to break a circular import bug in Webpack 2 beta.
 import UserModel from 'girder/models/UserModel';
 
-import Backbone from 'node/backbone';
-import d3 from 'node/d3';
-import is from 'node/is_js';
+import Backbone from 'girder_plugins/resonantlab/node/backbone';
+import d3 from 'girder_plugins/resonantlab/node/d3';
+import is from 'girder_plugins/resonantlab/node/is_js';
 
 import Router from './Router';
 import User from './models/User';

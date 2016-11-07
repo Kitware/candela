@@ -1,6 +1,6 @@
-import Backbone from 'node/backbone';
+import Backbone from 'girder_plugins/resonantlab/node/backbone';
 import SetOps, {Set} from './shims/SetOps';
-import 'node/jquery-deparam';
+import 'girder_plugins/resonantlab/node/jquery-deparam';
 
 var Router = Backbone.Router.extend({
   routes: {

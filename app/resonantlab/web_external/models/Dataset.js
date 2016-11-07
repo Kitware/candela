@@ -1,4 +1,4 @@
-import d3 from 'node/d3';
+import d3 from 'girder_plugins/resonantlab/node/d3';
 import MetadataItem from './MetadataItem';
 import { parseToAst } from '../querylang';
 import RangeSet from '../shims/rangeSet.js';

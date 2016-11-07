@@ -7,7 +7,7 @@
   nested elements across lines).
 */
 
-// import d3 from 'node/d3';
+// import d3 from 'girder_plugins/resonantlab/node/d3';
 
 function newTspan (textElement) {
   let newTspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');

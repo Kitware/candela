@@ -1,4 +1,4 @@
-import jQuery from 'node/jquery';
+import jQuery from 'girder_plugins/resonantlab/node/jquery';
 
 import ItemModel from 'girder/models/ItemModel';
 import { restRequest } from 'girder/rest';

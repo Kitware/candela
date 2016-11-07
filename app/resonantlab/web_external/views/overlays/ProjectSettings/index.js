@@ -1,4 +1,4 @@
-import Underscore from 'node/underscore';
+import Underscore from 'girder_plugins/resonantlab/node/underscore';
 import SettingsPanel from '../SettingsPanel';
 import myTemplate from './template.html';
 import canEditIcon from '../../../images/canEdit.svg';

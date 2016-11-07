@@ -1,5 +1,5 @@
-import Underscore from 'node/underscore';
-import backbone from 'node/backbone';
+import Underscore from 'girder_plugins/resonantlab/node/underscore';
+import backbone from 'girder_plugins/resonantlab/node/backbone';
 import Widget from '../Widget';
 import myTemplate from './template.html';
 import candela from '../../../../../../src/candela';

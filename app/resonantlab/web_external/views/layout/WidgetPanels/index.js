@@ -1,7 +1,7 @@
-import Underscore from 'node/underscore';
-import Backbone from 'node/backbone';
+import Underscore from 'girder_plugins/resonantlab/node/underscore';
+import Backbone from 'girder_plugins/resonantlab/node/backbone';
 import jQuery from 'jquery';
-import d3 from 'node/d3';
+import d3 from 'girder_plugins/resonantlab/node/d3';
 
 import emptyStateTemplate from './emptyState.html';
 import './emptyStyle.scss';

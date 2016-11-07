@@ -1,6 +1,6 @@
-import process from 'node/process';
-import fs from 'node/fs';
-import test from 'node/tape-catch';
+import process from 'girder_plugins/resonantlab/node/process';
+import fs from 'girder_plugins/resonantlab/node/fs';
+import test from 'girder_plugins/resonantlab/node/tape-catch';
 import { parseToAst } from '..';
 
 const negative_expression = [

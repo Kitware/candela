@@ -1,4 +1,4 @@
-import test from 'node/tape';
+import test from 'girder_plugins/resonantlab/node/tape';
 import RangeSet from '../rangeSet.js';
 
 function stringComparator (a, b) {

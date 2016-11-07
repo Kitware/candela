@@ -1,4 +1,4 @@
-import Backbone from 'node/backbone';
+import Backbone from 'girder_plugins/resonantlab/node/backbone';
 import closeIcon from '../../../images/close.svg';
 import downloadIcon from '../../../images/light/download.svg';
 import myTemplate from './template.jade';

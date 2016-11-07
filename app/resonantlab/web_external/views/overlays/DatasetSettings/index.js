@@ -1,5 +1,5 @@
-import d3 from 'node/d3';
-import Underscore from 'node/underscore';
+import d3 from 'girder_plugins/resonantlab/node/d3';
+import Underscore from 'girder_plugins/resonantlab/node/underscore';
 import SettingsPanel from '../SettingsPanel';
 import canEditIcon from '../../../images/canEdit.svg';
 import cantEditIcon from '../../../images/cantEdit.svg';

@@ -1,4 +1,4 @@
-import Backbone from 'node/backbone';
+import Backbone from 'girder_plugins/resonantlab/node/backbone';
 import myTemplate from './template.html';
 import './style.scss';
 
