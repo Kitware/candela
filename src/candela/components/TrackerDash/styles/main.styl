@@ -1,183 +1,184 @@
-.top-info-bar
-  border-bottom 2px solid #eeeeee
-  margin-bottom 5px
-  display flex
-  align-items center
+.trackerdash
+  .top-info-bar
+    border-bottom 2px solid #eeeeee
+    margin-bottom 5px
+    display flex
+    align-items center
 
-  .info-help
+    .info-help
+      padding-left 10px
+      padding-right 10px
+      margin-top 5px
+      align-self flex-start
+
+    span.caret
+      margin-left 5px
+
+  .info-title
     padding-left 10px
-    padding-right 10px
-    margin-top 5px
-    align-self flex-start
+    flex 1
+    flex-grow 3
+    font-size 18pt
 
-  span.caret
-    margin-left 5px
+  .info-date
+    font-size 18pt
+    flex 1
+    text-align right
 
-.info-title
-  padding-left 10px
-  flex 1
-  flex-grow 3
-  font-size 18pt
+  .info-branch
+    font-size 18pt
+    flex 1
+    flex-grow 3
 
-.info-date
-  font-size 18pt
-  flex 1
-  text-align right
+  .info-section
+    text-align center
+    font-size 22pt
 
-.info-branch
-  font-size 18pt
-  flex 1
-  flex-grow 3
+  .info-section-chart
+    height 55px
 
-.info-section
-  text-align center
-  font-size 22pt
+  .trend-pane
+    height 500px
 
-.info-section-chart
-  height 55px
+  .trend-chart
+    height 100%
 
-.trend-pane
-  height 500px
+  .status-bar-chart
+    svg
+      width 100%
+      height 100%
+    height 13px
+    padding-bottom 5px
 
-.trend-chart
-  height 100%
+  .valueWidget-container
+    svg
+      height 55px
 
-.status-bar-chart
+  .dataset-name
+    text-align center
+
+  .dataset-label
+    color rgb(150, 150, 150)
+    font-size 10pt
+    text-align center
+    font-family monospace
+
+  .result-labels
+    text-align center
+    font-size 14pt
+    font-weight bold
+
+  svg.statusDot
+    margin-top 11px
+    width 20px
+    height 20px
+    position absolute
+
+  .agg-label
+    width 4em
+
+  .agg-label, .agg-value
+    font-size 16pt
+    padding-top 9px
+
+  .agg-label-header
+    padding-left 20px
+
+  .agg-sparkline-header
+    text-align center
+
+  .agg-sparkline
+    height 55px
+    svg
+      font-size 10pt
+
+  .agg-bullet
+    height 55px
+
+  .agg-status-dot
+    width 30px
+    height 30px
+
+    svg
+      width 30px
+      height 30px
+      padding-top 2px
+
   svg
     width 100%
     height 100%
-  height 13px
-  padding-bottom 5px
 
-.valueWidget-container
-  svg
-    height 55px
+    .success
+      fill rgb(147, 196, 125)
 
-.dataset-name
-  text-align center
+    .bad
+      fill rgb(241, 194, 50)
 
-.dataset-label
-  color rgb(150, 150, 150)
-  font-size 10pt
-  text-align center
-  font-family monospace
+    .fail
+      fill rgb(204, 0, 0)
 
-.result-labels
-  text-align center
-  font-size 14pt
-  font-weight bold
+    .incomplete
+      fill rgb(28, 106, 133)
 
-svg.statusDot
-  margin-top 11px
-  width 20px
-  height 20px
-  position absolute
+    .none
+      fill rgba(0, 0, 0, 0)
 
-.agg-label
-  width 4em
+    .status-bar-label
+      text-anchor middle
 
-.agg-label, .agg-value
-  font-size 16pt
-  padding-top 9px
+    g.nv-sparkline
 
-.agg-label-header
-  padding-left 20px
+      circle
+        fill #555 !important
+        stroke #555 !important
 
-.agg-sparkline-header
-  text-align center
+      path
+        stroke-width 2px
+        stroke #555 !important
 
-.agg-sparkline
-  height 55px
-  svg
-    font-size 10pt
+  .trend-col-header-sortable
+    display flex
+    justify-content center
+    align-items center
 
-.agg-bullet
-  height 55px
+    abbr
+      cursor pointer
 
-.agg-status-dot
-  width 30px
-  height 30px
+  .tick
+    text
+      font-family sans-serif
+      font-size: 10px
 
-  svg
-    width 30px
-    height 30px
-    padding-top 2px
-
-svg
-  width 100%
-  height 100%
-
-  .success
-    fill rgb(147, 196, 125)
-
-  .bad
-    fill rgb(241, 194, 50)
-
-  .fail
-    fill rgb(204, 0, 0)
-
-  .incomplete
-    fill rgb(28, 106, 133)
-
-  .none
-    fill rgba(0, 0, 0, 0)
-
-  .status-bar-label
-    text-anchor middle
-
-  g.nv-sparkline
-
-    circle
-      fill #555 !important
-      stroke #555 !important
-
-    path
-      stroke-width 2px
-      stroke #555 !important
-
-.trend-col-header-sortable
-  display flex
-  justify-content center
-  align-items center
-
-  abbr
+  svg.sort-column-icon
+    width 40px
+    height 20px
     cursor pointer
+    margin-left 5px
 
-.tick
-  text
-    font-family sans-serif
-    font-size: 10px
+    polygon
+      fill #fff
+      stroke #000
+      stroke-width 2px
 
-svg.sort-column-icon
-  width 40px
-  height 20px
-  cursor pointer
-  margin-left 5px
+    polygon.active
+        fill #4098B7
 
-  polygon
-    fill #fff
-    stroke #000
-    stroke-width 2px
+  tr.key-metrics-row
+    border-bottom 2px solid #eee
 
-  polygon.active
-      fill #4098B7
+  #key-metrics-title
+    text-align center
+    font-size 18pt
+    font-weight bold
 
-tr.key-metrics-row
-  border-bottom 2px solid #eee
-
-#key-metrics-title
-  text-align center
-  font-size 18pt
-  font-weight bold
-
-.tdash-tooltip
-  display inline-block
-  position absolute
-  text-align center
-  padding 2px
-  font 12px sans-serif
-  border 1px solid #222
-  background #FFF
-  border-color #444
-  border-radius 3px
-  pointer-events none
+  .tdash-tooltip
+    display inline-block
+    position absolute
+    text-align center
+    padding 2px
+    font 12px sans-serif
+    border 1px solid #222
+    background #FFF
+    border-color #444
+    border-radius 3px
+    pointer-events none
