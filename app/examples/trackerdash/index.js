@@ -10,7 +10,7 @@ var betaGroundTruthSettings = {
   day: '2014-06-03',
   submission_uuid: '2d14dd46-0738-11e6-b653-000c29998cff',
   branch: 'feature/incredibly-complex-and-precise-branch-name-master',
-  producer_link: 'https://app-base.appspot.com/tracker/producer/view?producerId=5',
+  producer_link: 'http://www.example.com',
   histogram_max_x: 0.5,
   trendValuesByDataset: [
     {
@@ -119,12 +119,12 @@ var betaGroundTruthSettings = {
     'dataset1': 'label'
   },
   datasetMap: {
-    'dataset3': 'http://www.trackerdash.com',
+    'dataset3': 'http://www.example.com',
     'dataset2': function () { console.log('dataset 2'); }
   },
   trajectoryMap: {
     'dataset0.jpg': function () { console.log('dataset 0 -- trajectory'); },
-    'dataset1': 'https://github.com'
+    'dataset1': 'http://www.example.com'
   },
   agg_trends: [
     {
