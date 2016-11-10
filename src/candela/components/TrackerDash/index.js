@@ -2,9 +2,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import * as d3 from 'd3';
 
-require('bootstrap-webpack');
-require('nvd3/build/nv.d3.min.css');
-require('./styles/main.styl');
+import './styles';
 
 import InfoPane from './InfoPane';
 import TrendPane from './TrendPane';
