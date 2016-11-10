@@ -18,6 +18,7 @@ const componentList = [
   'ScatterPlot',
   'ScatterPlotMatrix',
   'SurvivalPlot',
+  'TrackerDash',
   'UpSet'
 ];
 
