@@ -1,5 +1,6 @@
 import html from './index.jade';
 import TrackerDash from '../../../src/candela/components/TrackerDash';
+import '../../../src/candela/components/TrackerDash/styles';
 
 document.write(html());
 
