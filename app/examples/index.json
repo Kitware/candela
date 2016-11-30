@@ -12,6 +12,10 @@
     "link": "line"
   },
   {
+    "title": "Line Chart with Points",
+    "link": "linechart-points"
+  },
+  {
     "title": "Scatter Plot Matrix",
     "link": "scattermatrix"
   },
