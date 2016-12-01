@@ -89,6 +89,7 @@ class ComponentAccessor(object):
     def __getattr__(self, name):
         return partial(Component, name)
 
+
 components = ComponentAccessor()
 
 init()
