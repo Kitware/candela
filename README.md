@@ -1,6 +1,6 @@
 [![codecov.io](https://codecov.io/github/Kitware/candela/coverage.svg?branch=master)](https://codecov.io/github/Kitware/candela?branch=master)
 
-# Candela
+# ![](docs/static/favicon.png) Candela
 
 Candela is an open-source suite of interoperable web visualization
 components for [Kitware](http://www.kitware.com)'s [Resonant](http://resonant.kitware.com) platform.
