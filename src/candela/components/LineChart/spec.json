@@ -7,7 +7,7 @@
 
     // Default to showing the x and y fields on hover.
     ["hover", ["@merge", [["@get", "x"]], ["@get", "y"]]],
-    ["hoverSize", 20],
+    ["pointSize", 25],
 
     // Default axis titles to x and y field names.
     ["xAxis.title", ["@get", "x"]],
@@ -174,12 +174,10 @@
                   "update": {
                     "x": {"scale": "x", "field": "x"},
                     "y": {"scale": "y", "field": "y"},
-                    "stroke": {"scale": "color", "field": "color"},
                     "shape": {"value": "circle"},
-                    "fill": {"scale": "color", "field": "color"},
-                    "opacity": {"value": 0},
-                    "strokeWidth": {"value": 2},
-                    "size": {"value": ["@get", "hoverSize"]}
+                    "fill": {"scale": "color", "value": ["@get", "yfield"]},
+                    "opacity": {"value": ["@if", ["@get", "showPoints"], 1, 0]},
+                    "size": {"value": ["@add", 0, ["@get", "pointSize"]]}
                   }
                 }
               },
