@@ -23,7 +23,8 @@ class ErrorBulletWidget extends VisComponent {
   chartData () {
     return {
       ranges: this.trend.incompleteThreshold ? [0, 0, this.trend.max] : [this.trend.warning, this.trend.fail, this.trend.max],
-      measures: [Math.round(Math.min(this.result.current, this.trend.max) * 10000) / 10000]
+      measures: [Math.round(Math.min(this.result.current, this.trend.max) * 10000) / 10000],
+      markerLines: []
     };
   }
 
