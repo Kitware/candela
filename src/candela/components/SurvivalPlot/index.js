@@ -90,5 +90,13 @@ export default class SurvivalPlot extends VegaChart(VisComponent, spec) {
       }
       d.survivors = groups[d[options.group]].survivors;
     });
+
+    this.chart.then(chart => {
+      let data = chart.data('table');
+      data.remove(() => true);
+      data.insert(options.data);
+
+      chart.update();
+    });
   }
 }

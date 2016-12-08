@@ -12,4 +12,6 @@ export default function showComponent (which, elementType, options) {
 
   let vis = new candela.components[which](el, options);
   vis.render();
+
+  return vis;
 }

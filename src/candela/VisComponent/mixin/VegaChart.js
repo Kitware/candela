@@ -4,10 +4,11 @@ let VegaChart = (Base, spec) => class extends Base {
   constructor (...args) {
     super(...args);
     this.options = args[1];
+    this.chart = vega.parseChart(spec, this.el, this.options);
   }
 
   render () {
-    this.chart = vega.parseChart(spec, this.el, this.options);
+    this.chart.then(chart => chart.update());
   }
 
   get serializationFormats () {

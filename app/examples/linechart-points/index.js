@@ -2,7 +2,7 @@ import { msft } from '../util/datasets';
 import showComponent from '../util/showComponent';
 
 window.onload = () => {
-  showComponent('LineChart', 'div', {
+  let vis = showComponent('LineChart', 'div', {
     data: msft,
     x: 'date',
     y: ['price'],
@@ -19,4 +19,6 @@ window.onload = () => {
     pointSize: 25,
     renderer: 'svg'
   });
+
+  vis.on('click', (d, item) => console.log(d, item));
 };

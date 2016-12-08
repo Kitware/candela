@@ -1,10 +1,9 @@
 import LineChart from '../../../src/candela/components/LineChart';
-import Events from '../../../src/candela/VisComponent/mixin/Events';
 import $ from 'jquery';
 import html from './index.jade';
 import './index.styl';
 
-class DynamicLineChart extends Events(LineChart) {
+class DynamicLineChart extends LineChart {
   constructor (...args) {
     super(...args);
   }
@@ -16,6 +15,14 @@ class DynamicLineChart extends Events(LineChart) {
 
   data (data) {
     this.options.data = data;
+
+    this.chart.then(chart => {
+      let data = chart.data('data');
+      data.remove(() => true);
+      data.insert(this.options.data);
+
+      chart.update();
+    });
   }
 }
 

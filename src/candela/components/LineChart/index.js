@@ -1,8 +1,9 @@
 import VisComponent from '../../VisComponent';
+import Events from '../../VisComponent/mixin/Events';
 import VegaChart from '../../VisComponent/mixin/VegaChart';
 import spec from './spec.json';
 
-export default class LineChart extends VegaChart(VisComponent, spec) {
+export default class LineChart extends Events(VegaChart(VisComponent, spec)) {
   static get options () {
     return [
       {
@@ -42,5 +43,22 @@ export default class LineChart extends VegaChart(VisComponent, spec) {
         }
       }
     ];
+  }
+
+  constructor (...args) {
+    super(...args);
+
+    // Attach a listener to the chart.
+    this.chart.then(chart => {
+      chart.on('click', (event, item) => {
+        if (item && item.mark.marktype === 'symbol') {
+          const datum = Object.assign({}, item.datum);
+          delete datum._id;
+          delete datum._prev;
+
+          this.emit('click', datum, item);
+        }
+      });
+    });
   }
 }
