@@ -115,10 +115,10 @@ webpack --watch
 ## Installation via Ansible
 
 Resonant Lab comes with an Ansible deployment strategy as well. To use
-it, you will need Ansible 2.0:
+it, you will need Ansible 2.2:
 
 ```shell
-pip install ansible==2.0
+pip install ansible==2.2
 ```
 
 Next, clone this repository:
