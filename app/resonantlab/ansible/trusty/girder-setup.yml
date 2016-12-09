@@ -1,0 +1,69 @@
+- name: Install girder_client
+  become: yes
+  command: "pip install -e ."
+  args:
+    chdir: "{{ storage }}/girder/clients/python"
+
+- name: Create Girder admin user
+  girder:
+    port: 8080
+    user:
+      firstName: "{{ adminuser_firstname }}"
+      lastName: "{{ adminuser_lastname }}"
+      login: "{{ adminuser_login }}"
+      password: "{{ adminuser_password }}"
+      email: "{{ adminuser_email }}"
+      admin: yes
+    state: present
+
+- name: Activate Girder plugins
+  girder:
+    port: 8080
+    username: "{{ adminuser_login }}"
+    password: "{{ adminuser_password }}"
+    plugins:
+      - resonantlab
+      - database_assetstore
+    state: present
+
+- name: Restart Girder
+  girder:
+    port: 8080
+    username: "{{ adminuser_login }}"
+    password: "{{ adminuser_password }}"
+    put:
+      path: system/restart
+
+- name: Wait for Girder to restart
+  wait_for:
+    port: 8080
+    delay: 5
+
+- name: Create filesystem assetstore
+  girder:
+    port: 8080
+    username: "{{ adminuser_login }}"
+    password: "{{ adminuser_password }}"
+    assetstore:
+      name: Filesystem Assetstore
+      type: filesystem
+      root: "{{ storage }}/assetstore/girder"
+      current: true
+    state: present
+
+- name: Create database assetstore
+  girder:
+    port: 8080
+    username: "{{ adminuser_login }}"
+    password: "{{ adminuser_password }}"
+    assetstore:
+      name: Resonant Lab Database Assetstore
+      type: database
+      dbtype: mongo
+      dburi: mongodb://localhost:27017/reslab
+    state: present
+
+- name: Upload example data to Girder
+  command: "python populateGirder.py -p {{ adminuser_password }}"
+  args:
+    chdir: "{{ storage }}/candela/app/resonantlab/scripts"
