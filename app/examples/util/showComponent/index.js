@@ -1,4 +1,4 @@
-import candela from '../../../../src/candela';
+import candela from '../../../..';
 import html from './index.jade';
 import './index.styl';
 

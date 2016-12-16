@@ -1,4 +1,4 @@
-import LineChart from '../../../src/candela/components/LineChart';
+import LineChart from '../../../components/LineChart';
 import $ from 'jquery';
 import html from './index.jade';
 import './index.styl';

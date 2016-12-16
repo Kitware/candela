@@ -9,7 +9,7 @@ module.exports = {
   devtool: 'source-map',
   __dirname: __dirname,
   entry: {
-    candela: './src/candela/index.js',
+    candela: './index.js',
   },
   output: {
     library: '[name]',
@@ -41,8 +41,12 @@ module.exports = {
           presets: ['es2015']
         },
         include: [
-          __dirname + '/src',
-          __dirname + '/app'
+          __dirname + '/app',
+          __dirname + '/index.js',
+          __dirname + '/components',
+          __dirname + '/test',
+          __dirname + '/util',
+          __dirname + '/VisComponent'
         ]
       },
       {

@@ -69,8 +69,12 @@ module.exports = {
           presets: ['es2015']
         },
         include: [
-          __dirname + '/src',
-          __dirname + '/app'
+          __dirname + '/app',
+          __dirname + '/index.js',
+          __dirname + '/components',
+          __dirname + '/test',
+          __dirname + '/util',
+          __dirname + '/VisComponent'
         ]
       },
       {
