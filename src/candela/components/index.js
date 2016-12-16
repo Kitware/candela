@@ -9,7 +9,6 @@ import Histogram from './Histogram';
 import LineChart from './LineChart';
 import LineUp from './LineUp';
 import OnSet from './OnSet';
-import ParallelCoordinates from './ParallelCoordinates';
 import ScatterPlot from './ScatterPlot';
 import ScatterPlotMatrix from './ScatterPlotMatrix';
 import SurvivalPlot from './SurvivalPlot';
@@ -28,7 +27,6 @@ export default {
   LineChart,
   LineUp,
   OnSet,
-  ParallelCoordinates,
   ScatterPlot,
   ScatterPlotMatrix,
   SurvivalPlot,

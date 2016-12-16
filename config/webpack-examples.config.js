@@ -43,12 +43,7 @@ var plugins = [
     title: 'Candela Examples',
     filename: 'examples/index.html',
     chunks: ['examples']
-  }),
-
-  new CopyPlugin([{
-    from: 'app/examples/data/nba-heatmaps',
-    to: 'examples/parallel-coords/nba-heatmaps'
-  }])
+  })
 ];
 
 htmlPlugins.forEach(function (hp) {

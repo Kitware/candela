@@ -46,12 +46,6 @@ module.exports = {
         ]
       },
       {
-        test: function (path) {
-          return path.endsWith('/src/external/pc.js');
-        },
-        loader: 'legacy-loader'
-      },
-      {
         test: /\.jpe?g$|\.gif$|\.png$|\.woff$|\.wav$|\.mp3$|\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$|\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'url-loader'
       },

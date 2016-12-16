@@ -14,7 +14,6 @@ const componentList = [
   'LineChart',
   'LineUp',
   'OnSet',
-  'ParallelCoordinates',
   'ScatterPlot',
   'ScatterPlotMatrix',
   'SurvivalPlot',
