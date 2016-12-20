@@ -10,12 +10,6 @@ config.entry = {
 
 config.devtool = 'inline-source-map';
 
-config.plugins = [
-  new webpack.ProvidePlugin({
-    vg: 'vega'
-  })
-];
-
 config.node = {
   fs: 'empty'
 };

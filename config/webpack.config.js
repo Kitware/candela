@@ -17,17 +17,7 @@ module.exports = {
     path: 'build',
     filename: '[name]/[name].js'
   },
-  resolve: {
-    alias: {
-      vega: path.resolve(__dirname, 'node_modules/vega/index.js'),
-      d3: path.resolve(__dirname, 'node_modules/d3/d3.min.js')
-    }
-  },
   plugins: [
-    new webpack.ProvidePlugin({
-      vg: 'vega'
-    }),
-
     new CleanPlugin([path.resolve(__dirname, 'build/candela')], {
       root: __dirname
     }),
