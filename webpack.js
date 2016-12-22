@@ -1,9 +1,12 @@
+var path = require('path');
+
 function _includePaths (basePath) {
   if (basePath) {
     return [
       basePath + '/app',
       basePath + '/index.js',
       basePath + '/components',
+      basePath + '/shim',
       basePath + '/test',
       basePath + '/util',
       basePath + '/VisComponent'
@@ -83,6 +86,10 @@ module.exports = function (config, basePath) {
       include: addNMPath('datalib', includePaths)
     }
   ].concat(config.module.loaders);
+
+  config.resolve = config.resolve || {};
+  config.resolve.alias = config.resolve.alias || {};
+  config.resolve.alias['font-awesome-webpack$'] = path.resolve(basePath || '.', 'shim', 'font-awesome-webpack.shim.js');
 
   return config;
 };
