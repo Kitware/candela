@@ -4,14 +4,14 @@
   "description": "Visualization components for the web",
   "main": "dist/candela.js",
   "scripts": {
-    "build": "script/prepare_lineup.sh && webpack --config config/webpack.config.js",
+    "build": "webpack --config config/webpack.config.js",
     "build:examples": "webpack --config config/webpack-examples.config.js",
     "build:resonantlab": "cd app/resonantlab && webpack",
     "build:resonantlab:tests": "webpack --config ./app/resonantlab/webpack-testing.config.js",
     "build:docs": "sphinx-build -a -b html docs/ build/docs/",
     "test:resonantlab:unit": "npm run test:resonantlab:unit:raw | tap-spec",
     "test:resonantlab:unit:raw": "for t in `ls build/resonantlab/*.tests.js`; do node $t; done",
-    "dist": "script/prepare_lineup.sh && webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
+    "dist": "webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
     "lint": "semistandard | snazzy",
     "lint:pycandela": "flake8 --config python/pycandela/flake8.cfg python/pycandela",
     "test": "echo 'Please use \"npm run test:unit\", \"npm run test:image\", or \"npm run test:all\"' && false",
@@ -112,7 +112,6 @@
     "webpack": "^1.12.12"
   },
   "dependencies": {
-    "LineUpJS": "git+https://github.com/Caleydo/lineup.js#0cd7f3f2ad06c498c09612daf5f3e2a36c07536d",
     "UpSet": "git+https://github.com/VCG/upset#6e8b7a172443dd6b4f4324d1a3368287e9e9c089",
     "onset": "git+https://github.com/Kitware/setvis#506bfccff63b0c8f5c39a81d299ed310e5e8fbff",
     "brace": "^0.7.0",
@@ -127,6 +126,7 @@
     "jquery": "^2.2.0",
     "jquery-deparam": "^0.5.2",
     "less": "^2.3.1",
+    "lineupjs": "^1.0.0",
     "md5": "^2.2.1",
     "node-sass": "^3.4.2",
     "nvd3": "^1.8.4",
