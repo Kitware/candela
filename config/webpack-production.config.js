@@ -3,7 +3,7 @@ var config = require('./webpack.config');
 delete config.devtool;
 
 config.entry = {
-  candela: './src/candela/index.js'
+  candela: './candela.js'
 };
 
 config.output = {

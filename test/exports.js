@@ -1,6 +1,6 @@
 import test from 'tape-catch';
 
-import candela from '..';
+import candela from '../candela';
 
 const componentList = [
   'BarChart',

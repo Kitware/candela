@@ -11,7 +11,7 @@ module.exports = candelaWebpack({
   devtool: 'source-map',
   __dirname: __dirname,
   entry: {
-    candela: './index.js',
+    candela: './candela.js',
   },
   output: {
     library: '[name]',

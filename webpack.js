@@ -4,7 +4,7 @@ function _includePaths (basePath) {
   if (basePath) {
     return [
       basePath + '/app',
-      basePath + '/index.js',
+      basePath + '/candela.js',
       basePath + '/components',
       basePath + '/shim',
       basePath + '/test',
