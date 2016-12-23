@@ -4,8 +4,6 @@ import VisComponent from '..';
 import Events from '../mixin/Events';
 
 test('Events mixin for VisComponent', t => {
-  t.plan(5);
-
   let EventedVisComponent = class extends Events(VisComponent) {
     constructor (el, options) {
       super(el);
@@ -41,6 +39,9 @@ test('Events mixin for VisComponent', t => {
   t.equal(v.value, options.value);
 
   // Make sure we can catch triggered events from the component.
-  v.on('foobar', value => t.equal(value, options.value, 'Event is emitted properly'));
+  v.on('foobar', value => {
+    t.equal(value, options.value, 'Event is emitted properly');
+    t.end()
+  });
   v.emitEvent();
 });
