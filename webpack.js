@@ -28,12 +28,28 @@ function addNMPath(packages, paths) {
   }).concat(paths);
 }
 
-module.exports = function (config, basePath) {
+module.exports = function (config, basePath, options) {
   var includePaths = _includePaths(basePath);
+
+  options = options || {};
+
+  // By default, exclude the existing loaders from affecting
+  // node_modules/candela. This prevents double application of loaders if they
+  // are specified in the client project without any include or exclude
+  // directives.
+  var exclude = options.excludeCandelaNM === undefined || options.excludeCandelaNM;
 
   // Install empty module and module.loaders entries if missing.
   config.module = config.module || {};
   config.module.loaders = config.module.loaders || [];
+
+  // Exclude the base paths from having existing loaders applied to them.
+  if (exclude) {
+    config.modules.loaders = config.modules.loaders || [];
+    config.modules.loaders.forEach(function (loader) {
+      loader.exclude = (loader.exclude || []).concat(includePaths);
+    });
+  }
 
   // Prepend the Candela loaders.
   config.module.loaders = [
