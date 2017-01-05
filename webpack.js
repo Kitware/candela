@@ -39,15 +39,24 @@ module.exports = function (config, basePath, options) {
   // directives.
   var exclude = options.excludeCandelaNM === undefined || options.excludeCandelaNM;
 
-  // Install empty module and module.loaders entries if missing.
-  config.module = config.module || {};
-  config.module.loaders = config.module.loaders || [];
-
   // Exclude the base paths from having existing loaders applied to them.
   if (exclude) {
-    config.modules.loaders = config.modules.loaders || [];
-    config.modules.loaders.forEach(function (loader) {
-      loader.exclude = (loader.exclude || []).concat(includePaths);
+    // Install empty module and module.loaders entries if missing.
+    config.module = config.module || {};
+    config.module.loaders = config.module.loaders || [];
+
+    // For each loader, append the Candela include paths to its `exclude`
+    // property.
+    config.module.loaders.forEach(function (loader) {
+      // Install an empty list if there is no `exclude` property.
+      loader.exclude = loader.exclude || [];
+
+      // If the `exclude` propertry is a non-list singleton, wrap it in a list.
+      if (!Array.isArray(loader.exclude)) {
+        loader.exclude = [loader.exclude];
+      }
+
+      loader.exclude = loader.exclude.concat(includePaths);
     });
   }
 
