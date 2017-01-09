@@ -41,7 +41,7 @@ test('Events mixin for VisComponent', t => {
   // Make sure we can catch triggered events from the component.
   v.on('foobar', value => {
     t.equal(value, options.value, 'Event is emitted properly');
-    t.end()
+    t.end();
   });
   v.emitEvent();
 });

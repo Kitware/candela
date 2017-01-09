@@ -14,17 +14,17 @@ function _includePaths (basePath) {
   } else {
     return [
       /\/node_modules\/candela\//
-    ]
+    ];
   }
 }
 
-function addNMPath(packages, paths) {
+function addNMPath (packages, paths) {
   if (!Array.isArray(packages)) {
     packages = [packages];
   }
 
-  return packages.map(function (package) {
-    return new RegExp('/node_modules/' + package + '/')
+  return packages.map(function (pkg) {
+    return new RegExp('/node_modules/' + pkg + '/');
   }).concat(paths);
 }
 
