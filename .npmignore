@@ -1,2 +1,11 @@
 app
 build
+config
+CONTRIBUTING.md
+coverage
+docs
+python
+R
+requirements-dev.txt
+script
+tests.bundle.js
