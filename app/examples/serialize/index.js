@@ -1,4 +1,4 @@
-import candela from '../../../';
+import candela from '../../../candela';
 import { iris } from '../util/datasets';
 import html from './index.jade';
 

@@ -1,7 +1,8 @@
 import showComponent from '../util/showComponent';
+import GeoDots from '../../../components/GeoDots';
 
 window.onload = () => {
-  showComponent('GeoDots', 'div', {
+  showComponent(GeoDots, 'div', {
     zoom: 10,
     center: {
       longitude: -87.6194,

@@ -1,4 +1,4 @@
-import candela from '../../../';
+import candela from '../../../candela';
 import AutoResize from '../../../VisComponent/mixin/AutoResize';
 import InitSize from '../../../VisComponent/mixin/InitSize';
 import html from './index.jade';

@@ -1,8 +1,9 @@
 import { iris } from '../util/datasets';
 import showComponent from '../util/showComponent';
+import LineUp from '../../../components/LineUp';
 
 window.onload = () => {
-  showComponent('LineUp', 'div', {
+  showComponent(LineUp, 'div', {
     data: iris,
     fields: [
       'species',

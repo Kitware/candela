@@ -1,8 +1,9 @@
 import { msft } from '../util/datasets';
 import showComponent from '../util/showComponent';
+import LineChart from '../../../components/LineChart';
 
 window.onload = () => {
-  showComponent('LineChart', 'div', {
+  showComponent(LineChart, 'div', {
     data: msft,
     x: 'date',
     y: ['price'],
