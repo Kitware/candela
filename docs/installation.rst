@@ -24,6 +24,47 @@ and add it to your ``package.json`` file, run: ::
 
     npm install --save candela
 
+A self-contained JavaScript bundle for Candela will be found at
+``node_modules/candela/dist/candela[.min].js``.
+
+Using Webpack
+~~~~~~~~~~~~~
+
+If your project uses a Webpack build process, you can use Candela's bundled
+Webpack helper function to include Candela easily in your project without having
+to use the fullsize bundle file. The idea is to directly include Candela source
+files as needed in your project, relying on the Webpack helper to arrange for
+the proper loaders and other configuration options to be used. For example,
+without Webpack, your source file might include lines like
+
+.. code-block:: javascript
+
+    var candela = require('candela/dist/candela.min.js');
+    var ScatterPlot = candela.components.ScatterPlot;
+
+This will result in your application loading the entire Candela bundle at
+runtime, which may not be optimal if you just wish to use the ``ScaterPlot``
+component. Instead, using Webpack, you could cast this code as follows:
+
+.. code-block:: javascript
+
+    var ScatterPlot = require('candela/components/ScatterPlot');
+
+To make sure that your build process uses the correct loaders for this file, you
+should make sure to use the Candela webpack helper function in your project's
+Webpack configuration:
+
+.. code-block:: javascript
+
+    var candelaWebpack = require('candela/webpack');
+
+    module.exports = candelaWebpack({
+      // Your original webpack configuration goes here
+    });
+
+This approach lets you keep your code more concise and meaningful, while also
+avoiding unnecessarily large application bundles.
+
 Python
 ------
 
