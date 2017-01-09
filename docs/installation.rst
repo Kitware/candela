@@ -3,7 +3,7 @@
 ====================
 
 There are two ways to install Candela: from standard package repositories systems such as
-npm and the Python Package Index (PyPI)
+npm and the Python Package Index (PyPI).
 Installing from a package repository is simpler, but limited to public release
 versions; installing from source is slightly more complicated but allows you to
 run cutting-edge development versions.
