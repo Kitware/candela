@@ -112,9 +112,5 @@ module.exports = function (config, basePath, options) {
     }
   ].concat(config.module.loaders);
 
-  config.resolve = config.resolve || {};
-  config.resolve.alias = config.resolve.alias || {};
-  config.resolve.alias['font-awesome-webpack$'] = path.resolve(basePath || '.', 'shim', 'font-awesome-webpack.shim.js');
-
   return config;
 };

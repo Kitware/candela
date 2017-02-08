@@ -4,6 +4,8 @@ import VisComponent from '../../VisComponent';
 import * as upset from 'UpSet';
 import template from './template.html';
 
+import 'font-awesome-webpack';
+
 export default class UpSet extends VisComponent {
   static get options () {
     return [

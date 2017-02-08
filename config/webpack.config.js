@@ -23,10 +23,5 @@ module.exports = candelaWebpack({
     new CleanPlugin([path.resolve(__dirname, 'build/candela')], {
       root: __dirname
     }),
-  ],
-  resolve: {
-    alias: {
-      'font-awesome-webpack$': path.resolve('shim', 'font-awesome-webpack.shim.js')
-    }
-  }
+  ]
 }, __dirname);
