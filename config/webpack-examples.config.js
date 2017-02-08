@@ -70,7 +70,7 @@ module.exports = {
         },
         include: [
           __dirname + '/app',
-          __dirname + '/index.js',
+          __dirname + '/candela.js',
           __dirname + '/components',
           __dirname + '/test',
           __dirname + '/util',
