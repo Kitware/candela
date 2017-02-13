@@ -46,17 +46,18 @@ Options
 data (:ref:`Table <table>`)
     The data table.
 
+id (String)
+    A field containing a unique identifier for each record.
+
 fields (Array of String)
-    A list of fields that will be shown on the LineUp view.  The list determines
-    the order of the fields.  If not supplied, all fields from the data are
-    shown.
+    A list of fields that will be shown on the UpSet view. Each value in each field
+    will be converted to a set membership 0/1 field before being passed to UpSet.
 
-stacked (Boolean)
-    Whether to display grouped measures as a stacked bar (default false).
+sets (Array of String)
+    A list of fields that will be shown on the UpSet view. Each field is assumed to
+    already be a 0/1 set membership field.
 
-histograms (Boolean)
-    Whether to display histograms in the headers of each measure (default true).
-
-animation (Boolean)
-    Whether to animate transitions when the scoring metric changes (default
-    true).
+metadata (Array of String)
+    A list of fields that will be shown as metadata when drilling down to individual
+    records. Numeric data will also be shown in summary box plots to the right of
+    each set.
