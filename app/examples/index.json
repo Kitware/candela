@@ -60,10 +60,6 @@
     "link": "upset-alternate"
   },
   {
-    "title": "Parallel Coordinates",
-    "link": "parallel-coords"
-  },
-  {
     "link": "resize-full",
     "title": "Resize Full",
     "template": "resize-full"

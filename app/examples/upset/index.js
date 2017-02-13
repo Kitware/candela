@@ -1,8 +1,9 @@
 import { simpsons } from '../util/datasets';
 import showComponent from '../util/showComponent';
+import UpSet from '../../../components/UpSet';
 
 window.onload = () => {
-  showComponent('UpSet', 'div', {
+  showComponent(UpSet, 'div', {
     data: simpsons,
     id: 'Name',
     sets: [

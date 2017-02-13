@@ -1,8 +1,9 @@
 import { iris } from '../util/datasets';
 import showComponent from '../util/showComponent';
+import Heatmap from '../../../components/Heatmap';
 
 window.onload = () => {
-  showComponent('Heatmap', 'div', {
+  showComponent(Heatmap, 'div', {
     data: iris,
     fields: [
       'sepalLength',

@@ -43,12 +43,7 @@ var plugins = [
     title: 'Candela Examples',
     filename: 'examples/index.html',
     chunks: ['examples']
-  }),
-
-  new CopyPlugin([{
-    from: 'app/examples/data/nba-heatmaps',
-    to: 'examples/parallel-coords/nba-heatmaps'
-  }])
+  })
 ];
 
 htmlPlugins.forEach(function (hp) {
@@ -74,8 +69,12 @@ module.exports = {
           presets: ['es2015']
         },
         include: [
-          __dirname + '/src',
-          __dirname + '/app'
+          __dirname + '/app',
+          __dirname + '/candela.js',
+          __dirname + '/components',
+          __dirname + '/test',
+          __dirname + '/util',
+          __dirname + '/VisComponent'
         ]
       },
       {

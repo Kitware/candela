@@ -1,8 +1,9 @@
 import { iris } from '../util/datasets';
 import showComponent from '../util/showComponent';
+import Histogram from '../../../components/Histogram';
 
 window.onload = () => {
-  showComponent('Histogram', 'div', {
+  showComponent(Histogram, 'div', {
     data: iris,
     bin: 'sepalLength',
     width: 735,

@@ -10,14 +10,16 @@ config.entry = {
 
 config.devtool = 'inline-source-map';
 
-config.plugins = [
-  new webpack.ProvidePlugin({
-    vg: 'vega'
-  })
-];
-
 config.node = {
   fs: 'empty'
 };
+
+config.module.loaders.forEach(function (loader) {
+  if (loader.loader !== 'babel-loader') {
+    delete loader.include;
+  }
+});
+
+delete config.plugins;
 
 module.exports = config;

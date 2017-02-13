@@ -1,6 +1,6 @@
 import test from 'tape-catch';
 
-import candela from '..';
+import candela from '../candela';
 
 const componentList = [
   'BarChart',
@@ -14,7 +14,6 @@ const componentList = [
   'LineChart',
   'LineUp',
   'OnSet',
-  'ParallelCoordinates',
   'ScatterPlot',
   'ScatterPlotMatrix',
   'SurvivalPlot',
@@ -53,7 +52,7 @@ test('Structure and content of exported Candela library object', t => {
 
 test('Structure and content of unminified Candela library file', t => {
   try {
-    let candelaBuilt = require('../../../build/candela/candela.js');
+    let candelaBuilt = require('../build/candela/candela.js');
     t.ok(candelaBuilt, 'The built candela.js file exists');
 
     if (candelaBuilt) {

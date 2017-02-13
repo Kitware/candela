@@ -1,7 +1,8 @@
 import showComponent from '../util/showComponent';
+import Geo from '../../../components/Geo';
 
 window.onload = () => {
-  showComponent('Geo', 'div', {
+  showComponent(Geo, 'div', {
     map: {
       zoom: 10,
       center: {

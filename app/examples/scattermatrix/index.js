@@ -1,8 +1,9 @@
 import { iris } from '../util/datasets';
 import showComponent from '../util/showComponent';
+import ScatterPlotMatrix from '../../../components/ScatterPlotMatrix';
 
 window.onload = () => {
-  showComponent('ScatterPlotMatrix', 'div', {
+  showComponent(ScatterPlotMatrix, 'div', {
     data: iris,
     fields: [
       'petalWidth',

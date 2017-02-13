@@ -1,8 +1,9 @@
 import { iris } from '../util/datasets';
 import showComponent from '../util/showComponent';
+import BoxPlot from '../../../components/BoxPlot';
 
 window.onload = () => {
-  showComponent('BoxPlot', 'div', {
+  showComponent(BoxPlot, 'div', {
     data: iris,
     fields: [
       'sepalLength',

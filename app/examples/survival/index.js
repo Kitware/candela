@@ -1,8 +1,9 @@
 import { hmohiv } from '../util/datasets';
 import showComponent from '../util/showComponent';
+import SurvivalPlot from '../../../components/SurvivalPlot';
 
 window.onload = () => {
-  showComponent('SurvivalPlot', 'div', {
+  showComponent(SurvivalPlot, 'div', {
     data: hmohiv,
     time: 'time',
     censor: 'censor',

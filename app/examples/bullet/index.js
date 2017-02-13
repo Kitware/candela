@@ -1,7 +1,8 @@
 import showComponent from '../util/showComponent';
+import BulletChart from '../../../components/BulletChart';
 
 window.onload = () => {
-  showComponent('BulletChart', 'div', {
+  showComponent(BulletChart, 'div', {
     value: 0.2,
     title: 'Error',
     subtitle: '% dev from ground truth',
