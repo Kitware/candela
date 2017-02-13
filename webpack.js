@@ -1,5 +1,3 @@
-var path = require('path');
-
 function _includePaths (basePath) {
   if (basePath) {
     return [
