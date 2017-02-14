@@ -114,7 +114,7 @@
   },
   "dependencies": {
     "UpSet": "git+https://github.com/ronichoudhury-work/upset#7f3c307769490f389ef79b31f68f2558ffa7b2f8",
-    "onset": "git+https://github.com/Kitware/setvis#506bfccff63b0c8f5c39a81d299ed310e5e8fbff",
+    "onset": "git+https://github.com/Kitware/setvis#b2b8e7cfdef335a4ee4b2af871e14d203ef3e754",
     "brace": "^0.7.0",
     "css-loader": "^0.23.1",
     "d3": "^3.5.14",
