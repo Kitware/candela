@@ -8,7 +8,17 @@ let VegaChart = (Base, spec) => class extends Base {
   }
 
   render () {
-    this.chart.then(chart => chart.update());
+    this.chart.then(chart => {
+      if (this.width) {
+        chart = chart.width(this.width);
+      }
+
+      if (this.height) {
+        chart = chart.height(this.height);
+      }
+
+      chart.update();
+    });
   }
 
   get serializationFormats () {
