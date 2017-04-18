@@ -8,6 +8,7 @@ import msft_raw from './msft.csv';
 import simpsons_raw from './simpsons.csv';
 import simpsons_alternate_raw from './simpsons-alternate.csv';
 import stocks_raw from './stocks.csv';
+import bigram from './bigram.json';
 
 function readCSV (raw) {
   return dl.read(raw, {
@@ -28,5 +29,6 @@ export {
   msft,
   simpsons,
   simpsons_alternate,
-  stocks
+  stocks,
+  bigram
 };
