@@ -113,7 +113,7 @@
     "webpack": "^1.12.12"
   },
   "dependencies": {
-    "UpSet": "git+https://github.com/ronichoudhury-work/upset#7f3c307769490f389ef79b31f68f2558ffa7b2f8",
+    "UpSet": "git+https://github.com/ronichoudhury-work/upset#aa6fcbf9573823ce5dae948e48d7a154deacad62",
     "onset": "git+https://github.com/Kitware/setvis#b2b8e7cfdef335a4ee4b2af871e14d203ef3e754",
     "brace": "^0.7.0",
     "css-loader": "^0.23.1",
