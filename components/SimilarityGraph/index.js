@@ -4,7 +4,7 @@ import d3 from 'd3';
 import cola from 'webcola';
 
 export default class SimilarityGraph extends VisComponent {
-  constructor (el, {data, threshold = 0, linkDistance = 100, nodeRadius = 10}) {
+  constructor (el, {data, threshold = 0, linkDistance = 100, size = 10}) {
     super(el);
     this.data = data;
 
@@ -24,8 +24,8 @@ export default class SimilarityGraph extends VisComponent {
     const nodes = this.nodes = this.data.map(d => ({
       id: d.id,
       color: d.color,
-      width: 2 * nodeRadius,
-      height: 2 * nodeRadius
+      width: 2 * size,
+      height: 2 * size
     }));
 
     // Construct an index map into the nodes list.
@@ -67,7 +67,7 @@ export default class SimilarityGraph extends VisComponent {
     this.nodeSelection.enter()
       .append('circle')
       .classed('node', true)
-      .attr('r', nodeRadius)
+      .attr('r', size)
       .style('stroke', 'black')
       .style('fill', d => colormap(d.color))
       .style('cursor', 'crosshair')
