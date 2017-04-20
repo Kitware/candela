@@ -4,12 +4,12 @@ import './index.styl';
 const createDOMElement = (eltType) => {
   let ret = null;
   switch (eltType) {
-  case 'svg':
-    ret = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    break;
+    case 'svg':
+      ret = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      break;
 
-  default:
-    ret = document.createElement(eltType);
+    default:
+      ret = document.createElement(eltType);
   }
 
   return ret;

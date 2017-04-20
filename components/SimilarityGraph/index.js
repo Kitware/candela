@@ -4,7 +4,7 @@ import d3 from 'd3';
 import cola from 'webcola';
 
 export default class SimilarityGraph extends VisComponent {
-  constructor (el, {data, threshold=0, linkDistance=100, nodeRadius=10}) {
+  constructor (el, {data, threshold = 0, linkDistance = 100, nodeRadius = 10}) {
     super(el);
     this.data = data;
 
@@ -109,7 +109,7 @@ export default class SimilarityGraph extends VisComponent {
         .attr('x1', d => d.source.x)
         .attr('y1', d => d.source.y)
         .attr('x2', d => d.target.x)
-        .attr('y2', d => d.target.y)
+        .attr('y2', d => d.target.y);
     });
 
     this.cola.avoidOverlaps(true)
