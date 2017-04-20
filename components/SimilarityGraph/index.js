@@ -8,6 +8,11 @@ export default class SimilarityGraph extends VisComponent {
     super(el);
     this.data = data;
 
+    // Construct a function that returns the needed size - either a constant
+    // supplied in the `size` parameter, or a lookup function that pulls it from
+    // the data table.
+    const sizeFunc = d => typeof size === 'string' ? d[size] : size;
+
     // Get the width and height of the SVG element the graph lives in.
     const bbox = this.el.getBoundingClientRect();
     const width = bbox.width;
@@ -21,11 +26,13 @@ export default class SimilarityGraph extends VisComponent {
     // Compute the graph.
     //
     // Create a list of nodes.
+    const sizeField = typeof size === 'string' ? size : 'size';
     const nodes = this.nodes = this.data.map(d => ({
       id: d.id,
       color: d.color,
-      width: 2 * size,
-      height: 2 * size
+      width: 2 * sizeFunc(d),
+      height: 2 * sizeFunc(d),
+      [`${sizeField}`]: sizeFunc(d)
     }));
 
     // Construct an index map into the nodes list.
@@ -67,7 +74,7 @@ export default class SimilarityGraph extends VisComponent {
     this.nodeSelection.enter()
       .append('circle')
       .classed('node', true)
-      .attr('r', size)
+      .attr('r', sizeFunc)
       .style('stroke', 'black')
       .style('fill', d => colormap(d.color))
       .style('cursor', 'crosshair')
@@ -102,7 +109,7 @@ export default class SimilarityGraph extends VisComponent {
         })
         .attr('y', function (d) {
           const bbox = this.getBBox();
-          return d.y + bbox.height;
+          return d.y + bbox.height + 0.5 * sizeFunc(d);
         });
 
       this.linkSelection
@@ -143,6 +150,22 @@ export default class SimilarityGraph extends VisComponent {
           mode: 'field',
           from: 'data',
           fieldTypes: ['date', 'number', 'integer', 'boolean']
+        }
+      },
+      {
+        name: 'size',
+        type: 'string',
+        domain: {
+          mode: 'field',
+          from: 'data',
+          fieldTypes: ['number', 'integer']
+        }
+      },
+      {
+        name: 'size',
+        type: 'number',
+        domain: {
+          mode: 'value'
         }
       }
     ];
