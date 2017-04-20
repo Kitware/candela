@@ -24,6 +24,7 @@ before_install:
     - sh -e /etc/init.d/xvfb start
 
 install:
+    - pip install --user pycparser==2.14
     - pip install --user girder-client 'requests[security]'
     - pip install --user flake8
 
