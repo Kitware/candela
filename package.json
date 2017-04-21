@@ -28,7 +28,7 @@
     "cover:report": "http-server coverage/html -p ${PORT-3000}",
     "codecov": "cat coverage/lcov/lcov.info | codecov",
     "examples": "http-server build -p ${PORT-3000}",
-    "docs": "npm run build:docs && http-server build/docs -p ${PORT-3000}",
+    "docs": "http-server build/docs -p ${PORT-3000}",
     "commit": "git-cz",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "commitmsg": "validate-commit-msg"
