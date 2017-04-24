@@ -164,9 +164,14 @@ export default class SimilarityGraph extends VisComponent {
       {
         name: 'size',
         type: 'number',
-        domain: {
-          mode: 'value'
-        }
+        format: 'number'
+        default: 10
+      },
+      {
+        name: 'threshold',
+        type: 'number',
+        format: 'number',
+        default: 0
       }
     ];
   }
