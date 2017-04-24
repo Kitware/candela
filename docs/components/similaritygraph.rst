@@ -117,23 +117,16 @@ Options
 data (:ref:`Table <table>`)
     The data table.
 
-x (String)
-    The x axis (bar position) field. Must contain numeric data. See :ref:`axis scales`.
-
-y (String)
-    The y axis (bar height) field. Must contain numeric data. See :ref:`axis scales`.
+id (String)
+    The ID field. Can contain any data type, but the value should be unique to
+    each data record.
 
 color (String)
-    The field used to color the bars. See :ref:`color scales`.
+    The field used to color the nodes. See :ref:`color scales`.
 
-hover (Array of String)
-    The fields to display on hover.
+size (String or Number)
+    If a string, the field used to provide the radius for each node; if a
+    number, the radius to use for *all* nodes.
 
-width (Number)
-    Width of the chart in pixels. See :ref:`sizing`.
-
-height (Number)
-    Height of the chart in pixels. See :ref:`sizing`.
-
-renderer (String)
-    Whether to render in ``"svg"`` or ``"canvas"`` mode (default ``"canvas"``).
+threshold (Number)
+    The link strength above which a link will appear in the graph.
