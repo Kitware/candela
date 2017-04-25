@@ -230,29 +230,29 @@ export default class TreeHeatmap extends VisComponent {
       .attr('height', height + 'px');
 
     vis.append('clipPath').attr('id', 'clip-rect')
-    .append('rect')
-    .attr('x', xStart)
-    .attr('y', yStart)
-    .attr('width', colSize)
-    .attr('height', rowSize);
+      .append('rect')
+      .attr('x', xStart)
+      .attr('y', yStart)
+      .attr('width', colSize)
+      .attr('height', rowSize);
 
     let rectGroup = vis.append('g').attr('clip-path', 'url(#clip-rect)');
 
     vis.append('clipPath').attr('id', 'clip-row-labels')
-    .append('rect')
-    .attr('x', xStart + colSize)
-    .attr('y', yStart)
-    .attr('width', labelHeight)
-    .attr('height', rowSize);
+      .append('rect')
+      .attr('x', xStart + colSize)
+      .attr('y', yStart)
+      .attr('width', labelHeight)
+      .attr('height', rowSize);
 
     let rowLabelGroup = vis.append('g').attr('clip-path', 'url(#clip-row-labels)');
 
     vis.append('clipPath').attr('id', 'clip-col-labels')
-    .append('rect')
-    .attr('x', xStart)
-    .attr('y', yStart + rowSize)
-    .attr('width', colSize)
-    .attr('height', labelHeight);
+      .append('rect')
+      .attr('x', xStart)
+      .attr('y', yStart + rowSize)
+      .attr('width', colSize)
+      .attr('height', labelHeight);
 
     let colLabelGroup = vis.append('g').attr('clip-path', 'url(#clip-col-labels)');
 
@@ -337,46 +337,46 @@ export default class TreeHeatmap extends VisComponent {
         });
 
         group.selectAll('.tree-links')
-        .data(links)
-        .transition().duration(duration)
-        .attr('d', d => line(d.lines));
+          .data(links)
+          .transition().duration(duration)
+          .attr('d', d => line(d.lines));
 
         group.selectAll('.tree-select')
-        .data(reverseLinks).transition().duration(duration)
-        .attr(axis1, d => distanceScale(distance(d)))
-        .attr(axis2, d => treeScale(d.offset))
-        .attr(axis1 === 'x' ? 'width' : 'height', d => distanceScale(0) - distanceScale(distance(d)))
-        .attr(axis2 === 'x' ? 'width' : 'height', d => treeScale(d.offset + d.size) - treeScale(d.offset));
+          .data(reverseLinks).transition().duration(duration)
+          .attr(axis1, d => distanceScale(distance(d)))
+          .attr(axis2, d => treeScale(d.offset))
+          .attr(axis1 === 'x' ? 'width' : 'height', d => distanceScale(0) - distanceScale(distance(d)))
+          .attr(axis2 === 'x' ? 'width' : 'height', d => treeScale(d.offset + d.size) - treeScale(d.offset));
 
         vis.selectAll('.datum')
-        .data(rectData).transition().duration(duration)
-        .attr('x', d => xScale(d.colIndex))
-        .attr('y', d => yScale(d.rowIndex))
-        .attr('width', d => xScale(d.colIndex + 1) - xScale(d.colIndex))
-        .attr('height', d => yScale(d.rowIndex + 1) - yScale(d.rowIndex));
+          .data(rectData).transition().duration(duration)
+          .attr('x', d => xScale(d.colIndex))
+          .attr('y', d => yScale(d.rowIndex))
+          .attr('width', d => xScale(d.colIndex + 1) - xScale(d.colIndex))
+          .attr('height', d => yScale(d.rowIndex + 1) - yScale(d.rowIndex));
 
         rowLabelGroup.selectAll('.row-label')
-        .data(rows).transition().duration(duration)
-        .attr('y', d => yScale(d.pos));
+          .data(rows).transition().duration(duration)
+          .attr('y', d => yScale(d.pos));
 
         colLabelGroup.selectAll('.col-label')
-        .data(columns).transition().duration(duration)
-        .attr('transform', d => 'translate(' + xScale(d.pos) + ',' + (yStart + rowSize) + ')');
+          .data(columns).transition().duration(duration)
+          .attr('transform', d => 'translate(' + xScale(d.pos) + ',' + (yStart + rowSize) + ')');
       }
 
       group.selectAll('.tree-select').data(reverseLinks).enter()
-      .append('rect')
-      .attr('class', 'tree-select')
-      .style('fill', 'steelblue')
-      .style('fill-opacity', 0)
-      .on('mouseover', function () { d3.select(this).style('fill-opacity', 0.4); })
-      .on('mouseout', function () { d3.select(this).style('fill-opacity', 0); })
-      .on('click', d => {
-        treeScale.domain([d.offset, d.offset + d.size]);
-        distanceScale.domain([0, distance(d.parent.parent)]);
-        (orientation === 'horizontal' ? xScale : yScale).domain([d.offset, d.offset + d.size]);
-        update(duration);
-      });
+        .append('rect')
+        .attr('class', 'tree-select')
+        .style('fill', 'steelblue')
+        .style('fill-opacity', 0)
+        .on('mouseover', function () { d3.select(this).style('fill-opacity', 0.4); })
+        .on('mouseout', function () { d3.select(this).style('fill-opacity', 0); })
+        .on('click', d => {
+          treeScale.domain([d.offset, d.offset + d.size]);
+          distanceScale.domain([0, distance(d.parent.parent)]);
+          (orientation === 'horizontal' ? xScale : yScale).domain([d.offset, d.offset + d.size]);
+          update(duration);
+        });
 
       update(0);
     };
@@ -438,41 +438,41 @@ export default class TreeHeatmap extends VisComponent {
     }
 
     rectGroup.selectAll('.datum')
-    .data(rectData)
-    .enter()
-    .append('rect')
-    .attr('class', 'datum')
-    .attr('fill', color)
-    .attr('x', d => xScale(d.colIndex))
-    .attr('y', d => yScale(d.rowIndex))
-    .attr('opacity', this.removeEmpty ? d => 1 : opacity)
-    .attr('width', d => xScale(d.colIndex + 1) - xScale(d.colIndex))
-    .attr('height', d => yScale(d.rowIndex + 1) - yScale(d.rowIndex));
+      .data(rectData)
+      .enter()
+      .append('rect')
+      .attr('class', 'datum')
+      .attr('fill', color)
+      .attr('x', d => xScale(d.colIndex))
+      .attr('y', d => yScale(d.rowIndex))
+      .attr('opacity', this.removeEmpty ? d => 1 : opacity)
+      .attr('width', d => xScale(d.colIndex + 1) - xScale(d.colIndex))
+      .attr('height', d => yScale(d.rowIndex + 1) - yScale(d.rowIndex));
 
     rowLabelGroup.selectAll('.row-label')
-    .data(rows)
-    .enter()
-    .append('text')
-    .attr('class', 'row-label')
-    .text(d => d.name)
-    .attr('color', 'black')
-    .attr('font-size', '10px')
-    .attr('alignment-baseline', 'middle')
-    .attr('x', xStart + colSize)
-    .attr('y', d => yScale(d.pos));
+      .data(rows)
+      .enter()
+      .append('text')
+      .attr('class', 'row-label')
+      .text(d => d.name)
+      .attr('color', 'black')
+      .attr('font-size', '10px')
+      .attr('alignment-baseline', 'middle')
+      .attr('x', xStart + colSize)
+      .attr('y', d => yScale(d.pos));
 
     colLabelGroup.selectAll('.col-label')
-    .data(columns)
-    .enter()
-    .append('g')
-    .attr('transform', d => 'translate(' + xScale(d.pos) + ',' + (yStart + rowSize) + ')')
-    .attr('class', 'col-label')
-    .append('text')
-    .text(d => d.name)
-    .attr('color', 'black')
-    .attr('font-size', '10px')
-    .attr('transform', 'rotate(-90)')
-    .attr('text-anchor', 'end')
-    .attr('alignment-baseline', 'middle');
+      .data(columns)
+      .enter()
+      .append('g')
+      .attr('transform', d => 'translate(' + xScale(d.pos) + ',' + (yStart + rowSize) + ')')
+      .attr('class', 'col-label')
+      .append('text')
+      .text(d => d.name)
+      .attr('color', 'black')
+      .attr('font-size', '10px')
+      .attr('transform', 'rotate(-90)')
+      .attr('text-anchor', 'end')
+      .attr('alignment-baseline', 'middle');
   }
 }
