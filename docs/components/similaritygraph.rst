@@ -99,9 +99,13 @@ Example
 
     import pycandela
 
-    data = [{'a': d, 'b': d} for d in range(10)]
+    data = [
+      {'id': 'A', 'class': 0, 'A': 1.0, 'B': 0.5, 'C': 0.3},
+      {'id': 'B', 'class': 1, 'A': 0.5, 'B': 1.0, 'C': 0.2},
+      {'id': 'C', 'class': 1, 'A': 0.3, 'B': 0.2, 'C': 1.0}
+    ]
 
-    pycandela.components.BarChart(data=data, x='a', y='b')
+    pycandela.components.SimilarityGraph(data=data, id='id', color='class', threshold=0.4)
 
 **R**
 
@@ -109,7 +113,14 @@ Example
 
     library(candela)
 
-    candela('BarChart', data=mtcars, x='mpg', y='wt', color='disp')
+    id = c('A', 'B', 'C')
+    class = c(0, 1, 1)
+    A = c(1.0, 0.5, 0.3)
+    B = c(0.5, 1.0, 0.2)
+    C = c(0.3, 0.2, 1.0)
+    data = data.frame(id, class, A, B, C)
+
+    candela('SimilarityGraph', data=data, id='id', color='class', threshold=0.4)
 
 Options
 =======
