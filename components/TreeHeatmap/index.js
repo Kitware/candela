@@ -169,7 +169,7 @@ export default class TreeHeatmap extends VisComponent {
           child1: +row._child1,
           child2: +row._child2,
           distance: +row._distance,
-          size: +row._size,
+          size: +row._size
         });
       }
     });
@@ -192,11 +192,9 @@ export default class TreeHeatmap extends VisComponent {
     let opacity = () => 1;
     if (this.thresholdMode === 'less than') {
       opacity = d => d.value < this.threshold ? 1 : 0;
-    }
-    else if (this.thresholdMode === 'greater than') {
+    } else if (this.thresholdMode === 'greater than') {
       opacity = d => d.value > this.threshold ? 1 : 0;
-    }
-    else if (this.thresholdMode === 'absolute value greater than') {
+    } else if (this.thresholdMode === 'absolute value greater than') {
       opacity = d => Math.abs(d.value) > this.threshold ? 1 : 0;
     }
 
@@ -263,7 +261,7 @@ export default class TreeHeatmap extends VisComponent {
     let xScale = d3.scale.linear().domain([0, content[0].length]).range([xStart, xStart + colSize]);
     let yScale = d3.scale.linear().domain([0, content.length]).range([yStart, yStart + rowSize]);
 
-    let tree = function(orientation, links, leaves, x, y, width, height, duration) {
+    let tree = function (orientation, links, leaves, x, y, width, height, duration) {
       let numLeaves = leaves.length;
       let linkMap = {};
       for (let leaf = 0; leaf < numLeaves; leaf += 1) {
@@ -304,22 +302,22 @@ export default class TreeHeatmap extends VisComponent {
       }
 
       vis.append('clipPath').attr('id', 'clip-' + orientation)
-      .append('rect')
-      .attr('x', orientation === 'horizontal' ? x : y)
-      .attr('y', orientation === 'horizontal' ? y : x)
-      .attr('width', orientation === 'horizontal' ? width : height)
-      .attr('height', orientation === 'horizontal' ? height : width);
+        .append('rect')
+        .attr('x', orientation === 'horizontal' ? x : y)
+        .attr('y', orientation === 'horizontal' ? y : x)
+        .attr('width', orientation === 'horizontal' ? width : height)
+        .attr('height', orientation === 'horizontal' ? height : width);
 
       let group = vis.append('g')
-      .attr('class', orientation)
-      .attr('clip-path', 'url(#clip-' + orientation + ')')
+        .attr('class', orientation)
+        .attr('clip-path', 'url(#clip-' + orientation + ')');
 
       group.selectAll('.tree-links').data(links)
-      .enter()
-      .append('path')
-      .attr('class', 'tree-links')
-      .style('fill-opacity', 0)
-      .style('stroke', 'black');
+        .enter()
+        .append('path')
+        .attr('class', 'tree-links')
+        .style('fill-opacity', 0)
+        .style('stroke', 'black');
 
       let reverseLinks = links.slice().reverse();
 
@@ -328,7 +326,7 @@ export default class TreeHeatmap extends VisComponent {
         line.x(d => d[1]).y(d => d[0]);
       }
 
-      function update(duration) {
+      function update (duration) {
         links.forEach(d => {
           d.lines = [
             [distanceScale(distance(linkMap[d.child1])), treeScale(linkMap[d.child1].pos)],
@@ -347,8 +345,8 @@ export default class TreeHeatmap extends VisComponent {
         .data(reverseLinks).transition().duration(duration)
         .attr(axis1, d => distanceScale(distance(d)))
         .attr(axis2, d => treeScale(d.offset))
-        .attr(axis1 == 'x' ? 'width' : 'height', d => distanceScale(0) - distanceScale(distance(d)))
-        .attr(axis2 == 'x' ? 'width' : 'height', d => treeScale(d.offset + d.size) - treeScale(d.offset));
+        .attr(axis1 === 'x' ? 'width' : 'height', d => distanceScale(0) - distanceScale(distance(d)))
+        .attr(axis2 === 'x' ? 'width' : 'height', d => treeScale(d.offset + d.size) - treeScale(d.offset));
 
         vis.selectAll('.datum')
         .data(rectData).transition().duration(duration)
@@ -364,7 +362,6 @@ export default class TreeHeatmap extends VisComponent {
         colLabelGroup.selectAll('.col-label')
         .data(columns).transition().duration(duration)
         .attr('transform', d => 'translate(' + xScale(d.pos) + ',' + (yStart + rowSize) + ')');
-
       }
 
       group.selectAll('.tree-select').data(reverseLinks).enter()
@@ -372,8 +369,8 @@ export default class TreeHeatmap extends VisComponent {
       .attr('class', 'tree-select')
       .style('fill', 'steelblue')
       .style('fill-opacity', 0)
-      .on('mouseover', function() { d3.select(this).style('fill-opacity', 0.4); })
-      .on('mouseout', function() { d3.select(this).style('fill-opacity', 0); })
+      .on('mouseover', function () { d3.select(this).style('fill-opacity', 0.4); })
+      .on('mouseout', function () { d3.select(this).style('fill-opacity', 0); })
       .on('click', d => {
         treeScale.domain([d.offset, d.offset + d.size]);
         distanceScale.domain([0, distance(d.parent.parent)]);
