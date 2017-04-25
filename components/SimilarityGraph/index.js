@@ -4,24 +4,31 @@ import d3 from 'd3';
 import cola from 'webcola';
 
 export default class SimilarityGraph extends VisComponent {
-  constructor (el, {data, threshold = 0, linkDistance = 100, size = 10}) {
+  constructor (el, {data, threshold = 0, linkDistance = 100, size = 10, width = 960, height = 540}) {
     super(el);
     this.data = data;
+
+    // Construct an SVG element inside the top-level div.
+    this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    this.svg.setAttribute('width', width);
+    this.svg.setAttribute('height', height);
+    this.el.appendChild(this.svg);
 
     // Construct a function that returns the needed size - either a constant
     // supplied in the `size` parameter, or a lookup function that pulls it from
     // the data table.
     const sizeFunc = d => typeof size === 'string' ? d[size] : size;
 
-    // Get the width and height of the SVG element the graph lives in.
-    const bbox = this.el.getBoundingClientRect();
-    const width = bbox.width;
-    const height = bbox.height;
+    // Get the width and height of the SVG element. This is necessary here in
+    // case non-pixel measures like '100%' were passed to the component.
+    const bbox = this.svg.getBBox();
+    const w = bbox.width;
+    const h = bbox.height;
 
     // Initialize the cola object.
     this.cola = cola.d3adaptor()
       .linkDistance(linkDistance)
-      .size([width, height]);
+      .size([w, h]);
 
     // Compute the graph.
     //
@@ -53,7 +60,7 @@ export default class SimilarityGraph extends VisComponent {
 
     // Create a D3 selection for the links, and initialize it with some line
     // elements.
-    this.linkSelection = d3.select(this.el)
+    this.linkSelection = d3.select(this.svg)
       .selectAll('line.link')
       .data(this.links);
 
@@ -65,7 +72,7 @@ export default class SimilarityGraph extends VisComponent {
 
     // Create a D3 selection for the nodes, and initialize it with some circle
     // elements.
-    this.nodeSelection = d3.select(this.el)
+    this.nodeSelection = d3.select(this.svg)
       .selectAll('circle.node')
       .data(this.nodes);
 
@@ -81,7 +88,7 @@ export default class SimilarityGraph extends VisComponent {
       .call(this.cola.drag);
 
     // Create a D3 selection for node labels.
-    this.labelSelection = d3.select(this.el)
+    this.labelSelection = d3.select(this.svg)
       .selectAll('text.label')
       .data(this.nodes);
 
@@ -164,7 +171,7 @@ export default class SimilarityGraph extends VisComponent {
       {
         name: 'size',
         type: 'number',
-        format: 'number'
+        format: 'number',
         default: 10
       },
       {

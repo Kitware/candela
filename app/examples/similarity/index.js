@@ -44,16 +44,17 @@ const generateTable = (freq) => {
   const rescale = val => (val - min) / (max - min) * (maxSize - minSize) + minSize;
 
   table.forEach(entry => entry.size = rescale(entry.size));
-  console.log(table);
 
   return table;
 };
 
 window.onload = () => {
-  showComponent(SimilarityGraph, 'svg', {
+  showComponent(SimilarityGraph, {
     data: generateTable(bigram),
     threshold: 0.01,
     size: 'size',
-    linkDistance: 120
+    linkDistance: 120,
+    width: '100%',
+    height: '100%'
   });
 };
