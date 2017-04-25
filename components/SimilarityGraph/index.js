@@ -29,7 +29,7 @@ export default class SimilarityGraph extends VisComponent {
 
     // Get the width and height of the SVG element. This is necessary here in
     // case non-pixel measures like '100%' were passed to the component.
-    const bbox = this.svg.getBBox();
+    const bbox = this.svg.getBoundingClientRect();
     const w = bbox.width;
     const h = bbox.height;
 
