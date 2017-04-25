@@ -8,6 +8,10 @@ export default class SimilarityGraph extends VisComponent {
     super(el);
     this.data = data;
 
+    // Empty the top-level div.
+    d3.select(this.el)
+      .selectAll('*').remove();
+
     // Construct an SVG element inside the top-level div.
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     this.svg.setAttribute('width', width);
