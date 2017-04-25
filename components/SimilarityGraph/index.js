@@ -4,7 +4,7 @@ import d3 from 'd3';
 import cola from 'webcola';
 
 export default class SimilarityGraph extends VisComponent {
-  constructor (el, {data, threshold = 0, linkDistance = 100, size = 10, width = 960, height = 540}) {
+  constructor (el, {data, threshold = 0, linkDistance = 100, id = 'id', color, size = 10, width = 960, height = 540}) {
     super(el);
     this.data = data;
 
@@ -18,6 +18,10 @@ export default class SimilarityGraph extends VisComponent {
     // supplied in the `size` parameter, or a lookup function that pulls it from
     // the data table.
     const sizeFunc = d => typeof size === 'string' ? d[size] : size;
+
+    // Construct lookup function for the color field.
+    const colormap = d3.scale.category10();
+    const colorFunc = color ? d => colormap(d[color]) : () => 'rgb(31, 119, 180)';
 
     // Get the width and height of the SVG element. This is necessary here in
     // case non-pixel measures like '100%' were passed to the component.
@@ -33,13 +37,12 @@ export default class SimilarityGraph extends VisComponent {
     // Compute the graph.
     //
     // Create a list of nodes.
-    const sizeField = typeof size === 'string' ? size : 'size';
     const nodes = this.nodes = this.data.map(d => ({
-      id: d.id,
-      color: d.color,
+      id: d[id],
+      color: colorFunc(d),
       width: 2 * sizeFunc(d),
       height: 2 * sizeFunc(d),
-      [`${sizeField}`]: sizeFunc(d)
+      size: sizeFunc(d)
     }));
 
     // Construct an index map into the nodes list.
@@ -50,10 +53,10 @@ export default class SimilarityGraph extends VisComponent {
     // that don't have enough strength.
     this.links = [];
     this.data.forEach(a => this.data.forEach(b => {
-      if (a.id !== b.id && a[b.id] >= threshold) {
+      if (a[id] !== b[id] && a[b[id]] >= threshold) {
         this.links.push({
-          source: idxmap[a.id],
-          target: idxmap[b.id]
+          source: idxmap[a[id]],
+          target: idxmap[b[id]]
         });
       }
     }));
@@ -76,14 +79,12 @@ export default class SimilarityGraph extends VisComponent {
       .selectAll('circle.node')
       .data(this.nodes);
 
-    const colormap = d3.scale.category10();
-
     this.nodeSelection.enter()
       .append('circle')
       .classed('node', true)
-      .attr('r', sizeFunc)
+      .attr('r', d => d.size)
       .style('stroke', 'black')
-      .style('fill', d => colormap(d.color))
+      .style('fill', d => d.color)
       .style('cursor', 'crosshair')
       .call(this.cola.drag);
 
@@ -116,7 +117,7 @@ export default class SimilarityGraph extends VisComponent {
         })
         .attr('y', function (d) {
           const bbox = this.getBBox();
-          return d.y + bbox.height + 0.5 * sizeFunc(d);
+          return d.y + bbox.height + 0.5 * d.size;
         });
 
       this.linkSelection

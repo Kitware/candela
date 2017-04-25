@@ -13,9 +13,9 @@ const generateTable = (freq) => {
 
   alphabet.forEach(x => {
     let entry = {
-      id: x,
-      color: sonorantClass(x),
-      size: -Infinity
+      letter: x,
+      vowel: sonorantClass(x),
+      radius: -Infinity
     };
 
     alphabet.forEach(y => {
@@ -29,8 +29,8 @@ const generateTable = (freq) => {
         max = value;
       }
 
-      if (value > entry.size) {
-        entry.size = value;
+      if (value > entry.radius) {
+        entry.radius = value;
       }
       entry[y] = value;
     });
@@ -43,7 +43,7 @@ const generateTable = (freq) => {
   const maxSize = 20;
   const rescale = val => (val - min) / (max - min) * (maxSize - minSize) + minSize;
 
-  table.forEach(entry => entry.size = rescale(entry.size));
+  table.forEach(entry => entry.radius = rescale(entry.radius));
 
   return table;
 };
@@ -51,8 +51,10 @@ const generateTable = (freq) => {
 window.onload = () => {
   showComponent(SimilarityGraph, {
     data: generateTable(bigram),
+    id: 'letter',
+    color: 'vowel',
     threshold: 0.01,
-    size: 'size',
+    size: 'radius',
     linkDistance: 120,
     width: '100%',
     height: '100%'
