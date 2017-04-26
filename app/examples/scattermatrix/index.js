@@ -3,7 +3,7 @@ import showComponent from '../util/showComponent';
 import ScatterPlotMatrix from '../../../components/ScatterPlotMatrix';
 
 window.onload = () => {
-  showComponent(ScatterPlotMatrix, 'div', {
+  showComponent(ScatterPlotMatrix, {
     data: iris,
     fields: [
       'petalWidth',

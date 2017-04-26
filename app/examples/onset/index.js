@@ -3,7 +3,7 @@ import showComponent from '../util/showComponent';
 import OnSet from '../../../components/OnSet';
 
 window.onload = () => {
-  showComponent(OnSet, 'div', {
+  showComponent(OnSet, {
     data: simpsons,
     id: 'Name',
     sets: [

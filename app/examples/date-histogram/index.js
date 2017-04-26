@@ -3,7 +3,7 @@ import showComponent from '../util/showComponent';
 import Histogram from '../../../components/Histogram';
 
 window.onload = () => {
-  showComponent(Histogram, 'div', {
+  showComponent(Histogram, {
     data: stocks,
     bin: 'date'
   });

@@ -3,7 +3,7 @@ import showComponent from '../util/showComponent';
 import UpSet from '../../../components/UpSet';
 
 window.onload = () => {
-  showComponent(UpSet, 'div', {
+  showComponent(UpSet, {
     data: simpsons,
     id: 'Name',
     sets: [

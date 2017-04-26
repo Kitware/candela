@@ -3,7 +3,7 @@ import showComponent from '../util/showComponent';
 import SurvivalPlot from '../../../components/SurvivalPlot';
 
 window.onload = () => {
-  showComponent(SurvivalPlot, 'div', {
+  showComponent(SurvivalPlot, {
     data: hmohiv,
     time: 'time',
     censor: 'censor',

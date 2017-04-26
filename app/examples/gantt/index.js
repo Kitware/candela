@@ -2,7 +2,7 @@ import showComponent from '../util/showComponent';
 import GanttChart from '../../../components/GanttChart';
 
 window.onload = () => {
-  showComponent(GanttChart, 'div', {
+  showComponent(GanttChart, {
     data: [
       {name: '1. Algorithms', level: 1, enter: 0, leave: 6},
       {name: 'Algorithm Specification', level: 2, enter: 0, leave: 2},
