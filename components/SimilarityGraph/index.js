@@ -1,6 +1,6 @@
 import VisComponent from '../../VisComponent';
 
-import d3 from 'd3';
+import * as d3 from 'd3';
 import cola from 'webcola';
 
 export default class SimilarityGraph extends VisComponent {
@@ -36,7 +36,8 @@ export default class SimilarityGraph extends VisComponent {
     const h = bbox.height;
 
     // Initialize the cola object.
-    this.cola = cola.d3adaptor()
+    console.log(d3);
+    this.cola = cola.d3adaptor(d3)
       .linkDistance(linkDistance)
       .size([w, h]);
 
@@ -73,11 +74,12 @@ export default class SimilarityGraph extends VisComponent {
       .selectAll('line.link')
       .data(this.links);
 
-    this.linkSelection.enter()
+    this.linkSelection = this.linkSelection.enter()
       .append('line')
       .classed('link', true)
       .attr('stroke-width', 1)
-      .attr('stroke', 'gray');
+      .attr('stroke', 'gray')
+      .merge(this.linkSelection);
 
     // Create a D3 selection for the nodes, and initialize it with some circle
     // elements.
@@ -85,14 +87,15 @@ export default class SimilarityGraph extends VisComponent {
       .selectAll('circle.node')
       .data(this.nodes);
 
-    this.nodeSelection.enter()
+    this.nodeSelection = this.nodeSelection.enter()
       .append('circle')
       .classed('node', true)
       .attr('r', d => d.size)
       .style('stroke', 'black')
       .style('fill', d => d.color)
       .style('cursor', 'crosshair')
-      .call(this.cola.drag);
+      .call(this.cola.drag)
+      .merge(this.nodeSelection);
 
     // Create a D3 selection for node labels.
     this.labelSelection = d3.select(this.svg)
@@ -100,7 +103,7 @@ export default class SimilarityGraph extends VisComponent {
       .data(this.nodes);
 
     const that = this;
-    this.labelSelection.enter()
+    this.labelSelection = this.labelSelection.enter()
       .append('text')
       .classed('label', true)
       .text(d => d.id)
@@ -109,7 +112,8 @@ export default class SimilarityGraph extends VisComponent {
         that.nodes[i].height += bbox.height;
       })
       .style('cursor', 'crosshair')
-      .call(this.cola.drag);
+      .call(this.cola.drag)
+      .merge(this.labelSelection);
 
     this.cola.on('tick', (...args) => {
       this.nodeSelection
