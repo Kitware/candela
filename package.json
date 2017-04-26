@@ -117,7 +117,7 @@
     "UpSet": "git+https://github.com/ronichoudhury-work/upset#aa6fcbf9573823ce5dae948e48d7a154deacad62",
     "brace": "^0.7.0",
     "css-loader": "^0.23.1",
-    "d3": "^3.5.14",
+    "d3": "^4.8.0",
     "datalib": "^1.7.3",
     "geojs": "^0.9.1",
     "html-loader": "^0.4.3",

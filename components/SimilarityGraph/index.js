@@ -21,12 +21,12 @@ export default class SimilarityGraph extends VisComponent {
     // Construct a function that returns the needed size - either a constant
     // supplied in the `size` parameter, or a lookup function that pulls it from
     // the data table.
-    const sizeMap = d3.scale.linear().domain(d3.extent(data, d => d[size])).range([5, 15]);
+    const sizeMap = d3.scaleLinear().domain(d3.extent(data, d => d[size])).range([5, 15]);
     const sizeFunc = d => typeof size === 'string' ? sizeMap(d[size]) : size;
 
     // Construct lookup function for the color field.
-    const colorScale = d3.scale.linear().domain(d3.extent(data, d => d[color])).range(['white', 'steelblue']);
-    const colormap = typeof data[0][color] === 'string' ? d3.scale.category10() : colorScale;
+    const colorScale = d3.scaleLinear().domain(d3.extent(data, d => d[color])).range(['white', 'steelblue']);
+    const colormap = typeof data[0][color] === 'string' ? d3.scaleOrdinal(d3.schemeCategory10) : colorScale;
     const colorFunc = color !== undefined ? d => colormap(d[color]) : () => 'rgb(31, 119, 180)';
 
     // Get the width and height of the SVG element. This is necessary here in
