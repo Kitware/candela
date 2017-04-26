@@ -69,7 +69,6 @@
     "conventional-commit-types": "^2.1.0",
     "copy-webpack-plugin": "^1.1.1",
     "cz-conventional-changelog": "^1.2.0",
-    "d3": "^3.5.17",
     "eslint": "^1.10.3",
     "eslint-config-standard": "^4.4.0",
     "eslint-plugin-promise": "^1.0.8",
