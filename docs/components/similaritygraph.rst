@@ -12,11 +12,12 @@ containing a unique identifier for each entity. Each object should also have a
 numeric fields named by the IDs of the other entities, containing a link
 strength to each entity. If any entity's link strength is missing, it is
 presumed to be 0. Each object may optionally contain a **color** field,
-containing a value identifying it into a color category, and a **size** field,
+containing a value identifying its color, and a **size** field,
 which is either a number (in pixels) for the radius of each node, or a string
-identifying a field in **data** that contains the radius for each node.
-**threshold** is a numeric value specifying the minimum value for a link
-strength to appear in the graph.
+identifying a field in **data** that contains a number that will be mapped to
+the radius for each node. **threshold** is a numeric value specifying
+the minimum value for a link strength to appear in the graph. **linkDistance**
+sets the desired length of the links in pixels.
 
 Example
 =======
@@ -116,7 +117,7 @@ Example
     id = c('A', 'B', 'C')
     class = c(0, 1, 1)
     A = c(1.0, 0.5, 0.3)
-    B = c(0.5, 1.0, 0.2)
+    B = c(0.5, 1.0, 0.2)the
     C = c(0.3, 0.2, 1.0)
     data = data.frame(id, class, A, B, C)
 
@@ -141,3 +142,6 @@ size (String or Number)
 
 threshold (Number)
     The link strength above which a link will appear in the graph.
+
+linkDistance (Number)
+    The desired length of each link in pixels.

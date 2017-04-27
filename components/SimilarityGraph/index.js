@@ -21,11 +21,13 @@ export default class SimilarityGraph extends VisComponent {
     // Construct a function that returns the needed size - either a constant
     // supplied in the `size` parameter, or a lookup function that pulls it from
     // the data table.
-    const sizeFunc = d => typeof size === 'string' ? d[size] : size;
+    const sizeMap = d3.scale.linear().domain(d3.extent(data, d => d[size])).range([5, 15]);
+    const sizeFunc = d => typeof size === 'string' ? sizeMap(d[size]) : size;
 
     // Construct lookup function for the color field.
-    const colormap = d3.scale.category10();
-    const colorFunc = color ? d => colormap(d[color]) : () => 'rgb(31, 119, 180)';
+    const colorScale = d3.scale.linear().domain(d3.extent(data, d => d[color])).range(['white', 'steelblue']);
+    const colormap = typeof data[0][color] === 'string' ? d3.scale.category10() : colorScale;
+    const colorFunc = color !== undefined ? d => colormap(d[color]) : () => 'rgb(31, 119, 180)';
 
     // Get the width and height of the SVG element. This is necessary here in
     // case non-pixel measures like '100%' were passed to the component.
@@ -143,11 +145,13 @@ export default class SimilarityGraph extends VisComponent {
     return [
       {
         name: 'data',
+        description: 'The data table.',
         type: 'table',
         format: 'objectlist'
       },
       {
         name: 'id',
+        description: 'The field containing the identifier of each row.',
         type: 'string',
         domain: {
           mode: 'field',
@@ -157,15 +161,17 @@ export default class SimilarityGraph extends VisComponent {
       },
       {
         name: 'color',
+        description: 'The field used for coloring the nodes.',
         type: 'string',
         domain: {
           mode: 'field',
           from: 'data',
-          fieldTypes: ['date', 'number', 'integer', 'boolean']
+          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
         }
       },
       {
         name: 'size',
+        description: 'The field used for sizing the nodes.',
         type: 'string',
         domain: {
           mode: 'field',
@@ -174,13 +180,15 @@ export default class SimilarityGraph extends VisComponent {
         }
       },
       {
-        name: 'size',
+        name: 'linkDistance',
+        description: 'The desired length of links.',
         type: 'number',
         format: 'number',
-        default: 10
+        default: 100
       },
       {
         name: 'threshold',
+        description: 'Only display links where the similarity is above this threshold.',
         type: 'number',
         format: 'number',
         default: 0
