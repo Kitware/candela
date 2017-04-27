@@ -117,7 +117,7 @@ Example
     id = c('A', 'B', 'C')
     class = c(0, 1, 1)
     A = c(1.0, 0.5, 0.3)
-    B = c(0.5, 1.0, 0.2)the
+    B = c(0.5, 1.0, 0.2)
     C = c(0.3, 0.2, 1.0)
     data = data.frame(id, class, A, B, C)
 
