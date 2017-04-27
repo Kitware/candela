@@ -16,6 +16,7 @@ const componentList = [
   'OnSet',
   'ScatterPlot',
   'ScatterPlotMatrix',
+  'SimilarityGraph',
   'SurvivalPlot',
   'TrackerDash',
   'UpSet'
