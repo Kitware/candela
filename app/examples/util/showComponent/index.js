@@ -1,13 +1,13 @@
 import html from './index.jade';
 import './index.styl';
 
-export default function showComponent (Component, elementType, options) {
+export default function showComponent (Component, options) {
   document.body.innerHTML = html();
 
   let el = document.getElementById('vis-container')
-  .appendChild(document.createElement(elementType));
+    .appendChild(document.createElement('div'));
   el.setAttribute('id', 'vis-element');
-  el.className = 'vis-full';
+  el.setAttribute('class', 'vis-full');
 
   let vis = new Component(el, options);
   vis.render();

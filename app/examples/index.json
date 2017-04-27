@@ -111,5 +111,9 @@
   {
     "title": "TrackerDash",
     "link": "trackerdash"
+  },
+  {
+    "title": "Similarity Graph",
+    "link": "similarity"
   }
 ]

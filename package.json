@@ -28,7 +28,7 @@
     "cover:report": "http-server coverage/html -p ${PORT-3000}",
     "codecov": "cat coverage/lcov/lcov.info | codecov",
     "examples": "http-server build -p ${PORT-3000}",
-    "docs": "npm run build:docs && http-server build/docs -p ${PORT-3000}",
+    "docs": "http-server build/docs -p ${PORT-3000}",
     "commit": "git-cz",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "commitmsg": "validate-commit-msg"
@@ -110,6 +110,7 @@
     "tape-catch": "^1.0.6",
     "url-loader": "^0.5.7",
     "validate-commit-msg": "^2.8.2",
+    "webcola": "^3.3.3",
     "webpack": "^1.12.12"
   },
   "dependencies": {
