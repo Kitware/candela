@@ -3,7 +3,7 @@ import showComponent from '../util/showComponent';
 import LineChart from '../../../components/LineChart';
 
 window.onload = () => {
-  showComponent(LineChart, 'div', {
+  showComponent(LineChart, {
     data: msft,
     x: 'date',
     y: ['price'],

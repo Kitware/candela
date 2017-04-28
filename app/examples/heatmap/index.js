@@ -3,7 +3,7 @@ import showComponent from '../util/showComponent';
 import Heatmap from '../../../components/Heatmap';
 
 window.onload = () => {
-  showComponent(Heatmap, 'div', {
+  showComponent(Heatmap, {
     data: iris,
     fields: [
       'sepalLength',

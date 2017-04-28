@@ -3,7 +3,7 @@ import showComponent from '../util/showComponent';
 import LineUp from '../../../components/LineUp';
 
 window.onload = () => {
-  showComponent(LineUp, 'div', {
+  showComponent(LineUp, {
     data: iris,
     fields: [
       'species',

@@ -1,6 +1,6 @@
 import VisComponent from '../../VisComponent';
 
-import d3 from 'd3';
+import * as d3 from 'd3';
 import cola from 'webcola';
 
 export default class SimilarityGraph extends VisComponent {
@@ -21,12 +21,12 @@ export default class SimilarityGraph extends VisComponent {
     // Construct a function that returns the needed size - either a constant
     // supplied in the `size` parameter, or a lookup function that pulls it from
     // the data table.
-    const sizeMap = d3.scale.linear().domain(d3.extent(data, d => d[size])).range([5, 15]);
+    const sizeMap = d3.scaleLinear().domain(d3.extent(data, d => d[size])).range([5, 15]);
     const sizeFunc = d => typeof size === 'string' ? sizeMap(d[size]) : size;
 
     // Construct lookup function for the color field.
-    const colorScale = d3.scale.linear().domain(d3.extent(data, d => d[color])).range(['white', 'steelblue']);
-    const colormap = typeof data[0][color] === 'string' ? d3.scale.category10() : colorScale;
+    const colorScale = d3.scaleLinear().domain(d3.extent(data, d => d[color])).range(['white', 'steelblue']);
+    const colormap = typeof data[0][color] === 'string' ? d3.scaleOrdinal(d3.schemeCategory10) : colorScale;
     const colorFunc = color !== undefined ? d => colormap(d[color]) : () => 'rgb(31, 119, 180)';
 
     // Get the width and height of the SVG element. This is necessary here in
@@ -36,7 +36,8 @@ export default class SimilarityGraph extends VisComponent {
     const h = bbox.height;
 
     // Initialize the cola object.
-    this.cola = cola.d3adaptor()
+    console.log(d3);
+    this.cola = cola.d3adaptor(d3)
       .linkDistance(linkDistance)
       .size([w, h]);
 
@@ -73,11 +74,12 @@ export default class SimilarityGraph extends VisComponent {
       .selectAll('line.link')
       .data(this.links);
 
-    this.linkSelection.enter()
+    this.linkSelection = this.linkSelection.enter()
       .append('line')
       .classed('link', true)
       .attr('stroke-width', 1)
-      .attr('stroke', 'gray');
+      .attr('stroke', 'gray')
+      .merge(this.linkSelection);
 
     // Create a D3 selection for the nodes, and initialize it with some circle
     // elements.
@@ -85,14 +87,15 @@ export default class SimilarityGraph extends VisComponent {
       .selectAll('circle.node')
       .data(this.nodes);
 
-    this.nodeSelection.enter()
+    this.nodeSelection = this.nodeSelection.enter()
       .append('circle')
       .classed('node', true)
       .attr('r', d => d.size)
       .style('stroke', 'black')
       .style('fill', d => d.color)
       .style('cursor', 'crosshair')
-      .call(this.cola.drag);
+      .call(this.cola.drag)
+      .merge(this.nodeSelection);
 
     // Create a D3 selection for node labels.
     this.labelSelection = d3.select(this.svg)
@@ -100,7 +103,7 @@ export default class SimilarityGraph extends VisComponent {
       .data(this.nodes);
 
     const that = this;
-    this.labelSelection.enter()
+    this.labelSelection = this.labelSelection.enter()
       .append('text')
       .classed('label', true)
       .text(d => d.id)
@@ -109,7 +112,8 @@ export default class SimilarityGraph extends VisComponent {
         that.nodes[i].height += bbox.height;
       })
       .style('cursor', 'crosshair')
-      .call(this.cola.drag);
+      .call(this.cola.drag)
+      .merge(this.labelSelection);
 
     this.cola.on('tick', (...args) => {
       this.nodeSelection

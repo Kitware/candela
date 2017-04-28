@@ -1,4 +1,4 @@
-import d3 from 'd3';
+import { select } from 'd3-selection';
 import vg from 'vega';
 import { isArray, isString, read } from 'datalib';
 import axisTemplate from './axis.json';
@@ -386,7 +386,7 @@ let merge = function (defaults, options) {
 let parseChart = function (spec, element, options) {
   // Use element size to set size, unless size explicitly specified or
   // element size is zero.
-  let el = d3.select(element)[0][0];
+  let el = select(element).node();
   let sizeOptions = {};
 
   const size = getElementSize(el);

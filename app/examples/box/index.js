@@ -3,7 +3,7 @@ import showComponent from '../util/showComponent';
 import BoxPlot from '../../../components/BoxPlot';
 
 window.onload = () => {
-  showComponent(BoxPlot, 'div', {
+  showComponent(BoxPlot, {
     data: iris,
     fields: [
       'sepalLength',
