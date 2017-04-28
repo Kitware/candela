@@ -1,0 +1,50 @@
+machine:
+  node:
+    version: 7.7.3
+
+dependencies:
+  pre:
+    # Install libgif (needed for npm install).
+    - sudo apt-get update
+    - sudo apt-get install libgif-dev
+
+    # Install flake8 for Python linting.
+    - sudo pip install flake8
+
+  cache_directories:
+    - node_modules
+
+compile:
+  override:
+    - npm run build
+    - npm run build:examples
+
+test:
+  override:
+    # Lint tests.
+    - npm run lint
+    - npm run lint:pycandela
+
+    # Unit tests.
+    - npm run test:unit
+
+    # Image tests.
+    - npm run test:image:
+        environment:
+          CANDELA_DUMP_IMAGE: all
+
+    # Coverage tests.
+    - npm run cover
+    - npm run codecov
+
+  post:
+    # Gather up the testing images as build artifacts.
+    - mkdir $CIRCLE_ARTIFACTS/test_images
+    - find components -name '*.png' | xargs -I xxx cp xxx $CIRCLE_ARTIFACTS/test_images
+
+deployment:
+  semantic-release:
+    branch: master
+    commands:
+      - npm run dist
+      - npm run semantic-release
