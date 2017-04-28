@@ -119,5 +119,9 @@
   {
     "title": "TreeHeatmap",
     "link": "tree-heatmap"
+  },
+  {
+    "title": "SentenTree",
+    "link": "sententree"
   }
 ]

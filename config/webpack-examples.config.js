@@ -88,7 +88,7 @@ module.exports = {
         loader: 'url-loader'
       },
       {
-        test: /\.csv$/,
+        test: /\.csv|\.tsv$/,
         loader: 'raw-loader'
       },
       {

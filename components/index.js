@@ -11,6 +11,7 @@ import LineUp from './LineUp';
 import OnSet from './OnSet';
 import ScatterPlot from './ScatterPlot';
 import ScatterPlotMatrix from './ScatterPlotMatrix';
+import SentenTree from './SentenTree';
 import SimilarityGraph from './SimilarityGraph';
 import SurvivalPlot from './SurvivalPlot';
 import TrackerDash from './TrackerDash';
@@ -31,6 +32,7 @@ export default {
   OnSet,
   ScatterPlot,
   ScatterPlotMatrix,
+  SentenTree,
   SimilarityGraph,
   SurvivalPlot,
   TrackerDash,
