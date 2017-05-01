@@ -24,7 +24,7 @@ Example
 
 .. raw:: html
 
-    <svg id="similaritygraph-example" width="700" height="700"></svg>
+    <div id="similaritygraph-example" width="700" height="700"></div>
     <script type="text/javascript" >
       var el = document.getElementById('similaritygraph-example');
 
@@ -61,7 +61,7 @@ Example
     <body>
     <script src="/static/candela.js"></script>
     <script>
-      var el = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+      var el = document.createElement('div')
       el.setAttribute('width', 700);
       el.setAttribute('width', 700);
 
