@@ -66,6 +66,7 @@
     "clean-webpack-plugin": "^0.1.7",
     "codecov.io": "^0.1.6",
     "commitizen": "^2.8.6",
+    "condition-circle": "^1.5.0",
     "conventional-commit-types": "^2.1.0",
     "copy-webpack-plugin": "^1.1.1",
     "cz-conventional-changelog": "^1.2.0",
@@ -148,5 +149,8 @@
     "validate-commit-msg": {
       "helpMessage": "This project is commitizen-friendly.\nLearn more at https://commitizen.github.io/cz-cli/https://commitizen.github.io/cz-cli/\nTo try again, you can say \"git commit -t .git/COMMIT_EDITMSG\".\nOr, you can use git-cz to make your commits."
     }
+  },
+  "release": {
+    "verifyConditions": "condition-circle"
   }
 }
