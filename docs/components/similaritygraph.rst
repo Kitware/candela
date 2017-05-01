@@ -24,7 +24,7 @@ Example
 
 .. raw:: html
 
-    <div id="similaritygraph-example" width="700" height="700"></svg>
+    <div id="similaritygraph-example" width="700" height="700"></div>
     <script type="text/javascript" >
       var el = document.getElementById('similaritygraph-example');
 
