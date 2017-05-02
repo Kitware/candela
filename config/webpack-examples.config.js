@@ -78,6 +78,11 @@ module.exports = {
         ]
       },
       {
+        test: /\.js$/,
+        loader: 'script-loader',
+        include: __dirname + '/node_modules/glo'
+      },
+      {
         test: function (path) {
           return path.endsWith('/src/external/pc.js');
         },
