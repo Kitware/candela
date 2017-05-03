@@ -1,5 +1,5 @@
 import VisComponent from '../../VisComponent';
-import d3 from 'd3';
+import * as d3 from 'd3';
 import { getElementSize } from '../../util';
 
 export default class TreeHeatmap extends VisComponent {
@@ -258,8 +258,8 @@ export default class TreeHeatmap extends VisComponent {
 
     let distance = d => d.distance;
 
-    let xScale = d3.scale.linear().domain([0, content[0].length]).range([xStart, xStart + colSize]);
-    let yScale = d3.scale.linear().domain([0, content.length]).range([yStart, yStart + rowSize]);
+    let xScale = d3.scaleLinear().domain([0, content[0].length]).range([xStart, xStart + colSize]);
+    let yScale = d3.scaleLinear().domain([0, content.length]).range([yStart, yStart + rowSize]);
 
     let tree = function (orientation, links, leaves, x, y, width, height, duration) {
       let numLeaves = leaves.length;
@@ -292,8 +292,8 @@ export default class TreeHeatmap extends VisComponent {
         }
       }
       let distanceExtent = [0, distance(finalCluster)];
-      let distanceScale = d3.scale.linear().domain(distanceExtent).range([y + height, y]);
-      let treeScale = d3.scale.linear().domain([0, numLeaves]).range([x, x + width]);
+      let distanceScale = d3.scaleLinear().domain(distanceExtent).range([y + height, y]);
+      let treeScale = d3.scaleLinear().domain([0, numLeaves]).range([x, x + width]);
       let axis1 = 'y';
       let axis2 = 'x';
       if (orientation === 'vertical') {
@@ -321,7 +321,7 @@ export default class TreeHeatmap extends VisComponent {
 
       let reverseLinks = links.slice().reverse();
 
-      let line = d3.svg.line();
+      let line = d3.line();
       if (orientation === 'horizontal') {
         line.x(d => d[1]).y(d => d[0]);
       }
@@ -414,19 +414,19 @@ export default class TreeHeatmap extends VisComponent {
 
     let colColor = [];
     for (let col = 0; col < content[0].length; col += 1) {
-      colColor[columns[col].offset] = d3.scale.linear().domain(d3.extent(content, d => d[col])).range(['white', 'steelblue']);
+      colColor[columns[col].offset] = d3.scaleLinear().domain(d3.extent(content, d => d[col])).range(['white', 'steelblue']);
     }
 
     let rowColor = [];
     for (let row = 0; row < content.length; row += 1) {
-      rowColor[rows[row].offset] = d3.scale.linear().domain(d3.extent(content[row])).range(['white', 'steelblue']);
+      rowColor[rows[row].offset] = d3.scaleLinear().domain(d3.extent(content[row])).range(['white', 'steelblue']);
     }
 
     let globalMin = d3.min(content, d => d3.min(d));
     let globalMax = d3.max(content, d => d3.max(d));
-    let globalColor = d3.scale.linear().domain([globalMin, globalMax]).range(['white', 'steelblue']);
+    let globalColor = d3.scaleLinear().domain([globalMin, globalMax]).range(['white', 'steelblue']);
 
-    let corrColor = d3.scale.linear().domain([-1, 0, 1]).range(['red', 'white', 'green']);
+    let corrColor = d3.scaleLinear().domain([-1, 0, 1]).range(['red', 'white', 'green']);
 
     let color = d => globalColor(d.value);
     if (this.scale === 'row') {
