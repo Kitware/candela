@@ -14,6 +14,7 @@ import ScatterPlotMatrix from './ScatterPlotMatrix';
 import SimilarityGraph from './SimilarityGraph';
 import SurvivalPlot from './SurvivalPlot';
 import TrackerDash from './TrackerDash';
+import TreeHeatmap from './TreeHeatmap';
 import UpSet from './UpSet';
 
 export default {
@@ -33,5 +34,6 @@ export default {
   SimilarityGraph,
   SurvivalPlot,
   TrackerDash,
+  TreeHeatmap,
   UpSet
 };

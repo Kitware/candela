@@ -12,3 +12,4 @@ npm-debug.log
 .ipynb_checkpoints
 app/resonantlab/scripts/core/*
 app/resonantlab/querylang/query.js
+docs/static/candela.js

@@ -115,5 +115,9 @@
   {
     "title": "Similarity Graph",
     "link": "similarity"
+  },
+  {
+    "title": "TreeHeatmap",
+    "link": "tree-heatmap"
   }
 ]

@@ -122,6 +122,7 @@ Quick start - R
     components/scatterplotmatrix
     components/similaritygraph
     components/survivalplot
+    components/treeheatmap
     components/upset
 
 .. toctree::

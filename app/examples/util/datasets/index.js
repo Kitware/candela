@@ -2,6 +2,7 @@ import dl from 'datalib';
 
 // hmohiv data downloaded from
 // http://www.ats.ucla.edu/stat/r/examples/asa/hmohiv.csv
+import heatmap_raw from './heatmap.csv';
 import hmohiv_raw from './hmohiv.csv';
 import iris from './iris.json';
 import msft_raw from './msft.csv';
@@ -17,6 +18,7 @@ function readCSV (raw) {
   });
 }
 
+const heatmap = readCSV(heatmap_raw);
 const hmohiv = readCSV(hmohiv_raw);
 const msft = readCSV(msft_raw);
 const simpsons = readCSV(simpsons_raw);
@@ -24,6 +26,7 @@ const simpsons_alternate = readCSV(simpsons_alternate_raw);
 const stocks = readCSV(stocks_raw);
 
 export {
+  heatmap,
   hmohiv,
   iris,
   msft,
