@@ -24,28 +24,25 @@ Example
       });
     </script>
 
+The examples below assume you have downloaded the `example data </_static/heatmap.json>`_.
+
 **JavaScript**
 
 .. code-block:: html
 
     <body>
     <script src="//unpkg.com/candela"></script>
-    <script>
-      var el = document.createElement('div')
-      document.body.appendChild(el);
+    <div id="vis" style="width:600px;height:600px"></div>
+    <script type="text/javascript" >
+      var el = document.getElementById('vis');
 
-      var data = [];
-      for (var d = 0; d < 10; d += 1) {
-        data.push({
-          a: d,
-          b: d*d
+      d3.json('heatmap.json', function (error, data) {
+        var vis = new candela.components.TreeHeatmap(el, {
+          data: data,
+          scale: 'column'
         });
-      }
-
-      var vis = new candela.components.TreeHeatmap(el, {
-        data: data
+        vis.render();
       });
-      vis.render();
     </script>
     </body>
 
@@ -54,19 +51,24 @@ Example
 .. code-block:: python
 
     import pycandela
+    import json
 
-    data = [{'a': d, 'b': d*d} for d in range(10)]
+    data = json.load(open('heatmap.json'))
 
-    pycandela.components.TreeHeatmap(
-        data=data)
+    pycandela.components.TreeHeatmap(data=data, scale='column')
 
 **R**
 
 .. code-block:: r
 
     library(candela)
+    library(jsonlite)
 
-    candela('TreeHeatmap', data=mtcars)
+    fname <- 'heatmap.json'
+    s <- readChar(fname, file.info(fname)$size)
+    data <- fromJSON(s)
+
+    candela('TreeHeatmap', data=data, scale='column')
 
 Options
 =======
