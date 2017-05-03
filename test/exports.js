@@ -19,6 +19,7 @@ const componentList = [
   'SimilarityGraph',
   'SurvivalPlot',
   'TrackerDash',
+  'TreeHeatmap',
   'UpSet'
 ];
 
