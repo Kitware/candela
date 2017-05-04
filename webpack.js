@@ -59,7 +59,7 @@ module.exports = function (config, basePath, options) {
   }
 
   // Prepend the Candela loaders.
-  var gloPath = basePath + '/node_modules/glo';
+  var gloPath = basePath + '/node_modules/glo/glo.js';
   config.module.loaders = [
     {
       test: /\.js$/,
@@ -67,11 +67,15 @@ module.exports = function (config, basePath, options) {
       query: {
         presets: ['es2015']
       },
-      include: includePaths
+      include: includePaths,
+      exclude: gloPath
     },
     {
       test: /\.js$/,
-      loader: 'script-loader',
+      loaders: [
+        'exports-loader?GLO',
+        'imports-loader?_=underscore&cola=webcola'
+      ],
       include: gloPath
     },
     {

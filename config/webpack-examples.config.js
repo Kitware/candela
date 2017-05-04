@@ -79,8 +79,11 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        loader: 'script-loader',
-        include: __dirname + '/node_modules/glo'
+        loaders: [
+          'exports-loader?GLO',
+          'imports-loader?_=underscore&cola=webcola'
+        ],
+        include: __dirname + '/node_modules/glo/glo.js'
       },
       {
         test: function (path) {
