@@ -43,11 +43,18 @@ export default class SentenTree extends VisComponent {
     ];
   }
 
-  constructor (el, {data, graphs = 3}) {
+  constructor (el, {data, id = null, text = 'text', count = 'count', graphs = 3}) {
     super(el);
 
+    // Transform input data into correct form.
+    this.data = data.map((d, i) => ({
+      id: id ? d[id] : i,
+      text: d[text],
+      count: d[count] !== undefined ? d[count] : 1
+    }));
+
     const model = new SentenTreeBuilder()
-      .buildModel(data);
+      .buildModel(this.data);
 
     this.vis = new SentenTreeVis(el)
       .data(model.getRenderedGraphs(graphs));
