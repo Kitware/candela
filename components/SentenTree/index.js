@@ -39,6 +39,13 @@ export default class SentenTree extends VisComponent {
           from: 'data',
           fieldTypes: ['integer']
         }
+      },
+      {
+        name: 'graphs',
+        description: 'The number of graphs to compute and render.',
+        type: 'integer',
+        format: 'integer',
+        default: 3
       }
     ];
   }
