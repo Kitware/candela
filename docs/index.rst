@@ -120,6 +120,7 @@ Quick start - R
     components/onset
     components/scatterplot
     components/scatterplotmatrix
+    components/sententree
     components/similaritygraph
     components/survivalplot
     components/treeheatmap
