@@ -3,8 +3,34 @@ import { lesmis } from '../util/datasets';
 import showComponent from '../util/showComponent';
 
 window.onload = () => {
-  showComponent(Glo, {
+  let glo = showComponent(Glo, {
+    width: '100%',
+    height: '100%',
     nodes: lesmis.nodes,
     edges: lesmis.edges
   });
+
+  window.setTimeout(() => {
+    glo.positionNodes('rho', 300);
+  }, 1000);
+
+  window.setTimeout(() => {
+    glo.distributeNodes('theta', 'modularity_class');
+  }, 2000);
+
+  window.setTimeout(() => {
+    glo.colorNodesDiscrete('modularity_class');
+  }, 3000);
+
+  window.setTimeout(() => {
+    glo.curvedEdges();
+  }, 4000);
+
+  window.setTimeout(() => {
+    glo.sizeNodes('degree');
+  }, 5000);
+
+  window.setTimeout(() => {
+    glo.incidentEdges();
+  }, 6000);
 };
