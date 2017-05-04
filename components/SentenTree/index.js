@@ -26,6 +26,7 @@ export default class SentenTree extends VisComponent {
       {
         name: 'text',
         description: 'The field containing the text sample.',
+        type: 'string',
         domain: {
           mode: 'field',
           from: 'data',
