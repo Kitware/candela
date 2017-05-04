@@ -1,3 +1,5 @@
+import { select } from 'd3-selection';
+
 import VisComponent from '../../VisComponent';
 import { SentenTreeBuilder,
          SentenTreeVis } from 'sententree/dist/SentenTree';
@@ -52,6 +54,11 @@ export default class SentenTree extends VisComponent {
 
   constructor (el, {data, id = null, text = 'text', count = 'count', graphs = 3}) {
     super(el);
+
+    // Empty element.
+    select(el)
+      .selectAll('*')
+      .remove();
 
     // Transform input data into correct form.
     this.data = data.map((d, i) => ({
