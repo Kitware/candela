@@ -4,6 +4,7 @@ import BulletChart from './BulletChart';
 import GanttChart from './GanttChart';
 import Geo from './Geo';
 import GeoDots from './GeoDots';
+import Glo from './Glo';
 import Heatmap from './Heatmap';
 import Histogram from './Histogram';
 import LineChart from './LineChart';
@@ -25,6 +26,7 @@ export default {
   GanttChart,
   Geo,
   GeoDots,
+  Glo,
   Heatmap,
   Histogram,
   LineChart,

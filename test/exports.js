@@ -9,6 +9,7 @@ const componentList = [
   'GanttChart',
   'Geo',
   'GeoDots',
+  'Glo',
   'Heatmap',
   'Histogram',
   'LineChart',
