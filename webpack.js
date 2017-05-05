@@ -67,11 +67,11 @@ module.exports = function (config, basePath, options) {
       query: {
         presets: ['es2015']
       },
-      include: includePaths,
-      exclude: gloPath
+      include: includePaths.concat(gloPath)
     },
     {
       test: /\.js$/,
+      tag: 'glo',
       loaders: [
         'exports-loader?GLO',
         'imports-loader?_=underscore&cola=webcola'

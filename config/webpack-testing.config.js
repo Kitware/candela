@@ -15,7 +15,7 @@ config.node = {
 };
 
 config.module.loaders.forEach(function (loader) {
-  if (loader.loader !== 'babel-loader') {
+  if (loader.loader !== 'babel-loader' && loader.tag !== 'glo') {
     delete loader.include;
   }
 });
