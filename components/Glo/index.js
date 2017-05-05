@@ -40,7 +40,7 @@ export default class Glo extends VisComponent {
     colorNodes(this, field, 'discrete');
   }
 
-  colorNodesContinuous(field) {
+  colorNodesContinuous (field) {
     colorNodes(this, field, 'continuous');
   }
 
@@ -60,7 +60,7 @@ export default class Glo extends VisComponent {
     this.glo.size_nodes_by_constant();
   }
 
-  distributeNodes(axis, attr = null) {
+  distributeNodes (axis, attr = null) {
     if (attr === null) {
       this.glo.evenly_distribute_nodes_on(axis);
     } else {
@@ -70,7 +70,7 @@ export default class Glo extends VisComponent {
     }
   }
 
-  positionNodes(axis, value) {
+  positionNodes (axis, value) {
     this.glo.node_attr({
       [value]: 'continuous'
     });
