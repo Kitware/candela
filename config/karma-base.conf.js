@@ -16,7 +16,7 @@ module.exports = {
   preprocessors: {
     'tests.bundle.js': [
       'webpack',
-      'sourcemap'
+      // 'sourcemap'
     ]
   },
   webpackServer: {

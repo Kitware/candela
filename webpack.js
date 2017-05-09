@@ -41,11 +41,11 @@ module.exports = function (config, basePath, options) {
   if (exclude) {
     // Install empty module and module.loaders entries if missing.
     config.module = config.module || {};
-    config.module.loaders = config.module.loaders || [];
+    config.module.rules = config.module.rules || [];
 
     // For each loader, append the Candela include paths to its `exclude`
     // property.
-    config.module.loaders.forEach(function (loader) {
+    config.module.rules.forEach(function (loader) {
       // Install an empty list if there is no `exclude` property.
       loader.exclude = loader.exclude || [];
 
@@ -60,65 +60,89 @@ module.exports = function (config, basePath, options) {
 
   // Prepend the Candela loaders.
   var gloPath = basePath + '/node_modules/glo/glo.js';
-  config.module.loaders = [
+  config.module.rules = [
     {
       test: /\.js$/,
-      loader: 'babel-loader',
-      query: {
-        presets: ['es2015']
-      },
+      use: [
+        {
+          loader: 'babel-loader',
+          options: {
+            presets: ['es2015']
+          }
+        }
+      ],
       include: includePaths.concat(gloPath)
     },
     {
       test: /\.js$/,
-      tag: 'glo',
-      loaders: [
-        'exports-loader?GLO',
-        'imports-loader?_=underscore&cola=webcola'
+      use: [
+        {
+          loader: 'exports-loader?GLO',
+          options: {
+            ident: 'glo'
+          }
+        },
+        {
+          loader: 'imports-loader?_=underscore&cola=webcola'
+        }
       ],
       include: gloPath
     },
     {
       test: /\.jpe?g$|\.gif$|\.png$|\.woff$|\.wav$|\.mp3$|\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$|\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-      loader: 'url-loader',
+      use: ['url-loader'],
       include: addNMPath(['font-awesome', 'bootstrap'], includePaths)
     },
     {
       test: /\.csv$/,
-      loader: 'raw-loader',
+      use: ['raw-loader'],
       include: includePaths
     },
     {
       test: /\.html$/,
-      loader: 'html-loader?attrs=img:src',
+      use: ['html-loader?attrs=img:src'],
       include: includePaths
     },
     {
       test: /\.styl$/,
-      loaders: ['style-loader', 'css-loader', 'stylus-loader'],
+      use: [
+        'style-loader',
+        'css-loader',
+        'stylus-loader'
+      ],
       include: includePaths
     },
     {
       test: /\.css$/,
-      loaders: ['style-loader', 'css-loader'],
+      use: [
+        'style-loader',
+        'css-loader'
+      ],
       include: addNMPath('lineupjs', includePaths)
     },
     {
       test: /\.scss$/,
-      loaders: ['style-loader', 'css-loader', 'sass-loader'],
+      use: [
+        'style-loader',
+        'css-loader',
+        'sass-loader'
+      ],
       include: addNMPath('UpSet', includePaths)
     },
     {
       test: /\.jade$/,
-      loaders: ['jade-loader'],
+      use: ['jade-loader'],
       include: includePaths
     },
     {
       test: /\.json$/,
-      loaders: ['json-loader', 'strip-json-comments-loader'],
+      use: [
+        'json-loader',
+        'strip-json-comments-loader'
+      ],
       include: addNMPath('datalib', includePaths)
     }
-  ].concat(config.module.loaders);
+  ].concat(config.module.rules);
 
   return config;
 };

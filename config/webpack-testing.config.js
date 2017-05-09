@@ -2,21 +2,21 @@ var webpack = require('webpack');
 
 var config = require('./webpack.config');
 
-__dirname = config.__dirname;
-
 config.entry = {
   'tests.bundle': './tests.bundle.js'
 };
 
-config.devtool = 'inline-source-map';
+// config.devtool = 'inline-source-map';
 
-config.node = {
-  fs: 'empty'
-};
+// config.node = {
+  // fs: 'empty'
+// };
 
-config.module.loaders.forEach(function (loader) {
-  if (loader.loader !== 'babel-loader' && loader.tag !== 'glo') {
-    delete loader.include;
+config.module.rules.forEach(function (rule) {
+  var ident = rule.use && rule.use[0] && rule.use[0].options && rule.use[0].options.ident;
+
+  if (rule.loader !== 'babel-loader' && ident !== 'glo') {
+    delete rule.include;
   }
 });
 
