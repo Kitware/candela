@@ -115,7 +115,7 @@
     "webpack": "^1.12.12"
   },
   "dependencies": {
-    "UpSet": "git+https://github.com/ronichoudhury-work/upset#aa6fcbf9573823ce5dae948e48d7a154deacad62",
+    "UpSet": "git+https://github.com/jeffbaumes/upset#no-global-vars",
     "brace": "^0.7.0",
     "css-loader": "^0.23.1",
     "d3": "^4.8.0",
