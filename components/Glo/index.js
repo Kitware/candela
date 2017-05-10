@@ -12,7 +12,7 @@ const colorNodes = (glo, field, type) => {
 };
 
 export default class Glo extends VisComponent {
-  constructor (el, {nodes, edges, nodeAttr, edgeAttr, width = 960, height = 540}) {
+  constructor (el, {nodes, edges, width = 960, height = 540}) {
     super(el);
 
     // Empty the top-level div.
