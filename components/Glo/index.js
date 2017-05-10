@@ -33,7 +33,10 @@ export default class Glo extends VisComponent {
   }
 
   render () {
-    this.glo.draw();
+    if (!this.drawn) {
+      this.glo.draw();
+      this.drawn = true;
+    }
   }
 
   colorNodesDiscrete (field) {
