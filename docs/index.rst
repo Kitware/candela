@@ -113,6 +113,7 @@ Quick start - R
     components/ganttchart
     components/geo
     components/geodots
+    components/glo
     components/heatmap
     components/histogram
     components/linechart

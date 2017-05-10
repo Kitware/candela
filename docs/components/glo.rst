@@ -1,57 +1,74 @@
-=======================
-    SimilarityGraph
-=======================
+====================================
+    GLO (Graph-Level Operations)
+====================================
 
-An interactive similarity graph. Given a list of entities that encode a
-connection strength to the other entities, this component creates a graph with
-the entities as the nodes, and a link appearing between nodes whose connection
-strength exceeds some threshold.
+A `visualization framework <https://github.com/chadstolper/glo>`_ that treats
+the data like nodes of a graph, and uses positioning and visual commands to
+arrange them into different formats to implement different visualizations.
 
-The **data** table contains a list of objects, each with an **id** field
-containing a unique identifier for each entity. Each object should also have a
-numeric fields named by the IDs of the other entities, containing a link
-strength to each entity. If any entity's link strength is missing, it is
-presumed to be 0. Each object may optionally contain a **color** field,
-containing a value identifying its color, and a **size** field,
-which is either a number (in pixels) for the radius of each node, or a string
-identifying a field in **data** that contains a number that will be mapped to
-the radius for each node. **threshold** is a numeric value specifying
-the minimum value for a link strength to appear in the graph. **linkDistance**
-sets the desired length of the links in pixels.
+The **nodes** table contains a list of objects, each with an ``id`` field
+containing a unique identifier, along with any other data attributes needed. The
+**edges** table contains ``source`` and ``target`` fields referring to ``id``
+values from the **nodes** table, an optional ``type`` field reading either
+``Undirected`` or ``Directed``, an ``id`` field identifying each edge, and an
+optional ``weight`` value. **width** and **height** control the size of the
+canvas used for rendering the visualization.
 
 Example
 =======
 
 .. raw:: html
 
-    <div id="similaritygraph-example" width="700" height="700"></div>
+    <div id="glo-example" width="200" height="700"></div>
     <script type="text/javascript" >
-      var el = document.getElementById('similaritygraph-example');
+      var el = document.getElementById('glo-example');
 
       var alphabet = 'abcdefghijklmnopqrstuvwxyz';
       var vowels = 'aeiou'.split('');
 
-      var data = [];
+      var nodes = [];
       for (var i = 0; i < 26; i++) {
         var letter = {
-          id: alphabet[i],
-          size: 10 + i,
-          color: vowels.indexOf(alphabet[i]) > 0 ? 'vowel' : 'consonant'
+          id: i,
+          label: alphabet[i],
+          vowel: vowels.indexOf(alphabet[i]) > 0 ? 'vowel' : 'consonant'
         };
 
         for (var j = 0; j < 26; j++) {
           letter[alphabet[j]] = Math.abs(j - i);
         }
 
-        data.push(letter);
+        nodes.push(letter);
       }
 
-      var vis = new candela.components.SimilarityGraph(el, {
-        data: data,
-        size: 'size',
-        threshold: 20
+      var edges = [];
+      var counter = 0;
+      for (var i = 0; i < 26; i++) {
+        for (var j = i + 1; j < 26; j++) {
+          if (nodes[i][alphabet[j]] > 20) {
+            edges.push({
+              source: i,
+              target: j,
+              type: 'Undirected',
+              id: counter++,
+              weight: 1
+            });
+          }
+        }
+      }
+
+      var vis = new candela.components.Glo(el, {
+        nodes: nodes,
+        edges: edges,
+        width: 700,
+        height: 200
       });
+
       vis.render();
+
+      vis.distributeNodes('x');
+      vis.colorNodesDiscrete('vowel');
+      vis.curvedEdges();
     </script>
 
 **JavaScript**
@@ -59,7 +76,7 @@ Example
 .. code-block:: html
 
     <body>
-    <script src="/static/candela.js"></script>
+    <script src="//unpkg.com/candela.js"></script>
     <script>
       var el = document.createElement('div')
       el.setAttribute('width', 700);
@@ -70,27 +87,49 @@ Example
       var alphabet = 'abcdefghijklmnopqrstuvwxyz';
       var vowels = 'aeiou'.split('');
 
-      var data = [];
+      var nodes = [];
       for (var i = 0; i < 26; i++) {
         var letter = {
-          id: alphabet[i],
-          size: 10 + i,
-          color: vowels.indexOf(alphabet[i]) > 0 ? 'vowel' : 'consonant'
+          id: i,
+          label: alphabet[i],
+          vowel: vowels.indexOf(alphabet[i]) > 0 ? 'vowel' : 'consonant'
         };
 
         for (var j = 0; j < 26; j++) {
           letter[alphabet[j]] = Math.abs(j - i);
         }
 
-        data.push(letter);
+        nodes.push(letter);
       }
 
-      var vis = new candela.components.SimilarityGraph(el, {
-        data: data,
-        size: 'size',
-        threshold: 20
+      var edges = [];
+      var counter = 0;
+      for (var i = 0; i < 26; i++) {
+        for (var j = i + 1; j < 26; j++) {
+          if (nodes[i][alphabet[j]] > 20) {
+            edges.push({
+              source: i,
+              target: j,
+              type: 'Undirected',
+              id: counter++,
+              weight: 1
+            });
+          }
+        }
+      }
+
+      var vis = new candela.components.Glo(el, {
+        nodes: nodes,
+        edges: edges,
+        width: 700,
+        height: 200
       });
+
       vis.render();
+
+      vis.distributeNodes('x');
+      vis.colorNodesDiscrete('vowel');
+      vis.curvedEdges();
     </script>
     </body>
 
@@ -101,12 +140,22 @@ Example
     import pycandela
 
     data = [
-      {'id': 'A', 'class': 0, 'A': 1.0, 'B': 0.5, 'C': 0.3},
-      {'id': 'B', 'class': 1, 'A': 0.5, 'B': 1.0, 'C': 0.2},
-      {'id': 'C', 'class': 1, 'A': 0.3, 'B': 0.2, 'C': 1.0}
+      {'id': 0, 'label': 'A', 'class': 0},
+      {'id': 1, 'label': 'B', 'class': 1},
+      {'id': 2, 'label': 'C', 'class': 1}
     ]
 
-    pycandela.components.SimilarityGraph(data=data, id='id', color='class', threshold=0.4)
+    edges = [
+      {'id': 0, 'source': 0, 'target': 1},
+      {'id': 1, 'source': 0, 'target': 2},
+      {'id': 2, 'source': 2, 'target': 1}
+    ]
+
+    glo = pycandela.components.Glo(nodes=nodes, edges=edges)
+    glo.render()
+    glo.distributeNodes('x');
+    glo.colorNodesDiscrete('class');
+    glo.curvedEdges();
 
 **R**
 
@@ -114,34 +163,114 @@ Example
 
     library(candela)
 
-    id = c('A', 'B', 'C')
+    id = c(0, 1, 2)
+    label = c('A', 'B', 'C')
     class = c(0, 1, 1)
-    A = c(1.0, 0.5, 0.3)
-    B = c(0.5, 1.0, 0.2)
-    C = c(0.3, 0.2, 1.0)
-    data = data.frame(id, class, A, B, C)
+    nodes = data.frame(id, label, class)
 
-    candela('SimilarityGraph', data=data, id='id', color='class', threshold=0.4)
+    source = c(0, 0, 2)
+    target = c(1, 2, 1)
+    edges = data.frame(id, source, target)
+
+    glo = candela('SimilarityGraph', nodes=nodes, edges=edges)
+    glo.render()
+    glo.distributeNodes('x')
+    glo.colorNodesDiscrete('class')
+    glo.curvedEdges()
 
 Options
 =======
 
-data (:ref:`Table <table>`)
-    The data table.
+nodes (:ref:`Table <table>`)
+    The node table.
 
-id (String)
-    The ID field. Can contain any data type, but the value should be unique to
-    each data record.
+edges (:ref:`Table <table>`)
+    The edge table.
 
-color (String)
-    The field used to color the nodes. See :ref:`color scales`.
+width (number)
+    The width of the drawing area.
 
-size (String or Number)
-    If a string, the field used to provide the radius for each node; if a
-    number, the radius to use for *all* nodes.
+height (number)
+    The height of the drawing area.
 
-threshold (Number)
-    The link strength above which a link will appear in the graph.
+Methods
+=======
 
-linkDistance (Number)
-    The desired length of each link in pixels.
+.. js:function:: colorNodesDiscrete (field)
+
+  :param string field: The field to color by
+
+  Use a categorical colormap to color the nodes by the values in ``field``.
+
+.. js:function:: colorNodesContinuous (field)
+
+  :param string field: The field to color by
+
+  Use a continuous colormap to color the nodes by the values in ``field``.
+
+.. js:function:: colorNodesDefault ()
+
+  Revert the node color to the default state (no colormap).
+
+.. js:function:: sizeNodes (field)
+
+  :param string field: The field to size by
+
+  Size the nodes according to the values in ``field``.
+
+.. js:function:: sizeNodesDefault ()
+
+  Revert the node size to the default state (constant sized).
+
+.. js:function:: distributeNodes (axis[, attr])
+
+  :param axis string: The axis on which to distribute the nodes
+  :param attr string: The field to use for grouping the nodes
+
+  Position the nodes evenly along ``axis``, which must be one of ``"x"``,
+  ``"y"``, ``"rho"`` (radial axis), or ``"theta"`` (angle axis). If ``attr`` is
+  given, the nodes will be partitioned and grouped according to it.
+
+.. js:function:: positionNodes (axis, value)
+
+  :param string axis: The axis on which to distribute the nodes
+  :param string|number value: The field to draw position data from, or a
+    constant
+
+  Position the nodes along ``axis`` (see :js:func:`distributeNodes`) according
+  to the data in ``value``. If ``value`` is a string, it refers to a column of
+  data frome the **nodes** table; if it is a number, then all nodes will be
+  positioned at that location.
+
+.. js:function:: forceDirected ()
+
+  Apply a force-directed positioning algorithm to the nodes.
+
+.. js:function:: showEdges ()
+
+  Display all edges between nodes.
+
+.. js:function:: hideEdges ()
+
+  Hide all edges between nodes.
+
+.. js:function:: fadeEdges ()
+
+  Render edges using a transparent gray color.
+
+.. js:function:: solidEdges ()
+
+  Render edges using black.
+
+.. js:function:: incidentEdges ()
+
+  Only render edges incident on a node when the mouse pointer is hovering over
+  that node.
+
+.. js:function:: curvedEdges ()
+
+  Render edges using curved lines.
+
+.. js:function:: straightEdges ()
+
+  Render edges using straight lines.
