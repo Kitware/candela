@@ -84,6 +84,7 @@ export default class TreeHeatmap extends VisComponent {
 
   constructor (el, options) {
     super(el);
+    options = options || {};
     this.data = options.data;
     this.scale = options.scale || 'global';
     this.clusterRows = options.clusterRows === undefined ? true : options.clusterRows;
@@ -98,6 +99,10 @@ export default class TreeHeatmap extends VisComponent {
 
   render () {
     d3.select(this.el).selectAll('*').remove();
+
+    if (this.data === undefined || this.data.length === 0) {
+      return;
+    }
 
     let size = getElementSize(this.el);
     let width = this.width || size.width;
@@ -119,16 +124,20 @@ export default class TreeHeatmap extends VisComponent {
 
     let keys = Object.keys(this.data[0]);
     let idColumn = this.idColumn;
-    if (!idColumn) {
+    if (idColumn === undefined) {
       idColumn = keys.includes('_id') ? '_id' : idColumn;
       idColumn = keys.includes('_') ? '_' : idColumn;
       idColumn = keys.includes('') ? '' : idColumn;
+    }
+    if (idColumn === undefined) {
+      console.log('TreeHeatmap: No suitable idColumn found.');
+      return;
     }
 
     let rows = [];
     let reachedMetadata = false;
     this.data.forEach(row => {
-      let id = row[idColumn];
+      let id = '' + row[idColumn];
       if (id === '_child1') {
         reachedMetadata = true;
       }
@@ -151,7 +160,7 @@ export default class TreeHeatmap extends VisComponent {
     let originalDataRows = {};
     reachedMetadata = false;
     this.data.forEach(row => {
-      let id = row[idColumn];
+      let id = '' + row[idColumn];
       if (id === '_child1') {
         reachedMetadata = true;
       }
@@ -272,7 +281,7 @@ export default class TreeHeatmap extends VisComponent {
       for (let link = 0; link < links.length; link += 1) {
         linkMap[links[link].cluster] = links[link];
       }
-      let finalCluster = links[links.length - 1];
+      let finalCluster = links[links.length - 1] || {};
       finalCluster.offset = 0;
       finalCluster.parent = finalCluster;
       for (let link = links.length - 1; link >= 0; link -= 1) {
