@@ -1,7 +1,6 @@
 import test from 'tape-catch';
 import TreeHeatmap from '..';
 
-
 test('TreeHeatmap component ', t => {
   let el = document.createElement('div');
   let vis = new TreeHeatmap(el);
