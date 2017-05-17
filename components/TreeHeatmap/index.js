@@ -345,36 +345,46 @@ export default class TreeHeatmap extends VisComponent {
           ];
         });
 
-        group.selectAll('.tree-links')
-          .data(links)
-          // .transition().duration(duration)
-          .attr('d', d => line(d.lines));
+        let treeLinks = group.selectAll('.tree-links')
+          .data(links);
+        if (duration > 0) {
+          treeLinks = treeLinks.transition().duration(duration);
+        }
+        treeLinks.attr('d', d => line(d.lines));
 
-        group.selectAll('.tree-select')
-          .data(reverseLinks)
-          // .transition().duration(duration)
-          .attr(axis1, d => distanceScale(distance(d)))
+        let treeSelect = group.selectAll('.tree-select')
+          .data(reverseLinks);
+        if (duration > 0) {
+          treeSelect = treeSelect.transition().duration(duration);
+        }
+        treeSelect.attr(axis1, d => distanceScale(distance(d)))
           .attr(axis2, d => treeScale(d.offset))
           .attr(axis1 === 'x' ? 'width' : 'height', d => distanceScale(0) - distanceScale(distance(d)))
           .attr(axis2 === 'x' ? 'width' : 'height', d => treeScale(d.offset + d.size) - treeScale(d.offset));
 
-        vis.selectAll('.datum')
-          .data(rectData)
-          // .transition().duration(duration)
-          .attr('x', d => xScale(d.colIndex))
+        let rect = vis.selectAll('.datum')
+          .data(rectData);
+        if (duration > 0) {
+          rect = rect.transition().duration(duration);
+        }
+        rect.attr('x', d => xScale(d.colIndex))
           .attr('y', d => yScale(d.rowIndex))
           .attr('width', d => xScale(d.colIndex + 1) - xScale(d.colIndex))
           .attr('height', d => yScale(d.rowIndex + 1) - yScale(d.rowIndex));
 
-        rowLabelGroup.selectAll('.row-label')
-          .data(rows)
-          // .transition().duration(duration)
-          .attr('y', d => yScale(d.pos));
+        let rowLabel = rowLabelGroup.selectAll('.row-label')
+          .data(rows);
+        if (duration > 0) {
+          rowLabel = rowLabel.transition().duration(duration);
+        }
+        rowLabel.attr('y', d => yScale(d.pos));
 
-        colLabelGroup.selectAll('.col-label')
-          .data(columns)
-          // .transition().duration(duration)
-          .attr('transform', d => 'translate(' + xScale(d.pos) + ',' + (yStart + rowSize) + ')');
+        let colLabel = colLabelGroup.selectAll('.col-label')
+          .data(columns);
+        if (duration > 0) {
+          colLabel = colLabel.transition().duration(duration);
+        }
+        colLabel.attr('transform', d => 'translate(' + xScale(d.pos) + ',' + (yStart + rowSize) + ')');
       }
 
       group.selectAll('.tree-select').data(reverseLinks).enter()

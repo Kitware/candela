@@ -2,6 +2,8 @@ import test from 'tape-catch';
 import TreeHeatmap from '..';
 
 test('TreeHeatmap component ', t => {
+  t.equal(TreeHeatmap.options[0].type, 'table');
+
   let el = document.createElement('div');
   let vis = new TreeHeatmap(el);
   vis.render();
