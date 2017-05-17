@@ -31,7 +31,7 @@ test('TreeHeatmap component', t => {
     <g clip-path="url(#clip-row-labels)"><text class="row-label" color="black" font-size="10px" alignment-baseline="middle" x="300" y="200">0</text></g>
     <clipPath id="clip-col-labels"><rect x="100" y="300" width="200" height="100"></rect></clipPath>
     <g clip-path="url(#clip-col-labels)"><g transform="translate(200,300)" class="col-label"><text color="black" font-size="10px" transform="rotate(-90)" text-anchor="end" alignment-baseline="middle">a</text></g></g>
-  </svg>`.replace(/\n/g, '').replace(/  /g, '');
+  </svg>`.replace(/\n/g, '').replace(/ {2}/g, '');
 
   t.ok(el.isEqualNode(single), 'single row and column produce the right graphics');
 
@@ -78,7 +78,7 @@ test('TreeHeatmap component', t => {
       <path class="tree-links" d="M150,100L150,0L250,0L250,100" style="fill-opacity: 0; stroke: #000000;"></path>
       <rect class="tree-select" y="0" x="100" height="100" width="200" style="fill: #4682b4; fill-opacity: 0;"></rect>
     </g>
-  </svg>`.replace(/\n/g, '').replace(/  /g, '');
+  </svg>`.replace(/\n/g, '').replace(/ {2}/g, '');
 
   t.ok(el.isEqualNode(two), 'two rows and columns produce the right graphics');
 
