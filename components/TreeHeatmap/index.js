@@ -84,6 +84,7 @@ export default class TreeHeatmap extends VisComponent {
 
   constructor (el, options) {
     super(el);
+    options = options || {};
     this.data = options.data;
     this.scale = options.scale || 'global';
     this.clusterRows = options.clusterRows === undefined ? true : options.clusterRows;
@@ -99,9 +100,13 @@ export default class TreeHeatmap extends VisComponent {
   render () {
     d3.select(this.el).selectAll('*').remove();
 
+    if (this.data === undefined || this.data.length === 0) {
+      return;
+    }
+
     let size = getElementSize(this.el);
-    let width = this.width || size.width;
-    let height = this.height || size.height;
+    let width = this.width || size.width || 400;
+    let height = this.height || size.height || 400;
     let treeHeight = 100;
     let labelHeight = 100;
     let clusterRows = this.clusterRows;
@@ -119,16 +124,19 @@ export default class TreeHeatmap extends VisComponent {
 
     let keys = Object.keys(this.data[0]);
     let idColumn = this.idColumn;
-    if (!idColumn) {
+    if (idColumn === undefined) {
       idColumn = keys.includes('_id') ? '_id' : idColumn;
       idColumn = keys.includes('_') ? '_' : idColumn;
       idColumn = keys.includes('') ? '' : idColumn;
+    }
+    if (idColumn === undefined) {
+      throw new Error('TreeHeatmap: No suitable idColumn found.');
     }
 
     let rows = [];
     let reachedMetadata = false;
     this.data.forEach(row => {
-      let id = row[idColumn];
+      let id = '' + row[idColumn];
       if (id === '_child1') {
         reachedMetadata = true;
       }
@@ -151,7 +159,7 @@ export default class TreeHeatmap extends VisComponent {
     let originalDataRows = {};
     reachedMetadata = false;
     this.data.forEach(row => {
-      let id = row[idColumn];
+      let id = '' + row[idColumn];
       if (id === '_child1') {
         reachedMetadata = true;
       }
@@ -177,7 +185,7 @@ export default class TreeHeatmap extends VisComponent {
     let colLinks = [];
     if (clusterColumns) {
       columns.forEach(col => {
-        if (+metadataRows._cluster[col.name] >= 0) {
+        if (metadataRows._cluster && +metadataRows._cluster[col.name] >= 0) {
           colLinks.push({
             cluster: +metadataRows._cluster[col.name],
             child1: +metadataRows._child1[col.name],
@@ -272,7 +280,7 @@ export default class TreeHeatmap extends VisComponent {
       for (let link = 0; link < links.length; link += 1) {
         linkMap[links[link].cluster] = links[link];
       }
-      let finalCluster = links[links.length - 1];
+      let finalCluster = links[links.length - 1] || {};
       finalCluster.offset = 0;
       finalCluster.parent = finalCluster;
       for (let link = links.length - 1; link >= 0; link -= 1) {
@@ -336,32 +344,46 @@ export default class TreeHeatmap extends VisComponent {
           ];
         });
 
-        group.selectAll('.tree-links')
-          .data(links)
-          .transition().duration(duration)
-          .attr('d', d => line(d.lines));
+        let treeLinks = group.selectAll('.tree-links')
+          .data(links);
+        if (duration > 0) {
+          treeLinks = treeLinks.transition().duration(duration);
+        }
+        treeLinks.attr('d', d => line(d.lines));
 
-        group.selectAll('.tree-select')
-          .data(reverseLinks).transition().duration(duration)
-          .attr(axis1, d => distanceScale(distance(d)))
+        let treeSelect = group.selectAll('.tree-select')
+          .data(reverseLinks);
+        if (duration > 0) {
+          treeSelect = treeSelect.transition().duration(duration);
+        }
+        treeSelect.attr(axis1, d => distanceScale(distance(d)))
           .attr(axis2, d => treeScale(d.offset))
           .attr(axis1 === 'x' ? 'width' : 'height', d => distanceScale(0) - distanceScale(distance(d)))
           .attr(axis2 === 'x' ? 'width' : 'height', d => treeScale(d.offset + d.size) - treeScale(d.offset));
 
-        vis.selectAll('.datum')
-          .data(rectData).transition().duration(duration)
-          .attr('x', d => xScale(d.colIndex))
+        let rect = vis.selectAll('.datum')
+          .data(rectData);
+        if (duration > 0) {
+          rect = rect.transition().duration(duration);
+        }
+        rect.attr('x', d => xScale(d.colIndex))
           .attr('y', d => yScale(d.rowIndex))
           .attr('width', d => xScale(d.colIndex + 1) - xScale(d.colIndex))
           .attr('height', d => yScale(d.rowIndex + 1) - yScale(d.rowIndex));
 
-        rowLabelGroup.selectAll('.row-label')
-          .data(rows).transition().duration(duration)
-          .attr('y', d => yScale(d.pos));
+        let rowLabel = rowLabelGroup.selectAll('.row-label')
+          .data(rows);
+        if (duration > 0) {
+          rowLabel = rowLabel.transition().duration(duration);
+        }
+        rowLabel.attr('y', d => yScale(d.pos));
 
-        colLabelGroup.selectAll('.col-label')
-          .data(columns).transition().duration(duration)
-          .attr('transform', d => 'translate(' + xScale(d.pos) + ',' + (yStart + rowSize) + ')');
+        let colLabel = colLabelGroup.selectAll('.col-label')
+          .data(columns);
+        if (duration > 0) {
+          colLabel = colLabel.transition().duration(duration);
+        }
+        colLabel.attr('transform', d => 'translate(' + xScale(d.pos) + ',' + (yStart + rowSize) + ')');
       }
 
       group.selectAll('.tree-select').data(reverseLinks).enter()
@@ -383,7 +405,7 @@ export default class TreeHeatmap extends VisComponent {
 
     let rectData = [];
 
-    if (clusterRows) {
+    if (clusterRows && rows.length > 1) {
       tree('vertical', rowLinks, rows, yStart, 0, rowSize, treeHeight, 1000);
     } else {
       rows.forEach((row) => {
@@ -392,7 +414,7 @@ export default class TreeHeatmap extends VisComponent {
         row.pos = i + 0.5;
       });
     }
-    if (clusterColumns) {
+    if (clusterColumns && columns.length > 1) {
       tree('horizontal', colLinks, columns, xStart, 0, colSize, treeHeight, 1000);
     } else {
       columns.forEach((col) => {
