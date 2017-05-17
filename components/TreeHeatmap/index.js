@@ -98,7 +98,7 @@ export default class TreeHeatmap extends VisComponent {
   }
 
   render () {
-    d3.select(this.el).selectAll('*').remove();
+    this.empty();
 
     if (this.data === undefined || this.data.length === 0) {
       return;

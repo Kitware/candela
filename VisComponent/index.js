@@ -1,3 +1,5 @@
+import { select } from 'd3-selection';
+
 export default class VisComponent {
   constructor (el) {
     if (!el) {
@@ -5,6 +7,12 @@ export default class VisComponent {
     }
 
     this.el = el;
+  }
+
+  empty () {
+    select(this.el)
+      .selectAll('*')
+      .remove();
   }
 
   render () {
