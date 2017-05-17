@@ -136,7 +136,7 @@ export default class TreeHeatmap extends VisComponent {
     let rows = [];
     let reachedMetadata = false;
     this.data.forEach(row => {
-      let id = String(row[idColumn]);
+      let id = '' + row[idColumn];
       if (id === '_child1') {
         reachedMetadata = true;
       }
@@ -159,7 +159,7 @@ export default class TreeHeatmap extends VisComponent {
     let originalDataRows = {};
     reachedMetadata = false;
     this.data.forEach(row => {
-      let id = String(row[idColumn]);
+      let id = '' + row[idColumn];
       if (id === '_child1') {
         reachedMetadata = true;
       }
@@ -170,14 +170,14 @@ export default class TreeHeatmap extends VisComponent {
         originalDataRows[id] = row;
         return;
       }
-      content.push(columns.map(col => Number(row[col.name])));
-      if (clusterRows && Number(row._cluster) >= 0) {
+      content.push(columns.map(col => +row[col.name]));
+      if (clusterRows && +row._cluster >= 0) {
         rowLinks.push({
-          cluster: Number(row._cluster),
-          child1: Number(row._child1),
-          child2: Number(row._child2),
-          distance: Number(row._distance),
-          size: Number(row._size)
+          cluster: +row._cluster,
+          child1: +row._child1,
+          child2: +row._child2,
+          distance: +row._distance,
+          size: +row._size
         });
       }
     });
@@ -185,13 +185,13 @@ export default class TreeHeatmap extends VisComponent {
     let colLinks = [];
     if (clusterColumns) {
       columns.forEach(col => {
-        if (metadataRows._cluster && Number(metadataRows._cluster[col.name]) >= 0) {
+        if (metadataRows._cluster && +metadataRows._cluster[col.name] >= 0) {
           colLinks.push({
-            cluster: Number(metadataRows._cluster[col.name]),
-            child1: Number(metadataRows._child1[col.name]),
-            child2: Number(metadataRows._child2[col.name]),
-            distance: Number(metadataRows._distance[col.name]),
-            size: Number(metadataRows._size[col.name])
+            cluster: +metadataRows._cluster[col.name],
+            child1: +metadataRows._child1[col.name],
+            child2: +metadataRows._child2[col.name],
+            distance: +metadataRows._distance[col.name],
+            size: +metadataRows._size[col.name]
           });
         }
       });
