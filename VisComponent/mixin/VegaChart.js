@@ -8,7 +8,7 @@ let VegaChart = (Base, spec) => class extends Base {
   }
 
   render () {
-    this.chart.then(chart => {
+    return this.chart.then(chart => {
       if (this.width) {
         chart = chart.width(this.width);
       }
@@ -28,7 +28,7 @@ let VegaChart = (Base, spec) => class extends Base {
 
     if (this.options.data) {
       promise = promise.then(chart => {
-        chart.data('data')
+        return chart.data('data')
           .remove(() => true)
           .insert(this.options.data);
       });
