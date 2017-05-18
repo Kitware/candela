@@ -9,14 +9,22 @@ export default class VisComponent {
     this.el = el;
   }
 
+  render () {
+    throw new Error('"render() is pure abstract"');
+  }
+
+  update () {
+    throw new Error('"update() is pure abstract"');
+  }
+
+  destroy () {
+    throw new Error('"destroy()" is pure abstract"');
+  }
+
   empty () {
     select(this.el)
       .selectAll('*')
       .remove();
-  }
-
-  render () {
-    throw new Error('"render() is pure abstract"');
   }
 
   get serializationFormats () {
