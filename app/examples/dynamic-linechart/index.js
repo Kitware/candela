@@ -12,18 +12,6 @@ class DynamicLineChart extends LineChart {
     super.render();
     this.emit('render');
   }
-
-  data (data) {
-    this.options.data = data;
-
-    this.chart.then(chart => {
-      let data = chart.data('data');
-      data.remove(() => true);
-      data.insert(this.options.data);
-
-      chart.update();
-    });
-  }
 }
 
 let data = [];
@@ -58,7 +46,7 @@ window.onload = () => {
 
     counter++;
 
-    vis.data(data);
+    vis.update({data});
     vis.render();
   }, 1000);
 
