@@ -13,12 +13,10 @@ export default class VisComponent {
     throw new Error('"render() is pure abstract"');
   }
 
-  update () {
-    throw new Error('"update() is pure abstract"');
-  }
+  update () {}
 
   destroy () {
-    throw new Error('"destroy()" is pure abstract"');
+    this.empty();
   }
 
   empty () {
