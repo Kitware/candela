@@ -17,10 +17,11 @@ export default class Geo extends VisComponent {
     }, map));
 
     // Process the requested layers.
+    this.layers = [];
     layers.forEach(layer => {
       switch (layer.type) {
         case 'osm':
-          this.plot.createLayer('osm', layer);
+          this.layers.push(this.plot.createLayer('osm', layer));
           break;
 
         case 'feature':
@@ -41,6 +42,8 @@ export default class Geo extends VisComponent {
             }, spec.style);
 
             feature.style(style);
+
+            this.layers.push(feature);
           });
           break;
       }
