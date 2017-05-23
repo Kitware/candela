@@ -12,7 +12,7 @@ class TopInfoBar extends VisComponent {
     this.branch = settings.branch || 'No branch set';
     this.day = settings.day || this.getToday();
     this.submissionUuid = settings.submission_uuid;
-    this.helpLink = settings.help_link || 'https://github.com/Trailmix/RedwoodInternal/wiki/Midas-for-Metrics-Based-Testing#performance-dashboards';
+    this.helpLink = settings.help_link;
   }
 
   render () {
