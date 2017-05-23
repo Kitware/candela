@@ -120,7 +120,7 @@ To build Candela from source, you will need to install the following software:
 * Git
 * Node.js
 * npm
-* cairo (``brew install cairo`` on macOS)
+* `cairo <https://cairographics.org/download/>`_ (``brew install cairo`` on macOS)
 
 **2. Install Node dependencies**
 
