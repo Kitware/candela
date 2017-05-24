@@ -100,7 +100,8 @@ features of all Candela components:
 3. Sometimes you need to change an aspect of the visualization at runtime, such
    as the color map, which columns of data are being visualized, or even the
    data itself; to support such changes, Candela components have an :ref:`update
-   <update>` method. The base class :ref:`update <update>` is a no-op.
+   <update>` method. The base class :ref:`update <update>` returns a promise
+   object that delivers the component itself.
 
 4. When a visualization component reaches the end of its lifecycle, it may need
    to clean up after itself, which can be done in the component's :ref:`destroy
@@ -154,8 +155,9 @@ is declared as an extension of ``VisComponent``, such as ``BarChart``):
     is, only the options given to this method should change, while any left
     unspecified should remain as they are.
 
-    **Note**: The ``VisComponent`` ``update()`` method is a no-op, since the
-    semantics of updating will be different for every component.
+    **Note**: The ``VisComponent`` ``update()`` method returns a promise object
+    that delivers the component itself without changing it, since the semantics
+    of updating will be different for every component.
 
 .. _destroy:
 
