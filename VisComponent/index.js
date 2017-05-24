@@ -13,7 +13,9 @@ export default class VisComponent {
     throw new Error('"render() is pure abstract"');
   }
 
-  update () {}
+  update () {
+    return Promise.resolve(this);
+  }
 
   destroy () {
     this.empty();

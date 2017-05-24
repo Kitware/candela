@@ -202,5 +202,7 @@ export default class GeoDots extends VisComponent {
     if (changed.size > 0) {
       points.modified();
     }
+
+    return Promise.resolve(this);
   }
 }
