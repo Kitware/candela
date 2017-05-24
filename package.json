@@ -36,12 +36,9 @@
   "semistandard": {
     "ignore": [
       "config",
-      "src/external",
-      "app/resonantlab/gaTemplate.js",
-      "app/resonantlab/ga.js",
-      "app/resonantlab/web_client/lib",
+      "app/resonantlab",
       "dist",
-      "built",
+      "build",
       "R/candela/inst/htmlwidgets/lib"
     ]
   },

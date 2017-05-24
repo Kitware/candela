@@ -1,7 +1,62 @@
-import d3 from 'd3';
+import d3 from 'geojs/node_modules/d3';
 import Geo from '../Geo';
 import VisComponent from '../../VisComponent';
 import { minmax } from '../../util';
+
+const computeSizeTransform = (data, sizeField) => {
+  let sizeTransform = 5;
+  if (sizeField) {
+    const range = minmax(data.map(d => d[sizeField]));
+    const scale = d3.scale.linear()
+      .domain([range.min, range.max])
+      .range([3, 19]);
+
+    sizeTransform = d => scale(d[sizeField]);
+  }
+
+  return sizeTransform;
+};
+
+const computeColorTransforms = (data, color) => {
+  let fillTransform = 'red';
+  let strokeTransform = 'darkred';
+  if (color && data.length > 0) {
+    let fillScale, strokeScale;
+
+    const type = typeof data[0][color];
+    if (type === undefined || type === 'string') {
+      fillScale = d3.scale.category10();
+      strokeScale = 'black';
+    } else {
+      const range = minmax(data.map(d => d[color]));
+
+      const red = d3.rgb('#ef6a62');
+      const blue = d3.rgb('#67a9cf');
+      const darkred = red.darker();
+      const darkblue = blue.darker();
+
+      fillScale = d3.scale.linear()
+        .domain([range.min, range.max])
+        .range([red, blue]);
+
+      strokeScale = d3.scale.linear()
+        .domain([range.min, range.max])
+        .range([darkred, darkblue]);
+    }
+
+    fillTransform = d => fillScale(d[color]);
+    if (strokeScale === 'black') {
+      strokeTransform = 'black';
+    } else {
+      strokeTransform = d => strokeScale(d[color]);
+    }
+  }
+
+  return {
+    fillTransform,
+    strokeTransform
+  };
+};
 
 export default class GeoDots extends VisComponent {
   static get options () {
@@ -65,49 +120,8 @@ export default class GeoDots extends VisComponent {
     el.style.width = width + 'px';
     el.style.height = height + 'px';
 
-    let sizeTransform = 5;
-    if (options.size) {
-      const range = minmax(options.data.map(d => d[options.size]));
-      const scale = d3.scale.linear()
-        .domain([range.min, range.max])
-        .range([3, 19]);
-
-      sizeTransform = d => scale(d[options.size]);
-    }
-
-    let fillTransform = 'red';
-    let strokeTransform = 'darkred';
-    if (options.color && options.data.length > 0) {
-      let fillScale, strokeScale;
-
-      const type = typeof options.data[0][options.color];
-      if (type === undefined || type === 'string') {
-        fillScale = d3.scale.category10();
-        strokeScale = 'black';
-      } else {
-        const range = minmax(options.data.map(d => d[options.color]));
-
-        const red = d3.rgb('#ef6a62');
-        const blue = d3.rgb('#67a9cf');
-        const darkred = red.darker();
-        const darkblue = blue.darker();
-
-        fillScale = d3.scale.linear()
-          .domain([range.min, range.max])
-          .range([red, blue]);
-
-        strokeScale = d3.scale.linear()
-          .domain([range.min, range.max])
-          .range([darkred, darkblue]);
-      }
-
-      fillTransform = d => fillScale(d[options.color]);
-      if (strokeScale === 'black') {
-        strokeTransform = 'black';
-      } else {
-        strokeTransform = d => strokeScale(d[options.color]);
-      }
-    }
+    const sizeTransform = computeSizeTransform(options.data, options.size);
+    const { fillTransform, strokeTransform } = computeColorTransforms(options.data, options.color);
 
     // TODO(choudhury): don't mutate the options object directly.
     options.layers = [];
@@ -150,9 +164,45 @@ export default class GeoDots extends VisComponent {
     }, options);
 
     this.geojs = new Geo(this.el, map_options);
+    this.options = options;
   }
 
   render () {
     this.geojs.render();
+  }
+
+  update (options) {
+    let points = this.geojs.layers[1];
+
+    let changed = new Set();
+    ['longitude', 'latitude', 'color', 'size'].forEach(opt => {
+      if (options[opt]) {
+        changed.add(opt);
+        this.options[opt] = options[opt];
+      }
+    });
+
+    if (changed.has('longitude') || changed.has('latitude')) {
+      points.position(d => ({
+        x: d[this.options.longitude],
+        y: d[this.options.latitude]
+      }));
+    }
+
+    if (changed.has('size')) {
+      points.style('radius', computeSizeTransform(this.options.data, this.options.size));
+    }
+
+    if (changed.has('color')) {
+      const { fillTransform, strokeTransform } = computeColorTransforms(this.options.data, this.options.color);
+      points.style('fillColor', fillTransform)
+        .style('strokeColor', strokeTransform);
+    }
+
+    if (changed.size > 0) {
+      points.modified();
+    }
+
+    return Promise.resolve(this);
   }
 }

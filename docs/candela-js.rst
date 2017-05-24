@@ -97,6 +97,17 @@ features of all Candela components:
    :ref:`render <render>` method. The base class :ref:`render <render>`
    simply raises an exception.
 
+3. Sometimes you need to change an aspect of the visualization at runtime, such
+   as the color map, which columns of data are being visualized, or even the
+   data itself; to support such changes, Candela components have an :ref:`update
+   <update>` method. The base class :ref:`update <update>` returns a promise
+   object that delivers the component itself.
+
+4. When a visualization component reaches the end of its lifecycle, it may need
+   to clean up after itself, which can be done in the component's :ref:`destroy
+   <destroy>` method. The base class :ref:`destroy <destroy>` simply removes all
+   content from `this.el`.
+
 You can create a concrete visualization component by extending ``VisComponent``.
 The following best practices maximize clarity, reusability, and interoperability
 of your components (in the rest of this document, imagine that ``Component``
@@ -133,6 +144,37 @@ is declared as an extension of ``VisComponent``, such as ``BarChart``):
     **Note**: The ``VisComponent`` ``render()`` method simply throws
     an exception; if you truly want your component to do nothing when it renders,
     simply redefine the method to be a no-op.
+
+.. _update:
+
+.. js:function:: component.update(options)
+
+    Changes the component state to reflect `options`. This method allows for
+    incremental changes to the component state. The form of `options` should be
+    the same as what the :ref:`constructor <constructor>` takes. The difference
+    is, only the options given to this method should change, while any left
+    unspecified should remain as they are.
+
+    **Note**: The ``VisComponent`` ``update()`` method returns a promise object
+    that delivers the component itself without changing it, since the semantics
+    of updating will be different for every component.
+
+.. _destroy:
+
+.. js:function:: component.destroy()
+
+    Performs any cleanup required of the component when it is no longer needed.
+    This may be as simple as emptying the container element the component has
+    been using, or it may involve unregistering event listeners, etc.
+
+    **Note**: The ``VisComponent`` ``destroy()`` method just empties the
+    top-level container, since this is a common "cleanup" operation.
+
+.. js:function:: component.empty()
+
+    Convenience method that empties the component's container element. This can
+    be used in the constructor to prepare the container element, or in the
+    :ref:`destroy <destroy>` method to clean up after the component.
 
 .. js:attribute:: component.serializationFormats
 
