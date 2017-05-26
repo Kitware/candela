@@ -44,7 +44,7 @@ class ResultTablePane extends VisComponent {
         resultsByDatasetIdThenTrend[result.dataset_id_selector] = {};
       }
       if (Array.isArray(result.current)) {
-        resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = d3.median(result.current);
+        resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = median(result.current);
       } else {
         resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = result.current;
       }
