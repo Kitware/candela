@@ -3,7 +3,7 @@ import datalib from 'datalib';
 import d3 from 'd3';
 import VisComponent from '../../VisComponent';
 import { type } from 'datalib';
-import * as LineUpJS from 'lineupjs/build/LineUpJS.min';
+import * as LineUpJS from 'lineupjs';
 import 'lineupjs/build/style.css';
 import './index.styl';
 import 'font-awesome-webpack';

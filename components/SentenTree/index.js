@@ -1,6 +1,6 @@
 import VisComponent from '../../VisComponent';
 import { SentenTreeBuilder,
-         SentenTreeVis } from 'sententree/dist/SentenTree';
+         SentenTreeVis } from 'sententree';
 
 export default class SentenTree extends VisComponent {
   static get options () {
