@@ -1,4 +1,4 @@
-import geojs from 'geojs/geo.js';
+import geojs from 'geojs';
 import VisComponent from '../../VisComponent';
 
 export default class Geo extends VisComponent {
