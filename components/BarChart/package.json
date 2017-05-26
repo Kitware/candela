@@ -1,0 +1,8 @@
+{
+  "name": "candela-barchart",
+  "version": "0.0.0",
+  "description": "Candela BarChart component",
+  "main": "index.js",
+  "author": "Kitware, Inc.",
+  "license": "Apache-2.0"
+}
