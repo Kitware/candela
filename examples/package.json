@@ -8,6 +8,7 @@
     "candela": "file:..",
     "candela-barchart": "file:../components/BarChart",
     "candela-scatterplot": "file:../components/ScatterPlot",
+    "candela-scatterplotmatrix": "file:../components/ScatterPlotMatrix",
     "d3-selection": "^1.1.0",
     "datalib": "^1.7.3",
     "raw-loader": "^0.5.1",
