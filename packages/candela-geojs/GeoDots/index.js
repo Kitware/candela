@@ -1,7 +1,7 @@
 import d3 from 'd3';
 import Geo from '../Geo';
-import VisComponent from '../../VisComponent';
-import { minmax } from '../../util';
+import VisComponent from 'candela/VisComponent';
+import { minmax } from 'candela/util';
 
 const computeSizeTransform = (data, sizeField) => {
   let sizeTransform = 5;

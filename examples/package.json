@@ -6,9 +6,11 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "candela": "file:..",
+    "candela-geojs": "file:../packages/candela-geojs",
     "candela-vega": "file:../packages/candela-vega",
     "d3-selection": "^1.1.0",
     "datalib": "^1.7.3",
+    "geojs": "^0.9.1",
     "raw-loader": "^0.5.1",
     "strip-json-comments-loader": "0.0.2",
     "vega": "^2.4.2"
