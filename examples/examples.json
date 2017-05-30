@@ -6,5 +6,9 @@
   {
     "title": "Scatter Plot",
     "link": "scatter"
+  },
+  {
+    "title": "Scatter Plot Matrix",
+    "link": "scattermatrix"
   }
 ]
