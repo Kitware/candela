@@ -1,13 +1,11 @@
 import candela from 'candela';
 import 'candela-scatterplotmatrix';
 
+import showComponent from '../util/showComponent';
 import { iris } from '../datasets';
 
 window.onload = () => {
-  const div = document.createElement('div');
-  document.body.appendChild(div);
-
-  const vis = new candela.components.ScatterPlotMatrix(div, {
+  showComponent(candela.components.ScatterPlotMatrix, {
     data: iris,
     fields: [
       'petalWidth',
