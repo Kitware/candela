@@ -10,6 +10,4 @@ npm-debug.log
 *-diff.png
 *-test.png
 .ipynb_checkpoints
-app/resonantlab/scripts/core/*
-app/resonantlab/querylang/query.js
 docs/static/candela.js

@@ -6,11 +6,7 @@
   "scripts": {
     "build": "webpack --config config/webpack.config.js",
     "build:examples": "webpack --config config/webpack-examples.config.js",
-    "build:resonantlab": "cd app/resonantlab && webpack",
-    "build:resonantlab:tests": "webpack --config ./app/resonantlab/webpack-testing.config.js",
     "build:docs": "sphinx-build -a -b html docs/ build/docs/",
-    "test:resonantlab:unit": "npm run test:resonantlab:unit:raw | tap-spec",
-    "test:resonantlab:unit:raw": "for t in `ls build/resonantlab/*.tests.js`; do node $t; done",
     "dist": "webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
     "lint": "semistandard | snazzy",
     "lint:pycandela": "flake8 --config python/pycandela/flake8.cfg python/pycandela",
@@ -36,7 +32,6 @@
   "semistandard": {
     "ignore": [
       "config",
-      "app/resonantlab",
       "dist",
       "build",
       "R/candela/inst/htmlwidgets/lib"
