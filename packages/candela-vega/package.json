@@ -1,7 +1,7 @@
 {
-  "name": "candela-scatterplotmatrix",
+  "name": "candela-vega",
   "version": "0.0.0",
-  "description": "Candela ScatterPlotMatrix component",
+  "description": "Candela Vega component collection",
   "main": "index.js",
   "author": "Kitware, Inc.",
   "license": "Apache-2.0",

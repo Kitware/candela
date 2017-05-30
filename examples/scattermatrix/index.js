@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela-scatterplotmatrix';
+import 'candela-vega';
 
 import showComponent from '../util/showComponent';
 import { iris } from '../datasets';

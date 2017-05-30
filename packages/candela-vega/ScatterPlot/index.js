@@ -1,4 +1,3 @@
-import candela from 'candela';
 import VisComponent from 'candela/VisComponent';
 import VegaChart from 'candela/VisComponent/mixin/VegaChart';
 import spec from './spec.json';
@@ -78,5 +77,3 @@ export default class ScatterPlot extends VegaChart(VisComponent, spec) {
     ];
   }
 }
-
-candela.registerComponent('ScatterPlot', ScatterPlot);
