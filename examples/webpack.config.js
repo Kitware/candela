@@ -41,6 +41,15 @@ module.exports = candelaLoaders({
         query: {
           presets: ['es2015']
         }
+      },
+      {
+        test: /\.json$/,
+        loader: 'json-loader',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.csv|\.tsv$/,
+        loader: 'raw-loader'
       }
     ]
   }
