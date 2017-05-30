@@ -109,7 +109,6 @@
     "md5": "^2.2.1",
     "nvd3": "^1.8.4",
     "onset": "git+https://github.com/Kitware/setvis#b2b8e7cfdef335a4ee4b2af871e14d203ef3e754",
-    "raw-loader": "^0.5.1",
     "sententree": "git+https://git@github.com/ronichoudhury-work/sententree.git#fix-typo",
     "style-loader": "^0.13.0",
     "stylus-loader": "^2.0.0",
