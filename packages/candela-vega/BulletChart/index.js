@@ -1,5 +1,5 @@
-import VisComponent from '../../VisComponent';
-import VegaChart from '../../VisComponent/mixin/VegaChart';
+import VisComponent from 'candela/VisComponent';
+import VegaChart from 'candela/VisComponent/mixin/VegaChart';
 import spec from './spec.json';
 
 export default class BulletChart extends VegaChart(VisComponent, spec) {

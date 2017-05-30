@@ -1,8 +1,8 @@
-import VisComponent from '../../VisComponent';
-import VegaChart from '../../VisComponent/mixin/VegaChart';
+import VisComponent from 'candela/VisComponent';
+import VegaChart from 'candela/VisComponent/mixin/VegaChart';
 import spec from './spec.json';
 
-export default class BoxPlot extends VegaChart(VisComponent, spec) {
+export default class Heatmap extends VegaChart(VisComponent, spec) {
   static get options () {
     return [
       {
@@ -11,17 +11,28 @@ export default class BoxPlot extends VegaChart(VisComponent, spec) {
         format: 'objectlist'
       },
       {
-        name: 'fields',
-        type: 'string_list',
-        format: 'string_list',
+        name: 'id',
+        type: 'string',
+        format: 'text',
+        optional: true,
         domain: {
           mode: 'field',
           from: 'data',
-          fieldTypes: ['date', 'number', 'integer', 'boolean']
+          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
         }
       },
       {
-        name: 'group',
+        name: 'fields',
+        type: 'string_list',
+        format: 'text',
+        domain: {
+          mode: 'field',
+          from: 'data',
+          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+        }
+      },
+      {
+        name: 'sort',
         type: 'string',
         format: 'text',
         optional: true,
