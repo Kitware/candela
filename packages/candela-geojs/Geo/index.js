@@ -1,5 +1,5 @@
 import geojs from 'geojs';
-import VisComponent from '../../VisComponent';
+import VisComponent from 'candela/VisComponent';
 
 export default class Geo extends VisComponent {
   constructor (el, {map = {}, layers = [], width, height}) {
