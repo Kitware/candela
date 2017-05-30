@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela-barchart';
+import 'candela-vega';
 
 import showComponent from '../util/showComponent';
 

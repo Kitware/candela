@@ -6,9 +6,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "candela": "file:..",
-    "candela-barchart": "file:../components/BarChart",
-    "candela-scatterplot": "file:../components/ScatterPlot",
-    "candela-scatterplotmatrix": "file:../components/ScatterPlotMatrix",
+    "candela-vega": "file:../packages/candela-vega",
     "d3-selection": "^1.1.0",
     "datalib": "^1.7.3",
     "raw-loader": "^0.5.1",
