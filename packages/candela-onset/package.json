@@ -1,0 +1,13 @@
+{
+  "name": "candela-onset",
+  "version": "0.0.0",
+  "description": "Candela OnSet component",
+  "main": "index.js",
+  "author": "Kitware, Inc.",
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "d3": "^3.5.17",
+    "datalib": "^1.7.3",
+    "onset": "git+https://github.com/Kitware/setvis#b2b8e7cfdef335a4ee4b2af871e14d203ef3e754"
+  }
+}

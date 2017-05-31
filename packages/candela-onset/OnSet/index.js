@@ -1,7 +1,8 @@
+import VisComponent from 'candela/VisComponent';
+
 import d3 from 'd3';
 import { unique } from 'datalib';
 import onset from 'onset';
-import VisComponent from '../../VisComponent';
 
 export default class OnSet extends VisComponent {
   static get options () {
