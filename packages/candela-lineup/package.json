@@ -1,0 +1,17 @@
+{
+  "name": "candela-lineup",
+  "version": "0.0.0",
+  "description": "Candela LineUp component",
+  "main": "index.js",
+  "author": "Kitware, Inc.",
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "css-loader": "^0.28.4",
+    "d3": "^3.5.17",
+    "datalib": "^1.7.3",
+    "font-awesome-webpack": "0.0.4",
+    "jquery": "^2.2.0",
+    "lineupjs": "^1.0.0",
+    "stylus-loader": "^3.0.1"
+  }
+}

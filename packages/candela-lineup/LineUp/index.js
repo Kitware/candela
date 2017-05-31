@@ -1,7 +1,8 @@
+import VisComponent from 'candela/VisComponent';
+
 import $ from 'jquery';
 import datalib from 'datalib';
 import d3 from 'd3';
-import VisComponent from '../../VisComponent';
 import { type } from 'datalib';
 import * as LineUpJS from 'lineupjs';
 import 'lineupjs/build/style.css';

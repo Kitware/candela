@@ -52,6 +52,10 @@
     "link": "line-dynamic"
   },
   {
+    "title": "LineUp",
+    "link": "lineup"
+  },
+  {
     "title": "Scatter Plot",
     "link": "scatter"
   },
