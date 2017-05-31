@@ -104,7 +104,6 @@
     "javascript-detect-element-resize": "^0.5.3",
     "md5": "^2.2.1",
     "nvd3": "^1.8.4",
-    "sententree": "git+https://git@github.com/ronichoudhury-work/sententree.git#fix-typo",
     "style-loader": "^0.13.0",
     "stylus-loader": "^2.0.0",
     "telegraph-events": "^1.0.3",
