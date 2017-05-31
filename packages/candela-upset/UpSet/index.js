@@ -1,6 +1,7 @@
+import VisComponent from 'candela/VisComponent';
+
 import d3 from 'd3';
 import { unique, read } from 'datalib';
-import VisComponent from '../../VisComponent';
 import * as upset from 'UpSet';
 import template from './template.html';
 

@@ -91,14 +91,12 @@
     "webpack": "^1.12.12"
   },
   "peerDependencies": {
-    "UpSet": "git+https://github.com/jeffbaumes/upset#no-global-vars",
     "babel-loader": "^6.2.1",
     "bootstrap": "^3.3.7",
     "bootstrap-webpack": "0.0.5",
     "css-loader": "^0.23.1",
     "d3": "^3.5.17",
     "glo": "github:ronichoudhury-work/glo#dist",
-    "html-loader": "^0.4.3",
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
     "javascript-detect-element-resize": "^0.5.3",
