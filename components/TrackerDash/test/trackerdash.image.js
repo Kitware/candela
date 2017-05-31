@@ -5,5 +5,5 @@ imageTest({
   url: 'http://localhost:28000/examples/trackerdash',
   selector: '.trackerdash',
   delay: 2000,
-  threshold: 0.001
+  threshold: 0.02
 });
