@@ -40,7 +40,8 @@ module.exports = candelaLoaders({
         loader: 'babel-loader',
         query: {
           presets: ['es2015']
-        }
+        },
+        exclude: /node_modules/
       },
       {
         test: /\.json$/,
@@ -49,7 +50,20 @@ module.exports = candelaLoaders({
       },
       {
         test: /\.csv|\.tsv$/,
-        loader: 'raw-loader'
+        loader: 'raw-loader',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.jade$/,
+        loader: 'jade-loader',
+        include: __dirname + '/line-dynamic',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.styl/,
+        loaders: ['style-loader', 'css-loader', 'stylus-loader'],
+        include: __dirname + '/line-dynamic',
+        exclude: /node_modules/
       }
     ]
   }
