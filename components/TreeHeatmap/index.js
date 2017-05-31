@@ -4,7 +4,7 @@ import { extent,
          max } from 'd3-array';
 import { scaleLinear } from 'd3-scale';
 import { select } from 'd3-selection';
-import { line } from 'd3-shape';
+import { line as d3line } from 'd3-shape';
 import { getElementSize } from '../../util';
 
 export default class TreeHeatmap extends VisComponent {
@@ -334,7 +334,7 @@ export default class TreeHeatmap extends VisComponent {
 
       let reverseLinks = links.slice().reverse();
 
-      let line = line();
+      let line = d3line();
       if (orientation === 'horizontal') {
         line.x(d => d[1]).y(d => d[0]);
       }
