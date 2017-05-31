@@ -1,6 +1,7 @@
-import VisComponent from '../../VisComponent';
-import Events from '../../VisComponent/mixin/Events';
-import VegaChart from '../../VisComponent/mixin/VegaChart';
+import VisComponent from 'candela/VisComponent';
+import Events from 'candela/VisComponent/mixin/Events';
+import VegaChart from 'candela/VisComponent/mixin/VegaChart';
+
 import spec from './spec.json';
 
 export default class LineChart extends Events(VegaChart(VisComponent, spec)) {

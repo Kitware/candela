@@ -40,6 +40,18 @@
     "link": "histogram"
   },
   {
+    "title": "Line Chart",
+    "link": "line"
+  },
+  {
+    "title": "Line Chart with Points",
+    "link": "line-points"
+  },
+  {
+    "title": "Dynamic Line Chart",
+    "link": "line-dynamic"
+  },
+  {
     "title": "Scatter Plot",
     "link": "scatter"
   },
