@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import _ from 'underscore';
-import { median } from 'd3-array';
+import d3 from 'd3';
 
 import InfoPane from './InfoPane';
 import TrendPane from './TrendPane';
@@ -43,7 +43,7 @@ const synthesizeMissingAggTrends = (aggTrends, trendMap, trendValuesByDataset, p
       const trendVals = _.chain(byTrend[aggTrend.name])
         .pluck('current')
         .map((value) => {
-          return deArray(value, median);
+          return deArray(value, d3.median);
         })
       // '+' converts values to numeric for a numeric sort.
         .sortBy((num) => { return +num; })
@@ -115,7 +115,7 @@ class TrackerDash extends VisComponent {
     // the max as the max input value for that trend.
     _.each(settings.trendValuesByDataset, function (trendValue) {
       if (!_.has(settings.trendMap, trendValue.trend)) {
-        const current = deArray(trendValue.current, median);
+        const current = deArray(trendValue.current, d3.median);
         const syntheticTrend = sanitizeTrend({
           name: trendValue.trend,
           synth: true,
@@ -124,7 +124,7 @@ class TrackerDash extends VisComponent {
         settings.trendMap[syntheticTrend.name] = syntheticTrend;
         settings.trends.push(syntheticTrend);
       } else {
-        const current = deArray(trendValue.current, median);
+        const current = deArray(trendValue.current, d3.median);
         const trend = settings.trendMap[trendValue.trend];
         if (trend.synth && trend.max < current) {
           trend.max = current;

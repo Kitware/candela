@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import $ from 'jquery';
-import { median } from 'd3-array';
+import d3 from 'd3';
 
 import ValueWidget from './ValueWidget';
 import { sanitizeSelector } from './utility.js';
@@ -44,7 +44,7 @@ class ResultTablePane extends VisComponent {
         resultsByDatasetIdThenTrend[result.dataset_id_selector] = {};
       }
       if (Array.isArray(result.current)) {
-        resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = median(result.current);
+        resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = d3.median(result.current);
       } else {
         resultsByDatasetIdThenTrend[result.dataset_id_selector][result.trend] = result.current;
       }
