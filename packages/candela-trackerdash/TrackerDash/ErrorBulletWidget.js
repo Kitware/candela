@@ -1,10 +1,11 @@
+import VisComponent from 'candela/VisComponent';
+
 import _ from 'underscore';
 import d3 from 'd3';
 import nv from 'nvd3';
 import $ from 'jquery';
 
 import { computeColor } from './utility.js';
-import VisComponent from '../../VisComponent';
 
 class ErrorBulletWidget extends VisComponent {
   constructor (el, settings) {

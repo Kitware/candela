@@ -1,10 +1,11 @@
+import VisComponent from 'candela/VisComponent';
+
 import _ from 'underscore';
 import d3 from 'd3';
 import $ from 'jquery';
 
 import colors from './colors.js';
 import { standardRound, computeColor } from './utility.js';
-import VisComponent from '../../VisComponent';
 
 class BoxAndWhiskerWidget extends VisComponent {
   constructor (el, settings) {

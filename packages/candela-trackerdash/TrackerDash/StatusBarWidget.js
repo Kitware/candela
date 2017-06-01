@@ -1,9 +1,10 @@
+import VisComponent from 'candela/VisComponent';
+
 import _ from 'underscore';
 import $ from 'jquery';
 import d3 from 'd3';
 
 import statusBarWidget from './templates/statusBarWidget.jade';
-import VisComponent from '../../VisComponent';
 
 class StatusBarWidget extends VisComponent {
   constructor (el, settings) {

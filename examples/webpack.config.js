@@ -32,7 +32,11 @@ module.exports = candelaLoaders({
     path: 'build',
     filename: '[name]/index.js'
   },
-  plugins: htmlPlugins,
+  plugins: htmlPlugins.concat([
+    new webpack.ProvidePlugin({
+      jQuery: 'jquery'
+    })
+  ]),
   module: {
     loaders: [
       {
@@ -62,6 +66,11 @@ module.exports = candelaLoaders({
         test: /\.styl/,
         loaders: ['style-loader', 'css-loader', 'stylus-loader'],
         exclude: /node_modules/
+      },
+      {
+        test: /\.css/,
+        loaders: ['style-loader', 'css-loader'],
+        include: /node_modules\/nvd3/,
       }
     ]
   }

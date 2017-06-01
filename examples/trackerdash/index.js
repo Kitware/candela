@@ -1,5 +1,6 @@
-import TrackerDash from '../../../components/TrackerDash';
-import '../../../components/TrackerDash/styles';
+import candela from 'candela';
+import 'candela-trackerdash';
+import 'candela-trackerdash/TrackerDash/styles';
 
 // Pass query param 'omitAggTrends' to test without 'agg_trends' key.
 var betaGroundTruthSettings = {
@@ -366,5 +367,5 @@ if (qParams) {
     }
   }
 }
-var app = new TrackerDash(document.body, appSettings);
+var app = new candela.components.TrackerDash(document.body, appSettings);
 app.render();

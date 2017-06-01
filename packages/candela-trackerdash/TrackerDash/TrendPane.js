@@ -1,3 +1,5 @@
+import VisComponent from 'candela/VisComponent';
+
 import _ from 'underscore';
 import $ from 'jquery';
 import nv from 'nvd3';
@@ -6,7 +8,6 @@ import d3 from 'd3';
 import { deArray } from './utility.js';
 
 import trendPane from './templates/trendPane.jade';
-import VisComponent from '../../VisComponent';
 
 class TrendPane extends VisComponent {
   constructor (el, settings) {

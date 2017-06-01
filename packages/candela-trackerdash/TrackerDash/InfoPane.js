@@ -1,3 +1,5 @@
+import VisComponent from 'candela/VisComponent';
+
 import _ from 'underscore';
 import $ from 'jquery';
 import d3 from 'd3';
@@ -8,7 +10,6 @@ import ErrorBulletWidget from './ErrorBulletWidget';
 import { deArray, failValue, warningValue } from './utility.js';
 
 import infoPane from './templates/infoPane.jade';
-import VisComponent from '../../VisComponent';
 
 class InfoPane extends VisComponent {
   constructor (el, statusBarEl, settings) {
