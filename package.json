@@ -106,8 +106,7 @@
     "stylus-loader": "^2.0.0",
     "telegraph-events": "^1.0.3",
     "underscore": "^1.8.3",
-    "url-loader": "^0.5.7",
-    "webcola": "^3.3.3"
+    "url-loader": "^0.5.7"
   },
   "config": {
     "commitizen": {
