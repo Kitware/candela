@@ -71,7 +71,15 @@ module.exports = candelaLoaders({
         test: /\.css/,
         loaders: ['style-loader', 'css-loader'],
         include: /node_modules\/nvd3/,
-      }
+      },
+      {
+        test: /\.js$/,
+        loaders: [
+          'exports-loader?GLO',
+          'imports-loader?_=underscore&cola=webcola'
+        ],
+        include: __dirname + '/node_modules/glo/glo.js'
+      },
     ]
   }
 });

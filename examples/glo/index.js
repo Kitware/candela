@@ -1,14 +1,17 @@
-import Glo from '../../../components/Glo';
-import { lesmis } from '../util/datasets';
+import candela from 'candela';
+import 'candela-glo';
+
+import { lesmis } from '../datasets';
 import showComponent from '../util/showComponent';
 
 window.onload = () => {
-  let glo = showComponent(Glo, {
-    width: '100%',
-    height: '100%',
+  let glo = showComponent(candela.components.Glo, {
+    width: '100vw',
+    height: '100vh',
     nodes: lesmis.nodes,
     edges: lesmis.edges
   });
+  glo.render();
 
   window.setTimeout(() => {
     glo.positionNodes('rho', 300);

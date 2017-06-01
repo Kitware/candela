@@ -1,7 +1,7 @@
+import VisComponent from 'candela/VisComponent';
+
 import d3 from 'd3';
 import GLO from 'glo';
-
-import VisComponent from '../../VisComponent';
 
 const colorNodes = (glo, field, type) => {
   glo.glo.node_attr({
