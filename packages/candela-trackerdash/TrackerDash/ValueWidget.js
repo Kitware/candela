@@ -1,6 +1,7 @@
+import VisComponent from 'candela/VisComponent';
+
 import ErrorBulletWidget from './ErrorBulletWidget';
 import BoxAndWhiskerWidget from './BoxAndWhiskerWidget';
-import VisComponent from '../../VisComponent';
 
 class ValueWidget extends VisComponent {
   constructor (el, settings) {

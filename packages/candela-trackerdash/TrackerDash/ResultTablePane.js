@@ -1,3 +1,5 @@
+import VisComponent from 'candela/VisComponent';
+
 import _ from 'underscore';
 import $ from 'jquery';
 import d3 from 'd3';
@@ -6,7 +8,6 @@ import ValueWidget from './ValueWidget';
 import { sanitizeSelector } from './utility.js';
 
 import tablePane from './templates/tablePane.jade';
-import VisComponent from '../../VisComponent';
 
 class ResultTablePane extends VisComponent {
   constructor (el, settings) {

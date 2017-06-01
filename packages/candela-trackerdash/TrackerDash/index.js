@@ -1,3 +1,5 @@
+import VisComponent from 'candela/VisComponent';
+
 import $ from 'jquery';
 import _ from 'underscore';
 import d3 from 'd3';
@@ -9,8 +11,6 @@ import TopInfoBar from './TopInfoBar';
 import { sanitizeSelector, deArray } from './utility.js';
 
 import layout from './templates/layout.jade';
-
-import VisComponent from '../../VisComponent';
 
 //  Calculate an percentile value from an array of numbers sorted in numerically
 //  increasing order, p should be a ratio percentile, e.g. 50th percentile is p

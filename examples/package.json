@@ -6,12 +6,15 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "UpSet": "git+https://github.com/jeffbaumes/upset#no-global-vars",
+    "bootstrap": "^3.3.7",
+    "bootstrap-webpack": "0.0.5",
     "candela": "file:..",
     "candela-geojs": "file:../packages/candela-geojs",
     "candela-lineup": "file:../packages/candela-lineup",
     "candela-onset": "file:../packages/candela-onset",
     "candela-sententree": "file:../packages/candela-sententree",
     "candela-similaritygraph": "file:../packages/candela-similaritygraph",
+    "candela-trackerdash": "file:../packages/candela-trackerdash",
     "candela-treeheatmap": "file:../packages/candela-treeheatmap",
     "candela-upset": "file:../packages/candela-upset",
     "candela-vega": "file:../packages/candela-vega",
@@ -28,7 +31,9 @@
     "jquery": "^2.2.0",
     "less": "^2.7.2",
     "lineupjs": "^1.1.1",
+    "md5": "^2.2.1",
     "node-sass": "^4.5.3",
+    "nvd3": "^1.8.5",
     "onset": "git+https://github.com/Kitware/setvis#b2b8e7cfdef335a4ee4b2af871e14d203ef3e754",
     "raw-loader": "^0.5.1",
     "sass-loader": "^6.0.5",
@@ -38,6 +43,7 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "telegraph-events": "^1.0.3",
+    "underscore": "^1.8.3",
     "url-loader": "^0.5.8",
     "vega": "^2.4.2"
   }

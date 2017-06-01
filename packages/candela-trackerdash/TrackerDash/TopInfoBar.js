@@ -1,7 +1,8 @@
+import VisComponent from 'candela/VisComponent';
+
 import $ from 'jquery';
 
 import topInfoBar from './templates/topInfoBar.jade';
-import VisComponent from '../../VisComponent';
 
 class TopInfoBar extends VisComponent {
   constructor (el, settings) {

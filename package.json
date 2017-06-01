@@ -88,19 +88,14 @@
   "peerDependencies": {
     "babel-loader": "^6.2.1",
     "bootstrap": "^3.3.7",
-    "bootstrap-webpack": "0.0.5",
     "css-loader": "^0.23.1",
-    "d3": "^3.5.17",
     "glo": "github:ronichoudhury-work/glo#dist",
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
     "javascript-detect-element-resize": "^0.5.3",
-    "md5": "^2.2.1",
-    "nvd3": "^1.8.4",
     "style-loader": "^0.13.0",
     "stylus-loader": "^2.0.0",
     "telegraph-events": "^1.0.3",
-    "underscore": "^1.8.3",
     "url-loader": "^0.5.7"
   },
   "config": {
