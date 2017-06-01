@@ -1,14 +1,6 @@
 import VisComponent from 'candela/VisComponent';
 
-<<<<<<< HEAD
 import d3 from 'd3';
-=======
-import { extent } from 'd3-array';
-import { scaleLinear,
-         scaleOrdinal,
-         schemeCategory10 } from 'd3-scale';
-import { select } from 'd3-selection';
->>>>>>> build(package.json): use d3 v3 for standalone library
 import cola from 'webcola';
 
 export default class SimilarityGraph extends VisComponent {
@@ -17,12 +9,9 @@ export default class SimilarityGraph extends VisComponent {
     this.data = data;
 
     // Empty the top-level div.
-<<<<<<< HEAD
     this.empty();
-=======
-    select(this.el)
+    d3.select(this.el)
       .selectAll('*').remove();
->>>>>>> build(package.json): use d3 v3 for standalone library
 
     // Construct an SVG element inside the top-level div.
     this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -33,21 +22,12 @@ export default class SimilarityGraph extends VisComponent {
     // Construct a function that returns the needed size - either a constant
     // supplied in the `size` parameter, or a lookup function that pulls it from
     // the data table.
-<<<<<<< HEAD
     const sizeMap = d3.scale.linear().domain(d3.extent(data, d => d[size])).range([5, 15]);
     const sizeFunc = d => typeof size === 'string' ? sizeMap(d[size]) : size;
 
     // Construct lookup function for the color field.
     const colorScale = d3.scale.linear().domain(d3.extent(data, d => d[color])).range(['white', 'steelblue']);
     const colormap = typeof data[0][color] === 'string' ? d3.scale.category10() : colorScale;
-=======
-    const sizeMap = scaleLinear().domain(extent(data, d => d[size])).range([5, 15]);
-    const sizeFunc = d => typeof size === 'string' ? sizeMap(d[size]) : size;
-
-    // Construct lookup function for the color field.
-    const colorScale = scaleLinear().domain(extent(data, d => d[color])).range(['white', 'steelblue']);
-    const colormap = typeof data[0][color] === 'string' ? scaleOrdinal(schemeCategory10) : colorScale;
->>>>>>> build(package.json): use d3 v3 for standalone library
     const colorFunc = color !== undefined ? d => colormap(d[color]) : () => 'rgb(31, 119, 180)';
 
     // Get the width and height of the SVG element. This is necessary here in
@@ -90,7 +70,7 @@ export default class SimilarityGraph extends VisComponent {
 
     // Create a D3 selection for the links, and initialize it with some line
     // elements.
-    this.linkSelection = select(this.svg)
+    this.linkSelection = d3.select(this.svg)
       .selectAll('line.link')
       .data(this.links);
 
@@ -102,7 +82,7 @@ export default class SimilarityGraph extends VisComponent {
 
     // Create a D3 selection for the nodes, and initialize it with some circle
     // elements.
-    this.nodeSelection = select(this.svg)
+    this.nodeSelection = d3.select(this.svg)
       .selectAll('circle.node')
       .data(this.nodes);
 
@@ -116,7 +96,7 @@ export default class SimilarityGraph extends VisComponent {
       .call(this.cola.drag);
 
     // Create a D3 selection for node labels.
-    this.labelSelection = select(this.svg)
+    this.labelSelection = d3.select(this.svg)
       .selectAll('text.label')
       .data(this.nodes);
 
