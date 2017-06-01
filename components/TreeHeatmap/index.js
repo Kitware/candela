@@ -1,5 +1,10 @@
 import VisComponent from '../../VisComponent';
-import * as d3 from 'd3';
+import { extent,
+         min,
+         max } from 'd3-array';
+import { scaleLinear } from 'd3-scale';
+import { select } from 'd3-selection';
+import { line as d3line } from 'd3-shape';
 import { getElementSize } from '../../util';
 
 export default class TreeHeatmap extends VisComponent {
@@ -233,7 +238,7 @@ export default class TreeHeatmap extends VisComponent {
     let sortedRows = rows.slice().sort((a, b) => a.name.localeCompare(b.name));
     let sortedCols = columns.slice().sort((a, b) => a.name.localeCompare(b.name));
 
-    let vis = d3.select(this.el).append('svg')
+    let vis = select(this.el).append('svg')
       .attr('width', width + 'px')
       .attr('height', height + 'px');
 
@@ -266,8 +271,8 @@ export default class TreeHeatmap extends VisComponent {
 
     let distance = d => d.distance;
 
-    let xScale = d3.scaleLinear().domain([0, content[0].length]).range([xStart, xStart + colSize]);
-    let yScale = d3.scaleLinear().domain([0, content.length]).range([yStart, yStart + rowSize]);
+    let xScale = scaleLinear().domain([0, content[0].length]).range([xStart, xStart + colSize]);
+    let yScale = scaleLinear().domain([0, content.length]).range([yStart, yStart + rowSize]);
 
     let tree = function (orientation, links, leaves, x, y, width, height, duration) {
       let numLeaves = leaves.length;
@@ -300,8 +305,8 @@ export default class TreeHeatmap extends VisComponent {
         }
       }
       let distanceExtent = [0, distance(finalCluster)];
-      let distanceScale = d3.scaleLinear().domain(distanceExtent).range([y + height, y]);
-      let treeScale = d3.scaleLinear().domain([0, numLeaves]).range([x, x + width]);
+      let distanceScale = scaleLinear().domain(distanceExtent).range([y + height, y]);
+      let treeScale = scaleLinear().domain([0, numLeaves]).range([x, x + width]);
       let axis1 = 'y';
       let axis2 = 'x';
       if (orientation === 'vertical') {
@@ -329,7 +334,7 @@ export default class TreeHeatmap extends VisComponent {
 
       let reverseLinks = links.slice().reverse();
 
-      let line = d3.line();
+      let line = d3line();
       if (orientation === 'horizontal') {
         line.x(d => d[1]).y(d => d[0]);
       }
@@ -391,8 +396,8 @@ export default class TreeHeatmap extends VisComponent {
         .attr('class', 'tree-select')
         .style('fill', 'steelblue')
         .style('fill-opacity', 0)
-        .on('mouseover', function () { d3.select(this).style('fill-opacity', 0.4); })
-        .on('mouseout', function () { d3.select(this).style('fill-opacity', 0); })
+        .on('mouseover', function () { select(this).style('fill-opacity', 0.4); })
+        .on('mouseout', function () { select(this).style('fill-opacity', 0); })
         .on('click', d => {
           treeScale.domain([d.offset, d.offset + d.size]);
           distanceScale.domain([0, distance(d.parent.parent)]);
@@ -436,19 +441,19 @@ export default class TreeHeatmap extends VisComponent {
 
     let colColor = [];
     for (let col = 0; col < content[0].length; col += 1) {
-      colColor[columns[col].offset] = d3.scaleLinear().domain(d3.extent(content, d => d[col])).range(['white', 'steelblue']);
+      colColor[columns[col].offset] = scaleLinear().domain(extent(content, d => d[col])).range(['white', 'steelblue']);
     }
 
     let rowColor = [];
     for (let row = 0; row < content.length; row += 1) {
-      rowColor[rows[row].offset] = d3.scaleLinear().domain(d3.extent(content[row])).range(['white', 'steelblue']);
+      rowColor[rows[row].offset] = scaleLinear().domain(extent(content[row])).range(['white', 'steelblue']);
     }
 
-    let globalMin = d3.min(content, d => d3.min(d));
-    let globalMax = d3.max(content, d => d3.max(d));
-    let globalColor = d3.scaleLinear().domain([globalMin, globalMax]).range(['white', 'steelblue']);
+    let globalMin = min(content, d => min(d));
+    let globalMax = max(content, d => max(d));
+    let globalColor = scaleLinear().domain([globalMin, globalMax]).range(['white', 'steelblue']);
 
-    let corrColor = d3.scaleLinear().domain([-1, 0, 1]).range(['red', 'white', 'green']);
+    let corrColor = scaleLinear().domain([-1, 0, 1]).range(['red', 'white', 'green']);
 
     let color = d => globalColor(d.value);
     if (this.scale === 'row') {

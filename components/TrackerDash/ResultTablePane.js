@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import $ from 'jquery';
-import * as d3 from 'd3';
+import d3 from 'd3';
 
 import ValueWidget from './ValueWidget';
 import { sanitizeSelector } from './utility.js';

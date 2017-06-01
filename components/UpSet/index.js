@@ -1,4 +1,4 @@
-import d3 from 'UpSet/node_modules/d3';
+import d3 from 'd3';
 import { unique, read } from 'datalib';
 import VisComponent from '../../VisComponent';
 import * as upset from 'UpSet';

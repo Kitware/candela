@@ -1,4 +1,4 @@
-import d3 from 'glo/node_modules/d3';
+import d3 from 'd3';
 import GLO from 'glo';
 
 import VisComponent from '../../VisComponent';

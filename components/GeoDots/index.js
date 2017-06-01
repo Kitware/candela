@@ -1,4 +1,4 @@
-import d3 from 'geojs/node_modules/d3';
+import d3 from 'd3';
 import Geo from '../Geo';
 import VisComponent from '../../VisComponent';
 import { minmax } from '../../util';

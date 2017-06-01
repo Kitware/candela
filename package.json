@@ -115,7 +115,7 @@
     "UpSet": "git+https://github.com/jeffbaumes/upset#no-global-vars",
     "brace": "^0.7.0",
     "css-loader": "^0.23.1",
-    "d3": "^4.8.0",
+    "d3": "^3.5.17",
     "datalib": "^1.7.3",
     "geojs": "^0.9.1",
     "glo": "github:ronichoudhury-work/glo#dist",

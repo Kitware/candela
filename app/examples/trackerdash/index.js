@@ -1,8 +1,5 @@
-import html from './index.jade';
 import TrackerDash from '../../../components/TrackerDash';
 import '../../../components/TrackerDash/styles';
-
-document.write(html());
 
 // Pass query param 'omitAggTrends' to test without 'agg_trends' key.
 var betaGroundTruthSettings = {

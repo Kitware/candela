@@ -1,4 +1,4 @@
-import d3 from 'onset/node_modules/d3';
+import d3 from 'd3';
 import { unique } from 'datalib';
 import onset from 'onset';
 import VisComponent from '../../VisComponent';

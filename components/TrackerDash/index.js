@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import _ from 'underscore';
-import * as d3 from 'd3';
+import d3 from 'd3';
 
 import InfoPane from './InfoPane';
 import TrendPane from './TrendPane';
