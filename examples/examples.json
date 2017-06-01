@@ -72,6 +72,10 @@
     "link": "similarity"
   },
   {
+    "title": "TreeHeatmap",
+    "link": "treeheatmap"
+  },
+  {
     "title": "Scatter Plot",
     "link": "scatter"
   },

@@ -12,6 +12,7 @@
     "candela-onset": "file:../packages/candela-onset",
     "candela-sententree": "file:../packages/candela-sententree",
     "candela-similaritygraph": "file:../packages/candela-similaritygraph",
+    "candela-treeheatmap": "file:../packages/candela-treeheatmap",
     "candela-upset": "file:../packages/candela-upset",
     "candela-vega": "file:../packages/candela-vega",
     "css-loader": "^0.28.4",
@@ -36,6 +37,7 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "telegraph-events": "^1.0.3",
+    "url-loader": "^0.5.8",
     "vega": "^2.4.2"
   }
 }
