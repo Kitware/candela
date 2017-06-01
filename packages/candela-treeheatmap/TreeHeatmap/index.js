@@ -7,6 +7,7 @@ import { extent,
 import { scaleLinear } from 'd3-scale';
 import { select } from 'd3-selection';
 import { line as d3line } from 'd3-shape';
+import 'd3-transition';
 
 export default class TreeHeatmap extends VisComponent {
   static get options () {
