@@ -1,4 +1,4 @@
-import VisComponent from '../../VisComponent';
+import VisComponent from 'candela/VisComponent';
 
 <<<<<<< HEAD
 import d3 from 'd3';

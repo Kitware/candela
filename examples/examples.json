@@ -68,6 +68,10 @@
     "link": "sententree"
   },
   {
+    "title": "SimilarityGraph",
+    "link": "similarity"
+  },
+  {
     "title": "Scatter Plot",
     "link": "scatter"
   },

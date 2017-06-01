@@ -11,6 +11,7 @@
     "candela-lineup": "file:../packages/candela-lineup",
     "candela-onset": "file:../packages/candela-onset",
     "candela-sententree": "file:../packages/candela-sententree",
+    "candela-similaritygraph": "file:../packages/candela-similaritygraph",
     "candela-upset": "file:../packages/candela-upset",
     "candela-vega": "file:../packages/candela-vega",
     "css-loader": "^0.28.4",
