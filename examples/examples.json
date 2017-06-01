@@ -40,6 +40,10 @@
     "link": "histogram"
   },
   {
+    "title": "Date Histogram",
+    "link": "histogram-date"
+  },
+  {
     "title": "Line Chart",
     "link": "line"
   },
@@ -52,6 +56,21 @@
     "link": "line-dynamic"
   },
   {
+    "link": "resize-full",
+    "title": "Resize Full",
+    "template": "resize-full"
+  },
+  {
+    "title": "Resize Table",
+    "link": "resize-table",
+    "template": "resize-table"
+  },
+  {
+    "title": "Resize Matrix",
+    "link": "resize-matrix",
+    "template": "resize-matrix"
+  },
+  {
     "title": "LineUp",
     "link": "lineup"
   },
@@ -62,6 +81,10 @@
   {
     "title": "UpSet",
     "link": "upset"
+  },
+  {
+    "title": "UpSet Alternate Sets",
+    "link": "upset-alternate"
   },
   {
     "title": "SentenTree",
@@ -80,11 +103,19 @@
     "link": "scatter"
   },
   {
+    "title": "Scatter Plot (solid dots)",
+    "link": "scatter-solid"
+  },
+  {
     "title": "Scatter Plot Matrix",
     "link": "scattermatrix"
   },
   {
     "title": "Survival Plot",
     "link": "survival"
+  },
+  {
+    "title": "Serialization",
+    "link": "serialize"
   }
 ]

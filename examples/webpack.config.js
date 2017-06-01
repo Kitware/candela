@@ -56,13 +56,11 @@ module.exports = candelaLoaders({
       {
         test: /\.jade$/,
         loader: 'jade-loader',
-        include: __dirname + '/line-dynamic',
         exclude: /node_modules/
       },
       {
         test: /\.styl/,
         loaders: ['style-loader', 'css-loader', 'stylus-loader'],
-        include: __dirname + '/line-dynamic',
         exclude: /node_modules/
       }
     ]
