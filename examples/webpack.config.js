@@ -4,7 +4,7 @@ var path = require('path');
 
 var HtmlPlugin = require('html-webpack-plugin');
 
-var examples = require('./examples.json');
+var examples = require('./index.json');
 
 var entryPoints = examples.map(function (ex) {
   return {
