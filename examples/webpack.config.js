@@ -29,7 +29,7 @@ var htmlPlugins = examples.map(function (ex) {
 module.exports = candelaLoaders({
   entry: entry,
   output: {
-    path: 'build',
+    path: '../build/examples',
     filename: '[name]/index.js'
   },
   plugins: htmlPlugins.concat([
