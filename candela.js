@@ -1,7 +1,8 @@
-import components from './components';
 import VisComponent from './VisComponent';
 
-function registerComponent (name, component) {
+let components = {};
+
+const registerComponent = (name, component) => {
   if (components.hasOwnProperty(name)) {
     throw new Error('fatal: component "' + name + '" already exists');
   }
