@@ -49,6 +49,10 @@
     "telegraph-events": "^1.0.3",
     "underscore": "^1.8.3",
     "url-loader": "^0.5.8",
-    "vega": "^2.4.2"
+    "vega": "^2.4.2",
+    "webpack": "^1.15.0"
+  },
+  "scripts": {
+    "build": "webpack"
   }
 }
