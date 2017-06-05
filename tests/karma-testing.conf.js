@@ -1,10 +1,10 @@
 var karmaConfig = require('./karma-base.conf');
-var webpackConfig = require('./webpack-testing.config');
+var webpackConfig = require('./webpack.config');
 
 karmaConfig.webpack = webpackConfig;
 
 karmaConfig.reporters = [
-  // 'quiet'
+  'quiet'
 ];
 
 module.exports = function (config) {

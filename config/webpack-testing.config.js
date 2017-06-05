@@ -14,11 +14,11 @@ config.node = {
   fs: 'empty'
 };
 
-config.module.loaders.forEach(function (loader) {
-  if (loader.loader !== 'babel-loader' && loader.tag !== 'glo') {
-    delete loader.include;
-  }
-});
+// config.module.loaders.forEach(function (loader) {
+  // if (loader.loader !== 'babel-loader' && loader.tag !== 'glo') {
+    // delete loader.include;
+  // }
+// });
 
 delete config.plugins;
 
