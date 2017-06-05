@@ -11,14 +11,5 @@ module.exports = candelaWebpack({
   output: {
     path: 'build',
       filename: 'tests.js'
-  },
-  module: {
-    loaders: [
-      {
-        test: /\.css/,
-        loaders: ['style-loader', 'css-loader'],
-        include: /node_modules\/nvd3/,
-      },
-    ]
   }
 });
