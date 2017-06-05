@@ -100,7 +100,7 @@ module.exports = function (config, basePath, options) {
     {
       test: /\.css$/,
       loaders: ['style-loader', 'css-loader'],
-      include: addNMPath('lineupjs', includePaths)
+      include: addNMPath(['lineupjs', 'nvd3'], includePaths)
     },
     {
       test: /\.scss$/,

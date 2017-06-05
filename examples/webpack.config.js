@@ -70,7 +70,7 @@ module.exports = candelaLoaders({
       {
         test: /\.css/,
         loaders: ['style-loader', 'css-loader'],
-        include: /node_modules\/nvd3/,
+        exclude: /node_modules/
       },
       {
         test: /\.js$/,
