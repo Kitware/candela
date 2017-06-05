@@ -56,7 +56,7 @@ test('Structure and content of exported Candela library object', t => {
 
 test('Structure and content of unminified Candela library file', t => {
   try {
-    let candelaBuilt = require('../build/candela/candela.js');
+    let candelaBuilt = require('../dist/candela.js');
     t.ok(candelaBuilt, 'The built candela.js file exists');
 
     if (candelaBuilt) {

@@ -3,8 +3,8 @@
 // the would-be loop instead.
 
 var context;
-context = require.context('./components', true, /^((?!image).)*\.js$/);
-context.keys().forEach(context);
+//context = require.context('./packages', true, /^((?!image).)*\.js$/);
+//context.keys().forEach(context);
 
 context = require.context('./test', true, /^((?!image).)*\.js$/);
 context.keys().forEach(context);

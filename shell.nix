@@ -43,6 +43,7 @@ in stdenv.mkDerivation {
     electron
     git
     nodejs-7_x
+    phantomjs
     pkgconfig
     python2
   ] ++ libs;

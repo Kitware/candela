@@ -1,18 +1,16 @@
 function _includePaths (basePath) {
   if (basePath) {
     return [
-      basePath + '/app',
       basePath + '/candela.js',
-      basePath + '/components',
-      basePath + '/shim',
       basePath + '/test',
       basePath + '/util',
-      basePath + '/VisComponent'
+      basePath + '/VisComponent',
+      basePath + '/packages'
     ];
   } else {
     return [
       /\/node_modules\/candela\//,
-      /\/node_modules\/candela-.*\//,
+      /\/node_modules\/candela-/,
     ];
   }
 }
