@@ -6,13 +6,7 @@ module.exports = {
   browsers: [
     'PhantomJS'
   ],
-  frameworks: [
-    'tap'
-  ],
   files: [
     'build/tests.js'
-  ],
-  webpackServer: {
-    noInfo: true
-  }
+  ]
 };
