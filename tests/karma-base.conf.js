@@ -3,6 +3,9 @@ module.exports = {
   client: {
     captureConsole: true
   },
+  frameworks: [
+    'tap'
+  ],
   browsers: [
     'PhantomJS'
   ],

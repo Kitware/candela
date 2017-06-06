@@ -33,6 +33,7 @@
     "karma": "^0.13.22",
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-quiet-reporter": "^0.1.2",
+    "karma-tap": "^1.0.4",
     "less": "^2.7.2",
     "lineupjs": "^1.1.1",
     "md5": "^2.2.1",
