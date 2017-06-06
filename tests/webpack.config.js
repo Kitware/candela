@@ -6,9 +6,8 @@ module.exports = candelaWebpack({
   },
   output: {
     path: 'build',
-      filename: 'tests.js'
+    filename: 'tests.js'
   },
-  devtool: 'inline-source-map',
   node: {
     fs: 'empty'
   }
