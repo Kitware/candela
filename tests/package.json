@@ -3,14 +3,17 @@
   "version": "0.0.0",
   "description": "Candela unit tests",
   "scripts": {
-    "build": "webpack",
-    "test": "karma start karma-testing.conf.js | grep \"^'.*'$\" | sed \"s/^'\\(.*\\)'$/\\1/\" | tap-spec"
+    "build:unit": "webpack",
+    "build:coverage": "webpack --config webpack-coverage.config.js",
+    "test:unit": "karma start --log-level disable karma-testing.conf.js | sed \"s/^'\\(.*\\)'$/\\1/\" | tap-spec",
+    "test:coverage": "karma start karma-coverage.conf.js"
   },
   "author": "Kitware Inc.",
   "license": "Apache-2.0",
   "devDependencies": {
     "UpSet": "git+https://github.com/jeffbaumes/upset#no-global-vars",
     "babel-core": "^6.24.1",
+    "babel-istanbul-loader": "^0.1.0",
     "babel-loader": "^7.0.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-es2015": "^6.24.1",
@@ -31,6 +34,7 @@
     "jquery": "^2.2.0",
     "json-loader": "^0.5.4",
     "karma": "^0.13.22",
+    "karma-coverage": "^0.5.5",
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-quiet-reporter": "^0.1.2",
     "karma-tap": "^1.0.4",
