@@ -1,4 +1,0 @@
-python-dateutil
-ijson
-PyExecJS
--e git://github.com/girder/girder_worker.git@b810e37dc513d4bcd14d31ba6fb8b4daeffa3e61#egg=girder_worker

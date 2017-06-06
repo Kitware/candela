@@ -1,8 +1,0 @@
-web_client/extra/
-web_client/lib/
-*.pyc
-*.ai
-*.pdf
-.vagrant
-ansible/**/site.retry
-ga.js
