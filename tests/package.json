@@ -1,7 +1,7 @@
 {
   "name": "tests",
   "version": "0.0.0",
-  "description": "Candela unit tests",
+  "description": "Candela unit/coverage/image tests",
   "scripts": {
     "build:unit": "webpack",
     "build:coverage": "webpack --config webpack-coverage.config.js",
