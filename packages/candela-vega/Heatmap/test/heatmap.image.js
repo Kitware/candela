@@ -1,4 +1,4 @@
-import imageTest from '../../../util/imageTest';
+import imageTest from '../../../../util/imageTest';
 
 imageTest({
   name: 'heatmap',
