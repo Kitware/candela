@@ -6,7 +6,8 @@
     "build:unit": "webpack",
     "build:coverage": "webpack --config webpack-coverage.config.js",
     "test:unit": "karma start --log-level disable karma-testing.conf.js | sed \"s/^'\\(.*\\)'$/\\1/\" | tap-spec",
-    "test:coverage": "karma start karma-coverage.conf.js"
+    "test:coverage": "karma start karma-coverage.conf.js",
+    "test:image": "result=true; npm run test:image:server:down; npm run test:image:server && find components/ -name '*.image.js' | xargs -n 1 babel-node --presets es2015 || result=false; npm run test:image:server:down; ${result}"
   },
   "author": "Kitware Inc.",
   "license": "Apache-2.0",
