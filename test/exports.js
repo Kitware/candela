@@ -2,36 +2,6 @@ import test from 'tape-catch';
 
 import candela from '../candela';
 
-const componentList = [
-  'BarChart',
-  'BoxPlot',
-  'BulletChart',
-  'GanttChart',
-  'Geo',
-  'GeoDots',
-  'Glo',
-  'Heatmap',
-  'Histogram',
-  'LineChart',
-  'LineUp',
-  'OnSet',
-  'ScatterPlot',
-  'ScatterPlotMatrix',
-  'SentenTree',
-  'SimilarityGraph',
-  'SurvivalPlot',
-  'TrackerDash',
-  'TreeHeatmap',
-  'UpSet'
-];
-
-function componentExists (t, cd, name) {
-  const component = cd.components[name];
-
-  t.ok(component, `candela.components.${name} exists`);
-  t.equal(typeof component, 'function', `candela.components.${name} is a function`);
-}
-
 function structureTests (t, cd) {
   t.ok(cd, 'candela exists');
 
@@ -41,12 +11,6 @@ function structureTests (t, cd) {
   t.equal(typeof cd.VisComponent.VisComponent, 'function', 'candela.VisComponent.VisComponent is a function');
 
   t.ok(cd.components, 'candela.components exists');
-
-  t.equal(Object.keys(cd.components).length, componentList.length, `candela.components contains ${componentList.length} components`);
-
-  componentList.forEach(name => {
-    componentExists(t, cd, name);
-  });
 }
 
 test('Structure and content of exported Candela library object', t => {
