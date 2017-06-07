@@ -2,7 +2,7 @@ import VisComponent from './VisComponent';
 
 let components = {};
 
-const registerComponent = (name, component) => {
+const register = (name, component) => {
   if (components.hasOwnProperty(name)) {
     throw new Error('fatal: component "' + name + '" already exists');
   }
@@ -10,9 +10,21 @@ const registerComponent = (name, component) => {
   components[name] = component;
 }
 
+const unregister = (name) => {
+  if (components.hasOwnProperty(name)) {
+    delete components[name];
+  }
+}
+
+const unregisterAll = () => {
+  Object.keys(components).forEach(unregister);
+};
+
 module.exports = {
   components,
-  registerComponent,
+  register,
+  unregister,
+  unregisterAll,
   VisComponent: {
     VisComponent
   }
