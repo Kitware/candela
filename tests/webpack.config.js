@@ -5,8 +5,8 @@ module.exports = candelaWebpack({
     tests: './tests.js'
   },
   output: {
-    path: 'build',
-    filename: 'tests.js'
+    path: '../build/tests',
+    filename: 'unit.js'
   },
   node: {
     fs: 'empty'

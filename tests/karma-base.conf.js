@@ -10,6 +10,6 @@ module.exports = {
     'PhantomJS'
   ],
   files: [
-    'build/tests.js'
+    '../build/tests/unit.js'
   ]
 };

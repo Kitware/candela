@@ -1,6 +1,6 @@
 var karmaConfig = require('./karma-base.conf');
 
-karmaConfig.files[0] = 'build/coverage.js';
+karmaConfig.files[0] = '../build/tests/coverage.js';
 
 karmaConfig.reporters = [
   'coverage'
@@ -13,12 +13,12 @@ karmaConfig.coverageReporter = {
     },
     {
       type: 'html',
-      dir: 'coverage/',
+      dir: '../build/coverage/',
       subdir: 'html'
     },
     {
       type: 'lcovonly',
-      dir: 'coverage',
+      dir: '../build/coverage',
       subdir: 'lcov'
     }
   ]
