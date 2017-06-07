@@ -8,4 +8,4 @@ const components = [
   GeoDots
 ];
 
-components.forEach(entry => candela.registerComponent(entry.name, entry));
+components.forEach(entry => candela.register(entry.name, entry));
