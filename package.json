@@ -15,7 +15,7 @@
     "test:image:raw": "result=true; npm run test:image:server:down; npm run test:image:server:up && find packages/ -name '*.image.js' | xargs -n 1 babel-node || result=false; npm run test:image:server:down; ${result}",
     "test:image:server:up": "sh script/test-server-up.sh >.server.log",
     "test:image:server:down": "sh script/test-server-down.sh",
-    "build:test:coverage": "cd tests; webpack --config webpack-coverage.config.js",
+    "build:test:coverage": "cd tests; CANDELA_COVERAGE=1 webpack",
     "test:coverage": "karma start tests/karma-coverage.conf.js",
     "coverage:report": "http-server build/coverage/html -p ${PORT-3000}",
     "coverage:codecov": "cat build/coverage/lcov/lcov.info | codecov",
