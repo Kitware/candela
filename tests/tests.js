@@ -3,14 +3,14 @@
 // the would-be loop instead.
 
 var context;
-context = require.context('./node_modules/candela/packages', true, /^((?!image).)*\.js$/);
+context = require.context('../node_modules/candela/packages', true, /^((?!image).)*\.js$/);
 context.keys().forEach(context);
 
-context = require.context('./node_modules/candela/test', true, /^((?!image).)*\.js$/);
+context = require.context('../node_modules/candela/test', true, /^((?!image).)*\.js$/);
 context.keys().forEach(context);
 
-context = require.context('./node_modules/candela/util', true, /^((?!image).)*\.js$/);
+context = require.context('../node_modules/candela/util', true, /^((?!image).)*\.js$/);
 context.keys().forEach(context);
 
-context = require.context('./node_modules/candela/VisComponent', true, /^((?!image).)*\.js$/);
+context = require.context('../node_modules/candela/VisComponent', true, /^((?!image).)*\.js$/);
 context.keys().forEach(context);
