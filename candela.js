@@ -2,7 +2,11 @@ import VisComponent from './VisComponent';
 
 let components = {};
 
-const register = (name, component) => {
+const register = (component, name) => {
+  if (name === undefined) {
+    name = component.name;
+  }
+
   if (components.hasOwnProperty(name)) {
     throw new Error('fatal: component "' + name + '" already exists');
   }
@@ -28,7 +32,7 @@ const registerMixin = (mixin, name) => {
   }
 
   if (mixins.hasOwnProperty(name)) {
-    throw new Error('fatal: component "' + name + '" already exists');
+    throw new Error('fatal: mixin "' + name + '" already exists');
   }
 
   mixins[name] = mixin;
