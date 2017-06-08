@@ -11,7 +11,7 @@ context.keys().forEach(function (key) {
   }
 });
 
-context = require.context('../test', true, /^((?!image).)*\.js$/);
+context = require.context('..', true, /^exportsTest\.js$/);
 context.keys().forEach(context);
 
 context = require.context('../util', true, /^((?!image).)*\.js$/);
