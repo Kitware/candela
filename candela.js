@@ -25,7 +25,5 @@ module.exports = {
   register,
   unregister,
   unregisterAll,
-  VisComponent: {
-    VisComponent
-  }
+  VisComponent
 };
