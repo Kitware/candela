@@ -1,11 +1,6 @@
-var webpack = require('webpack');
 var path = require('path');
 
-var CleanPlugin = require('clean-webpack-plugin');
-
-var candelaWebpack = require('../webpack');
-
-__dirname = path.resolve(__dirname, '..');
+var candelaWebpack = require('./webpack');
 
 var externals = {};
 var external_packages = [
@@ -34,22 +29,23 @@ var external_packages = [
   externals[ext] = true;
 });
 
-module.exports = candelaWebpack({
-  devtool: 'source-map',
-  __dirname: __dirname,
+var config = {
   entry: {
     candela: './candela.js',
   },
   output: {
-    library: '[name]',
+    library: 'candela',
     libraryTarget: 'umd',
-    path: 'build',
-    filename: '[name]/[name].js'
+    path: 'dist',
+    filename: null
   },
-  externals: externals,
-  plugins: [
-    new CleanPlugin([path.resolve(__dirname, 'build/candela')], {
-      root: __dirname
-    }),
-  ]
-}, __dirname);
+  externals: externals
+};
+
+if (process.env.CANDELA_MINIFY) {
+  config.output.filename = 'candela.min.js';
+} else {
+  config.output.filename = 'candela.js';
+}
+
+module.exports = candelaWebpack(config, path.resolve('.'));

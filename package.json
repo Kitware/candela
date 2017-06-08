@@ -4,7 +4,7 @@
   "description": "Visualization components for the web",
   "main": "dist/candela.js",
   "scripts": {
-    "build": "webpack --config config/webpack.config.js",
+    "build": "webpack; CANDELA_MINIFY=1 webpack -p",
     "build:examples": "cd examples; webpack",
     "examples": "http-server build/examples -p ${PORT-3000}",
     "build:test:unit": "cd tests; webpack",
@@ -24,7 +24,6 @@
     "build:docs": "sphinx-build -a -b html docs/ build/docs/",
     "test:resonantlab:unit": "npm run test:resonantlab:unit:raw | tap-spec",
     "test:resonantlab:unit:raw": "for t in `ls build/resonantlab/*.tests.js`; do node $t; done",
-    "dist": "webpack --config config/webpack-production.config.js && webpack --config config/webpack-production-minify.config.js",
     "lint": "semistandard | snazzy",
     "lint:pycandela": "flake8 --config python/pycandela/flake8.cfg python/pycandela",
     "docs": "http-server build/docs -p ${PORT-3000}",
