@@ -1,6 +1,6 @@
 import VisComponent from 'candela/VisComponent';
-import Events from 'candela/VisComponent/mixin/Events';
-import VegaChart from 'candela/VisComponent/mixin/VegaChart';
+import Events from 'candela/packages/candela-mixin/Events';
+import VegaChart from 'candela/packages/candela-mixin/VegaChart';
 
 import spec from './spec.json';
 
