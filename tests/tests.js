@@ -1,16 +1,21 @@
-// For some reason, we can't store the paths in a list variable and then
-// iterate. It sounds crazy but it just won't work. Hence, we manually unroll
-// the would-be loop instead.
-
 var context;
-context = require.context('../node_modules/candela/packages', true, /^((?!image).)*\.js$/);
+context = require.context('../packages', true, /^((?!image).)*\.js$/);
+context.keys().forEach(function (key) {
+  // This function avoids importing the micropackage importers at this point,
+  // since the JavaScript runtime seems to "cache" packages, so the registration
+  // actions in these micropackages will not be repeated when the testing module
+  // imports them later.
+  var splits = key.split('/');
+  if (!(splits.length === 3 && splits[2] === 'index.js')) {
+    context(key);
+  }
+});
+
+context = require.context('../test', true, /^((?!image).)*\.js$/);
 context.keys().forEach(context);
 
-context = require.context('../node_modules/candela/test', true, /^((?!image).)*\.js$/);
+context = require.context('../util', true, /^((?!image).)*\.js$/);
 context.keys().forEach(context);
 
-context = require.context('../node_modules/candela/util', true, /^((?!image).)*\.js$/);
-context.keys().forEach(context);
-
-context = require.context('../node_modules/candela/VisComponent', true, /^((?!image).)*\.js$/);
+context = require.context('../VisComponent', true, /^((?!image).)*\.js$/);
 context.keys().forEach(context);

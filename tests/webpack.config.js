@@ -1,3 +1,5 @@
+var path = require('path');
+
 var candelaWebpack = require('../webpack');
 
 var config = {
@@ -7,6 +9,11 @@ var config = {
   output: {
     path: '../build/tests',
     filename: null
+  },
+  resolve: {
+    alias: {
+      candela: path.resolve('..')
+    }
   },
   module: null,
   node: {
@@ -21,7 +28,11 @@ if (process.env.CANDELA_COVERAGE) {
       {
         test: /\.js$/,
         include: [
-          /node_modules\/candela\//
+          path.resolve('../candela.js'),
+          path.resolve('../test'),
+          path.resolve('../util'),
+          path.resolve('../VisComponent'),
+          path.resolve('../packages')
         ],
         exclude: /\/test\//,
         loader: 'babel-istanbul-loader',
@@ -36,4 +47,4 @@ if (process.env.CANDELA_COVERAGE) {
   delete config.module;
 }
 
-module.exports = candelaWebpack(config);
+module.exports = candelaWebpack(config, path.resolve('..'));

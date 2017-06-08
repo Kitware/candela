@@ -1,4 +1,4 @@
-import exportTest from 'candela/util/exportTest';
+import exportTest from '../../../util/exportTest';
 
 exportTest('candela-treeheatmap', [
   'TreeHeatmap'
