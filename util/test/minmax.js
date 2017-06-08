@@ -1,6 +1,6 @@
 import test from 'tape-catch';
 
-import { minmax } from '../util';
+import { minmax } from '..';
 
 test('minmax() exists', t => {
   t.ok(minmax, 'minmax was imported successfully');
