@@ -62,6 +62,7 @@
     "candela-geojs": "file:./packages/candela-geojs",
     "candela-glo": "file:./packages/candela-glo",
     "candela-lineup": "file:./packages/candela-lineup",
+    "candela-mixin": "file:./packages/candela-mixin",
     "candela-onset": "file:./packages/candela-onset",
     "candela-sententree": "file:./packages/candela-sententree",
     "candela-similaritygraph": "file:./packages/candela-similaritygraph",
@@ -143,10 +144,8 @@
     "css-loader": "^0.23.1",
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
-    "javascript-detect-element-resize": "^0.5.3",
     "style-loader": "^0.13.0",
     "stylus-loader": "^2.0.0",
-    "telegraph-events": "^1.0.3",
     "url-loader": "^0.5.7"
   },
   "config": {

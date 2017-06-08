@@ -13,6 +13,7 @@ var external_packages = [
   'datalib',
   'font-awesome-webpack',
   'geojs',
+  'javascript-detect-element-resize/detect-element-resize',
   'jquery',
   'lineupjs',
   'lineupjs/build/style.css',

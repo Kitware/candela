@@ -1,7 +1,7 @@
 import test from 'tape-catch';
 
-import VisComponent from '..';
-import Events from '../mixin/Events';
+import VisComponent from 'candela/VisComponent';
+import Events from '../Events';
 
 test('Events mixin for VisComponent', t => {
   let EventedVisComponent = class extends Events(VisComponent) {

@@ -1,5 +1,5 @@
 import VisComponent from 'candela/VisComponent';
-import VegaChart from 'candela/VisComponent/mixin/VegaChart';
+import VegaChart from 'candela/packages/candela-mixin/VegaChart';
 import spec from './spec.json';
 
 export default class Histogram extends VegaChart(VisComponent, spec) {

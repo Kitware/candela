@@ -20,10 +20,38 @@ const unregisterAll = () => {
   Object.keys(components).forEach(unregister);
 };
 
+let mixins = {};
+
+const registerMixin = (mixin, name) => {
+  if (name === undefined) {
+    name = mixin.name;
+  }
+
+  if (mixins.hasOwnProperty(name)) {
+    throw new Error('fatal: component "' + name + '" already exists');
+  }
+
+  mixins[name] = mixin;
+};
+
+const unregisterMixin = (name) => {
+  if (mixins.hasOwnProperty(name)) {
+    delete mixins[name];
+  }
+};
+
+const unregisterMixinAll = () => {
+  Object.keys(mixins).forEach(unregister);
+};
+
 module.exports = {
   components,
   register,
   unregister,
   unregisterAll,
+  mixins,
+  registerMixin,
+  unregisterMixin,
+  unregisterMixinAll,
   VisComponent
 };
