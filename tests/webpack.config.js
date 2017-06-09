@@ -55,7 +55,7 @@ if (process.env.CANDELA_COVERAGE) {
           path.resolve('../test'),
           path.resolve('../util'),
           path.resolve('../VisComponent'),
-          path.resolve('../packages')
+          path.resolve('../plugins')
         ],
         exclude: /\/test\//,
         loader: 'babel-istanbul-loader',

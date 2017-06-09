@@ -1,5 +1,5 @@
 var context;
-context = require.context('../packages', true, /^((?!image).)*\.js$/);
+context = require.context('../plugins', true, /^((?!image).)*\.js$/);
 context.keys().forEach(function (key) {
   // This function avoids importing the micropackage importers at this point,
   // since the JavaScript runtime seems to "cache" packages, so the registration

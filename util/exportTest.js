@@ -6,10 +6,10 @@ import candela from '..';
 // top-level of any node_modules package starting with "candela-". This is
 // needed to allow the exportTest() function to accept a package name at
 // runtime.
-const ctx = require.context('../packages', true, /\/candela-[^\/]*\/index\.js$/);
+const ctx = require.context('../plugins', true, /\/[^\/]*\/index\.js$/);
 
 export default function exportTest (packageName, components) {
-  test(`Contents of ${packageName} micropackage`, t => {
+  test(`Contents of ${packageName} plugin`, t => {
     candela.unregisterAll();
     ctx(`./${packageName}/index.js`);
 
