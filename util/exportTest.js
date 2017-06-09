@@ -1,6 +1,6 @@
 import test from 'tape-catch';
 
-import candela from 'candela';
+import candela from '..';
 
 // Create a require context consisting only of index.js files found in the
 // top-level of any node_modules package starting with "candela-". This is
