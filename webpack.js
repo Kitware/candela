@@ -5,7 +5,7 @@ function _includePaths (basePath) {
       basePath + '/test',
       basePath + '/util',
       basePath + '/VisComponent',
-      basePath + '/packages'
+      basePath + '/plugins'
     ];
   } else {
     return [
