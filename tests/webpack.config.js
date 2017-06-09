@@ -1,6 +1,26 @@
 var path = require('path');
+var fs = require('fs');
+
+var webpack = require('webpack');
 
 var candelaWebpack = require('../webpack');
+
+var defs = {
+  CANDELA_JS_MISSING: 'false',
+  CANDELA_MIN_JS_MISSING: 'false'
+};
+
+try {
+  fs.accessSync('../dist/candela.js');
+} catch (e) {
+  defs.CANDELA_JS_MISSING = 'true';
+}
+
+try {
+  fs.accessSync('../dist/candela.min.js');
+} catch (e) {
+  defs.CANDELA_MIN_JS_MISSING = 'true';
+}
 
 var config = {
   entry: {
@@ -15,6 +35,9 @@ var config = {
       candela: path.resolve('..')
     }
   },
+  plugins: [
+    new webpack.DefinePlugin(defs)
+  ],
   module: null,
   node: {
     fs: 'empty'

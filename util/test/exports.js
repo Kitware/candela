@@ -1,6 +1,6 @@
 import test from 'tape-catch';
 
-import candela from '../../candela';
+import candela from '../..';
 
 function structureTests (t, cd) {
   t.ok(cd, 'candela exists');
@@ -41,15 +41,30 @@ test('Structure and content of exported Candela library object', t => {
 });
 
 test('Structure and content of unminified Candela library file', t => {
-  try {
+  if (!CANDELA_JS_MISSING) {
     let candelaBuilt = require('../../dist/candela.js');
     t.ok(candelaBuilt, 'The built candela.js file exists');
 
     if (candelaBuilt) {
       structureTests(t, candelaBuilt);
     }
-  } catch (e) {
-    t.skip('Built candela.js file does not exist');
+  } else {
+    t.fail('Built candela.js file does not exist (run `npm run build` to build it)');
+  }
+
+  t.end();
+});
+
+test('Structure and content of minified Candela library file', t => {
+  if (!CANDELA_MIN_JS_MISSING) {
+    let candelaBuilt = require('../../dist/candela.min.js');
+    t.ok(candelaBuilt, 'The built candela.min.js file exists');
+
+    if (candelaBuilt) {
+      structureTests(t, candelaBuilt);
+    }
+  } else {
+    t.fail('Built candela.min.js file does not exist (run `npm run build` to build it)');
   }
 
   t.end();

@@ -32,7 +32,7 @@ var external_packages = [
 
 var config = {
   entry: {
-    candela: './candela.js',
+    candela: './index.js',
   },
   output: {
     library: 'candela',
