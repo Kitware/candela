@@ -5,22 +5,42 @@ var webpack = require('webpack');
 
 var candelaWebpack = require('../webpack');
 
-var defs = {
-  CANDELA_JS_MISSING: 'false',
-  CANDELA_MIN_JS_MISSING: 'false'
-};
+var defs = (() => {
+  var filebase = [
+    'candela',
+    'glo',
+    'mixin',
+    'sententree',
+    'trackerdash',
+    'upset',
+    'geojs',
+    'lineup',
+    'onset',
+    'similaritygraph',
+    'treeheatmap',
+    'vega'
+  ];
 
-try {
-  fs.accessSync('../dist/candela.js');
-} catch (e) {
-  defs.CANDELA_JS_MISSING = 'true';
-}
+  var defs = {};
 
-try {
-  fs.accessSync('../dist/candela.min.js');
-} catch (e) {
-  defs.CANDELA_MIN_JS_MISSING = 'true';
-}
+  filebase.forEach(fb => {
+    try {
+      fs.accessSync(`../dist/${fb}.js`);
+      defs[`${fb.toUpperCase()}_JS`] = 'true';
+    } catch (e) {
+      defs[`${fb.toUpperCase()}_JS`] = 'false';
+    }
+
+    try {
+      fs.accessSync(`../dist/${fb}.min.js`);
+      defs[`${fb.toUpperCase()}_MIN_JS`] = 'true';
+    } catch (e) {
+      defs[`${fb.toUpperCase()}_MIN_JS`] = 'false';
+    }
+  });
+
+  return defs;
+})();
 
 var config = {
   entry: {

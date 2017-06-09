@@ -1,5 +1,7 @@
-import exportTest from '../../../util/exportTest';
+import { exportTest } from '../../../util/exportTest';
 
-exportTest('lineup', [
+export const content = [
   'LineUp'
-]);
+];
+
+exportTest('lineup', content);

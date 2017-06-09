@@ -1,5 +1,7 @@
-import exportTest from '../../../util/exportTest';
+import { exportTest } from '../../../util/exportTest';
 
-exportTest('upset', [
+export const content = [
   'UpSet'
-]);
+];
+
+exportTest('upset', content);

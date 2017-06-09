@@ -1,9 +1,11 @@
-import exportMixinTest from '../../../util/exportMixinTest';
+import { exportMixinTest } from '../../../util/exportTest';
 
-exportMixinTest('mixin', [
+export const content = [
   'AutoResize',
   'Events',
   'InitSize',
   'Resize',
   'VegaChart'
-]);
+];
+
+exportMixinTest('mixin', content);

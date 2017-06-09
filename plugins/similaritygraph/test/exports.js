@@ -1,5 +1,7 @@
-import exportTest from '../../../util/exportTest';
+import { exportTest } from '../../../util/exportTest';
 
-exportTest('similaritygraph', [
+export const content = [
   'SimilarityGraph'
-]);
+];
+
+exportTest('similaritygraph', content);

@@ -11,7 +11,7 @@ import ScatterPlot from './ScatterPlot';
 import ScatterPlotMatrix from './ScatterPlotMatrix';
 import SurvivalPlot from './SurvivalPlot';
 
-const components = [
+const components = {
   BarChart,
   BoxPlot,
   BulletChart,
@@ -22,6 +22,6 @@ const components = [
   ScatterPlot,
   ScatterPlotMatrix,
   SurvivalPlot
-];
+};
 
-components.forEach(entry => candela.register(entry));
+Object.entries(components).forEach(entry => candela.register(entry[1], entry[0]));

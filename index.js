@@ -45,7 +45,7 @@ const unregisterMixin = (name) => {
 };
 
 const unregisterMixinAll = () => {
-  Object.keys(mixins).forEach(unregister);
+  Object.keys(mixins).forEach(unregisterMixin);
 };
 
 module.exports = {
