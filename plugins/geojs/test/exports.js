@@ -1,6 +1,8 @@
-import exportTest from '../../../util/exportTest';
+import { exportTest } from '../../../util/exportTest';
 
-exportTest('geojs', [
+export const content = [
   'Geo',
   'GeoDots'
-]);
+];
+
+exportTest('geojs', content);

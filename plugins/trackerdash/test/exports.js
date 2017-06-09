@@ -1,5 +1,7 @@
-import exportTest from '../../../util/exportTest';
+import { exportTest } from '../../../util/exportTest';
 
-exportTest('trackerdash', [
+export const content = [
   'TrackerDash'
-]);
+];
+
+exportTest('trackerdash', content);

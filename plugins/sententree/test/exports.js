@@ -1,5 +1,7 @@
-import exportTest from '../../../util/exportTest';
+import { exportTest } from '../../../util/exportTest';
 
-exportTest('sententree', [
+export const content = [
   'SentenTree'
-]);
+];
+
+exportTest('sententree', content);

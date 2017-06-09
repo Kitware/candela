@@ -1,5 +1,7 @@
-import exportTest from '../../../util/exportTest';
+import { exportTest } from '../../../util/exportTest';
 
-exportTest('treeheatmap', [
+export const content = [
   'TreeHeatmap'
-]);
+];
+
+exportTest('treeheatmap', content);
