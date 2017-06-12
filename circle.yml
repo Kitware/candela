@@ -18,6 +18,8 @@ compile:
   override:
     - npm run build
     - npm run build:examples
+    - npm run build:test:unit
+    - npm run build:test:coverage
 
 test:
   override:
@@ -34,17 +36,20 @@ test:
           CANDELA_DUMP_IMAGE: all
 
     # Coverage tests.
-    - npm run cover
-    - npm run codecov
+    - npm run test:coverage
+    - npm run test:coverage:codecov
 
   post:
     # Gather up the testing images as build artifacts.
     - mkdir $CIRCLE_ARTIFACTS/test_images
-    - find components -name '*.png' | xargs -I xxx cp xxx $CIRCLE_ARTIFACTS/test_images
+    - find plugins -name '*.png' | xargs -I xxx cp xxx $CIRCLE_ARTIFACTS/test_images
+
+    # Copy the html coverage report to the artifacts directory as well.
+    - mkdir $CIRCLE_ARTIFACTS/coverage
+    - cp -r build/coverage/html $CIRCLE_ARTIFACTS/coverage
 
 deployment:
   semantic-release:
     branch: master
     commands:
-      - npm run dist
       - npm run semantic-release || true
