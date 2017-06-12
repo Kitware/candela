@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela-sententree';
+import 'candela/dist/sententree.min.js';
 
 import { goal } from '../datasets';
 import showComponent from '../util/showComponent';

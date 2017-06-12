@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela-geojs';
+import 'candela/dist/geojs.min.js';
 
 import showComponent from '../util/showComponent';
 
