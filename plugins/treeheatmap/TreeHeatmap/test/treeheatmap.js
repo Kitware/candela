@@ -21,7 +21,6 @@ test('TreeHeatmap component', t => {
   vis = new TreeHeatmap(el, {data: [{_id: 0, a: 0}]});
   vis.render();
   t.equal(el.childNodes.length, 1, 'single row and column should produce something');
-  console.log(el.innerHTML);
   let single = document.createElement('div');
 
   single.innerHTML = `<svg width="400px" height="400px">
@@ -47,7 +46,6 @@ test('TreeHeatmap component', t => {
     ]});
   vis.render();
   t.equal(el.childNodes.length, 1, 'two rows and columns should produce something');
-  console.log(el.innerHTML);
   let two = document.createElement('div');
 
   two.innerHTML = `<svg width="400px" height="400px">
