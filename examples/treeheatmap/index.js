@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela-treeheatmap';
+import 'candela/dist/treeheatmap.min.js';
 
 import { heatmap } from '../datasets';
 import showComponent from '../util/showComponent';

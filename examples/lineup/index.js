@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela-lineup';
+import 'candela/dist/lineup.min.js';
 
 import { iris } from '../datasets';
 import showComponent from '../util/showComponent';

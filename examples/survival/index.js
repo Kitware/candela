@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela-vega';
+import 'candela/dist/vega.min.js';
 
 import { hmohiv } from '../datasets';
 import showComponent from '../util/showComponent';

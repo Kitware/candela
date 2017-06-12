@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela-similaritygraph';
+import 'candela/dist/similaritygraph.min.js';
 
 import { bigram } from '../datasets';
 import showComponent from '../util/showComponent';

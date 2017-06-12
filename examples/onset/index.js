@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela-onset';
+import 'candela/dist/onset.min.js';
 
 import { simpsons } from '../datasets';
 import showComponent from '../util/showComponent';

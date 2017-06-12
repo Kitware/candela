@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela-glo';
+import 'candela/dist/glo.min.js';
 
 import { lesmis } from '../datasets';
 import showComponent from '../util/showComponent';

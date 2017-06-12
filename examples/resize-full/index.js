@@ -1,7 +1,6 @@
 import candela from 'candela';
-import 'candela-vega';
-import AutoResize from 'candela/VisComponent/mixin/AutoResize';
-import InitSize from 'candela/VisComponent/mixin/InitSize';
+import 'candela/dist/vega.min.js';
+import 'candela/dist/mixin.min.js';
 
 import html from './index.jade';
 import './index.styl';
@@ -15,7 +14,7 @@ window.onload = () => {
   document.body.innerHTML = html();
 
   let el = document.getElementById('vis-element');
-  let vis = new (AutoResize(InitSize(candela.components.ScatterPlot)))(el, {
+  let vis = new (candela.mixins.AutoResize(candela.mixins.InitSize(candela.components.ScatterPlot)))(el, {
     data,
     x: 'x',
     y: 'y'
