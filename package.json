@@ -12,7 +12,7 @@
     "test:unit:raw": "cd tests; karma start",
     "test:unit:debug": "cd tests; karma start --log-level debug",
     "test:image": "npm run test:image:raw | tap-spec",
-    "test:image:raw": "result=true; npm run test:image:server:down; npm run test:image:server:up && find packages/ -name '*.image.js' | xargs -n 1 babel-node || result=false; npm run test:image:server:down; ${result}",
+    "test:image:raw": "result=true; npm run test:image:server:down; npm run test:image:server:up && find plugins/ -name '*.image.js' | xargs -n 1 babel-node || result=false; npm run test:image:server:down; ${result}",
     "test:image:server:up": "sh script/test-server-up.sh >.server.log",
     "test:image:server:down": "sh script/test-server-down.sh",
     "build:test:coverage": "cd tests; CANDELA_COVERAGE=1 webpack",
