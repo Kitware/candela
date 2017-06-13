@@ -16,8 +16,15 @@ dependencies:
 
 compile:
   override:
+    # Build Candela and "install" it as a node module.
     - npm run build
+    - rm -rf node_modules/candela
+    - npm install
+
+    # Build the examples.
     - npm run build:examples
+
+    # Build the unit test and coverage test bundles.
     - npm run build:test:unit
     - npm run build:test:coverage
 
