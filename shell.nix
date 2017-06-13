@@ -19,6 +19,8 @@ let libs = [
   nspr
   nss
   pango
+  python27Packages.sphinx
+  python27Packages.sphinx_rtd_theme
   freetype
   stdenv.cc.cc.lib
   zlib
