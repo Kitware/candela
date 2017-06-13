@@ -49,7 +49,6 @@ in stdenv.mkDerivation {
   ] ++ libs;
 
   C_INCLUDE_PATH = "${fontconfig.dev}/include";
-  LD_LIBRARY_PATH = stdenv.lib.makeLibraryPath libs;
 
   shellHook = ''
     echo "Candela nix dev environment"
