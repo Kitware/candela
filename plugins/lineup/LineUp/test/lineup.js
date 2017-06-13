@@ -3,15 +3,15 @@ import test from 'tape-catch';
 // needed to handle Babel's conversion of for `(x of array)`
 import 'babel-polyfill';
 
-import $ from 'jquery';
-
 import LineUp from '..';
 
 test('LineUp component', t => {
-  $('body').append($('<div/>').attr({id: 'elem'}).css({width: 800, height: 600}));
+  const div = document.createElement('div');
+  div.setAttribute('style', 'width: 800px; height: 600px');
+
   t.ok(LineUp, 'LineUp exists');
   t.ok(LineUp.options, 'LineUp options exists');
-  let lu = new LineUp(document.getElementById('elem'), {
+  let lu = new LineUp(div, {
     data: [
       {a: 1, b: 2, c: 'a', d: true},
       {a: 3, b: 4, c: 'b', d: false},
