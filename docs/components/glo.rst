@@ -14,6 +14,8 @@ values from the **nodes** table, an optional ``type`` field reading either
 optional ``weight`` value. **width** and **height** control the size of the
 canvas used for rendering the visualization.
 
+This component can be found in the ``candela/dist/glo.js`` plugin bundle.
+
 Example
 =======
 
@@ -77,6 +79,7 @@ Example
 
     <body>
     <script src="//unpkg.com/candela.js"></script>
+    <script src="//unpkg.com/candela/dist/glo.min.js"></script>
     <script>
       var el = document.createElement('div')
       el.setAttribute('width', 700);

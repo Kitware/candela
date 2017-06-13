@@ -6,6 +6,8 @@ A scatterplot matrix. This visualization will display a scatterplot for every
 pair of specified **fields**, arranged in a grid. An additional field
 may determine the **color** of the points.
 
+This component can be found in the ``candela/dist/vega.js`` plugin bundle.
+
 Example
 =======
 
@@ -29,6 +31,7 @@ Example
 
     <body>
     <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/vega.min.js"></script>
     <script>
       var el = document.createElement('div')
       document.body.appendChild(el);

@@ -5,6 +5,8 @@
 A line chart. The chart plots a line for each specified **y** field
 against a single **x** field.
 
+This component can be found in the ``candela/dist/vega.js`` plugin bundle.
+
 Example
 =======
 
@@ -29,6 +31,7 @@ Example
 
     <body>
     <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/vega.min.js"></script>
     <script>
       var el = document.createElement('div')
       document.body.appendChild(el);

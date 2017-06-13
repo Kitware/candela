@@ -6,6 +6,8 @@
 
 A `LineUp <http://www.caleydo.org/tools/lineup/>`_ table ranking visualization.
 
+This component can be found in the ``candela/dist/lineup.js`` plugin bundle.
+
 Example
 =======
 
@@ -29,6 +31,7 @@ Example
 
     <body>
     <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/lineup.min.js"></script>
     <script>
       var el = document.createElement('div')
       document.body.appendChild(el);

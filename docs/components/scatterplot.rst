@@ -8,6 +8,8 @@ A scatterplot. This visualization will plot values at specified **x** and **y**
 positions. Additional fields may determine the **color**, **size**, and **shape**
 of the plotted points.
 
+This component can be found in the ``candela/dist/vega.js`` plugin bundle.
+
 Example
 =======
 
@@ -32,6 +34,7 @@ Example
 
     <body>
     <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/vega.min.js"></script>
     <script>
       var el = document.createElement('div')
       document.body.appendChild(el);

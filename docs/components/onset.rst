@@ -45,6 +45,8 @@ and the sets become: ::
     n2: f2 x
     n3: f2 y
 
+This component can be found in the ``candela/dist/onset.js`` plugin bundle.
+
 Options
 =======
 

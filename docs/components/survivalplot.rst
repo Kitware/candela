@@ -13,6 +13,8 @@ and an optional column by which to group patients by, e.g., treatment type.
 The number of surviving patients is plotted as a decreasing step function, with
 crosses overplotted whenever a patient is censored from the study.
 
+This component can be found in the ``candela/dist/vega.js`` plugin bundle.
+
 Options
 =======
 

@@ -6,6 +6,8 @@
 
 A heatmap with optional hierarchies attached to the rows and columns.
 
+This component can be found in the ``candela/dist/treeheatmap.js`` plugin bundle.
+
 Example
 =======
 
@@ -32,6 +34,7 @@ The examples below assume you have downloaded the `example data </_static/heatma
 
     <body>
     <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/treeheatmap.min.js"></script>
     <div id="vis" style="width:600px;height:600px"></div>
     <script type="text/javascript" >
       var el = document.getElementById('vis');

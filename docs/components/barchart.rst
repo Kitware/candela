@@ -5,6 +5,8 @@
 A bar chart. The **x** field should contain a distinct value for each bar, while
 the **y** field will correspond to the height of each bar.
 
+This component can be found in the ``candela/dist/vega.js`` plugin bundle.
+
 Example
 =======
 
@@ -26,6 +28,7 @@ Example
 
     <body>
     <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/vega.min.js"></script>
     <script>
       var el = document.createElement('div')
       document.body.appendChild(el);

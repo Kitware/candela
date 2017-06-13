@@ -12,6 +12,8 @@ containing a unique identifier for each row, a **text** field containing the
 text sample, and a **count** field expressing the strength of that sample, or
 number of times it occurred in the corpus, etc.
 
+This component can be found in the ``candela/dist/sententree.js`` plugin bundle.
+
 Example
 =======
 
@@ -54,7 +56,8 @@ Example
 .. code-block:: html
 
     <body>
-    <script src="/static/candela.js"></script>
+    <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/sententree.min.js"></script>
     <script>
       var el = document.createElement('div')
       el.setAttribute('width', 1200);

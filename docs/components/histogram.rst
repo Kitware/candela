@@ -7,6 +7,8 @@ each record in the **data** table will contribute 1 to the bin's total.
 Specifying an **aggregate** field will instead add up that field's value for
 the each bin.
 
+This component can be found in the ``candela/dist/vega.js`` plugin bundle.
+
 Example
 =======
 
@@ -33,6 +35,7 @@ Example
 
     <body>
     <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/vega.min.js"></script>
     <script>
       var el = document.createElement('div')
       document.body.appendChild(el);

@@ -8,6 +8,8 @@ A geospatial view with locations marked by dots, using `GeoJS
 <https://geojs.readthedocs.io>`_. The **latitude** and **longitude** fields
 should contain lat/long values for each location in the data.
 
+This component can be found in the ``candela/dist/geojs.js`` plugin bundle.
+
 Example
 =======
 
@@ -39,6 +41,7 @@ Example
 
     <body>
     <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/geojs.min.js"></script>
     <script>
      var el = document.createElement('div')
      el.style.width = '500px';

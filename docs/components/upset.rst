@@ -40,6 +40,8 @@ and make them available to UpSet: ::
       {"id": "n3", "f1": 0, "f2 x": 0, "f2 y": 1}
     ]
 
+This component can be found in the ``candela/dist/upset.js`` plugin bundle.
+
 Options
 =======
 
