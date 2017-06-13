@@ -1,6 +1,5 @@
 var webpack = require('webpack');
 var candelaLoaders = require('../webpack');
-var path = require('path');
 
 var HtmlPlugin = require('html-webpack-plugin');
 
@@ -79,7 +78,7 @@ module.exports = candelaLoaders({
           'imports-loader?_=underscore&cola=webcola'
         ],
         include: __dirname + '/node_modules/glo/glo.js'
-      },
+      }
     ]
   }
 });

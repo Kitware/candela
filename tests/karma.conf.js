@@ -34,7 +34,7 @@ if (process.env.CANDELA_COVERAGE) {
       {
         type: 'lcovonly',
         dir: '../build/coverage',
-      subdir: 'lcov'
+        subdir: 'lcov'
       }
     ]
   };

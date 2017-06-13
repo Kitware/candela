@@ -12,13 +12,13 @@ const register = (component, name) => {
   }
 
   components[name] = component;
-}
+};
 
 const unregister = (name) => {
   if (components.hasOwnProperty(name)) {
     delete components[name];
   }
-}
+};
 
 const unregisterAll = () => {
   Object.keys(components).forEach(unregister);

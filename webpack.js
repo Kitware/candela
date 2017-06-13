@@ -9,8 +9,7 @@ function _includePaths (basePath) {
     ];
   } else {
     return [
-      /\/node_modules\/candela\//,
-      /\/node_modules\/candela-/,
+      /\/node_modules\/candela\//
     ];
   }
 }
