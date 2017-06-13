@@ -1,7 +1,5 @@
 import VisComponent from 'candela/VisComponent';
 
-import { select } from 'd3-selection';
-
 import { SentenTreeBuilder,
          SentenTreeVis } from 'sententree';
 

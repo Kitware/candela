@@ -2,7 +2,6 @@ var path = require('path');
 
 var candelaWebpack = require('./webpack');
 
-var externals = {};
 var external_packages = [
   'candela',
   'candela/VisComponent',
@@ -41,7 +40,10 @@ var external_packages = [
   'UpSet',
   'vega',
   'webcola'
-].forEach(function (ext) {
+];
+
+var externals = {};
+external_packages.forEach(function (ext) {
   externals[ext] = true;
 });
 

@@ -80,7 +80,7 @@ testBundle('candela.min.js', 'Structure and content of minified Candela library 
 // Test the mixin bundle using the utility function contentTests().
 const mixinContentTests = (t) => {
   contentTests(t, candela.mixins, mixinContent, 'candela.mixins');
-}
+};
 testBundle('mixin.js', 'Structure and content of unminified Candela mixin library file', MIXIN_JS, mixinContentTests);
 testBundle('mixin.min.js', 'Structure and content of minified Candela mixin library file', MIXIN_MIN_JS, mixinContentTests);
 
