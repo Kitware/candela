@@ -2,12 +2,47 @@
     Candela JavaScript API
 ==============================
 
-* :ref:`candela.components <components_list>` - The built-in Candela components.
+* :ref:`candela.components <components>` - The built-in Candela components.
 * :ref:`sizing`
 * :ref:`matchings`
 * :ref:`datatypes`
-* :ref:`viscomponent` - The base class and mixins for Candela components.
+* :ref:`viscomponent` - The base class for Candela components.
+* :ref:`candela.mixins <mixins>` - The built-in Candela component mixins.
 * :ref:`util` - Candela utility functions.
+
+.. _components:
+
+Components
+==========
+
+Candela comes with several visualization components ready to use. To reduce the
+size of the Candela JavaScript bundle, these components are packed into plugin
+bundles that ship alongside the main Candela bundle. The current list of plugin
+bundles is:
+
+* ``candela/dist/vega.js`` - Charts based on Vega, including basic chart types
+  such as bar charts, scatter plots, and histograms.
+* ``candela/dist/geojs.js`` - Components based on GeoJS for geospatial data visualization.
+* ``candela/dist/glo.js`` - A component based on GLO - "graph-level operations".
+* ``candela/dist/lineup.js`` - A component based on LineUp for visualizing
+  rankings.
+* ``candela/dist/onset.js`` - A component based on OnSet for visualizing subset
+  relationships.
+* ``candela/dist/sententree.js`` - A component based on SentenTree for
+  visualizing the grammatical structure of a corpus of text.
+* ``candela/dist/similaritygraph.js`` - A specialized interactive graph
+  visualization component for investigating degrees of similarity between nodes
+  in a data table.
+* ``candela/dist/trackerdash.js`` - A component based on the TrackerDash
+  algorithm metric tracking dashboard.
+* ``candela/dist/treeheatmap.js`` - A heatmap combined with hierarchical
+  clustering.
+* ``candela/dist/upset.js`` - A component based on UpSet, also for visualizing
+  subset relationships.
+
+For more details about each component (including how to import these bundles
+into your project), see the :ref:`full list <components_list>` of component
+documentation.
 
 .. _sizing:
 
@@ -202,6 +237,80 @@ is declared as an extension of ``VisComponent``, such as ``BarChart``):
 
     A static field containing the type of container this visualization can be added to.
     The most common is DOMElement.
+
+.. _mixins:
+
+Mixins
+======
+
+Candela uses mixins to add functionality to ``VisComponent`` when creating a new
+component. To use a mixin, the pattern is as follows:
+
+.. code-block:: javascript
+
+    class MyCoolVisualization extends Mixin(candela.VisComponent) {
+      .
+      .
+      .
+    }
+
+The class ``Mixin`` is defined using this pattern:
+
+.. code-block:: javascript
+
+    const Mixin = Base => class extends Base {
+      mixinMethod() {
+        .
+        .
+        .
+      }
+    };
+
+This is a function expression that maps a base class to a new, unnamed class -
+in other words, mixins are functions that can be applied to ``VisComponent`` (or
+any existing component class) to yield a new class with extra functionality.
+
+Candela comes with several mixins, which are available in the plugin bundle
+``candela/dist/mixin.js``.
+
+When including this bundle in your project, be sure the following packages
+appear in your ``package.json``'s ``dependencies`` field:
+
+.. code-block:: json
+
+  {
+    "javascript-detect-element-resize": "^0.5.3",
+    "telegraph-events": "^1.0.3"
+  }
+
+.. js:function:: Events()
+
+Adds basic event handling to the component. The component gains an ``.on()``
+method that takes a string naming an event type, and a callback to invoke when
+that event occurs, and a ``.trigger()`` method that takes an event type and
+optional arguments to fire that event type with those arguments.
+
+.. js:function:: InitSize()
+
+Causes a ``width`` and ``height`` property to be written to the component, based
+on the size of ``this.el`` at the time the component is instantiated.
+
+.. js:function:: Resize()
+
+Uses the ``Events`` mixin to trigger a ``resize`` event whenever the containing
+element's size changes. The event fires with the new width and height of the
+element, and a reference to the component itself.
+
+.. js:function:: AutoResize()
+
+Combines the ``InitSize`` and ``Resize`` mixins, and automatically responds to
+the ``resize`` event by updating the ``this.width`` and ``this.height``
+properties.
+
+.. js:function:: VegaChart(spec)
+
+Implements a vega-based visualization component, using the Vega specification
+given in ``spec``.
 
 .. _options:
 

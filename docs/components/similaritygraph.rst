@@ -21,6 +21,18 @@ sets the desired length of the links in pixels.
 
 This component can be found in the ``candela/dist/similaritygraph.js`` plugin bundle.
 
+When including this bundle in your project, be sure the following packages
+appear in your ``package.json``'s ``dependencies`` field:
+
+.. code-block:: json
+
+  {
+    "d3-array": "^1.1.0",
+    "d3-scale": "^1.1.0",
+    "d3-selection": "^1.1.0",
+    "webcola": "^3.3.3"
+  }
+
 Example
 =======
 

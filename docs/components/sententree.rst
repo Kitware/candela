@@ -14,6 +14,15 @@ number of times it occurred in the corpus, etc.
 
 This component can be found in the ``candela/dist/sententree.js`` plugin bundle.
 
+When including this bundle in your project, be sure the following packages
+appear in your ``package.json``'s ``dependencies`` field:
+
+.. code-block:: json
+
+  {
+    "sententree": "git+https://git@github.com/ronichoudhury-work/sententree.git#fix-typo"
+  }
+
 Example
 =======
 

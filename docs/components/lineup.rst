@@ -8,6 +8,21 @@ A `LineUp <http://www.caleydo.org/tools/lineup/>`_ table ranking visualization.
 
 This component can be found in the ``candela/dist/lineup.js`` plugin bundle.
 
+When including this bundle in your project, be sure the following packages
+appear in your ``package.json``'s ``dependencies`` field:
+
+.. code-block:: json
+
+  {
+    "css-loader": "^0.28.4",
+    "d3": "^3.5.17",
+    "datalib": "^1.7.3",
+    "font-awesome-webpack": "0.0.4",
+    "jquery": "^2.2.0",
+    "lineupjs": "^1.0.0",
+    "stylus-loader": "^3.0.1"
+  }
+
 Example
 =======
 

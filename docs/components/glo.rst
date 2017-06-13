@@ -16,6 +16,18 @@ canvas used for rendering the visualization.
 
 This component can be found in the ``candela/dist/glo.js`` plugin bundle.
 
+When including this bundle in your project, be sure the following packages
+appear in your ``package.json``'s ``dependencies`` field:
+
+.. code-block:: json
+
+  {
+    "d3": "^3.5.17",
+    "exports-loader": "0.6.4",
+    "glo": "github:ronichoudhury-work/glo#dist",
+    "imports-loader": "0.7.1"
+  }
+
 Example
 =======
 

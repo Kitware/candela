@@ -10,6 +10,15 @@ should contain lat/long values for each location in the data.
 
 This component can be found in the ``candela/dist/geojs.js`` plugin bundle.
 
+When including this bundle in your project, be sure the following packages
+appear in your ``package.json``'s ``dependencies`` field:
+
+.. code-block:: json
+
+  {
+    "geojs": "^0.9.1"
+  }
+
 Example
 =======
 
