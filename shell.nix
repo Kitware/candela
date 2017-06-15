@@ -13,7 +13,6 @@ let libs = [
   fontconfig.dev
   gdk_pixbuf
   glib
-  glibc
   gnome3.gconf
   gtk2
   nspr
@@ -43,7 +42,6 @@ in stdenv.mkDerivation {
 
   buildInputs = [
     electron
-    git
     nodejs-7_x
     phantomjs2
     pkgconfig
