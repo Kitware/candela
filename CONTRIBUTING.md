@@ -49,7 +49,7 @@ follows:
 ## Testing
 
 The Candela GitHub repository is configured to run Candela's testing suite via
-Travis on all pushes and pull requests. This gives us a quick sanity check
+Circle on all pushes and pull requests. This gives us a quick sanity check
 before we merge a pull request. There are two kinds of test: unit tests to
 stress basic functionality in the library itself (such as features of Candela
 that don't rely on visual output, or utilities that support such features) and
@@ -59,7 +59,7 @@ baseline.
 ### Running the test suite locally
 
 You can and should run the testing suite locally when working on your own pull
-request.  To do so, issue the following command after building your local
+request.  To do so, issue the following commands after building your local
 version of Candela from source:
 
     $ npm run test
@@ -73,16 +73,12 @@ differently due to factors that are difficult to control for. If any image test
 fails, you may want to manually view the testing image, the baseline, and the
 diff image side-by-side to verify what happened.
 
-### Running the test suite via Travis
+### Running the test suite via Circle
 
-The Candela repository is pre-configured to run tests on Travis on every push,
-and if you wish you can configure your own Travis account to run these tests. To
-do so, you will need to create a Travis account (which is relatively easy to do
-because it uses your GitHub credentials) and then activate continuous
-integration for your fork of Candela.
-
-Now, whenever you push a branch or create a pull request, GitHub will show you
-the results of these tests.
+The Candela repository is pre-configured to run tests on Circle on every push,
+including those coming from forked Candela repositories.  That is, whenever you
+push a branch or create a pull request, GitHub will show you the results of
+these tests.
 
 ## Semantic Release and commit messages
 
