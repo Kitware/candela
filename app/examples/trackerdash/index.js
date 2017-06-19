@@ -368,3 +368,5 @@ if (qParams) {
 }
 var app = new TrackerDash(document.body, appSettings);
 app.render();
+
+export default appSettings;
