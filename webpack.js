@@ -69,7 +69,6 @@ module.exports = function (config, basePath, options) {
     },
     {
       test: /\.js$/,
-      tag: 'glo',
       loaders: [
         'exports-loader?GLO',
         'imports-loader?_=underscore&cola=webcola'
