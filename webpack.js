@@ -1,3 +1,5 @@
+var path = require('path');
+
 function _includePaths (basePath) {
   if (basePath) {
     return [
@@ -57,7 +59,10 @@ module.exports = function (config, basePath, options) {
   }
 
   // Prepend the Candela loaders.
-  var gloPath = basePath + '/node_modules/glo/glo.js';
+  if (basePath === undefined) {
+    basePath = '.';
+  }
+  var gloPath = path.resolve(basePath, 'node_modules/glo/glo.js');
   config.module.loaders = [
     {
       test: /\.js$/,
