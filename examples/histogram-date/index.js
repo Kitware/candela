@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela/dist/vega.min.js';
+import 'candela/plugins/vega/load';
 
 import { stocks } from '../datasets';
 import showComponent from '../util/showComponent';

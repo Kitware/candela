@@ -1,6 +1,6 @@
 import candela from 'candela';
-import 'candela/dist/vega.min.js';
-import 'candela/dist/mixin.min.js';
+import 'candela/plugins/vega/load';
+import 'candela/plugins/mixin/load';
 
 import html from './index.jade';
 import './index.styl';

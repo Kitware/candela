@@ -1,5 +1,3 @@
-import candela from 'candela';
-
 import BarChart from './BarChart';
 import BoxPlot from './BoxPlot';
 import BulletChart from './BulletChart';
@@ -11,7 +9,7 @@ import ScatterPlot from './ScatterPlot';
 import ScatterPlotMatrix from './ScatterPlotMatrix';
 import SurvivalPlot from './SurvivalPlot';
 
-const components = {
+export {
   BarChart,
   BoxPlot,
   BulletChart,
@@ -23,5 +21,3 @@ const components = {
   ScatterPlotMatrix,
   SurvivalPlot
 };
-
-Object.entries(components).forEach(entry => candela.register(entry[1], entry[0]));

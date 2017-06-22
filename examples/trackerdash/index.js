@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela/dist/trackerdash.min.js';
+import 'candela/plugins/trackerdash/load';
 import 'candela/plugins/trackerdash/TrackerDash/styles';
 
 // Pass query param 'omitAggTrends' to test without 'agg_trends' key.

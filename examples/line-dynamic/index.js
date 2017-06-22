@@ -1,5 +1,5 @@
 import candela from 'candela';
-import 'candela/dist/vega.min.js';
+import 'candela/plugins/vega/load';
 
 import { select } from 'd3-selection';
 import html from './index.jade';
