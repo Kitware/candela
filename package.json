@@ -70,7 +70,7 @@
   "author": "Roni Choudhury",
   "license": "Apache-2.0",
   "devDependencies": {
-    "UpSet": "git+https://github.com/jeffbaumes/upset#no-global-vars",
+    "UpSet": "git+https://github.com/ronichoudhury-work/upset#candela",
     "babel-cli": "^6.7.5",
     "babel-core": "^6.24.1",
     "babel-istanbul-loader": "^0.1.0",

@@ -8,5 +8,5 @@ import './plugins/sententree/load';
 import './plugins/similaritygraph/load';
 import './plugins/trackerdash/load';
 import './plugins/treeheatmap/load';
-// import './plugins/upset/load';
+import './plugins/upset/load';
 import './plugins/vega/load';
