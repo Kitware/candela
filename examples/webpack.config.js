@@ -1,4 +1,6 @@
+var path = require('path');
 var webpack = require('webpack');
+
 var candelaLoaders = require('candela/webpack');
 
 var HtmlPlugin = require('html-webpack-plugin');
@@ -28,7 +30,7 @@ var htmlPlugins = examples.map(function (ex) {
 module.exports = candelaLoaders({
   entry: entry,
   output: {
-    path: '../build/examples',
+    path: path.resolve('..', 'build/examples'),
     filename: '[name]/index.js'
   },
   plugins: htmlPlugins.concat([
