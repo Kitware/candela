@@ -4,11 +4,12 @@ var process = require('process');
 function _includePaths (basePath) {
   if (basePath) {
     return [
-      basePath + '/index.js',
-      basePath + '/test',
-      basePath + '/util',
-      basePath + '/VisComponent',
-      basePath + '/plugins'
+      path.resolve(basePath, 'index.js'),
+      path.resolve(basePath, 'candela-all.js'),
+      path.resolve(basePath, 'test'),
+      path.resolve(basePath, 'util'),
+      path.resolve(basePath, 'VisComponent'),
+      path.resolve(basePath, 'plugins')
     ];
   } else {
     return [
