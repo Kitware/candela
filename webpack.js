@@ -44,10 +44,10 @@ module.exports = function (config, basePath, options) {
     // Install empty module and module.loaders entries if missing.
     config.module = config.module || {};
 
-    if (process.env.WEBPACK2) {
-      config.module.rules = config.module.rules || [];
-    } else {
+    if (process.env.WEBPACK1) {
       config.module.loaders = config.module.loaders || [];
+    } else {
+      config.module.rules = config.module.rules || [];
     }
 
     // For each loader, append the Candela include paths to its `exclude`
@@ -64,10 +64,10 @@ module.exports = function (config, basePath, options) {
       loader.exclude = loader.exclude.concat(includePaths);
     };
 
-    if (process.env.WEBPACK2) {
-      config.module.rules.forEach(excluder);
-    } else {
+    if (process.env.WEBPACK1) {
       config.module.loaders.forEach(excluder);
+    } else {
+      config.module.rules.forEach(excluder);
     }
   }
 
@@ -76,7 +76,66 @@ module.exports = function (config, basePath, options) {
     basePath = '.';
   }
   var gloPath = path.resolve(basePath, 'node_modules/glo/glo.js');
-  if (process.env.WEBPACK2) {
+  if (process.env.WEBPACK1) {
+    config.module.loaders = [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        query: {
+          presets: ['es2015']
+        },
+        include: includePaths.concat(gloPath)
+      },
+      {
+        test: /\.js$/,
+        loaders: [
+          'exports-loader?GLO',
+          'imports-loader?_=underscore&cola=webcola'
+        ],
+        include: gloPath
+      },
+      {
+        test: /\.jpe?g$|\.gif$|\.png$|\.woff$|\.wav$|\.mp3$|\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$|\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: 'url-loader',
+        include: addNMPath(['font-awesome', 'bootstrap'], includePaths)
+      },
+      {
+        test: /\.csv$/,
+        loader: 'raw-loader',
+        include: includePaths
+      },
+      {
+        test: /\.html$/,
+        loader: 'html-loader?attrs=img:src',
+        include: includePaths
+      },
+      {
+        test: /\.styl$/,
+        loaders: ['style-loader', 'css-loader', 'stylus-loader'],
+        include: includePaths
+      },
+      {
+        test: /\.css$/,
+        loaders: ['style-loader', 'css-loader'],
+        include: addNMPath(['lineupjs', 'nvd3'], includePaths)
+      },
+      {
+        test: /\.scss$/,
+        loaders: ['style-loader', 'css-loader', 'sass-loader'],
+        include: addNMPath('UpSet', includePaths)
+      },
+      {
+        test: /\.jade$/,
+        loaders: ['jade-loader'],
+        include: includePaths
+      },
+      {
+        test: /\.json$/,
+        loaders: ['json-loader', 'strip-json-comments-loader'],
+        include: addNMPath('datalib', includePaths)
+      }
+    ].concat(config.module.loaders);
+  } else {
     config.module.rules = [
       {
         test: /\.js$/,
@@ -138,65 +197,6 @@ module.exports = function (config, basePath, options) {
       }
 
     ].concat(config.module.rules);
-  } else {
-    config.module.loaders = [
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        query: {
-          presets: ['es2015']
-        },
-        include: includePaths.concat(gloPath)
-      },
-      {
-        test: /\.js$/,
-        loaders: [
-          'exports-loader?GLO',
-          'imports-loader?_=underscore&cola=webcola'
-        ],
-        include: gloPath
-      },
-      {
-        test: /\.jpe?g$|\.gif$|\.png$|\.woff$|\.wav$|\.mp3$|\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$|\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'url-loader',
-        include: addNMPath(['font-awesome', 'bootstrap'], includePaths)
-      },
-      {
-        test: /\.csv$/,
-        loader: 'raw-loader',
-        include: includePaths
-      },
-      {
-        test: /\.html$/,
-        loader: 'html-loader?attrs=img:src',
-        include: includePaths
-      },
-      {
-        test: /\.styl$/,
-        loaders: ['style-loader', 'css-loader', 'stylus-loader'],
-        include: includePaths
-      },
-      {
-        test: /\.css$/,
-        loaders: ['style-loader', 'css-loader'],
-        include: addNMPath(['lineupjs', 'nvd3'], includePaths)
-      },
-      {
-        test: /\.scss$/,
-        loaders: ['style-loader', 'css-loader', 'sass-loader'],
-        include: addNMPath('UpSet', includePaths)
-      },
-      {
-        test: /\.jade$/,
-        loaders: ['jade-loader'],
-        include: includePaths
-      },
-      {
-        test: /\.json$/,
-        loaders: ['json-loader', 'strip-json-comments-loader'],
-        include: addNMPath('datalib', includePaths)
-      }
-    ].concat(config.module.loaders);
   }
 
   return config;
