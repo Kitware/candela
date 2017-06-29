@@ -35,32 +35,6 @@
       "dist",
       "build",
       "R/candela/inst/htmlwidgets/lib"
-    ],
-    "globals": [
-      "CANDELA_JS",
-      "CANDELA_MIN_JS",
-      "MIXIN_JS",
-      "MIXIN_MIN_JS",
-      "MIXIN_JS",
-      "MIXIN_MIN_JS",
-      "GLO_JS",
-      "GLO_MIN_JS",
-      "LINEUP_JS",
-      "LINEUP_MIN_JS",
-      "ONSET_JS",
-      "ONSET_MIN_JS",
-      "SENTENTREE_JS",
-      "SENTENTREE_MIN_JS",
-      "SIMILARITYGRAPH_JS",
-      "SIMILARITYGRAPH_MIN_JS",
-      "TRACKERDASH_JS",
-      "TRACKERDASH_MIN_JS",
-      "TREEHEATMAP_JS",
-      "TREEHEATMAP_MIN_JS",
-      "UPSET_JS",
-      "UPSET_MIN_JS",
-      "VEGA_JS",
-      "VEGA_MIN_JS"
     ]
   },
   "repository": {
