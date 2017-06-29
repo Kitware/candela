@@ -2,11 +2,10 @@ import test from 'tape-catch';
 
 import candela from '..';
 
-// Create a require context consisting only of index.js files found in the
-// top-level of any node_modules package starting with "candela-". This is
-// needed to allow the exportTest() function to accept a package name at
-// runtime.
-const ctx = require.context('../plugins', true, /\/[^\/]*\/index\.js$/);
+// Create a require context consisting only of load.js files found in the
+// plugins directory.  This is needed to allow the exportTest() function to
+// accept a package name at runtime.
+const ctx = require.context('../plugins', true, /\/[^\/]*\/load\.js$/);
 
 export const contentTests = (t, container, components, prefix) => {
   components.forEach(comp => {
@@ -19,7 +18,7 @@ export const contentTests = (t, container, components, prefix) => {
 export const exportTest = (packageName, components) => {
   test(`Contents of ${packageName} plugin`, t => {
     candela.unregisterAll();
-    ctx(`./${packageName}/index.js`);
+    ctx(`./${packageName}/load.js`);
 
     t.equal(Object.keys(candela.components).length, components.length, `${packageName} exports ${components.length} component${components.length > 1 ? 's' : ''}`);
 
@@ -32,7 +31,7 @@ export const exportTest = (packageName, components) => {
 export const exportMixinTest = (packageName, mixins) => {
   test(`Contents of ${packageName} plugin`, t => {
     candela.unregisterMixinAll();
-    ctx(`./${packageName}/index.js`);
+    ctx(`./${packageName}/load.js`);
 
     t.equal(Object.keys(candela.mixins).length, mixins.length, `${packageName} exports ${mixins.length} mixin${mixins.length > 1 ? 's' : ''}`);
 

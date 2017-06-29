@@ -1,53 +1,13 @@
 var path = require('path');
-var fs = require('fs');
-
-var webpack = require('webpack');
 
 var candelaWebpack = require('../webpack');
-
-var defs = (() => {
-  var filebase = [
-    'candela',
-    'glo',
-    'mixin',
-    'sententree',
-    'trackerdash',
-    'upset',
-    'geojs',
-    'lineup',
-    'onset',
-    'similaritygraph',
-    'treeheatmap',
-    'vega'
-  ];
-
-  var defs = {};
-
-  filebase.forEach(fb => {
-    try {
-      fs.accessSync(`../dist/${fb}.js`);
-      defs[`${fb.toUpperCase()}_JS`] = 'true';
-    } catch (e) {
-      defs[`${fb.toUpperCase()}_JS`] = 'false';
-    }
-
-    try {
-      fs.accessSync(`../dist/${fb}.min.js`);
-      defs[`${fb.toUpperCase()}_MIN_JS`] = 'true';
-    } catch (e) {
-      defs[`${fb.toUpperCase()}_MIN_JS`] = 'false';
-    }
-  });
-
-  return defs;
-})();
 
 var config = {
   entry: {
     tests: './tests.js'
   },
   output: {
-    path: '../build/tests',
+    path: path.resolve('..', 'build/tests'),
     filename: null
   },
   resolve: {
@@ -55,9 +15,6 @@ var config = {
       candela: path.resolve('..')
     }
   },
-  plugins: [
-    new webpack.DefinePlugin(defs)
-  ],
   module: null,
   node: {
     fs: 'empty'

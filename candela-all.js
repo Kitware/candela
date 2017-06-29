@@ -1,4 +1,3 @@
-import candela from '.';
 import './plugins/geojs/load';
 import './plugins/glo/load';
 import './plugins/lineup/load';
@@ -10,3 +9,5 @@ import './plugins/trackerdash/load';
 import './plugins/treeheatmap/load';
 import './plugins/upset/load';
 import './plugins/vega/load';
+
+export * from '.';

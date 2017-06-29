@@ -6,7 +6,7 @@ context.keys().forEach(function (key) {
   // actions in these micropackages will not be repeated when the testing module
   // imports them later.
   var splits = key.split('/');
-  if (!(splits.length === 3 && splits[2] === 'index.js')) {
+  if (!(splits.length === 3 && splits[2] === 'load.js')) {
     context(key);
   }
 });
