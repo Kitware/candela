@@ -25,6 +25,8 @@ export const exportTest = (packageName, components) => {
     contentTests(t, candela.components, components, 'candela.components');
 
     t.end();
+
+    candela.unregisterAll();
   });
 };
 
@@ -36,6 +38,8 @@ export const exportMixinTest = (packageName, mixins) => {
     t.equal(Object.keys(candela.mixins).length, mixins.length, `${packageName} exports ${mixins.length} mixin${mixins.length > 1 ? 's' : ''}`);
 
     contentTests(t, candela.mixins, mixins, 'candela.mixins');
+
+    candela.unregisterMixinAll();
 
     t.end();
   });

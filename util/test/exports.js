@@ -17,11 +17,38 @@ import { content as vegaContent } from '../../plugins/vega/test/exports';
 
 const requireBuilt = require.context('../../dist', false, /\.js$/);
 
-function structureTests (t, cd) {
+function structureTests (t, cd, opts) {
   t.ok(cd, 'candela exists');
 
   t.ok(cd.components, 'candela.components exists');
   t.equal(typeof cd.components, 'object', 'candela.components is an object');
+
+  if (opts.empty) {
+    t.equal(Object.keys(cd.components).length, 0, 'candela.components is empty');
+  } else {
+    const allPluginContent = [
+      geojsContent,
+      gloContent,
+      lineupContent,
+      onsetContent,
+      sententreeContent,
+      similaritygraphContent,
+      trackerdashContent,
+      treeheatmapContent,
+      upsetContent,
+      vegaContent
+    ];
+
+    const count = allPluginContent.map(c => c.length).reduce((x, y) => x + y);
+    allPluginContent.forEach(content => {
+      content.forEach(item => {
+        t.ok(cd.components[item], `candela.components.${item} exists`);
+        t.equal(typeof cd.components[item], 'function', `candela.components.${item} is a function`);
+      });
+    });
+
+    t.equal(Object.keys(cd.components).length, count, 'candela.components contains no other items');
+  }
 
   t.ok(cd.register, 'candela.register exists');
   t.equal(typeof cd.register, 'function', 'candela.register is a function');
@@ -34,6 +61,17 @@ function structureTests (t, cd) {
 
   t.ok(cd.mixins, 'candela.mixins exists');
   t.equal(typeof cd.mixins, 'object', 'candela.mixins is an object');
+
+  if (opts.empty) {
+    t.equal(Object.keys(cd.mixins).length, 0, 'candela.mixins is empty');
+  } else {
+    mixinContent.forEach(mixin => {
+      t.ok(cd.mixins[mixin], `candela.mixins.${mixin} exists`);
+      t.equal(typeof cd.mixins[mixin], 'function', `candela.mixins.${mixin} is a function`);
+    });
+
+    t.equal(Object.keys(cd.mixins).length, mixinContent.length, 'candela.mixins contains no other items');
+  }
 
   t.ok(cd.registerMixin, 'candela.registerMixin exists');
   t.equal(typeof cd.registerMixin, 'function', 'candela.registerMixin is a function');
@@ -51,16 +89,18 @@ function structureTests (t, cd) {
 }
 
 test('Structure and content of exported Candela library object', t => {
-  structureTests(t, candela);
+  structureTests(t, candela, {
+    empty: true
+  });
   t.end();
 });
 
-const testBundle = (bundle, title, runTests) => {
+const testBundle = (bundle, title, runTests, opts) => {
   test(title, t => {
     let built = requireBuilt(`./${bundle}`);
     if (built) {
       t.ok(built, `The bundle ${bundle} exists`);
-      runTests(t, built);
+      runTests(t, built, opts);
     } else {
       t.fail(`Bundle file ${bundle} does not exist (run \`npm run build\` to build it)`);
     }
@@ -71,55 +111,5 @@ const testBundle = (bundle, title, runTests) => {
 
 // Use the structureTest() function above to verify the contents of the
 // candela-all[.min].js file.
-testBundle('candela-all.js', 'Structure and content of unminified Candela library file', structureTests);
-testBundle('candela-all.min.js', 'Structure and content of minified Candela library file', structureTests);
-
-/*// Test the mixin bundle using the utility function contentTests().*/
-// const mixinContentTests = (t) => {
-  // contentTests(t, candela.mixins, mixinContent, 'candela.mixins');
-// };
-// testBundle('mixin.js', 'Structure and content of unminified Candela mixin library file', MIXIN_JS, mixinContentTests);
-// testBundle('mixin.min.js', 'Structure and content of minified Candela mixin library file', MIXIN_MIN_JS, mixinContentTests);
-
-// // Create an abstraction to generate component bundle tests.
-// const contentTestGenerator = (content) => (t) => contentTests(t, candela.components, content, 'candela.components');
-
-// // Test geojs bundle.
-// testBundle('geojs.js', 'Structure and content of unminified Candela geojs library file', MIXIN_JS, contentTestGenerator(geojsContent));
-// testBundle('geojs.min.js', 'Structure and content of minified Candela geojs library file', MIXIN_MIN_JS, contentTestGenerator(geojsContent));
-
-// // Test glo bundle.
-// testBundle('glo.js', 'Structure and content of unminified Candela glo library file', GLO_JS, contentTestGenerator(gloContent));
-// testBundle('glo.min.js', 'Structure and content of minified Candela glo library file', GLO_MIN_JS, contentTestGenerator(gloContent));
-
-// // Test lineup bundle.
-// testBundle('lineup.js', 'Structure and content of unminified Candela lineup library file', LINEUP_JS, contentTestGenerator(lineupContent));
-// testBundle('lineup.min.js', 'Structure and content of minified Candela lineup library file', LINEUP_MIN_JS, contentTestGenerator(lineupContent));
-
-// // Test onset bundle.
-// testBundle('onset.js', 'Structure and content of unminified Candela onset library file', ONSET_JS, contentTestGenerator(onsetContent));
-// testBundle('onset.min.js', 'Structure and content of minified Candela onset library file', ONSET_MIN_JS, contentTestGenerator(onsetContent));
-
-// // Test sententree bundle.
-// testBundle('sententree.js', 'Structure and content of unminified Candela sententree library file', SENTENTREE_JS, contentTestGenerator(sententreeContent));
-// testBundle('sententree.min.js', 'Structure and content of minified Candela sententree library file', SENTENTREE_MIN_JS, contentTestGenerator(sententreeContent));
-
-// // Test similaritygraph bundle.
-// testBundle('similaritygraph.js', 'Structure and content of unminified Candela similaritygraph library file', SIMILARITYGRAPH_JS, contentTestGenerator(similaritygraphContent));
-// testBundle('similaritygraph.min.js', 'Structure and content of minified Candela similaritygraph library file', SIMILARITYGRAPH_MIN_JS, contentTestGenerator(similaritygraphContent));
-
-// // Test trackerdash bundle.
-// testBundle('trackerdash.js', 'Structure and content of unminified Candela trackerdash library file', TRACKERDASH_JS, contentTestGenerator(trackerdashContent));
-// testBundle('trackerdash.min.js', 'Structure and content of minified Candela trackerdash library file', TRACKERDASH_MIN_JS, contentTestGenerator(trackerdashContent));
-
-// // Test treeheatmap bundle.
-// testBundle('treeheatmap.js', 'Structure and content of unminified Candela treeheatmap library file', TREEHEATMAP_JS, contentTestGenerator(treeheatmapContent));
-// testBundle('treeheatmap.min.js', 'Structure and content of minified Candela treeheatmap library file', TREEHEATMAP_MIN_JS, contentTestGenerator(treeheatmapContent));
-
-// // Test upset bundle.
-// testBundle('upset.js', 'Structure and content of unminified Candela upset library file', UPSET_JS, contentTestGenerator(upsetContent));
-// testBundle('upset.min.js', 'Structure and content of minified Candela upset library file', UPSET_MIN_JS, contentTestGenerator(upsetContent));
-
-// // Test vega bundle.
-// testBundle('vega.js', 'Structure and content of unminified Candela vega library file', VEGA_JS, contentTestGenerator(vegaContent));
-/*testBundle('vega.min.js', 'Structure and content of minified Candela vega library file', VEGA_MIN_JS, contentTestGenerator(vegaContent));*/
+testBundle('candela-all.js', 'Structure and content of unminified Candela library file', structureTests, {empty: false});
+testBundle('candela-all.min.js', 'Structure and content of minified Candela library file', structureTests, {empty: false});
