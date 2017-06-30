@@ -3,6 +3,7 @@ var path = require('path');
 var candelaWebpack = require('./webpack');
 
 var config = {
+  devtool: 'source-map',
   entry: {
     'candela-all': path.resolve('candela-all.js')
   },

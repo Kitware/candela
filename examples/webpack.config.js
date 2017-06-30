@@ -28,6 +28,7 @@ var htmlPlugins = examples.map(function (ex) {
 });
 
 module.exports = candelaLoaders({
+  devtool: 'cheap-module-source-map',
   entry: entry,
   output: {
     path: path.resolve('..', 'build/examples'),
