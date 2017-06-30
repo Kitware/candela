@@ -89,10 +89,10 @@ function structureTests (t, cd, opts) {
 
   let count = 9;
   if (opts.default) {
-    t.equal(cd.default, undefined, 'candela.default does not exist');
-  } else {
     t.ok(cd.default, 'candela.default exists');
     count += 1;
+  } else {
+    t.equal(cd.default, undefined, 'candela.default does not exist');
   }
 
   t.equal(Object.keys(cd).length, count, 'candela contains no other members');
@@ -101,7 +101,7 @@ function structureTests (t, cd, opts) {
 test('Structure and content of default exported Candela library object', t => {
   structureTests(t, candela, {
     empty: true,
-    default: true
+    default: false
   });
   t.end();
 });
@@ -109,7 +109,7 @@ test('Structure and content of default exported Candela library object', t => {
 test('Structure and content of non-default exported Candela library object', t => {
   structureTests(t, candelaStar, {
     empty: true,
-    default: false
+    default: true
   });
   t.end();
 });
