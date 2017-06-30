@@ -128,11 +128,6 @@ module.exports = function (config, basePath, options) {
         test: /\.jade$/,
         loaders: ['jade-loader'],
         include: includePaths
-      },
-      {
-        test: /\.json$/,
-        loaders: ['json-loader', 'strip-json-comments-loader'],
-        include: addNMPath('datalib', includePaths)
       }
     ].concat(config.module.loaders);
   } else {
@@ -189,13 +184,7 @@ module.exports = function (config, basePath, options) {
         test: /\.jade$/,
         use: 'jade-loader',
         include: includePaths
-      },
-      {
-        test: /\.json$/,
-        use: ['json-loader', 'strip-json-comments-loader'],
-        include: addNMPath('datalib', includePaths)
       }
-
     ].concat(config.module.rules);
   }
 

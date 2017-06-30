@@ -1,7 +1,7 @@
 var path = require('path');
 var webpack = require('webpack');
 
-var candelaLoaders = require('candela/webpack');
+var candelaLoaders = require('../webpack');
 
 var HtmlPlugin = require('html-webpack-plugin');
 
@@ -33,24 +33,24 @@ module.exports = candelaLoaders({
     path: path.resolve('..', 'build/examples'),
     filename: '[name]/index.js'
   },
+  resolve: {
+    alias: {
+      candela: path.resolve('..')
+    }
+  },
   plugins: htmlPlugins.concat([
     new webpack.ProvidePlugin({
       jQuery: 'jquery'
     })
   ]),
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        query: {
+        options: {
           presets: ['es2015']
         },
-        exclude: /node_modules/
-      },
-      {
-        test: /\.json$/,
-        loader: 'json-loader',
         exclude: /node_modules/
       },
       {
@@ -83,4 +83,4 @@ module.exports = candelaLoaders({
       }
     ]
   }
-});
+}, '..');
