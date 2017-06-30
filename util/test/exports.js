@@ -1,6 +1,8 @@
 import test from 'tape-catch';
 
 import candela from 'candela';
+import * as candelaStar from 'candela';
+
 import { contentTests } from 'candela/test/util/exportTest';
 
 import { content as mixinContent } from 'candela/plugins/mixin/test/exports';
@@ -85,12 +87,29 @@ function structureTests (t, cd, opts) {
   t.ok(cd.VisComponent, 'candela.VisComponent exists');
   t.equal(typeof cd.VisComponent, 'function', 'candela.VisComponent is a function');
 
-  t.equal(Object.keys(cd).length, 9, 'candela contains no other members');
+  let count = 9;
+  if (opts.default) {
+    t.equal(cd.default, undefined, 'candela.default does not exist');
+  } else {
+    t.ok(cd.default, 'candela.default exists');
+    count += 1;
+  }
+
+  t.equal(Object.keys(cd).length, count, 'candela contains no other members');
 }
 
-test('Structure and content of exported Candela library object', t => {
+test('Structure and content of default exported Candela library object', t => {
   structureTests(t, candela, {
-    empty: true
+    empty: true,
+    default: true
+  });
+  t.end();
+});
+
+test('Structure and content of non-default exported Candela library object', t => {
+  structureTests(t, candelaStar, {
+    empty: true,
+    default: false
   });
   t.end();
 });
@@ -111,5 +130,9 @@ const testBundle = (bundle, title, runTests, opts) => {
 
 // Use the structureTest() function above to verify the contents of the
 // candela-all[.min].js file.
-testBundle('candela-all.js', 'Structure and content of unminified Candela library file', structureTests, {empty: false});
-testBundle('candela-all.min.js', 'Structure and content of minified Candela library file', structureTests, {empty: false});
+const options = {
+  empty: false,
+  default: true
+};
+testBundle('candela-all.js', 'Structure and content of unminified Candela library file', structureTests, options);
+testBundle('candela-all.min.js', 'Structure and content of minified Candela library file', structureTests, options);

@@ -48,7 +48,19 @@ const unregisterMixinAll = () => {
   Object.keys(mixins).forEach(unregisterMixin);
 };
 
-module.exports = {
+export default {
+  components,
+  register,
+  unregister,
+  unregisterAll,
+  mixins,
+  registerMixin,
+  unregisterMixin,
+  unregisterMixinAll,
+  VisComponent
+};
+
+export {
   components,
   register,
   unregister,
