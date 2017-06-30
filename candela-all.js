@@ -10,4 +10,8 @@ import './plugins/treeheatmap/load';
 import './plugins/upset/load';
 import './plugins/vega/load';
 
-export * from '.';
+import candela from '.';
+
+export default candela;
+let components = candela.components;
+export { components };
