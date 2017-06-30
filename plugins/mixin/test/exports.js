@@ -1,4 +1,4 @@
-import { exportMixinTest } from '../../../util/exportTest';
+import { exportMixinTest } from 'candela/test/util/exportTest';
 
 export const content = [
   'AutoResize',

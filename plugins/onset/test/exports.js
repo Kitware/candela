@@ -1,4 +1,4 @@
-import { exportTest } from '../../../util/exportTest';
+import { exportTest } from 'candela/test/util/exportTest';
 
 export const content = [
   'OnSet'

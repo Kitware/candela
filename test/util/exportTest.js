@@ -1,11 +1,11 @@
 import test from 'tape-catch';
 
-import candela from '..';
+import candela from 'candela';
 
 // Create a require context consisting only of load.js files found in the
 // plugins directory.  This is needed to allow the exportTest() function to
 // accept a package name at runtime.
-const ctx = require.context('../plugins', true, /\/[^\/]*\/load\.js$/);
+const ctx = require.context('candela/plugins', true, /\/[^\/]*\/load\.js$/);
 
 export const contentTests = (t, container, components, prefix) => {
   components.forEach(comp => {

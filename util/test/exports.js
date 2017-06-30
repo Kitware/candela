@@ -1,21 +1,21 @@
 import test from 'tape-catch';
 
-import candela from '../..';
-import { contentTests } from '../exportTest';
+import candela from 'candela';
+import { contentTests } from 'candela/test/util/exportTest';
 
-import { content as mixinContent } from '../../plugins/mixin/test/exports';
-import { content as geojsContent } from '../../plugins/geojs/test/exports';
-import { content as gloContent } from '../../plugins/glo/test/exports';
-import { content as lineupContent } from '../../plugins/lineup/test/exports';
-import { content as onsetContent } from '../../plugins/onset/test/exports';
-import { content as sententreeContent } from '../../plugins/sententree/test/exports';
-import { content as similaritygraphContent } from '../../plugins/similaritygraph/test/exports';
-import { content as trackerdashContent } from '../../plugins/trackerdash/test/exports';
-import { content as treeheatmapContent } from '../../plugins/treeheatmap/test/exports';
-import { content as upsetContent } from '../../plugins/upset/test/exports';
-import { content as vegaContent } from '../../plugins/vega/test/exports';
+import { content as mixinContent } from 'candela/plugins/mixin/test/exports';
+import { content as geojsContent } from 'candela/plugins/geojs/test/exports';
+import { content as gloContent } from 'candela/plugins/glo/test/exports';
+import { content as lineupContent } from 'candela/plugins/lineup/test/exports';
+import { content as onsetContent } from 'candela/plugins/onset/test/exports';
+import { content as sententreeContent } from 'candela/plugins/sententree/test/exports';
+import { content as similaritygraphContent } from 'candela/plugins/similaritygraph/test/exports';
+import { content as trackerdashContent } from 'candela/plugins/trackerdash/test/exports';
+import { content as treeheatmapContent } from 'candela/plugins/treeheatmap/test/exports';
+import { content as upsetContent } from 'candela/plugins/upset/test/exports';
+import { content as vegaContent } from 'candela/plugins/vega/test/exports';
 
-const requireBuilt = require.context('../../dist', false, /\.js$/);
+const requireBuilt = require.context('candela/dist', false, /\.js$/);
 
 function structureTests (t, cd, opts) {
   t.ok(cd, 'candela exists');
