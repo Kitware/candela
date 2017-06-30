@@ -15,36 +15,39 @@ var config = {
       candela: path.resolve('..')
     }
   },
-  module: null,
   node: {
     fs: 'empty'
   }
 };
 
 if (process.env.CANDELA_COVERAGE) {
+  config.devtool = 'cheap-module-source-map';
   config.output.filename = 'coverage.js';
   config.module = {
-    preLoaders: [
+    rules: [
       {
+        enforce: 'post',
         test: /\.js$/,
+        use: {
+          loader: 'istanbul-instrumenter-loader',
+          options: {
+            esModules: true
+          }
+        },
         include: [
-          path.resolve('../candela.js'),
-          path.resolve('../test'),
+          path.resolve('../index.js'),
           path.resolve('../util'),
           path.resolve('../VisComponent'),
           path.resolve('../plugins')
         ],
-        exclude: /\/test\//,
-        loader: 'babel-istanbul-loader',
-        query: {
-          presets: ['es2015']
-        }
+        exclude: /\/test\//
       }
     ]
   };
 } else {
   config.output.filename = 'unit.js';
-  delete config.module;
 }
 
-module.exports = candelaWebpack(config, path.resolve('..'));
+module.exports = candelaWebpack(config, path.resolve('..'), {
+  excludeCandelaNM: false
+});

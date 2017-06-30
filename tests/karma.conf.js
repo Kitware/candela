@@ -1,7 +1,9 @@
+var path = require('path');
+
 var kconfig = {
   singleRun: true,
   client: {
-    captureConsole: true
+    captureConsole: null
   },
   browsers: [
     'PhantomJS'
@@ -10,42 +12,37 @@ var kconfig = {
     'tap'
   ],
   reporters: null,
-  coverageReporter: null,
   files: null
 };
 
 if (process.env.CANDELA_COVERAGE) {
+  kconfig.client.captureConsole = false;
   kconfig.files = [
     '../build/tests/coverage.js'
   ];
   kconfig.reporters = [
-    'coverage'
+    'coverage-istanbul'
   ];
-  kconfig.coverageReporter = {
-    reporters: [
-      {
-        type: 'text-summary'
-      },
-      {
-        type: 'html',
-        dir: '../build/coverage/',
+  kconfig.coverageIstanbulReporter = {
+    reports: ['text-summary', 'html', 'lcovonly'],
+    dir: path.resolve('..', 'build/coverage'),
+    'report-config': {
+      html: {
         subdir: 'html'
       },
-      {
-        type: 'lcovonly',
-        dir: '../build/coverage',
-        subdir: 'lcov'
+      lcovonly: {
+        file: 'lcov/lcov.info'
       }
-    ]
+    }
   };
 } else {
+  kconfig.client.captureConsole = true;
   kconfig.files = [
     '../build/tests/unit.js'
   ];
   kconfig.reporters = [
     'quiet'
   ];
-  delete kconfig.coverageReporter;
 }
 
 module.exports = function (config) {

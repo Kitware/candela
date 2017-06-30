@@ -33,6 +33,15 @@ module.exports = function (config, basePath, options) {
 
   options = options || {};
 
+  // Install empty module and module.loaders entries if missing.
+  config.module = config.module || {};
+
+  if (process.env.WEBPACK1) {
+    config.module.loaders = config.module.loaders || [];
+  } else {
+    config.module.rules = config.module.rules || [];
+  }
+
   // By default, exclude the existing loaders from affecting
   // node_modules/candela. This prevents double application of loaders if they
   // are specified in the client project without any include or exclude
@@ -41,15 +50,6 @@ module.exports = function (config, basePath, options) {
 
   // Exclude the base paths from having existing loaders applied to them.
   if (exclude) {
-    // Install empty module and module.loaders entries if missing.
-    config.module = config.module || {};
-
-    if (process.env.WEBPACK1) {
-      config.module.loaders = config.module.loaders || [];
-    } else {
-      config.module.rules = config.module.rules || [];
-    }
-
     // For each loader, append the Candela include paths to its `exclude`
     // property.
     var excluder = function (loader) {
