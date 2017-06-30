@@ -7,7 +7,7 @@ var config = {
     tests: './tests.js'
   },
   output: {
-    path: path.resolve('..', 'build/tests'),
+    path: path.resolve('..', 'build/test'),
     filename: null
   },
   resolve: {

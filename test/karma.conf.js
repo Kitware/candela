@@ -18,7 +18,7 @@ var kconfig = {
 if (process.env.CANDELA_COVERAGE) {
   kconfig.client.captureConsole = false;
   kconfig.files = [
-    '../build/tests/coverage.js'
+    '../build/test/coverage.js'
   ];
   kconfig.reporters = [
     'coverage-istanbul'
@@ -38,7 +38,7 @@ if (process.env.CANDELA_COVERAGE) {
 } else {
   kconfig.client.captureConsole = true;
   kconfig.files = [
-    '../build/tests/unit.js'
+    '../build/test/unit.js'
   ];
   kconfig.reporters = [
     'quiet'
