@@ -83,8 +83,6 @@
     "raw-loader": "^0.5.1",
     "sass-loader": "^6.0.5",
     "sententree": "git+https://git@github.com/ronichoudhury-work/sententree.git#fix-typo",
-    "strip-json-comments": "^2.0.1",
-    "strip-json-comments-loader": "0.0.2",
     "style-loader": "^0.18.1",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
