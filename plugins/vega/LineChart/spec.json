@@ -5,11 +5,9 @@
     ["height", 500],
     ["legend", true],
 
-    // Default to showing the x and y fields on hover.
     ["hover", ["@merge", [["@get", "x"]], ["@get", "y"]]],
     ["pointSize", 25],
 
-    // Default axis titles to x and y field names.
     ["xAxis.title", ["@get", "x"]],
     ["yAxis.title", ["@join", ", ", ["@get", "y"]]],
 
@@ -18,8 +16,6 @@
   [
     "@let",
     [
-      // Create a legend boolean variable to use in the spec.
-      // Only show the legend if we have more than one line.
       ["legend", ["@gt", ["@length", ["@get", "y"]], 1]]
     ],
     [
