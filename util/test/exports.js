@@ -3,8 +3,6 @@ import test from 'tape-catch';
 import candela from 'candela';
 import * as candelaStar from 'candela';
 
-import { contentTests } from 'candela/test/util/exportTest';
-
 import { content as mixinContent } from 'candela/plugins/mixin/test/exports';
 import { content as geojsContent } from 'candela/plugins/geojs/test/exports';
 import { content as gloContent } from 'candela/plugins/glo/test/exports';

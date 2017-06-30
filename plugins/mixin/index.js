@@ -1,5 +1,3 @@
-import candela from 'candela';
-
 import AutoResize from './AutoResize';
 import Events from './Events';
 import InitSize from './InitSize';
