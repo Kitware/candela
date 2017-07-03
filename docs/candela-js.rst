@@ -44,16 +44,16 @@ You can also import a component directly:
 
    let vis = new BarChart(...);
 
-And as a last resort, you can also import the *candela-all* bundle, which is
+And as a last resort, you can also import the *candela* bundle, which is
 built to contain every component, preloaded into ``candela.components``:
 
 .. code-block:: javascript
 
-   import candela from 'candela/dist/candela-all';
+   import candela from 'candela/dist/candela';
 
    let vis = new candela.components.BarChart(...);
 
-However, the *candela-all* bundle is very large; using one of the other methods
+However, the *candela* bundle is very large; using one of the other methods
 of building your application will result in a smaller, more manageable bundle
 size.
 

@@ -7,7 +7,7 @@ script/
 test/
 **/test/
 candela-all.js
-!dist/candela-all.js
+!dist/candela.js
 circle.yml
 CONTRIBUTING.md
 requirements-dev.txt

@@ -5,10 +5,10 @@ var candelaWebpack = require('./webpack');
 var config = {
   devtool: 'source-map',
   entry: {
-    'candela-all': path.resolve('candela-all.js')
+    candela: path.resolve('candela-all.js')
   },
   output: {
-    library: 'candela-all',
+    library: 'candela',
     libraryTarget: 'umd',
     path: path.resolve('dist'),
     filename: process.env.NODE_ENV === 'production' ? '[name].min.js' : '[name].js'

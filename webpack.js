@@ -5,7 +5,7 @@ function _includePaths (basePath) {
   if (basePath) {
     return [
       path.resolve(basePath, 'index.js'),
-      path.resolve(basePath, 'candela-all.js'),
+      path.resolve(basePath, 'candela.js'),
       path.resolve(basePath, 'test'),
       path.resolve(basePath, 'util'),
       path.resolve(basePath, 'VisComponent'),

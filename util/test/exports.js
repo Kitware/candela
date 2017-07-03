@@ -127,10 +127,10 @@ const testBundle = (bundle, title, runTests, opts) => {
 };
 
 // Use the structureTest() function above to verify the contents of the
-// candela-all[.min].js file.
+// candela[.min].js file.
 const options = {
   empty: false,
   default: true
 };
-testBundle('candela-all.js', 'Structure and content of unminified Candela library file', structureTests, options);
-testBundle('candela-all.min.js', 'Structure and content of minified Candela library file', structureTests, options);
+testBundle('candela.js', 'Structure and content of unminified Candela library file', structureTests, options);
+testBundle('candela.min.js', 'Structure and content of minified Candela library file', structureTests, options);

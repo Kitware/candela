@@ -78,7 +78,7 @@ Example
 .. code-block:: html
 
     <body>
-    <script src="//unpkg.com/candela/dist/candela-all.min.js"></script>
+    <script src="//unpkg.com/candela/dist/candela.min.js"></script>
     <script>
       var el = document.createElement('div')
       el.setAttribute('width', 700);

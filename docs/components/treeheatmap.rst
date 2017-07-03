@@ -33,7 +33,7 @@ The examples below assume you have downloaded the `example data </_static/heatma
 .. code-block:: html
 
     <body>
-    <script src="//unpkg.com/candela/dist/candela-all.min.js"></script>
+    <script src="//unpkg.com/candela/dist/candela.min.js"></script>
     <div id="vis" style="width:600px;height:600px"></div>
     <script type="text/javascript" >
       var el = document.getElementById('vis');
