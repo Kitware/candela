@@ -45,18 +45,7 @@ and the sets become: ::
     n2: f2 x
     n3: f2 y
 
-This component can be found in the ``candela/dist/onset.js`` plugin bundle.
-
-When including this bundle in your project, be sure the following packages
-appear in your ``package.json``'s ``dependencies`` field:
-
-.. code-block:: json
-
-  {
-    "d3": "^3.5.17",
-    "datalib": "^1.7.3",
-    "onset": "git+https://github.com/Kitware/setvis#b2b8e7cfdef335a4ee4b2af871e14d203ef3e754"
-  }
+This component can be found in the ``candela/plugins/onset`` plugin.
 
 Options
 =======

@@ -6,18 +6,7 @@ A Gantt chart. The **data** table must contain two numeric fields, **start** and
 **end**, which specify the start and end of horizontal bars. A **label** field
 can specify the name of each item.
 
-This component can be found in the ``candela/dist/vega.js`` plugin bundle.
-
-When including this bundle in your project, be sure the following packages
-appear in your ``package.json``'s ``dependencies`` field:
-
-.. code-block:: json
-
-  {
-    "datalib": "^1.7.3",
-    "strip-json-comments-loader": "0.0.2",
-    "vega": "^2.4.2"
-  }
+This component can be found in the ``candela/plugins/vega`` plugin.
 
 Example
 =======
@@ -48,8 +37,7 @@ Example
 .. code-block:: html
 
     <body>
-    <script src="//unpkg.com/candela"></script>
-    <script src="//unpkg.com/candela/dist/vega.min.js"></script>
+    <script src="//unpkg.com/candela/dist/candela-all.min.js"></script>
     <script>
       var el = document.createElement('div')
       document.body.appendChild(el);

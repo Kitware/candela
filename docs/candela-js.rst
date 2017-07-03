@@ -15,29 +15,68 @@
 Components
 ==========
 
-Candela comes with several visualization components ready to use. To reduce the
-size of the Candela JavaScript bundle, these components are packed into plugin
-bundles that ship alongside the main Candela bundle. The current list of plugin
-bundles is:
+Candela comes with several visualization components ready to use. To make it
+easier to include these components in your project, they are partitioned into
+several built-in *plugins*. Each plugin exports its contents through its
+``index.js`` file:
 
-* ``candela/dist/vega.js`` - Charts based on Vega, including basic chart types
+.. code-block:: javascript
+
+   import * as candelaVega from 'candela/plugins/vega';
+
+   let vis = new candelaVega.BarChart(...);
+
+and can load its contents into the ``candela.components``
+object through its ``load.js`` file as follows:
+
+.. code-block:: javascript
+
+   import candela from 'candela';
+   import 'candela/plugins/vega/load.js';
+
+   let vis = new candela.components.BarChart(...);
+
+You can also import a component directly:
+
+.. code-block:: javascript
+
+   import BarChart from 'candela/plugins/vega/BarChart';
+
+   let vis = new BarChart(...);
+
+And as a last resort, you can also import the *candela-all* bundle, which is
+built to contain every component, preloaded into ``candela.components``:
+
+.. code-block:: javascript
+
+   import candela from 'candela/dist/candela-all';
+
+   let vis = new candela.components.BarChart(...);
+
+However, the *candela-all* bundle is very large; using one of the other methods
+of building your application will result in a smaller, more manageable bundle
+size.
+
+The current list of plugins is:
+
+* ``candela/plugins/vega`` - Charts based on Vega, including basic chart types
   such as bar charts, scatter plots, and histograms.
-* ``candela/dist/geojs.js`` - Components based on GeoJS for geospatial data visualization.
-* ``candela/dist/glo.js`` - A component based on GLO - "graph-level operations".
-* ``candela/dist/lineup.js`` - A component based on LineUp for visualizing
+* ``candela/plugins/geojs`` - Components based on GeoJS for geospatial data visualization.
+* ``candela/plugins/glo`` - A component based on GLO - "graph-level operations".
+* ``candela/plugins/lineup`` - A component based on LineUp for visualizing
   rankings.
-* ``candela/dist/onset.js`` - A component based on OnSet for visualizing subset
+* ``candela/plugins/onset`` - A component based on OnSet for visualizing subset
   relationships.
-* ``candela/dist/sententree.js`` - A component based on SentenTree for
+* ``candela/plugins/sententree`` - A component based on SentenTree for
   visualizing the grammatical structure of a corpus of text.
-* ``candela/dist/similaritygraph.js`` - A specialized interactive graph
+* ``candela/plugins/similaritygraph`` - A specialized interactive graph
   visualization component for investigating degrees of similarity between nodes
   in a data table.
-* ``candela/dist/trackerdash.js`` - A component based on the TrackerDash
+* ``candela/plugins/trackerdash`` - A component based on the TrackerDash
   algorithm metric tracking dashboard.
-* ``candela/dist/treeheatmap.js`` - A heatmap combined with hierarchical
+* ``candela/plugins/treeheatmap`` - A heatmap combined with hierarchical
   clustering.
-* ``candela/dist/upset.js`` - A component based on UpSet, also for visualizing
+* ``candela/plugins/upset`` - A component based on UpSet, also for visualizing
   subset relationships.
 
 For more details about each component (including how to import these bundles
@@ -270,18 +309,8 @@ This is a function expression that maps a base class to a new, unnamed class -
 in other words, mixins are functions that can be applied to ``VisComponent`` (or
 any existing component class) to yield a new class with extra functionality.
 
-Candela comes with several mixins, which are available in the plugin bundle
-``candela/dist/mixin.js``.
-
-When including this bundle in your project, be sure the following packages
-appear in your ``package.json``'s ``dependencies`` field:
-
-.. code-block:: json
-
-  {
-    "javascript-detect-element-resize": "^0.5.3",
-    "telegraph-events": "^1.0.3"
-  }
+Candela comes with several mixins, which are available in the plugin
+``candela/plugins/mixin``.
 
 .. js:function:: Events()
 

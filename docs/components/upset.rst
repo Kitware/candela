@@ -40,21 +40,7 @@ and make them available to UpSet: ::
       {"id": "n3", "f1": 0, "f2 x": 0, "f2 y": 1}
     ]
 
-This component can be found in the ``candela/dist/upset.js`` plugin bundle.
-
-When including this bundle in your project, be sure the following packages
-appear in your ``package.json``'s ``dependencies`` field:
-
-.. code-block:: json
-
-  {
-    "d3": "^3.5.17",
-    "datalib": "^1.7.3",
-    "font-awesome-webpack": "0.0.4",
-    "html-loader": "^0.4.3",
-    "sass-loader": "^6.0.5",
-    "UpSet": "git+https://github.com/jeffbaumes/upset#no-global-vars"
-  }
+This component can be found in the ``candela/plugins/upset`` plugin bundle.
 
 Options
 =======

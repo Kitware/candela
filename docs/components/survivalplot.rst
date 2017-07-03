@@ -13,18 +13,7 @@ and an optional column by which to group patients by, e.g., treatment type.
 The number of surviving patients is plotted as a decreasing step function, with
 crosses overplotted whenever a patient is censored from the study.
 
-This component can be found in the ``candela/dist/vega.js`` plugin bundle.
-
-When including this bundle in your project, be sure the following packages
-appear in your ``package.json``'s ``dependencies`` field:
-
-.. code-block:: json
-
-  {
-    "datalib": "^1.7.3",
-    "strip-json-comments-loader": "0.0.2",
-    "vega": "^2.4.2"
-  }
+This component can be found in the ``candela/plugins/vega`` plugin bundle.
 
 Options
 =======

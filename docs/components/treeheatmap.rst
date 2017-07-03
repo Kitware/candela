@@ -6,20 +6,7 @@
 
 A heatmap with optional hierarchies attached to the rows and columns.
 
-This component can be found in the ``candela/dist/treeheatmap.js`` plugin bundle.
-
-When including this bundle in your project, be sure the following packages
-appear in your ``package.json``'s ``dependencies`` field:
-
-.. code-block:: json
-
-  {
-    "d3-array": "^1.1.0",
-    "d3-scale": "^1.1.0",
-    "d3-selection": "^1.1.0",
-    "d3-transition": "^1.1.0",
-    "d3-shape": "^1.1.0"
-  }
+This component can be found in the ``candela/plugins/treeheatmap`` plugin.
 
 Example
 =======
@@ -46,8 +33,7 @@ The examples below assume you have downloaded the `example data </_static/heatma
 .. code-block:: html
 
     <body>
-    <script src="//unpkg.com/candela"></script>
-    <script src="//unpkg.com/candela/dist/treeheatmap.min.js"></script>
+    <script src="//unpkg.com/candela/dist/candela-all.min.js"></script>
     <div id="vis" style="width:600px;height:600px"></div>
     <script type="text/javascript" >
       var el = document.getElementById('vis');
