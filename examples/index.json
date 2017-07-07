@@ -1,0 +1,129 @@
+[
+  {
+    "title": "Bar Chart",
+    "link": "bar"
+  },
+  {
+    "title": "Box Plot",
+    "link": "box"
+  },
+  {
+    "title": "Bullet Chart",
+    "link": "bullet"
+  },
+  {
+    "title": "Gantt Chart",
+    "link": "gantt"
+  },
+  {
+    "title": "GeoJS (No Tiles)",
+    "link": "geoblank"
+  },
+  {
+    "title": "GeoJS Dots (No Tiles)",
+    "link": "geodotsblank"
+  },
+  {
+    "title": "GeoJS",
+    "link": "geo"
+  },
+  {
+    "title": "GeoJS Dots",
+    "link": "geodots"
+  },
+  {
+    "title": "Heatmap",
+    "link": "heatmap"
+  },
+  {
+    "title": "Histogram",
+    "link": "histogram"
+  },
+  {
+    "title": "Date Histogram",
+    "link": "histogram-date"
+  },
+  {
+    "title": "Line Chart",
+    "link": "line"
+  },
+  {
+    "title": "Line Chart with Points",
+    "link": "line-points"
+  },
+  {
+    "title": "Dynamic Line Chart",
+    "link": "line-dynamic"
+  },
+  {
+    "link": "resize-full",
+    "title": "Resize Full",
+    "template": "resize-full"
+  },
+  {
+    "title": "Resize Table",
+    "link": "resize-table",
+    "template": "resize-table"
+  },
+  {
+    "title": "Resize Matrix",
+    "link": "resize-matrix",
+    "template": "resize-matrix"
+  },
+  {
+    "title": "LineUp",
+    "link": "lineup"
+  },
+  {
+    "title": "OnSet",
+    "link": "onset"
+  },
+  {
+    "title": "UpSet",
+    "link": "upset"
+  },
+  {
+    "title": "UpSet Alternate Sets",
+    "link": "upset-alternate"
+  },
+  {
+    "title": "SentenTree",
+    "link": "sententree"
+  },
+  {
+    "title": "SimilarityGraph",
+    "link": "similarity"
+  },
+  {
+    "title": "TreeHeatmap",
+    "link": "treeheatmap"
+  },
+  {
+    "title": "Scatter Plot",
+    "link": "scatter"
+  },
+  {
+    "title": "Scatter Plot (solid dots)",
+    "link": "scatter-solid"
+  },
+  {
+    "title": "Scatter Plot Matrix",
+    "link": "scattermatrix"
+  },
+  {
+    "title": "Survival Plot",
+    "link": "survival"
+  },
+  {
+    "title": "TrackerDash",
+    "link": "trackerdash"
+  },
+  {
+    "title": "Glo",
+    "link": "glo"
+  },
+  {
+    "title": "Serialization",
+    "link": "serialize"
+  }
+]

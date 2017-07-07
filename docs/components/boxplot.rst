@@ -7,6 +7,8 @@ a boxplot of each one. The optional **group** field will partition the data
 into groups with matching value and make a boxplot (or set of boxplots)
 for each group.
 
+This component can be found in the ``candela/plugins/vega`` plugin.
+
 Example
 =======
 
@@ -27,7 +29,7 @@ Example
 .. code-block:: html
 
     <body>
-    <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/candela.min.js"></script>
     <script>
       var el = document.createElement('div')
       document.body.appendChild(el);

@@ -7,6 +7,8 @@ A bullet chart based on the
 The visualization takes a numeric **value** and plots it on a one-dimensional
 plot against comparison **markers** and background color **ranges**.
 
+This component can be found in the ``candela/plugins/vega`` plugin.
+
 Example
 =======
 
@@ -35,7 +37,7 @@ Example
 .. code-block:: html
 
     <body>
-    <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/candela.min.js"></script>
     <script>
       var el = document.createElement('div')
       document.body.appendChild(el);

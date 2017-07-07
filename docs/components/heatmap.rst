@@ -7,6 +7,8 @@ a set of **fields** in the **data** table using a separate color scale
 for each field. An optional **id** field is used to name the records,
 and the records can be ordered using a **sort** field.
 
+This component can be found in the ``candela/plugins/vega`` plugin.
+
 Example
 =======
 
@@ -30,7 +32,7 @@ Example
 .. code-block:: html
 
     <body>
-    <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/candela.min.js"></script>
     <script>
       var el = document.createElement('div')
       document.body.appendChild(el);

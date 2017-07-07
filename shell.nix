@@ -13,12 +13,13 @@ let libs = [
   fontconfig.dev
   gdk_pixbuf
   glib
-  glibc
   gnome3.gconf
   gtk2
   nspr
   nss
   pango
+  python27Packages.sphinx
+  python27Packages.sphinx_rtd_theme
   freetype
   stdenv.cc.cc.lib
   zlib
@@ -41,14 +42,13 @@ in stdenv.mkDerivation {
 
   buildInputs = [
     electron
-    git
     nodejs-7_x
+    phantomjs2
     pkgconfig
     python2
   ] ++ libs;
 
   C_INCLUDE_PATH = "${fontconfig.dev}/include";
-  LD_LIBRARY_PATH = stdenv.lib.makeLibraryPath libs;
 
   shellHook = ''
     echo "Candela nix dev environment"

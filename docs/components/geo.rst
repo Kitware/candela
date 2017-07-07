@@ -4,6 +4,8 @@
 
 A geospatial chart using `GeoJS <https://geojs.readthedocs.io>`_.
 
+This component can be found in the ``candela/plugins/geojs`` plugin.
+
 Example
 =======
 
@@ -47,7 +49,7 @@ Example
 .. code-block:: html
 
     <body>
-    <script src="//unpkg.com/candela"></script>
+    <script src="//unpkg.com/candela/dist/candela.min.js"></script>
     <script>
       var el = document.createElement('div')
       el.style.width = '500px';
