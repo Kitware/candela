@@ -2,12 +2,12 @@ import AutoResize from './AutoResize';
 import Events from './Events';
 import InitSize from './InitSize';
 import Resize from './Resize';
-import VegaChart from './VegaChart';
+import VegaView from './VegaView';
 
 export {
   AutoResize,
   Events,
   InitSize,
   Resize,
-  VegaChart
+  VegaView
 };
