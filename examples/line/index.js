@@ -1,23 +1,19 @@
 import candela from 'candela';
 import 'candela/plugins/vega/load';
 
-import { msft } from '../datasets';
+import { stocks } from '../datasets';
 import showComponent from '../util/showComponent';
 
 window.onload = () => {
   showComponent(candela.components.LineChart, {
-    data: msft,
+    data: stocks,
     x: 'date',
-    y: ['price'],
+    xType: 'temporal',
+    y: 'price',
+    series: 'symbol',
+    colorSeries: true,
     width: 735,
     height: 535,
-    hoverSize: 50,
-    padding: {
-      top: 20,
-      bottom: 45,
-      left: 45,
-      right: 20
-    },
     renderer: 'svg'
   });
 };

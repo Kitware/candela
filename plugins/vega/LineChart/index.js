@@ -64,8 +64,8 @@ export default class LineChart extends VegaView(VisComponent) {
         domain: ['quantitative', 'nominal', 'temporal', 'ordinal']
       },
       {
-        id: 'colorBySeries',
-        name: 'Color by series',
+        id: 'colorSeries',
+        name: 'Color series',
         type: 'boolean',
         optional: true,
         default: true
@@ -113,7 +113,7 @@ export default class LineChart extends VegaView(VisComponent) {
         field: this.options.series,
         type: this.options.seriesType || 'nominal'
       };
-      if (this.options.colorBySeries === undefined ? true : this.options.colorBySeries) {
+      if (this.options.colorSeries === undefined ? true : this.options.colorSeries) {
         spec.encoding.color = seriesSpec;
       } else {
         spec.encoding.detail = seriesSpec;

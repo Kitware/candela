@@ -7,6 +7,9 @@ import showComponent from '../util/showComponent';
 window.onload = () => {
   showComponent(candela.components.Histogram, {
     data: stocks,
-    bin: 'date'
+    x: 'date',
+    xType: 'temporal',
+    width: 500,
+    height: 400
   });
 };
