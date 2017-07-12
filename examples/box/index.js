@@ -11,17 +11,9 @@ window.onload = () => {
       'sepalLength',
       'sepalWidth'
     ],
-    group: 'species',
-    boxSize: 0.5,
-    capSize: 0.25,
-    width: 750,
+    x: 'species',
+    width: 100,
     height: 450,
-    padding: {
-      left: 30,
-      right: 20,
-      top: 20,
-      bottom: 130
-    },
     renderer: 'svg'
   });
 };

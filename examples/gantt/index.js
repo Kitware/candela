@@ -23,17 +23,10 @@ window.onload = () => {
     end: 'leave',
     label: 'name',
     level: 'level',
-    xAxis: {
-      values: [0, 3, 6, 9]
-    },
-    width: 620,
-    height: 555,
-    padding: {
-      left: 170,
-      right: 10,
-      top: 20,
-      bottom: 25
-    },
+    tickCount: 10,
+    axisTitle: 'Month',
+    width: 500,
+    height: 300,
     renderer: 'svg'
   });
 };

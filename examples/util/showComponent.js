@@ -6,7 +6,9 @@ const showComponent = (Component, options) => {
 
   document.body.appendChild(div);
 
-  return new Component(div, options);
+  let vis = new Component(div, options);
+  vis.render();
+  return vis;
 };
 
 export default showComponent;
