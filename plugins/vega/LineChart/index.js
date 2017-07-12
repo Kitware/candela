@@ -1,21 +1,18 @@
 import VisComponent from 'candela/VisComponent';
-import Events from 'candela/plugins/mixin/Events';
-import VegaChart from 'candela/plugins/mixin/VegaChart';
+import VegaView from 'candela/plugins/mixin/VegaView';
 
-import spec from './spec.json';
-
-export default class LineChart extends Events(VegaChart(VisComponent, spec)) {
+export default class LineChart extends VegaView(VisComponent) {
   static get options () {
     return [
       {
-        name: 'data',
-        type: 'table',
-        format: 'objectlist'
+        id: 'data',
+        name: 'Data table',
+        type: 'table'
       },
       {
-        name: 'x',
+        id: 'x',
+        name: 'X',
         type: 'string',
-        format: 'text',
         domain: {
           mode: 'field',
           from: 'data',
@@ -23,43 +20,106 @@ export default class LineChart extends Events(VegaChart(VisComponent, spec)) {
         }
       },
       {
-        name: 'y',
-        type: 'string_list',
-        format: 'string_list',
-        domain: {
-          mode: 'field',
-          from: 'data',
-          fieldTypes: ['date', 'number', 'integer', 'boolean']
-        }
-      },
-      {
-        name: 'hover',
-        type: 'string_list',
-        format: 'string_list',
+        id: 'xType',
+        name: ' ',
+        type: 'string',
         optional: true,
+        default: 'quantitative',
+        domain: ['quantitative', 'nominal', 'temporal', 'ordinal']
+      },
+      {
+        id: 'y',
+        name: 'Y',
+        type: 'string',
         domain: {
           mode: 'field',
           from: 'data',
-          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+          fieldTypes: ['date', 'number', 'integer', 'boolean']
         }
+      },
+      {
+        id: 'yType',
+        name: ' ',
+        type: 'string',
+        optional: true,
+        default: 'quantitative',
+        domain: ['quantitative', 'nominal', 'temporal', 'ordinal']
+      },
+      {
+        id: 'series',
+        name: 'Series',
+        type: 'string',
+        domain: {
+          mode: 'field',
+          from: 'data',
+          fieldTypes: ['date', 'number', 'integer', 'boolean', 'string']
+        }
+      },
+      {
+        id: 'seriesType',
+        name: ' ',
+        type: 'string',
+        optional: true,
+        default: 'nominal',
+        domain: ['quantitative', 'nominal', 'temporal', 'ordinal']
+      },
+      {
+        id: 'colorBySeries',
+        name: 'Color by series',
+        type: 'boolean',
+        optional: true,
+        default: true
       }
     ];
   }
 
-  constructor (...args) {
-    super(...args);
+  generateSpec () {
+    let spec = {
+      $schema: 'https://vega.github.io/schema/vega-lite/v2.0.json',
+      description: 'A line chart built by Candela.',
+      data: {
+        values: this.options.data || []
+      },
+      width: this.options.width === undefined ? 200 : this.options.width,
+      height: this.options.height === undefined ? 200 : this.options.height,
+      mark: 'line',
+      encoding: {}
+    };
 
-    // Attach a listener to the chart.
-    this.chart.then(chart => {
-      chart.on('click', (event, item) => {
-        if (item && item.mark.marktype === 'symbol') {
-          const datum = Object.assign({}, item.datum);
-          delete datum._id;
-          delete datum._prev;
-
-          this.emit('click', datum, item);
+    if (this.options.x && this.options.y) {
+      spec.selection = {
+        grid: {
+          type: 'interval', bind: 'scales'
         }
-      });
-    });
+      };
+    }
+
+    if (this.options.x) {
+      spec.encoding.x = {
+        field: this.options.x,
+        type: this.options.xType || 'quantitative'
+      };
+    }
+
+    if (this.options.y) {
+      spec.encoding.y = {
+        field: this.options.y,
+        type: this.options.yType || 'quantitative'
+      };
+    }
+
+    if (this.options.series) {
+      const seriesSpec = {
+        field: this.options.series,
+        type: this.options.seriesType || 'nominal'
+      };
+      if (this.options.colorBySeries === undefined ? true : this.options.colorBySeries) {
+        spec.encoding.color = seriesSpec;
+      } else {
+        spec.encoding.detail = seriesSpec;
+      }
+    }
+
+    return spec;
   }
 }

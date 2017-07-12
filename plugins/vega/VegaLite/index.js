@@ -1,13 +1,20 @@
 import VisComponent from 'candela/VisComponent';
 import VegaView from 'candela/plugins/mixin/VegaView';
 
-export default class ScatterPlot extends VegaView(VisComponent) {
+export default class VegaLite extends VegaView(VisComponent) {
   static get options () {
     return [
       {
         id: 'data',
         name: 'Data table',
         type: 'table'
+      },
+      {
+        id: 'mark',
+        name: 'Mark',
+        type: 'string',
+        default: 'point',
+        domain: ['point', 'circle', 'square', 'text', 'tick', 'bar', 'rectangle', 'line', 'area']
       },
       {
         id: 'x',
@@ -23,9 +30,8 @@ export default class ScatterPlot extends VegaView(VisComponent) {
         id: 'xType',
         name: ' ',
         type: 'string',
-        optional: true,
         default: 'quantitative',
-        domain: ['nominal', 'quantitative', 'temporal', 'ordinal']
+        domain: ['quantitative', 'temporal', 'ordinal', 'nominal']
       },
       {
         id: 'y',
@@ -41,8 +47,43 @@ export default class ScatterPlot extends VegaView(VisComponent) {
         id: 'yType',
         name: ' ',
         type: 'string',
-        optional: true,
         default: 'quantitative',
+        domain: ['quantitative', 'temporal', 'ordinal', 'nominal']
+      },
+      {
+        id: 'size',
+        name: 'Size',
+        type: 'string',
+        optional: true,
+        domain: {
+          mode: 'field',
+          from: 'data',
+          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+        }
+      },
+      {
+        id: 'sizeType',
+        name: ' ',
+        type: 'string',
+        default: 'quantitative',
+        domain: ['quantitative', 'temporal', 'ordinal', 'nominal']
+      },
+      {
+        id: 'shape',
+        name: 'Shape',
+        type: 'string',
+        optional: true,
+        domain: {
+          mode: 'field',
+          from: 'data',
+          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+        }
+      },
+      {
+        id: 'shapeType',
+        name: ' ',
+        type: 'string',
+        default: 'nominal',
         domain: ['nominal', 'quantitative', 'temporal', 'ordinal']
       },
       {
@@ -60,32 +101,12 @@ export default class ScatterPlot extends VegaView(VisComponent) {
         id: 'colorType',
         name: ' ',
         type: 'string',
-        optional: true,
         default: 'nominal',
         domain: ['nominal', 'quantitative', 'temporal', 'ordinal']
       },
       {
-        id: 'size',
-        name: 'Size',
-        type: 'string',
-        optional: true,
-        domain: {
-          mode: 'field',
-          from: 'data',
-          fieldTypes: ['number', 'integer', 'boolean']
-        }
-      },
-      {
-        id: 'sizeType',
-        name: ' ',
-        type: 'string',
-        optional: true,
-        default: 'quantitative',
-        domain: ['nominal', 'quantitative', 'temporal', 'ordinal']
-      },
-      {
-        id: 'shape',
-        name: 'Shape',
+        id: 'row',
+        name: 'Row',
         type: 'string',
         optional: true,
         domain: {
@@ -95,10 +116,27 @@ export default class ScatterPlot extends VegaView(VisComponent) {
         }
       },
       {
-        id: 'shapeType',
+        id: 'rowType',
         name: ' ',
         type: 'string',
+        default: 'nominal',
+        domain: ['nominal', 'quantitative', 'temporal', 'ordinal']
+      },
+      {
+        id: 'column',
+        name: 'Column',
+        type: 'string',
         optional: true,
+        domain: {
+          mode: 'field',
+          from: 'data',
+          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
+        }
+      },
+      {
+        id: 'columnType',
+        name: ' ',
+        type: 'string',
         default: 'nominal',
         domain: ['nominal', 'quantitative', 'temporal', 'ordinal']
       },
@@ -115,13 +153,13 @@ export default class ScatterPlot extends VegaView(VisComponent) {
   generateSpec () {
     let spec = {
       $schema: 'https://vega.github.io/schema/vega-lite/v2.0.json',
-      description: 'A generic Vega-lite chart built by Candela.',
+      description: 'A scatterplot built by Candela.',
       data: {
         values: this.options.data || []
       },
       width: this.options.width === undefined ? 200 : this.options.width,
       height: this.options.height === undefined ? 200 : this.options.height,
-      mark: 'point',
+      mark: this.options.mark || 'bar',
       config: {
         mark: {filled: this.options.filled === undefined ? true : this.options.filled}
       },
@@ -136,7 +174,7 @@ export default class ScatterPlot extends VegaView(VisComponent) {
       };
     }
 
-    for (let e of ['x', 'y', 'size', 'color', 'shape']) {
+    for (let e of ['x', 'y', 'size', 'color', 'shape', 'row', 'column']) {
       if (this.options[e]) {
         const defaultType = ['x', 'y', 'size'].indexOf(e) >= 0 ? 'quantitative' : 'nominal';
         spec.encoding[e] = {

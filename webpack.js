@@ -117,7 +117,7 @@ module.exports = function (config, basePath, options) {
       {
         test: /\.css$/,
         loaders: ['style-loader', 'css-loader'],
-        include: addNMPath(['lineupjs', 'nvd3'], includePaths)
+        include: addNMPath(['lineupjs', 'nvd3', 'vega-tooltip'], includePaths)
       },
       {
         test: /\.scss$/,
@@ -173,7 +173,7 @@ module.exports = function (config, basePath, options) {
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
-        include: addNMPath(['lineupjs', 'nvd3'], includePaths)
+        include: addNMPath(['lineupjs', 'nvd3', 'vega-tooltip'], includePaths)
       },
       {
         test: /\.scss$/,
