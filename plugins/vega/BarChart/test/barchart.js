@@ -25,16 +25,11 @@ test('BarChart component', t => {
     color: 'b',
     width: 625,
     height: 540,
-    padding: {
-      left: 45,
-      right: 130,
-      top: 20,
-      bottom: 40
-    },
     renderer: 'svg'
   });
+  vis.render();
 
-  vis.chart.then(() => {
+  vis.view.then(() => {
     t.equal(el.childNodes.length, 1, 'VegaCharts should have a single element under the top-level div');
 
     let container = el.childNodes[0];
