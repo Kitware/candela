@@ -18,15 +18,8 @@ window.onload = () => {
     x: 'id',
     y: 'a',
     color: 'b',
-    hover: ['id', 'c'],
     width: 625,
     height: 540,
-    padding: {
-      left: 45,
-      right: 130,
-      top: 20,
-      bottom: 40
-    },
     renderer: 'svg'
   });
 };
