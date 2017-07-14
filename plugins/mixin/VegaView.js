@@ -16,6 +16,10 @@ let VegaView = (Base) => class extends Base {
     return {};
   }
 
+  update (options) {
+    Object.assign(this.options, options);
+  }
+
   render () {
     // Use element size to set size, unless size explicitly specified or
     // element size is zero.

@@ -5,7 +5,7 @@ export const content = [
   'Events',
   'InitSize',
   'Resize',
-  'VegaChart'
+  'VegaView'
 ];
 
 exportMixinTest('mixin', content);
