@@ -18,6 +18,7 @@ let VegaView = (Base) => class extends Base {
 
   update (options) {
     Object.assign(this.options, options);
+    return Promise.resolve(this.view);
   }
 
   render () {
@@ -42,6 +43,9 @@ let VegaView = (Base) => class extends Base {
 
     if (spec.$schema && schemaParser(spec.$schema).library === 'vega-lite') {
       spec = vegaLiteCompile(spec).spec;
+    }
+    if (this.view) {
+      this.view.finalize();
     }
     this.view = new View(parse(spec))
       .renderer(this.options.renderer || 'canvas')
