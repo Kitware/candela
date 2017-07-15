@@ -87,7 +87,7 @@ export default class BarChart extends VegaView(VisComponent) {
     if (this.options.x && this.options.y) {
       spec.selection = {
         grid: {
-          type: 'interval', bind: 'scales'
+          type: 'interval', bind: 'scales', encodings: ['y']
         }
       };
     }

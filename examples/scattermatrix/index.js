@@ -14,8 +14,8 @@ window.onload = () => {
       'sepalWidth'
     ],
     color: 'species',
-    width: 200,
-    height: 200,
+    width: 90,
+    height: 90,
     renderer: 'svg'
   });
 };

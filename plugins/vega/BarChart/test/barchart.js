@@ -32,11 +32,11 @@ test('BarChart component', t => {
   t.equal(el.childNodes.length, 2, 'VegaViews should have two elements under the top-level div');
 
   let svg = el.childNodes[0];
-  t.equal(svg.nodeName, 'SVG', 'The first element should be an SVG');
+  t.equal(svg.nodeName, 'svg', 'The first element should be an svg');
 
   let bars = select(svg)
     .select('g.mark-rect')
-    .selectAll('rect');
+    .selectAll('path');
   t.equal(bars.size(), data.length, 'The number of bars in the chart should equal the number of data items');
 
   vis.update({
@@ -44,9 +44,10 @@ test('BarChart component', t => {
   })
   .then(() => vis.render())
   .then(() => {
+    let svg = el.childNodes[0];
     bars = select(svg)
       .select('g.mark-rect')
-      .selectAll('rect');
+      .selectAll('path');
     t.equal(bars.size(), data.length + 1, 'After data update, the number of bars in the chart should equal the original number of data items, plus one');
 
     vis.destroy();
