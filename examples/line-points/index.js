@@ -8,12 +8,11 @@ window.onload = () => {
   let vis = showComponent(candela.components.LineChart, {
     data: msft,
     x: 'date',
+    xType: 'temporal',
     y: 'price',
-    width: 735,
-    height: 535,
-    hoverSize: 50,
+    width: 600,
+    height: 400,
     showPoints: true,
-    pointSize: 25,
     renderer: 'svg'
   });
 

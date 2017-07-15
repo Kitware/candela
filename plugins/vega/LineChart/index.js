@@ -69,6 +69,13 @@ export default class LineChart extends VegaView(VisComponent) {
         type: 'boolean',
         optional: true,
         default: true
+      },
+      {
+        id: 'showPoints',
+        name: 'Show points',
+        type: 'boolean',
+        optional: true,
+        default: false
       }
     ];
   }
@@ -118,6 +125,10 @@ export default class LineChart extends VegaView(VisComponent) {
       } else {
         spec.encoding.detail = seriesSpec;
       }
+    }
+
+    if (this.options.showPoints) {
+      spec.config = {overlay: {line: true}};
     }
 
     return spec;

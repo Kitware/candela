@@ -12,8 +12,8 @@ window.onload = () => {
     y: 'price',
     series: 'symbol',
     colorSeries: true,
-    width: 735,
-    height: 535,
+    width: 600,
+    height: 400,
     renderer: 'svg'
   });
 };
