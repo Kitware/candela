@@ -109,12 +109,10 @@ Quick start - R
 
     components/barchart
     components/boxplot
-    components/bulletchart
     components/ganttchart
     components/geo
     components/geodots
     components/glo
-    components/heatmap
     components/histogram
     components/linechart
     components/lineup
@@ -123,7 +121,6 @@ Quick start - R
     components/scatterplotmatrix
     components/sententree
     components/similaritygraph
-    components/survivalplot
     components/treeheatmap
     components/upset
 

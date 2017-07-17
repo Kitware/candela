@@ -7,8 +7,7 @@ export const content = [
   'Histogram',
   'LineChart',
   'ScatterPlot',
-  'ScatterPlotMatrix',
-  'VegaLite'
+  'ScatterPlotMatrix'
 ];
 
 exportTest('vega', content);

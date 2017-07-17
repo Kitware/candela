@@ -5,7 +5,6 @@ import Histogram from './Histogram';
 import LineChart from './LineChart';
 import ScatterPlot from './ScatterPlot';
 import ScatterPlotMatrix from './ScatterPlotMatrix';
-import VegaLite from './VegaLite';
 
 export {
   BarChart,
@@ -14,6 +13,5 @@ export {
   Histogram,
   LineChart,
   ScatterPlot,
-  ScatterPlotMatrix,
-  VegaLite
+  ScatterPlotMatrix
 };
