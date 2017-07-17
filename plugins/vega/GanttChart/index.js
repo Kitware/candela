@@ -40,13 +40,6 @@ export default class GanttChart extends VegaView(VisComponent) {
         }
       },
       {
-        id: 'startType',
-        name: ' ',
-        type: 'string',
-        default: 'quantitative',
-        domain: ['nominal', 'quantitative', 'temporal', 'ordinal']
-      },
-      {
         id: 'end',
         name: 'End',
         type: 'string',
@@ -57,7 +50,7 @@ export default class GanttChart extends VegaView(VisComponent) {
         }
       },
       {
-        id: 'endType',
+        id: 'type',
         name: ' ',
         type: 'string',
         default: 'quantitative',
@@ -91,7 +84,7 @@ export default class GanttChart extends VegaView(VisComponent) {
       encoding: {
         x: {
           field: this.options.start || '',
-          type: this.options.startType || 'quantitative',
+          type: this.options.type || 'quantitative',
           axis: {
             grid: false,
             tickCount: this.options.tickCount || 5,
@@ -100,7 +93,7 @@ export default class GanttChart extends VegaView(VisComponent) {
         },
         x2: {
           field: this.options.end || '',
-          type: this.options.endType || 'quantitative'
+          type: this.options.type || 'quantitative'
         },
         y: {
           field: this.options.label || '',

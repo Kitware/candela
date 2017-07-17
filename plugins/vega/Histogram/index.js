@@ -20,6 +20,13 @@ export default class Histogram extends VegaView(VisComponent) {
         }
       },
       {
+        id: 'xType',
+        name: ' ',
+        type: 'string',
+        default: 'quantitative',
+        domain: ['quantitative', 'temporal', 'nominal', 'ordinal']
+      },
+      {
         id: 'maxBins',
         name: 'Maximum number of bins',
         type: 'number',
@@ -35,6 +42,13 @@ export default class Histogram extends VegaView(VisComponent) {
           from: 'data',
           fieldTypes: ['date', 'number', 'integer', 'boolean']
         }
+      },
+      {
+        id: 'yType',
+        name: ' ',
+        type: 'string',
+        default: 'quantitative',
+        domain: ['quantitative', 'temporal', 'nominal', 'ordinal']
       },
       {
         id: 'aggregate',

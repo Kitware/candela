@@ -48,6 +48,7 @@ export default class BarChart extends VegaView(VisComponent) {
         name: 'Aggregate',
         type: 'string',
         optional: true,
+        default: 'sum',
         domain: ['sum', 'count', 'mean', 'median', 'min', 'max']
       },
       {
@@ -102,10 +103,9 @@ export default class BarChart extends VegaView(VisComponent) {
 
     for (let e of ['x', 'color']) {
       if (this.options[e]) {
-        const defaultType = 'nominal';
         spec.encoding[e] = {
           field: this.options[e],
-          type: this.options[e + 'Type'] || defaultType
+          type: this.options[e + 'Type'] || 'nominal'
         };
       }
     }

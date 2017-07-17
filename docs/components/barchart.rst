@@ -3,7 +3,10 @@
 ================
 
 A bar chart. The **x** field should contain a distinct value for each bar, while
-the **y** field will correspond to the height of each bar.
+the **y** field will correspond to the height of each bar. The **color** field
+may be used to color each bar. In the case where there are multiple records
+for a single **x** value, **aggregate** may be used to combine values into a
+single bar.
 
 This component can be found in the ``candela/plugins/vega`` plugin.
 
@@ -76,14 +79,24 @@ data (:ref:`Table <table>`)
 x (String)
     The x axis (bar position) field. Must contain numeric data. See :ref:`axis scales`.
 
+xType (String)
+    The `data type`_ for the ``x`` field. The default is ``"nominal"``.
+
 y (String)
     The y axis (bar height) field. Must contain numeric data. See :ref:`axis scales`.
 
-color (String)
-    The field used to color the bars. See :ref:`color scales`.
+yType (String)
+    The `data type`_ for the ``y`` field. The default is ``"quantitative"``.
 
-hover (Array of String)
-    The fields to display on hover.
+color (String)
+    The field used to color the bars.
+
+colorType (String)
+    The `data type`_ for the ``color`` field. The default is ``"nominal"``.
+
+aggregate (String)
+    The `aggregation mode`_ for ``y`` values when the ``x`` value is the same
+    in multiple records. The default is ``"sum"``.
 
 width (Number)
     Width of the chart in pixels. See :ref:`sizing`.
@@ -93,3 +106,7 @@ height (Number)
 
 renderer (String)
     Whether to render in ``"svg"`` or ``"canvas"`` mode (default ``"canvas"``).
+
+.. _data type: https://vega.github.io/vega-lite/docs/encoding.html#data-type
+
+.. _aggregation mode: https://vega.github.io/vega-lite/docs/aggregate.html#supported-aggregation-operations

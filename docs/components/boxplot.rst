@@ -80,9 +80,18 @@ fields (Array of String)
     scales`. Axis type will be chosen by the inferred value of the first field
     in the array.
 
-group (String)
+x (String)
     The optional field to group by. Defaults to all records being placed in a
     single group. See :ref:`axis scales`.
+
+xType (String)
+    The `data type`_ for the ``x`` field. The default is ``"nominal"``.
+
+color (String)
+    The field used to color the box plots.
+
+colorType (String)
+    The `data type`_ for the ``color`` field. The default is ``"nominal"``.
 
 width (Number)
     Width of the chart in pixels. See :ref:`sizing`.
@@ -92,3 +101,5 @@ height (Number)
 
 renderer (String)
     Whether to render in ``"svg"`` or ``"canvas"`` mode (default ``"canvas"``).
+
+.. _data type: https://vega.github.io/vega-lite/docs/encoding.html#data-type
