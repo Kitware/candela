@@ -4,7 +4,7 @@ import test from 'tape-catch';
 import BarChart from '..';
 
 test('BarChart component', t => {
-  t.plan(5);
+  t.plan(6);
 
   const data = [
     {id: 0, a: 1, b: 3, c: 3},
@@ -29,9 +29,11 @@ test('BarChart component', t => {
   });
   vis.render();
 
-  t.equal(el.childNodes.length, 2, 'VegaViews should have two elements under the top-level div');
+  t.equal(el.childNodes.length, 1, 'VegaViews one content element under the top-level div');
 
-  let svg = el.childNodes[0];
+  t.equal(el.childNodes[0].childNodes.length, 2, 'VegaViews should have two elements under the content div');
+
+  let svg = el.childNodes[0].childNodes[0];
   t.equal(svg.nodeName, 'svg', 'The first element should be an svg');
 
   let bars = select(svg)
