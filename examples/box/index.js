@@ -12,7 +12,7 @@ window.onload = () => {
       'sepalWidth'
     ],
     x: 'species',
-    width: 100,
+    width: 400,
     height: 450,
     renderer: 'svg'
   });

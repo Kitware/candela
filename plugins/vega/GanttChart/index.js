@@ -78,8 +78,8 @@ export default class GanttChart extends VegaView(VisComponent) {
       data: {
         values: this.options.data || []
       },
-      width: this.options.width === undefined ? 200 : this.options.width,
-      height: this.options.height === undefined ? 200 : this.options.height,
+      width: this.getWidth(200),
+      height: this.getHeight(200),
       mark: 'rect',
       encoding: {
         x: {
