@@ -5,5 +5,5 @@ imageTest({
   url: 'http://localhost:28000/examples/line-points',
   selector: '#vis-element',
   delay: 1000,
-  threshold: 0.001
+  threshold: 0.002
 });

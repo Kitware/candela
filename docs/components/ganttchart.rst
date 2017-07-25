@@ -118,6 +118,15 @@ level (String)
     unique values, the first value encountered will be level 1 which is rendered
     more prominently, and the second value will be level 2.
 
+type (String)
+    The `data type`_ for the ``start`` and ``end`` fields. The default is ``"quantitative"``.
+
+tickCount (String)
+    The suggested number of tick marks to place along the x axis.
+
+axisTitle (String)
+    The title of the x axis.
+
 width (Number)
     Width of the chart in pixels. See :ref:`sizing`.
 
@@ -126,3 +135,5 @@ height (Number)
 
 renderer (String)
     Whether to render in ``"svg"`` or ``"canvas"`` mode (default ``"canvas"``).
+
+.. _data type: https://vega.github.io/vega-lite/docs/encoding.html#data-type

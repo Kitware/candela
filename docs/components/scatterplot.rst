@@ -83,22 +83,37 @@ data (:ref:`Table <table>`)
     The data table.
 
 x (String)
-    The x axis field. Must contain numeric data. See :ref:`axis scales`.
+    The x axis field.
+
+xType (String)
+    The `data type`_ for the ``x`` field. The default is ``"quantitative"``.
 
 y (String)
-    The y axis field. Must contain numeric data. See :ref:`axis scales`.
+    The y axis field.
+
+yType (String)
+    The `data type`_ for the ``y`` field. The default is ``"quantitative"``.
+
+color (String)
+    The field used to color the points.
+
+colorType (String)
+    The `data type`_ for the ``color`` field. The default is ``"nominal"``.
 
 size (String)
     The field used to size the points.
 
+sizeType (String)
+    The `data type`_ for the ``size`` field. The default is ``"quantitative"``.
+
 shape (String)
-    The field used to determine the shape of each point.
+    The field used to set the shape of the points.
 
-color (String)
-    The field used to color the points. See :ref:`color scales`.
+shapeType (String)
+    The `data type`_ for the ``shape`` field. The default is ``"nominal"``.
 
-hover (Array of String)
-    The fields to display on hover.
+filled (String)
+    Whether to fill the points or just draw the outline. The default is ``true``.
 
 width (Number)
     Width of the chart in pixels. See :ref:`sizing`.
@@ -108,3 +123,5 @@ height (Number)
 
 renderer (String)
     Whether to render in ``"svg"`` or ``"canvas"`` mode (default ``"canvas"``).
+
+.. _data type: https://vega.github.io/vega-lite/docs/encoding.html#data-type

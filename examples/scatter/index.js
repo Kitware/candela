@@ -10,15 +10,11 @@ window.onload = () => {
     x: 'petalLength',
     y: 'petalWidth',
     color: 'sepalLength',
+    colorType: 'quantitative',
     shape: 'species',
+    filled: false,
     width: 620,
     height: 500,
-    padding: {
-      top: 20,
-      bottom: 80,
-      left: 50,
-      right: 130
-    },
     renderer: 'svg'
   });
 };

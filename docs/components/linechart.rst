@@ -2,8 +2,8 @@
     LineChart
 =================
 
-A line chart. The chart plots a line for each specified **y** field
-against a single **x** field.
+A line chart. The chart plots a line for the **y** field against a single
+**x** field, optionally splitting into multiple lines using the **series** field.
 
 This component can be found in the ``candela/plugins/vega`` plugin.
 
@@ -20,7 +20,7 @@ Example
       for (var d = 0; d < 10; d += 1) data.push({a: d, b: d});
 
       var vis = new candela.components.LineChart(el, {
-        data: data, x: 'a', y: ['b'],
+        data: data, x: 'a', y: 'b',
         width: 700, height: 400});
       vis.render();
     </script>
@@ -46,7 +46,7 @@ Example
       var vis = new candela.components.LineChart(el, {
         data: data,
         x: 'a',
-        y: ['b'],
+        y: 'b',
         width: 700,
         height: 400
       });
@@ -63,7 +63,7 @@ Example
     data = [{'a': d, 'b': d} for d in range(10)]
 
     pycandela.components.LineChart(
-        data=data, x='a', y=['b'], width=700, height=400)
+        data=data, x='a', y='b', width=700, height=400)
 
 **R**
 
@@ -71,7 +71,7 @@ Example
 
     library(candela)
 
-    candela('LineChart', data=mtcars, x='mpg', y=list('wt'), color='disp')
+    candela('LineChart', data=mtcars, x='mpg', y='wt', color='disp')
 
 Options
 =======
@@ -80,15 +80,28 @@ data (:ref:`Table <table>`)
     The data table.
 
 x (String)
-    The field containing x-coordinates for the lines. The field must contain
-    date or numeric data. See :ref:`axis scales`.
+    The x axis field.
 
-y (Array of String)
-    The fields containing y-coordinates for the lines. The fields must contain
-    date or numeric data. See :ref:`axis scales`.
+xType (String)
+    The `data type`_ for the ``x`` field. The default is ``"quantitative"``.
 
-hover (Array of String)
-    The fields to display on hover.
+y (String)
+    The y axis field.
+
+yType (String)
+    The `data type`_ for the ``y`` field. The default is ``"quantitative"``.
+
+series (String)
+    The optional field used to separate the data into multiple lines.
+
+seriesType (String)
+    The `data type`_ for the ``series`` field. The default is ``"nominal"``.
+
+colorSeries (Boolean)
+    Whether to color the different series and show a legend. The default is ``true``.
+
+showPoints (Boolean)
+    Whether to overlay points on the lines. The default is ``false``.
 
 width (Number)
     Width of the chart in pixels. See :ref:`sizing`.
@@ -96,9 +109,7 @@ width (Number)
 height (Number)
     Height of the chart in pixels. See :ref:`sizing`.
 
-hoverSize (Number)
-    Displays the hover value when the pointer is within this number of pixels
-    (default 20).
-
 renderer (String)
     Whether to render in ``"svg"`` or ``"canvas"`` mode (default ``"canvas"``).
+
+.. _data type: https://vega.github.io/vega-lite/docs/encoding.html#data-type

@@ -1,19 +1,18 @@
 import VisComponent from 'candela/VisComponent';
-import VegaChart from 'candela/plugins/mixin/VegaChart';
-import spec from './spec.json';
+import VegaView from 'candela/plugins/mixin/VegaView';
 
-export default class BarChart extends VegaChart(VisComponent, spec) {
+export default class BarChart extends VegaView(VisComponent) {
   static get options () {
     return [
       {
-        name: 'data',
-        type: 'table',
-        format: 'objectlist'
+        id: 'data',
+        name: 'Data table',
+        type: 'table'
       },
       {
-        name: 'x',
+        id: 'x',
+        name: 'X',
         type: 'string',
-        format: 'text',
         domain: {
           mode: 'field',
           from: 'data',
@@ -21,19 +20,41 @@ export default class BarChart extends VegaChart(VisComponent, spec) {
         }
       },
       {
-        name: 'y',
+        id: 'xType',
+        name: ' ',
         type: 'string',
-        format: 'text',
+        default: 'nominal',
+        domain: ['nominal', 'quantitative', 'temporal', 'ordinal']
+      },
+      {
+        id: 'y',
+        name: 'Y',
+        type: 'string',
         domain: {
           mode: 'field',
           from: 'data',
-          fieldTypes: ['number', 'integer', 'boolean']
+          fieldTypes: ['date', 'number', 'integer', 'boolean']
         }
       },
       {
-        name: 'color',
+        id: 'yType',
+        name: ' ',
         type: 'string',
-        format: 'text',
+        default: 'quantitative',
+        domain: ['quantitative', 'temporal', 'nominal', 'ordinal']
+      },
+      {
+        id: 'aggregate',
+        name: 'Aggregate',
+        type: 'string',
+        optional: true,
+        default: 'sum',
+        domain: ['sum', 'count', 'mean', 'median', 'min', 'max']
+      },
+      {
+        id: 'color',
+        name: 'Color',
+        type: 'string',
         optional: true,
         domain: {
           mode: 'field',
@@ -42,16 +63,52 @@ export default class BarChart extends VegaChart(VisComponent, spec) {
         }
       },
       {
-        name: 'hover',
-        type: 'string_list',
-        format: 'string_list',
-        optional: true,
-        domain: {
-          mode: 'field',
-          from: 'data',
-          fieldTypes: ['string', 'date', 'number', 'integer', 'boolean']
-        }
+        id: 'colorType',
+        name: ' ',
+        type: 'string',
+        default: 'nominal',
+        domain: ['nominal', 'quantitative', 'temporal', 'ordinal']
       }
     ];
+  }
+
+  generateSpec () {
+    let spec = {
+      $schema: 'https://vega.github.io/schema/vega-lite/v2.0.json',
+      description: 'A bar chart built by Candela.',
+      data: {
+        values: this.options.data || []
+      },
+      width: this.getWidth(200),
+      height: this.getHeight(200),
+      mark: 'bar',
+      encoding: {}
+    };
+
+    if (this.options.x && this.options.y) {
+      spec.selection = {
+        grid: {
+          type: 'interval', bind: 'scales', encodings: ['y']
+        }
+      };
+    }
+
+    spec.encoding.y = {
+      aggregate: this.options.aggregate || 'sum'
+    };
+    if (this.options.y) {
+      spec.encoding.y.field = this.options.y;
+      spec.encoding.y.type = this.options.yType || 'quantitative';
+    }
+
+    for (let e of ['x', 'color']) {
+      if (this.options[e]) {
+        spec.encoding[e] = {
+          field: this.options[e],
+          type: this.options[e + 'Type'] || 'nominal'
+        };
+      }
+    }
+    return spec;
   }
 }

@@ -13,6 +13,7 @@ window.onload = () => {
     x: 'petalLength',
     y: 'petalWidth',
     color: 'sepalLength',
+    colorType: 'quantitative',
     shape: 'species',
     width: 620,
     height: 500

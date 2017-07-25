@@ -8,10 +8,6 @@
     "link": "box"
   },
   {
-    "title": "Bullet Chart",
-    "link": "bullet"
-  },
-  {
     "title": "Gantt Chart",
     "link": "gantt"
   },
@@ -30,10 +26,6 @@
   {
     "title": "GeoJS Dots",
     "link": "geodots"
-  },
-  {
-    "title": "Heatmap",
-    "link": "heatmap"
   },
   {
     "title": "Histogram",
@@ -109,10 +101,6 @@
   {
     "title": "Scatter Plot Matrix",
     "link": "scattermatrix"
-  },
-  {
-    "title": "Survival Plot",
-    "link": "survival"
   },
   {
     "title": "TrackerDash",

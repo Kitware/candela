@@ -24,7 +24,7 @@ Example
         }
 
         var vis = new candela.components.Histogram(el, {
-          data: data, bin: 'a',
+          data: data, x: 'a',
           width: 700, height: 400});
         vis.render();
     </script>
@@ -48,7 +48,7 @@ Example
 
       var vis = new candela.components.Histogram(el, {
         data: data,
-        bin: 'a',
+        x: 'a',
         width: 700,
         height: 400
       });
@@ -65,7 +65,7 @@ Example
 
     data = [{'a': nv(0, 1)} for d in range(1000)]
 
-    pycandela.components.Histogram(data=data, bin='a', width=700, height=400)
+    pycandela.components.Histogram(data=data, x='a', width=700, height=400)
 
 **R**
 
@@ -73,7 +73,7 @@ Example
 
     library(candela)
 
-    candela('Histogram', data=mtcars, bin='mpg')
+    candela('Histogram', data=mtcars, x='mpg')
 
 Options
 =======
@@ -81,12 +81,29 @@ Options
 data (:ref:`Table <table>`)
     The data table.
 
-bin (String)
-    The field to summarize. See :ref:`axis scales`.
+x (String)
+    The x axis field, which is binned into a histogram.
+
+xType (String)
+    The `data type`_ for the ``x`` field. The default is ``"nominal"``.
 
 aggregate (String)
-    An optional field to aggregate per bin. Must contain numeric data. See
-    :ref:`axis scales`.
+    The `aggregation mode`_ for ``y`` values within each histogram bin.
+    The default is ``"count"``, which does not use the
+    ``y`` values but will count the number of records in the bin.
+
+y (String)
+    The y axis field, which is used to determine the height of the histogram
+    bar when ``aggregate`` is not set to ``"count"``.
+
+yType (String)
+    The `data type`_ for the ``y`` field. The default is ``"quantitative"``.
+
+color (String)
+    The field used to color the bars.
+
+colorType (String)
+    The `data type`_ for the ``color`` field. The default is ``"nominal"``.
 
 width (Number)
     Width of the chart in pixels. See :ref:`sizing`.
@@ -96,3 +113,7 @@ height (Number)
 
 renderer (String)
     Whether to render in ``"svg"`` or ``"canvas"`` mode (default ``"canvas"``).
+
+.. _data type: https://vega.github.io/vega-lite/docs/encoding.html#data-type
+
+.. _aggregation mode: https://vega.github.io/vega-lite/docs/aggregate.html#supported-aggregation-operations

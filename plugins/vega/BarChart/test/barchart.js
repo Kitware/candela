@@ -4,7 +4,7 @@ import test from 'tape-catch';
 import BarChart from '..';
 
 test('BarChart component', t => {
-  t.plan(7);
+  t.plan(6);
 
   const data = [
     {id: 0, a: 1, b: 3, c: 3},
@@ -25,44 +25,35 @@ test('BarChart component', t => {
     color: 'b',
     width: 625,
     height: 540,
-    padding: {
-      left: 45,
-      right: 130,
-      top: 20,
-      bottom: 40
-    },
     renderer: 'svg'
   });
+  vis.render();
 
-  vis.chart.then(() => {
-    t.equal(el.childNodes.length, 1, 'VegaCharts should have a single element under the top-level div');
+  t.equal(el.childNodes.length, 1, 'VegaViews one content element under the top-level div');
 
-    let container = el.childNodes[0];
-    t.equal(container.nodeName, 'DIV', 'The single element should be a div');
-    t.equal(container.childNodes.length, 1, 'The div should have a single child element.');
+  t.equal(el.childNodes[0].childNodes.length, 2, 'VegaViews should have two elements under the content div');
 
-    let svg = container.childNodes[0];
-    t.equal(svg.nodeName, 'svg', 'The single child should be an svg.');
+  let svg = el.childNodes[0].childNodes[0];
+  t.equal(svg.nodeName, 'svg', 'The first element should be an svg');
 
-    let bars = select(svg)
+  let bars = select(svg)
+    .select('g.mark-rect')
+    .selectAll('path');
+  t.equal(bars.size(), data.length, 'The number of bars in the chart should equal the number of data items');
+
+  vis.update({
+    data: data.concat([{id: 8, a: 10, b: 6, c: 3}])
+  })
+  .then(() => vis.render())
+  .then(() => {
+    let svg = el.childNodes[0];
+    bars = select(svg)
       .select('g.mark-rect')
-      .selectAll('rect');
-    t.equal(bars.size(), data.length, 'The number of bars in the chart should equal the number of data items');
+      .selectAll('path');
+    t.equal(bars.size(), data.length + 1, 'After data update, the number of bars in the chart should equal the original number of data items, plus one');
 
-    vis.update({
-      data: data.concat([{id: 8, a: 10, b: 6, c: 3}])
-    }).then(() => vis.render())
-    .then(() => {
-      vis.render();
-
-      bars = select(svg)
-        .select('g.mark-rect')
-        .selectAll('rect');
-      t.equal(bars.size(), data.length + 1, 'After data update, the number of bars in the chart should equal the original number of data items, plus one');
-
-      vis.destroy();
-      let contents = select(vis.el).selectAll('*');
-      t.equal(contents.size(), 0, 'After destroy(), container element should have no children');
-    });
+    vis.destroy();
+    let contents = select(vis.el).selectAll('*');
+    t.equal(contents.size(), 0, 'After destroy(), container element should have no children');
   });
 });

@@ -1,11 +1,13 @@
 import candela from 'candela';
 import 'candela/plugins/vega/load';
+import 'candela/plugins/mixin/load';
 
+import { changeset } from 'vega';
 import { select } from 'd3-selection';
 import html from './index.jade';
 import './index.styl';
 
-class DynamicLineChart extends candela.components.LineChart {
+class DynamicLineChart extends candela.mixins.Events(candela.components.LineChart) {
   constructor (...args) {
     super(...args);
   }
@@ -17,14 +19,7 @@ class DynamicLineChart extends candela.components.LineChart {
 
   data (data) {
     this.options.data = data;
-
-    this.chart.then(chart => {
-      let data = chart.data('data');
-      data.remove(() => true);
-      data.insert(this.options.data);
-
-      chart.update();
-    });
+    this.view.change('source_0', changeset().remove(() => true).insert(this.options.data)).run();
   }
 }
 
@@ -44,7 +39,7 @@ window.onload = () => {
   let vis = new DynamicLineChart(el, {
     data,
     x: 'index',
-    y: ['value']
+    y: 'value'
   });
   vis.render();
 

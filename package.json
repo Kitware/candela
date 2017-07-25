@@ -4,7 +4,9 @@
   "description": "Visualization components for the web",
   "main": "index.js",
   "scripts": {
-    "build": "webpack && NODE_ENV=production webpack -p",
+    "build": "npm run build:dev && npm run build:prod",
+    "build:dev": "webpack",
+    "build:prod": "NODE_ENV=production webpack -p",
     "build:examples": "cd examples; webpack",
     "examples": "http-server build/examples -p ${PORT-3000}",
     "build:test:unit": "cd test; webpack",
@@ -89,7 +91,10 @@
     "telegraph-events": "^1.0.3",
     "underscore": "^1.8.3",
     "url-loader": "^0.5.8",
-    "vega": "^2.4.2",
+    "vega": "^3.0.0-rc1",
+    "vega-lite": "^2.0.0-beta.8",
+    "vega-schema-url-parser": "^1.0.0-beta.2",
+    "vega-tooltip": "^0.4.2",
     "webcola": "^3.3.3"
   },
   "devDependencies": {
