@@ -17,7 +17,7 @@ Example
     <script type="text/javascript" >
       var el = document.getElementById('treeheatmap-example');
 
-      d3.json('/_static/heatmap.json', function (error, data) {
+      d3.json('_static/heatmap.json', function (error, data) {
         var vis = new candela.components.TreeHeatmap(el, {
           data: data,
           scale: 'column'
@@ -26,7 +26,7 @@ Example
       });
     </script>
 
-The examples below assume you have downloaded the `example data </_static/heatmap.json>`_.
+The examples below assume you have downloaded the `example data <_static/heatmap.json>`_.
 
 **JavaScript**
 
