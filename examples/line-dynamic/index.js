@@ -39,6 +39,7 @@ window.onload = () => {
   let vis = new DynamicLineChart(el, {
     data,
     x: 'index',
+    xScale: {nice: false, zero: false},
     y: 'value'
   });
   vis.render();

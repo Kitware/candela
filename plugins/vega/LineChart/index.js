@@ -106,6 +106,9 @@ export default class LineChart extends VegaView(VisComponent) {
         field: this.options.x,
         type: this.options.xType || 'quantitative'
       };
+      if (this.options.xScale) {
+        spec.encoding.x.scale = this.options.xScale;
+      }
     }
 
     if (this.options.y) {
@@ -113,6 +116,9 @@ export default class LineChart extends VegaView(VisComponent) {
         field: this.options.y,
         type: this.options.yType || 'quantitative'
       };
+      if (this.options.yScale) {
+        spec.encoding.y.scale = this.options.yScale;
+      }
     }
 
     if (this.options.series) {
