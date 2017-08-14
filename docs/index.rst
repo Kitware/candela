@@ -139,4 +139,3 @@ Quick start - R
     coding-style-guide
     releasing-candela
     testing
-    vega-templates

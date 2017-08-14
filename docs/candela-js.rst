@@ -336,10 +336,11 @@ Combines the ``InitSize`` and ``Resize`` mixins, and automatically responds to
 the ``resize`` event by updating the ``this.width`` and ``this.height``
 properties.
 
-.. js:function:: VegaChart(spec)
+.. js:function:: VegaView()
 
-Implements a vega-based visualization component, using the Vega specification
-given in ``spec``.
+Implements a Vega or Vega-Lite visualization component. Subclasses should
+implement a ``generateSpec()`` method which returns an appropriate
+Vega/Vega-Lite specification based on the view options.
 
 .. _options:
 
