@@ -146,6 +146,14 @@ export default class ScatterPlot extends VegaView(VisComponent) {
       }
     }
 
+    if (this.options.xScale) {
+      spec.encoding.x.scale = this.options.xScale;
+    }
+
+    if (this.options.yScale) {
+      spec.encoding.y.scale = this.options.yScale;
+    }
+
     return spec;
   }
 }
