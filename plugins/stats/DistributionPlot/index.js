@@ -12,7 +12,10 @@ const xformData = opts => {
   const ret = Object.assign({}, opts, {
     data: newData,
     x: 'index',
-    y: 'value'
+    y: 'value',
+    yScale: {
+      zero: false
+    }
   });
 
   return ret;
