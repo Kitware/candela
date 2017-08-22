@@ -6,7 +6,7 @@ import { gaussian } from '../datasets';
 
 window.onload = () => {
   showComponent(candela.components.DistributionPlot, {
-    data: gaussian.map(x => x.normal),
+    data: gaussian.map(x => x.bimodal),
     width: 620,
     height: 500,
     renderer: 'svg'

@@ -8,6 +8,14 @@
     "link": "box"
   },
   {
+    "title": "Distribution Plot (normal)",
+    "link": "distribution"
+  },
+  {
+    "title": "Distribution Plot (bimodal)",
+    "link": "distribution-bimodal"
+  },
+  {
     "title": "Gantt Chart",
     "link": "gantt"
   },
