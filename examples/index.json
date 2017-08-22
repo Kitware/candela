@@ -8,6 +8,14 @@
     "link": "box"
   },
   {
+    "title": "Normal Probability Plot (normal)",
+    "link": "normalprobability"
+  },
+  {
+    "title": "Normal Probability Plot (bimodal)",
+    "link": "normalprobability-bimodal"
+  },
+  {
     "title": "Distribution Plot (normal)",
     "link": "distribution"
   },
