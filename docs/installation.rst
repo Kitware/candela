@@ -216,7 +216,7 @@ followed by Shift-Enter to execute the cell and display the visualization: ::
 
     import pycandela
     pycandela.components.ScatterPlot(
-        data=df, color='species', x='sepalLength', y='sepalWidth')
+        data=data, color='species', x='sepalLength', y='sepalWidth')
 
 
 R - using ``install_github`` or Git checkout
