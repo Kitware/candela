@@ -104,9 +104,6 @@ export default class GanttChart extends VegaView(VisComponent) {
           },
           sort: {
             field: '_id'
-          },
-          scale: {
-            reverse: true
           }
         },
         color: {
