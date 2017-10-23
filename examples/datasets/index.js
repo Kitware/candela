@@ -2,6 +2,7 @@ import dl from 'datalib';
 
 // hmohiv data downloaded from
 // http://www.ats.ucla.edu/stat/r/examples/asa/hmohiv.csv
+import gaussian_raw from './gaussian.csv';
 import heatmap_raw from './heatmap.csv';
 import hmohiv_raw from './hmohiv.csv';
 import iris from './iris.json';
@@ -25,6 +26,7 @@ const readCSV = raw => readDSV(raw, 'csv');
 const readTSV = raw => readDSV(raw, 'tsv');
 
 const goal = readTSV(goal_raw);
+const gaussian = readCSV(gaussian_raw);
 const heatmap = readCSV(heatmap_raw);
 const hmohiv = readCSV(hmohiv_raw);
 const lesmis = {
@@ -37,6 +39,7 @@ const simpsons_alternate = readCSV(simpsons_alternate_raw);
 const stocks = readCSV(stocks_raw);
 
 export {
+  gaussian,
   goal,
   heatmap,
   hmohiv,
