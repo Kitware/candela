@@ -85,8 +85,10 @@ let VegaView = (Base) => class extends Base {
     // is not currently supported in Vega-Lite.
     //
     // So here we render a few times to determine the relationship of cell
-    // width/height and final width/height. It is assumed that it is a linear
-    // relationship, with a non-unit slope to account for repeated cells.
+    // width/height and final width/height. By observing the full width/height
+    // of the rendered chart and comparing to the expected size of the data
+    // rectangles themselves, we can manipulate the settings needed to produce
+    // the full desired height and width.
 
     let intendedSize = {width: spec.width, height: spec.height};
     if (spec.spec) {
@@ -95,17 +97,31 @@ let VegaView = (Base) => class extends Base {
 
     this.el.removeChild(this.content);
 
-    let size1 = this._resizeContent(spec, {width: 100, height: 100});
-    let size2 = this._resizeContent(spec, {width: 200, height: 200});
+    // Render once at the requested dimensions.
+    const size = this._resizeContent(spec, intendedSize);
 
-    let widthSlope = (size2.width - size1.width) / 100;
-    let heightSlope = (size2.height - size1.height) / 100;
-    let widthIntercept = size1.width - widthSlope * 100;
-    let heightIntercept = size1.height - heightSlope * 100;
+    // Whether or not the chart contains small multiples, each data rectangle
+    // will be of the size requested. To figure out how much margin space is
+    // required, we need to subtract out the multiplicity of chart sizes.
+    const horzMult = Math.floor(size.width / intendedSize.width);
+    const vertMult = Math.floor(size.height / intendedSize.height);
 
+    // Now scale down the desired chart size by these factors, so as to roughly
+    // fit them in the desired space.
+    const size2 = this._resizeContent(spec, {
+      width: intendedSize.width / horzMult,
+      height: intendedSize.height / vertMult
+    });
+
+    // Compare the rendered dimensions the the desired dimensions; the excess is
+    // what is needed for marginalia.
+    const horzExcess = size2.width - intendedSize.width;
+    const vertExcess = size2.height - intendedSize.height;
+
+    // Finally, render one last time, subtracting out the marginalia dimensions.
     this._resizeContent(spec, {
-      width: (intendedSize.width - widthIntercept) / widthSlope,
-      height: (intendedSize.height - heightIntercept) / heightSlope
+      width: (intendedSize.width - horzExcess) / horzMult,
+      height: (intendedSize.height - vertExcess) / vertMult
     });
 
     this.content.firstChild.style.display = 'block';
