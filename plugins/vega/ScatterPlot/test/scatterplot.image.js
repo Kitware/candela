@@ -2,6 +2,7 @@ import imageTest from '../../../../test/util/imageTest';
 
 imageTest({
   name: 'scatterplot',
+  extraBaselines: ['scatterplot-circle'],
   url: 'http://localhost:28000/examples/scatter',
   selector: '#vis-element',
   delay: 1000,
