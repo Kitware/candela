@@ -11,6 +11,9 @@ dependencies:
     # Install flake8 for Python linting.
     - sudo pip install flake8
 
+    # Inject npm token into environment.
+    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >>~/.npmrc
+
   cache_directories:
     - node_modules
 
