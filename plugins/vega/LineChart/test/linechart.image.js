@@ -2,6 +2,7 @@ import imageTest from '../../../../test/util/imageTest';
 
 imageTest({
   name: 'linechart',
+  extraBaselines: ['linechart-circle'],
   url: 'http://localhost:28000/examples/line',
   selector: '#vis-element',
   delay: 1000,
