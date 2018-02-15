@@ -28,7 +28,7 @@
     "lint:pycandela": "flake8 --config python/pycandela/flake8.cfg python/pycandela",
     "docs": "http-server build/docs -p ${PORT-3000}",
     "commit": "git-cz",
-    "semantic-release": "semantic-release pre --debug && npm publish && semantic-release post --debug ",
+    "semantic-release": "semantic-release",
     "commitmsg": "validate-commit-msg"
   },
   "semistandard": {
@@ -116,7 +116,7 @@
     "karma-webpack": "^1.7.0",
     "nightmare": "^2.10.0",
     "node-resemble": "^1.1.3",
-    "semantic-release": "^4.3.5",
+    "semantic-release": "^12.4.1",
     "semistandard": "^7.0.5",
     "snazzy": "^4.0.0",
     "tap-spec": "^4.1.1",
