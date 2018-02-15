@@ -2,6 +2,7 @@ import imageTest from '../../../../test/util/imageTest';
 
 imageTest({
   name: 'lineup',
+  extraBaselines: ['lineup-circle'],
   url: 'http://localhost:28000/examples/lineup',
   selector: '#vis-element',
   delay: 2000,
