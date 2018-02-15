@@ -5,6 +5,6 @@ imageTest({
   extraBaselines: ['scatterplotmatrix-circle'],
   url: 'http://localhost:28000/examples/scattermatrix',
   selector: '#vis-element',
-  delay: 1000,
+  delay: 4000,
   threshold: 0.001
 });
