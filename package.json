@@ -28,7 +28,7 @@
     "lint:pycandela": "flake8 --config python/pycandela/flake8.cfg python/pycandela",
     "docs": "http-server build/docs -p ${PORT-3000}",
     "commit": "git-cz",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "semantic-release": "semantic-release pre --debug && npm publish && semantic-release post --debug ",
     "commitmsg": "validate-commit-msg"
   },
   "semistandard": {
