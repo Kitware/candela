@@ -60,4 +60,4 @@ deployment:
   semantic-release:
     branch: master
     commands:
-      - npm run semantic-release
+      - DEBUG=condition npm run semantic-release
