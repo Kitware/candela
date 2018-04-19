@@ -1,5 +1,5 @@
-import VisComponent from 'candela/VisComponent';
-import VegaView from 'candela/plugins/mixin/VegaView';
+import { VisComponent } from '@candela/core';
+import VegaView from '../../mixin/VegaView';
 
 export default class GanttChart extends VegaView(VisComponent) {
   static get options () {
