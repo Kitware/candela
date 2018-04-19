@@ -3,7 +3,7 @@ import schemaParser from 'vega-schema-url-parser';
 import { vega as vegaTooltip } from 'vega-tooltip';
 import 'vega-tooltip/build/vega-tooltip.css';
 import { select } from 'd3-selection';
-import { getElementSize } from '../../util';
+import { getElementSize } from '../../../../util';
 import { parse, View } from 'vega';
 
 let VegaView = (Base) => class extends Base {
