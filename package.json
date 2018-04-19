@@ -114,6 +114,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-tap": "^1.0.4",
     "karma-webpack": "^1.7.0",
+    "lerna": "^2.10.2",
     "nightmare": "^2.10.0",
     "node-resemble": "^1.1.3",
     "semantic-release": "^12.4.1",

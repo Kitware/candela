@@ -1,6 +1,4 @@
-import { select } from 'd3-selection';
-
-export default class VisComponent {
+export class VisComponent {
   constructor (el) {
     if (!el) {
       throw new Error('"el" is a required argument');
@@ -22,9 +20,9 @@ export default class VisComponent {
   }
 
   empty () {
-    select(this.el)
-      .selectAll('*')
-      .remove();
+    while(this.el.firstChild) {
+      this.el.removeChild(this.el.firstChild);
+    }
   }
 
   get serializationFormats () {
