@@ -15,11 +15,17 @@ let libs = [
   glib
   gnome3.gconf
   gtk2
+  icu.dev
+  libjpeg
   nspr
   nss
+  openssl.dev
   pango
+  pcre.dev
   python27Packages.sphinx
   python27Packages.sphinx_rtd_theme
+  readline.dev
+  sqlite.dev
   freetype
   stdenv.cc.cc.lib
   zlib
@@ -42,15 +48,16 @@ in stdenv.mkDerivation {
 
   buildInputs = [
     electron
-    nodejs-7_x
+    nodejs-8_x
     phantomjs2
     pkgconfig
     python2
   ] ++ libs;
 
-  C_INCLUDE_PATH = "${fontconfig.dev}/include";
+  C_INCLUDE_PATH = "${fontconfig.dev}/include:${openssl.dev}/include";
+  LD_LIBRARY_PATH = "${readline.dev}/lib:${zlib}/lib:${libjpeg}/lib";
 
   shellHook = ''
-    echo "Candela nix dev environment"
+    SOURCE_DATE_EPOCH=$(date +%s)
   '';
 }
