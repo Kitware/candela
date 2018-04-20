@@ -1,4 +1,4 @@
-import ScatterPlot from '../../vega/ScatterPlot';
+import { ScatterPlot } from '@candela/vega';
 
 const rankit = (n) => (i) => {
   const a = n <= 10 ? 3.0 / 8.0 : 0.5;

@@ -1,4 +1,4 @@
-import ScatterPlot from '../../vega/ScatterPlot';
+import { ScatterPlot } from '@candela/vega';
 
 const xformData = opts => {
   const data = [...opts.data];
