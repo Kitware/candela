@@ -1,6 +1,6 @@
 import 'javascript-detect-element-resize/detect-element-resize';
-import Events from './Events';
-import { getElementSize } from '../../util';
+import { Events } from '@candela/events';
+import { getElementSize } from '../../vega/src/util';
 
 let Resize = Base => class extends Events(Base) {
   constructor (...args) {
