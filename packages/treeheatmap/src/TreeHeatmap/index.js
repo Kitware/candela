@@ -1,5 +1,5 @@
-import VisComponent from 'candela/VisComponent';
-import { getElementSize } from 'candela/util';
+import { VisComponent } from '@candela/core';
+import { getElementSize } from '../../../vega/src/util';
 
 import { extent,
          min,
