@@ -1,0 +1,35 @@
+{
+  "name": "@candela/onset",
+  "version": "0.19.1",
+  "description": "Candela component for OnSet",
+  "main": "dist/candela-onset.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode development"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "babel": {
+    "presets": [
+      "@babel/env"
+    ]
+  },
+  "keywords": [],
+  "author": "Kitware Inc.",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@candela/core": "0.19.1",
+    "d3": "^3.5.17",
+    "datalib": "^1.7.3",
+    "onset": "git+https://github.com/Kitware/setvis#b2b8e7cfdef335a4ee4b2af871e14d203ef3e754"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.44",
+    "@babel/preset-env": "^7.0.0-beta.44",
+    "@babel/register": "^7.0.0-beta.44",
+    "babel-loader": "^8.0.0-beta.2",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.14"
+  }
+}
