@@ -1,4 +1,4 @@
-import VisComponent from 'candela/VisComponent';
+import { VisComponent } from '@candela/core';
 
 import ErrorBulletWidget from './ErrorBulletWidget';
 import BoxAndWhiskerWidget from './BoxAndWhiskerWidget';

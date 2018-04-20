@@ -1,4 +1,4 @@
-import VisComponent from 'candela/VisComponent';
+import { VisComponent } from '@candela/core';
 
 import _ from 'underscore';
 import d3 from 'd3';

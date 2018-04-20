@@ -1,4 +1,4 @@
-import VisComponent from 'candela/VisComponent';
+import { VisComponent } from '@candela/core';
 
 import $ from 'jquery';
 import _ from 'underscore';
