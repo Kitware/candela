@@ -3,7 +3,7 @@ import { simpsons } from '../datasets';
 import showComponent from '../util/showComponent';
 
 window.onload = () => {
-  showComponent(OnSet, {
+  let vis = showComponent(OnSet, {
     data: simpsons,
     id: 'Name',
     sets: [

@@ -7,6 +7,9 @@ export default {
     path: path.resolve('dist'),
     filename: 'candela-upset.js'
   },
+  externals: {
+    d3: 'd3'
+  },
   module: {
     rules: [
       {

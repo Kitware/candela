@@ -7,6 +7,9 @@ export default {
     path: path.resolve('dist'),
     filename: 'candela-onset.js'
   },
+  externals: {
+    d3: 'd3'
+  },
   module: {
     rules: [
       {

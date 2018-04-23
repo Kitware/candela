@@ -40,6 +40,7 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
+        exclude: /node_modules/,
         loader: 'babel-loader',
         options: {
           presets: [
@@ -49,8 +50,7 @@ module.exports = {
               }
             }]
           ]
-        },
-        exclude: /node_modules/
+        }
       },
       {
         test: /\.csv|\.tsv$/,
