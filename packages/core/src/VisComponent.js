@@ -1,4 +1,4 @@
-export class VisComponent {
+export default class VisComponent {
   constructor (el) {
     if (!el) {
       throw new Error('"el" is a required argument');

@@ -1,6 +1,9 @@
 import { VisComponent } from '@candela/core';
 import VegaView from '../../mixin/VegaView';
 
+console.log('VisComponent', VisComponent);
+console.log('VegaView', VegaView);
+
 export default class BarChart extends VegaView(VisComponent) {
   static get options () {
     return [

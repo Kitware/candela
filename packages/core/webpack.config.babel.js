@@ -1,8 +1,9 @@
 import path from 'path';
 
 export default {
-  entry: './src/VisComponent.js',
+  entry: './src/index.js',
   output: {
+    libraryTarget: 'umd',
     path: path.resolve('dist'),
     filename: 'candela-core.js'
   },

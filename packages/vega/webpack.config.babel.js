@@ -3,6 +3,7 @@ import path from 'path';
 export default {
   entry: './src/index.js',
   output: {
+    libraryTarget: 'umd',
     path: path.resolve('dist'),
     filename: 'candela-vega.js'
   },
