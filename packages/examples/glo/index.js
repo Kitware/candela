@@ -3,7 +3,7 @@ import { lesmis } from '../datasets';
 import showComponent from '../util/showComponent';
 
 window.onload = () => {
-  showComponent(Glo, {
+  const glo = showComponent(Glo, {
     width: '100vw',
     height: '100vh',
     nodes: lesmis.nodes,
