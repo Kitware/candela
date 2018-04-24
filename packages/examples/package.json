@@ -45,7 +45,6 @@
     "style-loader": "^0.21.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
-    "vega": "^3.3.1",
     "webpack": "^4.6.0",
     "webpack-cli": "^2.0.14"
   }
