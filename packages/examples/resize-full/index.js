@@ -1,6 +1,5 @@
 import { ScatterPlot } from '@candela/vega';
-import { AutoResize,
-         InitSize } from '@candela/size';
+import { AutoResize } from '@candela/size';
 import html from './index.jade';
 import './index.styl';
 
@@ -13,7 +12,7 @@ window.onload = () => {
   document.body.innerHTML = html();
 
   let el = document.getElementById('vis-element');
-  let vis = new AutoResize(InitSize(ScatterPlot))(el, {
+  let vis = new (AutoResize(ScatterPlot))(el, {
     data,
     x: 'x',
     y: 'y'
