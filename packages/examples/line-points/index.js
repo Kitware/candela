@@ -3,7 +3,7 @@ import { msft } from '../datasets';
 import showComponent from '../util/showComponent';
 
 window.onload = () => {
-  showComponent(LineChart, {
+  const vis = showComponent(LineChart, {
     data: msft,
     x: 'date',
     xType: 'temporal',
@@ -13,6 +13,5 @@ window.onload = () => {
     showPoints: true,
     renderer: 'svg'
   });
-
-  vis.on('click', (d, item) => console.log(d, item));
+  vis.render();
 };
