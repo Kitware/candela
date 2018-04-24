@@ -16,5 +16,4 @@ window.onload = () => {
     animation: true,
     histograms: true
   });
-  vis.render();
 };
