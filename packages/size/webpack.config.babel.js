@@ -7,6 +7,10 @@ export default {
     path: path.resolve('dist'),
     filename: 'candela-size.js'
   },
+  externals: [
+    '@candela/events',
+    'watch-element-resize'
+  ],
   module: {
     rules: [
       {
