@@ -69,16 +69,6 @@
     "template": "resize-full"
   },
   {
-    "title": "Resize Table",
-    "link": "resize-table",
-    "template": "resize-table"
-  },
-  {
-    "title": "Resize Matrix",
-    "link": "resize-matrix",
-    "template": "resize-matrix"
-  },
-  {
     "title": "LineUp",
     "link": "lineup"
   },
