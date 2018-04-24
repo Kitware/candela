@@ -1,7 +1,4 @@
 import { BarChart } from '@candela/vega';
-
-console.log('BarChart', BarChart);
-
 import showComponent from '../util/showComponent';
 
 window.onload = () => {
