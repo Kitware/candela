@@ -20,7 +20,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@candela/events": "0.19.1",
-    "javascript-detect-element-resize": "^0.5.3"
+    "watch-element-resize": "^2.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.44",
