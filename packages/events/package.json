@@ -19,7 +19,6 @@
   "author": "Kitware Inc.",
   "license": "Apache-2.0",
   "dependencies": {
-    "@candela/core": "0.19.1",
     "telegraph-events": "^1.0.3"
   },
   "devDependencies": {

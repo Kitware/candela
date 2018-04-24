@@ -7,6 +7,9 @@ export default {
     path: path.resolve('dist'),
     filename: 'candela-events.js'
   },
+  externals: [
+    'telegraph-events'
+  ],
   module: {
     rules: [
       {
