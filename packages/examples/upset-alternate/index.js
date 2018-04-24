@@ -16,5 +16,4 @@ window.onload = () => {
     ],
     fields: ['School']
   });
-  vis.render();
 };

@@ -17,5 +17,4 @@ window.onload = () => {
     fields: ['School'],
     metadata: ['Age']
   });
-  vis.render();
 };
