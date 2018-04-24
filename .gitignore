@@ -11,3 +11,4 @@ npm-debug.log
 *-test.png
 .ipynb_checkpoints
 docs/static/candela.js
+lerna-debug.log
