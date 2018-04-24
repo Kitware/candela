@@ -19,7 +19,6 @@
   "author": "Kitware Inc.",
   "license": "Apache-2.0",
   "dependencies": {
-    "@candela/core": "0.19.1",
     "@candela/events": "0.19.1",
     "javascript-detect-element-resize": "^0.5.3"
   },
