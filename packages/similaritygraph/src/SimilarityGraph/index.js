@@ -1,7 +1,7 @@
 import { VisComponent } from '@candela/core';
 
 import d3 from 'd3';
-import cola from 'webcola';
+import { d3adaptor } from 'webcola';
 
 export default class SimilarityGraph extends VisComponent {
   constructor (el, {data, threshold = 0, linkDistance = 100, id = 'id', color, size = 10, width = 960, height = 540}) {
@@ -37,7 +37,7 @@ export default class SimilarityGraph extends VisComponent {
     const h = bbox.height;
 
     // Initialize the cola object.
-    this.cola = cola.d3adaptor(d3)
+    this.cola = d3adaptor(d3)
       .linkDistance(linkDistance)
       .size([w, h]);
 

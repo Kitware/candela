@@ -7,9 +7,11 @@ export default {
     path: path.resolve('dist'),
     filename: 'candela-similaritygraph.js'
   },
-  externals: {
-    d3: 'd3'
-  },
+  externals: [
+    '@candela/core',
+    'd3',
+    'webcola'
+  ],
   module: {
     rules: [
       {
