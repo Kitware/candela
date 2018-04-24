@@ -1,4 +1,4 @@
-import { Geo } from '@candela/vega';
+import { Geo } from '@candela/geojs';
 import showComponent from '../util/showComponent';
 
 window.onload = () => {
