@@ -1,7 +1,6 @@
-import { blah } from '@candela/vega';
+import { LineChart } from '@candela/vega';
 import { Events } from '@candela/events';
 
-import { changeset } from 'vega';
 import { select } from 'd3-selection';
 import html from './index.jade';
 import './index.styl';
@@ -18,7 +17,6 @@ class DynamicLineChart extends Events(LineChart) {
 
   data (data) {
     this.options.data = data;
-    this.view.change('source_0', changeset().remove(() => true).insert(this.options.data)).run();
   }
 }
 
