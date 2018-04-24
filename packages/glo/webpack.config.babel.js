@@ -7,9 +7,11 @@ export default {
     path: path.resolve('dist'),
     filename: 'candela-glo.js'
   },
-  externals: {
-    d3: 'd3'
-  },
+  externals: [
+    '@candela/core',
+    'd3',
+    'underscore'
+  ],
   module: {
     rules: [
       {
@@ -27,6 +29,14 @@ export default {
             ]
           }
         }
+      },
+      {
+        test: () => true,
+        include: path.resolve('./node_modules/glo/glo.js'),
+        use: [
+          'exports-loader?GLO',
+          'imports-loader?_=underscore'
+        ]
       }
     ]
   }
