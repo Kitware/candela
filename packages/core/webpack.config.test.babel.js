@@ -14,4 +14,27 @@ let config = {
   }
 };
 
+if (process.env.COVERAGE) {
+  config.devtool = 'cheap-module-source-map';
+  config.output.filename = 'test.coverage.js';
+  config.module = {
+    rules: [
+      {
+        enforce: 'post',
+        test: /\.js$/,
+        use: {
+          loader: 'istanbul-instrumenter-loader',
+          options: {
+            esModules: true
+          }
+        },
+        include: [
+          path.resolve('src/')
+        ],
+        exclude: /\.spec\.js$/
+      }
+    ]
+  }
+}
+
 export default config;
