@@ -1,6 +1,6 @@
 import test from 'tape-catch';
 
-import VisComponent from 'candela/VisComponent';
+import { VisComponent } from '@candela/core';
 import Events from '../Events';
 
 test('Events mixin for VisComponent', t => {
