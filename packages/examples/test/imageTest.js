@@ -45,7 +45,7 @@ Promise.onPossiblyUnhandledRejection(err => {
   throw err;
 });
 
-export default function imageTest ({name, extraBaselines = [], url, selector, delay = 0, threshold, verbose = false}) {
+export default function imageTest ({name, dir, extraBaselines = [], url, selector, delay = 0, threshold, verbose = false}) {
   const dirname = callerDirname();
 
   test(`${name} image test`, t => {
@@ -109,7 +109,7 @@ export default function imageTest ({name, extraBaselines = [], url, selector, de
 
       const baselines = [name, ...extraBaselines];
       baselines.forEach((filename, i) => {
-        const refImage = dataUrl(fs.readFileSync(path.join(dirname, `${filename}.png`)));
+        const refImage = dataUrl(fs.readFileSync(path.join(dirname, dir, `${filename}.png`)));
 
         if (image === null) {
           image = refImage;
