@@ -7,6 +7,10 @@ export default {
     path: path.resolve('dist'),
     filename: 'candela-stats.js'
   },
+  externals: [
+    '@candela/core',
+    '@candela/vega'
+  ],
   module: {
     rules: [
       {
