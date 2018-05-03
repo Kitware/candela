@@ -5,7 +5,7 @@
   "main": "dist/candela-geojs.js",
   "scripts": {
     "build": "webpack --mode development",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist build",
     "lint": "semistandard | snazzy",
     "build:test": "webpack --config webpack.config.test.babel.js --mode development",
     "test": "karma start --log-level error"

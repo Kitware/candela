@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode development",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist build",
     "lint": "semistandard | snazzy"
   },
   "publishConfig": {

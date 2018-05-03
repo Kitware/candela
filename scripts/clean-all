@@ -6,7 +6,7 @@ setError ()
   code=1
 }
 
-for p in "$(cat scripts/packages.txt) examples"; do
+for p in $(cat scripts/packages.txt) examples; do
   cd packages/${p}
   npm run clean
   cd ../..
