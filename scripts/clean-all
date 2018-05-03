@@ -1,0 +1,15 @@
+trap setError ERR
+
+code=0
+setError ()
+{
+  code=1
+}
+
+for p in "$(cat scripts/packages.txt) examples"; do
+  cd packages/${p}
+  npm run clean
+  cd ../..
+done
+
+exit ${code}

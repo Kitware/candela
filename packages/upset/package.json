@@ -5,6 +5,8 @@
   "main": "dist/candela-upset.js",
   "scripts": {
     "build": "webpack --mode development",
+    "clean": "rm -rf dist",
+    "lint": "semistandard | snazzy",
     "build:test": "webpack --config webpack.config.test.babel.js --mode development",
     "test": "karma start --log-level error"
   },
@@ -19,6 +21,11 @@
   "keywords": [],
   "author": "Kitware Inc.",
   "license": "Apache-2.0",
+  "semistandard": {
+    "ignore": [
+      "dist"
+    ]
+  },
   "dependencies": {
     "@candela/core": "0.19.1",
     "d3": "^3.5.17",
@@ -42,6 +49,8 @@
     "less": "^3.0.2",
     "node-sass": "^4.8.3",
     "sass-loader": "^6.0.5",
+    "semistandard": "^7.0.5",
+    "snazzy": "^4.0.0",
     "tap-spec": "^4.1.1",
     "tape": "^4.9.0",
     "tape-catch": "^1.0.6",

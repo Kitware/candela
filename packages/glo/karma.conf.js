@@ -18,26 +18,23 @@ var kconfig = {
     prettify: require('tap-spec')
   },
   files: [
-    'dist/test.unit.js',
+    'build/test.unit.js',
   ]
 };
 
 if (process.env.COVERAGE) {
   kconfig.files = [
-    'dist/test.coverage.js'
+    'build/test.coverage.js'
   ];
   kconfig.reporters = [
     'coverage-istanbul'
   ];
   kconfig.coverageIstanbulReporter = {
-    reports: ['text-summary', 'html', 'lcovonly'],
-    dir: path.resolve('dist/coverage'),
+    reports: ['text-summary', 'html'],
+    dir: path.resolve('../../build/coverage'),
     'report-config': {
       html: {
-        subdir: 'html'
-      },
-      lcovonly: {
-        file: 'lcov/lcov.info'
+        subdir: 'html/glo'
       }
     }
   };
