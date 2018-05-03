@@ -22,7 +22,8 @@
   "license": "Apache-2.0",
   "semistandard": {
     "ignore": [
-      "dist"
+      "dist",
+      "build"
     ]
   },
   "dependencies": {
