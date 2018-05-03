@@ -3,7 +3,7 @@
   "version": "0.0.0-semantically-released",
   "description": "Visualization components for the web",
   "scripts": {
-    "install": "lerna bootstrap",
+    "install": "lerna bootstrap --hoist",
     "clean:lerna": "lerna clean",
     "clean:dist": "sh scripts/clean-all",
     "build": "sh scripts/build-all",
