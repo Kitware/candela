@@ -68,13 +68,13 @@ test('TreeHeatmap component', t => {
     </g>
     <clipPath id="clip-vertical"><rect x="0" y="100" width="100" height="200"></rect></clipPath>
     <g class="vertical" clip-path="url(#clip-vertical)">
-      <path class="tree-links" d="M100,150L0,150L0,250L100,250" style="fill-opacity: 0; stroke: #000000;"></path>
-      <rect class="tree-select" x="0" y="100" width="100" height="200" style="fill: #4682b4; fill-opacity: 0;"></rect>
+      <path class="tree-links" d="M100,150L0,150L0,250L100,250" style="fill-opacity: 0; stroke: black;"></path>
+      <rect class="tree-select" x="0" y="100" width="100" height="200" style="fill: steelblue; fill-opacity: 0;"></rect>
     </g>
     <clipPath id="clip-horizontal"><rect x="100" y="0" width="200" height="100"></rect></clipPath>
     <g class="horizontal" clip-path="url(#clip-horizontal)">
-      <path class="tree-links" d="M150,100L150,0L250,0L250,100" style="fill-opacity: 0; stroke: #000000;"></path>
-      <rect class="tree-select" y="0" x="100" height="100" width="200" style="fill: #4682b4; fill-opacity: 0;"></rect>
+      <path class="tree-links" d="M150,100L150,0L250,0L250,100" style="fill-opacity: 0; stroke: black;"></path>
+      <rect class="tree-select" y="0" x="100" height="100" width="200" style="fill: steelblue; fill-opacity: 0;"></rect>
     </g>
   </svg>`.replace(/\n/g, '').replace(/ {2}/g, '');
 
