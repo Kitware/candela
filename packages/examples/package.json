@@ -7,7 +7,7 @@
     "clean": "rm -rf dist build",
     "serve": "http-server dist -p 28000",
     "lint": "semistandard | snazzy",
-    "test": "result=true; npm run serve >.server.log& pid=$! && babel-node test/index.js | tap-spec; if [ ${PIPESTATUS[0]} == 1 ]; then result=false; fi; kill ${pid}; ${result}"
+    "test": "bash scripts/run-test"
   },
   "private": true,
   "babel": {
