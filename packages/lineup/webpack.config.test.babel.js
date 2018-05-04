@@ -34,6 +34,22 @@ if (process.env.COVERAGE) {
         exclude: /\.spec\.js$/
       },
       {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              ['@babel/env', {
+                targets: {
+                  node: 'current'
+                }
+              }]
+            ]
+          }
+        }
+      },
+      {
         test: /\.styl$/,
         use: ['style-loader', 'css-loader', 'stylus-loader']
       },
