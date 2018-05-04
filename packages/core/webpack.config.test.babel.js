@@ -34,7 +34,7 @@ if (process.env.COVERAGE) {
         exclude: /\.spec\.js$/
       }
     ]
-  }
+  };
 }
 
 export default config;

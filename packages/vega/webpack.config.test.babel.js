@@ -38,7 +38,7 @@ if (process.env.COVERAGE) {
         loader: ['style-loader', 'css-loader']
       }
     ]
-  }
+  };
 }
 
 export default config;

@@ -18,7 +18,7 @@ var kconfig = {
     prettify: require('tap-spec')
   },
   files: [
-    'build/test.unit.js',
+    'build/test.unit.js'
   ]
 };
 

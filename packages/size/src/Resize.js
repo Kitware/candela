@@ -1,6 +1,5 @@
 import WatchElementResize from 'watch-element-resize';
 import { Events } from '@candela/events';
-import { getElementSize } from '../../vega/src/util';
 
 let Resize = Base => class extends Events(Base) {
   constructor (...args) {

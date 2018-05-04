@@ -20,7 +20,7 @@ export default class VisComponent {
   }
 
   empty () {
-    while(this.el.firstChild) {
+    while (this.el.firstChild) {
       this.el.removeChild(this.el.firstChild);
     }
   }

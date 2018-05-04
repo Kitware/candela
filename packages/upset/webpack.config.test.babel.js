@@ -50,7 +50,7 @@ if (process.env.COVERAGE) {
         loader: 'file-loader'
       }
     ]
-  }
+  };
 }
 
 export default config;
