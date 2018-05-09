@@ -1,6 +1,6 @@
 {
   "name": "@candela/stats",
-  "version": "0.19.1",
+  "version": "0.20.0",
   "description": "Candela components for statistical visualization",
   "main": "dist/candela-stats.js",
   "scripts": {
@@ -28,8 +28,8 @@
     ]
   },
   "dependencies": {
-    "@candela/core": "0.19.1",
-    "@candela/vega": "0.19.1"
+    "@candela/core": "^0.20.0",
+    "@candela/vega": "^0.20.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.44",

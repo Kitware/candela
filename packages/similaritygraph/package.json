@@ -1,6 +1,6 @@
 {
   "name": "@candela/similaritygraph",
-  "version": "0.19.1",
+  "version": "0.20.0",
   "description": "Candela component for similarity graph",
   "main": "dist/candela-similaritygraph.js",
   "scripts": {
@@ -28,7 +28,7 @@
     ]
   },
   "dependencies": {
-    "@candela/core": "0.19.1",
+    "@candela/core": "^0.20.0",
     "d3": "^3.5.17",
     "webcola": "^3.3.3"
   },

@@ -1,6 +1,6 @@
 {
   "name": "@candela/treeheatmap",
-  "version": "0.19.1",
+  "version": "0.20.0",
   "description": "Candela component for tree heatmap",
   "main": "dist/candela-treeheatmap.js",
   "scripts": {
@@ -28,7 +28,7 @@
     ]
   },
   "dependencies": {
-    "@candela/core": "0.19.1",
+    "@candela/core": "^0.20.0",
     "d3-array": "^1.2.0",
     "d3-scale": "^1.0.6",
     "d3-selection": "^1.1.0",

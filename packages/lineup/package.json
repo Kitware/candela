@@ -1,6 +1,6 @@
 {
   "name": "@candela/lineup",
-  "version": "0.19.1",
+  "version": "0.20.0",
   "description": "Candela component for LineUp",
   "main": "dist/candela-lineup.js",
   "scripts": {
@@ -28,7 +28,7 @@
     ]
   },
   "dependencies": {
-    "@candela/core": "0.19.1",
+    "@candela/core": "^0.20.0",
     "d3": "^3.5.17",
     "datalib": "^1.7.3",
     "font-awesome-webpack": "git+https://github.com/jarecsni/font-awesome-webpack#440af2a2efe7ba1779d039556f04538e57bad4bb",
@@ -39,7 +39,7 @@
     "@babel/core": "^7.0.0-beta.44",
     "@babel/preset-env": "^7.0.0-beta.44",
     "@babel/register": "^7.0.0-beta.44",
-    "@candela/core": "0.19.1",
+    "@candela/core": "^0.20.0",
     "babel-loader": "^8.0.0-beta.2",
     "css-loader": "^0.26.1",
     "file-loader": "^1.1.11",

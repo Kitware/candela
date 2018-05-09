@@ -1,6 +1,6 @@
 {
   "name": "@candela/core",
-  "version": "0.19.1",
+  "version": "0.20.0",
   "description": "Candela core library",
   "main": "dist/candela-core.js",
   "scripts": {
