@@ -1,6 +1,7 @@
-[![codecov.io](https://codecov.io/github/Kitware/candela/coverage.svg?branch=master)](https://codecov.io/github/Kitware/candela?branch=master)
+# ![](docs/static/favicon.png) Candela Core
 
-# ![](docs/static/favicon.png) Candela
+Candela Vega contains components implementing basic chart types using
+[Vega](https://vega.github.io/vega/).
 
 Candela is an open-source framework for creating interoperable, reusable
 visualization components for the web. Candela is a part of
