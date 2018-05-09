@@ -11,11 +11,11 @@ dependencies:
     # Install flake8 for Python linting.
     - sudo pip install flake8
 
+    # Install Lerna globally.
+    - npm install -g lerna@2.10.2
+
     # Inject npm token into environment.
     - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >>~/.npmrc
-
-  cache_directories:
-    - node_modules
 
 compile:
   override:
@@ -26,8 +26,8 @@ compile:
     - npm run build:examples
 
     # Build the unit test and coverage test bundles.
-    - npm run build:test:unit
-    - npm run build:test:coverage
+    - npm run build:test
+    - npm run build:coverage
 
 test:
   override:
@@ -45,19 +45,18 @@ test:
 
     # Coverage tests.
     - npm run test:coverage
-    - npm run test:coverage:codecov
 
   post:
     # Gather up the testing images as build artifacts.
     - mkdir $CIRCLE_ARTIFACTS/test_images
-    - find plugins -name '*.png' | xargs -I xxx cp xxx $CIRCLE_ARTIFACTS/test_images
+    - find packages/examples/test -name '*.png' | xargs -I xxx cp xxx $CIRCLE_ARTIFACTS/test_images
 
     # Copy the html coverage report to the artifacts directory as well.
     - mkdir $CIRCLE_ARTIFACTS/coverage
     - cp -r build/coverage/html $CIRCLE_ARTIFACTS/coverage
 
 deployment:
-  semantic-release:
+  lerna-publish:
     branch: master
     commands:
-      - DEBUG=condition npm run semantic-release
+      - lerna publish --conventional-commits --yes
