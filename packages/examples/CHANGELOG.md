@@ -10,14 +10,3 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Features
 
 * enable monorepo ([e0c2ffa](https://github.com/kitware/candela/commit/e0c2ffa))
-
-
-
-
-<a name="0.20.0"></a>
-# [0.20.0](https://github.com/kitware/candela/compare/v0.19.1...v0.20.0) (2018-05-03)
-
-
-
-
-**Note:** Version bump only for package @candela/examples
