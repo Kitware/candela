@@ -19,11 +19,8 @@ dependencies:
 
 compile:
   override:
-    # Build Candela.
+    # Build Candela and the examples.
     - npm run build
-
-    # Build the examples.
-    - npm run build:examples
 
     # Build the unit test and coverage test bundles.
     - npm run build:test
