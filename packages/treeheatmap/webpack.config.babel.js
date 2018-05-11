@@ -7,6 +7,14 @@ export default {
     path: path.resolve('dist'),
     filename: 'candela-treeheatmap.js'
   },
+  externals: [
+    '@candela/core',
+    'd3-array',
+    'd3-scale',
+    'd3-selection',
+    'd3-shape',
+    'd3-transition'
+  ],
   module: {
     rules: [
       {

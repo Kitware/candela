@@ -7,6 +7,10 @@ export default {
     path: path.resolve('dist'),
     filename: 'candela-sententree.js'
   },
+  externals: [
+    '@candela/core',
+    'sententree'
+  ],
   module: {
     rules: [
       {
