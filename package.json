@@ -5,7 +5,7 @@
   "scripts": {
     "install": "lerna bootstrap --hoist",
     "clean:lerna": "lerna clean",
-    "clean:dist": "bash scripts/clean-all",
+    "clean:dist": "lerna run clean",
     "build": "lerna run build",
     "examples": "cd packages/examples && npm run serve",
     "build:test": "lerna run build:test",
