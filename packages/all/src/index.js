@@ -25,7 +25,7 @@ for (let bundle of [geojs, glo, lineup, onset, sententree, similaritygraph, stat
 }
 for (let component in vega) {
   if (vega[component] !== vega.VegaView) {
-    components[component] = vega[component]
+    components[component] = vega[component];
   }
 }
 
