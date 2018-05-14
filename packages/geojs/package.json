@@ -1,6 +1,6 @@
 {
   "name": "@candela/geojs",
-  "version": "0.20.1",
+  "version": "0.21.0",
   "description": "Candela components for GeoJS",
   "main": "dist/candela-geojs.js",
   "scripts": {
@@ -28,7 +28,7 @@
     ]
   },
   "dependencies": {
-    "@candela/core": "^0.20.1",
+    "@candela/core": "^0.21.0",
     "d3": "^3.5.17",
     "geojs": "^0.9.1"
   },

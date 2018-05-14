@@ -1,6 +1,6 @@
 {
   "name": "@candela/sententree",
-  "version": "0.20.1",
+  "version": "0.21.0",
   "description": "Candela component for Sententree",
   "main": "dist/candela-sententree.js",
   "scripts": {
@@ -28,7 +28,7 @@
     ]
   },
   "dependencies": {
-    "@candela/core": "^0.20.1",
+    "@candela/core": "^0.21.0",
     "sententree": "git+https://git@github.com/ronichoudhury-work/sententree.git#fix-typo"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 {
   "name": "@candela/examples",
-  "version": "0.20.1",
+  "version": "0.21.0",
   "description": "Candela examples for testing",
   "scripts": {
     "build": "webpack --mode development",
@@ -25,19 +25,19 @@
     ]
   },
   "dependencies": {
-    "@candela/events": "^0.20.1",
-    "@candela/geojs": "^0.20.1",
-    "@candela/glo": "^0.20.1",
-    "@candela/lineup": "^0.20.1",
-    "@candela/onset": "^0.20.1",
-    "@candela/sententree": "^0.20.1",
-    "@candela/similaritygraph": "^0.20.1",
-    "@candela/size": "^0.20.1",
-    "@candela/stats": "^0.20.1",
-    "@candela/trackerdash": "^0.20.1",
-    "@candela/treeheatmap": "^0.20.1",
-    "@candela/upset": "^0.20.1",
-    "@candela/vega": "^0.20.1"
+    "@candela/events": "^0.21.0",
+    "@candela/geojs": "^0.21.0",
+    "@candela/glo": "^0.21.0",
+    "@candela/lineup": "^0.21.0",
+    "@candela/onset": "^0.21.0",
+    "@candela/sententree": "^0.21.0",
+    "@candela/similaritygraph": "^0.21.0",
+    "@candela/size": "^0.21.0",
+    "@candela/stats": "^0.21.0",
+    "@candela/trackerdash": "^0.21.0",
+    "@candela/treeheatmap": "^0.21.0",
+    "@candela/upset": "^0.21.0",
+    "@candela/vega": "^0.21.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.44",

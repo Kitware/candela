@@ -1,6 +1,6 @@
 {
   "name": "@candela/events",
-  "version": "0.20.1",
+  "version": "0.21.0",
   "description": "Candela mixin for events",
   "main": "dist/candela-events.js",
   "scripts": {
@@ -34,7 +34,7 @@
     "@babel/core": "^7.0.0-beta.44",
     "@babel/preset-env": "^7.0.0-beta.44",
     "@babel/register": "^7.0.0-beta.44",
-    "@candela/core": "^0.20.1",
+    "@candela/core": "^0.21.0",
     "babel-loader": "^8.0.0-beta.2",
     "istanbul-instrumenter-loader": "^3.0.1",
     "karma": "^2.0.2",
