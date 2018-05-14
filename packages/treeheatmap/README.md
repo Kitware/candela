@@ -1,6 +1,7 @@
-[![codecov.io](https://codecov.io/github/Kitware/candela/coverage.svg?branch=master)](https://codecov.io/github/Kitware/candela?branch=master)
+# ![](docs/static/favicon.png) Candela Core
 
-# ![](docs/static/favicon.png) Candela
+Candela TreeHeatmap contains a component for displaying a heatmap of data that
+is also organized into a treelike structure.
 
 Candela is an open-source framework for creating interoperable, reusable
 visualization components for the web. Candela is a part of

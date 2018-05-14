@@ -1,6 +1,7 @@
-[![codecov.io](https://codecov.io/github/Kitware/candela/coverage.svg?branch=master)](https://codecov.io/github/Kitware/candela?branch=master)
+# ![](docs/static/favicon.png) Candela Core
 
-# ![](docs/static/favicon.png) Candela
+Candela SentenTree contains a component for visualizing text data using Georgia
+Tech's [SentenTree](https://github.com/twitter/SentenTree) technique.
 
 Candela is an open-source framework for creating interoperable, reusable
 visualization components for the web. Candela is a part of

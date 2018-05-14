@@ -1,6 +1,8 @@
-[![codecov.io](https://codecov.io/github/Kitware/candela/coverage.svg?branch=master)](https://codecov.io/github/Kitware/candela?branch=master)
+# ![](docs/static/favicon.png) Candela Core
 
-# ![](docs/static/favicon.png) Candela
+Candela Lineup contains a component for visualizing ranked data using Harvard's
+[LineUp](https://vcg.seas.harvard.edu/publications/lineup-visual-analysis-of-multi-attribute-rankings)
+tool.
 
 Candela is an open-source framework for creating interoperable, reusable
 visualization components for the web. Candela is a part of
