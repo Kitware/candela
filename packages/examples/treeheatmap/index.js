@@ -3,7 +3,7 @@ import { heatmap } from '../datasets';
 import showComponent from '../util/showComponent';
 
 window.onload = () => {
-  showComponent(TreeHeatmap, {
+  const vis = showComponent(TreeHeatmap, {
     data: heatmap,
     scale: 'column'
   });

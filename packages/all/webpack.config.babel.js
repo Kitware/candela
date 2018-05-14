@@ -5,12 +5,8 @@ export default {
   output: {
     libraryTarget: 'umd',
     path: path.resolve('dist'),
-    filename: 'candela-sententree.js'
+    filename: 'candela-all.js'
   },
-  externals: [
-    '@candela/core',
-    'sententree'
-  ],
   module: {
     rules: [
       {
@@ -20,11 +16,7 @@ export default {
           loader: 'babel-loader',
           options: {
             presets: [
-              ['@babel/env', {
-                targets: {
-                  node: 'current'
-                }
-              }]
+              '@babel/env'
             ]
           }
         }

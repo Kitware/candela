@@ -1,14 +1,12 @@
 {
-  "name": "@candela/geojs",
-  "version": "0.20.1",
-  "description": "Candela components for GeoJS",
-  "main": "dist/candela-geojs.js",
+  "name": "@candela/all",
+  "version": "0.20.0",
+  "description": "Candela all-inclusive library",
+  "main": "dist/candela-all.js",
   "scripts": {
     "build": "webpack --mode development",
     "clean": "rm -rf dist build",
-    "lint": "semistandard | snazzy",
-    "build:test": "webpack --config webpack.config.test.babel.js --mode development",
-    "test": "karma start --colors --log-level error"
+    "lint": "semistandard | snazzy"
   },
   "publishConfig": {
     "access": "public"
@@ -28,9 +26,19 @@
     ]
   },
   "dependencies": {
-    "@candela/core": "^0.20.1",
-    "d3": "^3.5.17",
-    "geojs": "^0.9.1"
+    "@candela/core": "^0.20.0",
+    "@candela/events": "^0.20.0",
+    "@candela/geojs": "^0.20.0",
+    "@candela/glo": "^0.20.0",
+    "@candela/lineup": "^0.20.0",
+    "@candela/onset": "^0.20.0",
+    "@candela/sententree": "^0.20.0",
+    "@candela/similaritygraph": "^0.20.0",
+    "@candela/size": "^0.20.0",
+    "@candela/stats": "^0.20.0",
+    "@candela/treeheatmap": "^0.20.0",
+    "@candela/upset": "^0.20.0",
+    "@candela/vega": "^0.20.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.44",

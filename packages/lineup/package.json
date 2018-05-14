@@ -8,7 +8,7 @@
     "clean": "rm -rf dist build",
     "lint": "semistandard | snazzy",
     "build:test": "webpack --config webpack.config.test.babel.js --mode development",
-    "test": "karma start --log-level error"
+    "test": "karma start --colors --log-level error"
   },
   "publishConfig": {
     "access": "public"
@@ -41,7 +41,7 @@
     "@babel/register": "^7.0.0-beta.44",
     "@candela/core": "^0.20.1",
     "babel-loader": "^8.0.0-beta.2",
-    "css-loader": "^0.26.1",
+    "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",
     "istanbul-instrumenter-loader": "^3.0.1",
     "karma": "^2.0.2",

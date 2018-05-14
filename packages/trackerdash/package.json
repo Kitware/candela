@@ -4,7 +4,6 @@
   "description": "Candela components for the TrackerDash dashboard",
   "main": "dist/candela-trackerdash.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode development",
     "clean": "rm -rf dist build",
     "lint": "semistandard | snazzy"

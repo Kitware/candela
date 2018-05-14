@@ -22,8 +22,11 @@ compile:
     # Build Candela.
     - npm run build
 
-    # Build the examples.
+    # Build the examples package.
     - npm run build:examples
+
+    # Build the big bundle.
+    - npm run build:bundle
 
     # Build the unit test and coverage test bundles.
     - npm run build:test

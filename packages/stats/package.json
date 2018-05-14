@@ -8,7 +8,7 @@
     "clean": "rm -rf dist build",
     "lint": "semistandard | snazzy",
     "build:test": "webpack --config webpack.config.test.babel.js --mode development",
-    "test": "karma start --log-level error"
+    "test": "karma start --colors --log-level error"
   },
   "publishConfig": {
     "access": "public"

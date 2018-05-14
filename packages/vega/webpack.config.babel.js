@@ -7,6 +7,14 @@ export default {
     path: path.resolve('dist'),
     filename: 'candela-vega.js'
   },
+  externals: [
+    '@candela/core',
+    'd3-selection',
+    'vega',
+    'vega-lite',
+    'vega-schema-url-parser',
+    'vega-tooltip'
+  ],
   module: {
     rules: [
       {
