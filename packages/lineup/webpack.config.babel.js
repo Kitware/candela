@@ -11,7 +11,6 @@ export default {
     '@candela/core',
     'd3',
     'datalib',
-    'font-awesome-webpack',
     'jquery',
     'lineupjs'
   ],
