@@ -5,8 +5,9 @@
   "scripts": {
     "install": "lerna bootstrap --hoist",
     "clean:lerna": "lerna clean",
-    "clean:dist": "lerna run clean",
-    "build": "lerna run build",
+    "clean": "lerna run clean",
+    "build": "lerna run build --ignore @candela/examples",
+    "build:examples": "cd packages/examples && npm run build",
     "examples": "cd packages/examples && npm run serve",
     "build:test": "lerna run build:test",
     "build:coverage": "COVERAGE=1 npm run build:test",
