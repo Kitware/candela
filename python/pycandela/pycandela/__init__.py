@@ -8,19 +8,20 @@ try:
 except NameError:
     raise ImportError('pycandela must be imported from IPython')
 
+MIME_TYPE = 'application/vnd.candela+json'
+
 _component_list = []
 
 _require_config = """
     if (!window.__pycandela_config) {
         require.config({
             paths: {
-                candela: 'https://unpkg.com/candela/dist/candela'
+                candela: 'https://unpkg.com/@candela/all/dist/candela-all'
 
                 // To test unreleased candela: comment above, uncomment below,
-                // start jupyter-notebook from base of candela checkout,
-                // and navigate to python/pycandela before creating notebook.
+                // and start jupyter-notebook from base of candela checkout.
 
-                // candela: '/files/build/candela/candela'
+                // candela: '/files/candela/packages/all/dist/candela-all'
             },
             urlArgs: null
         });
@@ -47,7 +48,10 @@ def init():
     });
     """
 
-    publish_display_data({'application/javascript': init_js})
+    publish_display_data({
+        'application/javascript': init_js,
+        MIME_TYPE: None
+    })
 
 
 class DataFrameEncoder(json.JSONEncoder):
@@ -62,24 +66,44 @@ class Component(object):
         self.name = name
         self.options = kwargs
 
+    def to_json(self):
+        return json.dumps({
+            'name': self.name,
+            'options': self.options
+        }, cls=DataFrameEncoder)
+
     def _ipython_display_(self):
+        serialized = self.to_json()
         js = ("""
             var render = function () {
                 %s
+                var c = %s;
                 require(['candela'], function (candela) {
-                    var comp = candela.components['%s'];
-                    var vis = new comp(element.get(0), %s);
+                    var comp = candela.components[c.name];
+                    var vis = new comp(element.get(0), c.options);
                     vis.render();
                 });
             };
             render();
-            """ % (_require_config, self.name,
-                   json.dumps(self.options, cls=DataFrameEncoder)))
+            """ % (_require_config, serialized))
 
-        publish_display_data({'application/javascript': js})
+        publish_display_data({
+            'application/javascript': js,
+            MIME_TYPE: json.loads(serialized)
+        })
+
+    def save(self, filename):
+        with open(filename, 'w') as f:
+            f.write(self.to_json())
 
     def display(self):
         display(self)
+
+
+def load(filename):
+    with open(filename) as f:
+        c = json.load(f)
+    return Component(c['name'], **c['options'])
 
 
 class ComponentAccessor(object):
