@@ -99,10 +99,12 @@ class Component(object):
     def display(self):
         display(self)
 
+
 def load(filename):
     with open(filename) as f:
         c = json.load(f)
     return Component(c['name'], **c['options'])
+
 
 class ComponentAccessor(object):
     def __dir__(self):
