@@ -31,9 +31,7 @@
     "@candela/core": "^0.21.0",
     "d3-selection": "^1.1.0",
     "vega": "^3.0.0-rc1",
-    "vega-lite": "^2.0.0-beta.8",
-    "vega-schema-url-parser": "^1.0.0-beta.2",
-    "vega-tooltip": "^0.4.2"
+    "vega-lite": "^2.0.0-beta.8"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.44",
