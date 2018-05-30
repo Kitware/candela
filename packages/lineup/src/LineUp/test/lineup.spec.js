@@ -1,3 +1,4 @@
+import { select } from 'd3-selection';
 import test from 'tape-catch';
 
 // needed to handle Babel's conversion of for `(x of array)`
@@ -8,6 +9,7 @@ import LineUp from '..';
 test('LineUp component', t => {
   const div = document.createElement('div');
   div.setAttribute('style', 'width: 800px; height: 600px');
+  document.body.appendChild(div);
 
   t.ok(LineUp, 'LineUp exists');
   t.ok(LineUp.options, 'LineUp options exists');
@@ -18,9 +20,9 @@ test('LineUp component', t => {
       {a: -1, b: 0, c: 'c', d: false}
     ],
     fields: ['d', 'a', 'c'],
-    stacked: false,
+    stacked: true,
     histograms: true,
-    animation: true
+    animation: false
   });
   t.ok(lu.lineUpConfig, 'LineUp configured');
   t.equal(lu.lineUpConfig.renderingOptions.histograms, true, 'LineUp options set');
@@ -29,5 +31,12 @@ test('LineUp component', t => {
   // still need to add tests for dragging columns and recording their weights,
   // tooltip updates, select callback, and date-based columns
 
-  t.end();
+  window.setTimeout(() => {
+    const rows = select(lu.el)
+      .selectAll('g.row')
+      .nodes();
+    t.assert(rows.length > 0, 'Plot has rendered some data rows');
+
+    t.end();
+  }, 200);
 });
