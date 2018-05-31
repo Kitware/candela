@@ -14,10 +14,15 @@ let VegaView = (Base) => class extends Base {
     this.content = document.createElement('div');
     this.content.style.display = 'block';
     this.el.appendChild(this.content);
+    this.calculateSize(this.options.calculateSize);
   }
 
   generateSpec () {
     return {};
+  }
+
+  calculateSize (on) {
+    this._calculateSize = !!on;
   }
 
   update (options) {
@@ -95,37 +100,41 @@ let VegaView = (Base) => class extends Base {
       intendedSize = {width: spec.spec.width, height: spec.spec.height};
     }
 
-    this.el.removeChild(this.content);
+    if (this._calculateSize) {
+      this.el.removeChild(this.content);
+    }
 
     // Render once at the requested dimensions.
     const size = this._resizeContent(spec, intendedSize);
 
-    // Whether or not the chart contains small multiples, each data rectangle
-    // will be of the size requested. To figure out how much margin space is
-    // required, we need to subtract out the multiplicity of chart sizes.
-    const horzMult = Math.floor(size.width / intendedSize.width);
-    const vertMult = Math.floor(size.height / intendedSize.height);
+    if (this._calculateSize) {
+      // Whether or not the chart contains small multiples, each data rectangle
+      // will be of the size requested. To figure out how much margin space is
+      // required, we need to subtract out the multiplicity of chart sizes.
+      const horzMult = Math.floor(size.width / intendedSize.width);
+      const vertMult = Math.floor(size.height / intendedSize.height);
 
-    // Now scale down the desired chart size by these factors, so as to roughly
-    // fit them in the desired space.
-    const size2 = this._resizeContent(spec, {
-      width: intendedSize.width / horzMult,
-      height: intendedSize.height / vertMult
-    });
+      // Now scale down the desired chart size by these factors, so as to roughly
+      // fit them in the desired space.
+      const size2 = this._resizeContent(spec, {
+        width: intendedSize.width / horzMult,
+        height: intendedSize.height / vertMult
+      });
 
-    // Compare the rendered dimensions the the desired dimensions; the excess is
-    // what is needed for marginalia.
-    const horzExcess = size2.width - intendedSize.width;
-    const vertExcess = size2.height - intendedSize.height;
+      // Compare the rendered dimensions the the desired dimensions; the excess is
+      // what is needed for marginalia.
+      const horzExcess = size2.width - intendedSize.width;
+      const vertExcess = size2.height - intendedSize.height;
 
-    // Finally, render one last time, subtracting out the marginalia dimensions.
-    this._resizeContent(spec, {
-      width: (intendedSize.width - horzExcess) / horzMult,
-      height: (intendedSize.height - vertExcess) / vertMult
-    });
+      // Finally, render one last time, subtracting out the marginalia dimensions.
+      this._resizeContent(spec, {
+        width: (intendedSize.width - horzExcess) / horzMult,
+        height: (intendedSize.height - vertExcess) / vertMult
+      });
 
-    this.content.firstChild.style.display = 'block';
-    this.el.appendChild(this.content);
+      this.content.firstChild.style.display = 'block';
+      this.el.appendChild(this.content);
+    }
 
     return Promise.resolve(this.view);
   }

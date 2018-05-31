@@ -12,6 +12,7 @@ window.onload = () => {
       'sepalWidth'
     ],
     color: 'species',
+    calculateSize: true,
     width: 500,
     height: 500,
     renderer: 'svg'
