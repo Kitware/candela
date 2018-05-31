@@ -1,6 +1,6 @@
 {
   "name": "@candela/vega",
-  "version": "0.21.0",
+  "version": "0.23.0",
   "description": "Candela components built around Vega",
   "main": "dist/candela-vega.js",
   "scripts": {

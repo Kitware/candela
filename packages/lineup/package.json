@@ -1,6 +1,6 @@
 {
   "name": "@candela/lineup",
-  "version": "0.21.0",
+  "version": "0.23.0",
   "description": "Candela component for LineUp",
   "main": "dist/candela-lineup.js",
   "scripts": {
