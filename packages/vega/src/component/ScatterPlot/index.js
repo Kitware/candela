@@ -125,7 +125,9 @@ export default class ScatterPlot extends VegaView(VisComponent) {
       config: {
         mark: {filled: this.options.filled === undefined ? true : this.options.filled}
       },
-      encoding: {}
+      encoding: {
+        tooltip: super.tooltipSpec()
+      }
     };
 
     if (this.options.x && this.options.y) {

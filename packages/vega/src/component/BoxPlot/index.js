@@ -84,29 +84,26 @@ export default class BoxPlot extends VegaView(VisComponent) {
       width: this.getWidth(200),
       height: this.getHeight(200),
       mark: 'box-plot',
-      encoding: {}
-    };
-
-    spec.encoding.y = {
-      field: '__value',
-      type: 'quantitative',
-      axis: {title: ''}
-    };
-
-    spec.encoding.column = {
-      field: '__field',
-      type: 'nominal',
-      header: {title: ''}
-    };
-
-    spec.encoding.x = {
-      field: this.options.x || '',
-      type: this.options.xType || 'nominal'
-    };
-
-    spec.encoding.color = {
-      field: this.options.color || '',
-      type: this.options.colorType || 'nominal'
+      encoding: {
+        y: {
+          field: '__value',
+          type: 'quantitative',
+          axis: {title: ''}
+        },
+        column: {
+          field: '__field',
+          type: 'nominal',
+          header: {title: ''}
+        },
+        x: {
+          field: this.options.x || '',
+          type: this.options.xType || 'nominal'
+        },
+        color: {
+          field: this.options.color || '',
+          type: this.options.colorType || 'nominal'
+        }
+      }
     };
 
     return spec;

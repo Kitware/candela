@@ -109,7 +109,8 @@ export default class ScatterPlotMatrix extends VegaView(VisComponent) {
           y: {
             field: {repeat: 'row'},
             type: 'quantitative'
-          }
+          },
+          tooltip: super.tooltipSpec()
         }
       },
       config: {

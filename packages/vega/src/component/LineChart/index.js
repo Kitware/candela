@@ -90,7 +90,9 @@ export default class LineChart extends VegaView(VisComponent) {
       width: this.getWidth(200),
       height: this.getHeight(200),
       mark: 'line',
-      encoding: {}
+      encoding: {
+        tooltip: super.tooltipSpec()
+      }
     };
 
     if (this.options.x && this.options.y) {
