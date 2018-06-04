@@ -84,7 +84,6 @@ export default class BoxPlot extends VegaView(VisComponent) {
       width: this.getWidth(200),
       height: this.getHeight(200),
       mark: 'box-plot',
-      encoding: {}
     };
 
     spec.encoding.y = {

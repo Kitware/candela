@@ -10,7 +10,7 @@ export default {
   externals: [
     '@candela/core',
     'd3-selection',
-    'vega',
+    'vega-lib',
     'vega-lite',
     'vega-schema-url-parser',
     'vega-tooltip'

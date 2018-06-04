@@ -1,10 +1,24 @@
 import { compile as vegaLiteCompile } from 'vega-lite';
 import schemaParser from 'vega-schema-url-parser';
-import { vega as vegaTooltip } from 'vega-tooltip';
-import 'vega-tooltip/build/vega-tooltip.css';
+import { Handler } from 'vega-tooltip';
 import { select } from 'd3-selection';
 import { getElementSize } from '../util';
-import { parse, View } from 'vega';
+import { parse, View } from 'vega-lib';
+
+function collectFields (data) {
+  let fields = [];
+  let keys = new Set();
+  data.forEach(d => {
+    Object.keys(d).forEach(k => {
+      if (!keys.has(k)) {
+        keys.add(k);
+        fields.push(k);
+      }
+    });
+  });
+
+  return fields.map(f => ({field: f, type: 'nominal'}));
+}
 
 let VegaView = (Base) => class extends Base {
   constructor (...args) {
@@ -15,6 +29,10 @@ let VegaView = (Base) => class extends Base {
     this.content.style.display = 'block';
     this.el.appendChild(this.content);
     this.calculateSize(this.options.calculateSize);
+  }
+
+  tooltipSpec () {
+    return collectFields(this.options.data);
   }
 
   generateSpec () {
@@ -70,12 +88,14 @@ let VegaView = (Base) => class extends Base {
     if (spec.$schema && schemaParser(spec.$schema).library === 'vega-lite') {
       vegaSpec = vegaLiteCompile(spec).spec;
     }
+    let handler = new Handler();
     this.view = new View(parse(vegaSpec))
       .renderer(this.options.renderer || 'canvas')
+      .tooltip(handler.call)
       .initialize(this.content)
       .hover()
       .run();
-    vegaTooltip(this.view);
+
     return {
       width: window.parseInt(this.content.firstChild.getAttribute('width')),
       height: window.parseInt(this.content.firstChild.getAttribute('height'))

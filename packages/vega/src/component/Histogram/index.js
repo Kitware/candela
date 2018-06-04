@@ -88,7 +88,9 @@ export default class Histogram extends VegaView(VisComponent) {
       width: this.getWidth(200),
       height: this.getHeight(200),
       mark: 'bar',
-      encoding: {}
+      encoding: {
+        tooltip: super.tooltipSpec()
+      }
     };
 
     if (this.options.x) {
