@@ -1,6 +1,6 @@
 {
   "name": "@candela/all",
-  "version": "0.23.0",
+  "version": "0.23.1",
   "description": "Candela all-inclusive library",
   "main": "dist/candela-all.js",
   "scripts": {
@@ -35,10 +35,10 @@
     "@candela/sententree": "^0.21.0",
     "@candela/similaritygraph": "^0.21.0",
     "@candela/size": "^0.21.0",
-    "@candela/stats": "^0.23.0",
+    "@candela/stats": "^0.23.1",
     "@candela/treeheatmap": "^0.21.0",
     "@candela/upset": "^0.21.0",
-    "@candela/vega": "^0.23.0"
+    "@candela/vega": "^0.23.1"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.44",

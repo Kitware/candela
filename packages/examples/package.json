@@ -1,6 +1,6 @@
 {
   "name": "@candela/examples",
-  "version": "0.23.0",
+  "version": "0.23.1",
   "description": "Candela examples for testing",
   "scripts": {
     "build": "webpack --mode development",
@@ -33,11 +33,11 @@
     "@candela/sententree": "^0.21.0",
     "@candela/similaritygraph": "^0.21.0",
     "@candela/size": "^0.21.0",
-    "@candela/stats": "^0.23.0",
+    "@candela/stats": "^0.23.1",
     "@candela/trackerdash": "^0.21.0",
     "@candela/treeheatmap": "^0.21.0",
     "@candela/upset": "^0.21.0",
-    "@candela/vega": "^0.23.0"
+    "@candela/vega": "^0.23.1"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.44",

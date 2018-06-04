@@ -1,6 +1,6 @@
 {
   "name": "@candela/jupyterlab",
-  "version": "0.23.0",
+  "version": "0.23.1",
   "description": "Candela visualizations for jupyterlab",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -24,7 +24,7 @@
     "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
   ],
   "dependencies": {
-    "@candela/all": "^0.23.0",
+    "@candela/all": "^0.23.1",
     "@jupyterlab/application": "^0.16.0",
     "@jupyterlab/notebook": "^0.16.2"
   },
