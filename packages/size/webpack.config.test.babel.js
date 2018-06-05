@@ -32,6 +32,22 @@ if (process.env.COVERAGE) {
           path.resolve('src/')
         ],
         exclude: /\.spec\.js$/
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              ['@babel/env', {
+                targets: {
+                  node: 'current'
+                }
+              }]
+            ]
+          }
+        }
       }
     ]
   };
