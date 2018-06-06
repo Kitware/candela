@@ -1,6 +1,6 @@
 {
   "name": "@candela/all",
-  "version": "0.23.1",
+  "version": "0.23.2",
   "description": "Candela all-inclusive library",
   "main": "dist/candela-all.js",
   "scripts": {
