@@ -1,6 +1,6 @@
 {
   "name": "@candela/onset",
-  "version": "0.21.0",
+  "version": "0.23.3",
   "description": "Candela component for OnSet",
   "main": "dist/candela-onset.js",
   "scripts": {
@@ -29,7 +29,7 @@
     ]
   },
   "dependencies": {
-    "@candela/core": "^0.21.0",
+    "@candela/core": "^0.23.3",
     "d3": "^3.5.17",
     "datalib": "^1.7.3",
     "onset": "git+https://github.com/Kitware/setvis#b2b8e7cfdef335a4ee4b2af871e14d203ef3e754"

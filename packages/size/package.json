@@ -1,6 +1,6 @@
 {
   "name": "@candela/size",
-  "version": "0.21.0",
+  "version": "0.23.3",
   "description": "Candela mixins for dealing with vis component size",
   "main": "dist/candela-size.js",
   "scripts": {
@@ -29,7 +29,7 @@
     ]
   },
   "dependencies": {
-    "@candela/events": "^0.21.0",
+    "@candela/events": "^0.23.3",
     "watch-element-resize": "^2.0.6"
   },
   "devDependencies": {
