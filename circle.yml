@@ -20,13 +20,13 @@ dependencies:
 compile:
   override:
     # Build Candela.
-    - npm run build
+    - npm run build:prod
 
     # Build the examples package.
     - npm run build:examples
 
     # Build the big bundle.
-    - npm run build:bundle
+    - npm run build:bundle:prod
 
     # Build the JupyterLab extension (which depends on @candela/all from the
     # previous step).

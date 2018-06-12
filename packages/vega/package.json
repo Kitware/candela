@@ -5,6 +5,7 @@
   "main": "dist/candela-vega.js",
   "scripts": {
     "build": "webpack --mode development",
+    "build:prod": "webpack --mode production",
     "clean": "rm -rf dist build",
     "lint": "semistandard | snazzy",
     "build:test": "webpack --config webpack.config.test.babel.js --mode development",

@@ -24,11 +24,7 @@ export default {
           loader: 'babel-loader',
           options: {
             presets: [
-              ['@babel/env', {
-                targets: {
-                  node: 'current'
-                }
-              }]
+              '@babel/env'
             ]
           }
         }
