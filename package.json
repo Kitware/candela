@@ -15,7 +15,7 @@
     "examples": "cd packages/examples && npm run serve",
     "build:test": "lerna run build:test",
     "build:coverage": "COVERAGE=1 npm run build:test",
-    "test:unit": "lerna run test --ignore @candela/examples",
+    "test:unit": "lerna run test --ignore @candela/examples --concurrency 1",
     "test:image": "cd packages/examples && npm test",
     "test:coverage": "COVERAGE=1 npm run test:unit",
     "coverage:report": "http-server build/coverage/html -p ${PORT-3000}",
