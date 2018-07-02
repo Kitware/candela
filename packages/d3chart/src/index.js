@@ -1,1 +1,1 @@
-export const value = 3;
+export { D3Chart, Swatches } from './D3Chart';

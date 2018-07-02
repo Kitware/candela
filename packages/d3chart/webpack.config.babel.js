@@ -7,6 +7,12 @@ export default {
     path: path.resolve('dist'),
     filename: 'candela-d3chart.js'
   },
+  externals: [
+    '@candela/core',
+    '@candela/size',
+    'd3-selection',
+    'd3-transition'
+  ],
   module: {
     rules: [
       {

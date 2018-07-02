@@ -28,11 +28,18 @@
       "build"
     ]
   },
+  "dependencies": {
+    "@candela/core": "^0.23.3",
+    "@candela/size": "^0.23.3",
+    "d3-selection": "^1.1.0",
+    "d3-transition": "^1.1.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.44",
     "@babel/preset-env": "^7.0.0-beta.44",
     "@babel/register": "^7.0.0-beta.44",
     "babel-loader": "^8.0.0-beta.2",
+    "d3-selection": "^1.1.0",
     "istanbul-instrumenter-loader": "^3.0.1",
     "karma": "^2.0.2",
     "karma-chrome-launcher": "^2.2.0",
