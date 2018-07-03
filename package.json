@@ -12,7 +12,7 @@
     "build:bundle": "cd packages/all && npm run build",
     "build:bundle:prod": "cd packages/all && npm run build:prod",
     "build:jupyterlab": "cd packages/jupyterlab && npm run build",
-    "examples": "cd packages/examples && npm run serve",
+    "start": "cd packages/examples && npm start",
     "build:test": "lerna run build:test",
     "build:coverage": "COVERAGE=1 npm run build:test",
     "test:unit": "lerna run test --ignore @candela/examples --concurrency 1",
