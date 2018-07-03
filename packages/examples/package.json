@@ -6,7 +6,7 @@
     "build": "webpack --mode development",
     "build:prod": "webpack --mode production",
     "clean": "rm -rf dist build",
-    "serve": "http-server dist -p 28000",
+    "start": "http-server dist -p 28000",
     "lint": "semistandard | snazzy",
     "test": "bash scripts/run-test"
   },
