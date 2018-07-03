@@ -1,1 +1,1 @@
-export { D3Chart, Swatches } from './D3Chart';
+export * from './D3Chart';
