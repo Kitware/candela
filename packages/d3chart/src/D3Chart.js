@@ -1,4 +1,5 @@
 import { VisComponent } from '@candela/core';
+import { Events } from '@candela/events';
 import { InitSize } from '@candela/size';
 
 import { select } from 'd3-selection';
@@ -28,8 +29,6 @@ export const Margin = Base => class extends Base {
         delete mm[key];
       }
     }
-
-    console.log('mm', mm);
 
     this._margin = {
       ...this._margin,
@@ -134,6 +133,160 @@ export const D3Chart = Base => class extends Margin(InitSize(Base)) {
     this.right.attr('transform', `translate(${this.width - margin.right},${margin.top})`);
     this.top.attr('transform', `translate(${margin.left},0)`);
     this.plot.attr('transform', `translate(${margin.left},${margin.top})`);
+  }
+};
+
+export const Interactive = Base => class extends Base {
+  initInteractive () {
+    const plotBounds = this.marginBounds('plot');
+
+    const target = this.root.append('rect')
+      .classed('interactive-target', true)
+      .attr('x', plotBounds.x)
+      .attr('y', plotBounds.y)
+      .attr('width', plotBounds.width)
+      .attr('height', plotBounds.height)
+      .style('opacity', 0.0);
+
+    this._interactive = {
+      target
+    };
+  }
+
+  target () {
+    return this._interactive.target;
+  }
+
+  mouseCoords () {
+    const event = window.event;
+    if (event) {
+      const bbox = this.target().node().getBoundingClientRect();
+      return {
+        x: event.clientX - bbox.left,
+        y: event.clientY - bbox.top
+      };
+    }
+  }
+};
+
+export const Crosshairs = Base => class extends Base {
+  initCrosshairs () {
+    const plotBounds = this.marginBounds('plot');
+    this.target = this.plot.append('rect', ':first-child')
+      .classed('crosshairs-target', true)
+      .attr('width', plotBounds.width)
+      .attr('height', plotBounds.height)
+      .style('opacity', 0.0);
+
+    const g = this.plot.append('g')
+      .classed('crosshairs', true)
+      .style('pointer-events', 'none');
+
+    const horz = this.bottomAxis() || this.topAxis();
+    const vert = this.leftAxis() || this.rightAxis();
+
+    this.crosshairX = g.append('line')
+      .classed('crosshair-x', true)
+      .style('opacity', 0)
+      .style('stroke', 'lightgray')
+      .attr('x1', horz.range()[0])
+      .attr('x2', horz.range()[1]);
+
+    this.crosshairY = g.append('line')
+      .classed('crosshair-y', true)
+      .style('opacity', 0)
+      .style('stroke', 'lightgray')
+      .attr('y1', vert.range()[0])
+      .attr('y2', vert.range()[1]);
+
+    this.target.on('mouseover.crosshairs', () => {
+        this.show();
+      })
+      .on('mousemove.crosshairs', () => {
+        const mouse = this.mouseCoords();
+        this.update(mouse.x, mouse.y);
+      })
+      .on('mouseout.crosshairs', () => {
+        this.hide();
+      });
+  }
+
+  mouseCoords () {
+    const event = window.event;
+    if (event) {
+      const bbox = this.target.node().getBoundingClientRect();
+      return {
+        x: event.pageX - bbox.left,
+        y: event.pageY - bbox.top
+      };
+    }
+  }
+
+  update (x, y) {
+    this.crosshairX.attr('y1', y)
+      .attr('y2', y);
+
+      crosshairY.attr('x1', mouse.x)
+        .attr('x2', mouse.x);
+
+      this.emit('crosshairs.move', window.event);
+    }).on('mouseout.crosshairs', () => {
+      g.selectAll('line')
+        .style('opacity', 0);
+
+      this.emit('crosshairs.out');
+    });
+
+    this.crosshairY.attr('x1', x)
+      .attr('x2', x);
+  }
+
+  show () {
+    this.crosshairX.style('opacity', 1);
+    this.crosshairY.style('opacity', 1);
+  }
+
+  hide () {
+    this.crosshairX.style('opacity', 0);
+    this.crosshairY.style('opacity', 0);
+  }
+};
+
+export const Tooltip = Base => class extends Base {
+  constructor () {
+    super(...arguments);
+
+    this._tooltip = {};
+  }
+
+  initTooltip (options = {}) {
+    this._tooltip.tooltip = select(this.el)
+      .append('div')
+      .style('opacity', 0)
+      .style('position', 'absolute')
+      .style('text-align', options.textAlign || 'center')
+      .style('width', options.width || '80px')
+      .style('height', options.height || '30px')
+      .style('padding', '2px')
+      .style('font', options.font || '12px sans-serif')
+      .style('background', options.background || 'lightgreen')
+      .style('border', '0px')
+      .style('border-radius', '8px')
+      .style('pointer-events', 'none');
+  }
+
+  tooltip () {
+    return this._tooltip.tooltip;
+  }
+
+  showTT () {
+    this.tooltip()
+      .style('opacity', 1);
+  }
+
+  hideTT () {
+    this.tooltip()
+      .style('opacity', 0);
   }
 };
 

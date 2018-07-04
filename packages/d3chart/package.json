@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@candela/core": "^0.23.3",
+    "@candela/events": "^0.23.3",
     "@candela/size": "^0.23.3",
     "d3-selection": "^1.1.0",
     "d3-transition": "^1.1.0"

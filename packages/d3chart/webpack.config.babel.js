@@ -9,6 +9,7 @@ export default {
   },
   externals: [
     '@candela/core',
+    '@candela/events',
     '@candela/size',
     'd3-selection',
     'd3-transition'
