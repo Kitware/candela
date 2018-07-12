@@ -137,17 +137,6 @@ export const Crosshairs = Base => class extends Base {
     this.crosshairX.attr('y1', y)
       .attr('y2', y);
 
-      crosshairY.attr('x1', mouse.x)
-        .attr('x2', mouse.x);
-
-      this.emit('crosshairs.move', window.event);
-    }).on('mouseout.crosshairs', () => {
-      g.selectAll('line')
-        .style('opacity', 0);
-
-      this.emit('crosshairs.out');
-    });
-
     this.crosshairY.attr('x1', x)
       .attr('x2', x);
   }
