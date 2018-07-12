@@ -93,8 +93,8 @@ export const Crosshairs = Base => class extends Base {
       .classed('crosshairs', true)
       .style('pointer-events', 'none');
 
-    const horz = this.bottomAxis() || this.topAxis();
-    const vert = this.leftAxis() || this.rightAxis();
+    const horz = this.bottomScale() || this.topScale();
+    const vert = this.leftScale() || this.rightScale();
 
     this.crosshairX = g.append('line')
       .classed('crosshair-x', true)
