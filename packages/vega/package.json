@@ -1,6 +1,6 @@
 {
   "name": "@candela/vega",
-  "version": "0.23.3",
+  "version": "0.23.4",
   "description": "Candela components built around Vega",
   "main": "dist/candela-vega.js",
   "scripts": {
@@ -29,7 +29,7 @@
     ]
   },
   "dependencies": {
-    "@candela/core": "^0.23.3",
+    "@candela/core": "^0.23.4",
     "d3-selection": "^1.1.0",
     "vega-lib": "^3.0.0-rc1",
     "vega-lite": "^2.0.0-beta.8",

@@ -1,6 +1,6 @@
 {
   "name": "@candela/glo",
-  "version": "0.23.3",
+  "version": "0.23.4",
   "description": "Candela component for GLO",
   "main": "dist/candela-glo.js",
   "scripts": {
@@ -29,7 +29,7 @@
     ]
   },
   "dependencies": {
-    "@candela/core": "^0.23.3",
+    "@candela/core": "^0.23.4",
     "d3": "^3.5.17",
     "glo": "github:ronichoudhury-work/glo#dist",
     "underscore": "^1.8.3"
