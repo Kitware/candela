@@ -47,39 +47,6 @@ export const D3Chart = Base => class extends Margin(InitSize(Base)) {
   }
 };
 
-export const Interactive = Base => class extends Base {
-  initInteractive () {
-    const plotBounds = this.marginBounds('plot');
-
-    const target = this.root.append('rect')
-      .classed('interactive-target', true)
-      .attr('x', plotBounds.x)
-      .attr('y', plotBounds.y)
-      .attr('width', plotBounds.width)
-      .attr('height', plotBounds.height)
-      .style('opacity', 0.0);
-
-    this._interactive = {
-      target
-    };
-  }
-
-  target () {
-    return this._interactive.target;
-  }
-
-  mouseCoords () {
-    const event = window.event;
-    if (event) {
-      const bbox = this.target().node().getBoundingClientRect();
-      return {
-        x: event.clientX - bbox.left,
-        y: event.clientY - bbox.top
-      };
-    }
-  }
-};
-
 export const Crosshairs = Base => class extends Base {
   initCrosshairs () {
     const plotBounds = this.marginBounds('plot');
