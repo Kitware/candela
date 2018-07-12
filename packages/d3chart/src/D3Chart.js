@@ -111,15 +111,13 @@ export const Crosshairs = Base => class extends Base {
       .attr('y2', vert.range()[1]);
 
     this.target.on('mouseover.crosshairs', () => {
-        this.show();
-      })
-      .on('mousemove.crosshairs', () => {
-        const mouse = this.mouseCoords();
-        this.update(mouse.x, mouse.y);
-      })
-      .on('mouseout.crosshairs', () => {
-        this.hide();
-      });
+      this.show();
+    }).on('mousemove.crosshairs', () => {
+      const mouse = this.mouseCoords();
+      this.update(mouse.x, mouse.y);
+    }).on('mouseout.crosshairs', () => {
+      this.hide();
+    });
   }
 
   mouseCoords () {
