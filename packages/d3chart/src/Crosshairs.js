@@ -1,6 +1,6 @@
 export const Crosshairs = Base => class extends Base {
   initCrosshairs () {
-    const plotBounds = this.marginBounds('plot');
+    const plotBounds = this.margin.bounds('plot');
     this.target = this.plot.append('rect', ':first-child')
       .classed('crosshairs-target', true)
       .attr('width', plotBounds.width)

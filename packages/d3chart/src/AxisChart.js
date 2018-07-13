@@ -19,7 +19,7 @@ export const AxisChart = Base => class extends Base {
     const scaleProp = `${direction}Scale`;
     const groupProp = `${direction}Group`;
 
-    const bounds = this.marginBounds('plot');
+    const bounds = this.margin.bounds('plot');
 
     if (direction === 'left' || direction === 'right') {
       scale.range([bounds.height, 0]);
@@ -38,7 +38,7 @@ export const AxisChart = Base => class extends Base {
         .style('font-weight', 'bold');
 
       if (direction === 'left') {
-        const margin = this.margin();
+        const margin = this.margin.get();
         axis.attr('transform', `translate(${margin.left},0)`);
       }
     } else {
@@ -75,7 +75,7 @@ export const AxisChart = Base => class extends Base {
   }
 
   leftLabel (label) {
-    const leftBounds = this.marginBounds('left');
+    const leftBounds = this.margin.bounds('left');
     if (label) {
       this._axes.leftGroup.select('text')
         .attr('transform', 'rotate(-90)')
@@ -88,7 +88,7 @@ export const AxisChart = Base => class extends Base {
   }
 
   bottomLabel (label) {
-    const bottomBounds = this.marginBounds('bottom');
+    const bottomBounds = this.margin.bounds('bottom');
     if (label) {
       this._axes.bottomGroup.select('text')
         .attr('x', bottomBounds.width / 2)

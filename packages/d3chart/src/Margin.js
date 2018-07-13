@@ -1,8 +1,8 @@
-export const Margin = Base => class extends Base {
-  constructor () {
-    super(...arguments);
+class MarginImpl {
+  constructor (that) {
+    this.that = that;
 
-    this._margin = {
+    this.margin = {
       top: null,
       right: null,
       bottom: null,
@@ -10,28 +10,30 @@ export const Margin = Base => class extends Base {
     };
   }
 
-  margin (m) {
-    if (m === undefined) {
-      return {...this._margin};
-    }
+  get () {
+    return {...this.margin};
+  }
 
+  set (m) {
     let mm = {...m};
     for (let key in mm) {
-      if (!(key in this._margin)) {
+      if (!(key in this.margin)) {
         delete mm[key];
       }
     }
 
-    this._margin = {
-      ...this._margin,
+    this.margin = {
+      ...this.margin,
       ...mm
     };
 
-    return this;
+    return this.that;
   }
 
-  marginBounds (region) {
-    const margin = this.margin();
+  bounds (region) {
+    const margin = this.get();
+    const width = this.that.width;
+    const height = this.that.height;
     let bounds;
 
     switch (region) {
@@ -40,16 +42,16 @@ export const Margin = Base => class extends Base {
           x: 0,
           y: margin.top,
           width: margin.left,
-          height: this.height - margin.top - margin.bottom
+          height: height - margin.top - margin.bottom
         };
         break;
 
       case 'right':
         bounds = {
-          x: this.width - margin.right,
+          x: width - margin.right,
           y: margin.top,
           width: margin.right,
-          height: this.height - margin.top - margin.bottom
+          height: height - margin.top - margin.bottom
         };
         break;
 
@@ -57,7 +59,7 @@ export const Margin = Base => class extends Base {
         bounds = {
           x: margin.left,
           y: 0,
-          width: this.width - margin.left - margin.right,
+          width: width - margin.left - margin.right,
           height: margin.top
         };
         break;
@@ -65,8 +67,8 @@ export const Margin = Base => class extends Base {
       case 'bottom':
         bounds = {
           x: margin.left,
-          y: this.height - margin.bottom,
-          width: this.width - margin.left - margin.right,
+          y: height - margin.bottom,
+          width: width - margin.left - margin.right,
           height: margin.bottom
         };
         break;
@@ -75,8 +77,8 @@ export const Margin = Base => class extends Base {
         bounds = {
           x: margin.left,
           y: margin.top,
-          width: this.width - margin.left - margin.right,
-          height: this.height - margin.top - margin.bottom
+          width: width - margin.left - margin.right,
+          height: height - margin.top - margin.bottom
         };
         break;
 
@@ -85,5 +87,14 @@ export const Margin = Base => class extends Base {
     }
 
     return bounds;
+  }
+}
+
+export const Margin = Base => class extends Base {
+  constructor () {
+    super(...arguments);
+    if (!this.margin) {
+      this.margin = new MarginImpl(this);
+    }
   }
 };

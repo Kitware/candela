@@ -36,7 +36,7 @@ export const D3Chart = Base => class extends Margin(InitSize(Base)) {
     this.svg.attr('width', this.width)
       .attr('height', this.height);
 
-    const margin = this.margin();
+    const margin = this.margin.get();
 
     this.left.attr('transform', `translate(0,${margin.top})`);
     this.bottom.attr('transform', `translate(${margin.left},${this.height - margin.bottom})`);
@@ -52,11 +52,10 @@ export class Swatches extends D3Chart(VisComponent) {
 
     this.width = options.width;
     this.height = options.height;
-    this.margin(options.margin)
+    this.margin.set(options.margin)
       .initD3Chart();
 
-    const margin = this.margin();
-    console.log(margin);
+    const margin = this.margin.get();
 
     this.left.append('rect')
       .attr('x', 0)
