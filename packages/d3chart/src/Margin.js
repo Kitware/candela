@@ -27,7 +27,7 @@ class MarginImpl {
       ...mm
     };
 
-    return this.that;
+    return this;
   }
 
   bounds (region) {

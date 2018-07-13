@@ -41,7 +41,7 @@ class CrosshairsImpl {
       this.show();
     }).on('mousemove.crosshairs', () => {
       const mouse = this.mouseCoords();
-      this.update(mouse.x, mouse.y);
+      this.setPosition(mouse.x, mouse.y);
     }).on('mouseout.crosshairs', () => {
       this.hide();
     });
@@ -58,28 +58,28 @@ class CrosshairsImpl {
     }
   }
 
-  update (x, y) {
+  setPosition (x, y) {
     this.crosshairX.attr('y1', y)
       .attr('y2', y);
 
     this.crosshairY.attr('x1', x)
       .attr('x2', x);
 
-    return this.that;
+    return this;
   }
 
   show () {
     this.crosshairX.style('opacity', 1);
     this.crosshairY.style('opacity', 1);
 
-    return this.that;
+    return this;
   }
 
   hide () {
     this.crosshairX.style('opacity', 0);
     this.crosshairY.style('opacity', 0);
 
-    return this.that;
+    return this;
   }
 }
 
