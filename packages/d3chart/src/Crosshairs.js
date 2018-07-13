@@ -1,32 +1,41 @@
-export const Crosshairs = Base => class extends Base {
-  initCrosshairs () {
-    const plotBounds = this.margin.bounds('plot');
-    this.target = this.plot.append('rect', ':first-child')
+import { Margin } from './Margin';
+
+class CrosshairsImpl {
+  constructor (that) {
+    this.that = that;
+
+    this.target = null;
+    this.crosshairX = null;
+    this.crosshairY = null;
+  }
+
+  init () {
+    const that = this.that;
+
+    const plotBounds = that.margin.bounds('plot');
+    this.target = that.plot.append('rect', ':first-child')
       .classed('crosshairs-target', true)
       .attr('width', plotBounds.width)
       .attr('height', plotBounds.height)
       .style('opacity', 0.0);
 
-    const g = this.plot.append('g')
+    const g = that.plot.append('g')
       .classed('crosshairs', true)
       .style('pointer-events', 'none');
-
-    const horz = this.bottomScale() || this.topScale();
-    const vert = this.leftScale() || this.rightScale();
 
     this.crosshairX = g.append('line')
       .classed('crosshair-x', true)
       .style('opacity', 0)
       .style('stroke', 'lightgray')
-      .attr('x1', horz.range()[0])
-      .attr('x2', horz.range()[1]);
+      .attr('x1', 0)
+      .attr('x2', plotBounds.width);
 
     this.crosshairY = g.append('line')
       .classed('crosshair-y', true)
       .style('opacity', 0)
       .style('stroke', 'lightgray')
-      .attr('y1', vert.range()[0])
-      .attr('y2', vert.range()[1]);
+      .attr('y1', 0)
+      .attr('y2', plotBounds.height);
 
     this.target.on('mouseover.crosshairs', () => {
       this.show();
@@ -55,15 +64,30 @@ export const Crosshairs = Base => class extends Base {
 
     this.crosshairY.attr('x1', x)
       .attr('x2', x);
+
+    return this.that;
   }
 
   show () {
     this.crosshairX.style('opacity', 1);
     this.crosshairY.style('opacity', 1);
+
+    return this.that;
   }
 
   hide () {
     this.crosshairX.style('opacity', 0);
     this.crosshairY.style('opacity', 0);
+
+    return this.that;
+  }
+}
+
+export const Crosshairs = Base => class extends Margin(Base) {
+  constructor () {
+    super(...arguments);
+    if (!this.crosshairs) {
+      this.crosshairs = new CrosshairsImpl(this);
+    }
   }
 };

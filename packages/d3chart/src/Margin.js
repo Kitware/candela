@@ -3,10 +3,10 @@ class MarginImpl {
     this.that = that;
 
     this.margin = {
-      top: null,
-      right: null,
-      bottom: null,
-      left: null
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0
     };
   }
 
