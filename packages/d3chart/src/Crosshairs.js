@@ -1,4 +1,4 @@
-import { Margin } from './Margin';
+import { D3Chart } from './D3Chart';
 
 class CrosshairsImpl {
   constructor (that) {
@@ -13,13 +13,13 @@ class CrosshairsImpl {
     const that = this.that;
 
     const plotBounds = that.margin.bounds('plot');
-    this.target = that.plot.append('rect', ':first-child')
+    this.target = that.d3chart.plot.append('rect', ':first-child')
       .classed('crosshairs-target', true)
       .attr('width', plotBounds.width)
       .attr('height', plotBounds.height)
       .style('opacity', 0.0);
 
-    const g = that.plot.append('g')
+    const g = that.d3chart.plot.append('g')
       .classed('crosshairs', true)
       .style('pointer-events', 'none');
 
@@ -83,7 +83,7 @@ class CrosshairsImpl {
   }
 }
 
-export const Crosshairs = Base => class extends Margin(Base) {
+export const Crosshairs = Base => class extends D3Chart(Base) {
   constructor () {
     super(...arguments);
     if (!this.crosshairs) {

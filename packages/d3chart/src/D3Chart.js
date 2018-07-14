@@ -6,11 +6,11 @@ import 'd3-transition';
 
 import { Margin } from './Margin';
 
-export const D3Chart = Base => class extends Margin(InitSize(Base)) {
-  constructor () {
-    super(...arguments);
+class D3ChartImpl {
+  constructor (that) {
+    this.that = that;
 
-    this.svg = select(this.el)
+    this.svg = select(this.that.el)
       .append('svg')
       .attr('xmlns', 'http://www.w3.org/2000/svg');
 
@@ -32,17 +32,26 @@ export const D3Chart = Base => class extends Margin(InitSize(Base)) {
       .classed('plot', true);
   }
 
-  initD3Chart () {
-    this.svg.attr('width', this.width)
-      .attr('height', this.height);
+  init () {
+    this.svg.attr('width', this.that.width)
+      .attr('height', this.that.height);
 
-    const margin = this.margin.get();
+    const margin = this.that.margin.get();
 
     this.left.attr('transform', `translate(0,${margin.top})`);
-    this.bottom.attr('transform', `translate(${margin.left},${this.height - margin.bottom})`);
-    this.right.attr('transform', `translate(${this.width - margin.right},${margin.top})`);
+    this.bottom.attr('transform', `translate(${margin.left},${this.that.height - margin.bottom})`);
+    this.right.attr('transform', `translate(${this.that.width - margin.right},${margin.top})`);
     this.top.attr('transform', `translate(${margin.left},0)`);
     this.plot.attr('transform', `translate(${margin.left},${margin.top})`);
+  }
+}
+
+export const D3Chart = Base => class extends Margin(InitSize(Base)) {
+  constructor () {
+    super(...arguments);
+    if (!this.d3chart) {
+      this.d3chart = new D3ChartImpl(this);
+    }
   }
 };
 
@@ -52,12 +61,12 @@ export class Swatches extends D3Chart(VisComponent) {
 
     this.width = options.width;
     this.height = options.height;
-    this.margin.set(options.margin)
-      .initD3Chart();
+    this.margin.set(options.margin);
+    this.d3chart.init();
 
     const margin = this.margin.get();
 
-    this.left.append('rect')
+    this.d3chart.left.append('rect')
       .attr('x', 0)
       .attr('y', 0)
       .attr('width', margin.left)
@@ -65,7 +74,7 @@ export class Swatches extends D3Chart(VisComponent) {
       .style('stroke', 'black')
       .style('fill', 'red');
 
-    this.bottom.append('rect')
+    this.d3chart.bottom.append('rect')
       .attr('x', 0)
       .attr('y', 0)
       .attr('width', this.width - margin.left - margin.right)
@@ -73,7 +82,7 @@ export class Swatches extends D3Chart(VisComponent) {
       .style('stroke', 'black')
       .style('fill', 'green');
 
-    this.right.append('rect')
+    this.d3chart.right.append('rect')
       .attr('x', 0)
       .attr('y', 0)
       .attr('width', margin.right)
@@ -81,7 +90,7 @@ export class Swatches extends D3Chart(VisComponent) {
       .style('stroke', 'black')
       .style('fill', 'cyan');
 
-    this.top.append('rect')
+    this.d3chart.top.append('rect')
       .attr('x', 0)
       .attr('y', 0)
       .attr('width', this.width - margin.left - margin.right)
@@ -89,7 +98,7 @@ export class Swatches extends D3Chart(VisComponent) {
       .style('stroke', 'black')
       .style('fill', 'yellow');
 
-    this.plot.append('rect')
+    this.d3chart.plot.append('rect')
       .attr('x', 0)
       .attr('y', 0)
       .attr('width', this.width - margin.left - margin.right)

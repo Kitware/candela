@@ -1,6 +1,6 @@
 import { axisLeft, axisBottom } from 'd3-axis';
 
-import { Margin } from './Margin';
+import { D3Chart } from './D3Chart';
 
 const scaleFuncMap = {
   left: axisLeft,
@@ -62,8 +62,7 @@ class AxesImpl {
 
     let axis = this.group[direction];
     if (!axis) {
-      // TODO: make the dependency on D3Chart explicit.
-      axis = this.group[direction] = this.that[direction].append('g');
+      axis = this.group[direction] = this.that.d3chart[direction].append('g');
       axis.append('text')
         .attr('fill', '#000')
         .style('font-size', '11pt')
@@ -109,7 +108,7 @@ class AxesImpl {
   }
 }
 
-export const Axes = Base => class extends Margin(Base) {
+export const Axes = Base => class extends D3Chart(Base) {
   constructor () {
     super(...arguments);
     this.axes = new AxesImpl(this);
