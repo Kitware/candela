@@ -28,6 +28,9 @@
       "build"
     ]
   },
+  "dependencies": {
+    "@candela/core": "^0.23.4"
+  },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.44",
     "@babel/preset-env": "^7.0.0-beta.44",
