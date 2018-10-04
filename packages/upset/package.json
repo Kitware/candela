@@ -1,0 +1,63 @@
+{
+  "name": "@candela/upset",
+  "version": "0.23.4",
+  "description": "Candela component for UpSet",
+  "main": "dist/candela-upset.js",
+  "scripts": {
+    "build": "webpack --mode development",
+    "build:prod": "webpack --mode production",
+    "clean": "rm -rf dist build",
+    "lint": "semistandard | snazzy",
+    "build:test": "webpack --config webpack.config.test.babel.js --mode development",
+    "test": "karma start --colors --log-level error"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "babel": {
+    "presets": [
+      "@babel/env"
+    ]
+  },
+  "keywords": [],
+  "author": "Kitware Inc.",
+  "license": "Apache-2.0",
+  "semistandard": {
+    "ignore": [
+      "dist",
+      "build"
+    ]
+  },
+  "dependencies": {
+    "@candela/core": "^0.23.4",
+    "UpSet": "git+https://github.com/ronichoudhury-work/upset#candela",
+    "d3": "^3.5.17",
+    "datalib": "^1.7.3",
+    "font-awesome-webpack": "git+https://github.com/jarecsni/font-awesome-webpack#440af2a2efe7ba1779d039556f04538e57bad4bb"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.44",
+    "@babel/preset-env": "^7.0.0-beta.44",
+    "@babel/register": "^7.0.0-beta.44",
+    "babel-loader": "^8.0.0-beta.2",
+    "file-loader": "^1.1.11",
+    "html-loader": "^0.4.5",
+    "istanbul-instrumenter-loader": "^3.0.1",
+    "karma": "^2.0.2",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage-istanbul-reporter": "^1.4.2",
+    "karma-tap": "^4.1.3",
+    "karma-tap-pretty-reporter": "^4.0.0",
+    "less": "^3.0.2",
+    "node-sass": "^4.8.3",
+    "sass-loader": "^6.0.5",
+    "semistandard": "^7.0.5",
+    "snazzy": "^4.0.0",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.9.0",
+    "tape-catch": "^1.0.6",
+    "url-loader": "^1.0.1",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.14"
+  }
+}

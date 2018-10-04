@@ -1,0 +1,18 @@
+Package: candela
+Title: R interface for Candela
+Version: 0.2.0
+Authors@R: person("Jeffrey", "Baumes", email = "jeff.baumes@kitware.com", role = c("aut", "cre"))
+Description: R interface for Candela. Candela is an open-source suite of
+    interoperable web visualization components for Kitware's Resonant platform.
+    Candela focuses on making rich visualizations available with a normalized
+    API for use in real-world data science applications. Integrated components
+    include LineUp (Harvard), UpSet (Harvard), OnSet (Georgia Tech), Vega
+    (University of Washington).
+Depends:
+    R (>= 3.2.2)
+License: Apache License (== 2.0) | file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1
+Imports: htmlwidgets
+Suggests: testthat, lintr

@@ -1,0 +1,9 @@
+*.sw*
+*.pyc
+package-lock.json
+node_modules/
+docs/static/candela.js
+build
+npm-debug.log
+.ipynb_checkpoints
+lerna-debug.log

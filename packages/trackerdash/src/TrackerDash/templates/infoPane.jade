@@ -1,0 +1,38 @@
+table.table.table-responsive.table-compact
+  thead.result-labels
+    th(colspan="2")
+      .agg-label-header
+        if producerLink
+          a(href=producerLink, title="Aggregate metrics over key metric values") Aggregate Metric
+        else
+          abbr(title="Aggregate metrics over key metric values") Aggregate Metric
+    if sparklinesExist
+      th
+        .agg-sparkline-header
+          abbr(title="Saved aggregate metric values from recent submissions on the same branch") Last 7 Days
+    th(colspan="2")
+      .agg-bullet-header
+        | Computed Value
+  tbody
+  each aggTrend in aggTrends
+    - var idSelector = aggTrend.id_selector
+    tr.info-section-chart(id="#{idSelector}-aggregate-container")
+      td.agg-status-dot
+        svg.statusDot
+          circle.none(id="#{idSelector}-aggregate-dot" r="10", cx="10", cy="10")
+      td
+        .agg-label
+          if aggTrend.synth
+            abbr(title="#{aggTrend.title}") *#{aggTrend.display_name}
+          else
+            abbr(title="#{aggTrend.title}") #{aggTrend.display_name}
+      if sparklinesExist
+        td
+          .agg-sparkline(id="#{idSelector}-aggregate-sparkline")
+            svg
+      td
+        .agg-value
+          | #{Math.round(aggTrend.history[aggTrend.history.length-1] * 10000) / 10000}
+      td
+        .agg-bullet(id="#{idSelector}-aggregate-bullet")
+          svg(id="#{idSelector}-aggregate-bullet-svg")

@@ -1,0 +1,22 @@
+# Track failure state of this script.
+result=true
+
+# Launch the server.
+npm run serve >.server.log&
+pid=$!
+if [ ${pid} == 0 ]; then
+    echo 'error: could not start server' >/dev/stderr
+    exit 1
+fi
+
+# Run the image tests.
+./node_modules/.bin/babel-node test/index.js | tap-spec
+if [ ${PIPESTATUS[0]} == 1 ]; then
+    result=false
+fi
+
+# Stop the server.
+kill ${pid}
+
+# Emit the needed exit code.
+${result}

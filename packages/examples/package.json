@@ -1,0 +1,71 @@
+{
+  "name": "@candela/examples",
+  "version": "0.23.4",
+  "description": "Candela examples for testing",
+  "scripts": {
+    "build": "webpack --mode development",
+    "build:prod": "webpack --mode production",
+    "clean": "rm -rf dist build",
+    "serve": "http-server dist -p 28000",
+    "lint": "semistandard | snazzy",
+    "test": "bash scripts/run-test"
+  },
+  "private": true,
+  "babel": {
+    "presets": [
+      "@babel/env"
+    ]
+  },
+  "keywords": [],
+  "author": "Kitware Inc.",
+  "license": "Apache-2.0",
+  "semistandard": {
+    "ignore": [
+      "dist",
+      "build"
+    ]
+  },
+  "dependencies": {
+    "@candela/events": "^0.23.4",
+    "@candela/geojs": "^0.23.4",
+    "@candela/glo": "^0.23.4",
+    "@candela/lineup": "^0.23.4",
+    "@candela/onset": "^0.23.4",
+    "@candela/sententree": "^0.23.4",
+    "@candela/similaritygraph": "^0.23.4",
+    "@candela/size": "^0.23.4",
+    "@candela/stats": "^0.23.4",
+    "@candela/trackerdash": "^0.23.4",
+    "@candela/treeheatmap": "^0.23.4",
+    "@candela/upset": "^0.23.4",
+    "@candela/vega": "^0.23.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.44",
+    "@babel/node": "^7.0.0-beta.44",
+    "@babel/preset-env": "^7.0.0-beta.44",
+    "@babel/register": "^7.0.0-beta.44",
+    "babel-loader": "^8.0.0-beta.2",
+    "callsite": "^1.0.0",
+    "css-loader": "^0.28.11",
+    "d3-selection": "^1.1.0",
+    "datalib": "^1.7.3",
+    "html-webpack-plugin": "^3.2.0",
+    "http-server": "^0.11.1",
+    "jade": "^1.11.0",
+    "jade-loader": "^0.8.0",
+    "nightmare": "^2.10.0",
+    "node-resemble": "^1.1.3",
+    "raw-loader": "^0.5.1",
+    "semistandard": "^7.0.5",
+    "snazzy": "^4.0.0",
+    "style-loader": "^0.21.0",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.2",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.9.0",
+    "tape-catch": "^1.0.6",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.14"
+  }
+}

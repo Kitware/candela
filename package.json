@@ -1,0 +1,51 @@
+{
+  "name": "candela",
+  "version": "0.0.0-semantically-released",
+  "description": "Visualization components for the web",
+  "scripts": {
+    "install": "lerna bootstrap --hoist",
+    "clean:lerna": "lerna clean",
+    "clean": "lerna run clean",
+    "build": "lerna run build --ignore @candela/examples --ignore @candela/all --ignore @candela/jupyterlab",
+    "build:prod": "lerna run build:prod --ignore @candela/examples --ignore @candela/all --ignore @candela/jupyterlab",
+    "build:examples": "cd packages/examples && npm run build",
+    "build:bundle": "cd packages/all && npm run build",
+    "build:bundle:prod": "cd packages/all && npm run build:prod",
+    "build:jupyterlab": "cd packages/jupyterlab && npm run build",
+    "examples": "cd packages/examples && npm run serve",
+    "build:test": "lerna run build:test",
+    "build:coverage": "COVERAGE=1 npm run build:test",
+    "test:unit": "lerna run test --ignore @candela/examples --concurrency 1",
+    "test:image": "cd packages/examples && npm test",
+    "test:coverage": "COVERAGE=1 npm run test:unit",
+    "coverage:report": "http-server build/coverage/html -p ${PORT-3000}",
+    "build:docs": "sphinx-build -a -b html docs/ build/docs/",
+    "lint": "lerna run lint --ignore @candela/trackerdash",
+    "lint:pycandela": "flake8 --config python/pycandela/flake8.cfg python/pycandela",
+    "docs": "http-server build/docs -p ${PORT-3000}",
+    "commit": "git-cz",
+    "commitmsg": "validate-commit-msg"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kitware/candela.git"
+  },
+  "author": "Roni Choudhury",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "commitizen": "^2.8.6",
+    "conventional-commit-types": "^2.1.0",
+    "cz-conventional-changelog": "^1.2.0",
+    "http-server": "^0.11.1",
+    "husky": "^0.11.8",
+    "validate-commit-msg": "^2.8.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    },
+    "validate-commit-msg": {
+      "helpMessage": "This project is commitizen-friendly.\nLearn more at https://commitizen.github.io/cz-cli/https://commitizen.github.io/cz-cli/\nTo try again, you can say \"git commit -t .git/COMMIT_EDITMSG\".\nOr, you can use git-cz to make your commits."
+    }
+  }
+}

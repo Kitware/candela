@@ -1,0 +1,52 @@
+table.table.table-striped.table-hover.table-responsive.table-compact
+  thead.result-labels
+    tr.key-metrics-row
+      td
+      td(colspan=trends.length)#key-metrics-title
+        if producerLink
+          a(href=producerLink) Key Metrics
+        else
+          | Key Metrics
+    tr
+      td
+        .trend-col-header-sortable(id="dataset-col-header")
+          | Dataset
+          svg.sort-column-icon
+            if !sortOrder || !sortOrder.dataset
+              polygon(points="4,6 12,6 8,14")
+            else
+              if sortOrder.order === 1
+                polygon.active(points="4,14 12,14 8,6")
+              else
+                polygon.active(points="4,6 12,6 8,14")
+
+      each trend in trends
+        td
+          .trend-col-header-sortable(id="#{trend.id_selector}-trend-col-header")
+            abbr(title="#{trend.title}") #{trend.display_name}
+            svg.sort-column-icon
+              if !sortOrder || sortOrder.trend !== trend.name
+                polygon(points="4,6 12,6 8,14")
+              else
+                if sortOrder.order === 1
+                  polygon.active(points="4,14 12,14 8,6")
+                else
+                  polygon.active(points="4,6 12,6 8,14")
+
+  tbody
+    each resultSet in resultsByDatasetId
+      tr
+        td.dataset-name(id="#{resultSet[0].dataset_id_selector}-name")
+          if typeof(datasetMap[resultSet[0].dataset]) === 'string'
+            a(href="#{datasetMap[resultSet[0].dataset]}") #{resultSet[0].dataset}
+          else if typeof(datasetMap[resultSet[0].dataset]) === 'function'
+            a(href="javascript:;", id="#{resultSet[0].dataset_id_selector}-link") #{resultSet[0].dataset}
+          else
+            | #{resultSet[0].dataset}
+          if typeof(datasetLabelMap[resultSet[0].dataset_id_selector]) === 'string'
+            .dataset-label(id="#{resultSet[0].dataset_id_selector}-label")
+              | #{datasetLabelMap[resultSet[0].dataset_id_selector]}
+        each trend in trends
+          td.valueWidget-container(id="#{resultSet[0].dataset_id_selector}-#{trend.id_selector}")
+            .valueWidget(id="#{resultSet[0].dataset_id_selector}-#{trend.id_selector}-valueWidget")
+              svg(id="#{resultSet[0].dataset_id_selector}-#{trend.id_selector}-valueWidget-svg")

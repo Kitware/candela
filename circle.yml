@@ -1,0 +1,69 @@
+machine:
+  node:
+    version: 9.5.0
+
+dependencies:
+  pre:
+    # Install libgif (needed for npm install).
+    - sudo apt-get update
+    - sudo apt-get install libgif-dev
+
+    # Install flake8 for Python linting.
+    - sudo pip install flake8
+
+    # Install Lerna globally.
+    - npm install -g lerna@2.10.2
+
+    # Inject npm token into environment.
+    - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >>~/.npmrc
+
+compile:
+  override:
+    # Build Candela.
+    - npm run build:prod
+
+    # Build the examples package.
+    - npm run build:examples
+
+    # Build the big bundle.
+    - npm run build:bundle:prod
+
+    # Build the JupyterLab extension (which depends on @candela/all from the
+    # previous step).
+    - npm run build:jupyterlab
+
+    # Build the unit test and coverage test bundles.
+    - npm run build:test
+    - npm run build:coverage
+
+test:
+  override:
+    # Lint tests.
+    - npm run lint
+    - npm run lint:pycandela
+
+    # Unit tests.
+    - npm run test:unit
+
+    # Image tests.
+    - npm run test:image:
+        environment:
+          CANDELA_DUMP_IMAGE: all
+
+    # Coverage tests.
+    - npm run test:coverage
+
+  post:
+    # Gather up the testing images as build artifacts.
+    - mkdir $CIRCLE_ARTIFACTS/test_images
+    - find packages/examples/test -name '*.png' | xargs -I xxx cp xxx $CIRCLE_ARTIFACTS/test_images
+
+    # Copy the html coverage report to the artifacts directory as well.
+    - mkdir $CIRCLE_ARTIFACTS/coverage
+    - cp -r build/coverage/html $CIRCLE_ARTIFACTS/coverage
+
+deployment:
+  lerna-publish:
+    branch: master
+    commands:
+      - lerna publish --conventional-commits --yes

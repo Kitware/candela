@@ -1,0 +1,5 @@
+dependencies:
+ - name: candela
+   version: 0.2.0
+   src: htmlwidgets/lib/candela
+   script: candela.js

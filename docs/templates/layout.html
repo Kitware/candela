@@ -1,0 +1,23 @@
+{% extends "!layout.html" %}
+
+{%- block extrahead %}
+    <!-- Switch the script tag for the docs to work locally. -->
+    <!-- <script src="/_static/candela.js"></script> -->
+    <script src="//unpkg.com/candela/dist/candela.min.js"></script>
+    <style>
+    /* This is a hack because Candela currently leaks global CSS. */
+    /* We should able to remove this when that issue is resolved. */
+    ul, ol, dl {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+    }
+    /* For a LineUp style that would use absolute position. */
+    div.lu {
+        position: static !important;
+    }
+    /* For an OnSet style that would use absolute position. */
+    .onset-body #wrapper {
+        position: static !important;
+    }
+    </style>
+{% endblock %}
