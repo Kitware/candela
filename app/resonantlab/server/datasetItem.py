@@ -21,9 +21,9 @@ from girder.api import access
 from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
 from girder.constants import AccessType
-from girder.plugins.database_assetstore.dbs.mongo import MongoConnector
+# from girder.plugins.database_assetstore.dbs.mongo import MongoConnector
 from girder_worker.format import get_csv_reader
-from girder.plugins.database_assetstore.assetstore import getDbInfoForFile
+# from girder.plugins.database_assetstore.assetstore import getDbInfoForFile
 
 
 TRUE_VALUES = set([True, 'true', 1, 'True'])
@@ -146,7 +146,8 @@ class DatasetItem(Resource):
                                            level=AccessType.READ,
                                            user=user,
                                            exc=True)
-        dbInfo = getDbInfoForFile(fileInfo)
+        # dbInfo = getDbInfoForFile(fileInfo)
+        dbInfo = None
 
         # Okay, figure out how/where we want to run our mapreduce code
         if dbInfo is not None:

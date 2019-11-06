@@ -6,5 +6,5 @@
     "autobuild": false,
     "file": "Gruntfile.js"
   },
-  "dependencies": ["database_assetstore"]
+  "dependencies": []
 }
