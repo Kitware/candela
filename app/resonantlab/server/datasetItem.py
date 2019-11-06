@@ -22,7 +22,7 @@ from girder.api.describe import Description, describeRoute
 from girder.api.rest import Resource, RestException, loadmodel
 from girder.constants import AccessType
 # from girder.plugins.database_assetstore.dbs.mongo import MongoConnector
-from girder_worker.format import get_csv_reader
+# from girder_worker.format import get_csv_reader
 # from girder.plugins.database_assetstore.assetstore import getDbInfoForFile
 
 
@@ -239,21 +239,23 @@ class DatasetItem(Resource):
             if 'dialect' in params:
                 rlab['dialect'] = json.loads(params['dialect'])
             else:
-                # use girder_worker's enhancements of csv.Sniffer()
-                # to infer the dialect
-                sample = functools.partial(self.model('file').download,
-                                           fileObj,
-                                           headers=False,
-                                           endByte=self.sniffSampleSize)()
-                reader = get_csv_reader(sample)
-                dialect = reader.dialect
-                # Check if it's a standard dialect (we have to do this
-                # to get at details like the delimiter if it IS standard...
-                # otherwise, they're directly accessible)
-                try:
-                    dialect = csv.get_dialect(dialect)
-                except Exception:
-                    pass
+                # # use girder_worker's enhancements of csv.Sniffer()
+                # # to infer the dialect
+                # sample = functools.partial(self.model('file').download,
+                                           # fileObj,
+                                           # headers=False,
+                                           # endByte=self.sniffSampleSize)()
+                # reader = get_csv_reader(sample)
+                # dialect = reader.dialect
+                # # Check if it's a standard dialect (we have to do this
+                # # to get at details like the delimiter if it IS standard...
+                # # otherwise, they're directly accessible)
+                # try:
+                    # dialect = csv.get_dialect(dialect)
+                # except Exception:
+                #     pass
+
+                dialect = csv.get_dialect('excel')
 
                 # Okay, now dump all the parameters so that
                 # we can reconstruct the dialect later
