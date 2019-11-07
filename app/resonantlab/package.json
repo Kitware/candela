@@ -1,0 +1,29 @@
+{
+  "name": "resonantlab",
+  "version": "0.0.0",
+  "description": "Choose your own visualization adventure",
+  "scripts": {
+    "postinstall": "git rev-parse HEAD >git-sha",
+    "postcommit": "git rev-parse HEAD >git-sha",
+    "postrewrite": "git rev-parse HEAD >git-sha",
+    "postcheckout": "git rev-parse HEAD >git-sha",
+    "postmerge": "git rev-parse HEAD >git-sha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ronichoudhury-work/resonantlab.git"
+  },
+  "author": "Roni Choudhury",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ronichoudhury-work/resonantlab/issues"
+  },
+  "homepage": "https://github.com/ronichoudhury-work/resonantlab#readme",
+  "devDependencies": {
+    "babel-core": "^6.18.2",
+    "babel-loader": "^6.2.10",
+    "babel-preset-es2015": "^6.18.0",
+    "backbone": "^1.3.3"
+  },
+  "dependencies": {}
+}
