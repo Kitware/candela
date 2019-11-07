@@ -214,7 +214,8 @@ class DatasetItem(Resource):
         fileObj = None
         if 'fileId' in rlab:
             fileObj = self.model('file').load(rlab['fileId'], user=user)
-            if getDbInfoForFile(fileObj) is not None:
+            # if getDbInfoForFile(fileObj) is not None:
+            if False:
                 # All database info is returned internally as CSV.
                 # TODO: this will change soon!
                 rlab['format'] = 'csv'
