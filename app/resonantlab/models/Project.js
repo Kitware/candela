@@ -2,7 +2,7 @@ import MetadataItem from './MetadataItem';
 import Dataset from './Dataset';
 import binUtils from '../general_purpose/binUtils.js';
 import { Set } from '../shims/SetOps.js';
-import candela from 'candela';
+import candela from '../../../src/candela';
 /*
     A Project represents a user's saved session;
     it includes specific dataset IDs, with specific
